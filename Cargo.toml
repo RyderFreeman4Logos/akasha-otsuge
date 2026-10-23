@@ -1,0 +1,17 @@
+[package]
+name = "akasha-otsuge"
+version = "0.1.0-dev"
+edition = "2024"
+rust-version = "1.99"
+license = "Apache-2.0"
+description = "Local, traceable cross-agent memory"
+repository = "https://github.com/RyderFreeman4Logos/akasha-otsuge"
+readme = "README.md"
+publish = false
+
+[workspace]
+members = ["."]
+resolver = "3"
+
+[lints.rust]
+unsafe_code = "forbid"
