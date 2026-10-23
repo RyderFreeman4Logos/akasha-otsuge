@@ -1,0 +1,586 @@
+{
+  "spec_version": "0.1",
+  "repository": "RyderFreeman4Logos/akasha-otsuge",
+  "milestone": 1,
+  "issues": [
+    {
+      "plan_id": "MVP-001",
+      "number": 1,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/1",
+      "title": "[MVP-001] 建立 Rust/Linux 项目骨架与可执行开发门槛",
+      "source_url": "https://app.notion.com/p/40117b41f58c81bbaa68d6f69d5b9c87",
+      "spec_path": "docs/spec/issues/MVP-001.md",
+      "dependencies": [],
+      "requirements": [
+        "REQ-01",
+        "REQ-23",
+        "REQ-24"
+      ]
+    },
+    {
+      "plan_id": "MVP-002",
+      "number": 2,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/2",
+      "title": "[MVP-002] 版本化配置、热重载与 deadline 配置契约",
+      "source_url": "https://app.notion.com/p/40117b41f58c817bacfcd856e125ca16",
+      "spec_path": "docs/spec/issues/MVP-002.md",
+      "dependencies": [
+        "MVP-001"
+      ],
+      "requirements": [
+        "REQ-15",
+        "REQ-16",
+        "REQ-23"
+      ]
+    },
+    {
+      "plan_id": "MVP-003",
+      "number": 3,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/3",
+      "title": "[MVP-003] 非 SQLite 存储 spike 与唯一 backend 决策",
+      "source_url": "https://app.notion.com/p/40117b41f58c8128bd07fb083f9c08d6",
+      "spec_path": "docs/spec/issues/MVP-003.md",
+      "dependencies": [
+        "MVP-001",
+        "MVP-002"
+      ],
+      "requirements": [
+        "REQ-18",
+        "REQ-19",
+        "REQ-20",
+        "REQ-21",
+        "REQ-23"
+      ]
+    },
+    {
+      "plan_id": "MVP-004",
+      "number": 4,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/4",
+      "title": "[MVP-004] 实现唯一正式 Storage、原子提交与恢复基础",
+      "source_url": "https://app.notion.com/p/40117b41f58c81179ecec5ee585aded5",
+      "spec_path": "docs/spec/issues/MVP-004.md",
+      "dependencies": [
+        "MVP-003"
+      ],
+      "requirements": [
+        "REQ-18",
+        "REQ-21"
+      ]
+    },
+    {
+      "plan_id": "MVP-005",
+      "number": 5,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5",
+      "title": "[MVP-005] 定义并执行来源、authority、scope 与 taste 数据语义",
+      "source_url": "https://app.notion.com/p/40117b41f58c81748409c0931a87fe6d",
+      "spec_path": "docs/spec/issues/MVP-005.md",
+      "dependencies": [
+        "MVP-004"
+      ],
+      "requirements": [
+        "REQ-07",
+        "REQ-10"
+      ]
+    },
+    {
+      "plan_id": "MVP-006",
+      "number": 6,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/6",
+      "title": "[MVP-006] 持久历史视图、as-of 查询与实际 recall receipt",
+      "source_url": "https://app.notion.com/p/40117b41f58c8105874ef73600eb9597",
+      "spec_path": "docs/spec/issues/MVP-006.md",
+      "dependencies": [
+        "MVP-004",
+        "MVP-005"
+      ],
+      "requirements": [
+        "REQ-11",
+        "REQ-21"
+      ]
+    },
+    {
+      "plan_id": "MVP-007",
+      "number": 7,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/7",
+      "title": "[MVP-007] 采集归一化、原文归档及分支/压缩恢复协议",
+      "source_url": "https://app.notion.com/p/40117b41f58c81a28826d2c11690c3a5",
+      "spec_path": "docs/spec/issues/MVP-007.md",
+      "dependencies": [
+        "MVP-004",
+        "MVP-006"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-05",
+        "REQ-11",
+        "REQ-21"
+      ]
+    },
+    {
+      "plan_id": "MVP-008",
+      "number": 8,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8",
+      "title": "[MVP-008] CLI、私有 IPC daemon 与持久后台作业",
+      "source_url": "https://app.notion.com/p/40117b41f58c8157a763eefdec11b284",
+      "spec_path": "docs/spec/issues/MVP-008.md",
+      "dependencies": [
+        "MVP-002",
+        "MVP-004",
+        "MVP-007"
+      ],
+      "requirements": [
+        "REQ-17",
+        "REQ-19",
+        "REQ-21"
+      ]
+    },
+    {
+      "plan_id": "MVP-009",
+      "number": 9,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9",
+      "title": "[MVP-009] 可配置本地模型客户端与 1700 秒全链长测",
+      "source_url": "https://app.notion.com/p/40117b41f58c81368a6cd8ba848f11cf",
+      "spec_path": "docs/spec/issues/MVP-009.md",
+      "dependencies": [
+        "MVP-002",
+        "MVP-008"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-15",
+        "REQ-16"
+      ]
+    },
+    {
+      "plan_id": "MVP-010",
+      "number": 10,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10",
+      "title": "[MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取",
+      "source_url": "https://app.notion.com/p/40117b41f58c81c8b834e7443112dc86",
+      "spec_path": "docs/spec/issues/MVP-010.md",
+      "dependencies": [
+        "MVP-005",
+        "MVP-006",
+        "MVP-009"
+      ],
+      "requirements": [
+        "REQ-02",
+        "REQ-08",
+        "REQ-11",
+        "REQ-18",
+        "REQ-20",
+        "REQ-23"
+      ]
+    },
+    {
+      "plan_id": "MVP-011",
+      "number": 11,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11",
+      "title": "[MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约",
+      "source_url": "https://app.notion.com/p/40117b41f58c81ef9424ecc0d3aaa26b",
+      "spec_path": "docs/spec/issues/MVP-011.md",
+      "dependencies": [
+        "MVP-007",
+        "MVP-008",
+        "MVP-010"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-04",
+        "REQ-06",
+        "REQ-17",
+        "REQ-23"
+      ]
+    },
+    {
+      "plan_id": "MVP-012",
+      "number": 12,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12",
+      "title": "[MVP-012] Claude Code CallerAdapter 与 AgentRunner 实接",
+      "source_url": "https://app.notion.com/p/40117b41f58c81b18b05e9ffdf1df215",
+      "spec_path": "docs/spec/issues/MVP-012.md",
+      "dependencies": [
+        "MVP-011"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-04",
+        "REQ-05",
+        "REQ-17"
+      ]
+    },
+    {
+      "plan_id": "MVP-013",
+      "number": 13,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/13",
+      "title": "[MVP-013] Codex CallerAdapter 与 AgentRunner 实接",
+      "source_url": "https://app.notion.com/p/40117b41f58c81e3bb61e1ef7e83b167",
+      "spec_path": "docs/spec/issues/MVP-013.md",
+      "dependencies": [
+        "MVP-011"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-04",
+        "REQ-05",
+        "REQ-17"
+      ]
+    },
+    {
+      "plan_id": "MVP-014",
+      "number": 14,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/14",
+      "title": "[MVP-014] Hermes CallerAdapter 与 AgentRunner 实接",
+      "source_url": "https://app.notion.com/p/40117b41f58c81408089ef038fbba9d1",
+      "spec_path": "docs/spec/issues/MVP-014.md",
+      "dependencies": [
+        "MVP-011"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-04",
+        "REQ-05",
+        "REQ-17"
+      ]
+    },
+    {
+      "plan_id": "MVP-015",
+      "number": 15,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/15",
+      "title": "[MVP-015] pi CallerAdapter 与 AgentRunner 实接",
+      "source_url": "https://app.notion.com/p/40117b41f58c81879ad8dc7f94261dd2",
+      "spec_path": "docs/spec/issues/MVP-015.md",
+      "dependencies": [
+        "MVP-011"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-04",
+        "REQ-05",
+        "REQ-17"
+      ]
+    },
+    {
+      "plan_id": "MVP-016",
+      "number": 16,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/16",
+      "title": "[MVP-016] consult 可选短 hint、渐进调研与子孙共享预算",
+      "source_url": "https://app.notion.com/p/40117b41f58c81099aafdaf53333a242",
+      "spec_path": "docs/spec/issues/MVP-016.md",
+      "dependencies": [
+        "MVP-012",
+        "MVP-013",
+        "MVP-014",
+        "MVP-015"
+      ],
+      "requirements": [
+        "REQ-02",
+        "REQ-03",
+        "REQ-04",
+        "REQ-06",
+        "REQ-11",
+        "REQ-16"
+      ]
+    },
+    {
+      "plan_id": "MVP-017",
+      "number": 17,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/17",
+      "title": "[MVP-017] 异步提取候选、来源引用与可重建索引作业",
+      "source_url": "https://app.notion.com/p/40117b41f58c812387a6c71af2632220",
+      "spec_path": "docs/spec/issues/MVP-017.md",
+      "dependencies": [
+        "MVP-005",
+        "MVP-007",
+        "MVP-009",
+        "MVP-010",
+        "MVP-016"
+      ],
+      "requirements": [
+        "REQ-05",
+        "REQ-07",
+        "REQ-08",
+        "REQ-20",
+        "REQ-21"
+      ]
+    },
+    {
+      "plan_id": "MVP-018",
+      "number": 18,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/18",
+      "title": "[MVP-018] 单一或组合 Runner 的 Auto-Grill 工作流",
+      "source_url": "https://app.notion.com/p/40117b41f58c81fd96b7fa87cde94c0d",
+      "spec_path": "docs/spec/issues/MVP-018.md",
+      "dependencies": [
+        "MVP-016",
+        "MVP-017"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-06",
+        "REQ-07",
+        "REQ-09",
+        "REQ-10"
+      ]
+    },
+    {
+      "plan_id": "MVP-019",
+      "number": 19,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19",
+      "title": "[MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则",
+      "source_url": "https://app.notion.com/p/40117b41f58c81009467f0058a1089c5",
+      "spec_path": "docs/spec/issues/MVP-019.md",
+      "dependencies": [
+        "MVP-005",
+        "MVP-006",
+        "MVP-018"
+      ],
+      "requirements": [
+        "REQ-07",
+        "REQ-09",
+        "REQ-10",
+        "REQ-11",
+        "REQ-15"
+      ]
+    },
+    {
+      "plan_id": "MVP-020",
+      "number": 20,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/20",
+      "title": "[MVP-020] 外部 Memory Editor、范围受限 patch 与并发修订",
+      "source_url": "https://app.notion.com/p/40117b41f58c814c9068f196da55a445",
+      "spec_path": "docs/spec/issues/MVP-020.md",
+      "dependencies": [
+        "MVP-016",
+        "MVP-019"
+      ],
+      "requirements": [
+        "REQ-06",
+        "REQ-07",
+        "REQ-10",
+        "REQ-11",
+        "REQ-12",
+        "REQ-20"
+      ]
+    },
+    {
+      "plan_id": "MVP-021",
+      "number": 21,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21",
+      "title": "[MVP-021] Run、Git/工作区、build/test 与 incident 证据关联",
+      "source_url": "https://app.notion.com/p/40117b41f58c813d9ec2c274b2518a42",
+      "spec_path": "docs/spec/issues/MVP-021.md",
+      "dependencies": [
+        "MVP-006",
+        "MVP-011",
+        "MVP-016"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-11",
+        "REQ-13",
+        "REQ-23"
+      ]
+    },
+    {
+      "plan_id": "MVP-022",
+      "number": 22,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22",
+      "title": "[MVP-022] 执行失败触发调查、自动修订或高优 review",
+      "source_url": "https://app.notion.com/p/40117b41f58c811b9858fa3521b0e3c7",
+      "spec_path": "docs/spec/issues/MVP-022.md",
+      "dependencies": [
+        "MVP-020",
+        "MVP-021"
+      ],
+      "requirements": [
+        "REQ-10",
+        "REQ-12",
+        "REQ-13",
+        "REQ-15",
+        "REQ-23"
+      ]
+    },
+    {
+      "plan_id": "MVP-023",
+      "number": 23,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/23",
+      "title": "[MVP-023] Notifier 插件、可用本地/stdio 实现与持久投递",
+      "source_url": "https://app.notion.com/p/40117b41f58c8138854cd923907ab3b7",
+      "spec_path": "docs/spec/issues/MVP-023.md",
+      "dependencies": [
+        "MVP-008",
+        "MVP-019",
+        "MVP-022"
+      ],
+      "requirements": [
+        "REQ-10",
+        "REQ-14",
+        "REQ-15",
+        "REQ-21"
+      ]
+    },
+    {
+      "plan_id": "MVP-024",
+      "number": 24,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/24",
+      "title": "[MVP-024] 50 GB、100 客户端、内存预算与故障恢复压力验收",
+      "source_url": "https://app.notion.com/p/40117b41f58c813ea375fb1009199a8e",
+      "spec_path": "docs/spec/issues/MVP-024.md",
+      "dependencies": [
+        "MVP-004",
+        "MVP-008",
+        "MVP-010",
+        "MVP-016",
+        "MVP-017",
+        "MVP-020",
+        "MVP-023"
+      ],
+      "requirements": [
+        "REQ-16",
+        "REQ-18",
+        "REQ-19",
+        "REQ-20",
+        "REQ-21",
+        "REQ-23"
+      ]
+    },
+    {
+      "plan_id": "MVP-025",
+      "number": 25,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/25",
+      "title": "[MVP-025] mempal 只读迁移、中立导出与往返验证",
+      "source_url": "https://app.notion.com/p/40117b41f58c816982e4d3eb17966d60",
+      "spec_path": "docs/spec/issues/MVP-025.md",
+      "dependencies": [
+        "MVP-004",
+        "MVP-005",
+        "MVP-006",
+        "MVP-007",
+        "MVP-019"
+      ],
+      "requirements": [
+        "REQ-07",
+        "REQ-11",
+        "REQ-21",
+        "REQ-22"
+      ]
+    },
+    {
+      "plan_id": "MVP-026",
+      "number": 26,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26",
+      "title": "[MVP-026] Linux 安装、升级、卸载与四宿主使用文档",
+      "source_url": "https://app.notion.com/p/40117b41f58c8108ac9ff217b3fc11cc",
+      "spec_path": "docs/spec/issues/MVP-026.md",
+      "dependencies": [
+        "MVP-012",
+        "MVP-013",
+        "MVP-014",
+        "MVP-015",
+        "MVP-023",
+        "MVP-024",
+        "MVP-025"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-04",
+        "REQ-15",
+        "REQ-16",
+        "REQ-17",
+        "REQ-22",
+        "REQ-24"
+      ]
+    },
+    {
+      "plan_id": "MVP-027",
+      "number": 27,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27",
+      "title": "[MVP-027] 质量评测、主上下文开销与组合回归",
+      "source_url": "https://app.notion.com/p/40117b41f58c819c90ebce9f0126ec58",
+      "spec_path": "docs/spec/issues/MVP-027.md",
+      "dependencies": [
+        "MVP-016",
+        "MVP-018",
+        "MVP-019",
+        "MVP-020",
+        "MVP-022",
+        "MVP-024",
+        "MVP-026"
+      ],
+      "requirements": [
+        "REQ-02",
+        "REQ-04",
+        "REQ-06",
+        "REQ-07",
+        "REQ-11",
+        "REQ-16",
+        "REQ-20",
+        "REQ-23"
+      ]
+    },
+    {
+      "plan_id": "MVP-028",
+      "number": 28,
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/28",
+      "title": "[MVP-028] 需求逐项终验、发布和完成证据归档",
+      "source_url": "https://app.notion.com/p/40117b41f58c81b2beebc622c808538c",
+      "spec_path": "docs/spec/issues/MVP-028.md",
+      "dependencies": [
+        "MVP-001",
+        "MVP-002",
+        "MVP-003",
+        "MVP-004",
+        "MVP-005",
+        "MVP-006",
+        "MVP-007",
+        "MVP-008",
+        "MVP-009",
+        "MVP-010",
+        "MVP-011",
+        "MVP-012",
+        "MVP-013",
+        "MVP-014",
+        "MVP-015",
+        "MVP-016",
+        "MVP-017",
+        "MVP-018",
+        "MVP-019",
+        "MVP-020",
+        "MVP-021",
+        "MVP-022",
+        "MVP-023",
+        "MVP-024",
+        "MVP-025",
+        "MVP-026",
+        "MVP-027"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-02",
+        "REQ-03",
+        "REQ-04",
+        "REQ-05",
+        "REQ-06",
+        "REQ-07",
+        "REQ-08",
+        "REQ-09",
+        "REQ-10",
+        "REQ-11",
+        "REQ-12",
+        "REQ-13",
+        "REQ-14",
+        "REQ-15",
+        "REQ-16",
+        "REQ-17",
+        "REQ-18",
+        "REQ-19",
+        "REQ-20",
+        "REQ-21",
+        "REQ-22",
+        "REQ-23",
+        "REQ-24"
+      ]
+    }
+  ]
+}
