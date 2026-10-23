@@ -459,13 +459,7 @@ fn corpus_admission(
         if config.generation.is_none() {
             return Err("full workload requires a pinned active generation".into());
         }
-        let reserve = 30 * 1024u64.pow(3)
-            + 4_000_000_000
-            + if config.generation == Some(1) {
-                45_000_000_000
-            } else {
-                0
-            };
+        let reserve = 30 * 1024u64.pow(3) + 4_000_000_000 + 45_000_000_000;
         let path = config
             .corpus_manifest
             .as_ref()
@@ -710,6 +704,50 @@ async fn run_open(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn every_full_generation_reserves_rebuild_space() {
+        let path = std::env::temp_dir().join(format!(
+            "akasha-reserve-{}-{}.json",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let bytes = serde_json::to_vec(&json!({"status":"full_corpus_prepared",
+            "corpus":{"unique_content_utf8_bytes":50_000_000_000u64,"unique_vectors":1_000_000}}))
+        .unwrap();
+        std::fs::write(&path, &bytes).unwrap();
+        let fixture: search::Fixture = serde_json::from_value(json!({
+            "source_sha256":"0".repeat(64), "model":"text-embedding-3-large", "dimension":1536,
+            "corpus_manifest_sha256":hash(&bytes),
+            "vector_file":{"name":"vectors.f32","bytes":1024*1536*4,"sha256":"0".repeat(64)},
+            "queries":(0..1536).map(|i|json!({"key":i.to_string(),"partition":format!("p{}",i%8),
+                "term":"source", "text_only":i>=1024})).collect::<Vec<_>>()
+        }))
+        .unwrap();
+        let mut config = Config {
+            run_id: "reserve".into(),
+            phase: "steady".into(),
+            seconds: 1800,
+            fixture: PathBuf::new(),
+            output: PathBuf::new(),
+            corpus_manifest: Some(path.clone()),
+            diagnostic: false,
+            generation: Some(1),
+        };
+        let first = corpus_admission(&config, &fixture);
+        config.generation = Some(2);
+        let next = corpus_admission(&config, &fixture);
+        std::fs::remove_file(path).unwrap();
+        for result in [first, next] {
+            assert_eq!(
+                result.unwrap().unwrap().1,
+                30 * 1024u64.pow(3) + 49_000_000_000
+            );
+        }
+    }
 
     #[test]
     fn full_window_has_all_clients_and_the_frozen_offered_load() {

@@ -6,6 +6,8 @@ profile = "low"
 phase = "steady"
 seconds = 1800
 diagnostic = false
+generation = 2
+cold_cache = true
 
 [paths]
 binary = "/absolute/path/to/akasha-helix-probe"
@@ -17,3 +19,7 @@ output = "/absolute/path/to/new-case-output"
 [reliability]
 # There are no network calls in a measured case. Never replay ambiguous effects.
 max_attempts = 1
+
+[disk]
+start_bytes = 81212254720
+reserve_bytes = 81212254720

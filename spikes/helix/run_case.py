@@ -179,8 +179,16 @@ def summarize(directory, profile, binary_sha256):
     status = "passed" if exits[0]["code"] == 0 and result["status"] == "passed" and memory_ok else "failed"
     paths = ["request.json", "memory.jsonl", "engine.log"]
     paths += [name for name in ["runtime/result.json", "runtime/requests.jsonl", "runtime/metrics.jsonl", "runtime/admission.json", "runtime/baseline.json", "runtime/derived-oracle.json"] if (directory / name).exists()]
+    cold = None
+    if json.loads((directory / 'state.json').read_text())['identity']['config']['run'].get('cold_cache'):
+        cold = json.loads((directory / 'cold-cache.json').read_text())
+        if cold['status'] != 'passed' or cold['files'] < 1 or cold['resident_pages_after'] != 0:
+            raise ValueError('cold-cache preparation did not verify zero resident file pages')
+        paths += ['cold-cache.json', 'cold-cache-progress.json']
+        cold = {key: value for key, value in cold.items() if key != 'rows'}
     return {"status": status, "effects": "measured" if runtime.exists() else "unknown", "content_oracle": oracle, "engine": result, "exit": exits[0], "rss_p99_bytes": p99,
             "rss_max_bytes": maximum, "memory_thresholds_passed": memory_ok,
+            "cold_cache": cold,
             "artifact_sha256": {name: digest(directory / name) for name in paths}}
 
 
@@ -196,7 +204,7 @@ def main():
     if set(config) - {"disk"} != {"run", "paths", "reliability"} or config["reliability"] != {"max_attempts": 1}:
         raise ValueError("case has no network retries; exactly one measured attempt is required")
     run, paths = config["run"], config["paths"]
-    if set(run) - {"generation"} != {"id", "profile", "phase", "seconds", "diagnostic"} or set(paths) != {"binary", "database", "fixture", "output", "corpus_manifest"}:
+    if set(run) - {"generation", "cold_cache"} != {"id", "profile", "phase", "seconds", "diagnostic"} or set(paths) != {"binary", "database", "fixture", "output", "corpus_manifest"}:
         raise ValueError("unknown or missing case setting")
     if run["profile"] not in {"low", "high"} or run["phase"] not in {"steady", "burst", "overload"}:
         raise ValueError("unknown profile or phase")
@@ -204,10 +212,12 @@ def main():
         raise ValueError("invalid duration")
     if not isinstance(run["diagnostic"], bool):
         raise ValueError("diagnostic must be a boolean")
+    if type(run.get('cold_cache', False)) is not bool:
+        raise ValueError('cold_cache must be a boolean')
     if "generation" in run and (type(run["generation"]) is not int or run["generation"] not in {1, 2}):
         raise ValueError("generation must be an explicit retained identity")
     disk = config.get("disk")
-    minimum = 30 * 1024**3 + 4_000_000_000 + (45_000_000_000 if not run["diagnostic"] and run.get("generation") == 1 else 0)
+    minimum = 30 * 1024**3 + 4_000_000_000 + (45_000_000_000 if not run["diagnostic"] and run.get("generation") is not None else 0)
     if (not run["diagnostic"] and disk is None) or (disk is not None and (
             set(disk) != {"start_bytes", "reserve_bytes"} or any(type(v) is not int for v in disk.values())
             or not disk["start_bytes"] >= disk["reserve_bytes"] >= minimum)):
@@ -250,6 +260,8 @@ def main():
                 "fixture_vector_sha256": vector_sha256,
                 "manifest_sha256": digest(manifest) if manifest else None, "database": str(root),
                 "controller_sha256": digest(__file__), "observer_sha256": digest(observer)}
+    if run.get('cold_cache'):
+        identity['cold_cache_sha256'] = digest(observer.with_name('cold_cache.py'))
     state_path = directory / "state.json"
     if directory.exists():
         if not args.resume and not args.abandon:
@@ -297,6 +309,10 @@ def main():
         if "generation" in run:
             request["generation"] = run["generation"]
         publish(directory / "request.json", request)
+        if run.get('cold_cache'):
+            sys.path.insert(0, str(observer.parent))
+            from cold_cache import prepare
+            prepare(root, directory, owner_lock)
         limit = (640 if run["profile"] == "low" else 2048) * 1024**2
         command = ["systemd-run", "--user", "--wait", "--pipe", "--collect", "--unit=" + state["unit"],
                    "-p", f"MemoryMax={limit}", "-p", "MemorySwapMax=0", "-p", f"RuntimeMaxSec={run['seconds'] + 900}",
