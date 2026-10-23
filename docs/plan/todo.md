@@ -173,8 +173,11 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       corpus index measurements remain pending. The compressed full import now
       completes at 37,799,542,784 allocated database bytes. Its initial low reopen
       fails at systemd's soft 1024 file limit against 2,202 VLogs; verification with
-      an explicit service-local 8192 limit is running, under the original memory
-      limits and observation deadline. Full low acceptance is not yet claimed.
+      an explicit service-local 8192 limit now passes every original byte and
+      source/scope mapping for all 11,428,831 documents in 3,570.278s. Sampled
+      RSS maximum is 133,865,472B, with no OOM; memory.high throttling is retained.
+      Original memory/swap limits and the observation deadline are unchanged.
+      This proves full low reopen/verification, not the mixed workload or indexes.
       The controller/deadline extension passes 47 native commands. Real-shard
       backfill succeeds; default Lance shuffle/window buffering OOMs on index
       merge. Existing 16MiB shuffle and no-offset-preload controls then complete
@@ -190,8 +193,10 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       failing/passing regression. The fallback now shares the unchanged frozen
       history model with Helix. Ten owned-runner cases pass 2,048 changes/replay
       and 5,163 historical checks; a fourth native unit rejects work after the
-      original persisted deadline. A separate 100k run on real-shard storage is
-      ongoing. Full-corpus history, concurrent workloads and actual outbox
+      original persisted deadline. On real-shard storage, all 100,000 changes
+      (311.838s) and 5,163 historical checks (4.007s) now pass; sampled RSS maxima
+      are 183,025,664B and 81,698,816B, no OOM. A separate full-corpus history and
+      backfill pipeline is running. Concurrent workloads and actual outbox
       application/activation remain required.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.

@@ -145,8 +145,24 @@ uncompressed VLog layout). Low reopen verifies original bytes and mappings in
 These short samples do not establish sustained P99 or full-size memory behavior.
 No new resolved package was added; only the probe gained a direct Zstd edge.
 
-Remaining: verify the completed full import at the low resource profile,
-complete full-size indexes, authority/outbox and derived generation
+The [full import/reopen and history receipts](../../docs/benchmarks/results/fallback-full-import-history/summary.json)
+verify all 11,428,831 original records and source/scope mappings at the low profile
+in 3,570.278s. The original full import uses 37,799,542,784 allocated database bytes;
+after low verification/close it uses 37,805,289,472B. Across 3,565 samples, RSS max
+is 133,865,472B and nearest-rank P99 is 133,861,376B, with no OOM and a maximum
+1.022s sample gap. Native page-cache pressure causes memory.high throttling;
+this single sequential verification is not mixed-workload memory acceptance.
+The retained first low open fails at the service's default soft1024 file limit
+for 2,202 eagerly opened VLogs. The second uses explicit service-local8192 and
+the unchanged original deadline/memory/swap limits. Its older observer did not
+record the effective nofile limits; the admitted command is retained.
+
+On the 38,462-record real shard, the same frozen history model also passes
+100,000 changes in 311.838s and 5,163 reopened checks in 4.007s. Sampled native
+RSS maxima are 183,025,664B and 81,698,816B, without OOM. Full-corpus history and
+backfill now run separately; none of these receipts proves full native indexes.
+
+Remaining: complete full-size indexes, authority/outbox and derived generation
 reconciliation, then the unchanged workload and recovery matrix. The original
 84GB expanded stream is never materialized. Existing Helix diagnostic passes do
 not transfer to this implementation.
