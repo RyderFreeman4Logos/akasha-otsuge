@@ -1,5 +1,12 @@
 //! Generation and outbox contract probe; corpus backfill is a separate acceptance step.
-use std::{io::Read, num::NonZeroUsize, path::Path};
+use std::{
+    io::Read,
+    num::NonZeroUsize,
+    path::{Path, PathBuf},
+};
+
+mod corpus;
+use corpus::Coverage;
 
 use helix_db::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -85,6 +92,16 @@ enum Request {
         generation: u64,
         bundle: Bundle,
     },
+    BeginCorpus {
+        generation: u64,
+        bundle: Bundle,
+        manifest: PathBuf,
+    },
+    Backfill {
+        generation: u64,
+        waves: u64,
+        hold: Option<String>,
+    },
     Build {
         generation: u64,
         #[serde(default)]
@@ -138,6 +155,7 @@ struct Generation {
     ready: bool,
     text: u64,
     vector: u64,
+    base: Option<Coverage>,
 }
 
 fn hash(bytes: impl AsRef<[u8]>) -> String {
@@ -152,7 +170,7 @@ fn number(value: &Value) -> Result<u64, Error> {
         .ok_or_else(|| "invalid generation integer".into())
 }
 
-pub async fn run(authority: &Authority, path: &Path) -> Result<Value, Error> {
+pub async fn run(authority: &Authority, path: &Path, root: &Path) -> Result<Value, Error> {
     let mut bytes = Vec::new();
     std::fs::File::open(path)?
         .take(1024 * 1024 + 1)
@@ -164,6 +182,16 @@ pub async fn run(authority: &Authority, path: &Path) -> Result<Value, Error> {
     initialize(authority).await?;
     match request {
         Request::Begin { generation, bundle } => begin(authority, generation, bundle).await,
+        Request::BeginCorpus {
+            generation,
+            bundle,
+            manifest,
+        } => corpus::begin(authority, generation, bundle, &manifest, root).await,
+        Request::Backfill {
+            generation,
+            waves,
+            hold,
+        } => corpus::backfill(authority, generation, waves, hold.as_deref(), root).await,
         Request::Build {
             generation,
             fail_after_text,
@@ -258,7 +286,7 @@ async fn generation(a: &Authority, id: u64) -> Result<Generation, Error> {
     if !(1..=2).contains(&id) {
         return Err("generation outside lifetime bound".into());
     }
-    let rows=a.engine.cypher("MATCH (g:Generation {key:$id}) RETURN g.bundle,g.fingerprint,g.status,g.ready,g.text,g.vector",params(json!({"id":id})),None).await?.rows;
+    let rows=a.engine.cypher("MATCH (g:Generation {key:$id}) RETURN g.bundle,g.fingerprint,g.status,g.ready,g.text,g.vector,g.base",params(json!({"id":id})),None).await?.rows;
     let [row] = rows.as_slice() else {
         return Err("unknown or duplicate generation".into());
     };
@@ -276,6 +304,11 @@ async fn generation(a: &Authority, id: u64) -> Result<Generation, Error> {
         ready: row[3].as_bool().ok_or("invalid generation readiness")?,
         text: number(&row[4])?,
         vector: number(&row[5])?,
+        base: match &row[6] {
+            Value::Null => None,
+            Value::String(value) => Some(serde_json::from_str(value)?),
+            _ => return Err("invalid corpus coverage".into()),
+        },
     };
     if !matches!(
         record.status.as_str(),
@@ -284,6 +317,12 @@ async fn generation(a: &Authority, id: u64) -> Result<Generation, Error> {
         || (matches!(record.status.as_str(), "active" | "retired") && !record.ready)
     {
         return Err("generation readiness/status integrity mismatch".into());
+    }
+    if let Some(base) = &record.base {
+        base.validate(&record.bundle)?;
+        if record.ready && !base.complete {
+            return Err("ready generation has incomplete corpus coverage".into());
+        }
     }
     Ok(record)
 }
@@ -306,6 +345,16 @@ async fn begin(a: &Authority, id: u64, bundle: Bundle) -> Result<Value, Error> {
             "generation diagnostic excludes imported corpus; full backfill is required".into(),
         );
     }
+    begin_record(a, id, bundle, None).await
+}
+
+// Caller holds the shared authority writer.
+async fn begin_record(
+    a: &Authority,
+    id: u64,
+    bundle: Bundle,
+    base: Option<Coverage>,
+) -> Result<Value, Error> {
     let rows = a
         .engine
         .cypher(
@@ -317,7 +366,12 @@ async fn begin(a: &Authority, id: u64, bundle: Bundle) -> Result<Value, Error> {
         .rows;
     if rows.iter().any(|row| row[0] == id) {
         let prior = generation(a, id).await?;
-        if prior.bundle != bundle {
+        let same_source = match (&prior.base, &base) {
+            (None, None) => true,
+            (Some(a), Some(b)) => a.same_source(b),
+            _ => false,
+        };
+        if prior.bundle != bundle || !same_source {
             return Err("generation identity reuse".into());
         }
         return Ok(serde_json::to_value(prior)?);
@@ -328,7 +382,7 @@ async fn begin(a: &Authority, id: u64, bundle: Bundle) -> Result<Value, Error> {
     }
     let encoded = serde_json::to_string(&bundle)?;
     let fingerprint = hash(encoded.as_bytes());
-    a.engine.cypher("CREATE (:Generation {key:$id,bundle:$bundle,fingerprint:$fingerprint,status:'building',ready:false,text:0,vector:0})",params(json!({"id":id,"bundle":encoded,"fingerprint":fingerprint})),None).await?;
+    a.engine.cypher("CREATE (:Generation {key:$id,bundle:$bundle,fingerprint:$fingerprint,status:'building',ready:false,text:0,vector:0,base:$base})",params(json!({"id":id,"bundle":encoded,"fingerprint":fingerprint,"base":base.as_ref().map(serde_json::to_string).transpose()?})),None).await?;
     Ok(serde_json::to_value(generation(a, id).await?)?)
 }
 
@@ -343,6 +397,9 @@ async fn build(
         let g = generation(a, id).await?;
         if !matches!(g.status.as_str(), "building" | "failed") {
             return Err("cannot rebuild active or retained generation".into());
+        }
+        if g.base.as_ref().is_some_and(|base| !base.complete) {
+            return Err("corpus backfill is incomplete".into());
         }
         a.engine
             .cypher(
@@ -681,7 +738,7 @@ async fn receipt(a: &Authority, id: u64, request: &str) -> Result<Value, Error> 
         }
     }
     Ok(
-        json!({"stage":if reasons.len()==2 && g.ready {"indexed"} else {"committed"},"commit_seq":seq,"generation":id,"bundle":g.bundle,"reasons":reasons,"watermarks":{"text":g.text,"vector":g.vector},"coverage":"authority_revision_diagnostic_only","visibility":"strong_with_bounded_pending_overlay"}),
+        json!({"stage":if reasons.len()==2 && g.ready {"indexed"} else {"committed"},"commit_seq":seq,"generation":id,"bundle":g.bundle,"reasons":reasons,"watermarks":{"text":g.text,"vector":g.vector},"corpus":g.base,"visibility":"strong_with_bounded_pending_overlay"}),
     )
 }
 
@@ -775,7 +832,7 @@ async fn status(a: &Authority) -> Result<Value, Error> {
         return Err("active pointer/bundle integrity mismatch".into());
     }
     Ok(
-        json!({"active":pointer[0],"generations":generations,"retention":"two builds lifetime bound; no native text blob GC","coverage":"authority_revision_diagnostic_only"}),
+        json!({"active":pointer[0],"generations":generations,"retention":"two builds lifetime bound; no native text blob GC"}),
     )
 }
 

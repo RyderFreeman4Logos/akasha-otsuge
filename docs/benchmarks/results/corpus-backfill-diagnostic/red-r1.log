@@ -1,0 +1,41 @@
+Running as unit: akasha-backfill-red-20261023T1141.service
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_backfill.py", line 147, in <module>
+    main()
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_backfill.py", line 89, in main
+    first = invoke(begin)
+            ^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_backfill.py", line 80, in invoke
+    assert child.returncode == -9 if kill else (child.returncode != 0) == failure, stderr.decode(errors='replace')
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"1","kind":"accepted","operation_id":"d9bcccdd-d7d2-4397-a9e3-1d768f8303a4"}}
+INDEX_PROGRESS:{"operation":{"attempt":1,"family":"secondary","generation":"1","index_id":"1","operation_id":"d9bcccdd-d7d2-4397-a9e3-1d768f8303a4","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"running"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"1","operation_id":"d9bcccdd-d7d2-4397-a9e3-1d768f8303a4","operation_kind":"build","progress":{"entities":"26","input_bytes":"58138","output_bytes":"702","output_operations":"26"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"2","kind":"accepted","operation_id":"82d49f65-8605-4c81-9185-3431949ad2a3"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"2","operation_id":"82d49f65-8605-4c81-9185-3431949ad2a3","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"2","operation_id":"82d49f65-8605-4c81-9185-3431949ad2a3","operation_kind":"build","progress":{"entities":"26","input_bytes":"58138","output_bytes":"702","output_operations":"26"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"3","kind":"accepted","operation_id":"042a95d6-50e8-4c25-ba7d-c9eaa9b8815a"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"3","operation_id":"042a95d6-50e8-4c25-ba7d-c9eaa9b8815a","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"3","operation_id":"042a95d6-50e8-4c25-ba7d-c9eaa9b8815a","operation_kind":"build","progress":{"entities":"26","input_bytes":"58138","output_bytes":"702","output_operations":"26"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"4","kind":"accepted","operation_id":"fa83e493-3f4a-4ec6-8d45-b44693e7949e"}}
+INDEX_PROGRESS:{"operation":{"attempt":1,"family":"secondary","generation":"1","index_id":"4","operation_id":"fa83e493-3f4a-4ec6-8d45-b44693e7949e","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"running"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"4","operation_id":"fa83e493-3f4a-4ec6-8d45-b44693e7949e","operation_kind":"build","progress":{"entities":"26","input_bytes":"58138","output_bytes":"702","output_operations":"26"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"5","kind":"accepted","operation_id":"9d7a7589-3524-421f-b9c5-b8693b8c7e8f"}}
+INDEX_PROGRESS:{"operation":{"attempt":1,"family":"secondary","generation":"1","index_id":"5","operation_id":"9d7a7589-3524-421f-b9c5-b8693b8c7e8f","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"running"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"5","operation_id":"9d7a7589-3524-421f-b9c5-b8693b8c7e8f","operation_kind":"build","progress":{"entities":"26","input_bytes":"58138","output_bytes":"702","output_operations":"26"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"6","kind":"accepted","operation_id":"a3b01b3b-b970-4b4f-80a8-771936fae98f"}}
+INDEX_PROGRESS:{"operation":{"attempt":1,"family":"secondary","generation":"1","index_id":"6","operation_id":"a3b01b3b-b970-4b4f-80a8-771936fae98f","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"running"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"6","operation_id":"a3b01b3b-b970-4b4f-80a8-771936fae98f","operation_kind":"build","progress":{"entities":"26","input_bytes":"58138","output_bytes":"702","output_operations":"26"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"7","kind":"accepted","operation_id":"9e37e221-1356-4a6c-9eeb-f9e20212ba61"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"7","operation_id":"9e37e221-1356-4a6c-9eeb-f9e20212ba61","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"7","operation_id":"9e37e221-1356-4a6c-9eeb-f9e20212ba61","operation_kind":"build","progress":{"entities":"26","input_bytes":"58138","output_bytes":"702","output_operations":"26"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"8","kind":"accepted","operation_id":"ec39df3e-6df0-4274-99e6-9d7d3e1575b3"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"8","operation_id":"ec39df3e-6df0-4274-99e6-9d7d3e1575b3","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"8","operation_id":"ec39df3e-6df0-4274-99e6-9d7d3e1575b3","operation_kind":"build","progress":{"entities":"26","input_bytes":"58138","output_bytes":"702","output_operations":"26"},"stage":"activate","status":"succeeded"}}
+Error: Error("unknown variant `begin_corpus`, expected one of `begin`, `build`, `commit`, `grant`, `apply`, `advance`, `activate`, `receipt`, `query`, `status`", line: 1, column: 21)
+
+Finished with result: exit-code
+Main processes terminated with: code=exited/status=1
+Service runtime: 1.182s
+CPU time consumed: 243ms

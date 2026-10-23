@@ -98,7 +98,7 @@ pub async fn create(client: &Engine, spec: IndexSpec) -> Result<Value, Error> {
     create_measured(client, spec, 7200, None).await
 }
 
-async fn create_measured(
+pub(crate) async fn create_measured(
     client: &Engine,
     spec: IndexSpec,
     seconds: u64,

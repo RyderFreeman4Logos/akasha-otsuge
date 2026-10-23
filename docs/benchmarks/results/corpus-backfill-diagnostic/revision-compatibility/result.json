@@ -1,0 +1,3000 @@
+{
+  "artifact_sha256": {
+    "000-begin.json": "e846c54aa0e3bfef3f378cc41f7faed73f931ac1512c87f63da825321bc065bc",
+    "000-begin.log": "d04765a7400608d24d3f333aecaf13712e5e40d3bb25e01d01e79d89a9b89644",
+    "000-begin.stderr": "e40844c9fc25c151581623f61ce9132c9b282e806666561b9a35e55203939470",
+    "001-grant.json": "7a856eba5b9b51a84893923140afaa48ee292aea9c69b5fe71e50a699fe20a75",
+    "001-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "001-grant.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "002-grant.json": "675c5eeb2b1e820aa2ca4870625f05cf3cf81aed0ccb30ca8be25f6561a827bd",
+    "002-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "002-grant.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "003-grant.json": "91d665c1f36cd7bc69002f3858c37c4e82161bf7b49f56add7c73c2266c9ff86",
+    "003-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "003-grant.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "004-grant.json": "af44c70f78564297243baa2827d44bd37b47da663fae6128cabfe58959850679",
+    "004-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "004-grant.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "005-grant.json": "65fdd4999dc29fbe31955e4b94649b2d0ff8c1ffb4270e2e359997a04481863b",
+    "005-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "005-grant.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "006-grant.json": "c0e90ccecc506f5c42fe45d2cc38ff37f742232c8b9e87334b0eed982cb6fc51",
+    "006-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "006-grant.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "007-grant.json": "0545361561764ad4b8a6e3eebbd158ffec4ab48abcc1423918b27f693811789e",
+    "007-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "007-grant.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "008-grant.json": "70462ac77f009e330c475abe0088a56a87ceb5eded3dbf58f84c7ff7ed3b2b23",
+    "008-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "008-grant.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "009-build.json": "f5d79732918a640924d57cb1003b64df74594146b555b657dc0b5f8b2f411937",
+    "009-build.log": "8cad02cd25830dc0ecdbb0a614080714e8854a0a7a4822858299403184db4403",
+    "009-build.stderr": "43c073b1c028fe12fbb706261f799469cd0a019f9a95a39e340a4714afdc5000",
+    "010-commit.json": "916dc00ddc22224b219c86340e1a53754bc0c1b5af09d21c4e7681e7196c09e3",
+    "010-commit.log": "c5b9b0f2260d1510f7c369f1dfb041393f21e9ef434819da65bcfba8d459b5ad",
+    "010-commit.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "011-receipt.json": "0edc5f9bd330ad4deb737fe27072ddf2f534452d2022af757e0befa9e8ef61d9",
+    "011-receipt.log": "99e177b07854c9a492eae1ed56d8e2b797a98e58fd62e6a55f00b603b1d20eb2",
+    "011-receipt.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "012-apply.json": "7e99778b8f4694869646143b02a6dbf8f2baf3b8d72830f6185bf02ccb5867a0",
+    "012-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "012-apply.stderr": "f8ae2a482994866c4baf5c8896f3060bc9d8862de3e7dd70f454948ef3795673",
+    "013-apply.json": "d9dae4c14463251be6d4b3f8f9aa63843d17a1013f6c95b3b2dee10d25f8cfaa",
+    "013-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "013-apply.stderr": "f8ae2a482994866c4baf5c8896f3060bc9d8862de3e7dd70f454948ef3795673",
+    "014-apply.json": "32491c57051e5ff3756fe06114a2e0f230c6d63b6c585cc50cf7e126395d04f6",
+    "014-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "014-apply.stderr": "f8ae2a482994866c4baf5c8896f3060bc9d8862de3e7dd70f454948ef3795673",
+    "015-apply.json": "dc4c6a17a518b34d992455f654f075b6b7473e6153afeab67be358353c337a0b",
+    "015-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "015-apply.stderr": "f8ae2a482994866c4baf5c8896f3060bc9d8862de3e7dd70f454948ef3795673",
+    "016-apply.json": "519f8f2fcb92687e55e9d04b9d1c052c3b7f8a34d24a556dbcdf839790181bc0",
+    "016-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "016-apply.stderr": "578631d9b13d8d0d39a5bd10680619839ed601bd862c8696515e247c7f4a4b57",
+    "017-apply.json": "d6af5c61a7fd8ec3cc6926aeb79afb94858306543d07b95eecd80a8436fc7368",
+    "017-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "017-apply.stderr": "907352fcc2732aeed9ebd42376356fb2fb2edc1fd66ceeefd986ad6202f01aa4",
+    "018-receipt.json": "0edc5f9bd330ad4deb737fe27072ddf2f534452d2022af757e0befa9e8ef61d9",
+    "018-receipt.log": "99e177b07854c9a492eae1ed56d8e2b797a98e58fd62e6a55f00b603b1d20eb2",
+    "018-receipt.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "019-apply.json": "34db3595885179459e01fc5d8338ba932ddbcf7ac8ce8b2c87f97c160a75f9fc",
+    "019-apply.log": "0667cc8f1477f031379e3bba0c0e95e5f12ad3736ab37e3f32ccd599e85d0c46",
+    "019-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "020-apply.json": "8c6e7926b2f5c876c3ca7646d7f361dcb01a2da6c9a7f31bd803de40f43aef32",
+    "020-apply.log": "725b0a94f32a56b2d6186b8b3b6e25e900c9f7e0d87262c1479420a27ae39002",
+    "020-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "021-receipt.json": "0edc5f9bd330ad4deb737fe27072ddf2f534452d2022af757e0befa9e8ef61d9",
+    "021-receipt.log": "46fee3a1e7b15a796b971c9ecc8741af093ce7bc0009b6d9a98b15ae1e2e9a7e",
+    "021-receipt.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "022-activate.json": "356b4ff63aaaa9cde4a733e3c37d2199c43510b3ef156605becddea5522336b9",
+    "022-activate.log": "e074de8b2c14610dd926cb56194847ee4d237e26a0295c785bafb5d4a0f7e0e7",
+    "022-activate.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "023-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "023-query.log": "7ec1af1a0662334706c9ea4e380a83a6d3ae7d03a05a3cce597e443d82fe04f0",
+    "023-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "024-query.json": "ced964bbd8de10072aaffb17e5c8e73ec21edd43cd19e3543f4b8a84300e8f34",
+    "024-query.log": "7ec1af1a0662334706c9ea4e380a83a6d3ae7d03a05a3cce597e443d82fe04f0",
+    "024-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "025-commit.json": "d45a43e22533f86d0da68a833f83fd43db5426956ebffb75a0e4226d3e0d3345",
+    "025-commit.log": "776b6023453495f4701c3cfe4dcd14993947f2ee30c468e07d40487a64b17640",
+    "025-commit.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "026-commit.json": "492cf9485485cfe46300c0a624381785fa86b9e6a2eb0b7834587f83ee5e20cd",
+    "026-commit.log": "1cae9d2fa5b1fda317e0aedd4fe955f567347631f3bf671d887f67ae33dcf96e",
+    "026-commit.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "027-apply.json": "de0c6eb1c8a3218c276798ac9808be3dad1a96dc80677a62001da6ef2d2743ea",
+    "027-apply.log": "afdf6ec506a5eca3d5ff00bea8fc6fa9a68657071b4ffb84f89af4aea1573459",
+    "027-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "028-apply.json": "24b04b00d58d524c31d8a6baa96d4b69d17e1c48f627d27a71f9432445fd3393",
+    "028-apply.log": "0ef72088a313dcd78bf159b03b059947bb2abbc8bb8c6ea0fa66a557a8d83990",
+    "028-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "029-receipt.json": "6c8e4273419ff2cf7f42f226aa3eeb97f9abee2e6775fcff13156662191cf3dd",
+    "029-receipt.log": "7700647c492ad4dd5dd1053efd89d6a7decb9be9179081d30166efa5f44d56cf",
+    "029-receipt.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "030-apply.json": "8270fcecb5a467394d5fc78590c34cb62490dd07fd95b65b41871b2d6fded4ee",
+    "030-apply.log": "ae739d7aefc2aea7735fc6bb213b607757606e2ee0a54de53cca22577b0d4bdc",
+    "030-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "031-apply.json": "a0e22e910470fd7a2ac03458c114e1e18f0f4a9a136845ddd639146d89d316ca",
+    "031-apply.log": "bbd02c23c0720e45a5a4b3dc17106cd58ef6ab4669117a79eddc666ffb510e33",
+    "031-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "032-receipt.json": "6c8e4273419ff2cf7f42f226aa3eeb97f9abee2e6775fcff13156662191cf3dd",
+    "032-receipt.log": "2b16d1ecac94fc564c105335612541b6f8febe21f0519093021c75c2794e2265",
+    "032-receipt.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "033-commit.json": "3ff1f9b8b66d5b45d1d515d030f25c3662dbc29cd605c9b63d3a6d15f6bea5a8",
+    "033-commit.log": "c3e52480420817f66c3709c2cc093461be4a5c96942963d80cdceeeaa4723839",
+    "033-commit.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "034-commit.json": "c26d1dc05f9ca0effeb00d4190301b581ee3bda25d2bdbdb13cd104f93a52af3",
+    "034-commit.log": "bb4890b248edf365733d7b5ffdeca8ce023d6cc08c1c01d7bda01c9c2eb4b8d6",
+    "034-commit.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "035-apply.json": "2e22ef80b08191d732c47535859aa7cbef48205ef282b39edd6b466c29c03907",
+    "035-apply.log": "71895139c137ec36c41a60ef401ce3b2e88bdf53c8fce1a6c10c942e191def14",
+    "035-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "036-apply.json": "e9f4d68933283026f9f24bd5a6ffb20c53abe95d45532812918424be06c9a541",
+    "036-apply.log": "3f2e661b23342ed1fe334ba4fd7b00d8c783eeb8ef91c284457e9cc38a2d8b58",
+    "036-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "037-apply.json": "d6d8316650bddbd50d139d2da25b9ded7f3f8efc911e8d07bcb920b4317dd3a1",
+    "037-apply.log": "2248cfd30aefea53eaa8e66016c0780f21e90e628dcef2f7b129362593b4badc",
+    "037-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "038-apply.json": "68eaefac69c2d5da19c518d9bd15a3a963f4d07176ea1d72395c3b6ea1292f6b",
+    "038-apply.log": "2ecd3cbad5fac9457eda9daee9b1bad4072a3e76cfdea6d14969a2d6a5e5d127",
+    "038-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "039-receipt.json": "a4be57e295af4e266792cb1fa539e5ad2e8d7fa329ef31cb38c3a69e85109a7e",
+    "039-receipt.log": "76553821c10488d86cbce07dcef3d1369c5b9c8e40969caa45536dbd26f6345c",
+    "039-receipt.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "040-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "040-query.log": "46338a83c99aae59c2b297be6d2c0cff6b201d807b8cad9af06fd9463c94ca9d",
+    "040-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "041-commit.json": "c9ce210a29bf444320d6b68ba4ae87cd67c5f84e5b2a6fbc4fcf17dcd266b6e2",
+    "041-commit.log": "1e6f66ba607153dfbeba85f70dafdd608aca87ba0448b815fb16a88313264138",
+    "041-commit.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "042-apply.json": "6c51e32a4d77d374ee90efc197f1bbbb214c68590028a3cb826d96982994209e",
+    "042-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "042-apply.stderr": "5b27043c5e6024842f6ffce16410c5b33ac36a6c1a9828dfdc3cac6e267cf2eb",
+    "043-query.json": "ced964bbd8de10072aaffb17e5c8e73ec21edd43cd19e3543f4b8a84300e8f34",
+    "043-query.log": "3bdc73a9fd99bb91e2860d5758dc3985512f5d955c7ab8f1489a946c13c52422",
+    "043-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "044-receipt.json": "8aae17460c1edc56da71ca2f77cf421ae617aa0a9f6e986df23852af10e1200c",
+    "044-receipt.log": "44e425ce0b96dbc17d0e814f318214faea961035ddd15c62d2408e822fa465b3",
+    "044-receipt.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "045-apply.json": "9d8cd1348c97745410e713339250223949b57e6c0471b606ce65e2a902c03506",
+    "045-apply.log": "5427e0e736ba58e0cb46ae59aa6aae146c03c91626569c93ada58b0f8556f111",
+    "045-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "046-apply.json": "70f21ca01d7aacef3b74a1a7f88ae08405167211ca591adb02c696794428bbe7",
+    "046-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "046-apply.stderr": "db44fcf14ff5e07a8475e35441706c440229ec889750aa303d7e1c061af79770",
+    "047-receipt.json": "8aae17460c1edc56da71ca2f77cf421ae617aa0a9f6e986df23852af10e1200c",
+    "047-receipt.log": "4627274702a6f1ac09e5c68634ae540b68d7b9e975d8b3de2512fcbc8ccd2c23",
+    "047-receipt.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "048-apply.json": "4582ea9caa44e58b049cd07712d758471685c98f09cd2d9db50b10392e7ab753",
+    "048-apply.log": "9bbaf56edb9a55d854fda9170fb506f543b61df6213e41e353840114f75584e8",
+    "048-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "049-receipt.json": "8aae17460c1edc56da71ca2f77cf421ae617aa0a9f6e986df23852af10e1200c",
+    "049-receipt.log": "15d5608a866de258b6845d9d14ba16ea8bda01e0a3b9c4a22a3b8fe62c8cc875",
+    "049-receipt.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "050-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "050-query.log": "015a28da44378410f61e9cbae3cb7579d476a63940629b9bb99825a996287478",
+    "050-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "051-begin.json": "68960d89e68fb28ad643d68c6e7bf15d2ce414f2d29f2b6f785596317d3ef83b",
+    "051-begin.log": "b76ae54b305cd5e4f5d32bbc1a81cb24810179de8a95b6732367a362e73df947",
+    "051-begin.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "052-build.json": "814bcbff7e96253e2d4523b724b3eb914bf999422bfef7933fd1e3492cd670e1",
+    "052-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "052-build.stderr": "87b17375fb862316a5bcc7bf36bd859f8dcbd0f989f32ecca6eaa8670c7d2fac",
+    "053-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "053-status.log": "34c8319cf023a2cc8a2f876b78398a92dd08ae970ad21a725580450c9e2e86ef",
+    "053-status.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "054-query.json": "ced964bbd8de10072aaffb17e5c8e73ec21edd43cd19e3543f4b8a84300e8f34",
+    "054-query.log": "015a28da44378410f61e9cbae3cb7579d476a63940629b9bb99825a996287478",
+    "054-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "055-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "055-query.log": "015a28da44378410f61e9cbae3cb7579d476a63940629b9bb99825a996287478",
+    "055-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "056-build.json": "afaf335472978af9cfac993900ddef23aca13e8322d6aba12a534dd12046e80b",
+    "056-build.log": "eb509e223b95bef39e570b19599d5bd2a0a7c772a53d444566b2809611713361",
+    "056-build.stderr": "0ba27e7c034dcbe85c0f53347b07b95f6c61beb0e925cfb1105a213802c94902",
+    "057-activate.json": "2e6676bc50135e4c6bd29e556ba31d96451e823e665495aa53de50563efbd45b",
+    "057-activate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "057-activate.stderr": "7871c65666565586c7fc265380ac90c4e8fb36f1a8644c24235ba38089dc4e3e",
+    "058-apply.json": "0f9368341772a067465f1788950541d237ae741c19984d4dc8c4962a45b5c4cf",
+    "058-apply.log": "f23e5965523a836b2d3bd3b65c0b4aec637004977658f981da00e62c57afdead",
+    "058-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "059-apply.json": "89ca7a1fcc3c66199d1caefc8f44f50cf4675089cadbe75578e0c81359a71ca0",
+    "059-apply.log": "98c903957cbb9ca65fdd53eb9b5d7b34ef2d4c751408819ae46499f0be9b6930",
+    "059-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "060-apply.json": "4c972cd0ffa4c6ff7ed9101b7b49fb9fa5194d8c4e94b70f5a3b062ea5bf6d23",
+    "060-apply.log": "2bdc9abf0b4e77707a2417c7f3074c0240f3069c9fb6b855c70d092f8db6bcc3",
+    "060-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "061-apply.json": "0849471ab6c4a8952bcfc1af5f1812f6332ff76520875210e290704bb1cd73ff",
+    "061-apply.log": "24d7d989c1dbc84d75d4d965b97b9b13fade972b9e8c768d4d4441f060d042ee",
+    "061-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "062-apply.json": "edf40ed19f4cf39b88ecfd78c1019d464dfac9293273758b9f3eadb43e963708",
+    "062-apply.log": "e7386fb5ba34313f0422277504611d631559d9d992e52abbcdf26fdf1a0fedb0",
+    "062-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "063-apply.json": "7cbb999bb7613e4dc203139ff48a72091ef344852d3c01f01ccdad66ab1ee79e",
+    "063-apply.log": "0c5e71e8d8bfb52c41670b2347251ac9892067911b40a632fd92b09248ed4805",
+    "063-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "064-apply.json": "af93b36ccb1a77cf1fcf778d8cc3cd8de7e562437be391362bdea72d2688ffbb",
+    "064-apply.log": "59237282e9d722d81d69a0bd8b00235526ebe5ff8318f37e2ff75084a1efb048",
+    "064-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "065-apply.json": "699584040fab1232b95ee6747bd19878dd1eefd19af55e03714814c5ee125116",
+    "065-apply.log": "828d68d29d3a27c8522f7c2b7b743201b7aeb04200a451b0fe2d8c9014979771",
+    "065-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "066-apply.json": "c0bba729394ea781bc5046e84449b0bd5c43fc16b8add96b217b0bbd71dc4798",
+    "066-apply.log": "52b75a35ad8230d9048556d7abc9a9f02042487e46c5cb3d9e58f0f79c684ae1",
+    "066-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "067-apply.json": "2cc79c1f7a56d8985dd1a1c15834de14758d117d2d27e1465221ee793d12d586",
+    "067-apply.log": "549440414a6a630ef61871572525010d17243527a0444b633259aa57849aa5b9",
+    "067-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "068-apply.json": "d5f556f47820ec5408bff5fd3b70994e3b9c6930c88b62d97eea38438135a8b9",
+    "068-apply.log": "25fc52644aba720657e0bad15a0945419f127b856b06ea79ea621b960e88e3ba",
+    "068-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "069-apply.json": "347bf4a74c75a1824b1f2c640db95e06af844e741e8472f690b22ba6abc878a6",
+    "069-apply.log": "e85adbfa67ccd4ab3fdb74a77339858e554d84b8d3ff35ac0d2c3a9f9e013635",
+    "069-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "070-apply.json": "39422df56b44017e89943e4788d9c0b57eb90cc944b3c4dd22153d69e953eeed",
+    "070-apply.log": "c3fda706542389676661106e48bd85fc03f72ed01e8be2c98a62be447e18a766",
+    "070-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "071-apply.json": "2c332fea60be7e68c3febf1ba66a614dd4942c0413a29b7bffb1106b964921c8",
+    "071-apply.log": "eec321836a149e1609bd7053caa121da258b87ae86bf6d7e12141a2c9748456a",
+    "071-apply.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "072-activate.json": "a59174e8b7f652969e1db8a4acf87f880c1d370b48541d74ba350d2ef8a700eb",
+    "072-activate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "072-activate.stderr": "a137e91f0fc72171659d91af68f5f03afa282a089e4099551de5e6303ce7c3d3",
+    "073-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "073-status.log": "94e66fad30edb9d3e03290aee2eda6ce2f1d9dd5fda170401fcc6a25cdf7e95d",
+    "073-status.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "074-activate.json": "aa554a1a50cf7bdc5ac14703e0fb0f15c8c4bf9cba3131149e20d386d004c02b",
+    "074-activate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "074-activate.stderr": "67ff10c635712ae07abf3e67b22b499567b70dc8b2a68fa2afc7ff48cb04d883",
+    "075-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "075-status.log": "1a915efef7c4ca5e6b5f8e9625ccf539c8a5345271325aabe67c1c377db347d3",
+    "075-status.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "076-query.json": "bcc914d7ca13633bc2785e788eebacaf273af556581fa875bb6ad0fe3721b163",
+    "076-query.log": "5781f96c54c57afb941fba966928530fc22680f6e6af89fc65a03822f9a69aec",
+    "076-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "077-query.json": "af123f00ca6825dea3852eae0039e47f20e81c8b10b4ff07e573a20c58b3d4df",
+    "077-query.log": "5781f96c54c57afb941fba966928530fc22680f6e6af89fc65a03822f9a69aec",
+    "077-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "078-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "078-query.log": "160d188fbfd9ce5b3c8a3f94e298f71be2ab8880f838c10d4e2efa35c6f5248e",
+    "078-query.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "079-query.json": "5bf82f5ced844c2a2ba3408e216219c4a941ee54b2acf7ce9532e1ba3dda2562",
+    "079-query.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "079-query.stderr": "99dde317441a19fd0a531ec38b1e911b6c076049eb0abcb1d02989f154b6f68e",
+    "080-begin.json": "58763ab9cd7551cb91888b3c97bed2ada669ed549e00d5e4c9d698357ea33d3f",
+    "080-begin.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "080-begin.stderr": "29737ae1e042681ad79f9121d5cfd5b27d417f5f0af63f2f2b10f49dd52784ea",
+    "081-apply.json": "6c985a7eacebea4d6cd07a6127413bf38786a6ba581e894452715aaf6f2c4bfe",
+    "081-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "081-apply.stderr": "d510718a0081992032122b8a97ff53efda16be7bc6b03af6988ad4cc24af7a46",
+    "082-query.json": "682435ad39cdf37c22cdc0b816268819a6c753803b1d521adc4311f6262569a7",
+    "082-query.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "082-query.stderr": "99dde317441a19fd0a531ec38b1e911b6c076049eb0abcb1d02989f154b6f68e",
+    "083-raw.json": "f5dab387f4b00a7f1904e3b2a59d2d72a39621caad63df98d35447ce90c12e58",
+    "083-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "083-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "084-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "084-status.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "084-status.stderr": "487298caae74935c661aa598390c0e311a841360d642e075dcb827f994d8d9d2",
+    "085-raw.json": "43da5f3f033fe1692f44c12abe8e1601b0a60c6633b7a8ca803013dba242be8b",
+    "085-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "085-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "086-raw.json": "4f7a1aa2b618eea6368e4ae483c2a9fadf4619b0b3cf5643042d98f16da53f24",
+    "086-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "086-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "087-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "087-status.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "087-status.stderr": "d55e5548c5dac2c3189f308e1de0e541c773058de06d7eccc32584f33943c329",
+    "088-raw.json": "4afe1011a7efd1fcff64bef673b61c0212008bd503081a0df3e336ae3d78979d",
+    "088-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "088-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "089-raw.json": "3c524c06220890999787d28a6d335667fa01ded79c00807792d3bdbeaa84a7db",
+    "089-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "089-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "090-advance.json": "1dfd169e05cb6d2882a0635f4b956c2bfc62a85b981f25085e8773029642e0e2",
+    "090-advance.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "090-advance.stderr": "1bf6ba67c61b30db7804c8f550556459dd965306c65bf8b2700d775256c873f9",
+    "091-raw.json": "deaa628a980a04127212e18553cabd47f3451e61c8db0da5897ffc4ca44eb6a7",
+    "091-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "091-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "092-advance.json": "796b75584268a44abbfd32e4c6a24bf1e6536d41f15bd7528484c36c9b8686c4",
+    "092-advance.log": "d83be004ed37b3787e57bed17c7b13ee0fcd20a0f0f6b18a7a95697d0a58747e",
+    "092-advance.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "093-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "093-status.log": "1a915efef7c4ca5e6b5f8e9625ccf539c8a5345271325aabe67c1c377db347d3",
+    "093-status.stderr": "890a1b1a0be54ce06610ac8502e6769aa00e202e7caa0afb22ab66b464d74d4f",
+    "094-raw.json": "f187d63ebaf7040962e4890930ccdb780cf531d4be5fe0094c2f37fad537c5b6",
+    "094-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "094-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "095-begin.json": "e846c54aa0e3bfef3f378cc41f7faed73f931ac1512c87f63da825321bc065bc",
+    "095-begin.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "095-begin.stderr": "14365742f4ff15d8f0df749dcc370daa0156f68515e81a11d81d3431a428260c",
+    "OWNER": "a3424ade0ef56357a88c25487d8cbc2e62e15fe7dc3c9ec1ad2fe55bfbe31573",
+    "admission.json": "9a71c1c53cec1884182c2c1e73c7b832118b325d136354e502af46360167470c",
+    "progress.json": "75662d2544698aa1c5d23019acdda9ac59ef36412def0a13d1a0ab00ccb78d8e"
+  },
+  "binary_sha256": "7757d56061ed3198e011569f5ea9fac8143c901103a325977e6e0e87bcbaee29",
+  "final": {
+    "active": 2,
+    "generations": [
+      {
+        "base": null,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+        "id": 1,
+        "ready": true,
+        "status": "retired",
+        "text": 6,
+        "vector": 6
+      },
+      {
+        "base": null,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+        "id": 2,
+        "ready": true,
+        "status": "active",
+        "text": 7,
+        "vector": 7
+      }
+    ],
+    "retention": "two builds lifetime bound; no native text blob GC"
+  },
+  "not_tested": [
+    "full corpus backfill",
+    "30-minute profiles",
+    "physical derived corruption",
+    "power loss",
+    "disk budget for full reindex"
+  ],
+  "records": [
+    {
+      "child": {
+        "pid": 3921197,
+        "start_ticks": "457408930",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/000-begin.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "000-begin.json",
+      "result": {
+        "base": null,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+        "id": 1,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3921232,
+        "start_ticks": "457409072",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/001-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "001-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3921243,
+        "start_ticks": "457409077",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/002-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "002-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3921255,
+        "start_ticks": "457409085",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/003-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "003-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3921264,
+        "start_ticks": "457409091",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/004-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "004-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3921281,
+        "start_ticks": "457409098",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/005-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "005-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3921294,
+        "start_ticks": "457409105",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/006-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "006-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3921306,
+        "start_ticks": "457409112",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/007-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "007-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3921317,
+        "start_ticks": "457409119",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/008-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "008-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3921438,
+        "start_ticks": "457409926",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/009-build.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "009-build.json",
+      "result": {
+        "concurrent_commit": null,
+        "generation": 1,
+        "text": {
+          "operation": {
+            "attempt": 8,
+            "family": "text",
+            "generation": "1",
+            "index_id": "15",
+            "operation_id": "f5d0117e-028e-434c-8f5b-07ac89c0cb00",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "11",
+              "input_bytes": "1747",
+              "output_bytes": "0",
+              "output_operations": "0"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        },
+        "vector": {
+          "operation": {
+            "attempt": 3,
+            "family": "vector",
+            "generation": "1",
+            "index_id": "16",
+            "operation_id": "3636deec-855f-4cac-970d-6009a3414947",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "11",
+              "input_bytes": "1747",
+              "output_bytes": "0",
+              "output_operations": "0"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3921450,
+        "start_ticks": "457409977",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/010-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "010-commit.json",
+      "result": {
+        "commit_seq": 1,
+        "config_generation": 1,
+        "request_id": "g-1",
+        "revision": "00000000000000000001:00000000000000000001",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921461,
+        "start_ticks": "457409986",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/011-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "011-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 1,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {},
+        "stage": "committed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 0,
+          "vector": 0
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3921469,
+        "start_ticks": "457409994",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/012-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "012-apply.json"
+    },
+    {
+      "child": {
+        "pid": 3921481,
+        "start_ticks": "457410003",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/013-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "013-apply.json"
+    },
+    {
+      "child": {
+        "pid": 3921494,
+        "start_ticks": "457410012",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/014-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "014-apply.json"
+    },
+    {
+      "child": {
+        "pid": 3921512,
+        "start_ticks": "457410021",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/015-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "015-apply.json"
+    },
+    {
+      "child": {
+        "pid": 3921522,
+        "start_ticks": "457410031",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/016-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "016-apply.json"
+    },
+    {
+      "child": {
+        "pid": 3921530,
+        "start_ticks": "457410038",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/017-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "017-apply.json"
+    },
+    {
+      "child": {
+        "pid": 3921542,
+        "start_ticks": "457410047",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/018-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "018-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 1,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {},
+        "stage": "committed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 0,
+          "vector": 0
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3921553,
+        "start_ticks": "457410056",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/019-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "019-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921572,
+        "start_ticks": "457410066",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/020-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "020-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921695,
+        "start_ticks": "457410974",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/021-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "021-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 1,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3921706,
+        "start_ticks": "457410982",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/022-activate.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "022-activate.json",
+      "result": {
+        "active": 1,
+        "at": 1,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "reused": false
+      }
+    },
+    {
+      "child": {
+        "pid": 3921715,
+        "start_ticks": "457410991",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/023-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "023-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 1
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3921727,
+        "start_ticks": "457410999",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/024-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "024-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 1
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3921741,
+        "start_ticks": "457411007",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/025-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "025-commit.json",
+      "result": {
+        "commit_seq": 2,
+        "config_generation": 1,
+        "request_id": "g-2",
+        "revision": "00000000000000000002:00000000000000000002",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921752,
+        "start_ticks": "457411015",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/026-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "026-commit.json",
+      "result": {
+        "commit_seq": 3,
+        "config_generation": 1,
+        "request_id": "g-3",
+        "revision": "00000000000000000003:00000000000000000003",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921763,
+        "start_ticks": "457411024",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/027-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "027-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 3,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921782,
+        "start_ticks": "457411036",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/028-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "028-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 3,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921865,
+        "start_ticks": "457411542",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/029-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "029-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 3,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3921876,
+        "start_ticks": "457411550",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/030-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "030-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 2,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921896,
+        "start_ticks": "457411562",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/031-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "031-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 2,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921907,
+        "start_ticks": "457411575",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/032-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "032-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 3,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 3,
+          "vector": 3
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3921919,
+        "start_ticks": "457411584",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/033-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "033-commit.json",
+      "result": {
+        "commit_seq": 4,
+        "config_generation": 1,
+        "request_id": "g-4",
+        "revision": "00000000000000000001:00000000000000000004",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 3921935,
+        "start_ticks": "457411595",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/034-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "034-commit.json",
+      "result": {
+        "commit_seq": 5,
+        "config_generation": 1,
+        "request_id": "g-5",
+        "revision": "00000000000000000001:00000000000000000005",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922061,
+        "start_ticks": "457412303",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/035-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "035-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 4,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922078,
+        "start_ticks": "457412314",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/036-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "036-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 4,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922095,
+        "start_ticks": "457412327",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/037-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "037-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "retracted",
+        "reused": false,
+        "seq": 5,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922106,
+        "start_ticks": "457412343",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/038-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "038-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "retracted",
+        "reused": false,
+        "seq": 5,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922179,
+        "start_ticks": "457412850",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/039-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "039-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 4,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "superseded",
+          "vector": "superseded"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 5,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922189,
+        "start_ticks": "457412859",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/040-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "040-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [],
+        "permission_revision": 1,
+        "read_seq": 5,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 5,
+        "watermarks": {
+          "text": 5,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922201,
+        "start_ticks": "457412869",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/041-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "041-commit.json",
+      "result": {
+        "commit_seq": 6,
+        "config_generation": 1,
+        "request_id": "g-6",
+        "revision": "00000000000000000001:00000000000000000006",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922213,
+        "start_ticks": "457412880",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/042-apply.json"
+      ],
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "after-index-application",
+      "request": "042-apply.json"
+    },
+    {
+      "child": {
+        "pid": 3922230,
+        "start_ticks": "457412893",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/043-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "043-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 6,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 6,
+        "watermarks": {
+          "text": 5,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922249,
+        "start_ticks": "457412904",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/044-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "044-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 6,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {},
+        "stage": "committed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 5,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922266,
+        "start_ticks": "457412914",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/045-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "045-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 6,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922280,
+        "start_ticks": "457412929",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/046-apply.json"
+      ],
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "before-watermark",
+      "request": "046-apply.json"
+    },
+    {
+      "child": {
+        "pid": 3922291,
+        "start_ticks": "457412941",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/047-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "047-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 6,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 6,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922303,
+        "start_ticks": "457412951",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/048-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "048-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "applied",
+        "reused": true,
+        "seq": 6
+      }
+    },
+    {
+      "child": {
+        "pid": 3922363,
+        "start_ticks": "457413357",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/049-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "049-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 6,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922378,
+        "start_ticks": "457413366",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/050-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "050-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 6,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 6,
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922391,
+        "start_ticks": "457413375",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/051-begin.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "051-begin.json",
+      "result": {
+        "base": null,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+        "id": 2,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3922405,
+        "start_ticks": "457413384",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/052-build.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "052-build.json"
+    },
+    {
+      "child": {
+        "pid": 3922420,
+        "start_ticks": "457413428",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/053-status.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "053-status.json",
+      "result": {
+        "active": 1,
+        "generations": [
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 1
+            },
+            "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+            "id": 1,
+            "ready": true,
+            "status": "active",
+            "text": 6,
+            "vector": 6
+          },
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 2
+            },
+            "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+            "id": 2,
+            "ready": false,
+            "status": "failed",
+            "text": 0,
+            "vector": 0
+          }
+        ],
+        "retention": "two builds lifetime bound; no native text blob GC"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922431,
+        "start_ticks": "457413438",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/054-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "054-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 6,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 6,
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922442,
+        "start_ticks": "457413447",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/055-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "055-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 6,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 6,
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922454,
+        "start_ticks": "457413456",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/056-build.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "056-build.json",
+      "result": {
+        "concurrent_commit": {
+          "commit_seq": 7,
+          "config_generation": 1,
+          "request_id": "g-7",
+          "revision": "00000000000000000004:00000000000000000007",
+          "stage": "committed"
+        },
+        "generation": 2,
+        "text": {
+          "index": {
+            "generation": "1",
+            "index_id": "19",
+            "kind": "already_active"
+          }
+        },
+        "vector": {
+          "operation": {
+            "attempt": 3,
+            "family": "vector",
+            "generation": "1",
+            "index_id": "20",
+            "operation_id": "89662e38-a83f-492f-aec8-3e22795584ff",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "60",
+              "input_bytes": "55684",
+              "output_bytes": "0",
+              "output_operations": "0"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3922472,
+        "start_ticks": "457413480",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/057-activate.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "057-activate.json"
+    },
+    {
+      "child": {
+        "pid": 3922485,
+        "start_ticks": "457413490",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/058-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "058-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922601,
+        "start_ticks": "457413996",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/059-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "059-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922616,
+        "start_ticks": "457414010",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/060-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "060-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 2,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922636,
+        "start_ticks": "457414024",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/061-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "061-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 2,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922647,
+        "start_ticks": "457414040",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/062-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "062-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 3,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922675,
+        "start_ticks": "457414056",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/063-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "063-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 3,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922825,
+        "start_ticks": "457414966",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/064-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "064-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 4,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922843,
+        "start_ticks": "457414981",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/065-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "065-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 4,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922860,
+        "start_ticks": "457414997",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/066-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "066-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 5,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922874,
+        "start_ticks": "457415014",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/067-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "067-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 5,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3922981,
+        "start_ticks": "457415521",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/068-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "068-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 6,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3923002,
+        "start_ticks": "457415537",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/069-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "069-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 6,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3923024,
+        "start_ticks": "457415555",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/070-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "070-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 7,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3923045,
+        "start_ticks": "457415570",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/071-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "071-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 7,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3923057,
+        "start_ticks": "457415590",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/072-activate.json"
+      ],
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "before-activation",
+      "request": "072-activate.json"
+    },
+    {
+      "child": {
+        "pid": 3923073,
+        "start_ticks": "457415603",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/073-status.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "073-status.json",
+      "result": {
+        "active": 1,
+        "generations": [
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 1
+            },
+            "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+            "id": 1,
+            "ready": true,
+            "status": "active",
+            "text": 6,
+            "vector": 6
+          },
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 2
+            },
+            "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+            "id": 2,
+            "ready": true,
+            "status": "building",
+            "text": 7,
+            "vector": 7
+          }
+        ],
+        "retention": "two builds lifetime bound; no native text blob GC"
+      }
+    },
+    {
+      "child": {
+        "pid": 3923093,
+        "start_ticks": "457415617",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/074-activate.json"
+      ],
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "after-activation",
+      "request": "074-activate.json"
+    },
+    {
+      "child": {
+        "pid": 3923112,
+        "start_ticks": "457415632",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/075-status.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "075-status.json",
+      "result": {
+        "active": 2,
+        "generations": [
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 1
+            },
+            "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+            "id": 1,
+            "ready": true,
+            "status": "retired",
+            "text": 6,
+            "vector": 6
+          },
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 2
+            },
+            "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+            "id": 2,
+            "ready": true,
+            "status": "active",
+            "text": 7,
+            "vector": 7
+          }
+        ],
+        "retention": "two builds lifetime bound; no native text blob GC"
+      }
+    },
+    {
+      "child": {
+        "pid": 3923221,
+        "start_ticks": "457416139",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/076-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "076-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 2,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 7,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 7,
+        "watermarks": {
+          "text": 7,
+          "vector": 7
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3923239,
+        "start_ticks": "457416151",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/077-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "077-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 2,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 7,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 7,
+        "watermarks": {
+          "text": 7,
+          "vector": 7
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3923250,
+        "start_ticks": "457416163",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/078-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "078-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 7,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 7,
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3923270,
+        "start_ticks": "457416175",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/079-query.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "079-query.json"
+    },
+    {
+      "child": {
+        "pid": 3923285,
+        "start_ticks": "457416186",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/080-begin.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "080-begin.json"
+    },
+    {
+      "child": {
+        "pid": 3923300,
+        "start_ticks": "457416197",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/081-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "081-apply.json"
+    },
+    {
+      "child": {
+        "pid": 3923321,
+        "start_ticks": "457416208",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/082-query.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "082-query.json"
+    },
+    {
+      "child": {
+        "pid": 3923333,
+        "start_ticks": "457416219",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "MATCH (p:IndexState {key:'active'}) SET p.generation=0"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "083-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3923349,
+        "start_ticks": "457416227",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/084-status.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "084-status.json"
+    },
+    {
+      "child": {
+        "pid": 3923367,
+        "start_ticks": "457416239",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "MATCH (p:IndexState {key:'active'}) SET p.generation=2"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "085-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3923386,
+        "start_ticks": "457416246",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "MATCH (g:Generation {key:1}) SET g.status='invalid'"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "086-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3923403,
+        "start_ticks": "457416253",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/087-status.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "087-status.json"
+    },
+    {
+      "child": {
+        "pid": 3923413,
+        "start_ticks": "457416263",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "MATCH (g:Generation {key:1}) SET g.status='retired'"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "088-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3923537,
+        "start_ticks": "457417071",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "CREATE (:IndexedJob {key:'00000000000000000001:text:00000000000000000007',generation:1,family:'text',seq:8,reason:'applied',hash:'corrupt fixture'})"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "089-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3923549,
+        "start_ticks": "457417078",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/090-advance.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "090-advance.json"
+    },
+    {
+      "child": {
+        "pid": 3923559,
+        "start_ticks": "457417088",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "MATCH (j:IndexedJob {key:'00000000000000000001:text:00000000000000000007'}) DELETE j"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "091-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3923574,
+        "start_ticks": "457417094",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/092-advance.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "092-advance.json",
+      "result": {
+        "advanced": 0,
+        "next_wave_may_be_needed": false
+      }
+    },
+    {
+      "child": {
+        "pid": 3923585,
+        "start_ticks": "457417105",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/093-status.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "093-status.json",
+      "result": {
+        "active": 2,
+        "generations": [
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 1
+            },
+            "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+            "id": 1,
+            "ready": true,
+            "status": "retired",
+            "text": 6,
+            "vector": 6
+          },
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 2
+            },
+            "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+            "id": 2,
+            "ready": true,
+            "status": "active",
+            "text": 7,
+            "vector": 7
+          }
+        ],
+        "retention": "two builds lifetime bound; no native text blob GC"
+      }
+    },
+    {
+      "child": {
+        "pid": 3923597,
+        "start_ticks": "457417116",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "CREATE (:Document {key:'baseline-requires-backfill'})"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "094-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3923608,
+        "start_ticks": "457417123",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/backfill-diagnostic-r2/probe",
+        "/tmp/akasha-generations-_pi33gv9/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/backfill-generation-compat-r2/095-begin.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "095-begin.json"
+    }
+  ],
+  "seconds": 82.12141275778413,
+  "source_sha256": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+  "status": "passed"
+}

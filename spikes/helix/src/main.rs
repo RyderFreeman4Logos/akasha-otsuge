@@ -46,7 +46,12 @@ async fn main() -> Result<(), Error> {
         )
         .await?;
         let authority = authority::Authority::open(client).await?;
-        let result = Box::pin(generations::run(&authority, &PathBuf::from(request))).await;
+        let result = Box::pin(generations::run(
+            &authority,
+            &PathBuf::from(request),
+            &PathBuf::from(&args[1]),
+        ))
+        .await;
         authority.engine.close().await?;
         println!("{}", result?);
         return Ok(());

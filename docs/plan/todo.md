@@ -77,7 +77,8 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       provenance rejection, four process-crash barriers, activation and bounded
       prefix advancement; the full-size obligations below remain open.
 - [ ] Backfill the full corpus into a candidate generation with resumable coverage
-      accounting; the revision-only generation diagnostic refuses imported data.
+      accounting. The explicit corpus-generation path has bounded atomic cursor
+      batches and native fixture coverage; full-size execution remains pending.
 - [ ] Measure and enforce disk admission for ordinary indexed writes and reindex,
       including retained native text splits; verify the explicit rebuild bound.
 - [ ] Test low-budget reopen of full data/backlog/interrupted builds and

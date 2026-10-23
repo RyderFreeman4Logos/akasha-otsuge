@@ -271,12 +271,30 @@ process kills bracket index application, watermark publication and activation.
 The ordinary write in the build fixture occurs between native text and vector
 build phases; it is not a full-size concurrent-build throughput measurement.
 
-This probe covers authority revisions only and explicitly refuses an imported
-`Document` corpus until resumable backfill and its coverage accounting exist.
-It admits at most two generation identities over the database lifetime. This
+The plain `begin` request covers authority revisions only and refuses imported
+`Document` data. `begin_corpus` additionally takes the exact completed import's
+manifest and binds source provenance, byte/vector/document counts and bundle.
+The `backfill` request copies eight immutable source records per transaction;
+derived rows and their cursor commit together. It checks contiguous IDs and final
+coverage before allowing native index construction. Its fsynced progress includes
+actual completed records, totals, current-attempt rate and ETA. Source corpus
+mutation is not allowed during backfill; ordinary revision writes use the durable
+outbox and must catch up before activation. Resume requires the same bundle and
+manifest. Each wave releases the shared writer before the next batch.
+
+`check_backfill.py PROBE PUBLIC_EIGHT_DOCUMENT_SUBSET NEW_EVIDENCE` exercises the
+import/backfill/build/activate path in separate native processes. It uses eight
+public vector documents and 17 explicitly synthetic diagnostic records. Forced
+exits before and after batch commit verify cursor/data atomicity; malformed
+source counts, gaps, final byte counts and changed manifests are rejected. Two
+generations perform real vector reads while retaining the prior bundle. The
+model fingerprint uses SHA-256 of the compact, key-sorted provenance JSON; this
+does not recompute embeddings or claim new-model quality.
+
+The probe admits at most two generation identities over the database lifetime. This
 is an explicit rebuild limit because the pinned engine does not reclaim native
 text split blobs, not a claim of garbage collection. Full-size disk admission,
-backfill, concurrent reindex performance and physical corruption remain pending.
+backfill execution, concurrent reindex performance and physical corruption remain pending.
 
 The [visibility diagnostic receipts](../../docs/benchmarks/results/visibility-diagnostic/summary.json)
 retain the serial-validation failure (write P95 9,316 ms), the batch-read fix and
