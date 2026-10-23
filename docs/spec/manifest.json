@@ -1,0 +1,375 @@
+{
+  "spec_version": "0.1",
+  "captured_at": "2026-10-23T00:34:33.166594+00:00",
+  "pages": [
+    {
+      "title": "📘 跨 Agent 记忆系统｜MVP 开发规格与 Issue 计划",
+      "url": "https://app.notion.com/p/40117b41f58c81acb9f3e88ffe51e135?pvs=204",
+      "page_last_edited_at": "2026-10-22T17:07:42.593Z",
+      "raw_path": "docs/spec/raw/00.json",
+      "raw_sha256": "0ab3f72911e95521c567793d130102a1bf21a9a58f05a270438d0989c8a3ab1a",
+      "markdown_path": "docs/spec/00.md",
+      "markdown_sha256": "f95a8e7d35d315e0cf79f603e9b8302555cde50b141f4a06fe6158076bd1bd65"
+    },
+    {
+      "title": "01｜产品契约、需求编号与 MVP 边界",
+      "url": "https://app.notion.com/p/40117b41f58c8162b87ff3c6a3d59567?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:10:24.169Z",
+      "raw_path": "docs/spec/raw/01.json",
+      "raw_sha256": "7cbac0e2909967e71d9fd3847da5b8f5a3202482be1822ce3b631240962a7ac9",
+      "markdown_path": "docs/spec/01.md",
+      "markdown_sha256": "2760e8df415ed78680ce7509cd85d2d5efb1d431e8be354aa4726e7486555c9c"
+    },
+    {
+      "title": "02｜总体架构、模块边界与 CLI 契约",
+      "url": "https://app.notion.com/p/40117b41f58c8172a233d5ed87b5fdba?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:39:56.033Z",
+      "raw_path": "docs/spec/raw/02.json",
+      "raw_sha256": "e5cdd288b05196cab79f7bdabfca6ff94d3f528673945d4b7c384c25745302a2",
+      "markdown_path": "docs/spec/02.md",
+      "markdown_sha256": "02403b411f3bf8e2f146fbeb9b3bfabfcc7f69f9a78cf3e611af30abad7bc2f4"
+    },
+    {
+      "title": "03｜短意图提示、渐进调研与四工具接入",
+      "url": "https://app.notion.com/p/40117b41f58c8132a0eaeb0281246fa5?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:39:53.660Z",
+      "raw_path": "docs/spec/raw/03.json",
+      "raw_sha256": "ec4dc0c5440736e002b38a92ad57307134d1d7c3e5559972a64c5665059e88e8",
+      "markdown_path": "docs/spec/03.md",
+      "markdown_sha256": "71f9a15ab14d7395cf726d7a08ef050aa517047b4ef0cd5c1a54e7f9715b04ee"
+    },
+    {
+      "title": "04｜配置热重载、1700 秒超时与任务生命周期",
+      "url": "https://app.notion.com/p/40117b41f58c813796f6ce78db6402d4?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:39:54.238Z",
+      "raw_path": "docs/spec/raw/04.json",
+      "raw_sha256": "ef70ed89639f2b7612819c00d94a121bdb419908e681f089a90cad5a89342eb4",
+      "markdown_path": "docs/spec/04.md",
+      "markdown_sha256": "c0441d8aa8a1621c8ccc79695f253d2fbc82c89c81ff838ce077054751d75c63"
+    },
+    {
+      "title": "05｜存储选型 ADR、版本、回执与索引一致性",
+      "url": "https://app.notion.com/p/40117b41f58c81d6a0b3ea46b1ac4c10?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:39:54.860Z",
+      "raw_path": "docs/spec/raw/05.json",
+      "raw_sha256": "abdcb35c9157a3b06d34a8ee8c5c9c00f382920da331f886cd716fc107859ca0",
+      "markdown_path": "docs/spec/05.md",
+      "markdown_sha256": "905804a47b7504b2758f386d37e7af45d5cf362b5488a2031a8fcdcebe810fcc"
+    },
+    {
+      "title": "06｜原文采集、记忆生成、Auto-Grill 与用户权威",
+      "url": "https://app.notion.com/p/40117b41f58c81cd8e0bda9e6a0b66c8?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:39:55.524Z",
+      "raw_path": "docs/spec/raw/06.json",
+      "raw_sha256": "f43d4b04fd30549b6dc1bbaa4cdc79cc44e7f50aac48e208eb61eea87dd319e6",
+      "markdown_path": "docs/spec/06.md",
+      "markdown_sha256": "4b6e906a75a44d1a14135f6234d7cd3b17561e83077bbc84d862c3b971d01ba6"
+    },
+    {
+      "title": "07｜外部纠正、运行反馈、Review 与通知插件",
+      "url": "https://app.notion.com/p/40117b41f58c81079798ecae0380324e?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:10:24.169Z",
+      "raw_path": "docs/spec/raw/07.json",
+      "raw_sha256": "b6376e9157b2763731d02f27a3e913b30122eebc8be77fea8f6c0b32e786e0b9",
+      "markdown_path": "docs/spec/07.md",
+      "markdown_sha256": "d82e1f1cfd38de2b806dba1981f2c38b026bfa871f05e529c21afcabbd98fe41"
+    },
+    {
+      "title": "08｜内存预算、SSD、并发、恢复与规模验收",
+      "url": "https://app.notion.com/p/40117b41f58c81f68da4d7bcb89553e4?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:42:45.453Z",
+      "raw_path": "docs/spec/raw/08.json",
+      "raw_sha256": "410088aefdbc0565f1d323aba0691c72fb079b6f8a405c6b1c1cb2d6f4cddf55",
+      "markdown_path": "docs/spec/08.md",
+      "markdown_sha256": "fd9b84a1ecefdb7a314cf6f564cdaf8a8992fd080796dca63d460d2a10528577"
+    },
+    {
+      "title": "09｜验收矩阵、质量门槛与 MVP 完成标准",
+      "url": "https://app.notion.com/p/40117b41f58c8129bf52e98ae1bf7016?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:25:52.192Z",
+      "raw_path": "docs/spec/raw/09.json",
+      "raw_sha256": "b73ae2de9c4fb50b39f9d69d0100c519177bae64bd04ca89333414a123369273",
+      "markdown_path": "docs/spec/09.md",
+      "markdown_sha256": "489695fdb81e76aac32f6af2b9cca564fe61ffcecab05a8327752568453925c9"
+    },
+    {
+      "title": "10｜开发 Agent 执行手册",
+      "url": "https://app.notion.com/p/40117b41f58c814ba2c8c2cbef66219c?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:42:46.602Z",
+      "raw_path": "docs/spec/raw/10.json",
+      "raw_sha256": "e6c8acf480da75d431dab5171f6737dd35818ed7156f841361571d4839b44ab3",
+      "markdown_path": "docs/spec/10.md",
+      "markdown_sha256": "6220a63e42e41b6e02ea7f4790afb606058e34f769197b2fe50c41f6971a1402"
+    },
+    {
+      "title": "11｜MVP Issue 清单、顺序与需求覆盖",
+      "url": "https://app.notion.com/p/40117b41f58c815d9678e25102eae698?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:41:06.112Z",
+      "raw_path": "docs/spec/raw/11.json",
+      "raw_sha256": "62922d52818a278ccb80565ce0b6d82670df12c911f3f9e23eed26c936b61076",
+      "markdown_path": "docs/spec/11.md",
+      "markdown_sha256": "fb07fbb390ff186aa62cd606e304148444cf04ad81b617de33db066481fe087c"
+    },
+    {
+      "title": "12｜研究依据、决策记录与变更管理",
+      "url": "https://app.notion.com/p/40117b41f58c81379763f39725266b85?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:25:52.192Z",
+      "raw_path": "docs/spec/raw/12.json",
+      "raw_sha256": "e24531b1fd8b7c92ba3723bc966e5e3d9798753d9e4cbc0a1a4c1d8e13c62d40",
+      "markdown_path": "docs/spec/12.md",
+      "markdown_sha256": "b1fb354bb5528fb01bbd91159e2af707721593389b1374ba20ef6f360c830732"
+    },
+    {
+      "title": "MVP-001｜建立 Rust/Linux 项目骨架与可执行开发门槛",
+      "url": "https://app.notion.com/p/40117b41f58c81bbaa68d6f69d5b9c87?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-001.json",
+      "raw_sha256": "56936f7fa0a715638d44284b1b26563a59832f2017d0a6d5cbe4ce1dc5b76d78",
+      "markdown_path": "docs/spec/issues/MVP-001.md",
+      "markdown_sha256": "fd767b00b6a3599352db2e1b8f57df9e367bc193a09d540ac4ac27905673c159"
+    },
+    {
+      "title": "MVP-002｜版本化配置、热重载与 deadline 配置契约",
+      "url": "https://app.notion.com/p/40117b41f58c817bacfcd856e125ca16?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-002.json",
+      "raw_sha256": "4cb42f57ae43eacad047d8e4c2959aab15a520ca8b8daefbbb99b6070528b81c",
+      "markdown_path": "docs/spec/issues/MVP-002.md",
+      "markdown_sha256": "ab57aa64872bcc95fcfa36a81c9e4fd22b80987a41c1531a5ba91922fb28d4b1"
+    },
+    {
+      "title": "MVP-003｜非 SQLite 存储 spike 与唯一 backend 决策",
+      "url": "https://app.notion.com/p/40117b41f58c8128bd07fb083f9c08d6?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-003.json",
+      "raw_sha256": "72948fa6c72d8fe537ddf68ee1a2dc5cfee56aa20afc924a2146146e6d50350e",
+      "markdown_path": "docs/spec/issues/MVP-003.md",
+      "markdown_sha256": "aa01195a953384ca8c91374fe029cd24d888b079255eeb591cd8b095091d702d"
+    },
+    {
+      "title": "MVP-004｜实现唯一正式 Storage、原子提交与恢复基础",
+      "url": "https://app.notion.com/p/40117b41f58c81179ecec5ee585aded5?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-004.json",
+      "raw_sha256": "af7a680723211132597bed88b792cb40d995c3b0af18c0397c3620761310e1f7",
+      "markdown_path": "docs/spec/issues/MVP-004.md",
+      "markdown_sha256": "8c2c6a10b6bcb9a06c963d4fde2fe35a158f34893b124a786646ce091601e69d"
+    },
+    {
+      "title": "MVP-005｜定义并执行来源、authority、scope 与 taste 数据语义",
+      "url": "https://app.notion.com/p/40117b41f58c81748409c0931a87fe6d?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-005.json",
+      "raw_sha256": "930784f6f7c451bbab2629ceeddbf0fe32bba24a28cc34a49c1012697cdce5ce",
+      "markdown_path": "docs/spec/issues/MVP-005.md",
+      "markdown_sha256": "f3deb2944133443325719b7d48cd4f953196734ef9dc75698adb0bf6d97efe48"
+    },
+    {
+      "title": "MVP-006｜持久历史视图、as-of 查询与实际 recall receipt",
+      "url": "https://app.notion.com/p/40117b41f58c8105874ef73600eb9597?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-006.json",
+      "raw_sha256": "bcf3ce1ff92add9b29677553a3db5051dc1d6c0a90f1af9228202292e86ae80a",
+      "markdown_path": "docs/spec/issues/MVP-006.md",
+      "markdown_sha256": "a36153d139e5e5385d3695ba61662a7230f1b05ca323a6e7e5638cf1d1afd45f"
+    },
+    {
+      "title": "MVP-007｜采集归一化、原文归档及分支/压缩恢复协议",
+      "url": "https://app.notion.com/p/40117b41f58c81a28826d2c11690c3a5?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-007.json",
+      "raw_sha256": "4a8f4abed309fc818758859f21ae251132248c2382baa5ed139863958fb31959",
+      "markdown_path": "docs/spec/issues/MVP-007.md",
+      "markdown_sha256": "1c889f3cdad1ae3e8e3bd310b0d8731d24734a907cbfbb5c73de0fdee693913d"
+    },
+    {
+      "title": "MVP-008｜CLI、私有 IPC daemon 与持久后台作业",
+      "url": "https://app.notion.com/p/40117b41f58c8157a763eefdec11b284?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-008.json",
+      "raw_sha256": "c3352ca696ea0623c60580ba3fe8ad99c6a9873a713612a3ac21f62f0768b1e2",
+      "markdown_path": "docs/spec/issues/MVP-008.md",
+      "markdown_sha256": "7c5e2640d2edbee130e575ed441ccc25b86b7e44c3f2e5e9cdbfdae8223c097c"
+    },
+    {
+      "title": "MVP-009｜可配置本地模型客户端与 1700 秒全链长测",
+      "url": "https://app.notion.com/p/40117b41f58c81368a6cd8ba848f11cf?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-009.json",
+      "raw_sha256": "29f684f58c646d2e12418ef4b7b6073e6fb1f4c7fe28e5ef46e7e462f9995efc",
+      "markdown_path": "docs/spec/issues/MVP-009.md",
+      "markdown_sha256": "4ed12c9deb0e9229606585ddfea01b8970fe4400b0c6067eb63c525779662f65"
+    },
+    {
+      "title": "MVP-010｜磁盘检索、混合召回、重排与有预算的原文读取",
+      "url": "https://app.notion.com/p/40117b41f58c81c8b834e7443112dc86?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-010.json",
+      "raw_sha256": "7d710e8d3d2d991cd530758d29a9f20a2edb12c17aae3356d9b62e6ba6bb792b",
+      "markdown_path": "docs/spec/issues/MVP-010.md",
+      "markdown_sha256": "a80f000ef907c6262244939bdee0cb94e8acf8565ed9f87c7df1baf25d1275bc"
+    },
+    {
+      "title": "MVP-011｜CallerAdapter/ContextSource 与 AgentRunner 公共契约",
+      "url": "https://app.notion.com/p/40117b41f58c81ef9424ecc0d3aaa26b?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-011.json",
+      "raw_sha256": "265ab0ef31f3baddbda2d551b7815e522a0171c6b0569cc28ad3e60dca9fb062",
+      "markdown_path": "docs/spec/issues/MVP-011.md",
+      "markdown_sha256": "cc9c47df1a461671cdb169a82d7db0ece539874bc020c278fc3a70d1e12641ed"
+    },
+    {
+      "title": "MVP-012｜Claude Code CallerAdapter 与 AgentRunner 实接",
+      "url": "https://app.notion.com/p/40117b41f58c81b18b05e9ffdf1df215?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-012.json",
+      "raw_sha256": "8e2d410c86674dd9a5a86fcb8d87db7e56cbb2cbf50a75f808e32e1b559f4c2d",
+      "markdown_path": "docs/spec/issues/MVP-012.md",
+      "markdown_sha256": "538cb58460d9a4cc5069b2b18afc4eee261233f972d0d2ee8cb46475e881487e"
+    },
+    {
+      "title": "MVP-013｜Codex CallerAdapter 与 AgentRunner 实接",
+      "url": "https://app.notion.com/p/40117b41f58c81e3bb61e1ef7e83b167?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-013.json",
+      "raw_sha256": "8971ebb4b6031a0c9b38d3ce0a5b0f1abc9732783a82da6459f7c705dc89b44e",
+      "markdown_path": "docs/spec/issues/MVP-013.md",
+      "markdown_sha256": "0fbc90ca6703a46456b25e1fa40750d8d61b76185a24f86439f03433cd924980"
+    },
+    {
+      "title": "MVP-014｜Hermes CallerAdapter 与 AgentRunner 实接",
+      "url": "https://app.notion.com/p/40117b41f58c81408089ef038fbba9d1?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-014.json",
+      "raw_sha256": "8fab17f827b617f548c6d9336055e4df1c5941004f178dd4ee999459bd2535c0",
+      "markdown_path": "docs/spec/issues/MVP-014.md",
+      "markdown_sha256": "5b21fbbd3b6f384ce19a763bb265f3548e5d9726d7cd90177df9466dd483dd10"
+    },
+    {
+      "title": "MVP-015｜pi CallerAdapter 与 AgentRunner 实接",
+      "url": "https://app.notion.com/p/40117b41f58c81879ad8dc7f94261dd2?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-015.json",
+      "raw_sha256": "9a60b210a236227cf8aae3d903dc3ea473f5b5e22abf3ea12f8b48d3c1d6dafe",
+      "markdown_path": "docs/spec/issues/MVP-015.md",
+      "markdown_sha256": "4d4b6efcf0f43dad4f90eb9cf69c05e8e78311a1307defaabec33a85d4dc9de3"
+    },
+    {
+      "title": "MVP-016｜consult 可选短 hint、渐进调研与子孙共享预算",
+      "url": "https://app.notion.com/p/40117b41f58c81099aafdaf53333a242?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-016.json",
+      "raw_sha256": "9159d6570bec24801c2131c95a8dff467ed13de397af1055677085cb7503d765",
+      "markdown_path": "docs/spec/issues/MVP-016.md",
+      "markdown_sha256": "1b34060a7df1d8db1cc12bc55da8b4ca5f4e1cc12ffccc550ad2142081647a9d"
+    },
+    {
+      "title": "MVP-017｜异步提取候选、来源引用与可重建索引作业",
+      "url": "https://app.notion.com/p/40117b41f58c812387a6c71af2632220?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-017.json",
+      "raw_sha256": "a92f3862343e2b59d908936ed9ef0092e3482b211f9757caada5aee0e77fdf53",
+      "markdown_path": "docs/spec/issues/MVP-017.md",
+      "markdown_sha256": "5ed0efad8a8c0f96b6c62ebe84c99853e40c24674118ac4ad6842deea0f4ea64"
+    },
+    {
+      "title": "MVP-018｜单一或组合 Runner 的 Auto-Grill 工作流",
+      "url": "https://app.notion.com/p/40117b41f58c81fd96b7fa87cde94c0d?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-018.json",
+      "raw_sha256": "67f1c56c65ea80af00f905b0e3155a2bd0167b505fa3e03370e8ce9143a651d8",
+      "markdown_path": "docs/spec/issues/MVP-018.md",
+      "markdown_sha256": "ba483ea434ae27213681f509928d4f4db243eb740d15afae56ebec94836c1c15"
+    },
+    {
+      "title": "MVP-019｜生效策略、review 队列、人工校准与 taste 使用规则",
+      "url": "https://app.notion.com/p/40117b41f58c81009467f0058a1089c5?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-019.json",
+      "raw_sha256": "a54b90e6802f91e6ef30d49d3451b74dcfc42d1abf21e7dcb7e50f041ce6a4e6",
+      "markdown_path": "docs/spec/issues/MVP-019.md",
+      "markdown_sha256": "2de757b4ac38c98556d08ea7a429b00d3f4e324964ba0974eef10bffdadfa368"
+    },
+    {
+      "title": "MVP-020｜外部 Memory Editor、范围受限 patch 与并发修订",
+      "url": "https://app.notion.com/p/40117b41f58c814c9068f196da55a445?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-020.json",
+      "raw_sha256": "fc548344a1c1026ade77874b673481efe3282ddb77cba7bcf58834eeb3a1dde5",
+      "markdown_path": "docs/spec/issues/MVP-020.md",
+      "markdown_sha256": "403366618f615c0b74e8ddd6f8e056f83cf1733f16484db04535ba86a51481be"
+    },
+    {
+      "title": "MVP-021｜Run、Git/工作区、build/test 与 incident 证据关联",
+      "url": "https://app.notion.com/p/40117b41f58c813d9ec2c274b2518a42?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-021.json",
+      "raw_sha256": "0c2e3f1dbfa4730a42dbe2bcd76e3ea4c532d6bdf5f6276b2d0a06f69398df43",
+      "markdown_path": "docs/spec/issues/MVP-021.md",
+      "markdown_sha256": "58bca6ee56e86277c9c14b3876d7768a94a86d6fbd59cb37631b3c412a24e335"
+    },
+    {
+      "title": "MVP-022｜执行失败触发调查、自动修订或高优 review",
+      "url": "https://app.notion.com/p/40117b41f58c811b9858fa3521b0e3c7?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-022.json",
+      "raw_sha256": "e1c9278e2fd64dcfd7cccc7e93c4b915b82bcfb56dce9f51c598f2bb449df3e1",
+      "markdown_path": "docs/spec/issues/MVP-022.md",
+      "markdown_sha256": "77035515e1ca59ec6b2a5aeffcf4dbd2cb2fa6ab3383bf09938b0f5b6e50df30"
+    },
+    {
+      "title": "MVP-023｜Notifier 插件、可用本地/stdio 实现与持久投递",
+      "url": "https://app.notion.com/p/40117b41f58c8138854cd923907ab3b7?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-023.json",
+      "raw_sha256": "9515d98cb42a5567f45887c3cfc7ebc49b9c7db33a102e939f72b8721b6d836b",
+      "markdown_path": "docs/spec/issues/MVP-023.md",
+      "markdown_sha256": "7198d34d771af0b3e8a509a02efc9bb0c761a482505c579ad8a03adabdfb2e90"
+    },
+    {
+      "title": "MVP-024｜50 GB、100 客户端、内存预算与故障恢复压力验收",
+      "url": "https://app.notion.com/p/40117b41f58c813ea375fb1009199a8e?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-024.json",
+      "raw_sha256": "307090558d371d271d6bb5c7683e80f1bddb855cc7a4b6168af344d9c377610f",
+      "markdown_path": "docs/spec/issues/MVP-024.md",
+      "markdown_sha256": "0e6e5652fef640590cb98257b936128fc8ecb0d130c96c0c74d390d271bb0524"
+    },
+    {
+      "title": "MVP-025｜mempal 只读迁移、中立导出与往返验证",
+      "url": "https://app.notion.com/p/40117b41f58c816982e4d3eb17966d60?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-025.json",
+      "raw_sha256": "09294d3fa991a69ef3d877d8e79202c9529eb08815120287f93ca2374554bb47",
+      "markdown_path": "docs/spec/issues/MVP-025.md",
+      "markdown_sha256": "a3a563e929641e2297ea785fbdc3f53701f661782f833deea3c1ae14b9d42e93"
+    },
+    {
+      "title": "MVP-026｜Linux 安装、升级、卸载与四宿主使用文档",
+      "url": "https://app.notion.com/p/40117b41f58c8108ac9ff217b3fc11cc?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-026.json",
+      "raw_sha256": "565ff274d6260dd544600aa46e500bb5a167cf54ffaea9ece6fab7cdf307c6bc",
+      "markdown_path": "docs/spec/issues/MVP-026.md",
+      "markdown_sha256": "74b9cc106d7381912c3591536c4e90ee69e2df874d43cbf0f638b42aed38fb53"
+    },
+    {
+      "title": "MVP-027｜质量评测、主上下文开销与组合回归",
+      "url": "https://app.notion.com/p/40117b41f58c819c90ebce9f0126ec58?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-027.json",
+      "raw_sha256": "2701b0620d03f827a640cc4b202307253ad623af395792e5e1ea844319b9af1d",
+      "markdown_path": "docs/spec/issues/MVP-027.md",
+      "markdown_sha256": "2ea34d0c3188ad83b39e2e21b9a64a2bad753eb7d232132091d12c106d519144"
+    },
+    {
+      "title": "MVP-028｜需求逐项终验、发布和完成证据归档",
+      "url": "https://app.notion.com/p/40117b41f58c81b2beebc622c808538c?pvs=204",
+      "page_last_edited_at": "2026-10-22T15:40:15.293Z",
+      "raw_path": "docs/spec/raw/issues-MVP-028.json",
+      "raw_sha256": "7984f9b65ee2aa3edfd01277282ed73b06bfdd77215a86a7e10e95b162ca35f0",
+      "markdown_path": "docs/spec/issues/MVP-028.md",
+      "markdown_sha256": "87877d8eacc94ca4309f40bb0f2c6e740c83abf1b1c6d21bca9942ce792c39f0"
+    }
+  ]
+}

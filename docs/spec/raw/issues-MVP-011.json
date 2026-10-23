@@ -1,0 +1,16 @@
+{
+  "id": "https://app.notion.com/p/40117b41f58c81ef9424ecc0d3aaa26b",
+  "title": "MVP-011｜CallerAdapter/ContextSource 与 AgentRunner 公共契约",
+  "text": "Here is the result of \"fetch\" for the Page with URL https://app.notion.com/p/40117b41f58c81ef9424ecc0d3aaa26b as of 2026-10-22T15:40:15.580Z:\n<page url=\"https://app.notion.com/p/40117b41f58c81ef9424ecc0d3aaa26b\">\n<ancestor-path>\n<parent-page url=\"https://app.notion.com/p/40117b41f58c815d9678e25102eae698\" title=\"11｜MVP Issue 清单、顺序与需求覆盖\"/>\n<ancestor-2-page url=\"https://app.notion.com/p/40117b41f58c81acb9f3e88ffe51e135\" title=\"跨 Agent 记忆系统｜MVP 开发规格与 Issue 计划\"/>\n</ancestor-path>\n<properties>\n{\"title\":\"MVP-011｜CallerAdapter/ContextSource 与 AgentRunner 公共契约\"}\n</properties>\n<iconMetadata>null</iconMetadata>\n<content>\n<b>计划ID：</b> <code>MVP-011</code>。<b>当前状态：</b> 规格草案，GitHub Issue待后续开发Agent创建；未实施、未验收。\n\nIssue清单与依赖映射：<mention url=\"https://app.notion.com/p/40117b41f58c815d9678e25102eae698\">11｜MVP Issue 清单、顺序与需求覆盖</mention>\n\n<b>拟用GitHub标题：</b> <code>[MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约</code>\n\n## Issue 正文\n\n\\*\\*覆盖需求：\\*\\*REQ-03、REQ-04、REQ-06、REQ-17、REQ-23。\n\n\\*\\*目标：\\*\\*使四宿主的上下文来源与执行器可以解耦组合，主 LLM 不需要编写任务包。\n\n\\*\\*范围：\\*\\*实现统一 JSONL envelope、request ID/sequence、capabilities 握手、结构化错误/取消/输出限制；runtime 带外 binding 解析 session、turn、branch、cutoff、scope 和 context snapshot。AgentRunner 统一输入、事件、结果、工具权限和预算；delegate 原子预留资源或明确失败回退，禁止父任务占满槽位后无限等待子任务；ContextSource只提供获准读取的来源。按总验收页冻结至少60个有来源的参考任务、oracle、计数规则、参考profile选择方法和门槛，记录commit/hash；冻结必须早于MVP-016的调研prompt实现。\n\n\\*\\*非目标：\\*\\*不根据“最近修改的会话文件”猜调用者，不把提示词中的禁止事项冒充实际权限限制，不建设泛化远程 agent 平台。\n\n\\*\\*依赖：\\*\\*MVP-007、MVP-008、MVP-010。\n\n\\*\\*验收测试：\\*\\*并发 binding 不串线；缺失 binding 返回明确错误；session-only 与精确 turn 能力不混报；未知 capability 有清楚降级/拒绝；协议兼容测试及权限越界测试通过。真实 CLI 验收必须由后四项分别完成。\n\n\\*\\*完成证据/产物：\\*\\*协议/trait文档、契约测试套件、binding诊断输出、Runner权限执行策略、冻结评测集及规则的commit/hash。\n\n## 相关规格\n\n- <mention url=\"https://app.notion.com/p/40117b41f58c8132a0eaeb0281246fa5\" />\n- <mention url=\"https://app.notion.com/p/40117b41f58c8129bf52e98ae1bf7016\" />\n\n## 执行与结案记录\n\n后续开发Agent创建真实Issue后记录URL。关闭前在GitHub Issue中补齐：实现commit/PR、实际测试命令、系统/宿主/模型版本、验收结果与产物链接、仍存在的限制。不得把本页“待执行”直接改为完成而没有证据。\n\n所有Issue遵循统一执行手册：<mention url=\"https://app.notion.com/p/40117b41f58c814ba2c8c2cbef66219c\" />\n</content>\n</page>",
+  "url": "https://app.notion.com/p/40117b41f58c81ef9424ecc0d3aaa26b?pvs=204",
+  "metadata": {
+    "type": "page"
+  },
+  "cover": null,
+  "icon": null,
+  "path": "跨 Agent 记忆系统｜MVP 开发规格与 Issue 计划 / 11｜MVP Issue 清单、顺序与需求覆盖",
+  "verification": {
+    "state": "unverified"
+  },
+  "page_last_edited_at": "2026-10-22T15:40:15.293Z"
+}

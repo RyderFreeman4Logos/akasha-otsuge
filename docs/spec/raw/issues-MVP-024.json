@@ -1,0 +1,16 @@
+{
+  "id": "https://app.notion.com/p/40117b41f58c813ea375fb1009199a8e",
+  "title": "MVP-024｜50 GB、100 客户端、内存预算与故障恢复压力验收",
+  "text": "Here is the result of \"fetch\" for the Page with URL https://app.notion.com/p/40117b41f58c813ea375fb1009199a8e as of 2026-10-22T15:40:15.882Z:\n<page url=\"https://app.notion.com/p/40117b41f58c813ea375fb1009199a8e\">\n<ancestor-path>\n<parent-page url=\"https://app.notion.com/p/40117b41f58c815d9678e25102eae698\" title=\"11｜MVP Issue 清单、顺序与需求覆盖\"/>\n<ancestor-2-page url=\"https://app.notion.com/p/40117b41f58c81acb9f3e88ffe51e135\" title=\"跨 Agent 记忆系统｜MVP 开发规格与 Issue 计划\"/>\n</ancestor-path>\n<properties>\n{\"title\":\"MVP-024｜50 GB、100 客户端、内存预算与故障恢复压力验收\"}\n</properties>\n<iconMetadata>null</iconMetadata>\n<content>\n<b>计划ID：</b> <code>MVP-024</code>。<b>当前状态：</b> 规格草案，GitHub Issue待后续开发Agent创建；未实施、未验收。\n\nIssue清单与依赖映射：<mention url=\"https://app.notion.com/p/40117b41f58c815d9678e25102eae698\">11｜MVP Issue 清单、顺序与需求覆盖</mention>\n\n<b>拟用GitHub标题：</b> <code>[MVP-024] 50 GB、100 客户端、内存预算与故障恢复压力验收</code>\n\n## Issue 正文\n\n\\*\\*覆盖需求：\\*\\*REQ-16、REQ-18、REQ-19、REQ-20、REQ-21、REQ-23。\n\n\\*\\*目标：\\*\\*证明系统在要求的数据规模和并发下有界运行，而非只在小型 fixtures 上成立。\n\n\\*\\*范围：\\*\\*构建可追溯、实际落盘、可解析且内容有多样性的 50 GB 语料压力档，并实际建立所需索引；明确原始与索引各自体积。100 个并发客户端进行读写混合，后台同时导入/索引/历史读取/修订；控制 daemon+storage/index 的 512 MiB 默认目标与最高 2 GiB 配置预算；外部 workers 单列且总进程组一并报告。\n\n\\*\\*非目标：\\*\\*不以稀疏占位文件、空向量、极端重复文本或仅 cache hit 冒充真实压力；不把 backpressure/SSD spool 当绝对防 OOM 保证；100 GB 和 256 MiB 不属于必须通过档。\n\n\\*\\*依赖：\\*\\*MVP-004、MVP-008、MVP-010、MVP-016、MVP-017、MVP-020、MVP-023。\n\n\\*\\*验收测试：\\*\\*正式 50 GB/100 客户端档无 OOM、无已确认接收事件丢失、无 scope 串线、无撤回内容复活；报告冷热 p50/p95/p99、吞吐、队列/字节水位、RSS/实际限制口径、外部进程和磁盘。测试磁盘满、超大消息、断连、kill/restart、索引落后和 provider 停机；过载有明确降级/拒绝且可恢复。达不到默认目标必须修复或取得明确范围变更，不能隐藏到报告脚注。\n\n\\*\\*完成证据/产物：\\*\\*数据 manifest/hash/来源许可、真实磁盘与索引统计、压测命令/机器规格、原始监控和一致性检查、故障注入报告；可附非阻塞的 100 GB 扩展结果。\n\n## 相关规格\n\n- <mention url=\"https://app.notion.com/p/40117b41f58c81f68da4d7bcb89553e4\" />\n- <mention url=\"https://app.notion.com/p/40117b41f58c81d6a0b3ea46b1ac4c10\" />\n- <mention url=\"https://app.notion.com/p/40117b41f58c8129bf52e98ae1bf7016\" />\n\n## 执行与结案记录\n\n后续开发Agent创建真实Issue后记录URL。关闭前在GitHub Issue中补齐：实现commit/PR、实际测试命令、系统/宿主/模型版本、验收结果与产物链接、仍存在的限制。不得把本页“待执行”直接改为完成而没有证据。\n\n所有Issue遵循统一执行手册：<mention url=\"https://app.notion.com/p/40117b41f58c814ba2c8c2cbef66219c\" />\n</content>\n</page>",
+  "url": "https://app.notion.com/p/40117b41f58c813ea375fb1009199a8e?pvs=204",
+  "metadata": {
+    "type": "page"
+  },
+  "cover": null,
+  "icon": null,
+  "path": "跨 Agent 记忆系统｜MVP 开发规格与 Issue 计划 / 11｜MVP Issue 清单、顺序与需求覆盖",
+  "verification": {
+    "state": "unverified"
+  },
+  "page_last_edited_at": "2026-10-22T15:40:15.293Z"
+}

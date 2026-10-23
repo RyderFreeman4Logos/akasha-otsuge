@@ -1,0 +1,16 @@
+{
+  "id": "https://app.notion.com/p/40117b41f58c81748409c0931a87fe6d",
+  "title": "MVP-005｜定义并执行来源、authority、scope 与 taste 数据语义",
+  "text": "Here is the result of \"fetch\" for the Page with URL https://app.notion.com/p/40117b41f58c81748409c0931a87fe6d as of 2026-10-22T15:40:15.445Z:\n<page url=\"https://app.notion.com/p/40117b41f58c81748409c0931a87fe6d\">\n<ancestor-path>\n<parent-page url=\"https://app.notion.com/p/40117b41f58c815d9678e25102eae698\" title=\"11｜MVP Issue 清单、顺序与需求覆盖\"/>\n<ancestor-2-page url=\"https://app.notion.com/p/40117b41f58c81acb9f3e88ffe51e135\" title=\"跨 Agent 记忆系统｜MVP 开发规格与 Issue 计划\"/>\n</ancestor-path>\n<properties>\n{\"title\":\"MVP-005｜定义并执行来源、authority、scope 与 taste 数据语义\"}\n</properties>\n<iconMetadata>null</iconMetadata>\n<content>\n<b>计划ID：</b> <code>MVP-005</code>。<b>当前状态：</b> 规格草案，GitHub Issue待后续开发Agent创建；未实施、未验收。\n\nIssue清单与依赖映射：<mention url=\"https://app.notion.com/p/40117b41f58c815d9678e25102eae698\">11｜MVP Issue 清单、顺序与需求覆盖</mention>\n\n<b>拟用GitHub标题：</b> <code>[MVP-005] 定义并执行来源、authority、scope 与 taste 数据语义</code>\n\n## Issue 正文\n\n\\*\\*覆盖需求：\\*\\*REQ-07、REQ-10。\n\n\\*\\*目标：\\*\\*系统能区分真人陈述、人工确认、agent 推断、自动讨论和技术事实，不混淆生效与批准。\n\n\\*\\*范围：\\*\\*实现 provenance、actor、scope、assumptions、evidence refs、decision kind、authorization、review 标记；支持 taste/原则、项目选择、技术事实和候选结论。人工确认绑定具体 revision/hash；仅有 user role、interactive 标记或环境变量不能伪造 human\\_confirmed。已信任宿主输入通道中的明确用户决定，可以依据一次性配置的采纳策略生成有来源的 decision event，不要求用户为同一句决定再点击一次批准；合成 worker 消息不能走这条路径。\n\n\\*\\*非目标：\\*\\*不以单一 confidence 分数替代来源和适用范围，不把所有用户发言自动升级为永久原则；不声称同 UID 任意 shell 访问构成可信人机隔离。\n\n\\*\\*依赖：\\*\\*MVP-004。\n\n\\*\\*验收测试：\\*\\*伪造 author/human\\_confirmed 字段被拒绝或降为未验证来源；局部例外不自动覆盖全局规则；修改已审核文本产生新 revision 且不继承旧审核；自动结论可以在授权策略下 active，同时仍明确是 agent 来源。\n\n\\*\\*完成证据/产物：\\*\\*数据 schema、权限/优先级规则、包含容易误判例子的 fixtures 与通过记录。\n\n## 相关规格\n\n- <mention url=\"https://app.notion.com/p/40117b41f58c81cd8e0bda9e6a0b66c8\" />\n- <mention url=\"https://app.notion.com/p/40117b41f58c81d6a0b3ea46b1ac4c10\" />\n\n## 执行与结案记录\n\n后续开发Agent创建真实Issue后记录URL。关闭前在GitHub Issue中补齐：实现commit/PR、实际测试命令、系统/宿主/模型版本、验收结果与产物链接、仍存在的限制。不得把本页“待执行”直接改为完成而没有证据。\n\n所有Issue遵循统一执行手册：<mention url=\"https://app.notion.com/p/40117b41f58c814ba2c8c2cbef66219c\" />\n</content>\n</page>",
+  "url": "https://app.notion.com/p/40117b41f58c81748409c0931a87fe6d?pvs=204",
+  "metadata": {
+    "type": "page"
+  },
+  "cover": null,
+  "icon": null,
+  "path": "跨 Agent 记忆系统｜MVP 开发规格与 Issue 计划 / 11｜MVP Issue 清单、顺序与需求覆盖",
+  "verification": {
+    "state": "unverified"
+  },
+  "page_last_edited_at": "2026-10-22T15:40:15.293Z"
+}

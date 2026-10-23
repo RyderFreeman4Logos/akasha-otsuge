@@ -1,0 +1,16 @@
+{
+  "id": "https://app.notion.com/p/40117b41f58c814c9068f196da55a445",
+  "title": "MVP-020｜外部 Memory Editor、范围受限 patch 与并发修订",
+  "text": "Here is the result of \"fetch\" for the Page with URL https://app.notion.com/p/40117b41f58c814c9068f196da55a445 as of 2026-10-22T15:40:15.792Z:\n<page url=\"https://app.notion.com/p/40117b41f58c814c9068f196da55a445\">\n<ancestor-path>\n<parent-page url=\"https://app.notion.com/p/40117b41f58c815d9678e25102eae698\" title=\"11｜MVP Issue 清单、顺序与需求覆盖\"/>\n<ancestor-2-page url=\"https://app.notion.com/p/40117b41f58c81acb9f3e88ffe51e135\" title=\"跨 Agent 记忆系统｜MVP 开发规格与 Issue 计划\"/>\n</ancestor-path>\n<properties>\n{\"title\":\"MVP-020｜外部 Memory Editor、范围受限 patch 与并发修订\"}\n</properties>\n<iconMetadata>null</iconMetadata>\n<content>\n<b>计划ID：</b> <code>MVP-020</code>。<b>当前状态：</b> 规格草案，GitHub Issue待后续开发Agent创建；未实施、未验收。\n\nIssue清单与依赖映射：<mention url=\"https://app.notion.com/p/40117b41f58c815d9678e25102eae698\">11｜MVP Issue 清单、顺序与需求覆盖</mention>\n\n<b>拟用GitHub标题：</b> <code>[MVP-020] 外部 Memory Editor、范围受限 patch 与并发修订</code>\n\n## Issue 正文\n\n\\*\\*覆盖需求：\\*\\*REQ-06、REQ-07、REQ-10、REQ-11、REQ-12、REQ-20。\n\n\\*\\*目标：\\*\\*外部 agent 能查证并修正记忆，同时核心保持版本、来源和权限一致。\n\n\\*\\*范围：\\*\\*实现反馈入口和 editor 工作流；允许读取授权原文/代码、定位错误类型、提交带 expected revision/evidence/scope/reason 的精确 patch；由核心策略决定自动激活或 review；扩大 scope 使用单独授权；修订后索引和缓存立即按权威状态过滤。\n\n\\*\\*非目标：\\*\\*不让 editor 任意写数据库/原始日志，不因一次局部失败修改全局偏好，不把所有失败归咎于记忆，不允许最后写入无条件覆盖并发修改。\n\n\\*\\*依赖：\\*\\*MVP-016、MVP-019。\n\n\\*\\*验收测试：\\*\\*正确修订、证据不足、scope 越界、伪造人审、重复 patch、并发冲突和补丁过期都有测试；原文不被改写；旧 receipt 可复核，新查询不再返回已撤回版本；一次真实外部 Runner 完成调查和受策略约束的修订。\n\n\\*\\*完成证据/产物：\\*\\*patch 协议、权限/并发测试、修订审计、真实 editor 执行记录。\n\n## 相关规格\n\n- <mention url=\"https://app.notion.com/p/40117b41f58c81079798ecae0380324e\" />\n- <mention url=\"https://app.notion.com/p/40117b41f58c81d6a0b3ea46b1ac4c10\" />\n\n## 执行与结案记录\n\n后续开发Agent创建真实Issue后记录URL。关闭前在GitHub Issue中补齐：实现commit/PR、实际测试命令、系统/宿主/模型版本、验收结果与产物链接、仍存在的限制。不得把本页“待执行”直接改为完成而没有证据。\n\n所有Issue遵循统一执行手册：<mention url=\"https://app.notion.com/p/40117b41f58c814ba2c8c2cbef66219c\" />\n</content>\n</page>",
+  "url": "https://app.notion.com/p/40117b41f58c814c9068f196da55a445?pvs=204",
+  "metadata": {
+    "type": "page"
+  },
+  "cover": null,
+  "icon": null,
+  "path": "跨 Agent 记忆系统｜MVP 开发规格与 Issue 计划 / 11｜MVP Issue 清单、顺序与需求覆盖",
+  "verification": {
+    "state": "unverified"
+  },
+  "page_last_edited_at": "2026-10-22T15:40:15.293Z"
+}
