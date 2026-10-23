@@ -147,6 +147,11 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       low-recovery failure. Pin Rust dependencies/licenses; prove primitive
       transactions/history, bounded import and search before the full unchanged
       workload/recovery matrix. No third backend or reduced thresholds.
+      Exact dependencies and license inventory are now retained. Twenty native
+      primitive commands pass commit-crash atomicity, conflict/rollback, history,
+      idempotent replay, real BM25/IVF queries and separate-process reopen in a
+      640MiB group without swap. Bounded/resumable import, full-scale indexes,
+      authority/outbox semantics and the complete matrix remain unfinished.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 
