@@ -832,10 +832,15 @@ fn checkpoint(
     started: Instant,
 ) -> Result<(), Error> {
     let elapsed = started.elapsed().as_secs_f64();
+    let stat = std::fs::read_to_string("/proc/self/stat")?;
+    let start_ticks = stat
+        .rsplit_once(')')
+        .and_then(|(_, tail)| tail.split_whitespace().nth(19))
+        .ok_or("invalid oracle process identity")?;
     let progress = json!({"oracle_version":1,"phase":phase,"completed":completed,"total":total,
         "elapsed_s":elapsed,"rate_per_s":completed as f64/elapsed,
         "eta_s":if completed>0 {Some((total-completed) as f64*elapsed/completed as f64)} else {None},
-        "pid":std::process::id(),"config_epoch":1});
+        "pid":std::process::id(),"start_ticks":start_ticks,"config_epoch":1});
     let temporary = path.with_extension("json.tmp");
     let mut file = std::fs::File::create(&temporary)?;
     writeln!(file, "{progress}")?;

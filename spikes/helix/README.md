@@ -363,6 +363,14 @@ The TOML has `run.id/profile/seconds`, `paths.binary/database/request/output`,
 `disk.start_bytes/reserve_bytes` and `reliability.max_attempts = 1`. The request
 is an existing `begin_corpus`, `backfill`, `build`, `catch_up` or `activate` JSON,
 or `{"op":"abort_index","generation":1,"operation_id":"EXACT_NATIVE_UUID"}`.
+The same owner can run the existing deterministic text-history oracle using
+`{"op":"seed_text","generation":1,"count":100000}` and then `verify_text`.
+Counts must be integers in 1..=1000000. Native seeding reconciles existing exact
+receipts; verification reopens and checks content/history without adding changes.
+Their progress includes PID/start time and is observed only inside the admitted
+unit. [Controller checks](../../docs/benchmarks/results/oracle-runner-diagnostic/summary.json)
+cover 2,048 commits, native replay, completed reuse, independent reopen verification
+and invalid-count refusal. Full-database 100,000-change execution remains pending.
 It verifies the completed import receipt, excludes simultaneous case owners,
 retains the executed binary and exact request/manifest/config snapshots, and
 observes the dedicated cgroup and native cursor.

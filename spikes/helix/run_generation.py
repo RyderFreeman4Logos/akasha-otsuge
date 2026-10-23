@@ -16,7 +16,7 @@ import uuid
 from run_case import digest, process_identity, publish
 
 MIN_RESERVE = 30 * 1024**3 + 4_000_000_000
-OPERATIONS = {'begin_corpus', 'backfill', 'build', 'catch_up', 'activate', 'abort_index'}
+OPERATIONS = {'begin_corpus', 'backfill', 'build', 'catch_up', 'activate', 'abort_index', 'seed_text', 'verify_text'}
 
 
 def stopped(state):
@@ -29,13 +29,17 @@ def stopped(state):
             raise ValueError('generation unit is still live: ' + status)
 
 
-def observe(database, generation, attempt):
-    for name in [f'generation-{generation}-backfill.json', f'generation-{generation}-catch-up.json']:
+def observe(database, request, attempt):
+    generation = request['generation']
+    names = [f'generation-{generation}-backfill.json', f'generation-{generation}-catch-up.json']
+    if request['op'] in {'seed_text', 'verify_text'}:
+        names = [f'oracle-{request["op"].replace("_", "-")}-{request["count"]}.json']
+    for name in names:
         path = database / name
         if path.exists():
             value = json.loads(path.read_text())
             actual = process_identity(value['pid'])
-            if actual and actual['state'] != 'Z':
+            if actual and actual['state'] != 'Z' and actual['start_ticks'] == value['start_ticks']:
                 cgroup = pathlib.Path(f'/proc/{actual["pid"]}/cgroup').read_text()
                 if attempt['unit'] + '.service' in cgroup:
                     return value
@@ -77,6 +81,9 @@ def main():
         if not isinstance(value, str) or len(value) != 36 or any(
                 c != '-' if i in {8,13,18,23} else c not in '0123456789abcdefABCDEF' for i,c in enumerate(value)):
             raise ValueError('abort requires an exact native operation ID')
+    if request['op'] in {'seed_text', 'verify_text'} and (set(request) != {'op','generation','count'}
+            or type(request['count']) is not int or not 1 <= request['count'] <= 1_000_000):
+        raise ValueError('oracle count must be an integer in 1..=1000000')
     marker = database.parent / 'OWNER'
     if not marker.is_file() or not marker.read_text().startswith('akasha-otsuge MVP-003 '):
         raise ValueError('database is not an owned storage experiment')
@@ -163,6 +170,12 @@ def main():
     state.update(phase='running', controller=process_identity(os.getpid()))
     publish(state_path, state)
     publish(owner_path, dict(output=str(output), run_id=run['id']))
+    if request['op'] == 'abort_index':
+        native_args = ['--abort-index', request['operation_id']]
+    elif request['op'] in {'seed_text', 'verify_text'}:
+        native_args = ['--oracle-'+request['op'].replace('_','-'), str(request['count'])]
+    else:
+        native_args = ['--generation', str(output / 'request.json')]
     command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit,
                '-p', f'MemoryMax={(640 if run["profile"] == "low" else 2048)*1024**2}',
                '-p', 'MemorySwapMax=0', '-p', f'RuntimeMaxSec={run["seconds"]}',
@@ -170,7 +183,7 @@ def main():
                '-p', 'Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES='+str(disk['reserve_bytes']),
                '-p', 'Environment=AKASHA_SPIKE_INDEX_OBSERVE_SECONDS='+str(run['seconds']),
                sys.executable, str(observer), str(attempt_dir / 'memory.jsonl'), str(output / 'probe'),
-               str(database), *(['--abort-index', request['operation_id']] if request['op'] == 'abort_index' else ['--generation', str(output / 'request.json')])]
+               str(database), *native_args]
     attempt['command'] = command
     publish(state_path, state)
     started, failure = time.monotonic(), None
@@ -181,7 +194,7 @@ def main():
                 free = shutil.disk_usage(database).free
                 if free < disk['reserve_bytes']:
                     raise RuntimeError('generation disk reservation reached')
-                native = observe(database, request['generation'], attempt)
+                native = observe(database, request, attempt)
                 counters = {k: (native or {}).get(k) for k in ['completed', 'total', 'rate_per_s', 'eta_s']}
                 publish(output / 'progress.json', dict(phase=request['op'], elapsed_s=time.monotonic()-started, native=native, free_bytes=free, reserved_bytes=disk['reserve_bytes'], controller=process_identity(os.getpid()), config_epoch=1, **counters))
                 time.sleep(2)
