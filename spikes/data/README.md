@@ -49,3 +49,12 @@ must have an `OWNER` marker. Partial transfers are resumed; final names are
 published only after size and SHA-256 validation. Existing final files are
 revalidated. The command reserves 30 GiB of free space. It does not count
 downloaded bytes as eligible content or assert that 16 shards pass acceptance.
+
+Downloads keep an fsynced `download-state.json`, per-file attempt receipts and
+`download-progress.json` in the owned corpus directory. Resume a recorded run
+with `download.py DIRECTORY TEXT_SHARD_COUNT --resume`; every completed file is
+revalidated and interrupted GETs resume their byte offset. `download.toml` defines
+bounded retries for transient transport errors, HTTP 429 and 5xx; each file records
+the policy hash. A failed file is recorded while other files finish. Partial and
+failed receipts are retained. Verified downloads are preparation, not indexed
+benchmark coverage. ETA remains unavailable across unequal shard sizes.
