@@ -35,13 +35,13 @@ use surrealkv::{Durability, LSMIterator, Tree};
 use crate::{Error, MIB, checkpoint, load, open_authority};
 
 #[derive(Clone, Copy, Debug)]
-struct Settings {
+pub(crate) struct Settings {
     seconds: u64,
     reserve: u64,
 }
 
 impl Settings {
-    fn read(root: &Path) -> Result<Self, Error> {
+    pub(crate) fn read(root: &Path) -> Result<Self, Error> {
         let env = |name: &str| -> Result<Option<String>, Error> {
             std::env::var_os(name)
                 .map(|v| v.into_string().map_err(|_| "non-UTF8 index setting".into()))
@@ -70,7 +70,7 @@ impl Settings {
         Ok(settings)
     }
 
-    fn check_disk(&self, root: &Path) -> Result<(), Error> {
+    pub(crate) fn check_disk(&self, root: &Path) -> Result<(), Error> {
         if fs4::available_space(root)? < self.reserve {
             return Err("disk reservation reached".into());
         }

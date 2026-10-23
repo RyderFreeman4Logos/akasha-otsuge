@@ -194,3 +194,29 @@ The default systemd soft file limit of 1,024 cannot open its 2,202 native VLogs;
 generation services therefore explicitly use `LimitNOFILE=8192`. This is local
 to the measured services, with no global configuration change. Full-data low
 verification, full indexes and the unchanged workload matrix remain separate.
+
+`--authority REQUEST.json` now exercises ordinary changes on imported roots.
+One immediate transaction commits the compressed immutable revision, versioned
+head and scope membership, request-hash receipt, pending job and global sequence.
+The revision key orders by memory and sequence; historical heads must agree with
+the latest immutable revision at that read point. Source revision zero remains
+readable after corrections, scope changes, retractions and restores. The encoded
+revision bound matches the 512KiB decoder bound, including JSON escape expansion.
+
+Current reads and candidate publication check live permissions and latest heads.
+Candidates return canonical authority metadata, excluding supplied body/provenance.
+Historical pages preserve their commit point, release the writer while scanning,
+and check permission again before publication. A deterministic in-process pause
+allows a concurrent revocation to complete and verifies an empty final page.
+Raw diagnostic get/state operations deliberately bypass authorization; they are
+internal probe operations, not a public product interface.
+
+[53 native authority checks](../../docs/benchmarks/results/fallback-authority/summary.json)
+pass three commit SIGKILL barriers, receipt reuse/conflicts, historical membership
+and pagination, live authorization, restoration, forged derived metadata and
+input validation. Three release units cover codec bounds, corrupted head/sequence
+rejection and the revocation race. The prior candidate also passes all 47 search
+regressions; the final change adds the encoded authority-record bound after its
+retained native RED. Short resource samples do not establish sustained P99.
+Pending outbox jobs are durable; applying them to derived indexes, generation
+activation, full 100k history and the workload matrix remain unfinished.

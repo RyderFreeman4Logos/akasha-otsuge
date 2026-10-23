@@ -1,3 +1,4 @@
+mod authority;
 mod load;
 mod search;
 
@@ -306,6 +307,13 @@ async fn main() -> Result<(), Error> {
             return Err("usage: probe ROOT derive REQUEST.json".into());
         }
         println!("{}", search::run(root, Path::new(&args[3])).await?);
+        return Ok(());
+    }
+    if operation == "--authority" {
+        if args.len() != 4 {
+            return Err("usage: probe ROOT --authority REQUEST.json".into());
+        }
+        println!("{}", authority::run(root, Path::new(&args[3])).await?);
         return Ok(());
     }
     if matches!(operation, "import-state" | "verify-import" | "corpus-get") {

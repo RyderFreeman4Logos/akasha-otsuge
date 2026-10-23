@@ -182,6 +182,13 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       max 464,904,192B. Sixteen real queries across all eight scopes and 272
       independently checked source candidates pass. Full indexes and all ordinary
       change/permission/activation obligations remain open.
+      Fallback authority now passes 53 native checks for atomic revision/head/
+      receipt/job/sequence writes, history, scope moves, retraction/restore and
+      current permissions. Three release units include a deterministic concurrent
+      revocation race and corrupted head/sequence refusal; 47 search regressions
+      pass on the preceding candidate. Encoded-record escape expansion has a real
+      failing/passing regression. Full 100k history, concurrent workloads and actual
+      outbox application/activation remain required.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 

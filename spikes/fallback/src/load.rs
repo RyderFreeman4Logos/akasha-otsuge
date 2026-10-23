@@ -15,7 +15,7 @@ use crate::{Error, OWNER, open_authority};
 
 const STATE: &[u8] = b"meta:import";
 pub(crate) const FIRST_MEMORY: u64 = 1_000_000;
-const MAX_RECORD: usize = 512 * 1024;
+pub(crate) const MAX_RECORD: usize = 512 * 1024;
 const STORAGE_FORMAT: u32 = 2;
 
 #[derive(Deserialize)]
