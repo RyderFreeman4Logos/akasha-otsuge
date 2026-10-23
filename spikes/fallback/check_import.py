@@ -26,7 +26,8 @@ def main():
             harness_sha256=digest(pathlib.Path(__file__)), controller=process_identity(os.getpid()),
             temporary_root=temporary, scope='synthetic bounded-import contract only'))
         source, manifest = root / 'source.jsonl', root / 'manifest.json'
-        rows = [dict(key=f'fixture:{i}', body=f'synthetic {i} ' + 'x' * 4096,
+        rows = [dict(key=f'fixture:{i}', body=f'synthetic {i} ' + ''.join(
+                     hashlib.sha256(f'{i}:{j}'.encode()).hexdigest() for j in range(64)),
                      partition=f'p{i % 8}') for i in range(1057)]
 
         def prepare(values):
@@ -87,6 +88,7 @@ def main():
 
         completed = invoke('complete', '--load', source, manifest)
         assert completed['documents'] == 1057 and completed['complete']
+        assert completed.get('storage_format') == 2, 'compressed corpus/scope layout absent'
         verified = invoke('complete', 'verify-import')
         assert verified['documents'] == 1057 and verified['prefix'] == expected['prepared_sha256']
         assert invoke('complete', 'corpus-get', 1_001_056) == rows[-1]

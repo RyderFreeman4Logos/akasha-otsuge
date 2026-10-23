@@ -161,8 +161,11 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       Inline-value reopen was stopped after retained heap values caused sustained
       memory throttling. Native VLog now passes the same 38,462-vector high import
       and direct low reopen with all original bytes verified (3.223s, sampled
-      RSS max 78,217,216B). Full data is still pending. Compress retained records
-      before full import; arena settings are not aggregate RSS bounds.
+      RSS max 78,217,216B). Compressed format 2 then verifies every original byte and
+      source/scope mapping on that shard, at 500,682,752 allocated bytes (about
+      61% less). Low reopen is 4.242s with sampled RSS max 71,561,216B, no memory
+      throttling/OOM. Large VLog corruption, bounded decode and legacy-format
+      rejection also pass. Full data and sustained memory acceptance remain pending.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 

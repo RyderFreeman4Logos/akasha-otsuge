@@ -116,7 +116,25 @@ Allocated database size is 1,280,880,640B: VLog payloads are still uncompressed.
 See [raw diagnostics and stopped inline run](../../docs/benchmarks/results/fallback-vlog/summary.json).
 These are small real-data results, not a full-corpus pass or paired speedup.
 
-Remaining: compress retained corpus records before enlarging the corpus,
+Storage format 2 compresses each original JSONL record with the already-resolved
+Zstd 0.13.3 library (level 1), with a 512KiB decoded-record limit. The same immediate
+transaction also stores source identity and initial scope membership. Verification
+reads every original record and checks both mappings; original input hashes are
+unchanged. Old format roots are rejected explicitly and remain readable with their
+frozen original binary; no implicit migration occurs. The import crash fixture
+uses deterministic incompressible bodies so its committed values still exercise
+VLog. Oversized/truncated compressed frames and legacy bytes are rejected.
+
+The [compressed-layout receipts](../../docs/benchmarks/results/fallback-compressed/summary.json)
+include all six native stages, the unsupported-layout RED, committed VLog payload
+CRC failure without silent repair, and original-format compatibility checks. The
+same real shard now occupies 500,682,752 allocated bytes (about 61% below the
+uncompressed VLog layout). Low reopen verifies original bytes and mappings in
+4.242s; five samples show native RSS max 71,561,216B, with no throttling or OOM.
+These short samples do not establish sustained P99 or full-size memory behavior.
+No new resolved package was added; only the probe gained a direct Zstd edge.
+
+Remaining: enlarge the corpus with the verified compressed layout,
 complete full-size import/indexes, authority/outbox and derived generation
 reconciliation, then the unchanged workload and recovery matrix. The original
 84GB expanded stream is never materialized. Existing Helix diagnostic passes do

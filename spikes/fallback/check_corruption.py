@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Committed authority WAL corruption must fail explicitly without silent repair."""
+"""Committed WAL and native value-log corruption must fail without silent repair."""
 import json
 import os
 import pathlib
@@ -72,6 +72,37 @@ def main():
             kill_exit=-9, reopen_exit=reopened.returncode, wal_relative=str(wal.relative_to(root)),
             flipped_offset=offset, damaged_wal_unchanged=True,
             limitation='small WAL process-crash fixture; no power-loss or full-size corruption proof')
+        large = root / 'large-value'
+        large.mkdir(mode=0o700)
+        (large / 'OWNER').write_text('akasha-otsuge MVP-003 fallback database\n')
+        command = [str(binary), str(large)]
+        env = dict(os.environ, AKASHA_SPIKE_PROFILE='low')
+        committed = subprocess.run([*command, 'disk-full'], input=b'go\n',
+                                   capture_output=True, timeout=60, env=env)
+        (output / 'large-commit.stdout').write_bytes(committed.stdout)
+        (output / 'large-commit.stderr').write_bytes(committed.stderr)
+        assert committed.returncode == 0 and json.loads(committed.stdout) == dict(committed=True)
+        before_read = subprocess.run([*command, 'read'], capture_output=True, timeout=60, env=env)
+        assert before_read.returncode == 0 and json.loads(before_read.stdout)['values'] == ['x' * 16384] * 5
+        (output / 'large-before.stdout').write_bytes(before_read.stdout)
+        value_logs = [p for p in large.rglob('*.vlog') if b'x' * 16384 in p.read_bytes()]
+        assert len(value_logs) == 1, value_logs
+        value_log = value_logs[0]
+        original = value_log.read_bytes()
+        offset = original.index(b'x' * 16384) + 128
+        damaged = original[:offset] + bytes([original[offset] ^ 1]) + original[offset+1:]
+        (output / 'original.vlog').write_bytes(original)
+        (output / 'damaged.vlog').write_bytes(damaged)
+        with value_log.open('r+b') as target:
+            target.write(damaged); target.flush(); os.fsync(target.fileno())
+        before = digest(value_log)
+        reopened = subprocess.run([*command, 'read'], capture_output=True, timeout=60, env=env)
+        (output / 'large-reopen.stdout').write_bytes(reopened.stdout)
+        (output / 'large-reopen.stderr').write_bytes(reopened.stderr)
+        assert reopened.returncode == 1 and b'Key+Value CRC32 mismatch' in reopened.stderr, reopened
+        assert not reopened.stdout and digest(value_log) == before
+        result['value_log'] = dict(relative=str(value_log.relative_to(large)),
+            flipped_offset=offset, reopen_exit=reopened.returncode, damaged_value_log_unchanged=True)
     result['temporary_root_removed'] = not pathlib.Path(temporary).exists()
     result['artifact_sha256'] = {p.name:digest(p) for p in output.iterdir() if p.is_file()}
     publish(output / 'result.json', result)

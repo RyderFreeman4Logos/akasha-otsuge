@@ -16,6 +16,7 @@ use crate::{Error, OWNER, open_authority};
 const STATE: &[u8] = b"meta:import";
 const FIRST_MEMORY: u64 = 1_000_000;
 const MAX_RECORD: usize = 512 * 1024;
+const STORAGE_FORMAT: u32 = 2;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -43,6 +44,8 @@ struct Expected {
 #[derive(Clone, Default, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct State {
+    #[serde(default)]
+    storage_format: u32,
     manifest_sha256: String,
     pub documents: u64,
     content_bytes: u64,
@@ -99,10 +102,20 @@ pub(crate) fn corpus_key(memory: u64) -> String {
     format!("corpus:{memory:020}")
 }
 
+pub(crate) fn scope_key(partition: &str, memory: u64) -> String {
+    format!("scope:{partition}:{memory:020}")
+}
+
+pub(crate) fn decode_record(raw: &[u8]) -> Result<Vec<u8>, Error> {
+    Ok(zstd::bulk::decompress(raw, MAX_RECORD)?)
+}
+
 pub(crate) fn read_state(tx: &Transaction) -> Result<State, Error> {
-    Ok(serde_json::from_slice(
-        &tx.get(STATE)?.ok_or("missing import state")?,
-    )?)
+    let state: State = serde_json::from_slice(&tx.get(STATE)?.ok_or("missing import state")?)?;
+    if state.storage_format != STORAGE_FORMAT {
+        return Err("unsupported corpus storage format; explicit reimport required".into());
+    }
+    Ok(state)
 }
 
 fn atomic_json(path: &Path, value: &Value) -> Result<(), Error> {
@@ -165,6 +178,7 @@ pub async fn run(root: &Path, input: &Path, manifest: &Path, resume: bool) -> Re
     }
     let tree = open_authority(root)?;
     let empty = State {
+        storage_format: STORAGE_FORMAT,
         manifest_sha256: manifest_hash.clone(),
         prefix: hex(&Sha256::new()),
         ..Default::default()
@@ -224,6 +238,7 @@ pub async fn run(root: &Path, input: &Path, manifest: &Path, resume: bool) -> Re
     let mut tx = tree.begin()?;
     tx.set_durability(Durability::Immediate);
     let mut pending = 0;
+    let mut compressor = zstd::bulk::Compressor::new(1)?;
     loop {
         let mut raw = Vec::new();
         let bytes = (&mut reader)
@@ -259,7 +274,8 @@ pub async fn run(root: &Path, input: &Path, manifest: &Path, resume: bool) -> Re
             return Err("duplicate source key".into());
         }
         tx.set(source_key.as_bytes(), &memory.to_be_bytes())?;
-        tx.set_at(corpus_key(memory).as_bytes(), &raw, 1)?;
+        tx.set_at(scope_key(&doc.partition, memory).as_bytes(), b"1", 1)?;
+        tx.set_at(corpus_key(memory).as_bytes(), compressor.compress(&raw)?, 1)?;
         pending += bytes;
         if state.documents.is_multiple_of(128) || pending >= 4 * 1024 * 1024 {
             tx.set(STATE, serde_json::to_vec(&state)?)?;
@@ -302,21 +318,24 @@ pub async fn inspect(root: &Path, operation: &str, memory: Option<u64>) -> Resul
     let tree = open_authority(root)?;
     let result = {
         let tx = tree.begin()?;
+        let expected = read_state(&tx)?;
         if operation == "corpus-get" {
             let id = memory.ok_or("missing corpus ID")?;
             if id < FIRST_MEMORY {
                 return Err("invalid corpus ID".into());
             }
             tx.get(corpus_key(id).as_bytes())?
-                .map(|v| serde_json::from_slice(&v))
+                .map(|v| -> Result<Value, Error> {
+                    Ok(serde_json::from_slice(&decode_record(&v)?)?)
+                })
                 .transpose()?
                 .unwrap_or(Value::Null)
         } else {
-            let expected = read_state(&tx)?;
             if operation == "verify-import" {
                 let mut iter = tx.range(b"corpus:".to_vec(), b"corpus;".to_vec())?;
                 iter.seek_first()?;
                 let mut state = State {
+                    storage_format: STORAGE_FORMAT,
                     manifest_sha256: expected.manifest_sha256.clone(),
                     prefix: hex(&Sha256::new()),
                     ..Default::default()
@@ -351,8 +370,18 @@ pub async fn inspect(root: &Path, operation: &str, memory: Option<u64>) -> Resul
                     {
                         return Err("noncontiguous stored corpus".into());
                     }
-                    let raw = iter.value()?;
+                    let memory = FIRST_MEMORY + state.documents;
+                    let raw = decode_record(&iter.value()?)?;
                     let doc = document(&raw)?;
+                    if tx.get(format!("source:{}", doc.key).as_bytes())?.as_deref()
+                        != Some(memory.to_be_bytes().as_slice())
+                        || tx
+                            .get_at(scope_key(&doc.partition, memory).as_bytes(), 1)?
+                            .as_deref()
+                            != Some(b"1".as_slice())
+                    {
+                        return Err("corpus source or initial scope index mismatch".into());
+                    }
                     advance(&mut state, &mut digest, &raw, &doc);
                     iter.next()?;
                     if state.documents.is_multiple_of(1024) {
@@ -370,4 +399,20 @@ pub async fn inspect(root: &Path, operation: &str, memory: Option<u64>) -> Resul
     };
     tree.close().await?;
     Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn compressed_records_reject_oversized_frames_and_legacy_bytes() {
+        let original = b"{\"key\":\"test\"}\n";
+        let encoded = zstd::bulk::compress(original, 1).unwrap();
+        assert_eq!(decode_record(&encoded).unwrap(), original);
+        assert!(decode_record(original).is_err());
+        assert!(decode_record(&encoded[..encoded.len() - 1]).is_err());
+        let oversized = zstd::bulk::compress(&vec![b'x'; MAX_RECORD + 1], 1).unwrap();
+        assert!(decode_record(&oversized).is_err());
+    }
 }

@@ -1,0 +1,133 @@
+{
+  "binary_sha256": "4fff0520217d83177093aeb92ba79a5c5b9e7440f36210b9a449d52ba2d104a4",
+  "database_allocated_bytes": 500682752,
+  "legacy_compatibility": {
+    "new_binary_sha256": "4fff0520217d83177093aeb92ba79a5c5b9e7440f36210b9a449d52ba2d104a4",
+    "old_binary_sha256": "d5ccf0623c77676b540e61aadc5daeb652c94b96ecccae848b73435d071f75ca",
+    "original_hash_unchanged": true,
+    "original_verify_command": [
+      "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/fallback-vlog-r1/probe",
+      "/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-stream-vlog-r1/database",
+      "verify-import"
+    ],
+    "rejections": [
+      {
+        "command": [
+          "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/fallback-compressed-r1/probe",
+          "/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-stream-vlog-r1/database",
+          "import-state"
+        ],
+        "exit": 1
+      },
+      {
+        "command": [
+          "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/fallback-compressed-r1/probe",
+          "/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-stream-vlog-r1/database",
+          "verify-import"
+        ],
+        "exit": 1
+      },
+      {
+        "command": [
+          "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/fallback-compressed-r1/probe",
+          "/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-stream-vlog-r1/database",
+          "corpus-get",
+          "1000000"
+        ],
+        "exit": 1
+      }
+    ],
+    "status": "passed"
+  },
+  "measurements": {
+    "corruption": {
+      "artifact_files": 15,
+      "status": "passed"
+    },
+    "enospc": {
+      "artifact_files": 27,
+      "status": "passed"
+    },
+    "high_import": {
+      "cgroup_peak_bytes": 610140160,
+      "last_memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "max_sample_gap_s": 1.0010816864669323,
+      "rss_max_bytes": 51912704,
+      "samples": 26
+    },
+    "import": {
+      "artifact_files": 45,
+      "status": "passed"
+    },
+    "low_reopen": {
+      "cgroup_peak_bytes": 90451968,
+      "last_memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "max_sample_gap_s": 1.001746527850628,
+      "rss_max_bytes": 71561216,
+      "samples": 5
+    },
+    "primitives": {
+      "artifact_files": 43,
+      "status": "passed"
+    }
+  },
+  "original_source": {
+    "complete": true,
+    "content_bytes": 13344347,
+    "documents": 38462,
+    "input_bytes": 1273224971,
+    "manifest_sha256": "5d28ca68dc34d108d9887c6306eafe7182ac50e9222ca3a44acdc39b0656641a",
+    "prefix": "83704596cac9a4e772e46bc65816981136585fc721a1ffba2c198566f36082ab",
+    "storage_format": 2,
+    "vectors": 38462
+  },
+  "runs": [
+    {
+      "exit": 0,
+      "name": "compressed-primitives-r1",
+      "seconds": 1.3192615136504173
+    },
+    {
+      "exit": 0,
+      "name": "compressed-import-r1",
+      "seconds": 2.4226221879944205
+    },
+    {
+      "exit": 0,
+      "name": "compressed-corruption-r1",
+      "seconds": 0.6167730800807476
+    },
+    {
+      "exit": 0,
+      "name": "compressed-enospc-r1",
+      "seconds": 0.41717823315411806
+    },
+    {
+      "exit": 0,
+      "name": "compressed-stream-r1",
+      "seconds": 31.91985378600657
+    },
+    {
+      "exit": 0,
+      "name": "compressed-low-reopen-r1",
+      "seconds": 4.24232288915664
+    }
+  ],
+  "scope": "38462 actual vectors; original bytes, source mapping and initial scope membership verified",
+  "scope_limit": "Small real-data/native-fault diagnostics only; full corpus/index/workload/recovery remain pending.",
+  "status": "passed_diagnostic_only"
+}
