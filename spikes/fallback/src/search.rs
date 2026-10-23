@@ -211,10 +211,35 @@ struct Wave {
     hash: String,
 }
 
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+enum TextLayout {
+    #[default]
+    Legacy,
+    ScopeColumns,
+}
+
+impl TextLayout {
+    fn column(self, scope: u8) -> String {
+        match self {
+            Self::Legacy => "body".into(),
+            Self::ScopeColumns => format!("body_p{scope}"),
+        }
+    }
+
+    fn columns(self) -> Vec<String> {
+        (0..if self == Self::Legacy { 1 } else { 8 })
+            .map(|scope| self.column(scope))
+            .collect()
+    }
+}
+
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct State {
     generation: u64,
+    #[serde(default)]
+    text_layout: TextLayout,
     bundle: Bundle,
     source: String,
     documents: u64,
@@ -325,7 +350,11 @@ fn table_name(generation: u64, vector: bool) -> String {
     format!("g{generation}_{}", if vector { "vector" } else { "text" })
 }
 
-fn batch(rows: &[(u64, load::Document)], vector: bool) -> Result<RecordBatch, Error> {
+fn batch(
+    rows: &[(u64, load::Document)],
+    vector: bool,
+    layout: TextLayout,
+) -> Result<RecordBatch, Error> {
     let rows: Vec<_> = rows
         .iter()
         .filter(|(_, d)| !vector || d.embedding.is_some())
@@ -353,15 +382,24 @@ fn batch(rows: &[(u64, load::Document)], vector: bool) -> Result<RecordBatch, Er
         fields.push(Field::new("vector", values.data_type().clone(), false));
         columns.push(Arc::new(values));
     } else {
-        fields.push(
-            Field::new("body", DataType::Utf8, false).with_metadata(HashMap::from([
-                ("lance-encoding:compression".into(), "zstd".into()),
-                ("lance-encoding:compression-level".into(), "1".into()),
-            ])),
-        );
-        columns.push(Arc::new(StringArray::from_iter_values(
-            rows.iter().map(|(_, d)| d.body.as_str()),
-        )));
+        // Separate dictionaries bound scope-query memory; each body occupies one column.
+        for (scope, name) in layout.columns().into_iter().enumerate() {
+            fields.push(
+                Field::new(name, DataType::Utf8, layout == TextLayout::ScopeColumns).with_metadata(
+                    HashMap::from([
+                        ("lance-encoding:compression".into(), "zstd".into()),
+                        ("lance-encoding:compression-level".into(), "1".into()),
+                    ]),
+                ),
+            );
+            columns.push(Arc::new(StringArray::from_iter(rows.iter().map(
+                |(_, d)| {
+                    (layout == TextLayout::Legacy
+                        || d.partition.as_bytes()[1] - b'0' == scope as u8)
+                        .then_some(d.body.as_str())
+                },
+            ))));
+        }
     }
     Ok(RecordBatch::try_new(
         Arc::new(Schema::new(fields)),
@@ -401,11 +439,20 @@ async fn verify_appended(table: &Table, expected: &RecordBatch, start: u64) -> R
             {
                 return Err("appended identity/scope mismatch".into());
             }
-            if expected.column_by_name("body").is_some() {
-                if column::<StringArray>(&actual, "body")?.value(row)
-                    != column::<StringArray>(expected, "body")?.value(at)
+            if expected.column_by_name("vector").is_none() {
+                for field in expected
+                    .schema()
+                    .fields()
+                    .iter()
+                    .filter(|f| f.data_type() == &DataType::Utf8)
                 {
-                    return Err("appended text mismatch".into());
+                    let actual = column::<StringArray>(&actual, field.name())?;
+                    let expected = column::<StringArray>(expected, field.name())?;
+                    if actual.is_null(row) != expected.is_null(at)
+                        || (!expected.is_null(at) && actual.value(row) != expected.value(at))
+                    {
+                        return Err("appended text mismatch".into());
+                    }
                 }
             } else {
                 let a = column::<FixedSizeListArray>(&actual, "vector")?.value(row);
@@ -588,7 +635,7 @@ async fn backfill(
         let text_version = append(
             &connection,
             &table_name(state.generation, false),
-            batch(&rows, false)?,
+            batch(&rows, false, state.text_layout)?,
             state.cursor,
             state.text_version,
             &tag,
@@ -598,7 +645,7 @@ async fn backfill(
         let vector_version = append(
             &connection,
             &table_name(state.generation, true),
-            batch(&rows, true)?,
+            batch(&rows, true, state.text_layout)?,
             state.vector_rows,
             state.vector_version,
             &tag,
@@ -793,9 +840,15 @@ async fn build(
     }
     if state.ready {
         let indexes = text.list_indices().await?;
-        if !["scope_bitmap", "body_fts"]
-            .iter()
-            .all(|name| indexes.iter().any(|i| i.name == *name))
+        if !std::iter::once("scope_bitmap".to_string())
+            .chain(
+                state
+                    .text_layout
+                    .columns()
+                    .iter()
+                    .map(|column| format!("{column}_fts")),
+            )
+            .all(|name| indexes.iter().any(|i| i.name == name))
         {
             return Err("ready index missing; create another generation".into());
         }
@@ -815,16 +868,18 @@ async fn build(
         .memory_limit_mb(32)
         .num_workers(1)
         .with_position(false);
-    index(
-        &text,
-        &context,
-        "body_fts",
-        "body",
-        IndexType::Inverted,
-        &fts,
-        state.documents,
-    )
-    .await?;
+    for column in state.text_layout.columns() {
+        index(
+            &text,
+            &context,
+            &format!("{column}_fts"),
+            &column,
+            IndexType::Inverted,
+            &fts,
+            state.documents,
+        )
+        .await?;
+    }
     if fail_after_text {
         return Err("injected build failure".into());
     }
@@ -921,9 +976,12 @@ async fn query(
             .execute()
             .await?
     } else {
-        base.full_text_search(FullTextSearchQuery::new(term.ok_or("missing term")?))
-            .execute()
-            .await?
+        base.full_text_search(
+            FullTextSearchQuery::new(term.ok_or("missing term")?)
+                .with_column(state.text_layout.column(scope))?,
+        )
+        .execute()
+        .await?
     };
     let mut ids = Vec::new();
     while let Some(batch) = stream.try_next().await? {
@@ -976,6 +1034,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
             } else {
                 let value = State {
                     generation,
+                    text_layout: TextLayout::ScopeColumns,
                     bundle,
                     source: corpus.manifest_sha256,
                     documents: corpus.documents,
@@ -1119,4 +1178,45 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
     };
     tree.close().await?;
     Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn scoped_text_retains_each_body_once_and_legacy_layout() -> Result<(), Error> {
+        let rows: Vec<_> = (0..8)
+            .map(|scope| {
+                (
+                    1_000_000 + scope,
+                    load::Document {
+                        key: format!("scope:{scope}"),
+                        body: format!("original scope {scope} 文本"),
+                        partition: format!("p{scope}"),
+                        embedding: None,
+                    },
+                )
+            })
+            .collect();
+        let scoped = batch(&rows, false, TextLayout::ScopeColumns)?;
+        let mut bytes = 0;
+        for scope in 0..8 {
+            let text = column::<StringArray>(&scoped, &format!("body_p{scope}"))?;
+            for (row, (_, document)) in rows.iter().enumerate() {
+                assert_eq!(text.is_valid(row), row == scope);
+                if text.is_valid(row) {
+                    assert_eq!(text.value(row), document.body);
+                    bytes += text.value(row).len();
+                }
+            }
+        }
+        assert_eq!(bytes, rows.iter().map(|(_, d)| d.body.len()).sum::<usize>());
+        assert!(scoped.column_by_name("body").is_none());
+        let legacy = batch(&rows, false, TextLayout::Legacy)?;
+        assert_eq!(column::<StringArray>(&legacy, "body")?.len(), 8);
+        assert_eq!(TextLayout::default(), TextLayout::Legacy);
+        assert!(serde_json::from_str::<TextLayout>("\"unknown\"").is_err());
+        Ok(())
+    }
 }

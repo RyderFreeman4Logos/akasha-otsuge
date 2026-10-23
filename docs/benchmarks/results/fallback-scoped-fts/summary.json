@@ -1,0 +1,81 @@
+{
+  "archive_sha256": "25caaeaf3573b0b4b56433e81df13f6ae0770465954e52452ec469ce502a5247",
+  "base_commit": "6be9e9d050c78c23c5aae0ab345ee6295d58e8cc",
+  "binary_sha256": "5b1ced503e8fd8dce80812569ca6e55c2766515fc9fd9b65791175966b149ec5",
+  "change": "new baseline generation stores each body once in one of8nullable scope columns; FTS explicitly selects that scope column; legacy generation/delta body shape retained",
+  "controls": {
+    "lifecycle": {
+      "artifact_hashes_verified": true,
+      "checks": 103,
+      "exact_native_processes_exited": true,
+      "rss_max_bytes": 119312384,
+      "scratch_removed": true,
+      "seconds": 8.204008583910763,
+      "temporary_root_removed": true,
+      "unit": "inactive"
+    },
+    "search": {
+      "artifact_hashes_verified": true,
+      "checks": 70,
+      "exact_native_processes_exited": true,
+      "rss_max_bytes": 191111168,
+      "scratch_removed": true,
+      "seconds": 28.236913478933275,
+      "temporary_root_removed": true,
+      "unit": "inactive"
+    }
+  },
+  "full_work_pending": [
+    "generation2 full backfill/index",
+    "all32 ANN exact references",
+    "activation",
+    "cold reads",
+    "both30min profiles",
+    "remaining recovery matrix"
+  ],
+  "high_diagnostic": {
+    "native": {
+      "corpus_baseline_only": true,
+      "generation": 1,
+      "ids": [
+        6306828,
+        11852102,
+        8451429,
+        5946754,
+        4261273,
+        2415379,
+        11802556,
+        2465193,
+        9787125,
+        4336401,
+        11524244,
+        1432586,
+        12099190,
+        5031081,
+        11202221,
+        5094455,
+        1033312,
+        8641240,
+        2866727,
+        2737370
+      ]
+    },
+    "native_identity": {
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-bm25-high-d5edeff6c05f4ad3a31524d63804ef6b.service",
+      "event": "executable",
+      "pid": 1166266,
+      "sha256": "95081e9e4f5666c4141d53fd111f85d6b9c26735280fb7e4fe3b42d3c05e15e2",
+      "start_ticks": "461319720"
+    },
+    "not_low_acceptance": true,
+    "rss_max_bytes": 1157300224,
+    "scratch_removed": true,
+    "seconds": 7.170238773338497,
+    "status": "passed_high_group_diagnostic_only",
+    "unit": "inactive"
+  },
+  "low_failure": "first full BM25 massachusetts scope0 times out180s; I/O concurrency1 also times out",
+  "query_harness": "all32 reference queries retained; timeout captures launched PID/start/partial output/exit;2units pass",
+  "root_cause": "native FTS eagerly retains all435 token dictionaries; token files861893690B; default low index cache does not bound their resident footprint",
+  "status": "native_scope_layout_controls_pass_full_scope_acceptance_pending"
+}

@@ -16,6 +16,9 @@ from run_case import digest, process_identity, publish
 
 def main():
     binary, output = pathlib.Path(sys.argv[1]).resolve(strict=True), pathlib.Path(sys.argv[2]).resolve()
+    legacy = pathlib.Path(sys.argv[3]).resolve(strict=True) if len(sys.argv) == 4 else None
+    selected_binary = binary
+    total = 70 if legacy else 56
     output.mkdir(mode=0o700)
     (output / 'OWNER').write_text('akasha-otsuge MVP-003 fallback search receipts\n')
     records, started = [], time.monotonic()
@@ -25,6 +28,7 @@ def main():
         database, source, manifest, request = [root / n for n in ('database', 'source.jsonl', 'manifest.json', 'request.json')]
         publish(output / 'admission.json', dict(binary_sha256=digest(binary),
             harness_sha256=digest(pathlib.Path(__file__)), controller=process_identity(os.getpid()),
+            legacy_binary_sha256=digest(legacy) if legacy else None,
             temporary_root=temporary, scope='1057 synthetic corpus records; excluded from full-scale accounting'))
         sha, size, body_size = hashlib.sha256(), 0, 0
         with source.open('xb') as stream:
@@ -39,7 +43,7 @@ def main():
 
         def invoke(*arguments, kill=None, error=None, overrides=None):
             name = f'{len(records):03d}'
-            command = [str(binary), str(database), *map(str, arguments)]
+            command = [str(selected_binary), str(database), *map(str, arguments)]
             env = dict(os.environ, AKASHA_SPIKE_PROFILE='low', LANCE_CPU_THREADS='2',
                        AKASHA_SPIKE_INDEX_OBSERVE_SECONDS='600')
             env.pop('AKASHA_SPIKE_DISK_RESERVE_BYTES', None)
@@ -77,9 +81,9 @@ def main():
                 request=json.loads(request.read_text()) if arguments[0] == '--generation' else None,
                 kill=kill, expected_error=error, config_overrides=overrides))
             elapsed = time.monotonic() - started
-            publish(output / 'progress.json', dict(phase=name, completed=len(records), total=48,
+            publish(output / 'progress.json', dict(phase=name, completed=len(records), total=total,
                 elapsed_s=elapsed, rate_per_s=len(records)/elapsed,
-                eta_s=max(0, 48-len(records))*elapsed/len(records)))
+                eta_s=max(0, total-len(records))*elapsed/len(records)))
             if not kill and not error:
                 return json.loads((output / (name + '.stdout')).read_text())
 
@@ -101,6 +105,10 @@ def main():
         assert ready['ready'] and call('build') == ready
         assert call('query', bundle=bundle, scope=2, term='beaconfortytwo')['ids'] == [1_000_042]
         assert call('query', bundle=bundle, scope=0, term='beaconfortytwo')['ids'] == []
+        assert ready['text_layout'] == 'scope_columns'
+        for scope in range(8):
+            ids = call('query', bundle=bundle, scope=scope, term='astronomy')['ids']
+            assert ids and all((memory-1_000_000) % 8 == scope for memory in ids)
         vector = [1.0] + [0.0] * 1535
         assert call('query', bundle=bundle, scope=0, vector=vector)['ids'][0] == 1_000_000
         call('query', bundle=dict(bundle, model='other'), scope=0, vector=vector, error='bundle mismatch')
@@ -128,15 +136,28 @@ def main():
         assert call('status', overrides={'AKASHA_SPIKE_DISK_RESERVE_BYTES':str(2**64-1)})['ready']
         call('begin', 7, bundle=bundle, overrides={'AKASHA_SPIKE_DISK_RESERVE_BYTES':str(2**64-1)}, error='disk reservation')
         assert invoke('verify-import')['prefix'] == sha.hexdigest()
-        assert len(records) == 48, len(records)
+        if legacy:
+            database = root / 'legacy-database'
+            selected_binary = legacy
+            invoke('--load', source, manifest)
+            call('begin', bundle=bundle)
+            call('backfill', waves=100)
+            call('build')
+            selected_binary = binary
+            assert call('status')['text_layout'] == 'legacy'
+            assert call('build')['text_layout'] == 'legacy'
+            for scope in range(8):
+                ids = call('query', bundle=bundle, scope=scope, term='astronomy')['ids']
+                assert ids and all((memory-1_000_000) % 8 == scope for memory in ids)
+        assert len(records) == total, len(records)
     elapsed = time.monotonic() - started
-    publish(output / 'progress.json', dict(phase='completed', completed=48, total=48,
-        elapsed_s=elapsed, rate_per_s=48/elapsed, eta_s=0))
-    publish(output / 'result.json', dict(status='passed', checks=48, seconds=elapsed, records=records,
+    publish(output / 'progress.json', dict(phase='completed', completed=total, total=total,
+        elapsed_s=elapsed, rate_per_s=total/elapsed, eta_s=0))
+    publish(output / 'result.json', dict(status='passed', checks=total, seconds=elapsed, records=records,
         temporary_root_removed=not pathlib.Path(temporary).exists(),
         artifact_sha256={str(p.relative_to(output)):digest(p) for p in output.iterdir() if p.is_file()},
         not_tested=['full corpus', 'ordinary concurrent changes', 'active generation switch', 'power loss']))
-    print(json.dumps(dict(status='passed', checks=48, seconds=elapsed)))
+    print(json.dumps(dict(status='passed', checks=total, seconds=elapsed)))
 
 
 if __name__ == '__main__':

@@ -215,6 +215,14 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       in 164.265s, sampled RSS max610,480,128B, with no OOM. All original
       deadlines and limits remain unchanged. Exact ANN query measurement,
       activation and both sustained workloads remain required.
+      The first full BM25 query then exceeds180s under the low profile;
+      limiting I/O concurrency to1 does not resolve it. The same query with
+      unchanged low engine caches but a2GiB diagnostic group returns in7.170s,
+      RSS1,157,300,224B. This is not low acceptance. Source and disk inspection
+      identify435 eagerly resident FTS token dictionaries (861,893,690 file bytes).
+      A new generation will store each body in one nullable scope column and
+      build separate dictionaries; legacy generations retain their original layout.
+      Full scoped-layout/query/activation/workload acceptance is still pending.
       The lifecycle implementation now applies real delta indexes, validates
       embedding bundles/source hashes, records gap-free watermarks and atomically
       activates generations. Its 103-command fixture covers six SIGKILL cuts,

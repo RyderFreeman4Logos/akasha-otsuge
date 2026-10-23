@@ -180,7 +180,7 @@ fn data(
             )
         })
         .collect();
-    let batch = super::batch(&docs, family == Family::Vector)?;
+    let batch = super::batch(&docs, family == Family::Vector, TextLayout::Legacy)?;
     let mut columns = batch.columns().to_vec();
     columns[2] = Arc::new(UInt64Array::from_iter_values(
         selected.iter().map(|e| e.seq),
@@ -569,6 +569,7 @@ pub(super) async fn activate(a: &Authority, id: u64, hold: Option<&str>) -> Resu
 async fn candidates(
     root: &Path,
     name: &str,
+    text_column: &str,
     scope: u8,
     term: Option<&str>,
     vector: Option<&[f32]>,
@@ -586,9 +587,12 @@ async fn candidates(
             .execute()
             .await?
     } else {
-        base.full_text_search(FullTextSearchQuery::new(term.ok_or("missing term")?.into()))
-            .execute()
-            .await?
+        base.full_text_search(
+            FullTextSearchQuery::new(term.ok_or("missing term")?.into())
+                .with_column(text_column.into())?,
+        )
+        .execute()
+        .await?
     };
     let mut hits = Vec::new();
     while let Some(batch) = stream.try_next().await? {
@@ -662,6 +666,7 @@ pub(super) async fn query_current(
             candidates(
                 &a.root,
                 &family.table(id),
+                "body",
                 scope,
                 term.as_deref(),
                 vector.as_deref(),
@@ -674,6 +679,7 @@ pub(super) async fn query_current(
             candidates(
                 &a.root,
                 &table_name(id, family == Family::Vector),
+                &base.text_layout.column(scope),
                 scope,
                 term.as_deref(),
                 vector.as_deref(),

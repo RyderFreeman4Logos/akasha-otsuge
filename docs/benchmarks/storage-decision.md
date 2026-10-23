@@ -134,3 +134,25 @@ The only change from the preceding merge failure is the existing native worker
 limit from two to one. Total training sample, partition count and iteration limit
 are unchanged. Full exact-ANN queries, ordinary-change catch-up/activation, both
 30-minute profiles, cold reads and the remaining failure matrix are still open.
+
+### Full-query memory and scoped dictionaries
+
+[Query diagnosis and layout controls](results/fallback-scoped-fts/summary.json)
+show the original full BM25 query cannot meet the low profile: the first query
+times out at180s, including with I/O concurrency reduced to1. Native source loads
+and retains all435 token dictionaries (861,893,690B of files). The same query,
+unchanged low engine caches and I/O1 in a2GiB diagnostic group, returns in7.170s
+with RSS1,157,300,224B. This diagnoses residency; it is not low-profile acceptance.
+
+New generations place each source body in exactly one nullable scope column,
+with a separate native FTS index for each of the eight frozen scopes. The query
+selects that column explicitly and still filters scope. Original body bytes are
+not duplicated among columns. Persisted layout identity preserves legacy
+generations and the delta-table shape. Seven native units,70 native search and
+legacy-layout checks, and103 lifecycle checks pass under the low group. Full
+scoped-generation acceptance is pending; source/authority data is reused.
+
+The reference-query harness now retains all32 exact-ANN references and supports
+an explicit generation. A timeout records the child identity, partial output and
+exit before failing. The initial failed run lacked those child receipts; its
+cgroup samples and that limitation remain archived. No ANN recall is yet claimed.
