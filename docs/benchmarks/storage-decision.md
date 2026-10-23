@@ -57,9 +57,10 @@ all original bytes verified after direct low reopen. See the
 intentional stop and unchanged limits. Compressed full import and low-memory
 verification of every original record now pass. Full-corpus 100k history and
 all-record native backfill also pass; see the [retained receipts](results/fallback-full-history-backfill/).
-Full indexes, sustained workloads and the remaining recovery matrix are still
-unproven. The first full FTS build OOMs; its bounded-I/O successor preserves the
-original native deadline. Reuse source shards and query oracles, and do not retain
+Full native text/vector index coverage now passes with bounded scan I/O,
+streaming IVF training, private scratch and one build worker. Sustained workloads
+and the remaining recovery matrix are still unproven. All failed attempts and
+the original native deadline remain retained. Reuse source shards and query oracles, and do not retain
 an expanded corpus copy.
 
 The [frozen contract](storage-contract.md) and [remaining checklist](../plan/todo.md)
@@ -83,3 +84,53 @@ The final admission-only correction has a retained failing control and passing
 controls for both rebuilt backends: malformed full-scale evidence is rejected
 before authority initialization. Runtime measurements remain bound to their
 recorded earlier binaries; the correction does not change scheduling or queries.
+
+### Full index training bound
+
+[Training receipts](results/fallback-index-training/summary.json) preserve two
+failures. With scan I/O bounded, full FTS completes but vector training OOMs at
+640MiB. The existing native streaming API keeps sample_rate=16 while limiting
+each batch to four vectors per partition. At one million vectors it completes
+training in 17.845s and assigns every vector to a partition; sampled RSS maximum
+is 466,124,800B, with no OOM. The separate page-metadata spill finalization then
+fails with ENOENT, so this is not full-index acceptance. The bounded syscall
+diagnostic and following scratch correction are recorded below.
+
+Release Clippy/build, six units and 48 native search checks pass for this change.
+The locked Lance crate archives and the inspected training source hashes match;
+no upstream source is modified. Partition count, total sample budget, iteration
+limit, resource profile and original absolute deadline are retained. Cumulative
+inner k-means iterations are not unique row coverage or a trustworthy total.
+
+### Private native scratch
+
+[File-syscall and cleanup evidence](results/fallback-private-scratch/summary.json)
+reproduces the ENOENT: a scratch file is created, but its final rename fails; no
+removal of that file or directory appears in the traced process tree. The actor
+that removed it is not established. A private observer copy permits only its
+exact strace parent for this diagnostic; its timings are not acceptance.
+
+The ordinary observer now places TMPDIR beside its owned receipts and removes
+it only after every native descendant exits. Three native controls cover success,
+failure and live-descendant cleanup refusal; all four procfs controls still pass.
+The same native binary then completes shuffle on full data, but OOMs at partition
+584/1000 during merge. After exact process and unit exit checks, 6,150,127,616B of
+that attempt's exclusive scratch is removed; authority and committed indexes stay
+intact. The single-worker result is recorded below; sustained workload acceptance
+remains open.
+
+### Full native index coverage
+
+[The single-worker receipt](results/fallback-full-index/summary.json) completes
+all 1,000 IVF partitions in 164.265s. Native index statistics verify every declared
+11,428,831 text row and 1,000,000 vector row is indexed, with no unindexed rows.
+The generation is ready; pending work and activation are separate. The unchanged
+640MiB hard limit, disabled swap and original absolute deadline remain in force.
+Sampled RSS maximum/P99 is 610,480,128B, with no OOM; this build measurement does
+not satisfy or substitute for the steady 512MiB P99 workload criterion. The
+observer confirms private scratch removal after process exit.
+
+The only change from the preceding merge failure is the existing native worker
+limit from two to one. Total training sample, partition count and iteration limit
+are unchanged. Full exact-ANN queries, ordinary-change catch-up/activation, both
+30-minute profiles, cold reads and the remaining failure matrix are still open.

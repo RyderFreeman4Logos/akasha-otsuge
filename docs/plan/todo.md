@@ -81,7 +81,10 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       full-size workloads remain separate acceptance below.
 - [ ] Observe full-size hot/cold read coverage; partition labels and process
       restart alone do not prove file-cache coldness.
-- [ ] Index every declared searchable text/vector record at full size.
+- [x] Index every declared searchable text/vector record at full size. Fallback
+      native statistics verify all 11,428,831 text rows and 1,000,000 vector rows
+      after bounded streaming training and single-worker partition merge.
+      Full query quality, activation and sustained memory remain separate below.
 - [x] Implement bounded admission and 100 independent harness clients with actual
       conflicts, durable latency/error records and per-second checkpoints;
       full-size measured cases and recovery remain below.
@@ -200,8 +203,18 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       and 1,000,000 vectors are backfilled in 830.918s, sampled RSS max
       334,905,344B, without OOM. Allocated storage after backfill is 68,256,649,216B.
       Full FTS build r1 OOMs during tokenization at 1,072,926 documents; failure,
-      journal and original deadline are retained. The bounded-I/O successor is
-      separate acceptance. Full indexes and sustained workloads remain required.
+      journal and original deadline are retained. The bounded-I/O successor
+      completes full FTS coverage, then OOMs during IVF training. Native streaming
+      training with sample_rate16/streaming_sample_rate4 completes training and
+      assigns all one million vectors (RSS max466,124,800B), but final metadata
+      spill persistence returns ENOENT. Both failures are archived and abandoned
+      explicitly. The syscall trace finds no deletion inside the traced process
+      tree; the deleting actor remains unknown. Private scratch avoids that
+      failure, but two-worker merge OOMs at 584/1000 partitions. Reducing only
+      the native worker limit to one then completes full native index coverage
+      in 164.265s, sampled RSS max610,480,128B, with no OOM. All original
+      deadlines and limits remain unchanged. Exact ANN query measurement,
+      activation and both sustained workloads remain required.
       The lifecycle implementation now applies real delta indexes, validates
       embedding bundles/source hashes, records gap-free watermarks and atomically
       activates generations. Its 103-command fixture covers six SIGKILL cuts,

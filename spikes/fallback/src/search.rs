@@ -858,6 +858,8 @@ async fn build(
         let partitions = ((state.vectors as f64).sqrt() as usize).clamp(1, 1024);
         let mut ivf = IvfBuildParams::new(partitions);
         ivf.sample_rate = 16;
+        // Bound resident training vectors without reducing the total sample.
+        ivf.streaming_sample_rate = Some(4);
         ivf.max_iters = 20;
         let params =
             VectorIndexParams::with_ivf_flat_params(lancedb::DistanceType::Cosine.into(), ivf);

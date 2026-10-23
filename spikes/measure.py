@@ -5,8 +5,10 @@ import hashlib
 import json
 import pathlib
 import resource
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 
 
@@ -62,6 +64,17 @@ def process_io(pid):
         return None
 
 
+def clean_scratch(scratch, cgroup, observer):
+    if not scratch.exists():
+        return dict(path=str(scratch), removed=True)
+    live = [int(pid) for pid in (cgroup / "cgroup.procs").read_text().split()
+            if int(pid) != observer and not exited(int(pid))]
+    if live:
+        return dict(path=str(scratch), removed=False, live_pids=live)
+    shutil.rmtree(scratch)
+    return dict(path=str(scratch), removed=True)
+
+
 def main():
     if len(sys.argv) < 3:
         raise SystemExit("usage: measure.py NEW_JSONL COMMAND [ARG ...]")
@@ -77,15 +90,18 @@ def main():
         raise SystemExit("requires a memory hard limit and disabled cgroup swap")
     started = time.monotonic()
     with open(sys.argv[1], "x", encoding="utf-8") as samples:
-        samples.write(json.dumps({"event": "start", "limits": limits,
-                                  "nofile_soft_hard": resource.getrlimit(resource.RLIMIT_NOFILE),
-                                  "native_environment": {name: os.environ.get(name) for name in (
-                                      "LANCE_CPU_THREADS", "LANCE_DEFAULT_IO_BUFFER_SIZE",
-                                      "LANCE_SHUFFLE_BATCH_BYTES",
-                                      "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES")},
-                                  "command": sys.argv[2:]}) + "\n")
-        child = subprocess.Popen(sys.argv[2:])
+        scratch = pathlib.Path(tempfile.mkdtemp(prefix="native-scratch-", dir=pathlib.Path(sys.argv[1]).resolve().parent))
+        child = None
         try:
+            env = dict(os.environ, TMPDIR=str(scratch))
+            samples.write(json.dumps({"event": "start", "limits": limits,
+                                      "nofile_soft_hard": resource.getrlimit(resource.RLIMIT_NOFILE),
+                                      "native_environment": {name: env.get(name) for name in (
+                                          "TMPDIR", "LANCE_CPU_THREADS", "LANCE_DEFAULT_IO_BUFFER_SIZE",
+                                          "LANCE_SHUFFLE_BATCH_BYTES",
+                                          "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES")},
+                                      "command": sys.argv[2:]}) + "\n")
+            child = subprocess.Popen(sys.argv[2:], env=env)
             with open(f"/proc/{child.pid}/exe", "rb") as executable:
                 binary_hash = hashlib.file_digest(executable, "sha256").hexdigest()
             start_ticks = pathlib.Path(f"/proc/{child.pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
@@ -116,17 +132,21 @@ def main():
                 samples.flush()
                 result = child.poll()
                 if result is not None:
-                    samples.write(json.dumps({"event": "exit", "code": result, "seconds": time.monotonic() - started}) + "\n")
-                    raise SystemExit(result if result >= 0 else 128 - result)
+                    cleanup = clean_scratch(scratch, cgroup, os.getpid())
+                    code = result if cleanup['removed'] else 1
+                    samples.write(json.dumps({"event": "exit", "code": code, "native_code": result,
+                                              "scratch_cleanup": cleanup, "seconds": time.monotonic() - started}) + "\n")
+                    raise SystemExit(code if code >= 0 else 128 - code)
                 time.sleep(1)
         finally:
-            if child.poll() is None:
+            if child is not None and child.poll() is None:
                 child.terminate()
                 try:
                     child.wait(timeout=5)
                 except subprocess.TimeoutExpired:
                     child.kill()
                     child.wait()
+            clean_scratch(scratch, cgroup, os.getpid())
 
 
 if __name__ == "__main__":

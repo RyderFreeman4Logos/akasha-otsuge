@@ -1,0 +1,153 @@
+{
+  "archive_sha256": "43060838f587c92a82a90176124e5e0d23de34643fb8d7fb9be1b6abbe8e633a",
+  "change": "native streaming_sample_rate=4; total16,partitions1000,max_iters20 unchanged; no upstream source edits",
+  "interpretation": "full training completes after change; separate page-metadata spill finalization error remains. Native progress counts cumulative inner iterations, not unique coverage.",
+  "native_control": {
+    "binary_sha256": "95081e9e4f5666c4141d53fd111f85d6b9c26735280fb7e4fe3b42d3c05e15e2",
+    "checks": 48,
+    "hashes_verified": true,
+    "memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "0",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "native_processes_exited": true,
+    "rss_max_bytes": 176922624,
+    "seconds": 13.053893215954304,
+    "status": "passed",
+    "temporary_root_removed": true,
+    "unit_inactive": true
+  },
+  "r2": {
+    "binary_sha256": "eb265fec86b8de1323d22a8741512884351ebfa68ec26e3cfb24d50a6c4ece9c",
+    "hashes_verified": true,
+    "journal": "fallback-full-index-r2-journal.log",
+    "last_controller_progress": {
+      "completed": null,
+      "config_epoch": 1,
+      "controller": {
+        "pid": 1038275,
+        "start_ticks": "460796931",
+        "state": "R"
+      },
+      "elapsed_s": 2167.768059401773,
+      "eta_s": null,
+      "free_bytes": 468088778752,
+      "native": {
+        "counter_note": "native entity counter can include repeated passes; not unique coverage",
+        "native_index": {
+          "deadline_unix_ms": 1792796647085,
+          "phase": "copy_partitions",
+          "pid": 1038280,
+          "progress": {
+            "completed": 425,
+            "done": false,
+            "elapsed_s": 0.512399797,
+            "eta_s": 0.012056465811764706,
+            "rate_per_s": 829.4304613083209,
+            "total": 435,
+            "unit": "partitions"
+          },
+          "start_ticks": "460796971"
+        }
+      },
+      "phase": "build",
+      "rate_per_s": null,
+      "reserved_bytes": 36212254720,
+      "total": null
+    },
+    "last_observation": {
+      "cgroup_current_bytes": 671031296,
+      "cgroup_peak_bytes": 671305728,
+      "engine_process_io": {
+        "1038280": {
+          "cancelled_write_bytes": 0,
+          "rchar": 22922355526,
+          "read_bytes": 23306608640,
+          "syscr": 23718,
+          "syscw": 1620343,
+          "wchar": 9139463567,
+          "write_bytes": 9891586048
+        }
+      },
+      "engine_pss_bytes": 330937344,
+      "engine_rss_bytes": 333062144,
+      "event": "sample",
+      "io_coverage": "currently sampled processes; cgroup controller unavailable",
+      "io_stat": null,
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "174540",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "observer_rss_bytes": 16355328,
+      "seconds": 2168.0969121856615
+    },
+    "native_processes_exited": true,
+    "note": "FTS build/coverage completed before vector training; observer killed with unit so last OOM0 is not a no-OOM receipt",
+    "original_deadline_ms": 1792796647085,
+    "rss_max_bytes": 673681408,
+    "rss_p99_bytes": 659623936,
+    "samples": 2152,
+    "seconds": 2169.8066414808854,
+    "status": "failed_oom_train_ivf",
+    "unit_inactive": true
+  },
+  "r3": {
+    "binary_sha256": "95081e9e4f5666c4141d53fd111f85d6b9c26735280fb7e4fe3b42d3c05e15e2",
+    "hashes_verified": true,
+    "memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "76907",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "native_processes_exited": true,
+    "note": "full native training and1M-row shuffle finish; final page-metadata spill persistence fails; no OOM",
+    "original_deadline_ms": 1792796647085,
+    "rss_max_bytes": 466124800,
+    "rss_p99_bytes": 466124800,
+    "samples": 54,
+    "seconds": 54.05147516075522,
+    "stages": {
+      "shuffle": {
+        "completed": 1000000,
+        "done": false,
+        "elapsed_s": 32.908636487,
+        "eta_s": 0.0,
+        "rate_per_s": 30387.159929735557,
+        "total": 1000000,
+        "unit": "rows"
+      },
+      "train_ivf": {
+        "completed": 5632,
+        "done": true,
+        "elapsed_s": 17.844976829,
+        "eta_s": 0.0,
+        "rate_per_s": 315.6070222992611,
+        "total": 20,
+        "unit": "iterations"
+      },
+      "train_quantizer": {
+        "completed": 0,
+        "done": true,
+        "elapsed_s": 0.001023717,
+        "eta_s": null,
+        "rate_per_s": 0.0,
+        "total": null,
+        "unit": ""
+      }
+    },
+    "status": "failed_spill_file_persist_ENOENT",
+    "unit_inactive": true
+  },
+  "status": "not_full_index_acceptance"
+}
