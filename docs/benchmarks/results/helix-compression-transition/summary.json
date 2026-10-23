@@ -1,0 +1,28 @@
+{
+  "status": "diagnostic_passed",
+  "native_feature": "Zstd for writer and embedded compactor; pinned dependency versions unchanged",
+  "compatibility": {
+    "result": "passed",
+    "documents": 1057,
+    "killed_after_durable_documents": 32,
+    "initial_binary_sha256": "18b13ffbdea345996121bdac8ad0515f8f57e0b37a7385091252696f86576991",
+    "resume_binary_sha256": "170fb1799332756085ced337860140c8332cdde1fcc1c87b77ab21d1bf17eb7c",
+    "checks": [
+      "process_crash",
+      "changed_prefix_rejected",
+      "no_duplicate_resume",
+      "manifest_change_rejected"
+    ],
+    "not_tested": [
+      "50GB",
+      "disk_full",
+      "100_clients"
+    ]
+  },
+  "adoption_tests": 5,
+  "root_gate": "mvp-003-zstd-root-gate.log; current product tree, exact-commit repetition before push",
+  "spike_tests": "4 release unit tests before prefix-observability addition; actual import compatibility rerun afterwards",
+  "full_import": "stopped by disk reservation; durable prefix retained, no engine OOM; all full-size acceptance remains pending",
+  "storage": "current /tmp 125846241280 bytes free < 126212254720 reservation; /mnt/ssd capacity available but obj cannot create a directory there",
+  "review": "implementing-agent source self-check, not independent review"
+}

@@ -51,6 +51,10 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       streaming import and completed-run reconciliation on diagnostic input.
 - [x] Freeze distributed 3,328-query input and exact ANN top-20 references for
       32 queries against all one million vectors, with source/binary hashes.
+- [ ] Finish the full corpus import. The first attempt stopped at its disk
+      reservation after about 4.7 million documents; the durable prefix remains.
+      Native Zstd continuation and journaled run transfer are verified on small
+      fixtures. More writable capacity is required before full-size continuation.
 - [ ] Observe full-size hot/cold read coverage; partition labels and process
       restart alone do not prove file-cache coldness.
 - [ ] Index every declared searchable text/vector record at full size.

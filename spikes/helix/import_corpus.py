@@ -17,6 +17,77 @@ from run_case import digest, process_identity, publish
 OWNER = "akasha-otsuge MVP-003 owned corpus import and database\n"
 
 
+def require_stopped(state):
+    owner = process_identity(state["controller"]["pid"])
+    if owner and owner["state"] != "Z" and owner["start_ticks"] == state["controller"]["start_ticks"]:
+        raise ValueError("previous import controller is live")
+    for attempt in state["attempts"]:
+        for unit in attempt["units"]:
+            active = subprocess.run(["systemctl", "--user", "show", unit, "-p", "ActiveState", "--value"],
+                                    check=True, capture_output=True, text=True, timeout=15).stdout.strip()
+            if active not in {"inactive", "failed"}:
+                raise ValueError("previous import unit is still live")
+
+
+def adopt_database(run, state, source=None):
+    """Journal the exact prior run before a same-filesystem directory transfer."""
+    record = state.get("adoption")
+    source = pathlib.Path(record["run"] if record else source).resolve(strict=True)
+    if source == run or source.is_relative_to(run) or run.is_relative_to(source):
+        raise ValueError("adoption requires separate run directories")
+    if (source / "OWNER").read_text() != OWNER or source.stat().st_dev != run.stat().st_dev:
+        raise ValueError("adoption requires an owned run on the same filesystem")
+    with (source / "controller.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        previous = json.loads((source / "state.json").read_text())
+        require_stopped(previous)
+        if previous["phase"] == "completed":
+            raise ValueError("adoption is only for an incomplete import")
+        if digest(source / "probe") != previous["binary_sha256"]:
+            raise ValueError("prior import binary changed")
+        for name in ("input", "manifest_sha256", "preparer_sha256", "data_python", "disk_plan"):
+            if previous["identity"][name] != state["identity"][name]:
+                raise ValueError("adoption corpus or reservation differs")
+        old, new = source / "database", run / "database"
+        if old.is_symlink() or new.is_symlink():
+            raise ValueError("adoption database must not be a symlink")
+        if not record:
+            if not old.is_dir() or new.exists():
+                raise ValueError("adoption requires exactly one original database")
+            for original, archived in [(source / "state.json", "origin-state.json"),
+                                       (old / "import-progress.json", "origin-progress.json")]:
+                with (run / archived).open("xb") as output:
+                    output.write(original.read_bytes())
+                    output.flush()
+                    os.fsync(output.fileno())
+            record = {"run": str(source), "state_sha256": digest(source / "state.json"),
+                      "binary_sha256": previous["binary_sha256"],
+                      "progress_sha256": digest(old / "import-progress.json"), "complete": False}
+            state.update(adoption=record, phase="adoption_prepared")
+            publish(run / "state.json", state)
+        if (digest(source / "state.json") != record["state_sha256"]
+                or digest(run / "origin-state.json") != record["state_sha256"]
+                or digest(run / "origin-progress.json") != record["progress_sha256"]):
+            raise ValueError("adoption origin evidence changed")
+        if old.exists() == new.exists():
+            raise ValueError("adoption must have exactly one database location")
+        if old.exists():
+            if digest(old / "import-progress.json") != record["progress_sha256"]:
+                raise ValueError("original database progress changed before transfer")
+            os.rename(old, new)
+        elif digest(new / "import-progress.json") != record["progress_sha256"]:
+            raise ValueError("transferred database changed before adoption completion")
+        for directory in (source, run):
+            fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(fd)
+            finally:
+                os.close(fd)
+        record["complete"] = True
+        state["phase"] = "adopted"
+        publish(run / "state.json", state)
+
+
 def stop(unit, child):
     if child.poll() is None:
         subprocess.run(["systemctl", "--user", "stop", unit], check=False, timeout=60)
@@ -30,7 +101,9 @@ def main():
     parser.add_argument("run", type=pathlib.Path)
     parser.add_argument("binary", type=pathlib.Path)
     parser.add_argument("python", type=pathlib.Path)
-    parser.add_argument("--resume", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--resume", action="store_true")
+    mode.add_argument("--adopt-run", type=pathlib.Path, help="explicitly transfer a stopped partial import to this new binary/run")
     args = parser.parse_args()
     inputs, manifest_path, run = args.input.resolve(strict=True), args.manifest.resolve(strict=True), args.run.resolve()
     # Preserve the venv invocation path; resolving its symlink discards PyArrow.
@@ -66,24 +139,20 @@ def main():
         state = json.loads(state_path.read_text())
         if state["identity"] != identity or digest(run / "probe") != state["binary_sha256"]:
             raise ValueError("import identity changed")
-        owner = process_identity(state["controller"]["pid"])
-        if owner and owner["state"] != "Z" and owner["start_ticks"] == state["controller"]["start_ticks"]:
-            raise ValueError("previous import controller is live")
-        for attempt in state["attempts"]:
-            for unit in attempt["units"]:
-                active = subprocess.run(["systemctl", "--user", "show", unit, "-p", "ActiveState", "--value"], check=True, capture_output=True, text=True).stdout.strip()
-                if active not in {"inactive", "failed"}:
-                    raise ValueError("previous import unit is still live")
+        require_stopped(state)
         if state["phase"] == "completed":
             for name, expected in state["result"]["artifact_sha256"].items():
                 if digest(run / name) != expected:
                     raise ValueError("completed import artifact changed")
             print(json.dumps(state["result"]))
             return 0
+        if state.get("adoption") and not state["adoption"]["complete"]:
+            adopt_database(run, state)
         if not (run / "database").exists():
             raise ValueError("no import database to resume; inspect the failed admission")
     else:
-        if shutil.disk_usage(run.parent).free < sum(plan.values()):
+        required = reserved_during_import + 1024**3 if args.adopt_run else sum(plan.values())
+        if shutil.disk_usage(run.parent).free < required:
             raise ValueError("insufficient disk for authority, two index generations, scratch and reserve")
         run.mkdir(mode=0o700)
         owner_lock = (run / "controller.lock").open("a")
@@ -93,7 +162,10 @@ def main():
         (run / "probe").chmod(0o700)
         with (run / "probe").open("rb") as executable:
             os.fsync(executable.fileno())
-        state = {"identity": identity, "binary_sha256": digest(run / "probe"), "attempts": []}
+        state = {"identity": identity, "binary_sha256": digest(run / "probe"), "attempts": [],
+                 "controller": process_identity(os.getpid()), "phase": "prepared"}
+        if args.adopt_run:
+            adopt_database(run, state, args.adopt_run)
     attempt_id = uuid.uuid4().hex
     attempt_dir = run / attempt_id
     attempt_dir.mkdir()
@@ -106,7 +178,7 @@ def main():
     producer_command = common + ["--unit=" + units[0], "-p", "MemoryMax=8589934592", str(data_python), str(prepare), "stream", str(inputs), str(manifest_path)]
     consumer_command = common + ["--unit=" + units[1], "-p", "MemoryMax=2147483648", "-p", "Environment=AKASHA_SPIKE_PROFILE=high",
                                  sys.executable, str(observer), str(attempt_dir / "memory.jsonl"), str(run / "probe"),
-                                 str(run / "database"), "--resume-load" if args.resume else "--load", "/dev/stdin", str(manifest_path)]
+                                 str(run / "database"), "--resume-load" if args.resume or args.adopt_run else "--load", "/dev/stdin", str(manifest_path)]
     attempt.update(producer_command=producer_command, consumer_command=consumer_command)
     publish(state_path, state)
     started = time.monotonic()

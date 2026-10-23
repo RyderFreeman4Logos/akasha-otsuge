@@ -24,6 +24,7 @@ def count(binary, database):
 
 def main():
     binary = pathlib.Path(sys.argv[1]).resolve(strict=True)
+    resume_binary = pathlib.Path(sys.argv[2]).resolve(strict=True) if len(sys.argv) == 3 else binary
     with tempfile.TemporaryDirectory(prefix="akasha-import-contract-") as temporary:
         root = pathlib.Path(temporary)
         database, source, manifest = root / "database", root / "source.jsonl", root / "manifest.json"
@@ -56,6 +57,9 @@ def main():
                 child.kill()
             child.communicate(timeout=10)
         assert count(binary, database) == 32
+        initial_binary = binary
+        binary = resume_binary
+        assert count(binary, database) == 32, "replacement binary cannot read the durable prefix"
         source.write_bytes(data.replace(b"fixture 0", b"changed 0", 1))
         rejected = invoke(binary, database, "--resume-load", source, manifest, success=False)
         assert "committed prefix" in rejected.stderr, rejected.stderr
@@ -79,6 +83,8 @@ def main():
         invoke(binary, legacy, "--load", source)
         assert count(binary, legacy) == 1057, "unpinned diagnostic import changed"
         print(json.dumps({"result": "passed", "documents": 1057, "killed_after_durable_documents": 32,
+                          "initial_binary_sha256": hashlib.sha256(initial_binary.read_bytes()).hexdigest(),
+                          "resume_binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
                           "checks": ["process_crash", "changed_prefix_rejected", "no_duplicate_resume", "manifest_change_rejected"],
                           "not_tested": ["50GB", "disk_full", "100_clients"]}))
 

@@ -132,9 +132,19 @@ pub async fn run(
         .ok_or("invalid process identity")?;
     let checkpoint = |phase: &str, progress: &Progress| -> Result<(), Error> {
         let elapsed = start.elapsed().as_secs_f64();
-        let total = expected.as_ref().map(|(expected, _)| expected.documents);
-        let completed_now = progress.documents - completed;
+        let verifying = phase == "verify_prefix";
+        let total = if verifying {
+            Some(completed)
+        } else {
+            expected.as_ref().map(|(expected, _)| expected.documents)
+        };
+        let completed_now = if verifying {
+            progress.documents
+        } else {
+            progress.documents - completed
+        };
         let receipt = json!({"phase":phase,"completed":progress.documents,"total":total,
+        "durable_documents":completed.max(progress.documents),
         "elapsed_s":elapsed,"rate_per_s":completed_now as f64/elapsed,
         "eta_s":if phase=="import_complete" {Some(0.0)} else {total.filter(|_| completed_now>0).map(|total|(total-progress.documents) as f64*elapsed/completed_now as f64)},
         "pid":std::process::id(),"start_ticks":start_ticks,
@@ -149,6 +159,9 @@ pub async fn run(
     };
     let mut source = BufReader::new(File::open(input)?);
     let mut progress = Progress::default();
+    if resume {
+        checkpoint("verify_prefix", &progress)?;
+    }
     let mut batch = write_batch();
     loop {
         let mut line = String::new();
@@ -199,6 +212,9 @@ pub async fn run(
                         "input differs from the committed prefix; no new records imported".into(),
                     );
                 }
+            }
+            if progress.documents.is_multiple_of(1024) || progress.documents == completed {
+                checkpoint("verify_prefix", &progress)?;
             }
             continue;
         }

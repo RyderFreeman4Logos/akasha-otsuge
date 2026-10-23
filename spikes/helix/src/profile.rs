@@ -20,6 +20,7 @@ const MIB: u64 = 1024 * 1024;
 #[derive(Serialize)]
 struct Budget {
     profile: &'static str,
+    sst_compression: &'static str,
     vector_cache_mib: u64,
     slate_block_cache_mib: u64,
     slate_metadata_cache_mib: u64,
@@ -33,6 +34,7 @@ impl Budget {
         match value.map(OsStr::to_str) {
             None | Some(Some("low")) => Ok(Self {
                 profile: "low",
+                sst_compression: "zstd",
                 vector_cache_mib: 32,
                 slate_block_cache_mib: 32,
                 slate_metadata_cache_mib: 8,
@@ -42,6 +44,7 @@ impl Budget {
             }),
             Some(Some("high")) => Ok(Self {
                 profile: "high",
+                sst_compression: "zstd",
                 vector_cache_mib: 128,
                 slate_block_cache_mib: 64,
                 slate_metadata_cache_mib: 16,
@@ -100,12 +103,20 @@ impl Budget {
             ),
         )?
         .with_vector_build_cache_bytes(positive(self.vector_build_cache_mib * MIB));
-        let slate = slatedb::Settings {
+        let mut slate = slatedb::Settings {
+            compression_codec: Some(slatedb::config::CompressionCodec::Zstd),
             flush_interval: Some(Duration::from_millis(3)),
             l0_sst_size_bytes: 8 * MIB as usize,
             max_unflushed_bytes: self.unflushed_mib * MIB as usize,
             ..Default::default()
         };
+        if let Some(worker) = slate
+            .compactor_options
+            .as_mut()
+            .and_then(|options| options.worker.as_mut())
+        {
+            worker.compression_codec = slate.compression_codec;
+        }
         Ok(DbConfig::new()
             .with_query_telemetry(QueryTelemetry::Disabled)
             .with_max_concurrent_reads(4)

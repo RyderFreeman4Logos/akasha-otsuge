@@ -48,6 +48,13 @@ same. Every open logs the selected profile. An unknown or non-UTF-8 profile fail
 before opening the database. Both configurations pass the native search fixture;
 neither configuration alone proves the full RSS/rate contract.
 
+Both profiles enable the pinned SlateDB fork's native Zstd codec for SST writes
+and its embedded compactor. The feature changes no dependency version. Profile
+receipts identify the codec; compression does not change eligible content bytes.
+`check_import.py OLD_PROBE NEW_PROBE` checks an uncompressed durable prefix,
+forced process death, compressed continuation, changed-prefix refusal and reopen.
+This establishes forward readability, not downgrade compatibility.
+
 Verified source chain: [Helix mutation commit](https://github.com/HelixDB/helix-db/blob/c72e64f0c7e480f3d125f071659d5e3ad7b8da15/crates/db/src/execution/interpreter/mutation/tx.rs)
 uses its owned serializable transaction; [SlateDB transaction](https://github.com/HelixDB/slatedb/blob/2fb25fdaa61d42cc3756f979a8a7b37dbfc483fd/slatedb/src/db_transaction.rs)
 commits with default write options whose `await_durable` is true. The runtime
@@ -67,6 +74,8 @@ atomically stores its document count and input-prefix hash. `--resume-load INPUT
 MANIFEST` revalidates that prefix before any new writes and rejects changed
 manifests. It checks complete stream size/hash, body bytes, vector and document
 counts before marking the import complete. Progress is fsynced to the owned root.
+Resume reports prefix verification separately from new writes, including the
+already durable document count; prefix scanning is not ingestion throughput.
 The manifest-free diagnostic form is not resumable. Real precomputed
 1536-dimensional input is prepared by `../data/prepare_vectors.py` or the full
 corpus preparer. `--build-indexes [SECONDS_PER_INDEX]` builds the Document text
@@ -141,6 +150,17 @@ before import consumes the later-index reservation. `--resume` validates run
 ownership, source/input/binary identities and dead prior units, then reconciles
 the import prefix. Completed runs validate their artifact hashes without writes.
 Use the virtual environment's Python path without resolving its symlink.
+
+An explicit `--adopt-run OLD_RUN` starts a new binary/run from a stopped partial
+import. It checks the old controller, every unit, binary, corpus and unchanged
+disk reservations; archives the old state/progress; then journals a same-filesystem
+database-directory transfer. `--resume` reconciles interruptions on either side
+of the atomic rename. Old logs and the old executable remain separate evidence.
+`check_adoption.py` exercises both transfer crash windows, evidence drift, live
+owners/units and duplicate database locations. Adoption needs the existing index,
+scratch and free-space reservation plus 1 GiB startup room; it does not reserve
+the already occupied authority bytes a second time. Mixed-binary import elapsed
+times must remain separate, never presented as one candidate's throughput.
 
 The streaming controller passes a 38,462-record end-to-end check, completed-run
 reuse and negative identity/artifact checks. Full corpus import, indexing and
