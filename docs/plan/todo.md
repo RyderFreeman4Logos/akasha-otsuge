@@ -58,7 +58,9 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       by replaying the complete deduplicated source order. Source/body hashes and
       global memory IDs verify; completed reuse changes no retained files.
       Native mixed-query admission and small real-vector/synthetic-text workload
-      now pass; full corpus reads and preparer crash-resume testing remain pending.
+      now pass. Full-source preparer SIGKILL/resume preserves the first 17 selected
+      queries and reproduces all 512 canonical query bytes; terminal artifact
+      hashes and completed reuse verify. Full corpus reads remain pending.
 - [x] Finish the full corpus import. The first attempt stopped at its disk
       reservation after about 4.7 million documents; the durable prefix remains.
       Native Zstd continuation and journaled run transfer are verified on small
