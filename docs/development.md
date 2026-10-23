@@ -23,6 +23,10 @@ help/version and error handling; `tests/cli.rs` invokes the actual executable.
 Add modules when behavior requires them. Storage selection belongs to MVP-003;
 no database or host integration is implied by this bootstrap.
 
+`src/config/` contains the shared configuration schema, atomic generation manager
+and monotonic deadline contracts. Its controlled consumers are tested in
+`tests/config.rs`; see [configuration](configuration.md) for integration boundaries.
+
 Version output uses Cargo's compiled package version. The immutable Git commit and
 CI run identify the exact source; no changing wall-clock timestamp enters the binary.
 

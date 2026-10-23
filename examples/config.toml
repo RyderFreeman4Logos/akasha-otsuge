@@ -1,0 +1,32 @@
+schema_version = 1
+
+# Configure only installed hosts; binary resolution happens during daemon prepare.
+[executors.codex]
+kind = "codex"
+binary = "codex"
+
+[consult]
+executor = "caller"
+max_runner_starts = 3
+max_delegation_depth = 1
+
+[timeouts]
+local_request = "1700s"
+runner = "1700s"
+workflow = "auto"
+idle = "disabled"
+
+[runtime]
+max_concurrent_jobs = 1
+memory_budget_mib = 512
+
+[review]
+mode = "policy"
+
+[notifiers.inbox]
+kind = "local"
+enabled = true
+
+# Explicit named overrides; no fallback to another host is added implicitly.
+[profiles.patient.timeouts]
+runner = "2000s"

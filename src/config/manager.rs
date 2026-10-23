@@ -1,0 +1,196 @@
+use std::collections::VecDeque;
+use std::sync::{Arc, Mutex};
+
+use serde::Serialize;
+use serde_json::{Value, json};
+use tokio::sync::watch;
+
+use super::{ConfigError, Notifier, Paths, ResolvedConfig, resolve};
+
+pub struct Snapshot<R> {
+    generation: u64,
+    resolved: ResolvedConfig,
+    resources: R,
+}
+
+impl<R> Snapshot<R> {
+    pub fn generation(&self) -> u64 {
+        self.generation
+    }
+    pub fn resolved(&self) -> &ResolvedConfig {
+        &self.resolved
+    }
+    pub fn resources(&self) -> &R {
+        &self.resources
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReloadStatus {
+    Applied,
+    Rejected,
+    RestartRequired,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct ReloadReport {
+    pub status: ReloadStatus,
+    pub active_generation: u64,
+    pub pending_generation: Option<u64>,
+    pub candidate_digest: Option<String>,
+    pub reasons: Vec<ConfigError>,
+}
+
+struct State {
+    pending: Option<(u64, ResolvedConfig)>,
+    history: VecDeque<ReloadReport>,
+}
+
+/// R holds resources prepared for exactly one generation; pinned jobs retain them.
+pub struct ConfigManager<R> {
+    state: Mutex<State>,
+    snapshots: watch::Sender<Arc<Snapshot<R>>>,
+    paths: Paths,
+}
+
+impl<R: Send + Sync + 'static> ConfigManager<R> {
+    /// The daemon must restore the generation from durable state on restart.
+    pub fn new(
+        generation: u64,
+        initial: ResolvedConfig,
+        prepare: impl FnOnce(&ResolvedConfig) -> Result<R, ()>,
+    ) -> Result<Self, ConfigError> {
+        if generation == 0 {
+            return Err(ConfigError::invalid(
+                "generation",
+                "generation must be positive",
+            ));
+        }
+        let resources = prepare(&initial)
+            .map_err(|_| ConfigError::invalid("prepare", "initial resource preparation failed"))?;
+        let paths = initial.base_paths.clone();
+        let (snapshots, _) = watch::channel(Arc::new(Snapshot {
+            generation,
+            resolved: initial,
+            resources,
+        }));
+        Ok(Self {
+            state: Mutex::new(State {
+                pending: None,
+                history: VecDeque::new(),
+            }),
+            snapshots,
+            paths,
+        })
+    }
+
+    pub fn pin(&self) -> Arc<Snapshot<R>> {
+        Arc::clone(&self.snapshots.borrow())
+    }
+
+    pub fn subscribe(&self) -> watch::Receiver<Arc<Snapshot<R>>> {
+        self.snapshots.subscribe()
+    }
+
+    /// File watching and explicit reload both submit complete bytes here.
+    /// A prepare callback must not re-enter this manager or publish partial resources.
+    pub fn reload(
+        &self,
+        input: &str,
+        profile: Option<&str>,
+        prepare: impl FnOnce(&ResolvedConfig) -> Result<R, ()>,
+    ) -> Result<ReloadReport, ConfigError> {
+        let mut state = self
+            .state
+            .lock()
+            .map_err(|_| ConfigError::invalid("reload", "configuration manager unavailable"))?;
+        let active = self.pin();
+        let mut report = ReloadReport {
+            status: ReloadStatus::Rejected,
+            active_generation: active.generation,
+            pending_generation: state.pending.as_ref().map(|(g, _)| *g),
+            candidate_digest: None,
+            reasons: Vec::new(),
+        };
+        match resolve(input, profile, "", &self.paths) {
+            Err(error) => report.reasons.push(error),
+            Ok(candidate) => {
+                report.candidate_digest = Some(candidate.digest().into());
+                let next = active.generation.checked_add(1).ok_or_else(|| {
+                    ConfigError::invalid("generation", "configuration generation exhausted")
+                })?;
+                if candidate.config().paths != active.resolved.config().paths {
+                    report.status = ReloadStatus::RestartRequired;
+                    report.pending_generation = Some(next);
+                    report.reasons.push(ConfigError {
+                        code: "CONFIG_RESTART_REQUIRED", field: "paths".into(),
+                        message: "data directory or socket change requires explicit drain and restart",
+                        byte_offset: None,
+                    });
+                    state.pending = Some((next, candidate));
+                } else {
+                    match prepare(&candidate) {
+                        Err(()) => report.reasons.push(ConfigError::invalid(
+                            "prepare",
+                            "resource preparation failed; old configuration retained",
+                        )),
+                        Ok(resources) => {
+                            self.snapshots.send_replace(Arc::new(Snapshot {
+                                generation: next,
+                                resolved: candidate,
+                                resources,
+                            }));
+                            state.pending = None;
+                            report.status = ReloadStatus::Applied;
+                            report.active_generation = next;
+                            report.pending_generation = None;
+                        }
+                    }
+                }
+            }
+        }
+        if state.history.len() == 64 {
+            state.history.pop_front();
+        }
+        state.history.push_back(report.clone());
+        Ok(report)
+    }
+
+    /// Read live for each dispatch/retry, even when the job pins an old generation.
+    pub fn delivery_route(&self, channel: &str) -> Option<(u64, Notifier)> {
+        let current = self.pin();
+        current
+            .resolved
+            .config()
+            .notifiers
+            .get(channel)
+            .filter(|n| n.enabled)
+            .map(|route| (current.generation, route.clone()))
+    }
+
+    pub fn executor_allowed(&self, name: &str) -> bool {
+        let current = self.pin();
+        !current.resolved.config().runtime.paused
+            && current
+                .resolved
+                .config()
+                .executors
+                .get(name)
+                .is_some_and(|e| e.enabled)
+    }
+
+    pub fn status(&self) -> Result<Value, ConfigError> {
+        let state = self
+            .state
+            .lock()
+            .map_err(|_| ConfigError::invalid("reload", "configuration manager unavailable"))?;
+        let active = self.pin();
+        Ok(json!({
+            "active_generation": active.generation,
+            "effective": active.resolved.diagnostic(),
+            "pending": state.pending.as_ref().map(|(g, c)| json!({ "generation": g, "desired": c.diagnostic() })),
+            "revision_log": state.history,
+        }))
+    }
+}
