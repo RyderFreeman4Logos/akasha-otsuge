@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_visibility.py", line 84, in <module>
+    main()
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_visibility.py", line 20, in main
+    if manifest.stat().st_size > 65536 or fixture.stat().st_size > 4 * 1024**2:
+       ^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/pathlib.py", line 1014, in stat
+    return os.stat(self, follow_symlinks=follow_symlinks)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/akasha-otsuge-storage-20261022/search-eight-partitions.manifest.json'

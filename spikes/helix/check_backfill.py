@@ -20,7 +20,7 @@ def main():
     (output / 'OWNER').write_text('akasha-otsuge MVP-003 corpus backfill receipts\n')
     started = time.monotonic()
     records = []
-    planned_commands = 61
+    planned_commands = 114
     rows = [json.loads(line) for line in source.read_text().splitlines()]
     assert len(rows) == 8 and source.stat().st_size < 4 * 1024**2
     rows += [{'key': f'fixture:{i}', 'body': f'Synthetic backfill diagnostic only {i}', 'partition': f'p{i % 8}'} for i in range(17)]
@@ -124,6 +124,39 @@ def main():
         for scope in range(8):
             invoke({'op': 'grant', 'principal': 'reader', 'scope': scope, 'allowed': True})
         query = {'op': 'query', 'generation': 1, 'bundle': bundle, 'principal': 'reader', 'scope': 7, 'vector': rows[0]['embedding']}
+        source_query = {**query, 'scope': int(rows[1]['partition'][1]), 'vector': rows[1]['embedding']}
+        invoke({'op': 'raw', 'cypher': 'MATCH (d:Derived1Vector {memory:1000001}) SET d.memory=1000099'})
+        assert all(hit['memory'] != 1_000_099 for hit in invoke(source_query)['hits'])
+        invoke({'op': 'raw', 'cypher': 'MATCH (d:Derived1Vector {memory:1000099}) SET d.memory=1000001'})
+        wrong_scope = (int(rows[1]['partition'][1]) + 1) % 8
+        invoke({'op': 'raw', 'cypher': f"MATCH (d:Derived1Vector {{memory:1000001}}) SET d.partition='p{wrong_scope}'"})
+        assert all(hit['memory'] != 1_000_001 for hit in invoke({**source_query, 'scope': wrong_scope})['hits'])
+        invoke({'op': 'raw', 'cypher': f"MATCH (d:Derived1Vector {{memory:1000001}}) SET d.partition='{rows[1]['partition']}'"})
+        invoke({'op': 'raw', 'cypher': 'MATCH (d:Document {memory:1000002}) SET d.memory=1000098'})
+        invoke({**query, 'scope': int(rows[2]['partition'][1]), 'vector': rows[2]['embedding']}, failure=True)
+        invoke({'op': 'raw', 'cypher': 'MATCH (d:Document {memory:1000098}) SET d.memory=1000002'})
+        def original(i):
+            return {'memory': 1_000_000 + i, 'seq': 0, 'scope': int(rows[i]['partition'][1]), 'active': True, 'body': rows[i]['body']}
+        for i in range(25):
+            expected = {**original(i), **({'seq': 1, 'scope': 7} if i == 0 else {})}
+            assert invoke({'op': 'current', 'principal': 'reader', 'memory': 1_000_000 + i})['entry'] == expected
+        for i in range(8):
+            assert invoke({'op': 'history', 'principal': 'reader', 'memory': 1_000_000 + i, 'at': 0, 'scope': int(rows[i]['partition'][1])})['entry'] == original(i)
+        for at, scope in [(0, 0), (1, 7)]:
+            expected = [{**original(i), **({'seq': 1, 'scope': 7} if i == 0 and at else {})} for i in range(25)]
+            expected = [row for row in expected if row['scope'] == scope]
+            assert invoke({'op': 'state', 'principal': 'reader', 'scope': scope, 'at': at, 'limit': 100})['entries'] == expected
+        history = {'op': 'history', 'principal': 'reader', 'memory': 1_000_000, 'at': 0, 'scope': int(rows[0]['partition'][1])}
+        current = {'op': 'current', 'principal': 'reader', 'memory': 1_000_000}
+        invoke({'op': 'grant', 'principal': 'reader', 'scope': history['scope'], 'allowed': False})
+        assert invoke(history)['entry'] is None
+        assert invoke(current)['entry']['seq'] == 1
+        invoke({'op': 'grant', 'principal': 'reader', 'scope': 7, 'allowed': False})
+        assert invoke(current)['entry'] is None
+        invoke({'op': 'grant', 'principal': 'reader', 'scope': history['scope'], 'allowed': True})
+        assert invoke(history)['entry'] == original(0)
+        invoke({'op': 'grant', 'principal': 'reader', 'scope': 7, 'allowed': True})
+        assert invoke({**current, 'principal': 'unknown'})['entry'] is None
         copied = invoke({'op': 'raw', 'cypher': 'MATCH (d:Derived1Text) RETURN d.memory,d.body ORDER BY d.memory'})
         assert copied['rows'] == [[1_000_000 + i, row['body']] for i, row in enumerate(rows)]
         lexical = invoke({**query, 'scope': 0, 'vector': None, 'term': 'backfill'})

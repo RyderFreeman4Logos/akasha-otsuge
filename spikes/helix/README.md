@@ -291,6 +291,22 @@ generations perform real vector reads while retaining the prior bundle. The
 model fingerprint uses SHA-256 of the compact, key-sorted provenance JSON; this
 does not recompute embeddings or claim new-model quality.
 
+Imported documents are authoritative revision zero. Current and historical reads
+use bounded native lookups; candidate filtering checks the actual source identity
+and scope, including before the first correction. Corpus backfill records original
+scope membership atomically so a later scope move preserves historical pages.
+Missing pinned source records fail explicitly. Historical pagination releases the
+writer during immutable reads and rechecks live permission before returning.
+
+The [corpus-view diagnostic](../../docs/benchmarks/results/corpus-views-diagnostic/summary.json)
+passes 114 native commands and a separate visibility/reopen check. It retains the
+forged-candidate regression, writer-lock RED/GREEN test, profiling source and failed
+workload. The corrected 60-second, 100-client workload passes unchanged thresholds:
+11.8 writes/s, write P95 4,303 ms, current P95 2,888 ms, historical-page P95 6,652 ms
+and RSS maximum 162,824,192 bytes. Earlier runs added synthetic revisions to the
+same diagnostic database, so the comparison is not an isolated hardware speedup.
+Full-size current-read coverage and both 30-minute profiles remain required.
+
 The probe admits at most two generation identities over the database lifetime. This
 is an explicit rebuild limit because the pinned engine does not reclaim native
 text split blobs, not a claim of garbage collection. Full-size disk admission,

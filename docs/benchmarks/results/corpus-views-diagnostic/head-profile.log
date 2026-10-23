@@ -1,0 +1,16 @@
+Running as unit: akasha-head-profile-20261023T1214.service
+ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"11","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"3","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"4","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"5","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"6","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"7","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"8","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"9","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"10","kind":"already_active"}}
+{"diagnostic_only":true,"samples":[{"memories":20,"mode":"combined","repeat":0,"seconds":0.102579474},{"memories":20,"mode":"heads","repeat":0,"seconds":0.00660209},{"memories":20,"mode":"revisions","repeat":0,"seconds":0.069037646},{"memories":20,"mode":"sources","repeat":0,"seconds":0.008200076},{"memories":20,"mode":"import","repeat":0,"seconds":0.006899237},{"memories":20,"mode":"combined","repeat":1,"seconds":0.098369989},{"memories":20,"mode":"heads","repeat":1,"seconds":0.007912016},{"memories":20,"mode":"revisions","repeat":1,"seconds":0.067230198},{"memories":20,"mode":"sources","repeat":1,"seconds":0.008483874},{"memories":20,"mode":"import","repeat":1,"seconds":0.007044099},{"memories":20,"mode":"combined","repeat":2,"seconds":0.09341114},{"memories":20,"mode":"heads","repeat":2,"seconds":0.008949635},{"memories":20,"mode":"revisions","repeat":2,"seconds":0.058829702},{"memories":20,"mode":"sources","repeat":2,"seconds":0.007275708},{"memories":20,"mode":"import","repeat":2,"seconds":0.007447706},{"memories":20,"mode":"combined","repeat":3,"seconds":0.096483859},{"memories":20,"mode":"heads","repeat":3,"seconds":0.008532691},{"memories":20,"mode":"revisions","repeat":3,"seconds":0.056947219},{"memories":20,"mode":"sources","repeat":3,"seconds":0.005848818},{"memories":20,"mode":"import","repeat":3,"seconds":0.006514792},{"memories":20,"mode":"combined","repeat":4,"seconds":0.096924858},{"memories":20,"mode":"heads","repeat":4,"seconds":0.008016763},{"memories":20,"mode":"revisions","repeat":4,"seconds":0.054538974},{"memories":20,"mode":"sources","repeat":4,"seconds":0.007521091},{"memories":20,"mode":"import","repeat":4,"seconds":0.007599907}]}
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 1.111s
+CPU time consumed: 2.166s

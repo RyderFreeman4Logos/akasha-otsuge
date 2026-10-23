@@ -1,0 +1,16 @@
+Running as unit: akasha-case-8ecfdf95c3894a90a82b6bf1a8cc7d64.service
+ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"11","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"3","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"4","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"5","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"6","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"7","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"8","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"9","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"10","kind":"already_active"}}
+{"diagnostic":true,"drain_s":2.5621829860000034,"failures":[],"not_tested":["derived_watermarks","live_permission_revocation","correction_of_search_candidates","RSS_thresholds_checked_by_outer_observer"],"phase":"steady","snapshot":{"active":0,"admission_slots":4,"clients":[24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,12,12,12,12,12,12,12,12,12,12,12,12,6,6,6,6,6,6,6,6,6,6,6,6,4,4,4,3,4,4,4,3,2,2,2,2,1,1,1,1],"completed":1656,"completed_waves":60,"config_epoch":1,"derived_lag":null,"elapsed_s":62.534735181,"eta_s":0.0,"operations":{"ann":{"attempted":15,"conflicts":0,"errors":0,"p95_upper_ms":3159,"successful":15,"successful_per_s":0.25,"within_window":15},"bm25":{"attempted":72,"conflicts":0,"errors":0,"p95_upper_ms":2962,"successful":72,"successful_per_s":1.15,"within_window":69},"correction":{"attempted":12,"conflicts":0,"errors":0,"p95_upper_ms":2829,"successful":12,"successful_per_s":0.2,"within_window":12},"current":{"attempted":144,"conflicts":0,"errors":0,"p95_upper_ms":2888,"successful":144,"successful_per_s":2.3,"within_window":138},"history":{"attempted":15,"conflicts":0,"errors":0,"p95_upper_ms":6652,"successful":15,"successful_per_s":0.23333333333333334,"within_window":14},"write":{"attempted":1398,"conflicts":660,"errors":0,"p95_upper_ms":4303,"successful":738,"successful_per_s":11.8,"within_window":708}},"peak_queued":73,"phase":"completed","pid":3974986,"queue_bytes_bound":819200,"queue_entry_bound":100,"queued":0,"queued_bytes_upper_bound":0,"rate_per_s":26.481282685644832,"run_id":"corpus-views-workload-v2","start_ticks":"457710661","total":1698,"wave_seconds":1},"status":"passed"}
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 1min 5.164s
+CPU time consumed: 1min 47.078s

@@ -27,11 +27,17 @@ pub struct Change {
 pub struct Authority {
     pub engine: Engine,
     pub(crate) writer: Mutex<()>,
+    #[cfg(test)]
+    history_barrier: Option<(
+        std::sync::Arc<tokio::sync::Notify>,
+        std::sync::Arc<tokio::sync::Notify>,
+    )>,
 }
 
 impl Authority {
     pub async fn open(engine: Engine) -> Result<Self, Error> {
         for spec in [
+            IndexSpec::node_unique_equality("Document", "memory"),
             IndexSpec::node_unique_equality("Counter", "key"),
             IndexSpec::node_unique_equality("Head", "key"),
             IndexSpec::node_unique_equality("Receipt", "key"),
@@ -62,6 +68,8 @@ impl Authority {
         Ok(Self {
             engine,
             writer: Mutex::new(()),
+            #[cfg(test)]
+            history_barrier: None,
         })
     }
 
@@ -205,11 +213,44 @@ impl Authority {
             .await?;
         // A bounded single-object traversal represents an empty result as null.
         let rows = match result.get("revision") {
-            Some(Value::Null) => return Ok(None),
+            Some(Value::Null) => &[][..],
             Some(Value::Array(rows)) => rows,
             _ => return Err(format!("invalid history response: {result}").into()),
         };
-        Ok(rows.first().cloned())
+        if let Some(row) = rows.first() {
+            return Ok(Some(row.clone()));
+        }
+        if !corpus_memory(memory) {
+            return Ok(None);
+        }
+        let result = self
+            .engine
+            .query(QueryRequest::read(
+                read_batch()
+                    .var_as(
+                        "source",
+                        g().n_with_label_where(
+                            "Document",
+                            SourcePredicate::eq("memory", i64::try_from(memory)?),
+                        )
+                        .limit(2)
+                        .value_map(Some(vec![
+                            "memory",
+                            "key",
+                            "partition",
+                            "body",
+                        ])),
+                    )
+                    .var_as(
+                        "corpus",
+                        g().n_with_label("ImportState")
+                            .limit(2)
+                            .value_map(Some(vec!["documents", "complete"])),
+                    )
+                    .returning(["source", "corpus"]),
+            ))
+            .await?;
+        baseline_entry(memory, &result["source"], corpus_bound(&result["corpus"])?)
     }
 
     pub async fn read_point(&self) -> Result<u64, Error> {
@@ -321,6 +362,26 @@ impl Authority {
                     .value_map(Some(vec!["memory", "seq", "scope", "active"])),
                 );
             names.extend([head, revision]);
+            if corpus_memory(*memory) {
+                let source = format!("source{index}");
+                batch = batch.var_as(
+                    &source,
+                    g().n_with_label_where("Document", SourcePredicate::eq("memory", memory_i64))
+                        .limit(2)
+                        .value_map(Some(vec!["memory", "key", "partition"])),
+                );
+                names.push(source);
+            }
+        }
+        let has_corpus = memories.iter().any(|memory| corpus_memory(*memory));
+        if has_corpus {
+            batch = batch.var_as(
+                "corpus",
+                g().n_with_label("ImportState")
+                    .limit(2)
+                    .value_map(Some(vec!["documents", "complete"])),
+            );
+            names.push("corpus".into());
         }
         // One read snapshot and one bounded engine call for the whole candidate set.
         let result = self
@@ -328,6 +389,11 @@ impl Authority {
             .query(QueryRequest::read(batch.returning(names)))
             .await?;
         let mut entries = Vec::new();
+        let bound = if has_corpus {
+            corpus_bound(&result["corpus"])?
+        } else {
+            None
+        };
         for (index, memory) in memories.iter().enumerate() {
             let rows = |name: String| -> Result<&[Value], Error> {
                 match result.get(&name) {
@@ -338,8 +404,13 @@ impl Authority {
             };
             let heads = rows(format!("head{index}"))?;
             let revisions = rows(format!("revision{index}"))?;
+            let baseline = if corpus_memory(*memory) {
+                baseline_entry(*memory, &result[format!("source{index}")], bound)?
+            } else {
+                None
+            };
             match (heads, revisions) {
-                ([], []) => entries.push(None),
+                ([], []) => entries.push(baseline),
                 ([head], [revision])
                     if head["seq"].as_u64().is_some_and(|seq| seq > 0 && seq <= at)
                         && head["scope"].as_u64().is_some_and(|scope| scope < 8)
@@ -420,17 +491,35 @@ impl Authority {
         cursor: Option<u64>,
         limit: usize,
     ) -> Result<Value, Error> {
+        {
+            let _writer = self.writer.lock().await;
+            let (allowed, revision) = self.permission(principal, scope).await?;
+            let validated = self.read_point().await?;
+            if at > validated {
+                return Err("historical read point is not committed".into());
+            }
+            if !allowed {
+                return Ok(
+                    json!({"entries":[],"next":null,"at":at,"permission_revision":revision,"validated_at_seq":validated,"retrieval_mode":"historical_state"}),
+                );
+            }
+        }
+        #[cfg(test)]
+        if let Some((started, resume)) = &self.history_barrier {
+            started.notify_one();
+            resume.notified().await;
+        }
+        // Committed history is immutable; only final live authorization needs the writer.
+        let mut page = self.state(scope, at, cursor, limit).await?;
         let _writer = self.writer.lock().await;
         let (allowed, revision) = self.permission(principal, scope).await?;
         let validated = self.read_point().await?;
         if at > validated {
-            return Err("historical read point is not committed".into());
+            return Err("historical read point is no longer committed".into());
         }
-        let mut page = if allowed {
-            self.state(scope, at, cursor, limit).await?
-        } else {
-            json!({"entries":[],"next":null,"at":at})
-        };
+        if !allowed {
+            page = json!({"entries":[],"next":null,"at":at});
+        }
         page["permission_revision"] = json!(revision);
         page["validated_at_seq"] = json!(validated);
         page["retrieval_mode"] = json!("historical_state");
@@ -466,7 +555,7 @@ impl Authority {
                 })
                 .collect::<Result<_, _>>()?;
             let heads = self.checked_heads(&memories, at).await?;
-            for ((hit, memory), head) in hits.iter().zip(memories).zip(heads) {
+            for (hit, head) in hits.iter().zip(heads) {
                 let indexed = match hit.get("seq") {
                     None | Some(Value::Null) => 0,
                     Some(value) => value.as_u64().ok_or("invalid candidate revision")?,
@@ -476,7 +565,7 @@ impl Authority {
                 }
                 // Imported immutable documents are revision zero until a correction creates a head.
                 let valid = match head {
-                    None => indexed == 0 && memory >= 1_000_000,
+                    None => false,
                     Some(row) => {
                         row["seq"] == indexed && row["scope"] == scope && row["active"] == true
                     }
@@ -556,6 +645,66 @@ impl Authority {
             }
         }
     }
+}
+
+fn corpus_memory(memory: u64) -> bool {
+    (1_000_000..101_000_000).contains(&memory)
+}
+
+fn corpus_bound(value: &Value) -> Result<Option<u64>, Error> {
+    match value {
+        Value::Null => Ok(None),
+        Value::Array(rows) if rows.is_empty() => Ok(None),
+        Value::Array(rows) if rows.len() == 1 && rows[0]["complete"] == true => {
+            let count = rows[0]["documents"]
+                .as_u64()
+                .filter(|v| (1..=100_000_000).contains(v))
+                .ok_or("invalid authoritative corpus count")?;
+            Ok(Some(count))
+        }
+        _ => Err("incomplete or malformed authoritative corpus".into()),
+    }
+}
+
+fn baseline_entry(memory: u64, value: &Value, count: Option<u64>) -> Result<Option<Value>, Error> {
+    let rows = match value {
+        Value::Null => &[][..],
+        Value::Array(rows) => rows,
+        _ => return Err("invalid source lookup".into()),
+    };
+    let expected = count.is_some_and(|count| memory < 1_000_000 + count);
+    let row = match rows {
+        [] if !expected => return Ok(None),
+        [row] => row,
+        _ => return Err("authoritative corpus record missing or duplicated".into()),
+    };
+    let scope = match row["partition"].as_str() {
+        Some("p0") => 0,
+        Some("p1") => 1,
+        Some("p2") => 2,
+        Some("p3") => 3,
+        Some("p4") => 4,
+        Some("p5") => 5,
+        Some("p6") => 6,
+        Some("p7") => 7,
+        _ => return Err("invalid source scope".into()),
+    };
+    if row["memory"] != memory
+        || (count.is_some() && !expected)
+        || !row["key"]
+            .as_str()
+            .is_some_and(|key| !key.is_empty() && key.len() <= 256)
+    {
+        return Err("authoritative source identity mismatch".into());
+    }
+    let mut entry = json!({"memory":memory,"seq":0,"scope":scope,"active":true});
+    if let Some(body) = row.get("body") {
+        if !body.as_str().is_some_and(|body| body.len() <= 128 * 1024) {
+            return Err("invalid source body".into());
+        }
+        entry["body"] = body.clone();
+    }
+    Ok(Some(entry))
 }
 
 fn permission_key(principal: &str, scope: u8) -> Result<String, Error> {
@@ -758,4 +907,101 @@ pub async fn verify(authority: &Authority, count: u64, progress: &Path) -> Resul
         json!({"phase":"oracle_verified","changes":count,"checks":checks,"seconds":started.elapsed().as_secs_f64(),
         "not_tested":["50GB","100_clients","derived_watermark","live_permission_revocation"]}),
     )
+}
+
+#[cfg(test)]
+mod history_concurrency_tests {
+    use super::*;
+    use std::{
+        sync::Arc,
+        time::{Duration, SystemTime, UNIX_EPOCH},
+    };
+    #[tokio::test]
+    async fn historical_scan_releases_writer_and_rechecks_revocation_before_return() {
+        let path = std::env::temp_dir().join(format!(
+            "akasha-history-race-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir(&path).unwrap();
+        std::fs::write(
+            path.join("OWNER"),
+            "akasha-otsuge MVP-003 history concurrency unit fixture\n",
+        )
+        .unwrap();
+        let engine = Engine::open_with_config(
+            helix_db::HelixDbSource::Disk {
+                root: path.clone(),
+                database: "akasha-history-race".into(),
+            },
+            crate::config().unwrap(),
+        )
+        .await
+        .unwrap();
+        let mut authority = Authority::open(engine).await.unwrap();
+        for memory in 1..=4 {
+            authority
+                .apply(&Change {
+                    request_id: format!("seed-{memory}"),
+                    memory,
+                    expected: 0,
+                    scope: 0,
+                    active: true,
+                    body: format!("Synthetic history race {memory}"),
+                })
+                .await
+                .unwrap();
+        }
+        authority.set_permission("reader", 0, true).await.unwrap();
+        let started = Arc::new(tokio::sync::Notify::new());
+        let resume = Arc::new(tokio::sync::Notify::new());
+        authority.history_barrier = Some((started.clone(), resume.clone()));
+        let a = Arc::new(authority);
+        let reader = a.clone();
+        let page =
+            tokio::spawn(
+                async move { Box::pin(reader.state_for("reader", 0, 4, None, 100)).await },
+            );
+        tokio::time::timeout(Duration::from_secs(5), started.notified())
+            .await
+            .unwrap();
+        let writer = a.clone();
+        let mut change = tokio::spawn(async move {
+            writer.set_permission("reader", 0, false).await?;
+            writer
+                .apply(&Change {
+                    request_id: "during-page".into(),
+                    memory: 99,
+                    expected: 0,
+                    scope: 0,
+                    active: true,
+                    body: "Synthetic change during historical page".into(),
+                })
+                .await
+        });
+        let completed = tokio::time::timeout(Duration::from_secs(1), &mut change).await;
+        let before_resume = completed.is_ok();
+        resume.notify_one();
+        let changed = match completed {
+            Ok(result) => result,
+            Err(_) => change.await,
+        }
+        .unwrap()
+        .unwrap();
+        let page = page.await.unwrap().unwrap();
+        a.engine.close().await.unwrap();
+        drop(a);
+        std::fs::remove_dir_all(&path).unwrap();
+        assert!(
+            before_resume,
+            "historical scan held the shared writer across immutable reads"
+        );
+        assert_eq!(changed["commit_seq"], 5);
+        assert_eq!(page["entries"], json!([]));
+        assert_eq!(page["permission_revision"], 2);
+        assert_eq!(page["validated_at_seq"], 5);
+    }
 }

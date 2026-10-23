@@ -277,6 +277,7 @@ async fn step(a: &Authority, id: u64, hold: Option<&str>) -> Result<Generation, 
         return Err("corpus backfill count or range mismatch".into());
     }
     let mut batch = write_batch();
+    let mut memberships = Vec::new();
     for (offset, row) in rows.iter().enumerate() {
         let memory = 1_000_000 + base.completed + offset as u64;
         let body = row["body"].as_str().ok_or("invalid source body")?;
@@ -292,6 +293,7 @@ async fn step(a: &Authority, id: u64, hold: Option<&str>) -> Result<Generation, 
         {
             return Err("non-contiguous or malformed corpus source".into());
         }
+        memberships.push((format!("{}:{memory:020}", &partition[1..]), memory));
         let identity = hash(serde_json::to_vec(row)?);
         let properties = vec![
             ("memory", PropertyValue::from(i64::try_from(memory)?)),
@@ -323,6 +325,39 @@ async fn step(a: &Authority, id: u64, hold: Option<&str>) -> Result<Generation, 
             base.copied_vectors += 1;
         }
         base.copied_bytes += body.len() as u64;
+    }
+    let mut lookup = read_batch();
+    let mut names = Vec::new();
+    for (i, (key, _)) in memberships.iter().enumerate() {
+        let name = format!("member{i}");
+        lookup = lookup.var_as(
+            &name,
+            g().n_with_label_where("ScopeMember", SourcePredicate::eq("key", key.clone()))
+                .limit(2)
+                .value_map(Some(vec!["key", "memory"])),
+        );
+        names.push(name);
+    }
+    let existing = a
+        .engine
+        .query(QueryRequest::read(lookup.returning(names)))
+        .await?;
+    for (i, (key, memory)) in memberships.iter().enumerate() {
+        let value = &existing[format!("member{i}")];
+        if value.is_null() || value == &json!([]) {
+            batch = batch.var_as(
+                &format!("scope{i}"),
+                g().add_n(
+                    "ScopeMember",
+                    vec![
+                        ("key", PropertyValue::from(key.clone())),
+                        ("memory", PropertyValue::from(i64::try_from(*memory)?)),
+                    ],
+                ),
+            );
+        } else if value != &json!([{"key":key,"memory":memory}]) {
+            return Err("original scope membership integrity mismatch".into());
+        }
     }
     base.completed += rows.len() as u64;
     base.complete = base.completed == base.documents;

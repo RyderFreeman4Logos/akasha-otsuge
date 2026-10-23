@@ -116,6 +116,23 @@ enum Request {
         scope: u8,
         allowed: bool,
     },
+    Current {
+        principal: String,
+        memory: u64,
+    },
+    History {
+        principal: String,
+        memory: u64,
+        at: u64,
+        scope: u8,
+    },
+    State {
+        principal: String,
+        scope: u8,
+        at: u64,
+        cursor: Option<u64>,
+        limit: usize,
+    },
     Apply {
         generation: u64,
         family: Family,
@@ -203,6 +220,24 @@ pub async fn run(authority: &Authority, path: &Path, root: &Path) -> Result<Valu
             scope,
             allowed,
         } => Ok(json!({"revision":authority.set_permission(&principal,scope,allowed).await?})),
+        Request::Current { principal, memory } => authority.current(&principal, memory).await,
+        Request::History {
+            principal,
+            memory,
+            at,
+            scope,
+        } => authority.history_for(&principal, memory, at, scope).await,
+        Request::State {
+            principal,
+            scope,
+            at,
+            cursor,
+            limit,
+        } => {
+            authority
+                .state_for(&principal, scope, at, cursor, limit)
+                .await
+        }
         Request::Apply {
             generation,
             family,

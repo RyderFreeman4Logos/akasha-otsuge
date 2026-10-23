@@ -70,7 +70,11 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       historical pages; current head/scope revalidation and live permissions.
       Small real-index fixtures now cover stale candidates, permission races,
       historical content preservation, principal isolation and malformed/missing
-      heads. Full-size coverage and the generation lifecycle remain required.
+      heads. Imported revision-zero current/history views, original scope membership
+      and forged candidate rejection pass 114 native commands. A deterministic race
+      proves historical scans release the writer and recheck revocation before
+      return; the unchanged 100-client diagnostic passes after that fix. Full-size
+      coverage and the generation lifecycle remain required.
 - [ ] Verify generation-specific indexed receipts and gap-free watermarks,
       concurrent writes/reindex, failed-build rollback and model separation.
       A 96-command revision-only diagnostic passes real text/vector reads,
