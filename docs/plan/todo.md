@@ -40,6 +40,8 @@ Improvements: instrument the precise slow query before enlarging its workload;
 classify retryable transport failures and preserve individual file outcomes;
 separate preparation from measured engine work; publish verified, cohesive leaves
 without repeatedly rebuilding unchanged product code. Continue one main Issue.
+For the fallback, test direct low-budget reopen after the first real source shard
+before admitting the full corpus, so memory-layout failures surface earlier.
 
 ## MVP-003 remaining acceptance
 
@@ -152,6 +154,12 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       idempotent replay, real BM25/IVF queries and separate-process reopen in a
       640MiB group without swap. Bounded/resumable import, full-scale indexes,
       authority/outbox semantics and the complete matrix remain unfinished.
+      The bounded import now passes 21 native recovery/input checks and preserves
+      original record hashes; 38,462 real vectors stream successfully at the high
+      profile. Small committed-WAL corruption and isolated kernel ENOSPC during
+      commit pass, including prior-history preservation and successful retry.
+      The first real-data low-profile reopen remains separately under observation;
+      do not enlarge the corpus or treat arena settings as aggregate RSS bounds.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 

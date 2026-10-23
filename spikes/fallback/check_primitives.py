@@ -23,18 +23,18 @@ def main():
         root = pathlib.Path(temporary)
         publish(output / 'admission.json', dict(binary_sha256=digest(binary),
             harness_sha256=digest(pathlib.Path(__file__)), controller=process_identity(os.getpid()),
-            temporary_root=temporary, client_environment={'LANCE_CPU_THREADS':'2'},
+            temporary_root=temporary, client_environment={'LANCE_CPU_THREADS':'2', 'AKASHA_SPIKE_PROFILE':'low'},
             scope='small primitives; no scale acceptance'))
 
         def invoke(case, operation, *, kill=None, failure=None):
             database = root / case
             database.mkdir(exist_ok=True)
-            (database / 'OWNER').write_text('akasha-otsuge MVP-003 fallback primitive database\n')
+            (database / 'OWNER').write_text('akasha-otsuge MVP-003 fallback database\n')
             name = f'{len(records):03d}-{case}-{operation}'
             command = [str(binary), str(database), operation, *([kill] if kill else [])]
             with (output / (name + '.stdout')).open('x') as stdout, (output / (name + '.stderr')).open('xb') as stderr:
                 child = subprocess.Popen(command, stdout=stdout, stderr=subprocess.PIPE,
-                    env={**os.environ, 'LANCE_CPU_THREADS':'2'})
+                    env={**os.environ, 'LANCE_CPU_THREADS':'2', 'AKASHA_SPIKE_PROFILE':'low'})
                 identity = process_identity(child.pid)
                 try:
                     if kill:

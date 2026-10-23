@@ -1,4 +1,10 @@
-use std::{io::Write, path::Path, sync::Arc};
+mod load;
+
+use std::{
+    io::{Read, Write},
+    path::Path,
+    sync::Arc,
+};
 
 use arrow_array::{
     Array, FixedSizeListArray, Int32Array, RecordBatch, RecordBatchIterator, StringArray,
@@ -13,9 +19,12 @@ use lancedb::{
     query::{ExecutableQuery, QueryBase, Select},
 };
 use serde_json::{Value, json};
-use surrealkv::{Durability, Options, Transaction, TreeBuilder, WalRecoveryMode};
+use surrealkv::{
+    CompressionType, Durability, Options, Transaction, Tree, TreeBuilder, WalRecoveryMode,
+};
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
+const OWNER: &str = "akasha-otsuge MVP-003 fallback database\n";
 const MIB: usize = 1024 * 1024;
 const KEYS: [&[u8]; 5] = [
     b"revision:1",
@@ -44,17 +53,28 @@ fn text(value: Option<Vec<u8>>) -> Result<Option<String>, Error> {
     Ok(value.map(String::from_utf8).transpose()?)
 }
 
-async fn authority(root: &Path, operation: &str, hold: Option<&str>) -> Result<Value, Error> {
+fn open_authority(root: &Path) -> Result<Tree, Error> {
+    let profile = std::env::var("AKASHA_SPIKE_PROFILE").unwrap_or_else(|_| "low".into());
+    let (memtable, cache, sst) = match profile.as_str() {
+        "low" => (8, 32, 8),
+        "high" => (64, 128, 64),
+        _ => return Err("invalid storage resource profile".into()),
+    };
     let options = Options::new()
         .with_path(root.join("authority"))
-        .with_max_memtable_size(8 * MIB)
-        .with_block_cache_capacity((16 * MIB) as u64)
-        .with_target_file_size((8 * MIB) as u64)
+        .with_max_memtable_size(memtable * MIB)
+        .with_block_cache_capacity((cache * MIB) as u64)
+        .with_target_file_size((sst * MIB) as u64)
+        .with_compression_per_level(vec![CompressionType::ZstdCompression])
         .with_memtable_stall_threshold(2)
         .with_versioning(true, 0)
         .with_wal_recovery_mode(WalRecoveryMode::AbsoluteConsistency)
         .with_flush_on_close(false);
-    let tree = TreeBuilder::with_options(options).build()?;
+    Ok(TreeBuilder::with_options(options).build()?)
+}
+
+async fn authority(root: &Path, operation: &str, hold: Option<&str>) -> Result<Value, Error> {
+    let tree = open_authority(root)?;
     let result = match operation {
         "read" => {
             let tx = tree.begin()?;
@@ -84,6 +104,22 @@ async fn authority(root: &Path, operation: &str, hold: Option<&str>) -> Result<V
                 }
                 receipt
             }
+        }
+        "disk-full" => {
+            let mut tx = tree.begin()?;
+            // Exceed an existing WAL page so ENOSPC must reach the commit path.
+            stage(&mut tx, &vec![b'x'; 16 * 1024])?;
+            eprintln!("PROBE_CHECKPOINT:disk-full");
+            let mut token = [0; 3];
+            std::io::stdin().read_exact(&mut token)?;
+            if token != *b"go\n" {
+                return Err("invalid fault barrier release".into());
+            }
+            if let Err(error) = tx.commit().await {
+                eprintln!("COMMIT_ERROR_PHASE");
+                return Err(error.into());
+            }
+            json!({"committed":true})
         }
         "rollback" => {
             let mut tx = tree.begin()?;
@@ -241,10 +277,38 @@ async fn main() -> Result<(), Error> {
         .get(2)
         .map(String::as_str)
         .ok_or("usage: probe OWNED_ROOT OPERATION [CHECKPOINT]")?;
+    let root = Path::new(&args[1]);
+    if matches!(operation, "--load" | "--resume-load") {
+        if args.len() != 5 {
+            return Err("usage: probe ROOT --load|--resume-load INPUT MANIFEST".into());
+        }
+        let result = load::run(
+            root,
+            Path::new(&args[3]),
+            Path::new(&args[4]),
+            operation == "--resume-load",
+        )
+        .await?;
+        println!("{result}");
+        return Ok(());
+    }
+    if std::fs::read_to_string(root.join("OWNER"))? != OWNER {
+        return Err("foreign probe root".into());
+    }
+    if matches!(operation, "import-state" | "verify-import" | "corpus-get") {
+        if args.len() != if operation == "corpus-get" { 4 } else { 3 } {
+            return Err("invalid corpus command arguments".into());
+        }
+        let memory = args.get(3).map(|s| s.parse::<u64>()).transpose()?;
+        let result = load::inspect(root, operation, memory).await?;
+        println!("{result}");
+        return Ok(());
+    }
     if !matches!(
         operation,
         "read"
             | "write"
+            | "disk-full"
             | "rollback"
             | "conflict"
             | "history-write"
@@ -261,12 +325,6 @@ async fn main() -> Result<(), Error> {
                 || !matches!(hold, Some("before-commit" | "after-commit" | "after-reply"))))
     {
         return Err("invalid checkpoint".into());
-    }
-    let root = Path::new(&args[1]);
-    if std::fs::read_to_string(root.join("OWNER"))?
-        != "akasha-otsuge MVP-003 fallback primitive database\n"
-    {
-        return Err("foreign probe root".into());
     }
     let result = if operation.starts_with("search-") {
         search(root, operation == "search-create").await?

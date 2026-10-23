@@ -66,13 +66,42 @@ Source-grounded controls to exercise:
 - Set finite memtables, SST target and block cache. `memory.rs` documentation is
   not proof of an aggregate RSS bound; measure the complete engine process tree.
   Use `WalRecoveryMode::AbsoluteConsistency` to expose authority corruption.
+  In this pin, memtable capacity measures the internal arena; retained values
+  live on the heap. Do not interpret its byte setting as a bound on all values.
 - LanceDB exposes `Session` caches and a `LocalSpillStore` cap through real Rust
   APIs. Cache units are native weighted budgets, not process RSS. FTS construction
   exposes per-worker `memory_limit_mb` and `num_workers`; vector training and
   shuffle still require their own budget/call-chain verification.
 
-After primitives: bound/resume streaming import using the existing manifest and
-source shards, implement authority/outbox and derived generation reconciliation,
-then run the complete unchanged workload and recovery matrix. The original
+`--load INPUT MANIFEST` and `--resume-load INPUT MANIFEST` now consume the same
+bounded JSONL stream and manifest as the existing `spikes/helix/import_corpus.py`
+controller. The importer stores original record bytes, a unique source-key map
+and each committed cursor/hash in one immediate-durability transaction. Batches
+contain at most 128 records and stop at 4MiB plus one bounded record. Resume
+replays and hashes the committed prefix before adding data. `verify-import`
+streams all persisted record bytes in ID order and compares the committed hash;
+`corpus-get ID` reads one imported record. Interrupted runs require explicit
+resume through the existing exclusive controller. These are probe commands.
+
+The [import/recovery receipts](../../docs/benchmarks/results/fallback-import-recovery/summary.json)
+retain a failing unsupported-command baseline, two compile API corrections, 21
+native import checks, repeated primitive checks, committed-WAL corruption, and
+real kernel ENOSPC after staging an 80KiB transaction. The 8MiB private tmpfs is
+filled only after the native barrier. Failure emits no successful receipt or
+partial keys; after freeing space, previous history and successful retry verify.
+The private mount is disposed. These fixtures do not simulate SSD power loss.
+
+A first real-source stream imports 38,462 actual 1536-dimensional vectors from
+the pinned public shard in 28.042 seconds, with no expanded stream retained.
+Both producer and consumer exit zero and the stored prefix matches the source
+hash. High-profile sampled native RSS reaches 1,503,567,872 bytes. The database
+uses 1,278,259,200 allocated bytes after close, including retained WAL; this is
+not a compacted-size claim. Low-profile reopen is a separate pending measurement.
+The current probe uses 8/64MiB low/high arenas, 32/128MiB caches, 8/64MiB SST
+targets and Zstd SST compression; those settings are not an aggregate bound.
+
+Remaining: prove bounded low-profile recovery before enlarging the corpus,
+complete full-size import/indexes, authority/outbox and derived generation
+reconciliation, then the unchanged workload and recovery matrix. The original
 84GB expanded stream is never materialized. Existing Helix diagnostic passes do
 not transfer to this implementation.
