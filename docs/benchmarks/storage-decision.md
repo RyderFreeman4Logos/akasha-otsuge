@@ -47,10 +47,16 @@ Proceed only with the fallback already named in the specification: Apache-2.0
 commit `4338a790c8edc56ef5ea1e46157427af4815be3c`, for authority, and
 [LanceDB 0.40.0](https://github.com/lancedb/lancedb/releases/tag/v0.40.0),
 commit `b1b080b97c3edd2fd9f2aae8a3b71ff19487b1f8`, for derived search.
-No production dependency has yet been added. Rust API availability, exact
-dependency licenses, lockfile, primitive durability and resource controls must be
-verified before the same full-data acceptance. Reuse source shards and query
-oracles; do not retain an expanded corpus copy.
+No production dependency has yet been added. The isolated probe now pins the
+lockfile and dependency licenses, and passes native transaction/crash/history,
+small BM25/IVF, bounded resumable import, authority WAL-corruption and isolated
+kernel ENOSPC checks. Initial inline-value WAL replay stalled under the low
+profile; native VLog corrects that layout problem on 38,462 real vectors, with
+all original bytes verified after direct low reopen. See the
+[measured layout comparison](results/fallback-vlog/summary.json), including the
+intentional stop and unchanged limits. Full corpus, derived indexes, sustained
+workload and recovery acceptance remain unproven. Compress corpus values, reuse
+source shards and query oracles, and do not retain an expanded corpus copy.
 
 The [frozen contract](storage-contract.md) and [remaining checklist](../plan/todo.md)
 apply unchanged. If this route also fails a required contract, report the concrete

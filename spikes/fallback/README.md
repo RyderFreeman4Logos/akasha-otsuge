@@ -96,11 +96,27 @@ the pinned public shard in 28.042 seconds, with no expanded stream retained.
 Both producer and consumer exit zero and the stored prefix matches the source
 hash. High-profile sampled native RSS reaches 1,503,567,872 bytes. The database
 uses 1,278,259,200 allocated bytes after close, including retained WAL; this is
-not a compacted-size claim. Low-profile reopen is a separate pending measurement.
+not a compacted-size claim. Low-profile inline reopen was intentionally stopped
+after 1,610.563 seconds of memory throttling without reaching verification.
+It was neither OOM nor expiry of its original 3,600-second limit. The source pin
+retains heap values while replaying all WAL memtables before flushing; the
+retained 1.278GB WAL therefore defeats an arena-only memory bound.
 The current probe uses 8/64MiB low/high arenas, 32/128MiB caches, 8/64MiB SST
 targets and Zstd SST compression; those settings are not an aggregate bound.
 
-Remaining: prove bounded low-profile recovery before enlarging the corpus,
+The corrected layout enables native VLog for values above 256 bytes, with 16MiB
+files and full value checksum verification. It leaves resource thresholds,
+transaction durability and strict WAL recovery unchanged. All primitive, import,
+WAL-corruption and ENOSPC checks pass again. The same 38,462-vector source then
+imports with sampled native RSS of 45,514,752B; direct low-profile reopen verifies
+every original byte in 3.223 seconds with sampled native RSS of 78,217,216B.
+The four low samples have a maximum 1.002-second gap, no memory.high events or OOM.
+The cgroup peak includes page cache and is recorded separately from RSS.
+Allocated database size is 1,280,880,640B: VLog payloads are still uncompressed.
+See [raw diagnostics and stopped inline run](../../docs/benchmarks/results/fallback-vlog/summary.json).
+These are small real-data results, not a full-corpus pass or paired speedup.
+
+Remaining: compress retained corpus records before enlarging the corpus,
 complete full-size import/indexes, authority/outbox and derived generation
 reconciliation, then the unchanged workload and recovery matrix. The original
 84GB expanded stream is never materialized. Existing Helix diagnostic passes do

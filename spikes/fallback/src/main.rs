@@ -20,7 +20,8 @@ use lancedb::{
 };
 use serde_json::{Value, json};
 use surrealkv::{
-    CompressionType, Durability, Options, Transaction, Tree, TreeBuilder, WalRecoveryMode,
+    CompressionType, Durability, Options, Transaction, Tree, TreeBuilder, VLogChecksumLevel,
+    WalRecoveryMode,
 };
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -66,6 +67,10 @@ fn open_authority(root: &Path) -> Result<Tree, Error> {
         .with_block_cache_capacity((cache * MIB) as u64)
         .with_target_file_size((sst * MIB) as u64)
         .with_compression_per_level(vec![CompressionType::ZstdCompression])
+        .with_enable_vlog(true)
+        .with_vlog_value_threshold(256)
+        .with_vlog_max_file_size((16 * MIB) as u64)
+        .with_vlog_checksum_verification(VLogChecksumLevel::Full)
         .with_memtable_stall_threshold(2)
         .with_versioning(true, 0)
         .with_wal_recovery_mode(WalRecoveryMode::AbsoluteConsistency)

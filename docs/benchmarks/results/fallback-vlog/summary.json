@@ -1,0 +1,122 @@
+{
+  "inline_reopen": {
+    "classification": "intentional SIGKILL after retained-value memory-pressure diagnosis; not OOM or original timeout",
+    "database_allocated_bytes": 1278259200,
+    "last_memory_events": {
+      "high": "166829",
+      "low": "0",
+      "max": "0",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "max_sample_gap_s": 5.855901203118265,
+    "native_absent": true,
+    "native_exit": [
+      {
+        "code": -9,
+        "event": "exit",
+        "seconds": 1610.4710950711742
+      }
+    ],
+    "original_runtime_limit_s": 3600,
+    "rss_max_bytes": 583860224,
+    "samples": 480,
+    "seconds": 1610.5625559277833,
+    "status": "stopped_diagnostic",
+    "unit_state": "inactive",
+    "verification_never_started": true
+  },
+  "limitation": "38462 actual vectors, not full corpus or workload acceptance; sequential layouts are not paired timing experiments",
+  "source_sha256": {
+    "spikes/fallback/Cargo.lock": "cb7f299297004c4e71ae9658d3d33a86d5f24a63d08aca4f62503f1a882ef954",
+    "spikes/fallback/src/load.rs": "fccf0bfbafb1b2d24602a5de086daf7039a6c6ede8573b50ff3851e14a7e6c7b",
+    "spikes/fallback/src/main.rs": "c2d21fd23f08311c95d81e993608998b41006f0e91d90ef3ba5368adf26e78d2"
+  },
+  "status": "passed_diagnostic_only",
+  "vlog": {
+    "binary_sha256": "d5ccf0623c77676b540e61aadc5daeb652c94b96ecccae848b73435d071f75ca",
+    "database_allocated_bytes": 1280880640,
+    "limits": "full corpus, indexes and full workload/recovery remain pending",
+    "measurements": {
+      "corruption": {
+        "artifact_files": 8,
+        "status": "passed"
+      },
+      "enospc": {
+        "artifact_files": 27,
+        "status": "passed"
+      },
+      "high_import": {
+        "cgroup_peak_bytes": 1220919296,
+        "last_memory_events": {
+          "high": "0",
+          "low": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_group_kill": "0",
+          "oom_kill": "0"
+        },
+        "max_sample_gap_s": 1.0027862032875419,
+        "rss_max_bytes": 45514752,
+        "samples": 30
+      },
+      "import": {
+        "artifact_files": 45,
+        "status": "passed"
+      },
+      "low_reopen": {
+        "cgroup_peak_bytes": 208936960,
+        "last_memory_events": {
+          "high": "0",
+          "low": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_group_kill": "0",
+          "oom_kill": "0"
+        },
+        "max_sample_gap_s": 1.001946079544723,
+        "rss_max_bytes": 78217216,
+        "samples": 4
+      },
+      "primitives": {
+        "artifact_files": 43,
+        "status": "passed"
+      }
+    },
+    "runs": [
+      {
+        "exit": 0,
+        "name": "vlog-primitives-r1",
+        "seconds": 1.2812682846561074
+      },
+      {
+        "exit": 0,
+        "name": "vlog-import-r1",
+        "seconds": 2.3057240983471274
+      },
+      {
+        "exit": 0,
+        "name": "vlog-corruption-r1",
+        "seconds": 0.40668799728155136
+      },
+      {
+        "exit": 0,
+        "name": "vlog-enospc-r1",
+        "seconds": 0.38174690026789904
+      },
+      {
+        "exit": 0,
+        "name": "vlog-stream-r1",
+        "seconds": 32.920305497944355
+      },
+      {
+        "exit": 0,
+        "name": "vlog-low-reopen-r1",
+        "seconds": 3.2231364445760846
+      }
+    ],
+    "scope": "38462 actual vectors; all retained original bytes verified after direct low reopen",
+    "status": "passed_diagnostic_only"
+  }
+}

@@ -158,8 +158,11 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       original record hashes; 38,462 real vectors stream successfully at the high
       profile. Small committed-WAL corruption and isolated kernel ENOSPC during
       commit pass, including prior-history preservation and successful retry.
-      The first real-data low-profile reopen remains separately under observation;
-      do not enlarge the corpus or treat arena settings as aggregate RSS bounds.
+      Inline-value reopen was stopped after retained heap values caused sustained
+      memory throttling. Native VLog now passes the same 38,462-vector high import
+      and direct low reopen with all original bytes verified (3.223s, sampled
+      RSS max 78,217,216B). Full data is still pending. Compress retained records
+      before full import; arena settings are not aggregate RSS bounds.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 
