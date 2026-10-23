@@ -34,6 +34,8 @@ pub struct Query {
     pub key: String,
     pub partition: String,
     pub term: String,
+    pub memory: Option<u64>,
+    pub body_sha256: Option<String>,
     #[serde(default)]
     pub embedding: Vec<f32>,
     vector_offset: Option<u64>,
@@ -96,7 +98,22 @@ pub fn load(path: &Path) -> Result<(Fixture, String), Error> {
     }
     let mut partitions = BTreeSet::new();
     let mut keys = BTreeSet::new();
+    let mut memories = BTreeSet::new();
     for (index, query) in fixture.queries.iter().enumerate() {
+        if fixture.population() || query.memory.is_some() || query.body_sha256.is_some() {
+            let memory = query.memory.ok_or("missing current corpus identity")?;
+            if !(1_000_000..101_000_000).contains(&memory)
+                || !memories.insert(memory)
+                || !query.body_sha256.as_ref().is_some_and(|hash| {
+                    hash.len() == 64
+                        && hash
+                            .bytes()
+                            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+                })
+            {
+                return Err("invalid current corpus identity".into());
+            }
+        }
         if query.key.is_empty()
             || query.key.len() > 256
             || !matches!(

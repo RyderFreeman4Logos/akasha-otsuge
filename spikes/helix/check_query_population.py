@@ -25,7 +25,7 @@ def main():
         config.write_text(json.dumps({'run_id':'negative-query','phase':'burst','seconds':1,'diagnostic':True,
             'fixture':str(metadata),'output':str(directory/'must-not-create-output'),'corpus_manifest':None}))
         checks = []
-        for case in ['offset','path','dimension','hash','zero','nan','neighbors']:
+        for case in ['offset','path','dimension','hash','zero','nan','neighbors','missing_memory','duplicate_memory','body_hash']:
             value = copy.deepcopy(original)
             shutil.copyfile(fixture.parent / vectors.name, vectors)
             if case == 'offset':value['queries'][0]['vector_offset'] = 1
@@ -33,6 +33,9 @@ def main():
             if case == 'dimension':value['dimension'] = 3
             if case == 'hash':value['vector_file']['sha256'] = '0'*64
             if case == 'neighbors':value['queries'][0]['exact_neighbors'] = ['wrong']
+            if case == 'missing_memory':del value['queries'][0]['memory']
+            if case == 'duplicate_memory':value['queries'][1]['memory'] = value['queries'][0]['memory']
+            if case == 'body_hash':value['queries'][0]['body_sha256'] = 'z' * 64
             if case in {'zero','nan'}:
                 with vectors.open('r+b') as stream:
                     stream.write(b'\0'*(1536*4) if case == 'zero' else b'\0\0\xc0\x7f')

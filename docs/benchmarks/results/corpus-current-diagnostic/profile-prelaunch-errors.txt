@@ -1,0 +1,1 @@
+r1: temporary mod inserted before inner crate attribute; cargo fmt failed before build. r2: instrumentation generator matched the type array semicolon instead of the const terminator; cargo fmt failed before build. Neither attempted an engine case. Corrected the exact generated declaration; original request/thresholds unchanged.

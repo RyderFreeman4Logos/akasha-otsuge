@@ -44,6 +44,14 @@ def process_identity(pid):
 
 def verify_requests(directory):
     baseline = json.loads((directory / "runtime/baseline.json").read_text())
+    request = json.loads((directory / "request.json").read_text())
+    admission = json.loads((directory / "runtime/admission.json").read_text())
+    fixture = pathlib.Path(request["fixture"])
+    with fixture.open("rb") as source:
+        fixture_bytes = source.read(4 * 1024**2 + 1)
+    if len(fixture_bytes) > 4 * 1024**2 or hashlib.sha256(fixture_bytes).hexdigest() != admission["fixture_sha256"]:
+        raise ValueError("current corpus oracle source differs from admission")
+    queries = json.loads(fixture_bytes)["queries"]
     base, run = baseline["base"], baseline["run_id"]
     def expected_body(client, ordinal):
         prefix = f"Synthetic workload; excluded from corpus. Run {run}; client {client}; request {ordinal}. "
@@ -56,6 +64,8 @@ def verify_requests(directory):
         sequences.add(value["seq"])
         events.append((value["seq"], 0, value))
     records = current_checks = 0
+    corpus_points = []
+    corpus_memories, corpus_partitions = set(), {}
     with (directory / "runtime/requests.jsonl").open() as source:
         for line in source:
             row = json.loads(line)
@@ -73,6 +83,18 @@ def verify_requests(directory):
                 sequences.add(expected["seq"])
                 events.append((expected["seq"], 0, expected))
             elif row["operation"] == "current":
+                corpus = receipt.get("corpus")
+                if not isinstance(corpus, dict) or type(corpus.get("query_index")) is not int or not 0 <= corpus["query_index"] < len(queries):
+                    raise ValueError("missing or invalid corpus current receipt")
+                query = queries[corpus["query_index"]]
+                expected = dict(memory=query["memory"], seq=0, scope=int(query["partition"][1]), active=True, body_sha256=query["body_sha256"])
+                if (corpus.get("entry") != expected or corpus.get("key") != query["key"]
+                        or type(corpus.get("at")) is not int or corpus["at"] < receipt["at"]
+                        or corpus.get("permission_revision") != 1):
+                    raise ValueError("current corpus receipt differs from pinned source")
+                corpus_points.append(corpus["at"])
+                corpus_memories.add(query["memory"])
+                corpus_partitions[query["partition"]] = corpus_partitions.get(query["partition"], 0) + 1
                 events.append((receipt["at"], 1, receipt))
     heads = {}
     for _, kind, value in sorted(events, key=lambda event: event[:2]):
@@ -87,7 +109,11 @@ def verify_requests(directory):
             current_checks += 1
     if len(baseline["heads"]) != 50 or len(sequences) != max(sequences) - min(sequences) + 1:
         raise ValueError("missing baseline identity or unexplained commit-sequence gap")
-    return {"requests": records, "current_checks": current_checks, "distinct_commits": len(sequences)}
+    if any(point > max(sequences) for point in corpus_points):
+        raise ValueError("current corpus read claims an uncommitted point")
+    return {"requests": records, "current_checks": current_checks, "corpus_current_checks": len(corpus_points),
+            "corpus_current_distinct": len(corpus_memories), "corpus_current_partitions": corpus_partitions,
+            "distinct_commits": len(sequences)}
 
 
 def summarize(directory, profile, binary_sha256):

@@ -20,10 +20,10 @@ def main():
     (output / 'OWNER').write_text('akasha-otsuge MVP-003 corpus backfill receipts\n')
     started = time.monotonic()
     records = []
-    planned_commands = 114
+    planned_commands = 123
     rows = [json.loads(line) for line in source.read_text().splitlines()]
     assert len(rows) == 8 and source.stat().st_size < 4 * 1024**2
-    rows += [{'key': f'fixture:{i}', 'body': f'Synthetic backfill diagnostic only {i}', 'partition': f'p{i % 8}'} for i in range(17)]
+    rows += [{'key': f'fixture:{i}', 'body': f'Synthetic backfill diagnostic only {i}', 'partition': 'p0'} for i in range(17)]
     identity = {'model': 'text-embedding-3-large', 'repository': 'Qdrant/dbpedia-entities-openai3-text-embedding-3-large-1536-1M', 'revision': '4a9731217921bc476a0f03544f11f22ae4903fa5', 'precomputed_at': '2024-02', 'precision': 'float32'}
     fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     bundle = {'model': identity['model'], 'model_fingerprint': fingerprint, 'dimension': 1536, 'chunker': 'source-document-v1', 'schema': 1}
@@ -146,6 +146,16 @@ def main():
             expected = [{**original(i), **({'seq': 1, 'scope': 7} if i == 0 and at else {})} for i in range(25)]
             expected = [row for row in expected if row['scope'] == scope]
             assert invoke({'op': 'state', 'principal': 'reader', 'scope': scope, 'at': at, 'limit': 100})['entries'] == expected
+        for limit in [7, 8, 9]:
+            cursor, collected = None, []
+            while True:
+                page = invoke({'op': 'state', 'principal': 'reader', 'scope': 0, 'at': 0, 'cursor': cursor, 'limit': limit})
+                collected.extend(page['entries'])
+                if page['next'] is None:
+                    break
+                assert cursor is None or page['next'] > cursor
+                cursor = page['next']
+            assert collected == [original(i) for i in range(25) if rows[i]['partition'] == 'p0']
         history = {'op': 'history', 'principal': 'reader', 'memory': 1_000_000, 'at': 0, 'scope': int(rows[0]['partition'][1])}
         current = {'op': 'current', 'principal': 'reader', 'memory': 1_000_000}
         invoke({'op': 'grant', 'principal': 'reader', 'scope': history['scope'], 'allowed': False})

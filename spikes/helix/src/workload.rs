@@ -194,6 +194,34 @@ impl Shared {
                         .remove("body");
                 }
                 current["memory"] = json!(memory);
+                let index = (client * 101 + ordinal as usize * 97) % self.fixture.queries.len();
+                let query = &self.fixture.queries[index];
+                let source_memory = query.memory.ok_or("missing current corpus identity")?;
+                let mut source = self
+                    .authority
+                    .current(&self.config.run_id, source_memory)
+                    .await?;
+                let entry = &mut source["entry"];
+                let body = entry["body"]
+                    .as_str()
+                    .ok_or("missing current corpus body")?;
+                let body_hash = hash(body.as_bytes());
+                if entry["memory"] != source_memory
+                    || entry["seq"] != 0
+                    || entry["scope"] != query.partition.as_bytes()[1] - b'0'
+                    || entry["active"] != true
+                    || query.body_sha256.as_deref() != Some(&body_hash)
+                {
+                    return Err("current corpus differs from frozen source".into());
+                }
+                entry["body_sha256"] = json!(body_hash);
+                entry
+                    .as_object_mut()
+                    .ok_or("invalid corpus entry")?
+                    .remove("body");
+                source["key"] = json!(query.key);
+                source["query_index"] = json!(index);
+                current["corpus"] = source;
                 Ok(current)
             }
             2 | 3 => {
@@ -398,6 +426,13 @@ pub async fn run(root: PathBuf, request: &Path) -> Result<(), Error> {
         return Err("invalid workload identity, phase or duration".into());
     }
     let (fixture, fixture_hash) = search::load(&config.fixture)?;
+    if fixture
+        .queries
+        .iter()
+        .any(|query| query.memory.is_none() || query.body_sha256.is_none())
+    {
+        return Err("workload requires pinned corpus current-read identities".into());
+    }
     std::fs::create_dir(&config.output)?;
     atomic_json(
         &config.output.join("admission.json"),

@@ -1,0 +1,132 @@
+{
+  "artifact_sha256": {
+    "OWNER": "63cb401aa19d070cb5c6ee9185011c4375dadb48998ac10c39df9ef2e14e8e04",
+    "admission.json": "4f3f46f285c9720b47da9a885c5676d825c88b8f3d0d0406b605213722a4e42a",
+    "import-command.json": "b33ce30ee7a1f79e032c2caf0ba3afecfc4fbc29072b928c9de0dc72dd1197c8",
+    "import-memory.jsonl": "5a20c9ab8c4b075705916eb288344b7d80d2e50efe93d62b90085c55c0376d2f",
+    "import.log": "fdde40c978169523b3db462762098c1a473a635cd56800f3b0dbf4a7f9a6362c",
+    "indexes-command.json": "05650a6bd8a84107003bad6cf7ea4a0c8a1fc110db7c98d06d76cbd385c95164",
+    "indexes-memory.jsonl": "c3aa6e10983afd1873ad1e03f694edd5df12325d728810d58ae07b845ba6b25e",
+    "indexes.log": "d4d218ec61236af525ab14ac7289c47c8cf8c04957a5766f8eee190bcb8b0223",
+    "input.jsonl": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+    "progress.json": "141ff4f1591d13f9bab9ba20269e9d628c5f4c70da0add09d45eb43a9680e53d",
+    "reopen-command.json": "bed0d5bd941abe0a7c6dda6d488a1836b0f8972e01d87483badbced2542c6dc5",
+    "reopen-memory.jsonl": "1d7b22c87e9f6ab24dbe6ba50208db51ca345caf4999862810708a5de2800008",
+    "reopen.log": "e5322942126609d50c669423061801598f57f5d8d52cab58a3d2bb073b025a2b",
+    "seed-command.json": "e7dbf3143ac03d059b04007475439351d3f3bdc124ce1453ffde6d39887184f8",
+    "seed-memory.jsonl": "242eb00e1f96bc66fa16963b968a5a62a7169a2f20c6a01ff335ab3bb2620aba",
+    "seed.log": "041801961c24c34ee1546f09aa00002058170f494822e0345e8400199e15a495"
+  },
+  "native": {
+    "import": {
+      "content_bytes": 3588,
+      "documents": 8,
+      "elapsed_seconds": 0.031004282,
+      "phase": "import_complete",
+      "prepared_sha256": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+      "resumed_documents": 0
+    },
+    "indexes": {
+      "elapsed_seconds": 1.49248597,
+      "phase": "indexes_built",
+      "text": {
+        "operation": {
+          "attempt": 43,
+          "family": "text",
+          "generation": "1",
+          "index_id": "1",
+          "operation_id": "1d8ec23a-f054-4bf7-a9ed-827f6176b2e2",
+          "operation_kind": "build",
+          "progress": {
+            "entities": "16",
+            "input_bytes": "165328",
+            "output_bytes": "67691",
+            "output_operations": "469"
+          },
+          "stage": "activate",
+          "status": "succeeded"
+        }
+      },
+      "vector": {
+        "operation": {
+          "attempt": 3,
+          "family": "vector",
+          "generation": "1",
+          "index_id": "2",
+          "operation_id": "be16d4e5-bc34-4f8b-8e4f-5d2a67729073",
+          "operation_kind": "build",
+          "progress": {
+            "entities": "24",
+            "input_bytes": "55864",
+            "output_bytes": "53136",
+            "output_operations": "88"
+          },
+          "stage": "activate",
+          "status": "succeeded"
+        }
+      }
+    },
+    "reopen": {
+      "changes": 4,
+      "checks": [
+        "stale_bm25",
+        "stale_ann",
+        "old_read_seq_new_validation",
+        "scope_move",
+        "retraction",
+        "restoration_does_not_revive_old_index_revision",
+        "historical_content_preserved",
+        "live_permission_revocation",
+        "principal_isolation",
+        "default_deny",
+        "minimum_commit_point",
+        "permission_idempotency",
+        "invalid_or_missing_head_explicit_error_on_reopen",
+        "orphaned_future_revision_error"
+      ],
+      "fixture_sha256": "1ec12178668947ebdcc79e3cfa33668748825d6a7b93515134a73555fff2cb1c",
+      "memory": 1000000,
+      "not_tested": [
+        "full_size",
+        "indexed_receipts",
+        "generation_watermarks",
+        "power_loss"
+      ],
+      "phase": "separate_process_reopen",
+      "scope": 0,
+      "status": "passed"
+    },
+    "seed": {
+      "changes": 4,
+      "checks": [
+        "stale_bm25",
+        "stale_ann",
+        "old_read_seq_new_validation",
+        "scope_move",
+        "retraction",
+        "restoration_does_not_revive_old_index_revision",
+        "historical_content_preserved",
+        "live_permission_revocation",
+        "principal_isolation",
+        "default_deny",
+        "minimum_commit_point",
+        "permission_idempotency",
+        "invalid_or_missing_head_explicit_error_on_reopen",
+        "orphaned_future_revision_error"
+      ],
+      "fixture_sha256": "1ec12178668947ebdcc79e3cfa33668748825d6a7b93515134a73555fff2cb1c",
+      "memory": 1000000,
+      "not_tested": [
+        "full_size",
+        "indexed_receipts",
+        "generation_watermarks",
+        "power_loss"
+      ],
+      "phase": "seed_and_invalidate",
+      "scope": 0,
+      "status": "passed"
+    }
+  },
+  "seconds": 6.733750132843852,
+  "status": "passed"
+}

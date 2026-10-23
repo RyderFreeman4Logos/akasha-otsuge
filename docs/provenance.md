@@ -10,3 +10,4 @@
 - `docs/benchmarks/results/generation-diagnostic/` 的请求记录重用同一公开摘录与向量，适用上述来源许可；模型来源指纹绑定发布者仓库、固定版本、预计算时间与 float32 表示。该实验未调用模型提供商。
 - `docs/benchmarks/results/corpus-backfill-diagnostic/` 复用上述八条公开记录，并加入 17 条明确标为 synthetic 的小型回填测试文本；这些测试文本不计入完整语料规模。请求、原文一致性结果与向量结果保留相同数据来源许可。
 - `docs/benchmarks/results/corpus-views-diagnostic/` 延续上述公开摘录与 synthetic 测试文本，保留当前/历史视图、权限与并发诊断的请求及结果；适用相同来源许可，均不替代完整语料验收。
+- `docs/benchmarks/results/corpus-current-diagnostic/` 复用相同公开摘录、向量和 synthetic 文本，新增固定来源的 current 内容校验及分页诊断；失败运行、临时性能测量源码和最终结果均保留，数据继续适用上述来源许可。

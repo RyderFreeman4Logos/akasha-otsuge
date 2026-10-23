@@ -307,6 +307,27 @@ and RSS maximum 162,824,192 bytes. Earlier runs added synthetic revisions to the
 same diagnostic database, so the comparison is not an isolated hardware speedup.
 Full-size current-read coverage and both 30-minute profiles remain required.
 
+The [corpus-current diagnostic](../../docs/benchmarks/results/corpus-current-diagnostic/summary.json)
+adds actual pinned source reads to every current operation, inside its existing
+deadline. An independent Python oracle verifies source identity, content hash,
+scope and committed read point; seven corrupted-receipt controls fail. Population
+admission also rejects missing/duplicate source IDs and malformed body hashes.
+Historical reads batch at most eight records, precommit metadata shares one native
+snapshot, and current reads hydrate the already validated head. The atomic write
+transaction and live permission checks remain in place.
+
+The final retained binary passes 123 corpus/pagination commands, visibility across
+reopen, and 5,163 exact history checks over 100,000 changes. Its 100-client,
+60-second diagnostic records 1,698 requests, 144 synthetic and 144 real corpus
+current checks across eight partitions: 12.28 writes/s, write P95 483 ms, current
+P95 569 ms and historical-page P95 2,575 ms. RSS P99/maximum is 510,844,928 bytes,
+close to the 512 MiB target; the full-duration profiles remain necessary. The
+archive retains three failed workloads and temporary profiling source. Different
+accumulated revisions and concurrent host work prevent isolated speedup claims.
+The corpus command fixture has no independent RSS/cgroup attestation; workload,
+visibility and 100,000-change checks retain their separate resource observations.
+Unvectorized text coverage and generation-backed concurrent search remain open.
+
 The probe admits at most two generation identities over the database lifetime. This
 is an explicit rebuild limit because the pinned engine does not reclaim native
 text split blobs, not a claim of garbage collection. Full-size disk admission,

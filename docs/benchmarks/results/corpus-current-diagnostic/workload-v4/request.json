@@ -1,0 +1,9 @@
+{
+  "corpus_manifest": null,
+  "diagnostic": true,
+  "fixture": "/tmp/akasha-otsuge-storage-20261022/query-population-contract/queries.json",
+  "output": "/tmp/akasha-otsuge-storage-20261022/case-corpus-current-v4/runtime",
+  "phase": "steady",
+  "run_id": "corpus-current-workload-v4",
+  "seconds": 60
+}

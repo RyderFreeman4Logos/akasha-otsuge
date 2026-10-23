@@ -89,75 +89,90 @@ impl Authority {
             .collect();
         // One owner serializes short authority transactions; model work never holds this lock.
         let _writer = self.writer.lock().await;
-        let prior = self
+        let membership = format!("{}:{:020}", change.scope, change.memory);
+        let metadata = self
             .engine
-            .cypher(
-                "MATCH (r:Receipt {key:$request}) RETURN r.hash,r.result",
-                params(json!({"request":change.request_id})),
-                None,
-            )
+            .query(QueryRequest::read(
+                read_batch()
+                    .var_as(
+                        "receipt",
+                        g().n_with_label_where(
+                            "Receipt",
+                            SourcePredicate::eq("key", change.request_id.clone()),
+                        )
+                        .limit(2)
+                        .value_map(Some(vec!["hash", "result"])),
+                    )
+                    .var_as(
+                        "head",
+                        g().n_with_label_where(
+                            "Head",
+                            SourcePredicate::eq("key", i64::try_from(change.memory)?),
+                        )
+                        .limit(2)
+                        .value_map(Some(vec!["seq"])),
+                    )
+                    .var_as(
+                        "counter",
+                        g().n_with_label_where("Counter", SourcePredicate::eq("key", "global"))
+                            .limit(2)
+                            .value_map(Some(vec!["seq"])),
+                    )
+                    .var_as(
+                        "member",
+                        g().n_with_label_where(
+                            "ScopeMember",
+                            SourcePredicate::eq("key", membership.clone()),
+                        )
+                        .limit(2)
+                        .value_map(Some(vec!["key"])),
+                    )
+                    .returning(["receipt", "head", "counter", "member"]),
+            ))
             .await?;
-        if let Some(row) = prior.rows.first() {
-            return if row[0] == digest {
+        let rows = |name: &str| -> Result<&[Value], Error> {
+            match metadata.get(name) {
+                Some(Value::Null) => Ok(&[]),
+                Some(Value::Array(rows)) if rows.len() <= 1 => Ok(rows),
+                _ => Err("invalid or duplicate authority metadata".into()),
+            }
+        };
+        if let Some(row) = rows("receipt")?.first() {
+            return if row["hash"] == digest {
                 Ok(serde_json::from_str(
-                    row[1].as_str().ok_or("invalid stored receipt")?,
+                    row["result"].as_str().ok_or("invalid stored receipt")?,
                 )?)
             } else {
                 Ok(json!({"conflict":"idempotency"}))
             };
         }
-        let head = self
-            .engine
-            .cypher(
-                "MATCH (h:Head {key:$memory}) RETURN h.seq",
-                params(json!({"memory": change.memory})),
-                None,
-            )
-            .await?;
+        let head = rows("head")?;
         let previous = head
-            .rows
             .first()
-            .map(|row| row[0].as_u64().ok_or("invalid head sequence"))
+            .map(|row| row["seq"].as_u64().ok_or("invalid head sequence"))
             .transpose()?
             .unwrap_or(0);
         if previous != change.expected {
             return Ok(json!({"conflict":"expected_revision", "actual":previous}));
         }
-        let counter = self
-            .engine
-            .cypher(
-                "MATCH (c:Counter {key:'global'}) RETURN c.seq",
-                BTreeMap::new(),
-                None,
-            )
-            .await?;
-        let before = counter
-            .rows
+        let before = rows("counter")?
             .first()
-            .and_then(|row| row[0].as_u64())
+            .and_then(|row| row["seq"].as_u64())
             .ok_or("missing commit counter")?;
         let seq = before
             .checked_add(1)
             .filter(|value| *value <= i64::MAX as u64)
             .ok_or("commit sequence exhausted")?;
         let order = format!("{:020}:{seq:020}", change.memory);
-        let membership = format!("{}:{:020}", change.scope, change.memory);
-        let member = self
-            .engine
-            .cypher(
-                "MATCH (m:ScopeMember {key:$key}) RETURN m.key",
-                params(json!({"key":membership})),
-                None,
-            )
-            .await?;
+        let member = rows("member")?;
         let receipt = json!({"stage":"committed", "request_id":change.request_id,
             "commit_seq":seq, "revision":order, "config_generation":1});
-        let head_clause = if head.rows.is_empty() {
+        let head_clause = if head.is_empty() {
             "CREATE (h:Head {key:$memory})"
         } else {
             "MATCH (h:Head {key:$memory}) WHERE h.seq=$expected"
         };
-        let member_clause = if member.rows.is_empty() {
+        let member_clause = if member.is_empty() {
             "CREATE (:ScopeMember {key:$membership,memory:$memory})"
         } else {
             ""
@@ -190,67 +205,87 @@ impl Authority {
     }
 
     pub async fn get(&self, memory: u64, at: u64) -> Result<Option<Value>, Error> {
-        let result = self
-            .engine
-            .query(QueryRequest::read(
-                read_batch()
-                    .var_as(
-                        "revision",
-                        g().n_with_label_where(
-                            "Revision",
-                            SourcePredicate::between(
-                                "order",
-                                format!("{memory:020}:00000000000000000000"),
-                                format!("{memory:020}:{at:020}"),
-                            ),
-                        )
-                        .order_by("order", Order::Desc)
-                        .limit(1)
-                        .value_map(Some(vec!["memory", "seq", "scope", "active", "body"])),
-                    )
-                    .returning(["revision"]),
-            ))
-            .await?;
-        // A bounded single-object traversal represents an empty result as null.
-        let rows = match result.get("revision") {
-            Some(Value::Null) => &[][..],
-            Some(Value::Array(rows)) => rows,
-            _ => return Err(format!("invalid history response: {result}").into()),
-        };
-        if let Some(row) = rows.first() {
-            return Ok(Some(row.clone()));
+        Ok(self.get_many(&[memory], at).await?.pop().flatten())
+    }
+
+    async fn get_many(&self, memories: &[u64], at: u64) -> Result<Vec<Option<Value>>, Error> {
+        if memories.is_empty() || memories.len() > 8 {
+            return Err("history batch outside eight-record bound".into());
         }
-        if !corpus_memory(memory) {
-            return Ok(None);
+        let mut batch = read_batch();
+        let mut names = Vec::new();
+        for (index, memory) in memories.iter().enumerate() {
+            let name = format!("revision{index}");
+            batch = batch.var_as(
+                &name,
+                g().n_with_label_where(
+                    "Revision",
+                    SourcePredicate::between(
+                        "order",
+                        format!("{memory:020}:00000000000000000000"),
+                        format!("{memory:020}:{at:020}"),
+                    ),
+                )
+                .order_by("order", Order::Desc)
+                .limit(1)
+                .value_map(Some(vec!["memory", "seq", "scope", "active", "body"])),
+            );
+            names.push(name);
         }
         let result = self
             .engine
-            .query(QueryRequest::read(
-                read_batch()
-                    .var_as(
-                        "source",
-                        g().n_with_label_where(
-                            "Document",
-                            SourcePredicate::eq("memory", i64::try_from(memory)?),
-                        )
-                        .limit(2)
-                        .value_map(Some(vec![
-                            "memory",
-                            "key",
-                            "partition",
-                            "body",
-                        ])),
-                    )
-                    .var_as(
-                        "corpus",
-                        g().n_with_label("ImportState")
-                            .limit(2)
-                            .value_map(Some(vec!["documents", "complete"])),
-                    )
-                    .returning(["source", "corpus"]),
-            ))
+            .query(QueryRequest::read(batch.returning(names)))
             .await?;
-        baseline_entry(memory, &result["source"], corpus_bound(&result["corpus"])?)
+        let mut entries = Vec::new();
+        let mut source_batch = read_batch();
+        let mut source_names = Vec::new();
+        for (index, memory) in memories.iter().enumerate() {
+            let rows = match result.get(format!("revision{index}")) {
+                Some(Value::Null) => &[][..],
+                Some(Value::Array(rows)) => rows,
+                _ => return Err("invalid history response".into()),
+            };
+            entries.push(rows.first().cloned());
+            if rows.is_empty() && corpus_memory(*memory) {
+                let name = format!("source{index}");
+                source_batch = source_batch.var_as(
+                    &name,
+                    g().n_with_label_where(
+                        "Document",
+                        SourcePredicate::eq("memory", i64::try_from(*memory)?),
+                    )
+                    .limit(2)
+                    .value_map(Some(vec![
+                        "memory",
+                        "key",
+                        "partition",
+                        "body",
+                    ])),
+                );
+                source_names.push(name);
+            }
+        }
+        if !source_names.is_empty() {
+            source_batch = source_batch.var_as(
+                "corpus",
+                g().n_with_label("ImportState")
+                    .limit(2)
+                    .value_map(Some(vec!["documents", "complete"])),
+            );
+            source_names.push("corpus".into());
+            let result = self
+                .engine
+                .query(QueryRequest::read(source_batch.returning(source_names)))
+                .await?;
+            let bound = corpus_bound(&result["corpus"])?;
+            for (index, memory) in memories.iter().enumerate() {
+                if entries[index].is_none() && corpus_memory(*memory) {
+                    entries[index] =
+                        baseline_entry(*memory, &result[format!("source{index}")], bound)?;
+                }
+            }
+        }
+        Ok(entries)
     }
 
     pub async fn read_point(&self) -> Result<u64, Error> {
@@ -331,8 +366,23 @@ impl Authority {
         memories: &[u64],
         at: u64,
     ) -> Result<Vec<Option<Value>>, Error> {
+        self.read_heads(memories, at, false).await
+    }
+
+    async fn read_heads(
+        &self,
+        memories: &[u64],
+        at: u64,
+        with_body: bool,
+    ) -> Result<Vec<Option<Value>>, Error> {
         if memories.len() > 20 {
             return Err("head validation exceeds top-20 bound".into());
+        }
+        let mut revision_properties = vec!["memory", "seq", "scope", "active"];
+        let mut source_properties = vec!["memory", "key", "partition"];
+        if with_body {
+            revision_properties.push("body");
+            source_properties.push("body");
         }
         let mut batch = read_batch();
         let mut names = Vec::new();
@@ -359,7 +409,7 @@ impl Authority {
                     )
                     .order_by("order", Order::Desc)
                     .limit(1)
-                    .value_map(Some(vec!["memory", "seq", "scope", "active"])),
+                    .value_map(Some(revision_properties.clone())),
                 );
             names.extend([head, revision]);
             if corpus_memory(*memory) {
@@ -368,7 +418,7 @@ impl Authority {
                     &source,
                     g().n_with_label_where("Document", SourcePredicate::eq("memory", memory_i64))
                         .limit(2)
-                        .value_map(Some(vec!["memory", "key", "partition"])),
+                        .value_map(Some(source_properties.clone())),
                 );
                 names.push(source);
             }
@@ -432,19 +482,15 @@ impl Authority {
         permission_key(principal, 0)?;
         let _writer = self.writer.lock().await;
         let at = self.read_point().await?;
-        let head = self.checked_heads(&[memory], at).await?.pop().flatten();
-        let mut entry = if head.is_some_and(|row| row["active"] == true) {
-            let row = self
-                .get(memory, at)
-                .await?
-                .ok_or("current revision disappeared")?;
-            if !row["body"].is_string() {
-                return Err("invalid authoritative body".into());
-            }
-            Some(row)
-        } else {
-            None
-        };
+        let mut entry = self
+            .read_heads(&[memory], at, true)
+            .await?
+            .pop()
+            .flatten()
+            .filter(|row| row["active"] == true);
+        if entry.as_ref().is_some_and(|row| !row["body"].is_string()) {
+            return Err("invalid authoritative body".into());
+        }
         let mut permission_revision = None;
         if let Some(row) = &entry {
             let scope = u8::try_from(row["scope"].as_u64().ok_or("invalid current scope")?)?;
@@ -627,21 +673,30 @@ impl Authority {
             if members.is_empty() {
                 return Ok(json!({"entries":result,"next":null,"at":at}));
             }
-            for member in members {
-                let id = member["memory"].as_u64().ok_or("invalid membership ID")?;
-                if cursor.is_some_and(|previous| id <= previous) {
-                    return Err(format!("membership range did not advance: scope={scope}, cursor={cursor:?}, returned={id}").into());
+            let mut offset = 0;
+            while offset < members.len() {
+                let count = 8.min(limit - result.len()).min(members.len() - offset);
+                let ids = members[offset..offset + count]
+                    .iter()
+                    .map(|member| member["memory"].as_u64().ok_or("invalid membership ID"))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let revisions = self.get_many(&ids, at).await?;
+                for (id, revision) in ids.into_iter().zip(revisions) {
+                    if cursor.is_some_and(|previous| id <= previous) {
+                        return Err(format!("membership range did not advance: scope={scope}, cursor={cursor:?}, returned={id}").into());
+                    }
+                    cursor = Some(id);
+                    if let Some(revision) = revision
+                        && revision["active"] == true
+                        && revision["scope"] == scope
+                    {
+                        result.push(revision);
+                    }
+                    if result.len() == limit {
+                        return Ok(json!({"entries":result,"next":cursor,"at":at}));
+                    }
                 }
-                cursor = Some(id);
-                if let Some(revision) = self.get(id, at).await?
-                    && revision["active"] == true
-                    && revision["scope"] == scope
-                {
-                    result.push(revision);
-                }
-                if result.len() == limit {
-                    return Ok(json!({"entries":result,"next":cursor,"at":at}));
-                }
+                offset += count;
             }
         }
     }

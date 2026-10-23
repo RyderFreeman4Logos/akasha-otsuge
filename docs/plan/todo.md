@@ -75,6 +75,11 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       proves historical scans release the writer and recheck revocation before
       return; the unchanged 100-client diagnostic passes after that fix. Full-size
       coverage and the generation lifecycle remain required.
+      The current-read workload now checks real pinned corpus content as well as
+      concurrent synthetic revisions. Seven negative oracle controls, 123 native
+      corpus/pagination commands, visibility/reopen and 5,163 checks over 100,000
+      changes pass. The 60-second case passes with 144 real current checks, but
+      full-duration memory, unvectorized text and generation-backed reads remain.
 - [ ] Verify generation-specific indexed receipts and gap-free watermarks,
       concurrent writes/reindex, failed-build rollback and model separation.
       A 96-command revision-only diagnostic passes real text/vector reads,
