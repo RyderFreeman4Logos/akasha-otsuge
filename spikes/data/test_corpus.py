@@ -1,6 +1,7 @@
 import hashlib
 import json
 import math
+import os
 import pathlib
 import tempfile
 import unittest
@@ -9,10 +10,20 @@ from unittest.mock import patch
 import pyarrow
 import pyarrow.parquet as parquet
 
-from prepare_corpus import CHUNK_BYTES, chunks, prepare, vector_fingerprint
+from prepare_corpus import CHUNK_BYTES, chunks, prepare, vector_fingerprint, wait_for_shard
 
 
 class CorpusBoundaries(unittest.TestCase):
+    def test_wait_refuses_missing_or_reused_download_controller(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            (root / "download-state.json").write_text(json.dumps({"pid": 999999999, "start_ticks": "0"}))
+            with self.assertRaisesRegex(RuntimeError, "controller exited"):
+                wait_for_shard(root / "missing.parquet")
+            (root / "download-state.json").write_text(json.dumps({"pid": os.getpid(), "start_ticks": "0"}))
+            with self.assertRaisesRegex(RuntimeError, "identity"):
+                wait_for_shard(root / "missing.parquet")
+
     def test_real_parquet_deduplication_excludes_added_separator_bytes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)
@@ -26,8 +37,14 @@ class CorpusBoundaries(unittest.TestCase):
                 sources.append({"repository": "test/" + name, "revision": "fixture", "license": "CC0",
                                 "files": [{"path": path.name, "size": len(content),
                                            "sha256": hashlib.sha256(content).hexdigest()}]})
-            with patch.object(pathlib.Path, "read_text", return_value=json.dumps({"sources": sources})):
-                result = prepare(root, [1, 1])
+            read_text = pathlib.Path.read_text
+            def source_inventory(path, *args, **kwargs):
+                return json.dumps({"sources": sources}) if path.name == "sources.json" else read_text(path, *args, **kwargs)
+            with patch.object(pathlib.Path, "read_text", autospec=True, side_effect=source_inventory):
+                result = prepare(root, [1, 1], progress=root / "progress.json")
+            progress = json.loads((root / "progress.json").read_text())
+            self.assertEqual((progress["completed"], progress["total"]), (2, 2))
+            self.assertEqual(progress["unique_content_utf8_bytes"], 10)
             self.assertEqual(result["documents"], 2)
             self.assertEqual(result["unique_content_utf8_bytes"], 10)
             self.assertEqual(result["indexed_body_utf8_bytes"], 11)

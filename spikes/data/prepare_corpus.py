@@ -9,11 +9,12 @@ import os
 import pathlib
 import struct
 import sys
+import time
 
 import pyarrow
 import pyarrow.parquet as parquet
 
-from download import verify
+from download import publish, verify
 
 TARGET_BYTES = 50_000_000_000
 CHUNK_BYTES = 64 * 1024
@@ -42,7 +43,24 @@ def vector_fingerprint(vector):
     return hashlib.sha256(encoded).digest()
 
 
-def records(directory, counts, statistics):
+def wait_for_shard(path):
+    while not path.exists():
+        state = json.loads((path.parent / "download-state.json").read_text())
+        try:
+            stat = pathlib.Path(f"/proc/{state['pid']}/stat").read_text().rsplit(")", 1)[1].split()
+        except FileNotFoundError as error:
+            raise RuntimeError("download controller exited before required shard arrived") from error
+        if stat[0] == "Z" or stat[19] != state["start_ticks"]:
+            raise RuntimeError("download controller identity no longer matches")
+        receipt_path = path.with_suffix(".download.json")
+        if receipt_path.exists():
+            receipt = json.loads(receipt_path.read_text())
+            if receipt["pid"] == state["pid"] and receipt["phase"] in ("failed", "verification_failed"):
+                raise RuntimeError(f"required download failed: {path.name}")
+        time.sleep(2)
+
+
+def records(directory, counts, statistics, progress=None, wait=False):
     inventory = json.loads(pathlib.Path(__file__).with_name("sources.json").read_text())["sources"]
     seen_content, seen_vectors, seen_keys = set(), set(), set()
     partitions = {f"p{i}": collections.Counter() for i in range(8)}
@@ -50,12 +68,26 @@ def records(directory, counts, statistics):
                       indexed_body_utf8_bytes=0, vectors=0, unique_vectors=0,
                       duplicate_content_utf8_bytes=0, unvectorized_unique_utf8_bytes=0,
                       added_separator_bytes=0, inputs=[])
+    started = time.monotonic()
+    def checkpoint(phase, file):
+        if progress is not None:
+            elapsed = time.monotonic() - started
+            completed = len(statistics["inputs"])
+            publish(progress, {"phase": phase, "active_unit": file, "completed": completed,
+                               "total": sum(counts), "elapsed_s": elapsed, "eta_s": None,
+                               "rate_per_s": completed / elapsed, "documents": statistics["documents"],
+                               "unique_content_utf8_bytes": statistics["unique_content_utf8_bytes"],
+                               "pid": os.getpid(),
+                               "start_ticks": pathlib.Path("/proc/self/stat").read_text().rsplit(")", 1)[1].split()[19]})
     for group, count in enumerate(counts):
         source = inventory[group]
         if not 0 <= count <= len(source["files"]):
             raise ValueError("invalid source shard count")
         for index, item in enumerate(source["files"][:count]):
             path = directory / f"{'vectors' if group == 0 else 'text'}-{index:05d}.parquet"
+            if not path.exists() and wait:
+                checkpoint("waiting_verified_shard", path.name)
+                wait_for_shard(path)
             verify(path, item)
             statistics["inputs"].append({"file": path.name, "source": item,
                 "repository": source["repository"], "revision": source["revision"],
@@ -107,18 +139,20 @@ def records(directory, counts, statistics):
                         if group == 1 and statistics["unique_content_utf8_bytes"] >= TARGET_BYTES:
                             statistics["unique_vectors"] = len(seen_vectors)
                             statistics["partitions"] = partitions
+                            checkpoint("target_prepared", path.name)
                             return
+            checkpoint("shard_prepared", path.name)
             print(json.dumps({"prepared": path.name, "documents": statistics["documents"],
                               "unique_content_utf8_bytes": statistics["unique_content_utf8_bytes"]}), file=sys.stderr, flush=True)
     statistics["unique_vectors"] = len(seen_vectors)
     statistics["partitions"] = partitions
 
 
-def prepare(directory, counts, output=None):
+def prepare(directory, counts, output=None, progress=None, wait=False):
     statistics = {}
     digest = hashlib.sha256()
     prepared_bytes = 0
-    for record in records(directory, counts, statistics):
+    for record in records(directory, counts, statistics, progress, wait):
         line = (json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8")
         digest.update(line)
         prepared_bytes += len(line)
@@ -130,8 +164,9 @@ def prepare(directory, counts, output=None):
 
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else ""
-    if (mode == "scan" and len(sys.argv) != 6) or (mode == "stream" and len(sys.argv) != 4) or mode not in ("scan", "stream"):
-        raise SystemExit("usage: prepare_corpus.py scan DIR VECTOR_SHARDS TEXT_SHARDS NEW_MANIFEST | stream DIR MANIFEST")
+    wait = len(sys.argv) == 7 and sys.argv[6] == "--wait-for-downloads"
+    if (mode == "scan" and len(sys.argv) != (7 if wait else 6)) or (mode == "stream" and len(sys.argv) != 4) or mode not in ("scan", "stream"):
+        raise SystemExit("usage: prepare_corpus.py scan DIR VECTOR_SHARDS TEXT_SHARDS NEW_MANIFEST [--wait-for-downloads] | stream DIR MANIFEST")
     directory = pathlib.Path(sys.argv[2]).resolve(strict=True)
     code = {name: hashlib.sha256(pathlib.Path(__file__).with_name(name).read_bytes()).hexdigest()
             for name in ("prepare_corpus.py", "download.py", "sources.json")}
@@ -141,7 +176,7 @@ def main():
         output = pathlib.Path(sys.argv[5])
         if output.exists():
             raise FileExistsError(output)
-        statistics = prepare(directory, counts)
+        statistics = prepare(directory, counts, progress=output.with_suffix(".progress.json"), wait=wait)
         full = statistics["unique_content_utf8_bytes"] >= TARGET_BYTES and statistics["unique_vectors"] >= 1_000_000
         manifest = {"status": "full_corpus_prepared" if full else "diagnostic_corpus_prepared",
                     "seed": 0, "embedding_model": "text-embedding-3-large", "dimensions": 1536,

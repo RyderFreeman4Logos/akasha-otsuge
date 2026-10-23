@@ -74,3 +74,11 @@ output and verifies the complete statistics and stream hash at EOF. Consumers
 must reject an import if the producer fails; receiving a prefix is not acceptance.
 Run these commands with the pinned private PyArrow environment. Corpus preparation
 memory is separate from measured database RSS. Neither command claims indexing.
+
+`scan ... --wait-for-downloads` overlaps preparation with the managed downloader.
+Only fully published source files are consumed. A missing source waits only while
+the recorded downloader PID/start identity is live; a terminal file failure or
+changed process identity fails the preparation. Per-shard progress is fsynced next
+to the requested manifest as `.progress.json`. Incomplete preparation can be
+restarted with a new manifest path: it rereads sources and does not claim saved
+hash state or exactly-once execution. No database is modified by preparation.
