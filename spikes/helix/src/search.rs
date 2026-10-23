@@ -8,22 +8,22 @@ use sha2::{Digest, Sha256};
 use crate::engine::{Engine, Error};
 
 #[derive(Deserialize)]
-struct Fixture {
+pub struct Fixture {
     source_sha256: String,
     model: String,
     dimension: usize,
-    queries: Vec<Query>,
+    pub queries: Vec<Query>,
 }
 
-#[derive(Deserialize)]
-struct Query {
-    key: String,
-    partition: String,
-    term: String,
-    embedding: Vec<f32>,
+#[derive(Clone, Deserialize)]
+pub struct Query {
+    pub key: String,
+    pub partition: String,
+    pub term: String,
+    pub embedding: Vec<f32>,
 }
 
-pub async fn verify(engine: &Engine, path: &Path) -> Result<Value, Error> {
+pub fn load(path: &Path) -> Result<(Fixture, String), Error> {
     let mut bytes = Vec::new();
     std::fs::File::open(path)?
         .take(1024 * 1024 + 1)
@@ -57,6 +57,47 @@ pub async fn verify(engine: &Engine, path: &Path) -> Result<Value, Error> {
             return Err("invalid real-document search query".into());
         }
     }
+    let digest = Sha256::digest(&bytes)
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect::<String>();
+    Ok((fixture, digest))
+}
+
+pub async fn query(
+    engine: &Engine,
+    query: &Query,
+    scope: &str,
+    vector: bool,
+) -> Result<Value, Error> {
+    let traversal = if vector {
+        g().vector_search_nodes(
+            "Document",
+            "embedding",
+            query.embedding.clone(),
+            20,
+            Some(PropertyValue::from(scope.to_owned())),
+        )
+    } else {
+        g().text_search_nodes(
+            "Document",
+            "body",
+            query.term.clone(),
+            20,
+            Some(PropertyValue::from(scope.to_owned())),
+        )
+    };
+    engine
+        .query(QueryRequest::read(
+            read_batch()
+                .var_as("hits", traversal.value_map(Some(vec!["key", "partition"])))
+                .returning(["hits"]),
+        ))
+        .await
+}
+
+pub async fn verify(engine: &Engine, path: &Path) -> Result<Value, Error> {
+    let (fixture, digest) = load(path)?;
     let started = Instant::now();
     let mut results = Vec::new();
     for query in fixture.queries {
@@ -66,31 +107,8 @@ pub async fn verify(engine: &Engine, path: &Path) -> Result<Value, Error> {
             } else {
                 query.partition.clone()
             };
-            let traversal = if mode == "ann" {
-                g().vector_search_nodes(
-                    "Document",
-                    "embedding",
-                    query.embedding.clone(),
-                    20,
-                    Some(PropertyValue::from(scope.clone())),
-                )
-            } else {
-                g().text_search_nodes(
-                    "Document",
-                    "body",
-                    query.term.clone(),
-                    20,
-                    Some(PropertyValue::from(scope.clone())),
-                )
-            };
             let query_started = Instant::now();
-            let response = engine
-                .query(QueryRequest::read(
-                    read_batch()
-                        .var_as("hits", traversal.value_map(Some(vec!["key", "partition"])))
-                        .returning(["hits"]),
-                ))
-                .await?;
+            let response = self::query(engine, &query, &scope, mode == "ann").await?;
             let elapsed = query_started.elapsed().as_secs_f64();
             let hits = response["hits"]
                 .as_array()
@@ -113,7 +131,7 @@ pub async fn verify(engine: &Engine, path: &Path) -> Result<Value, Error> {
     }
     Ok(
         json!({"phase":"real_search_verified", "queries":results.len(), "results":results,
-        "fixture_sha256":Sha256::digest(&bytes).iter().map(|b|format!("{b:02x}")).collect::<String>(),"source_sha256":fixture.source_sha256,
+        "fixture_sha256":digest,"source_sha256":fixture.source_sha256,
         "seconds":started.elapsed().as_secs_f64(),"not_tested":["50GB","100_clients","retraction","model_generations"]}),
     )
 }

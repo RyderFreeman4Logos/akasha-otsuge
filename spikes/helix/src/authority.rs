@@ -211,6 +211,24 @@ impl Authority {
         Ok(rows.first().cloned())
     }
 
+    pub async fn current(&self, memory: u64) -> Result<Value, Error> {
+        let _writer = self.writer.lock().await;
+        let counter = self
+            .engine
+            .cypher(
+                "MATCH (c:Counter {key:'global'}) RETURN c.seq",
+                BTreeMap::new(),
+                None,
+            )
+            .await?;
+        let at = counter
+            .rows
+            .first()
+            .and_then(|row| row[0].as_u64())
+            .ok_or("missing current commit point")?;
+        Ok(json!({"at":at,"entry":self.get(memory,at).await?.filter(|row|row["active"]==true)}))
+    }
+
     pub async fn state(
         &self,
         scope: u8,
@@ -300,7 +318,7 @@ pub fn oracle_change(seq: u64) -> Change {
     }
 }
 
-fn oracle_state(memory: u64, at: u64) -> Option<Value> {
+pub fn oracle_state(memory: u64, at: u64) -> Option<Value> {
     if at <= memory {
         return None;
     }

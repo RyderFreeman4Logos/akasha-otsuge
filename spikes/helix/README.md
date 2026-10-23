@@ -1,7 +1,7 @@
 # Helix embedded diagnostic probe
 
-Temporary MVP-003 experiment, outside the production Cargo workspace. This is
-an initial primitive test, not the full storage harness or backend selection.
+Temporary MVP-003 experiment, outside the production Cargo workspace. Full-size
+acceptance and the backend decision are still pending.
 [Frozen acceptance criteria](../../docs/benchmarks/storage-contract.md).
 
 Pinned upstream: [Helix v3.5.1 / c72e64f0](https://github.com/HelixDB/helix-db/tree/c72e64f0c7e480f3d125f071659d5e3ad7b8da15),
@@ -123,3 +123,44 @@ documents, rejects a changed prefix, resumes 1,057 documents including a partial
 last batch, repeats resume without duplicates and rejects a changed manifest.
 `AKASHA_SPIKE_IMPORT_HOLD_AFTER` is only an explicit crash-fixture barrier; normal
 imports leave it unset. Test directories are owned and removed after children exit.
+
+## Bounded workload cases
+
+Copy `workload.example.toml` outside Git and fill its absolute paths. Run
+`python3 spikes/helix/run_case.py CASE.toml`. Use a fresh run ID and output path
+for each `steady`, `burst` and `overload` case. The runner reads configuration only
+between cases and freezes it, the executable, input manifest and fixture hashes
+before effects. Epoch 1 is local to that case's runtime ID; do not aggregate
+different case configuration snapshots. Full steady cases require at least 1,800
+seconds and a completed import bound to the full manifest. Seed the historical
+oracle before starting workload cases in a new full database.
+
+The Rust harness starts 100 independent clients, one operation in flight per
+client, with four fair admission slots and at most 100 waiting requests. It
+records every result/latency, including real conflicts between writers sharing
+identities. Schedules include approximately 4 KiB writes, structured current
+reads, real BM25/ANN and exact 100-entry historical pages. Success rates count
+only operations completed inside the measurement window. Latency includes client
+scheduling delay and queue time. Corrections have their own success count.
+
+Every second the harness syncs request records, appends queue/progress samples and
+atomically checkpoints progress. The separate observer measures the entire
+engine/client process RSS/PSS and I/O; its Python memory is reported separately.
+If cgroup I/O accounting is unavailable, `/proc` counters are explicitly labelled
+as currently sampled processes. Derived lag remains unavailable until that
+separate acceptance leaf is implemented.
+
+An independent controller oracle reconstructs committed contents from request
+identities and compares every current read at its recorded commit point, including
+retractions. It rejects wrong content, duplicate/gapped sequences, executable or
+resource-profile drift and mismatched raw counts. `--resume` reuses a completed
+case only after validating its identity and artifact hashes. A still-live owner
+is refused; an ambiguous interrupted case requires `--abandon EXACT_RUN_ID`
+before another case may use the database. No measured case is automatically
+replayed. A TOML change is a new case, not an in-place change to old work.
+
+The 60-second, 38,462-vector diagnostic completed 1,698 requests from all 100
+clients; burst and ten-second overload diagnostics also passed. These are
+controller checks, not 50 GB or 30-minute profile acceptance. Current synthetic
+corrections do not yet modify the real search candidates; generation watermarks,
+live permissions, broad cold-query coverage and recovery remain required.

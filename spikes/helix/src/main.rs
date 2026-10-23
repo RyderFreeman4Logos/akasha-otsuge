@@ -1,3 +1,5 @@
+#![recursion_limit = "256"]
+
 use engine::{Engine, Error};
 use helix_db::HelixDbSource;
 use profile::config;
@@ -10,6 +12,7 @@ mod indexes;
 mod load;
 mod profile;
 mod search;
+mod workload;
 
 #[tokio::main(worker_threads = 2)]
 async fn main() -> Result<(), Error> {
@@ -29,6 +32,13 @@ async fn main() -> Result<(), Error> {
     }
     if args.len() > 4 {
         return Err("unexpected extra argument".into());
+    }
+    if args[2] == "--workload" {
+        return workload::run(
+            PathBuf::from(&args[1]),
+            &PathBuf::from(args.get(3).ok_or("--workload requires a request path")?),
+        )
+        .await;
     }
     if args[2] == "--search-corpus" {
         let fixture = args

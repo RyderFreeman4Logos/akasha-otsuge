@@ -21,6 +21,14 @@ def memory(pid):
     return values
 
 
+def process_io(pid):
+    try:
+        return {key: int(value) for key, value in
+                (line.split(":", 1) for line in pathlib.Path(f"/proc/{pid}/io").read_text().splitlines())}
+    except (FileNotFoundError, ProcessLookupError):
+        return None
+
+
 def main():
     if len(sys.argv) < 3:
         raise SystemExit("usage: measure.py NEW_JSONL COMMAND [ARG ...]")
@@ -41,10 +49,18 @@ def main():
         try:
             with open(f"/proc/{child.pid}/exe", "rb") as executable:
                 binary_hash = hashlib.file_digest(executable, "sha256").hexdigest()
-            samples.write(json.dumps({"event": "executable", "sha256": binary_hash}) + "\n")
+            start_ticks = pathlib.Path(f"/proc/{child.pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
+            samples.write(json.dumps({"event": "executable", "sha256": binary_hash,
+                                      "pid": child.pid, "start_ticks": start_ticks,
+                                      "cgroup": str(cgroup)}) + "\n")
             while True:
                 pids = {int(pid) for pid in (cgroup / "cgroup.procs").read_text().split()}
                 stats = [memory(pid) for pid in pids if pid != os.getpid()]
+                try:
+                    io_stat = {parts[0]: dict(field.split("=", 1) for field in parts[1:])
+                               for parts in (line.split() for line in (cgroup / "io.stat").read_text().splitlines())}
+                except FileNotFoundError:
+                    io_stat = None
                 sample = {
                     "event": "sample", "seconds": time.monotonic() - started,
                     "engine_rss_bytes": sum(item["Rss"] for item in stats),
@@ -53,6 +69,9 @@ def main():
                     "cgroup_current_bytes": int((cgroup / "memory.current").read_text()),
                     "cgroup_peak_bytes": int((cgroup / "memory.peak").read_text()),
                     "memory_events": dict(line.split() for line in (cgroup / "memory.events").read_text().splitlines()),
+                    "io_stat": io_stat,
+                    "engine_process_io": {str(pid): process_io(pid) for pid in pids if pid != os.getpid()},
+                    "io_coverage": "currently sampled processes; cgroup controller unavailable" if io_stat is None else "cgroup and sampled processes",
                 }
                 samples.write(json.dumps(sample) + "\n")
                 samples.flush()

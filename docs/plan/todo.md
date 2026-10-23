@@ -45,12 +45,13 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       and exact contents across revision/retraction/restore/scope boundaries.
 - [x] Reconcile the interrupted diagnostic vector build and verify real search
       in all eight partitions (24 queries); full-size coverage remains below.
-- [ ] Resume public corpus downloads and independently verify all source hashes.
+- [x] Resume public corpus downloads and independently verify all 42 source hashes.
 - [ ] Freeze reproducible >=50GB unique-content / >=1M unique-vector manifest,
       exclusions, hot/cold partitions, oracle identity and disk headroom.
 - [ ] Index every declared searchable text/vector record at full size.
-- [ ] Implement bounded admission and 100 independent clients with actual
-      conflicts, durable latency/error records and per-wave checkpoints.
+- [x] Implement bounded admission and 100 independent harness clients with actual
+      conflicts, durable latency/error records and per-second checkpoints;
+      full-size measured cases and recovery remain below.
 - [ ] Run >=30 minutes each at 512MiB and 2GiB; meet every frozen rate/latency/RSS
       threshold; include cold reads, burst, overload fairness and bounded drain.
 - [ ] Verify atomic revision/head/receipt/job/sequence commit; request-hash reuse;

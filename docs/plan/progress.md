@@ -10,10 +10,15 @@ All 41 source pages and all 28 real Issues/dependency mappings are preserved.
 [Complete remaining checklist and restart review](todo.md): 26 Issues remain open.
 The interrupted 38,462-vector index recovered and activated; [24 real search
 checks](../benchmarks/results/helix-real-search.json) pass across eight partitions
-after process reopen. Full corpus preparation is independent: its first Python
-run reached 1,000,000 vector records then exceeded a 2 GiB preparation cgroup.
-The read-only preparation was restarted with 8 GiB; engine acceptance budgets
-remain 512 MiB and 2 GiB. No full-size pass follows from these diagnostics.
+after process reopen. [Full input preparation](../benchmarks/results/full-corpus-manifest.json)
+now proves 50,000,002,783 eligible bytes and 1,000,000 distinct vectors across
+11,428,831 documents. The successful Python preparation used 8 GiB after its
+earlier 2 GiB run was killed; engine acceptance budgets remain 512 MiB and 2 GiB.
+
+The [100-client diagnostics](../benchmarks/results/workload-diagnostic-r3/summary.json)
+include a 60-second mixed run, simultaneous burst, overload and independent
+current-content checks. They pass on 38,462 vectors; full-size indexing, sustained
+profiles, cold-query coverage and the remaining recovery matrix are still open.
 The remaining MVP Issues are open. Library configuration tests are not provider,
 daemon, four-host, 1600–1690s or 50GB/100-client acceptance. Persistent configuration
 audit, daemon commands and file watcher integration remain assigned to MVP-008;
