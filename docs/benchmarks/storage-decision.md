@@ -152,7 +152,39 @@ generations and the delta-table shape. Seven native units,70 native search and
 legacy-layout checks, and103 lifecycle checks pass under the low group. Full
 scoped-generation acceptance is pending; source/authority data is reused.
 
+[Full scope-column backfill](results/fallback-scoped-backfill/summary.json) now
+covers all11,428,831 text rows and1,000,000 vectors in974.591s; sampled RSS max
+is276,017,152B. The first scoped index attempt is interrupted at205.737s by the
+controller parsing an incomplete trailing progress line. Its last samples show
+no OOM; there is no native terminal exit receipt. Exact process/unit exit and
+owned scratch cleanup are verified before explicit abandonment. A deterministic
+RED/GREEN check fixes the observer to read only newline-terminated records while
+still rejecting malformed complete records. The successor uses the same native
+binary and original persisted index deadline; its result remains pending.
+
 The reference-query harness now retains all32 exact-ANN references and supports
 an explicit generation. A timeout records the child identity, partial output and
 exit before failing. The initial failed run lacked those child receipts; its
 cgroup samples and that limitation remain archived. No ANN recall is yet claimed.
+
+### Cold-file preparation and workload reservations
+
+[The real-shard cold case](results/fallback-cold-workload/summary.json) verifies
+all2,383 owned database files have zero resident pages immediately before engine
+launch, under the same exclusive database lock. This is measured with mincore
+after per-file fsync/fadvise; host caches are untouched. Those files were already
+nonresident at admission. A separate warm-file test proves eviction and unchanged
+bytes, and rejects foreign locks, competing owners and symlinks.
+
+The subsequent60s/100-client case completes1,698 requests,144 synthetic and144
+corpus current checks,72 BM25 queries and15 ANN queries. All original rates and
+latencies pass; sampled RSS maximum/P99 is324,235,264B. Raw cold-file receipts,
+commands, memory and request records are hashed; completed reuse is unchanged.
+This covers38,462 real vectors and does not establish full-corpus cold coverage
+or either30-minute profile.
+
+Full workload admission previously omitted the45GB rebuild allowance when the
+pinned generation was2. Both the native shared scheduler and controller now
+retain81,212,254,720B for either generation. Native and controller RED/GREEN
+controls verify that boundary before database access. Both candidates' release
+units and Clippy pass; no frozen acceptance threshold changed.

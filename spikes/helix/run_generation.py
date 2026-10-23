@@ -46,8 +46,8 @@ def observe(database, request, attempt):
     log = pathlib.Path(attempt['log'])
     with log.open('rb') as source:
         source.seek(max(0, log.stat().st_size - 65536))
-        for line in reversed(source.read().decode(errors='replace').splitlines()):
-            if line.startswith('INDEX_PROGRESS:'):
+        for line in reversed(source.read().decode(errors='replace').splitlines(keepends=True)):
+            if line.startswith('INDEX_PROGRESS:') and line.endswith('\n'):
                 return {'native_index': json.loads(line[len('INDEX_PROGRESS:'):]), 'counter_note': 'native entity counter can include repeated passes; not unique coverage'}
     return None
 

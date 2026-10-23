@@ -7,9 +7,9 @@ not narrow them. Check an Issue only after its evidence, review, gate and merge.
 
 Current decision: the tested Helix candidate failed full-data low-memory recovery
 in three retained OOM runs. Stop Helix tuning and validate the specification's
-SurrealKV 1.0.0/LanceDB 0.40 fallback against the unchanged contract. The checked
-diagnostic leaves below are Helix evidence, not acceptance transferred to the
-fallback. See [decision record](../benchmarks/storage-decision.md).
+SurrealKV 1.0.0/LanceDB 0.40 fallback against the unchanged contract. Diagnostic
+leaves below identify their candidate; no acceptance transfers between backends.
+See [decision record](../benchmarks/storage-decision.md).
 
 ## Session operating rules
 
@@ -81,6 +81,12 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       full-size workloads remain separate acceptance below.
 - [ ] Observe full-size hot/cold read coverage; partition labels and process
       restart alone do not prove file-cache coldness.
+      Owned-file fsync/fadvise and mincore now verify zero resident pages under
+      the exclusive database lock. The real 38,462-vector shard has 2,383 files
+      already nonresident at admission; its subsequent 60s/100-client case passes
+      1,698 requests and independent content checks, RSS max324,235,264B.
+      A separate warm-file control proves actual eviction without byte changes.
+      Full database cold coverage remains pending.
 - [x] Index every declared searchable text/vector record at full size. Fallback
       native statistics verify all 11,428,831 text rows and 1,000,000 vector rows
       after bounded streaming training and single-worker partition merge.
@@ -122,9 +128,12 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       runs 100 clients for 60 seconds with background indexing, reaches both
       watermarks without gaps and passes independent derived-content/job-count
       verification. Full-size execution and concurrent rebuild remain required.
-- [ ] Backfill the full corpus into a candidate generation with resumable coverage
+- [x] Backfill the full corpus into a candidate generation with resumable coverage
       accounting. The explicit corpus-generation path has bounded atomic cursor
-      batches and native fixture coverage; full-size execution remains pending.
+      batches and native fixture coverage. Fallback generations1 and2 both now
+      cover all11,428,831 text records and1,000,000 vectors; generation2 uses
+      scope columns, takes974.591s and peaks at276,017,152B sampled RSS.
+      The following interrupted-build history belongs to the rejected Helix path.
       A dedicated operation controller now checks exclusive import/case ownership,
       disk reservations, exact binary identity and explicit resume. Native
       controller-crash/live-child refusal and committed-cursor reuse pass; the
@@ -136,13 +145,16 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       limiting compaction ranges alone also failed. Both original failures are
       retained. Reducing compressed read-ahead also failed; Helix is rejected for
       this tested recovery criterion. Full selected-backend indexes and backfill
-      still require acceptance on the specified fallback.
+      remain separate from this completed fallback backfill.
 - [ ] Measure and enforce disk admission for ordinary indexed writes and reindex,
       including retained native text splits; verify the explicit rebuild bound.
       Native per-write and index admission now have 26-command diagnostic coverage,
       including refusal of an insufficient full-workload plan and continued
       reads/idempotent receipt reuse. Full-size allocation and physical disk-full
       recovery remain required; logical input allowances are not physical bounds.
+      Both workload admission boundaries now retain the same81,212,254,720B
+      reservation for generations1 and2; the previous generation2 omission has
+      native and controller RED/GREEN regressions.
 - [ ] Test low-budget reopen of full data/backlog/interrupted builds and
       2GiB-to-512MiB draining with original work deadlines preserved.
 - [ ] Test all required commit/index/watermark/activation crash barriers,
@@ -220,8 +232,9 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       unchanged low engine caches but a2GiB diagnostic group returns in7.170s,
       RSS1,157,300,224B. This is not low acceptance. Source and disk inspection
       identify435 eagerly resident FTS token dictionaries (861,893,690 file bytes).
-      A new generation will store each body in one nullable scope column and
-      build separate dictionaries; legacy generations retain their original layout.
+      A new generation stores each body in one nullable scope column and builds
+      separate dictionaries; legacy generations retain their original layout.
+      The complete scope-column backfill now passes; full index build is separate.
       Full scoped-layout/query/activation/workload acceptance is still pending.
       The lifecycle implementation now applies real delta indexes, validates
       embedding bundles/source hashes, records gap-free watermarks and atomically
