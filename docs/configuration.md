@@ -1,0 +1,105 @@
+# Configuration contract (MVP-002)
+
+The configuration library is implemented and tested independently of the daemon.
+Production config commands, automatic file watching and durable generation/audit
+storage are integrated by MVP-008. This document describes the shared contract;
+the current bootstrap CLI does not advertise those commands yet.
+
+See [example TOML](../examples/config.toml) and the complete
+[built-in defaults](../src/config/defaults.toml). There is no selected database:
+MVP-003 chooses the single production backend. There is no backend switch setting.
+
+The daemon supplies absolute data/socket paths at startup. The library never reads
+project configuration, environment overrides, credentials or installed-host state
+implicitly. The daemon's later setup layer resolves the documented XDG paths.
+Credential references accept only `env:NAME`; values are resolved by prepared
+consumers, never stored in the configuration audit.
+
+Precedence is explicit management overrides, selected `profiles.NAME`, user TOML,
+then built-in defaults. All base/profile documents must be valid; an override cannot
+hide an invalid base or unknown key. `ResolvedConfig::sources()` records the winning
+layer per effective field, including defaulted profile members. `resolve` returns an immutable, validated configuration,
+parsed timeouts, an effective-content SHA-256 and a retrieval fingerprint.
+One-shot management overrides create a separate resolved plan; `reload` has no
+override argument and cannot publish a per-command override to the whole daemon.
+
+Configuration is limited to 1 MiB and 64 profiles per executor/model/notifier or
+named-profile category. Unknown fields, types, malformed/zero durations, absent
+profile references, cyclic fallback, invalid URL/credential forms and contradictory
+budgets are rejected. Durations are positive integer `ms`, `s`, `m` or `h` values;
+only idle accepts `disabled`, and only workflow accepts `auto`.
+
+`models.NAME` requires `kind` (`text`, `embedding`, `reranker`), `endpoint`, `model`
+and explicit `local`. Embedding requires `dimension`. An optional `timeout`
+overrides the common request budget. Endpoints accept HTTP(S), with no userinfo,
+query or fragment; use `credential_ref` for authentication. Unconfigured model
+services are valid. `retrieval.embedding/reranker/extraction` reference profiles of
+the corresponding kind. These are configuration contracts; actual requests are
+implemented in MVP-009/010/017.
+
+`executors.NAME` requires `kind` (`claude_code`, `codex`, `hermes`, `pi`) and `binary`.
+Optional fields are `args`, `enabled`, a text `model`, `timeout` and an ordered
+`fallback` list. No other host, fallback or paid API is enabled by default. Resolving
+config does not spawn a binary. The selected host's prepare consumer validates its
+capabilities. `notifiers.NAME` accepts `local` or `stdio`; stdio requires `command`.
+
+| Settings | Activation | Accepted/queued jobs |
+| --- | --- | --- |
+| Executor/model routes, prompts, timeouts, retrieval, review | Complete resource prepare, then one snapshot swap | Retain accepted generation/resources |
+| Embedding model/dimension | Prepare complete matching encoder/index resources before swap | Retain old matching bundle |
+| Concurrency, pause, read policy, executor permission | Consumers check current snapshot at admission/read/delegation/return | Execution plan stays pinned; limits stay live |
+| Notifier enable/route/credentials | `delivery_route()` reads current generation for each claim/retry/send | Never reuse event-generation route permission |
+| Data directory or socket path | Entire candidate pending; explicit drain/restart required | No fields partially applied |
+| Logging | New active diagnostic setting; retrieval fingerprint unaffected | No retrieval cache invalidation for log-only changes |
+
+`ConfigManager::pin()` fixes the accepted task generation. Generic resource owner
+`R` is prepared once for that complete configuration and drops only after its last
+snapshot reference. A watcher and explicit reload submit complete bytes to the same
+`reload` pipeline; the watcher must debounce stable bytes/atomic replacement.
+Preparation is serialized. It must be bounded, must not re-enter the manager, and
+must build the entire candidate resource set without changing active consumers.
+Failure preserves the old snapshot. Clone watch payloads before awaiting; never
+hold a watch borrow across reload.
+
+`status()` supplies active/pending generations, redacted effective/desired config,
+parsed timeouts, field sources and the last 64 revision results. Reload returns
+`applied`, `rejected` or `restart_required`, including field/reason and candidate
+digest. A mixed path/model change remains entirely pending. Rejection does not
+discard a previous valid pending candidate. JSON error locations omit untrusted
+values; credentials, endpoints and command arguments are redacted in diagnostics.
+
+The in-memory revision ring is a diagnostic window, not durable audit authority.
+MVP-008 must persist each returned report and accepted task snapshot, restore
+the positive generation passed to `ConfigManager::new`, and record separate live
+revocations. OS permissions and actual read/dispatch operations belong to their
+consumers; an old task must not authorize itself using its pinned policy.
+
+Timeout defaults and calculation:
+
+- Each text/embedding/reranker provider request: 1700 seconds.
+- Each runner execution: 1700 seconds, starting after admission/startup.
+- Queue: 300 seconds on a separate clock; queue deadlines cannot parent execution.
+- Startup 30s, cleanup 10s, bounded tool budget 120s, summary budget 60s.
+- Workflow auto: `starts × (slowest selected/fallback runner + startup + cleanup) + tools + summary`. Defaults yield 5400s, covering all three 1700s starts.
+- Explicit workflow must cover at least one selected runner plus all declared overhead. An explicit smaller total can limit later starts; the triggering layer stays visible. Idle is disabled unless explicitly configured.
+
+`Deadline` uses monotonic Tokio time and never resets on output/heartbeat.
+Its trace records configured/effective/elapsed/remaining time and the limiting and
+triggered layer. A provider started late inside a runner receives the remaining
+runner budget and reports the runner as the limiting layer. Reload does not mutate
+existing deadlines. These controlled-clock tests do not certify a real CLI/model
+path: `local_long_timeout_verified` remains false. MVP-009 and host integration must
+supply the required real 1600–1690s long tests.
+
+Reproduce the configuration acceptance and a redacted revision log:
+
+```sh
+cargo test --test config --locked
+cargo test --test config rejected_or_mixed_restart_changes_never_partially_apply -- --exact --nocapture
+bash scripts/check.sh
+```
+
+Dependency contracts were checked against current primary documentation:
+[TOML document deserialization](https://docs.rs/toml/latest/toml/fn.from_str.html)
+and [Tokio watch snapshots](https://docs.rs/tokio/latest/tokio/sync/watch/index.html).
+Versions are recorded in `Cargo.lock`.

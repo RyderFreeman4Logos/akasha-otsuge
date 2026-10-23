@@ -1,0 +1,39 @@
+schema_version = 1
+
+[consult]
+executor = "caller"
+max_runner_starts = 3
+max_delegation_depth = 1
+max_result_chars = 4000
+instructions_version = "v1"
+
+[timeouts]
+local_request = "1700s"
+runner = "1700s"
+workflow = "auto"
+idle = "disabled"
+queue = "5m"
+startup = "30s"
+cleanup = "10s"
+tools = "120s"
+summary = "60s"
+
+[runtime]
+max_concurrent_jobs = 1
+max_queued_jobs = 100
+memory_budget_mib = 512
+paused = false
+
+[retrieval]
+top_k = 20
+max_candidates = 100
+max_original_chars = 64000
+
+[review]
+mode = "policy"
+
+[access]
+read_roots = []
+
+[logging]
+level = "info"
