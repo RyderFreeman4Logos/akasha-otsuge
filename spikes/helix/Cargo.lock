@@ -30,6 +30,7 @@ version = "0.0.0"
 dependencies = [
  "db",
  "helix-db",
+ "serde",
  "serde_json",
  "slatedb",
  "tokio",

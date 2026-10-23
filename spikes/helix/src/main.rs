@@ -8,6 +8,9 @@ use db::config::{
 };
 use helix_db::{Client, HelixDbSource};
 
+mod indexes;
+mod load;
+
 const MIB: u64 = 1024 * 1024;
 
 fn config() -> Result<DbConfig, Box<dyn Error>> {
@@ -59,6 +62,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if !(3..=4).contains(&args.len()) {
         return Err("usage: akasha-helix-probe OWNED_DATABASE_DIRECTORY CYPHER [before-execute|before-reply|after-reply]".into());
     }
+    if args[2] == "--load" {
+        let input = args.get(3).ok_or("--load requires a prepared JSONL path")?;
+        return load::run(PathBuf::from(&args[1]), PathBuf::from(input)).await;
+    }
     let hold = args
         .get(3)
         .map(|arg| arg.to_str().ok_or("invalid phase"))
@@ -79,6 +86,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
         config()?,
     )
     .await?;
+    if query == "--indexes" {
+        let result = indexes::probe(&client).await;
+        client.close().await?;
+        println!("{}", serde_json::to_string(&result?)?);
+        return Ok(());
+    }
+    if query == "--build-indexes" {
+        let result = indexes::build(&client).await;
+        client.close().await?;
+        println!("{}", serde_json::to_string(&result?)?);
+        return Ok(());
+    }
     checkpoint(hold, "before-execute").await;
     let result = client.cypher(query, Default::default(), None).await;
     let result = match result {

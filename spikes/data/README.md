@@ -49,4 +49,3 @@ must have an `OWNER` marker. Partial transfers are resumed; final names are
 published only after size and SHA-256 validation. Existing final files are
 revalidated. The command reserves 30 GiB of free space. It does not count
 downloaded bytes as eligible content or assert that 16 shards pass acceptance.
-

@@ -41,3 +41,28 @@ uses its owned serializable transaction; [SlateDB transaction](https://github.co
 commits with default write options whose `await_durable` is true. The runtime
 probe verifies process-crash recovery. It does not certify arbitrary power loss,
 historical pagination, idempotency, indexing, 100 clients or 50 GB operation.
+
+## Additional diagnostics
+
+`--indexes` creates 100 small fixtures, builds partitioned BM25 and vector
+indexes, and checks matching, excluded scope, nearest self and reuse of an
+already active definition. Its vectors have only three dimensions; this checks
+API behavior, not production-size performance.
+
+`--load PREPARED_JSONL` requires a new directory, imports bounded records in
+16-record transactions and closes cleanly. Failed imports are deliberately not
+resumable. Real precomputed 1536-dimensional input is prepared by
+`../data/prepare_vectors.py`. `--build-indexes` builds the Document text and
+1536-dimensional vector indexes; its two-hour observation deadline is a harness
+limit, not a performance acceptance threshold.
+
+Wrap long runs in `../measure.py NEW_SAMPLES_JSONL COMMAND ...` inside a fresh
+dedicated systemd service cgroup with a finite memory limit and swap disabled.
+The observer records engine RSS/PSS, its own RSS, cgroup usage/events and the
+executed binary hash. Cgroup memory includes file cache; it is reported separately
+from process RSS. The observer terminates only its owned child on failure.
+
+[Published diagnostic results](../../docs/benchmarks/results/) include the real
+38,462-vector import and its raw memory samples. This first shard is 13,344,347
+UTF-8 content bytes, far below the required full corpus. The live long vector
+build is not yet an acceptance result. No production backend has been selected.

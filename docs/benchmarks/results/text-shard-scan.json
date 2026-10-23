@@ -1,0 +1,10 @@
+{
+  "phase": "diagnostic_text_scan",
+  "rows": 726000,
+  "content_utf8_bytes": 3479172098,
+  "unique_content_utf8_bytes": 3473352561,
+  "unique_documents": 724698,
+  "documents_over_128KiB": 330,
+  "seconds": 14.196561351418495,
+  "indexed": false
+}
