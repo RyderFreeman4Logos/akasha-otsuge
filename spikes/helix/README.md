@@ -69,9 +69,15 @@ manifests. It checks complete stream size/hash, body bytes, vector and document
 counts before marking the import complete. Progress is fsynced to the owned root.
 The manifest-free diagnostic form is not resumable. Real precomputed
 1536-dimensional input is prepared by `../data/prepare_vectors.py` or the full
-corpus preparer. `--build-indexes` builds the Document text and
-1536-dimensional vector indexes; its two-hour observation deadline is a harness
-limit, not a performance acceptance threshold.
+corpus preparer. `--build-indexes [SECONDS_PER_INDEX]` builds the Document text
+and 1536-dimensional vector indexes. The default two-hour observation deadline
+is a harness limit, not a performance acceptance threshold. Full-size runs pass
+an explicit budget (up to seven days per index). Every five seconds and at
+completion, each family's progress is fsynced with operation identity, actual
+stage and counters. Entity counters include validation visits; total unique
+coverage and ETA are not inferred from them. Reopening resumes the same native
+operation. `check_index_progress.py PROBE REAL_FIXTURE` exercises both native
+builds, terminal checkpoints, reuse and invalid deadlines before database open.
 
 Wrap long runs in `../measure.py NEW_SAMPLES_JSONL COMMAND ...` inside a fresh
 dedicated systemd service cgroup with a finite memory limit and swap disabled.

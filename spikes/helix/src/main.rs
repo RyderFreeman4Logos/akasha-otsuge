@@ -85,10 +85,16 @@ async fn main() -> Result<(), Error> {
         println!("{}", result?);
         return Ok(());
     }
-    let hold = args
+    let third = args
         .get(3)
-        .map(|arg| arg.to_str().ok_or("invalid phase"))
+        .map(|arg| arg.to_str().ok_or("invalid argument"))
         .transpose()?;
+    let build_seconds = if args[2] == "--build-indexes" {
+        Some(indexes::build_seconds(third)?)
+    } else {
+        None
+    };
+    let hold = if build_seconds.is_some() { None } else { third };
     if hold.is_some_and(|value| !["before-execute", "before-reply", "after-reply"].contains(&value))
     {
         return Err("invalid phase".into());
@@ -112,7 +118,12 @@ async fn main() -> Result<(), Error> {
         return Ok(());
     }
     if query == "--build-indexes" {
-        let result = indexes::build(&client).await;
+        let result = indexes::build(
+            &client,
+            &PathBuf::from(&args[1]),
+            build_seconds.ok_or("missing build budget")?,
+        )
+        .await;
         client.close().await?;
         println!("{}", serde_json::to_string(&result?)?);
         return Ok(());
