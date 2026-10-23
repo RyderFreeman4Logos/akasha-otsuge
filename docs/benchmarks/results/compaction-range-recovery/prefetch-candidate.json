@@ -1,0 +1,33 @@
+{
+  "baseline_commit": "42d9b0072969694197dd0f77c9596cea0d5cda23",
+  "candidate_binary_sha256": "006fbe3cd091dfc945e6465f1f0387f4b32459b2b6d11eb922d711b069fa33c6",
+  "changed_setting": {
+    "low.compactor.worker.bytes_to_fetch": [
+      2097152,
+      262144
+    ]
+  },
+  "not_claimed": [
+    "encoded prefetch is a hard decoded-memory bound",
+    "causal proof from unpaired full database cleanup states",
+    "full recovery success"
+  ],
+  "profile_source_sha256": "b43c963fadde13f1c4b57ffb0dd1cba9a16698446bc1e7e8c4ebc36f7c563535",
+  "source_evidence": {
+    "format/sst.rs:1275": "read_blocks reads an encoded range then try_join_all decodes every block before returning VecDeque",
+    "sst_iter.rs:407": "each iterator retains max_fetch_tasks batches",
+    "tablestore.rs:823": "block_range_for_target_bytes compares encoded byte offsets"
+  },
+  "status": "candidate_pending_full_recovery",
+  "unchanged": [
+    "max_subcompactions1low/4high",
+    "high prefetch2MiB",
+    "concurrent fetch tasks4",
+    "all admission memory/deadline criteria"
+  ],
+  "upstream_source_sha256": {
+    "format/sst.rs": "f02eb98c2d9e5659f208ed957034b246a3ae21bd3cef02da979403bdbfe177a1",
+    "sst_iter.rs": "435d9d9b20d7165fa1e68832cbd8cc562bdf1bbb023279496adf17dfc72a61f8",
+    "tablestore.rs": "cf1addb6517f75bbced2ac10a8a942787783016a40d77e9b8daf5aef9d5fea7a"
+  }
+}

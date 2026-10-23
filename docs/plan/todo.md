@@ -121,7 +121,10 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       index observation limit. Ordinary immutable-source lookup now passes 146
       corpus checks and the small mixed workload while retaining duplicate
       rejection. Native index abort/replacement and explicit stopped-run
-      abandonment pass; full cleanup, replacement and backfill remain pending.
+      abandonment pass. Full low-budget cleanup OOM-killed its 640MiB group;
+      limiting compaction ranges alone also failed. Both original failures are
+      retained. A bounded compressed-read-ahead candidate is next; full cleanup,
+      replacement and backfill remain pending.
 - [ ] Measure and enforce disk admission for ordinary indexed writes and reindex,
       including retained native text splits; verify the explicit rebuild bound.
       Native per-write and index admission now have 26-command diagnostic coverage,

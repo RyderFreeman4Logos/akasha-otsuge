@@ -28,6 +28,7 @@ struct Budget {
     vector_build_cache_mib: u64,
     unflushed_mib: usize,
     slate_subcompactions: usize,
+    slate_compaction_read_ahead_kib: usize,
 }
 
 impl Budget {
@@ -43,6 +44,7 @@ impl Budget {
                 vector_build_cache_mib: 32,
                 unflushed_mib: 32,
                 slate_subcompactions: 1,
+                slate_compaction_read_ahead_kib: 256,
             }),
             Some(Some("high")) => Ok(Self {
                 profile: "high",
@@ -54,6 +56,7 @@ impl Budget {
                 vector_build_cache_mib: 512,
                 unflushed_mib: 64,
                 slate_subcompactions: 4,
+                slate_compaction_read_ahead_kib: 2048,
             }),
             _ => Err("AKASHA_SPIKE_PROFILE must be low or high".into()),
         }
@@ -121,6 +124,8 @@ impl Budget {
             worker.compression_codec = slate.compression_codec;
             // Each range holds its own merge/read-ahead buffers.
             worker.max_subcompactions = self.slate_subcompactions;
+            // SlateDB sizes fetches in encoded bytes but retains decoded blocks.
+            worker.bytes_to_fetch = self.slate_compaction_read_ahead_kib * 1024;
         }
         Ok(DbConfig::new()
             .with_query_telemetry(QueryTelemetry::Disabled)
@@ -184,7 +189,7 @@ mod tests {
 
     #[test]
     fn low_profile_bounds_compaction_ranges_in_actual_writer_settings() {
-        for (profile, ranges) in [("low", 1), ("high", 4)] {
+        for (profile, ranges, fetch_bytes) in [("low", 1, 256 * 1024), ("high", 4, 2 * MIB as usize)] {
             let config = Budget::parse(Some(OsStr::new(profile)))
                 .unwrap()
                 .config()
@@ -193,7 +198,7 @@ mod tests {
             let worker = settings.compactor_options.unwrap().worker.unwrap();
             assert_eq!(worker.max_subcompactions, ranges, "{profile}");
             assert_eq!(worker.max_fetch_tasks, 4);
-            assert_eq!(worker.bytes_to_fetch, 2 * MIB as usize);
+            assert_eq!(worker.bytes_to_fetch, fetch_bytes, "{profile}");
         }
     }
 }
