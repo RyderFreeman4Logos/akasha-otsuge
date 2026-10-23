@@ -41,7 +41,7 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
 - [x] Pin Helix/SlateDB source, licenses and isolated Rust lockfile.
 - [x] Exercise primitive durable transaction/rollback and process-crash barriers.
 - [x] Import 38,462 real 1536-dimensional embeddings (diagnostic only).
-- [ ] Correct and instrument the historical query probe; verify 100,000 changes
+- [x] Correct and instrument the historical query probe; verify 100,000 changes
       and exact contents across revision/retraction/restore/scope boundaries.
 - [ ] Reconcile the interrupted real vector build and validate search coverage.
 - [ ] Resume public corpus downloads and independently verify all source hashes.
