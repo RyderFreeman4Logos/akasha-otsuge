@@ -32,11 +32,21 @@ The probe disables embedded telemetry. Explicit budgets are vector cache 32 MiB,
 SimHasher 2 MiB, Slate block/metadata 32/8 MiB, FTS 8 MiB, unflushed data 32 MiB,
 pending queue 8 MiB/4096 items per index, strong vector pending 8 MiB, strong text
 analysis 16 MiB, vector build cache 32 MiB and one lifecycle build slot. Remaining
-text backfill limits are upstream defaults in this small probe. Cypher uses the
+text backfill limits are explicit pinned values: 512 entities/8 MiB input and
+output, 32,768 output operations, 512 artifacts/4 MiB, compaction fan-in 32,
+64 MiB compaction input/output, 128 MiB temporary disk and a 4 MiB manifest.
+Cypher uses the
 public embedded request boundary with 32 MiB/query, 2 MiB results and a 60-second
 deadline; native queries also receive that deadline. These controls are
 not yet a validated aggregate production budget. Cgroup usage includes the Python
 controller and page cache, and is not the full-scale RSS measurement.
+
+The default remains `AKASHA_SPIKE_PROFILE=low`. The explicit `high` profile uses
+128 MiB vector cache, 64/16 MiB Slate caches, 32 MiB FTS, 512 MiB vector build
+cache and 64 MiB unflushed data; request, staging and concurrency limits stay the
+same. Every open logs the selected profile. An unknown or non-UTF-8 profile fails
+before opening the database. Both configurations pass the native search fixture;
+neither configuration alone proves the full RSS/rate contract.
 
 Verified source chain: [Helix mutation commit](https://github.com/HelixDB/helix-db/blob/c72e64f0c7e480f3d125f071659d5e3ad7b8da15/crates/db/src/execution/interpreter/mutation/tx.rs)
 uses its owned serializable transaction; [SlateDB transaction](https://github.com/HelixDB/slatedb/blob/2fb25fdaa61d42cc3756f979a8a7b37dbfc483fd/slatedb/src/db_transaction.rs)
