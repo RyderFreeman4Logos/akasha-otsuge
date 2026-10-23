@@ -1,7 +1,9 @@
 # Helix embedded diagnostic probe
 
-Temporary MVP-003 experiment, outside the production Cargo workspace. Full-size
-acceptance and the backend decision are still pending.
+Temporary MVP-003 experiment, outside the production Cargo workspace. The tested
+candidate failed full-data low-memory recovery; preserve it as evidence while
+validating the specified fallback. No production backend is selected.
+[Decision and failures](../../docs/benchmarks/storage-decision.md).
 [Frozen acceptance criteria](../../docs/benchmarks/storage-contract.md).
 
 Pinned upstream: [Helix v3.5.1 / c72e64f0](https://github.com/HelixDB/helix-db/tree/c72e64f0c7e480f3d125f071659d5e3ad7b8da15),

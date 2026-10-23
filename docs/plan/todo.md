@@ -5,6 +5,12 @@ Updated 2026-10-23 after the session restart. GitHub audit: **26 open Issues,
 This checklist supplements each linked Issue's full acceptance criteria; it does
 not narrow them. Check an Issue only after its evidence, review, gate and merge.
 
+Current decision: the tested Helix candidate failed full-data low-memory recovery
+in three retained OOM runs. Stop Helix tuning and validate the specification's
+SurrealKV 1.0.0/LanceDB 0.40 fallback against the unchanged contract. The checked
+diagnostic leaves below are Helix evidence, not acceptance transferred to the
+fallback. See [decision record](../benchmarks/storage-decision.md).
+
 ## Session operating rules
 
 - Use `/home/obj/.hermes/skills/software-development/wd/SKILL.md` before every
@@ -123,8 +129,9 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       rejection. Native index abort/replacement and explicit stopped-run
       abandonment pass. Full low-budget cleanup OOM-killed its 640MiB group;
       limiting compaction ranges alone also failed. Both original failures are
-      retained. A bounded compressed-read-ahead candidate is next; full cleanup,
-      replacement and backfill remain pending.
+      retained. Reducing compressed read-ahead also failed; Helix is rejected for
+      this tested recovery criterion. Full selected-backend indexes and backfill
+      still require acceptance on the specified fallback.
 - [ ] Measure and enforce disk admission for ordinary indexed writes and reindex,
       including retained native text splits; verify the explicit rebuild bound.
       Native per-write and index admission now have 26-command diagnostic coverage,
@@ -136,8 +143,10 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
 - [ ] Test all required commit/index/watermark/activation crash barriers,
       derived corruption/rebuild, authority corruption, isolated disk-full,
       child resource failure, invalid config and competing reloads.
-- [ ] If Helix fails a hard criterion, apply the same contract to the specified
-      SurrealKV/LanceDB fallback. No third backend or reduced thresholds.
+- [ ] Validate the specified SurrealKV/LanceDB fallback after Helix's measured
+      low-recovery failure. Pin Rust dependencies/licenses; prove primitive
+      transactions/history, bounded import and search before the full unchanged
+      workload/recovery matrix. No third backend or reduced thresholds.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 

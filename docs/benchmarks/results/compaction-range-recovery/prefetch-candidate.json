@@ -7,18 +7,29 @@
       262144
     ]
   },
+  "decision": "Tested Helix candidate fails full-size low-profile interrupted recovery. Stop tuning and validate specified SurrealKV1.0.0/LanceDB0.40 fallback. No proof about all possible Helix configurations.",
   "not_claimed": [
     "encoded prefetch is a hard decoded-memory bound",
     "causal proof from unpaired full database cleanup states",
     "full recovery success"
   ],
   "profile_source_sha256": "b43c963fadde13f1c4b57ffb0dd1cba9a16698446bc1e7e8c4ebc36f7c563535",
+  "result": {
+    "artifact_hashes": "verified",
+    "elapsed_s": 16.14184139110148,
+    "observer_exit": "absent",
+    "processes": "absent",
+    "rss_max_bytes": 676163584,
+    "rss_samples": 15,
+    "unit": "inactive",
+    "unit_result": "oom-kill"
+  },
   "source_evidence": {
     "format/sst.rs:1275": "read_blocks reads an encoded range then try_join_all decodes every block before returning VecDeque",
     "sst_iter.rs:407": "each iterator retains max_fetch_tasks batches",
     "tablestore.rs:823": "block_range_for_target_bytes compares encoded byte offsets"
   },
-  "status": "candidate_pending_full_recovery",
+  "status": "failed_full_low_profile_recovery",
   "unchanged": [
     "max_subcompactions1low/4high",
     "high prefetch2MiB",
