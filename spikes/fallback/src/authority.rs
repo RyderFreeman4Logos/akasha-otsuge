@@ -109,10 +109,16 @@ enum Request {
 
 pub(crate) struct Authority {
     pub tree: Tree,
-    writer: Mutex<()>,
-    root: PathBuf,
-    settings: Settings,
+    pub(crate) writer: Mutex<()>,
+    pub(crate) derived: Mutex<()>,
+    pub(crate) root: PathBuf,
+    pub(crate) settings: Settings,
     documents: u64,
+    #[cfg(test)]
+    pub(crate) derived_barrier: Option<(
+        std::sync::Arc<tokio::sync::Notify>,
+        std::sync::Arc<tokio::sync::Notify>,
+    )>,
     #[cfg(test)]
     history_barrier: Option<(
         std::sync::Arc<tokio::sync::Notify>,
@@ -129,7 +135,7 @@ fn number(value: Option<Vec<u8>>) -> Result<u64, Error> {
     }
     Ok(number)
 }
-fn point(tx: &Transaction) -> Result<u64, Error> {
+pub(crate) fn point(tx: &Transaction) -> Result<u64, Error> {
     number(tx.get(SEQ)?)
 }
 fn head(memory: u64) -> String {
@@ -199,15 +205,23 @@ impl Authority {
         Ok(Self {
             tree,
             writer: Mutex::new(()),
+            derived: Mutex::new(()),
             root: root.into(),
             settings,
             documents: imported.documents,
             #[cfg(test)]
             history_barrier: None,
+            #[cfg(test)]
+            derived_barrier: None,
         })
     }
 
-    fn get(&self, tx: &Transaction, memory: u64, at: u64) -> Result<Option<Entry>, Error> {
+    pub(crate) fn get(
+        &self,
+        tx: &Transaction,
+        memory: u64,
+        at: u64,
+    ) -> Result<Option<Entry>, Error> {
         if memory > i64::MAX as u64 || at > point(tx)? {
             return Err("historical read point is not committed".into());
         }
@@ -273,6 +287,36 @@ impl Authority {
             text_only: doc.embedding.is_none(),
             source_key: Some(doc.key),
         }))
+    }
+
+    pub(crate) fn job_entry(&self, tx: &Transaction, seq: u64) -> Result<Entry, Error> {
+        if seq == 0 || seq > point(tx)? {
+            return Err("invalid outbox sequence".into());
+        }
+        let value: Value = serde_json::from_slice(
+            &tx.get(job(seq).as_bytes())?
+                .ok_or("missing durable outbox job")?,
+        )?;
+        let memory = value["memory"].as_u64().ok_or("invalid outbox memory")?;
+        let entry = self
+            .get(tx, memory, seq)?
+            .ok_or("missing immutable outbox revision")?;
+        if entry.seq != seq
+            || value["seq"] != seq
+            || value["revision"] != format!("{memory:020}:{seq:020}")
+        {
+            return Err("outbox revision integrity mismatch".into());
+        }
+        Ok(entry)
+    }
+
+    pub(crate) fn stored_receipt(&self, request: &str) -> Result<Value, Error> {
+        let raw = self
+            .tree
+            .begin_with_mode(Mode::ReadOnly)?
+            .get(receipt_key(request)?.as_bytes())?
+            .ok_or("unknown durable receipt")?;
+        Ok(serde_json::from_slice::<Receipt>(&raw)?.result)
     }
 
     pub async fn apply(&self, change: &Change, hold: Option<&str>) -> Result<Value, Error> {
@@ -624,10 +668,13 @@ mod tests {
         let a = Authority {
             tree: open_authority(&path)?,
             writer: Mutex::new(()),
+            derived: Mutex::new(()),
             root: path.clone(),
             settings: Settings::read(&path)?,
             documents: 0,
             history_barrier: None,
+            #[cfg(test)]
+            derived_barrier: None,
         };
         Ok((path, a))
     }

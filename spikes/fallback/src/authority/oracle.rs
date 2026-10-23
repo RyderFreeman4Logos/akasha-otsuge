@@ -32,6 +32,7 @@ async fn deadline(a: &Authority, operation: &str, count: u64) -> Result<u64, Err
     if let Some(value) = tx.get(key.as_bytes())? {
         return number(Some(value));
     }
+    a.settings.check_disk(&a.root)?;
     let deadline = now_ms()? + a.settings.seconds * 1000;
     tx.set_durability(Durability::Immediate);
     tx.set(key.as_bytes(), deadline.to_be_bytes().as_slice())?;

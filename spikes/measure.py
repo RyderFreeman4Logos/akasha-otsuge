@@ -17,10 +17,27 @@ def exited(pid):
         return True
 
 
+def read_process_file(pid, name):
+    path = pathlib.Path(f"/proc/{pid}/{name}")
+    try:
+        return path.read_text()
+    except PermissionError:
+        if exited(pid):
+            raise ProcessLookupError(pid) from None
+        # procfs access can briefly fail during exec/exit credential transitions.
+        time.sleep(0.01)
+        try:
+            return path.read_text()
+        except PermissionError:
+            if exited(pid):
+                raise ProcessLookupError(pid) from None
+            raise
+
+
 def memory(pid):
     values = {}
     try:
-        for line in pathlib.Path(f"/proc/{pid}/smaps_rollup").read_text().splitlines():
+        for line in read_process_file(pid, "smaps_rollup").splitlines():
             key, _, value = line.partition(":")
             if key in ("Rss", "Pss"):
                 values[key] = int(value.split()[0]) * 1024
@@ -36,7 +53,7 @@ def memory(pid):
 def process_io(pid):
     try:
         return {key: int(value) for key, value in
-                (line.split(":", 1) for line in pathlib.Path(f"/proc/{pid}/io").read_text().splitlines())}
+                (line.split(":", 1) for line in read_process_file(pid, "io").splitlines())}
     except (FileNotFoundError, ProcessLookupError):
         return None
     except PermissionError:
@@ -63,7 +80,8 @@ def main():
         samples.write(json.dumps({"event": "start", "limits": limits,
                                   "nofile_soft_hard": resource.getrlimit(resource.RLIMIT_NOFILE),
                                   "native_environment": {name: os.environ.get(name) for name in (
-                                      "LANCE_CPU_THREADS", "LANCE_SHUFFLE_BATCH_BYTES",
+                                      "LANCE_CPU_THREADS", "LANCE_DEFAULT_IO_BUFFER_SIZE",
+                                      "LANCE_SHUFFLE_BATCH_BYTES",
                                       "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES")},
                                   "command": sys.argv[2:]}) + "\n")
         child = subprocess.Popen(sys.argv[2:])

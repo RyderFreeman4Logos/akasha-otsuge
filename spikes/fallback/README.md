@@ -245,5 +245,43 @@ input validation. Three release units cover codec bounds, corrupted head/sequenc
 rejection and the revocation race. The prior candidate also passes all 47 search
 regressions; the final change adds the encoded authority-record bound after its
 retained native RED. Short resource samples do not establish sustained P99.
-Pending outbox jobs are durable; applying them to derived indexes, generation
-activation, full 100k history and the workload matrix remain unfinished.
+These initial authority receipts are superseded by the additional lifecycle and
+full-history evidence below; the sustained workload matrix remains unfinished.
+
+[Full history and backfill receipts](../../docs/benchmarks/results/fallback-full-history-backfill/summary.json)
+verify 100,000 changes and 5,163 historical assertions on the complete corpus.
+All 11,428,831 text records and 1,000,000 vectors backfill in 830.918s under the
+640MiB/swap=0 group; sampled RSS max is 334,905,344B. Native row counts, cursor,
+versions, empty pending wave and original manifest agree. Allocated storage is
+68,256,649,216B after backfill. Native indexes remain separate acceptance.
+
+[Lifecycle receipts](../../docs/benchmarks/results/fallback-lifecycle/summary.json)
+cover generation-specific delta tables. A durable pending-wave identity and
+native append transaction tag reconcile interrupted writes before indexed
+completion. Separate text/vector watermarks advance only through contiguous
+completed jobs. `indexed_receipt` distinguishes durable authority commits from
+both-family index completion. No cross-store atomic transaction is claimed.
+
+`apply`, `advance`, `catch_up`, `activate`, `indexed_receipt`, `lifecycle_status`
+and `query_current` are native `--generation` requests. Vector output must match
+model, fingerprint, source body hash and dimension. Retracted/superseded jobs and
+explicit text-only vectors record their reason. Catch-up takes bounded 256-job
+waves and persists its original target/deadline. These probe operations have one
+controller owner; persistent multi-client execution remains a later acceptance.
+
+Activation checks complete native baseline/delta coverage, then holds the
+ordinary writer briefly for the authority sequence and active-pointer commit.
+Old activated generations remain readable with their own bundle. Queries bound
+and combine baseline/delta candidates, then recheck live authority and permissions;
+coverage explicitly says `candidate_set_only`, with no global BM25 rank claim.
+A minimum commit sequence fails when the relevant watermark lags.
+
+The 103-command native fixture covers six process-crash boundaries, out-of-order
+completion/gaps, source validation, retraction/supersession/text-only behavior,
+failed build/old reads, activation/model isolation and revocation. Five release
+units include a deterministic concurrent write during paused index publication.
+48 baseline-search and 53 authority regressions pass on the preceding lifecycle
+candidate. Read-only status ignores free-space admission while every mutation
+retains its reservation check. Catch-up rate/ETA exclude work from earlier runs.
+Full 100k outbox application, full activation, concurrent workloads, sustained
+P99, power loss and physical derived corruption remain unproven.

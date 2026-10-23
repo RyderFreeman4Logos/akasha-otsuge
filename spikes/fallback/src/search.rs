@@ -32,7 +32,9 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use surrealkv::{Durability, LSMIterator, Tree};
 
-use crate::{Error, MIB, checkpoint, load, open_authority};
+use crate::{Error, MIB, authority::Authority, checkpoint, load};
+
+mod changes;
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Settings {
@@ -41,7 +43,7 @@ pub(crate) struct Settings {
 }
 
 impl Settings {
-    pub(crate) fn read(root: &Path) -> Result<Self, Error> {
+    pub(crate) fn read(_root: &Path) -> Result<Self, Error> {
         let env = |name: &str| -> Result<Option<String>, Error> {
             std::env::var_os(name)
                 .map(|v| v.into_string().map_err(|_| "non-UTF8 index setting".into()))
@@ -64,7 +66,6 @@ impl Settings {
             seconds,
             reserve: reserve.unwrap_or(0),
         };
-        settings.check_disk(root)?;
         eprintln!("INDEX_OBSERVATION_SECONDS:{seconds}");
         eprintln!("DISK_RESERVATION_BYTES:{}", settings.reserve);
         Ok(settings)
@@ -126,7 +127,7 @@ impl Bundle {
             || self.dimension != 1536
             || self.chunker.is_empty()
             || self.chunker.len() > 128
-            || self.schema != 1
+            || self.schema == 0
         {
             return Err("invalid corpus index bundle".into());
         }
@@ -150,6 +151,44 @@ enum Request {
     },
     Build {
         generation: u64,
+        #[serde(default)]
+        fail_after_text: bool,
+    },
+    Apply {
+        generation: u64,
+        family: changes::Family,
+        seq: u64,
+        vector: Option<changes::VectorOutput>,
+        hold: Option<String>,
+    },
+    Advance {
+        generation: u64,
+        family: changes::Family,
+    },
+    CatchUp {
+        generation: u64,
+        waves: u64,
+    },
+    Activate {
+        generation: u64,
+        hold: Option<String>,
+    },
+    IndexedReceipt {
+        generation: u64,
+        request_id: String,
+    },
+    LifecycleStatus {
+        generation: u64,
+    },
+    QueryCurrent {
+        generation: u64,
+        bundle: Bundle,
+        principal: String,
+        scope: u8,
+        term: Option<String>,
+        vector: Option<Vec<f32>>,
+        #[serde(default)]
+        min_commit_seq: u64,
     },
     Status {
         generation: u64,
@@ -356,7 +395,8 @@ async fn verify_appended(table: &Table, expected: &RecordBatch, start: u64) -> R
             if !seen.insert(id)
                 || column::<UInt8Array>(&actual, "scope")?.value(row)
                     != column::<UInt8Array>(expected, "scope")?.value(at)
-                || column::<UInt64Array>(&actual, "revision")?.value(row) != 0
+                || column::<UInt64Array>(&actual, "revision")?.value(row)
+                    != column::<UInt64Array>(expected, "revision")?.value(at)
             {
                 return Err("appended identity/scope mismatch".into());
             }
@@ -729,6 +769,7 @@ async fn build(
     root: &Path,
     state: &mut State,
     settings: Settings,
+    fail_after_text: bool,
 ) -> Result<(), Error> {
     if state.cursor != state.documents
         || state.vector_rows != state.vectors
@@ -783,6 +824,9 @@ async fn build(
         state.documents,
     )
     .await?;
+    if fail_after_text {
+        return Err("injected build failure".into());
+    }
     if state.vectors > 0 {
         let vector = connection
             .open_table(table_name(state.generation, true))
@@ -810,7 +854,7 @@ async fn build(
             state.vectors,
         )
         .await?;
-        let partitions = ((state.vectors as f64).sqrt() as usize).clamp(1, 256);
+        let partitions = ((state.vectors as f64).sqrt() as usize).clamp(1, 1024);
         let mut ivf = IvfBuildParams::new(partitions);
         ivf.sample_rate = 16;
         ivf.max_iters = 20;
@@ -894,8 +938,9 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
         return Err("derived request exceeds 1 MiB".into());
     }
     let request: Request = serde_json::from_slice(&bytes)?;
-    let settings = Settings::read(root)?;
-    let tree = open_authority(root)?;
+    let a = Authority::open(root)?;
+    let settings = a.settings;
+    let tree = &a.tree;
     let corpus = load::read_state(&tree.begin()?)?;
     if !corpus.complete {
         return Err("corpus import is incomplete".into());
@@ -920,7 +965,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
             }
             let existing = tree.begin()?.get(key(generation)?.as_bytes())?;
             let value = if existing.is_some() {
-                let value = state(&tree, generation)?;
+                let value = state(tree, generation)?;
                 if value.bundle != bundle || value.source != corpus.manifest_sha256 {
                     return Err("generation identity conflict".into());
                 }
@@ -941,7 +986,8 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
                     backfill_deadline_ms: None,
                     index_deadline_ms: None,
                 };
-                save(&tree, &value).await?;
+                settings.check_disk(root)?;
+                save(tree, &value).await?;
                 value
             };
             serde_json::to_value(value)?
@@ -951,7 +997,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
             waves,
             hold,
         } => {
-            let mut value = state(&tree, generation)?;
+            let mut value = state(tree, generation)?;
             if !(1..=1_000_000).contains(&waves) {
                 return Err("invalid wave count".into());
             }
@@ -964,20 +1010,24 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
                 return Err("invalid backfill checkpoint".into());
             }
             if value.cursor < value.documents {
-                let until = deadline(&tree, &mut value, settings, false).await?;
+                settings.check_disk(root)?;
+                let until = deadline(tree, &mut value, settings, false).await?;
                 tokio::time::timeout(
                     remaining(until)?,
-                    backfill(&tree, root, &mut value, waves, hold.as_deref(), settings),
+                    backfill(tree, root, &mut value, waves, hold.as_deref(), settings),
                 )
                 .await
                 .map_err(|_| "original operation deadline expired")??;
             }
             serde_json::to_value(value)?
         }
-        Request::Build { generation } => {
-            let mut value = state(&tree, generation)?;
+        Request::Build {
+            generation,
+            fail_after_text,
+        } => {
+            let mut value = state(tree, generation)?;
             if value.ready {
-                build(&tree, root, &mut value, settings).await?;
+                build(tree, root, &mut value, settings, fail_after_text).await?;
             } else {
                 if value.cursor != value.documents
                     || value.vector_rows != value.vectors
@@ -985,14 +1035,67 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
                 {
                     return Err("backfill is incomplete".into());
                 }
-                let until = deadline(&tree, &mut value, settings, true).await?;
-                tokio::time::timeout(remaining(until)?, build(&tree, root, &mut value, settings))
-                    .await
-                    .map_err(|_| "original operation deadline expired")??;
+                settings.check_disk(root)?;
+                let until = deadline(tree, &mut value, settings, true).await?;
+                tokio::time::timeout(
+                    remaining(until)?,
+                    build(tree, root, &mut value, settings, fail_after_text),
+                )
+                .await
+                .map_err(|_| "original operation deadline expired")??;
             }
             serde_json::to_value(value)?
         }
-        Request::Status { generation } => serde_json::to_value(state(&tree, generation)?)?,
+        Request::Apply {
+            generation,
+            family,
+            seq,
+            vector,
+            hold,
+        } => {
+            changes::apply(
+                &a,
+                generation,
+                family,
+                &[seq],
+                vector.as_ref(),
+                hold.as_deref(),
+                false,
+            )
+            .await?
+        }
+        Request::Advance { generation, family } => changes::advance(&a, generation, family).await?,
+        Request::CatchUp { generation, waves } => changes::catch_up(&a, generation, waves).await?,
+        Request::Activate { generation, hold } => {
+            changes::activate(&a, generation, hold.as_deref()).await?
+        }
+        Request::IndexedReceipt {
+            generation,
+            request_id,
+        } => changes::receipt(&a, generation, &request_id)?,
+        Request::LifecycleStatus { generation } => changes::status(&a, generation)?,
+        Request::QueryCurrent {
+            generation,
+            bundle,
+            principal,
+            scope,
+            term,
+            vector,
+            min_commit_seq,
+        } => {
+            changes::query_current(
+                &a,
+                generation,
+                &bundle,
+                &principal,
+                scope,
+                term,
+                vector,
+                min_commit_seq,
+            )
+            .await?
+        }
+        Request::Status { generation } => serde_json::to_value(state(tree, generation)?)?,
         Request::Query {
             generation,
             bundle,
@@ -1002,7 +1105,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
         } => {
             query(
                 root,
-                &state(&tree, generation)?,
+                &state(tree, generation)?,
                 &bundle,
                 scope,
                 term,

@@ -195,9 +195,21 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       and 5,163 historical checks; a fourth native unit rejects work after the
       original persisted deadline. On real-shard storage, all 100,000 changes
       (311.838s) and 5,163 historical checks (4.007s) now pass; sampled RSS maxima
-      are 183,025,664B and 81,698,816B, no OOM. A separate full-corpus history and
-      backfill pipeline is running. Concurrent workloads and actual outbox
-      application/activation remain required.
+      are 183,025,664B and 81,698,816B, no OOM. Full-corpus history now passes
+      all 100,000 changes and the same 5,163 checks. All 11,428,831 text records
+      and 1,000,000 vectors are backfilled in 830.918s, sampled RSS max
+      334,905,344B, without OOM. Allocated storage after backfill is 68,256,649,216B.
+      Full FTS build r1 OOMs during tokenization at 1,072,926 documents; failure,
+      journal and original deadline are retained. The bounded-I/O successor is
+      separate acceptance. Full indexes and sustained workloads remain required.
+      The lifecycle implementation now applies real delta indexes, validates
+      embedding bundles/source hashes, records gap-free watermarks and atomically
+      activates generations. Its 103-command fixture covers six SIGKILL cuts,
+      failed-build old reads, model separation and live permissions. A deterministic
+      release unit proves ordinary writes continue while index publication pauses.
+      Full 100k outbox drain, persistent concurrent workloads and full activation
+      remain required. Read-only status works below the write reservation; new
+      mutations still fail. Catch-up rates use this attempt's starting watermark.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 

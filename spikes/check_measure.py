@@ -30,6 +30,24 @@ class ProcfsExitRace(unittest.TestCase):
                     with self.assertRaises(PermissionError):
                         function(101)
 
+    def test_transient_procfs_denial_recovers_without_hiding_live_errors(self):
+        for function, content, expected in (
+            (measure.process_io, "rchar: 24\nwrite_bytes: 4096\n", {"rchar":24,"write_bytes":4096}),
+            (measure.memory, "Rss: 8 kB\nPss: 4 kB\n", {"Rss":8192,"Pss":4096}),
+        ):
+            denied_once = False
+            def read(path):
+                nonlocal denied_once
+                if path.name == "stat":
+                    return "101 (probe) S 0 0 0"
+                if not denied_once:
+                    denied_once = True
+                    raise PermissionError("transient procfs credential transition")
+                return content
+            with self.subTest(function=function.__name__):
+                with patch("pathlib.Path.read_text", read):
+                    self.assertEqual(function(101), expected)
+
     def test_disappeared_process_and_valid_io(self):
         with patch("pathlib.Path.read_text", side_effect=FileNotFoundError):
             self.assertIsNone(measure.process_io(101))

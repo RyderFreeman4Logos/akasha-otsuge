@@ -54,9 +54,13 @@ kernel ENOSPC checks. Initial inline-value WAL replay stalled under the low
 profile; native VLog corrects that layout problem on 38,462 real vectors, with
 all original bytes verified after direct low reopen. See the
 [measured layout comparison](results/fallback-vlog/summary.json), including the
-intentional stop and unchanged limits. Full corpus, derived indexes, sustained
-workload and recovery acceptance remain unproven. Compress corpus values, reuse
-source shards and query oracles, and do not retain an expanded corpus copy.
+intentional stop and unchanged limits. Compressed full import and low-memory
+verification of every original record now pass. Full-corpus 100k history and
+all-record native backfill also pass; see the [retained receipts](results/fallback-full-history-backfill/).
+Full indexes, sustained workloads and the remaining recovery matrix are still
+unproven. The first full FTS build OOMs; its bounded-I/O successor preserves the
+original native deadline. Reuse source shards and query oracles, and do not retain
+an expanded corpus copy.
 
 The [frozen contract](storage-contract.md) and [remaining checklist](../plan/todo.md)
 apply unchanged. If this route also fails a required contract, report the concrete

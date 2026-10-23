@@ -77,9 +77,9 @@ def main():
                 request=json.loads(request.read_text()) if arguments[0] == '--generation' else None,
                 kill=kill, expected_error=error, config_overrides=overrides))
             elapsed = time.monotonic() - started
-            publish(output / 'progress.json', dict(phase=name, completed=len(records), total=47,
+            publish(output / 'progress.json', dict(phase=name, completed=len(records), total=48,
                 elapsed_s=elapsed, rate_per_s=len(records)/elapsed,
-                eta_s=max(0, 47-len(records))*elapsed/len(records)))
+                eta_s=max(0, 48-len(records))*elapsed/len(records)))
             if not kill and not error:
                 return json.loads((output / (name + '.stdout')).read_text())
 
@@ -125,17 +125,18 @@ def main():
         assert call('status', 6) == expired, 'resume extended the original deadline'
         assert call('query', bundle=bundle, scope=2, term='beaconfortytwo')['ids'] == [1_000_042]
         call('status', overrides={'AKASHA_SPIKE_INDEX_OBSERVE_SECONDS':'0'}, error='index observation seconds')
-        call('status', overrides={'AKASHA_SPIKE_DISK_RESERVE_BYTES':str(2**64-1)}, error='disk reservation')
+        assert call('status', overrides={'AKASHA_SPIKE_DISK_RESERVE_BYTES':str(2**64-1)})['ready']
+        call('begin', 7, bundle=bundle, overrides={'AKASHA_SPIKE_DISK_RESERVE_BYTES':str(2**64-1)}, error='disk reservation')
         assert invoke('verify-import')['prefix'] == sha.hexdigest()
-        assert len(records) == 47, len(records)
+        assert len(records) == 48, len(records)
     elapsed = time.monotonic() - started
-    publish(output / 'progress.json', dict(phase='completed', completed=47, total=47,
-        elapsed_s=elapsed, rate_per_s=47/elapsed, eta_s=0))
-    publish(output / 'result.json', dict(status='passed', checks=47, seconds=elapsed, records=records,
+    publish(output / 'progress.json', dict(phase='completed', completed=48, total=48,
+        elapsed_s=elapsed, rate_per_s=48/elapsed, eta_s=0))
+    publish(output / 'result.json', dict(status='passed', checks=48, seconds=elapsed, records=records,
         temporary_root_removed=not pathlib.Path(temporary).exists(),
         artifact_sha256={str(p.relative_to(output)):digest(p) for p in output.iterdir() if p.is_file()},
         not_tested=['full corpus', 'ordinary concurrent changes', 'active generation switch', 'power loss']))
-    print(json.dumps(dict(status='passed', checks=47, seconds=elapsed)))
+    print(json.dumps(dict(status='passed', checks=48, seconds=elapsed)))
 
 
 if __name__ == '__main__':
