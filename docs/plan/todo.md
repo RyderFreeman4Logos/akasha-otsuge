@@ -46,8 +46,11 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
 - [x] Reconcile the interrupted diagnostic vector build and verify real search
       in all eight partitions (24 queries); full-size coverage remains below.
 - [x] Resume public corpus downloads and independently verify all 42 source hashes.
-- [ ] Freeze reproducible >=50GB unique-content / >=1M unique-vector manifest,
-      exclusions, hot/cold partitions, oracle identity and disk headroom.
+- [x] Freeze reproducible >=50GB unique-content / >=1M unique-vector input
+      manifest, deduplication/exclusions and import disk reservations; validate
+      streaming import and completed-run reconciliation on diagnostic input.
+- [ ] Freeze full-size query/oracle coverage for hot/cold reads; input partition
+      labels alone do not prove cold-cache coverage.
 - [ ] Index every declared searchable text/vector record at full size.
 - [x] Implement bounded admission and 100 independent harness clients with actual
       conflicts, durable latency/error records and per-second checkpoints;

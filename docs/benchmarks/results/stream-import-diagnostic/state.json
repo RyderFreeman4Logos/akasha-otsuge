@@ -1,0 +1,105 @@
+{
+  "attempts": [
+    {
+      "consumer_command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=43200",
+        "--unit=akasha-import-cd4491bbfee14f42a87b8e254e71c271",
+        "-p",
+        "MemoryMax=2147483648",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=high",
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/stream-contract-r2/cd4491bbfee14f42a87b8e254e71c271/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/stream-contract-r2/probe",
+        "/tmp/akasha-otsuge-storage-20261022/stream-contract-r2/database",
+        "--load",
+        "/dev/stdin",
+        "/tmp/akasha-otsuge-storage-20261022/stream-contract-manifest.json"
+      ],
+      "consumer_exit": 0,
+      "elapsed_seconds": 36.38287431653589,
+      "failure": null,
+      "id": "cd4491bbfee14f42a87b8e254e71c271",
+      "phase": "completed",
+      "producer_command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=43200",
+        "--unit=akasha-stream-cd4491bbfee14f42a87b8e254e71c271",
+        "-p",
+        "MemoryMax=8589934592",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/data-env/bin/python",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/data/prepare_corpus.py",
+        "stream",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/corpus-full-v1",
+        "/tmp/akasha-otsuge-storage-20261022/stream-contract-manifest.json"
+      ],
+      "producer_exit": 0,
+      "started_unix_s": 1792743126.4438188,
+      "units": [
+        "akasha-stream-cd4491bbfee14f42a87b8e254e71c271",
+        "akasha-import-cd4491bbfee14f42a87b8e254e71c271"
+      ]
+    }
+  ],
+  "binary_sha256": "18b13ffbdea345996121bdac8ad0515f8f57e0b37a7385091252696f86576991",
+  "controller": {
+    "pid": 3604162,
+    "start_ticks": "456102333",
+    "state": "R"
+  },
+  "identity": {
+    "controller_sha256": "e5ba51a28a143904b01895b7fad5dfa60062d1f2df5e8afd09a4337a5cac966e",
+    "data_python": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/data-env/bin/python",
+    "disk_plan": {
+      "authority_bytes": 75000000000,
+      "current_index_bytes": 45000000000,
+      "free_reserve_bytes": 32212254720,
+      "next_index_bytes": 45000000000,
+      "scratch_bytes": 4000000000
+    },
+    "engine_memory_max": 2147483648,
+    "input": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/corpus-full-v1",
+    "manifest_sha256": "5d28ca68dc34d108d9887c6306eafe7182ac50e9222ca3a44acdc39b0656641a",
+    "observer_sha256": "a3ef0fb18220f8b0145ebd96f131c5ef9a5e28a0ce2ac5402b99a88d03bf6160",
+    "preparer_sha256": "d222cf1ee8601aa6f7e35832b7065a9534fbfeb7995a7bbf77059c1aa9748b02",
+    "producer_memory_max": 8589934592,
+    "profile": "high",
+    "runtime_max_seconds": 43200
+  },
+  "phase": "completed",
+  "result": {
+    "acceptance": "not_run",
+    "artifact_sha256": {
+      "cd4491bbfee14f42a87b8e254e71c271/consumer.log": "78b8bda4a02b773b0a75a1aeaa97ca6c6a27d668389d946f21635d6f7b5f9ab3",
+      "cd4491bbfee14f42a87b8e254e71c271/memory.jsonl": "108c13ec64cd8781fbb488b8d71dfcc530f1b5847298d2bbd04471d0eeece9aa",
+      "cd4491bbfee14f42a87b8e254e71c271/producer.log": "8cb05e9175778bef5bd24003f3eb19b0f749f9f74d46181241cc6e021bd87b64",
+      "database/import-progress.json": "181af8585c441a13ca59cd9477195d6ef9c93bb7d3723bd0b22bdec7229993ab"
+    },
+    "attempt": "cd4491bbfee14f42a87b8e254e71c271",
+    "binary_sha256": "18b13ffbdea345996121bdac8ad0515f8f57e0b37a7385091252696f86576991",
+    "documents": 38462,
+    "elapsed_seconds": 36.38287431653589,
+    "failure": null,
+    "indexes": "not_built",
+    "manifest_sha256": "5d28ca68dc34d108d9887c6306eafe7182ac50e9222ca3a44acdc39b0656641a",
+    "status": "passed"
+  }
+}

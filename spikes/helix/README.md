@@ -124,6 +124,22 @@ last batch, repeats resume without duplicates and rejects a changed manifest.
 `AKASHA_SPIKE_IMPORT_HOLD_AFTER` is only an explicit crash-fixture barrier; normal
 imports leave it unset. Test directories are owned and removed after children exit.
 
+`import_corpus.py INPUT_DIR MANIFEST NEW_RUN_DIR PROBE DATA_PYTHON` pipes the
+reproduced corpus directly to the importer. It retains the exact probe binary,
+admits unique producer/consumer units durably and separates the 8 GiB Python
+preparation limit from the 2 GiB engine limit. Both processes and the complete
+stream hash must succeed. No second 84 GB JSONL file is retained. The controller
+reserves space for authority, two index generations, scratch and 30 GiB free;
+these are planning envelopes, not measured index sizes. It stops its own units
+before import consumes the later-index reservation. `--resume` validates run
+ownership, source/input/binary identities and dead prior units, then reconciles
+the import prefix. Completed runs validate their artifact hashes without writes.
+Use the virtual environment's Python path without resolving its symlink.
+
+The streaming controller passes a 38,462-record end-to-end check, completed-run
+reuse and negative identity/artifact checks. Full corpus import, indexing and
+acceptance remain separate steps.
+
 ## Bounded workload cases
 
 Copy `workload.example.toml` outside Git and fill its absolute paths. Run

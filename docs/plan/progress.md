@@ -14,6 +14,11 @@ after process reopen. [Full input preparation](../benchmarks/results/full-corpus
 now proves 50,000,002,783 eligible bytes and 1,000,000 distinct vectors across
 11,428,831 documents. The successful Python preparation used 8 GiB after its
 earlier 2 GiB run was killed; engine acceptance budgets remain 512 MiB and 2 GiB.
+The [streaming import controller](../benchmarks/results/stream-import-diagnostic/summary.json)
+passes 38,462 real records in 36.38 seconds, completed-run reuse without writes,
+and source/artifact/ownership rejection checks. It pipes the full reproducible
+stream without retaining a second JSONL copy and reserves two index generations.
+That planning reservation is not a measurement of their eventual disk usage.
 
 The [100-client diagnostics](../benchmarks/results/workload-diagnostic-r3/summary.json)
 include a 60-second mixed run, simultaneous burst, overload and independent
