@@ -1,0 +1,37 @@
+{
+  "completed": null,
+  "config_epoch": 1,
+  "controller": {
+    "pid": 57658,
+    "start_ticks": "458706691",
+    "state": "R"
+  },
+  "elapsed_s": 2.014693694189191,
+  "eta_s": null,
+  "free_bytes": 173534949376,
+  "native": {
+    "counter_note": "native entity counter can include repeated passes; not unique coverage",
+    "native_index": {
+      "operation": {
+        "attempt": 4,
+        "family": "secondary",
+        "generation": "1",
+        "index_id": "14",
+        "operation_id": "c8140a4e-d4b8-4111-a2af-c5266c980daa",
+        "operation_kind": "build",
+        "progress": {
+          "entities": "19",
+          "input_bytes": "55683",
+          "output_bytes": "1417",
+          "output_operations": "27"
+        },
+        "stage": "activate",
+        "status": "succeeded"
+      }
+    }
+  },
+  "phase": "begin_corpus",
+  "rate_per_s": null,
+  "reserved_bytes": 36212254720,
+  "total": null
+}

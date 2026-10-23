@@ -370,6 +370,16 @@ Full runs retain the frozen current/next-index plan plus scratch
 and 30 GiB free. Resource changes belong to a later operation config, not a live
 case. No network or automatic operation retries are involved.
 
+The operation's `run.seconds` also sets `AKASHA_SPIKE_INDEX_OBSERVE_SECONDS`
+for native metadata/corpus/generation index observation (1..=604800 seconds).
+Direct native calls retain the 7200-second default; query deadlines are unchanged.
+The outer unit still bounds the complete operation. The controller requires the
+executed process to report both this value and its disk reserve; exit zero from
+an older binary that ignores them is insufficient. [Native and controller checks](../../docs/benchmarks/results/index-budget-diagnostic/summary.json)
+cover invalid values before database effects, default/explicit values and this
+unsupported-binary refusal. Existing full initialization retains its original
+binary, controller and time limits.
+
 `AKASHA_SPIKE_DISK_RESERVE_BYTES` binds one immutable disk reserve at native open.
 Ordinary authority/permission writes, generation records, bounded backfill,
 derived writes, watermark advancement and activation check available filesystem

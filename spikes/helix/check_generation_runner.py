@@ -65,6 +65,8 @@ max_attempts = 1
         assert executed['manifest'] == str(output / 'begin/manifest.json')
         assert digest(output / 'begin/manifest.json') == digest(source_run / 'manifest.json')
         assert (output / 'begin/config.toml').read_bytes() == conf.read_bytes()
+        begun = json.loads((output / 'begin/state.json').read_text())
+        assert 'INDEX_OBSERVATION_SECONDS:180' in pathlib.Path(begun['attempts'][0]['log']).read_text()
         fill = config('fill', dict(op='backfill', generation=1, waves=2, hold='after-backfill-commit'))
         with (output / 'interrupted-controller.log').open('x') as log:
             controller = subprocess.Popen([sys.executable, str(runner), str(fill)], stdout=log, stderr=subprocess.STDOUT)

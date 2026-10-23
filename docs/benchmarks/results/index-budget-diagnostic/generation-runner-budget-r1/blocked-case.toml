@@ -1,0 +1,15 @@
+[run]
+id = "blocked-generation-case"
+profile = "low"
+phase = "steady"
+seconds = 60
+diagnostic = true
+generation = 1
+[paths]
+binary = "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/index-budget-r1/probe"
+database = "/tmp/akasha-generation-runner-er3mvedj/database"
+fixture = "/tmp/akasha-otsuge-storage-20261022/generation-workload-r3/queries.json"
+output = "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/must-not-start-case"
+corpus_manifest = "/tmp/akasha-otsuge-storage-20261022/generation-workload-r3/manifest.json"
+[reliability]
+max_attempts = 1

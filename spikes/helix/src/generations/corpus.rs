@@ -157,7 +157,7 @@ pub(super) async fn begin(
         indexes::create_measured(
             &a.engine,
             spec,
-            7200,
+            a.engine.index_observation_seconds,
             Some(&root.join("corpus-cursor-index-progress.json")),
         )
         .await?;

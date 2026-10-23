@@ -156,7 +156,14 @@ def main():
     state.update(phase='running', controller=process_identity(os.getpid()))
     publish(state_path, state)
     publish(owner_path, dict(output=str(output), run_id=run['id']))
-    command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit, '-p', f'MemoryMax={(640 if run["profile"] == "low" else 2048)*1024**2}', '-p', 'MemorySwapMax=0', '-p', f'RuntimeMaxSec={run["seconds"]}', '-p', 'Environment=AKASHA_SPIKE_PROFILE='+run['profile'], '-p', 'Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES='+str(disk['reserve_bytes']), sys.executable, str(observer), str(attempt_dir / 'memory.jsonl'), str(output / 'probe'), str(database), '--generation', str(output / 'request.json')]
+    command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit,
+               '-p', f'MemoryMax={(640 if run["profile"] == "low" else 2048)*1024**2}',
+               '-p', 'MemorySwapMax=0', '-p', f'RuntimeMaxSec={run["seconds"]}',
+               '-p', 'Environment=AKASHA_SPIKE_PROFILE='+run['profile'],
+               '-p', 'Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES='+str(disk['reserve_bytes']),
+               '-p', 'Environment=AKASHA_SPIKE_INDEX_OBSERVE_SECONDS='+str(run['seconds']),
+               sys.executable, str(observer), str(attempt_dir / 'memory.jsonl'), str(output / 'probe'),
+               str(database), '--generation', str(output / 'request.json')]
     attempt['command'] = command
     publish(state_path, state)
     started, failure = time.monotonic(), None
@@ -185,8 +192,11 @@ def main():
     exits = [row for row in events if row['event'] == 'exit']
     limit = str((640 if run['profile'] == 'low' else 2048)*1024**2)
     limits_ok = bool(events) and events[0].get('limits', {}).get('memory.max') == limit and events[0].get('limits', {}).get('memory.swap.max') == '0'
-    passed = failure is None and child.returncode == 0 and limits_ok and len(executions) == len(exits) == 1 and executions[0]['sha256'] == identity['binary_sha256'] and exits[0]['code'] == 0
-    result = dict(status='passed' if passed else 'failed', failure=failure, exit=child.returncode, elapsed_s=time.monotonic()-started, operation=request['op'], generation=request['generation'])
+    with pathlib.Path(attempt['log']).open('rb') as source:
+        header = source.read(65536).decode(errors='replace').splitlines()
+    native_config_attested = {f'INDEX_OBSERVATION_SECONDS:{run["seconds"]}', f'DISK_RESERVATION_BYTES:{disk["reserve_bytes"]}'}.issubset(header)
+    passed = failure is None and child.returncode == 0 and limits_ok and native_config_attested and len(executions) == len(exits) == 1 and executions[0]['sha256'] == identity['binary_sha256'] and exits[0]['code'] == 0
+    result = dict(status='passed' if passed else 'failed', failure=failure, exit=child.returncode, native_config_attested=native_config_attested, elapsed_s=time.monotonic()-started, operation=request['op'], generation=request['generation'])
     artifacts = [output / 'request.json', output / 'config.toml', output / 'manifest.json']
     for previous in state['attempts']:
         artifacts.extend([pathlib.Path(previous['log']), pathlib.Path(previous['log']).with_name('memory.jsonl')])

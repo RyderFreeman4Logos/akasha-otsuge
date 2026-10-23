@@ -1,0 +1,12 @@
+{
+  "bundle": {
+    "chunker": "source-document-v1",
+    "dimension": 1536,
+    "model": "text-embedding-3-large",
+    "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+    "schema": 1
+  },
+  "generation": 1,
+  "manifest": "/tmp/akasha-otsuge-storage-20261022/generation-runner-unsupported-r1/begin/manifest.json",
+  "op": "begin_corpus"
+}

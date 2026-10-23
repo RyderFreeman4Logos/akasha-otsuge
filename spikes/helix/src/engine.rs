@@ -20,10 +20,18 @@ pub struct Engine {
     db: Arc<HelixDB>,
     service: HelixQueryService,
     disk_reserve: Option<(PathBuf, u64)>,
+    pub(crate) index_observation_seconds: u64,
 }
 
 impl Engine {
     pub async fn open_with_config(source: HelixDbSource, config: DbConfig) -> Result<Self, Error> {
+        let budget = std::env::var_os("AKASHA_SPIKE_INDEX_OBSERVE_SECONDS");
+        let budget = budget
+            .as_deref()
+            .map(|value| value.to_str().ok_or("non-UTF8 index observation budget"))
+            .transpose()?;
+        let index_observation_seconds = crate::indexes::build_seconds(budget)?;
+        eprintln!("INDEX_OBSERVATION_SECONDS:{index_observation_seconds}");
         let disk_reserve = match std::env::var_os("AKASHA_SPIKE_DISK_RESERVE_BYTES") {
             None => None,
             Some(value) => {
@@ -43,6 +51,7 @@ impl Engine {
             service: HelixQueryService::new(db.clone()),
             db,
             disk_reserve,
+            index_observation_seconds,
         })
     }
 

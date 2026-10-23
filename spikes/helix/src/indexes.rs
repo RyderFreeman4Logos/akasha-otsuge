@@ -95,7 +95,7 @@ pub async fn probe(client: &Engine) -> Result<Value, Error> {
 }
 
 pub async fn create(client: &Engine, spec: IndexSpec) -> Result<Value, Error> {
-    create_measured(client, spec, 7200, None).await
+    create_measured(client, spec, client.index_observation_seconds, None).await
 }
 
 pub(crate) async fn create_measured(
