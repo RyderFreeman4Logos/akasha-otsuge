@@ -139,3 +139,26 @@ complete full-size import/indexes, authority/outbox and derived generation
 reconciliation, then the unchanged workload and recovery matrix. The original
 84GB expanded stream is never materialized. Existing Helix diagnostic passes do
 not transfer to this implementation.
+
+`derive REQUEST.json` builds a corpus baseline in separate generation-specific
+Lance text/vector tables. It uses bounded 16MiB/8,192-record waves, Zstd text
+columns, finite file/group sizes and a durable SurrealKV pending-wave record.
+Native Lance transaction properties identify each committed append. Resume
+checks count, version, identity and every row of an ambiguously completed append
+before advancing the authority cursor; it never blindly repeats an append.
+Full-text and cosine IVF Flat indexes plus scope bitmaps must report complete
+native coverage before the baseline is marked ready. This does not activate a
+production generation or reconcile ordinary writes. Native index progress
+callbacks write durable stage counters.
+
+[39 native search checks](../../docs/benchmarks/results/fallback-search/summary.json)
+pass four SIGKILL barriers (before text, after text, after vector, after cursor),
+separate-process resume, all-row coverage, reopened queries, scope filters,
+model-bundle mismatch and invalid-input rejection. The 1,057 synthetic records
+are excluded from scale accounting. Under 640MiB/swap=0, eleven samples show
+harness-plus-child RSS max 190,279,680B and no throttling/OOM. Small native import
+and primitive regressions also pass. The raw evidence retains both the missing
+operation RED and the first append-mode failure: explicit native WriteParams
+defaulted to Create, so subsequent appends must set Append explicitly. No
+upstream code was changed. The three new direct dependency edges reuse already
+resolved packages; no new package was added.

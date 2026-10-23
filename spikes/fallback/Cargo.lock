@@ -89,7 +89,10 @@ version = "0.0.0"
 dependencies = [
  "arrow-array",
  "arrow-schema",
+ "async-trait",
  "futures",
+ "lance",
+ "lance-core",
  "lance-index",
  "lance-io",
  "lancedb",

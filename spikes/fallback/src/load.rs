@@ -14,7 +14,7 @@ use surrealkv::{Durability, LSMIterator, Transaction};
 use crate::{Error, OWNER, open_authority};
 
 const STATE: &[u8] = b"meta:import";
-const FIRST_MEMORY: u64 = 1_000_000;
+pub(crate) const FIRST_MEMORY: u64 = 1_000_000;
 const MAX_RECORD: usize = 512 * 1024;
 const STORAGE_FORMAT: u32 = 2;
 
@@ -46,16 +46,16 @@ struct Expected {
 pub(crate) struct State {
     #[serde(default)]
     storage_format: u32,
-    manifest_sha256: String,
+    pub manifest_sha256: String,
     pub documents: u64,
     content_bytes: u64,
     input_bytes: u64,
-    vectors: u64,
+    pub vectors: u64,
     prefix: String,
-    complete: bool,
+    pub complete: bool,
 }
 
-fn hex(digest: &Sha256) -> String {
+pub(crate) fn hex(digest: &Sha256) -> String {
     let mut value = String::with_capacity(64);
     for byte in digest.clone().finalize() {
         value.push(b"0123456789abcdef"[(byte >> 4) as usize] as char);
@@ -64,7 +64,7 @@ fn hex(digest: &Sha256) -> String {
     value
 }
 
-fn document(raw: &[u8]) -> Result<Document, Error> {
+pub(crate) fn document(raw: &[u8]) -> Result<Document, Error> {
     if raw.len() > MAX_RECORD {
         return Err("prepared record exceeds 512 KiB".into());
     }
@@ -118,7 +118,7 @@ pub(crate) fn read_state(tx: &Transaction) -> Result<State, Error> {
     Ok(state)
 }
 
-fn atomic_json(path: &Path, value: &Value) -> Result<(), Error> {
+pub(crate) fn atomic_json(path: &Path, value: &Value) -> Result<(), Error> {
     let temp = path.with_extension("json.tmp");
     let mut file = File::create(&temp)?;
     writeln!(file, "{value}")?;

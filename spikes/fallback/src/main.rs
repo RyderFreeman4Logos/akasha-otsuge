@@ -1,4 +1,5 @@
 mod load;
+mod search;
 
 use std::{
     io::{Read, Write},
@@ -299,6 +300,13 @@ async fn main() -> Result<(), Error> {
     }
     if std::fs::read_to_string(root.join("OWNER"))? != OWNER {
         return Err("foreign probe root".into());
+    }
+    if operation == "derive" {
+        if args.len() != 4 {
+            return Err("usage: probe ROOT derive REQUEST.json".into());
+        }
+        println!("{}", search::run(root, Path::new(&args[3])).await?);
+        return Ok(());
     }
     if matches!(operation, "import-state" | "verify-import" | "corpus-get") {
         if args.len() != if operation == "corpus-get" { 4 } else { 3 } {

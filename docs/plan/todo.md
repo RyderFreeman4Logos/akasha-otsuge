@@ -166,6 +166,11 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       61% less). Low reopen is 4.242s with sampled RSS max 71,561,216B, no memory
       throttling/OOM. Large VLog corruption, bounded decode and legacy-format
       rejection also pass. Full data and sustained memory acceptance remain pending.
+      Corpus-derived generation backfill now passes 39 native checks, including
+      four cross-store SIGKILL/resume barriers, native append receipts, complete
+      index coverage, reopened scope-filtered BM25/ANN and bundle validation.
+      This is a synthetic baseline; ordinary changes, activation and real/full
+      corpus index measurements remain pending. Full compressed import is running.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 
