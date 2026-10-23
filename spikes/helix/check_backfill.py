@@ -21,7 +21,7 @@ def main():
     (output / 'OWNER').write_text('akasha-otsuge MVP-003 corpus backfill receipts\n')
     started = time.monotonic()
     records = []
-    planned_commands = 141
+    planned_commands = 146
     rows = [json.loads(line) for line in source.read_text().splitlines()]
     assert len(rows) == 8 and source.stat().st_size < 4 * 1024**2
     rows += [{'key': f'fixture:{i}', 'body': f'Synthetic backfill diagnostic only {i}', 'partition': 'p0'} for i in range(17)]
@@ -94,6 +94,11 @@ def main():
         invoke({'op': 'raw', 'cypher': 'MATCH (s:ImportState) SET s.complete=true'})
         first = invoke(begin)
         assert first['base']['completed'] == 0
+        invoke({'op': 'raw', 'cypher': 'MATCH (d:Document {memory:1000002}) SET d.memory=1000001'})
+        invoke({'op': 'current', 'principal': 'reader', 'memory': 1_000_001}, failure=True)
+        invoke({'op': 'backfill', 'generation': 1, 'waves': 1}, failure=True)
+        invoke({'op': 'raw', 'cypher': f'MATCH (d:Document {{key:{json.dumps(rows[2]["key"])}}}) SET d.memory=1000002'})
+        assert invoke(begin)['base']['completed'] == 0
         invoke({'op': 'raw', 'cypher': "CREATE (:Document {memory:99,key:'stray',body:'excluded fixture',partition:'p0'})"})
         invoke(begin, failure=True)
         invoke({'op': 'raw', 'cypher': 'MATCH (d:Document {memory:99}) DELETE d'})

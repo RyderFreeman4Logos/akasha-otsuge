@@ -121,6 +121,38 @@ pub(crate) async fn create_measured(
     let operation = receipt["index"]["operation_id"]
         .as_str()
         .ok_or("no operation ID")?;
+    wait_for(client, operation, started, seconds, progress, false).await
+}
+
+pub async fn abort(client: &Engine, operation: &str, root: &Path) -> Result<Value, Error> {
+    let started = tokio::time::Instant::now();
+    let receipt = client
+        .query(QueryRequest::write(
+            write_batch()
+                .var_as("operation", g().abort_index_operation(operation))
+                .returning(["operation"]),
+        ))
+        .await?;
+    eprintln!("INDEX_ABORT_REQUEST:{receipt}");
+    wait_for(
+        client,
+        operation,
+        started,
+        client.index_observation_seconds,
+        Some(&root.join("index-abort-progress.json")),
+        true,
+    )
+    .await
+}
+
+async fn wait_for(
+    client: &Engine,
+    operation: &str,
+    started: tokio::time::Instant,
+    seconds: u64,
+    progress: Option<&Path>,
+    aborting: bool,
+) -> Result<Value, Error> {
     let deadline = started + Duration::from_secs(seconds);
     let mut last_report = None;
     loop {
@@ -144,9 +176,10 @@ pub(crate) async fn create_measured(
             last_report = Some(tokio::time::Instant::now());
         }
         match status["operation"]["status"].as_str() {
-            Some("succeeded") => return Ok(status),
+            Some("succeeded") if !aborting => return Ok(status),
+            Some("aborted") if aborting => return Ok(status),
             Some("queued" | "running") if tokio::time::Instant::now() < deadline => {
-                if let Err(error) = client.admit_write(0) {
+                if !aborting && let Err(error) = client.admit_write(0) {
                     // Abort metadata uses reserved scratch to stop further allocation.
                     let aborted = client
                         .query(QueryRequest::write(
@@ -160,7 +193,11 @@ pub(crate) async fn create_measured(
                 }
                 tokio::time::sleep(Duration::from_millis(100)).await;
             }
-            _ => return Err(format!("index did not become active: {status}").into()),
+            _ => {
+                return Err(
+                    format!("index did not reach its requested terminal state: {status}").into(),
+                );
+            }
         }
     }
 }
@@ -232,6 +269,100 @@ pub async fn build(client: &Engine, root: &Path, seconds: u64) -> Result<Value, 
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn abort_preserves_documents_and_allows_replacement_after_cleanup() {
+        let root = std::env::temp_dir().join(format!(
+            "akasha-index-abort-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        std::fs::write(
+            root.join("OWNER"),
+            "akasha-otsuge MVP-003 abort unit fixture\n",
+        )
+        .unwrap();
+        let engine = Engine::open_with_config(
+            helix_db::HelixDbSource::Disk {
+                root: root.clone(),
+                database: "abort-fixture".into(),
+            },
+            crate::config().unwrap(),
+        )
+        .await
+        .unwrap();
+        engine
+            .cypher(
+                "CREATE (:AbortDoc {key:1, body:'first'}), (:AbortDoc {key:1, body:'second'})",
+                Default::default(),
+                None,
+            )
+            .await
+            .unwrap();
+        let progress = root.join("blocked.json");
+        assert!(
+            create_measured(
+                &engine,
+                IndexSpec::node_unique_equality("AbortDoc", "key"),
+                30,
+                Some(&progress)
+            )
+            .await
+            .is_err()
+        );
+        let blocked: Value = serde_json::from_slice(&std::fs::read(&progress).unwrap()).unwrap();
+        assert_eq!(blocked["status"]["operation"]["status"], "blocked");
+        let operation = blocked["status"]["operation"]["operation_id"]
+            .as_str()
+            .unwrap();
+        assert_eq!(
+            abort(&engine, operation, &root).await.unwrap()["operation"]["status"],
+            "aborted"
+        );
+        assert_eq!(
+            abort(&engine, operation, &root).await.unwrap()["operation"]["status"],
+            "aborted"
+        );
+        let replacement = create_measured(
+            &engine,
+            IndexSpec::node_equality("AbortDoc", "key"),
+            30,
+            None,
+        )
+        .await
+        .unwrap();
+        let completed = replacement["operation"]["operation_id"].as_str().unwrap();
+        assert!(abort(&engine, completed, &root).await.is_err());
+        assert!(
+            abort(&engine, "00000000-0000-0000-0000-000000000000", &root)
+                .await
+                .is_err()
+        );
+        let rows = engine
+            .cypher(
+                "MATCH (d:AbortDoc) WHERE d.key = 1 RETURN d.body ORDER BY d.body",
+                Default::default(),
+                None,
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            serde_json::to_value(rows).unwrap()["rows"],
+            json!([["first"], ["second"]])
+        );
+        let saved: Value =
+            serde_json::from_slice(&std::fs::read(root.join("index-abort-progress.json")).unwrap())
+                .unwrap();
+        assert_eq!(saved["status"]["operation"]["status"], "aborted");
+        engine.close().await.unwrap();
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
     #[test]
     fn observation_budget_is_explicit_and_bounded() {
         assert_eq!(super::build_seconds(None).unwrap(), 7200);

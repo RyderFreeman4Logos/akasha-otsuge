@@ -151,7 +151,7 @@ pub(super) async fn begin(
     let base = coverage(&bytes, &bundle)?;
     verify_import(a, &base).await?;
     for spec in [
-        IndexSpec::node_unique_equality("Document", "memory"),
+        IndexSpec::node_equality("Document", "memory"),
         IndexSpec::node_range("Document", "memory"),
     ] {
         indexes::create_measured(

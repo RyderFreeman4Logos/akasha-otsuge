@@ -112,7 +112,11 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       A dedicated operation controller now checks exclusive import/case ownership,
       disk reservations, exact binary identity and explicit resume. Native
       controller-crash/live-child refusal and committed-cursor reuse pass; the
-      full-size generation initialization is running under the retained probe.
+      first full-size initialization stopped at its original 7,200-second unique
+      index observation limit. Ordinary immutable-source lookup now passes 146
+      corpus checks and the small mixed workload while retaining duplicate
+      rejection. Native index abort/replacement and explicit stopped-run
+      abandonment pass; full cleanup, replacement and backfill remain pending.
 - [ ] Measure and enforce disk admission for ordinary indexed writes and reindex,
       including retained native text splits; verify the explicit rebuild bound.
       Native per-write and index admission now have 26-command diagnostic coverage,

@@ -35,6 +35,36 @@ async fn main() -> Result<(), Error> {
     if args.len() > 4 {
         return Err("unexpected extra argument".into());
     }
+    if args[2] == "--abort-index" {
+        let operation = args
+            .get(3)
+            .and_then(|v| v.to_str())
+            .ok_or("abort requires an exact operation ID")?;
+        if operation.len() != 36
+            || operation.bytes().enumerate().any(|(i, b)| {
+                if [8, 13, 18, 23].contains(&i) {
+                    b != b'-'
+                } else {
+                    !b.is_ascii_hexdigit()
+                }
+            })
+        {
+            return Err("invalid exact index operation ID".into());
+        }
+        let root = PathBuf::from(&args[1]);
+        let client = Engine::open_with_config(
+            HelixDbSource::Disk {
+                root: root.clone(),
+                database: "akasha-storage-spike".into(),
+            },
+            config()?,
+        )
+        .await?;
+        let result = indexes::abort(&client, operation, &root).await;
+        client.close().await?;
+        println!("{}", result?);
+        return Ok(());
+    }
     if args[2] == "--generation" {
         let request = args.get(3).ok_or("--generation requires a request path")?;
         let client = Engine::open_with_config(

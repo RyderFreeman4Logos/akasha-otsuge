@@ -39,7 +39,8 @@ pub struct Authority {
 impl Authority {
     pub async fn open(engine: Engine) -> Result<Self, Error> {
         for spec in [
-            IndexSpec::node_unique_equality("Document", "memory"),
+            // Import assigns immutable ordinal IDs; source reads reject duplicates explicitly.
+            IndexSpec::node_equality("Document", "memory"),
             IndexSpec::node_unique_equality("Counter", "key"),
             IndexSpec::node_unique_equality("Head", "key"),
             IndexSpec::node_unique_equality("Receipt", "key"),

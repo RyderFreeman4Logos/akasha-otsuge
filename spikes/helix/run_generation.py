@@ -16,7 +16,7 @@ import uuid
 from run_case import digest, process_identity, publish
 
 MIN_RESERVE = 30 * 1024**3 + 4_000_000_000
-OPERATIONS = {'begin_corpus', 'backfill', 'build', 'catch_up', 'activate'}
+OPERATIONS = {'begin_corpus', 'backfill', 'build', 'catch_up', 'activate', 'abort_index'}
 
 
 def stopped(state):
@@ -72,6 +72,11 @@ def main():
     request = json.loads(request_bytes)
     if request['op'] not in OPERATIONS or type(request['generation']) is not int or request['generation'] not in {1, 2}:
         raise ValueError('only idempotent retained-generation operations are resumable')
+    if request['op'] == 'abort_index':
+        value = request.get('operation_id')
+        if not isinstance(value, str) or len(value) != 36 or any(
+                c != '-' if i in {8,13,18,23} else c not in '0123456789abcdefABCDEF' for i,c in enumerate(value)):
+            raise ValueError('abort requires an exact native operation ID')
     marker = database.parent / 'OWNER'
     if not marker.is_file() or not marker.read_text().startswith('akasha-otsuge MVP-003 '):
         raise ValueError('database is not an owned storage experiment')
@@ -128,6 +133,8 @@ def main():
         if state['phase'] == 'completed':
             print(json.dumps(state['result']))
             return 0
+        if state['phase'] == 'abandoned':
+            raise ValueError('abandoned run cannot execute again; use a new operation identity')
     else:
         if args.resume:
             raise ValueError('cannot resume an absent operation')
@@ -163,7 +170,7 @@ def main():
                '-p', 'Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES='+str(disk['reserve_bytes']),
                '-p', 'Environment=AKASHA_SPIKE_INDEX_OBSERVE_SECONDS='+str(run['seconds']),
                sys.executable, str(observer), str(attempt_dir / 'memory.jsonl'), str(output / 'probe'),
-               str(database), '--generation', str(output / 'request.json')]
+               str(database), *(['--abort-index', request['operation_id']] if request['op'] == 'abort_index' else ['--generation', str(output / 'request.json')])]
     attempt['command'] = command
     publish(state_path, state)
     started, failure = time.monotonic(), None

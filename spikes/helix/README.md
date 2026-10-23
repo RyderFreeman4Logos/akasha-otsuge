@@ -361,7 +361,8 @@ backfill execution, concurrent reindex performance and physical corruption remai
 `run_generation.py CONFIG [--resume]` observes one immutable generation operation.
 The TOML has `run.id/profile/seconds`, `paths.binary/database/request/output`,
 `disk.start_bytes/reserve_bytes` and `reliability.max_attempts = 1`. The request
-is an existing `begin_corpus`, `backfill`, `build`, `catch_up` or `activate` JSON.
+is an existing `begin_corpus`, `backfill`, `build`, `catch_up` or `activate` JSON,
+or `{"op":"abort_index","generation":1,"operation_id":"EXACT_NATIVE_UUID"}`.
 It verifies the completed import receipt, excludes simultaneous case owners,
 retains the executed binary and exact request/manifest/config snapshots, and
 observes the dedicated cgroup and native cursor.
@@ -379,6 +380,25 @@ an older binary that ignores them is insufficient. [Native and controller checks
 cover invalid values before database effects, default/explicit values and this
 unsupported-binary refusal. Existing full initialization retains its original
 binary, controller and time limits.
+
+An interrupted operation can be retired with
+`reconcile_generation.py OUTPUT --abandon EXACT_RUN_ID` after its exact controller
+and native unit have stopped. This checks ownership and retained input/artifact
+hashes, preserves the failed receipts, and records effects as unknown. It does
+not undo native work. A new `abort_index` operation must reach native `aborted`
+before replacing an unfinished index; completed indexes reject abort. Abandoned
+runs cannot execute again. The first controller's external manifest is supported
+only with its pinned controller hash and the original request/manifest hashes.
+
+Imported `Document.memory` values now use an ordinary equality index: the
+streaming importer assigns immutable ordinal IDs, current reads reject duplicate
+matches, and backfill requires exact contiguous coverage. Mutable authority and
+derived-record uniqueness constraints remain. The original full unique-index
+validation reached its 7200-second observation limit; this is a failed preparation
+attempt, not a backend rejection. The [lookup/recovery diagnostic](../../docs/benchmarks/results/corpus-lookup-recovery/summary.json)
+retains that result, 146 corpus checks, the 100-client mixed workload, native abort
+and replacement checks, and controller recovery checks. Its compressed raw archive
+has individual file hashes; binaries remain identified by hash rather than copied.
 
 `AKASHA_SPIKE_DISK_RESERVE_BYTES` binds one immutable disk reserve at native open.
 Ordinary authority/permission writes, generation records, bounded backfill,
