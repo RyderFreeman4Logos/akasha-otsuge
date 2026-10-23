@@ -16,3 +16,4 @@
 - `docs/benchmarks/results/disk-admission-diagnostic/` 复用相同公开摘录与明确标记的合成变更，记录磁盘准入、进程恢复及混合负载；原始数据许可与上述来源相同。
 - `docs/benchmarks/results/text-query-population/` 保存 FineWeb-Edu 固定版本的 512 个检索词、正文哈希和全局记录位置，不包含向量或完整正文。来源版本见 `spikes/data/sources.json`；FineWeb-Edu 数据集遵循 ODC-BY，原文权利仍归原权利人，不改为 Apache-2.0。
 - `docs/benchmarks/results/source-key-diagnostic/` 复用上述八条公开 DBpedia 记录、预计算向量和明确标记的合成测试文本，验证恢复后的来源、scope 与权限；沿用相同数据许可。
+- `docs/benchmarks/results/mixed-query-diagnostic/` 的负载使用上述八条公开 DBpedia 记录与八条明确标为 synthetic 的无向量文本。完整查询元数据另含 FineWeb-Edu 的来源哈希与检索词；沿用上述 MIT/CC-BY-SA-4.0 与 ODC-BY 来源许可，未调用模型或伪造测试负载向量。

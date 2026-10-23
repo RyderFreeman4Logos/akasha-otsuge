@@ -67,6 +67,8 @@ def verify_requests(directory):
     records = current_checks = 0
     corpus_points = []
     corpus_memories, corpus_partitions = set(), {}
+    search_points, search_checks = [], dict(bm25=0, ann=0)
+    text_current, text_bm25 = [], []
     with (directory / "runtime/requests.jsonl").open() as source:
         for line in source:
             row = json.loads(line)
@@ -96,7 +98,28 @@ def verify_requests(directory):
                 corpus_points.append(corpus["at"])
                 corpus_memories.add(query["memory"])
                 corpus_partitions[query["partition"]] = corpus_partitions.get(query["partition"], 0) + 1
+                if query.get('text_only'):
+                    text_current.append(query['partition'])
                 events.append((receipt["at"], 1, receipt))
+            elif row['operation'] in search_checks:
+                index = receipt.get('query_index')
+                if type(index) is not int or not 0 <= index < len(queries):
+                    raise ValueError('invalid search query identity')
+                query, hits, validation = queries[index], receipt.get('hits'), receipt.get('validation', {})
+                read, validated = validation.get('read_seq'), validation.get('validated_at_seq')
+                if (receipt.get('query_key') != query['key'] or receipt.get('partition') != query['partition']
+                        or (row['operation'] == 'ann' and query.get('text_only'))
+                        or not isinstance(hits, list) or not 1 <= len(hits) <= 20
+                        or validation.get('hits') != hits or validation.get('permission_revision') != 1
+                        or type(read) is not int or type(validated) is not int or not 0 <= read <= validated
+                        or any(hit.get('partition') != query['partition'] or type(hit.get('memory')) is not int
+                               or not 0 <= hit['memory'] <= 2**63-1
+                               or (hit.get('seq') is not None and (type(hit['seq']) is not int or not 0 <= hit['seq'] <= validated)) for hit in hits)):
+                    raise ValueError('search receipt differs from pinned query or validated candidates')
+                search_points.append(validated)
+                search_checks[row['operation']] += 1
+                if query.get('text_only'):
+                    text_bm25.append(query['partition'])
     heads = {}
     for _, kind, value in sorted(events, key=lambda event: event[:2]):
         if kind == 0:
@@ -110,8 +133,11 @@ def verify_requests(directory):
             current_checks += 1
     if len(baseline["heads"]) != 50 or len(sequences) != max(sequences) - min(sequences) + 1:
         raise ValueError("missing baseline identity or unexplained commit-sequence gap")
-    if any(point > max(sequences) for point in corpus_points):
-        raise ValueError("current corpus read claims an uncommitted point")
+    if any(point > max(sequences) for point in corpus_points + search_points):
+        raise ValueError("corpus read claims an uncommitted point")
+    if request.get('diagnostic') is False and request.get('phase') == 'steady' and (
+            set(text_current) != {f'p{i}' for i in range(8)} or set(text_bm25) != {f'p{i}' for i in range(8)}):
+        raise ValueError('full steady case did not exercise all unvectorized partitions')
     derived_checks = 0
     if generation := request.get("generation"):
         derived = json.loads((directory / "runtime/derived-oracle.json").read_text())
@@ -124,6 +150,9 @@ def verify_requests(directory):
         derived_checks = len(expected_text)
     return {"requests": records, "current_checks": current_checks, "corpus_current_checks": len(corpus_points),
             "corpus_current_distinct": len(corpus_memories), "corpus_current_partitions": corpus_partitions,
+            "text_only_current_checks": len(text_current), "text_only_bm25_checks": len(text_bm25),
+            "text_only_current_partitions": sorted(set(text_current)), "text_only_bm25_partitions": sorted(set(text_bm25)),
+            "search_checks": search_checks,
             "distinct_commits": len(sequences), "derived_current_checks": derived_checks}
 
 

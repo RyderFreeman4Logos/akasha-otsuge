@@ -1,0 +1,70 @@
+FFFFFFFE
+======================================================================
+ERROR: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (__main__.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 90, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    self.assertEqual(checked['text_only_current_checks'], 1)
+                     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'text_only_current_checks'
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (__main__.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (search='ann_text')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 86, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(search=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (__main__.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (search='index')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 86, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(search=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (__main__.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (search='key')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 86, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(search=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (__main__.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (search='scope')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 86, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(search=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (__main__.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (search='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 86, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(search=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (__main__.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (search='unvalidated')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 86, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(search=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (__main__.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (search='future')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 86, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(search=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.024s
+
+FAILED (failures=7, errors=1)

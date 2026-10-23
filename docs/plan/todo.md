@@ -54,7 +54,8 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
 - [x] Prepare 512 additional unvectorized text queries across all eight partitions
       by replaying the complete deduplicated source order. Source/body hashes and
       global memory IDs verify; completed reuse changes no retained files.
-      Native mixed-query consumption and crash-resume testing remain pending.
+      Native mixed-query admission and small real-vector/synthetic-text workload
+      now pass; full corpus reads and preparer crash-resume testing remain pending.
 - [x] Finish the full corpus import. The first attempt stopped at its disk
       reservation after about 4.7 million documents; the durable prefix remains.
       Native Zstd continuation and journaled run transfer are verified on small
@@ -92,6 +93,9 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       A 141-command extension verifies restored generation candidates recover
       their source identity from authority, reject forged derived provenance,
       obey changed scope/live permissions and preserve original history.
+      The mixed fixture independently verifies 70 text-only current reads and 36
+      BM25 queries across eight partitions, with 15 real ANN queries. The full
+      3,840-query population is admitted but has not yet queried full indexes.
 - [ ] Verify generation-specific indexed receipts and gap-free watermarks,
       concurrent writes/reindex, failed-build rollback and model separation.
       A 96-command revision-only diagnostic passes real text/vector reads,

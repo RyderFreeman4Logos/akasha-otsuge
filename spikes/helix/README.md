@@ -461,3 +461,17 @@ a scope change, forged derived keys, live revocation and immutable history; a
 separate visibility/reopen check also passes. See `source-key-diagnostic/` for
 the earlier failing binary and exact receipts. Sustained concurrent corpus
 corrections and full-size retrieval remain required.
+
+Search fixtures now explicitly mark unvectorized queries with `text_only`.
+Current/BM25 workloads select the complete population; ANN selects only verified
+vector entries. Sidecar offsets count vectors, so mixed ordering stays valid.
+Full steady cases require text queries and observed current/BM25 coverage in all
+eight partitions. The independent verifier checks query identity, type, scope,
+validated candidates and committed read points, and reports text-only coverage.
+
+The mixed diagnostic uses eight public vector documents plus eight clearly
+synthetic text documents, which never count toward full corpus size. Its 100
+clients/60-second case passes 1,698 requests, 70 text-only current reads and 36
+text-only BM25 queries across all partitions, plus 15 real ANN queries. RSS
+P99/maximum is 300,818,432B. These results and the separately admitted 3,840-query
+full population are in `mixed-query-diagnostic/`; full native reads remain pending.

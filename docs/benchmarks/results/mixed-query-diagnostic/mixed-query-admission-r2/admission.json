@@ -1,0 +1,19 @@
+{
+  "config": {
+    "corpus_manifest": null,
+    "diagnostic": true,
+    "fixture": "/tmp/akasha-otsuge-storage-20261022/mixed-query-population-full-v1/queries.json",
+    "generation": null,
+    "output": "/tmp/akasha-mixed-admission-_oqrux13/candidate",
+    "phase": "burst",
+    "run_id": "mixed-admission",
+    "seconds": 1
+  },
+  "config_epoch": 1,
+  "config_sha256": "df4f8407fd69a8b0bf76bdbbd64a9d88d5350c7948146e20cd98eb32e4358805",
+  "fixture_sha256": "4cb92aa6fb33c98090eed16a71355324f21159785db7d6f8c5f1a81002d0c8e9",
+  "pid": 130538,
+  "resume": "completed units are reusable only by the outer controller; an interrupted unit requires explicit abandonment",
+  "start_ticks": "458874576",
+  "state": "admitted"
+}

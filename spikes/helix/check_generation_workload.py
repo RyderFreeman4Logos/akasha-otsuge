@@ -23,6 +23,7 @@ def main():
     assert source.stat().st_size < 4 * 1024**2
     rows = [json.loads(line) for line in source.read_text().splitlines()]
     assert len(rows) == 8 and {r['partition'] for r in rows} == {f'p{i}' for i in range(8)}
+    rows += [dict(key=f'fixture:text:{i}', partition=f'p{i}', body=f'Synthetic unvectorized diagnostic {i}; excluded from corpus scale.') for i in range(8)]
     data = b''.join((json.dumps(row, separators=(',', ':')) + '\n').encode() for row in rows)
     prepared = output / 'input.jsonl'
     prepared.write_bytes(data)
@@ -30,9 +31,9 @@ def main():
     fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     bundle = dict(model=identity['model'], model_fingerprint=fingerprint, dimension=1536, chunker='source-document-v1', schema=1)
     manifest = output / 'manifest.json'
-    manifest.write_text(json.dumps(dict(dimensions=1536, embedding_model=identity['model'], precomputed_at='2024-02 (publisher)', chunk_bytes=65536, corpus=dict(documents=8, vectors=8, prepared_bytes=len(data), prepared_sha256=hashlib.sha256(data).hexdigest(), indexed_body_utf8_bytes=sum(len(r['body'].encode()) for r in rows), inputs=[dict(file='vectors-00000.parquet', repository=identity['repository'], revision=identity['revision'])]))))
+    manifest.write_text(json.dumps(dict(dimensions=1536, embedding_model=identity['model'], precomputed_at='2024-02 (publisher)', chunk_bytes=65536, synthetic_text_documents=8, corpus=dict(documents=len(rows), vectors=8, prepared_bytes=len(data), prepared_sha256=hashlib.sha256(data).hexdigest(), indexed_body_utf8_bytes=sum(len(r['body'].encode()) for r in rows), inputs=[dict(file='vectors-00000.parquet', repository=identity['repository'], revision=identity['revision'])]))))
     fixture = output / 'queries.json'
-    fixture.write_text(json.dumps(dict(source_sha256=digest(manifest), corpus_manifest_sha256=digest(manifest), model=identity['model'], dimension=1536, queries=[dict(key=r['key'], partition=r['partition'], term=max(re.findall(r'[A-Za-z]{4,}', r['body']), key=len), memory=1_000_000+i, body_sha256=hashlib.sha256(r['body'].encode()).hexdigest(), embedding=r['embedding']) for i, r in enumerate(rows)])))
+    fixture.write_text(json.dumps(dict(source_sha256=digest(manifest), corpus_manifest_sha256=digest(manifest), model=identity['model'], dimension=1536, queries=[dict(key=r['key'], partition=r['partition'], term=max(re.findall(r'[A-Za-z]{4,}', r['body']), key=len), memory=1_000_000+i, body_sha256=hashlib.sha256(r['body'].encode()).hexdigest(), embedding=r.get('embedding', []), text_only='embedding' not in r) for i, r in enumerate(rows)])))
     records, units = [], []
     started = time.monotonic()
     temporary = pathlib.Path(tempfile.mkdtemp(prefix='akasha-generation-workload-'))
@@ -95,6 +96,11 @@ max_attempts = 1
         state = json.loads((output / 'case/state.json').read_text())
         units.append(state['unit'])
         assert terminal.returncode == 0, ('case', terminal.returncode)
+        oracle = state['result']['content_oracle']
+        assert oracle['text_only_current_checks'] > 0 and oracle['text_only_bm25_checks'] > 0
+        assert oracle['text_only_current_partitions'] == [f'p{i}' for i in range(8)]
+        assert oracle['text_only_bm25_partitions'] == [f'p{i}' for i in range(8)]
+        assert oracle['search_checks']['ann'] > 0
         derived = state['result']['engine']['snapshot']['derived']
         assert derived['remaining'] == 0 and derived['text'] == derived['vector'] == derived['committed']
         publish(output / 'result.json', dict(status='passed_diagnostic_only', binary_sha256=admission['binary_sha256'], commands=records, case=state['result'], seconds=time.monotonic()-started, not_tested=['full scale', '30-minute profiles', 'concurrent rebuild', 'corpus corrections']))

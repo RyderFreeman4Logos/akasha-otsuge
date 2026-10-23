@@ -1,0 +1,27 @@
+{
+  "status": "passed_admission_only",
+  "queries": 3840,
+  "negative_controls": [
+    "manifest",
+    "overlap",
+    "vector_for_text",
+    "vector_offset",
+    "missing_partition"
+  ],
+  "native": [
+    {
+      "binary_sha256": "1e482e799e40d9e23d2a13d218b80f39c8b69f42a086353a95b2b1b80fb2a45f",
+      "exit": 1,
+      "query_admitted": false,
+      "storage_opened": false
+    },
+    {
+      "binary_sha256": "893c76e525051484a8b0d0a6cf8647ec61e1cd45da2801e0f4382b99d73d0b2b",
+      "exit": 1,
+      "query_admitted": true,
+      "storage_opened": false
+    }
+  ],
+  "fixture_sha256": "4cb92aa6fb33c98090eed16a71355324f21159785db7d6f8c5f1a81002d0c8e9",
+  "script_sha256": "3403381e24e923ea50f2b3dd31c599b4fb4c61d7b008369c632e068461b8ba45"
+}

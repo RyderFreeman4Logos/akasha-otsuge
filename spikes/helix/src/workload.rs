@@ -229,7 +229,9 @@ impl Shared {
                 Ok(current)
             }
             2 | 3 => {
-                let index = (client * 101 + ordinal as usize * 97) % self.fixture.queries.len();
+                let index = self
+                    .fixture
+                    .select_index(client * 101 + ordinal as usize * 97, kind == 3);
                 let query = self.fixture.query(index)?;
                 let validated = if let (Some(id), Some(bundle)) =
                     (self.config.generation, &self.bundle)
@@ -582,7 +584,16 @@ async fn run_open(
             return Err("corpus does not meet frozen scale".into());
         }
         if !fixture.population()
-            || fixture.queries.len() < 1024
+            || fixture.queries.iter().filter(|q| !q.text_only).count() < 1024
+            || fixture.queries.iter().filter(|q| q.text_only).count() < 512
+            || fixture
+                .queries
+                .iter()
+                .filter(|q| q.text_only)
+                .map(|q| &q.partition)
+                .collect::<std::collections::BTreeSet<_>>()
+                .len()
+                != 8
             || fixture.corpus_manifest_sha256.as_deref() != Some(hash(&bytes).as_str())
         {
             return Err(

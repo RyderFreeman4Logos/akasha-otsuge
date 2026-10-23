@@ -103,3 +103,12 @@ The retained full run selected all 512 queries from 11,428,831 documents in
 limit is not an engine memory result. Native mixed-query consumption, lexical
 ranking and file-cache-cold coverage remain separate checks. Receipts are in
 `docs/benchmarks/results/text-query-population/`.
+
+`merge_query_populations.py VECTOR_QUERIES TEXT_QUERIES NEW_OUTPUT` combines
+completed populations bound to the same corpus manifest. It copies only the
+small query-vector sidecar, verifies its hash and records both metadata hashes.
+Text queries have no vector offset or fabricated embedding. The full combined
+fixture contains 3,840 queries; its 20 MB sidecar remains outside Git.
+`check_mixed_population.py VECTOR_QUERIES TEXT_QUERIES MIXED_QUERIES OLD_PROBE
+NEW_PROBE NEW_OUTPUT` checks malformed inputs and native query admission, then
+deliberately rejects resource configuration before opening any database.

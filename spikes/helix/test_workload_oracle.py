@@ -66,6 +66,30 @@ class CorpusCurrentOracle(unittest.TestCase):
                     verify_requests(root)
             derived_path.write_text(json.dumps(derived))
             self.assertEqual(verify_requests(root)["derived_current_checks"], 50)
+            query['text_only'] = True
+            fixture.write_text(json.dumps(dict(queries=[query])))
+            (root / 'runtime/admission.json').write_text(json.dumps(dict(fixture_sha256=digest(fixture))))
+            hits = [dict(memory=query['memory'], seq=0, partition='p3', key=query['key'])]
+            search = dict(client=80, ordinal=0, operation='bm25', status='success', receipt=dict(
+                query_index=0, query_key=query['key'], partition='p3', hits=hits,
+                validation=dict(read_seq=50, validated_at_seq=50, hits=hits, permission_revision=1)))
+            for case in ['ann_text', 'index', 'key', 'scope', 'empty', 'unvalidated', 'future']:
+                changed = copy.deepcopy(search)
+                if case == 'ann_text':changed['operation'] = 'ann'
+                if case == 'index':changed['receipt']['query_index'] = 1
+                if case == 'key':changed['receipt']['query_key'] = 'wrong'
+                if case == 'scope':changed['receipt']['partition'] = 'p4'
+                if case == 'empty':changed['receipt']['hits'] = []
+                if case == 'unvalidated':changed['receipt']['validation']['hits'] = []
+                if case == 'future':changed['receipt']['validation']['validated_at_seq'] = 51
+                requests.write_text(json.dumps(row)+'\n'+json.dumps(changed)+'\n')
+                with self.subTest(search=case), self.assertRaises(ValueError):
+                    verify_requests(root)
+            requests.write_text(json.dumps(row)+'\n'+json.dumps(search)+'\n')
+            checked = verify_requests(root)
+            self.assertEqual(checked['text_only_current_checks'], 1)
+            self.assertEqual(checked['text_only_bm25_checks'], 1)
+            self.assertEqual(checked['search_checks'], dict(bm25=1, ann=0))
 
 
 if __name__ == "__main__":
