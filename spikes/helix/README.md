@@ -32,7 +32,9 @@ The probe disables embedded telemetry. Explicit budgets are vector cache 32 MiB,
 SimHasher 2 MiB, Slate block/metadata 32/8 MiB, FTS 8 MiB, unflushed data 32 MiB,
 pending queue 8 MiB/4096 items per index, strong vector pending 8 MiB, strong text
 analysis 16 MiB, vector build cache 32 MiB and one lifecycle build slot. Remaining
-text backfill/query limits are upstream defaults in this small probe; these are
+text backfill limits are upstream defaults in this small probe. Cypher uses the
+public embedded request boundary with 32 MiB/query, 2 MiB results and a 60-second
+deadline; native queries also receive that deadline. These controls are
 not yet a validated aggregate production budget. Cgroup usage includes the Python
 controller and page cache, and is not the full-scale RSS measurement.
 
@@ -64,5 +66,29 @@ from process RSS. The observer terminates only its owned child on failure.
 
 [Published diagnostic results](../../docs/benchmarks/results/) include the real
 38,462-vector import and its raw memory samples. This first shard is 13,344,347
-UTF-8 content bytes, far below the required full corpus. The live long vector
-build is not yet an acceptance result. No production backend has been selected.
+indexed UTF-8 body bytes, including 38,462 added title/text separators, far below
+the required full corpus. The first long vector build exhausted its observation
+deadline without completing. No production backend has been selected.
+
+## Immutable history and idempotency oracle
+
+`--oracle-seed COUNT` appends deterministic revisions to 1,024 logical memories,
+cycling scope, retraction and restoration. One authority transaction checks the
+head and global counter, appends the immutable revision, switches the head,
+stores the request hash/receipt and appends pending derived work. Repeating the
+same seed reconciles each durable receipt; changed input with the same ID conflicts.
+Synthetic oracle bodies are excluded from all eligible public-corpus byte counts.
+
+`--oracle-verify COUNT` runs in a separate process after close/reopen. It compares
+exact identities/content at five commit points, paginates all eight scopes,
+checks stale-head and idempotency conflicts and counts revisions/receipts/jobs.
+Each operation publishes fsynced progress in the owned database directory.
+The active database has one writer; do not run seed/verify against the same root
+concurrently. Both commands take the existing database root before the mode.
+
+Historical lookups use one `between` predicate on a composite ordered revision
+key. In this pinned engine, expressing the same range as two separate inequalities
+made the diagnostic scan much slower. Membership cursors must strictly advance.
+This oracle proves the measured history/transaction leaf only: derived watermarks,
+live permission revocation, 100 clients and the full-scale profiles remain separate
+required acceptance work.

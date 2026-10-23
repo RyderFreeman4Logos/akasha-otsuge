@@ -1,9 +1,10 @@
-use std::{collections::BTreeMap, error::Error, num::NonZeroUsize, time::Duration};
+use std::{collections::BTreeMap, num::NonZeroUsize, time::Duration};
 
-use helix_db::{Client, prelude::*};
+use crate::engine::{Engine, Error};
+use helix_db::prelude::*;
 use serde_json::{Value, json};
 
-pub async fn probe(client: &Client) -> Result<Value, Box<dyn Error>> {
+pub async fn probe(client: &Engine) -> Result<Value, Error> {
     let rows: Vec<_> = (0..100)
         .map(|key| json!({
             "key": key,
@@ -47,7 +48,6 @@ pub async fn probe(client: &Client) -> Result<Value, Box<dyn Error>> {
                 )
                 .returning(["hits"]),
         ))
-        .send()
         .await?;
     assert_eq!(text_hit["hits"], json!([{"key":42,"scope":"even"}]));
     let excluded: Value = client
@@ -66,7 +66,6 @@ pub async fn probe(client: &Client) -> Result<Value, Box<dyn Error>> {
                 )
                 .returning(["hits"]),
         ))
-        .send()
         .await?;
     assert_eq!(excluded["hits"], json!([]));
     let vector_hit: Value = client
@@ -85,7 +84,6 @@ pub async fn probe(client: &Client) -> Result<Value, Box<dyn Error>> {
                 )
                 .returning(["hits"]),
         ))
-        .send()
         .await?;
     assert_eq!(vector_hit["hits"], json!([{"key":42,"scope":"even"}]));
     Ok(
@@ -96,14 +94,13 @@ pub async fn probe(client: &Client) -> Result<Value, Box<dyn Error>> {
     )
 }
 
-pub async fn create(client: &Client, spec: IndexSpec) -> Result<Value, Box<dyn Error>> {
+pub async fn create(client: &Engine, spec: IndexSpec) -> Result<Value, Error> {
     let receipt: Value = client
         .query(QueryRequest::write(
             write_batch()
                 .var_as("index", g().create_index_if_not_exists(spec))
                 .returning(["index"]),
         ))
-        .send()
         .await?;
     eprintln!("INDEX_RECEIPT:{receipt}");
     if receipt["index"]["kind"] == "already_active" {
@@ -121,7 +118,6 @@ pub async fn create(client: &Client, spec: IndexSpec) -> Result<Value, Box<dyn E
                     .var_as("operation", g().get_index_operation(operation))
                     .returning(["operation"]),
             ))
-            .send()
             .await?;
         match status["operation"]["status"].as_str() {
             Some("succeeded") => return Ok(status),
@@ -137,7 +133,7 @@ pub async fn create(client: &Client, spec: IndexSpec) -> Result<Value, Box<dyn E
     }
 }
 
-pub async fn build(client: &Client) -> Result<Value, Box<dyn Error>> {
+pub async fn build(client: &Engine) -> Result<Value, Error> {
     let started = tokio::time::Instant::now();
     let text = create(
         client,

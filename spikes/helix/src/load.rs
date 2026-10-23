@@ -1,14 +1,14 @@
 use std::{
-    error::Error,
     fs::File,
     io::{BufRead, BufReader, Read, Write},
     path::PathBuf,
     time::Instant,
 };
 
-use helix_db::{Client, HelixDbSource, prelude::*};
+use crate::engine::{Engine, Error};
+use helix_db::{HelixDbSource, prelude::*};
 use serde::Deserialize;
-use serde_json::{Value, json};
+use serde_json::json;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -19,10 +19,10 @@ struct Document {
     embedding: Option<Vec<f32>>,
 }
 
-pub async fn run(root: PathBuf, input: PathBuf) -> Result<(), Box<dyn Error>> {
+pub async fn run(root: PathBuf, input: PathBuf) -> Result<(), Error> {
     // Diagnostic imports require a new database: a partial import is never silently reused.
     std::fs::create_dir(&root)?;
-    let client = Client::open_with_config(
+    let client = Engine::open_with_config(
         HelixDbSource::Disk {
             root,
             database: "akasha-storage-spike".into(),
@@ -75,8 +75,7 @@ pub async fn run(root: PathBuf, input: PathBuf) -> Result<(), Box<dyn Error>> {
         bytes += body_bytes;
         if documents.is_multiple_of(16) {
             client
-                .query::<Value>(QueryRequest::write(std::mem::take(&mut batch)))
-                .send()
+                .query(QueryRequest::write(std::mem::take(&mut batch)))
                 .await?;
         }
         if documents.is_multiple_of(1000) {
@@ -87,10 +86,7 @@ pub async fn run(root: PathBuf, input: PathBuf) -> Result<(), Box<dyn Error>> {
         }
     }
     if !batch.entries.is_empty() {
-        client
-            .query::<Value>(QueryRequest::write(batch))
-            .send()
-            .await?;
+        client.query(QueryRequest::write(batch)).await?;
     }
     println!(
         "{}",

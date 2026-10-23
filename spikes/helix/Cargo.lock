@@ -32,6 +32,7 @@ dependencies = [
  "helix-db",
  "serde",
  "serde_json",
+ "sha2",
  "slatedb",
  "tokio",
 ]

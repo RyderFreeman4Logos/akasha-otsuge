@@ -1,4 +1,4 @@
-use std::{error::Error, io::Write, num::NonZeroU64, path::PathBuf, time::Duration};
+use std::{io::Write, num::NonZeroU64, path::PathBuf, time::Duration};
 
 use db::config::{
     CacheConfig, CacheMode, DbConfig, FtsMemoryCacheConfig, FtsWarmConfig,
@@ -6,14 +6,18 @@ use db::config::{
     IndexOperationQueueTuning, QueryTelemetry, SearchIndexBackfillLimits, SimHasherCacheSettings,
     SlateMemoryCacheConfig, SlateWarmConfig, VectorMemoryBudget, VectorMemorySettings,
 };
-use helix_db::{Client, HelixDbSource};
+use engine::{Engine, Error};
+use helix_db::HelixDbSource;
+
+mod authority;
+mod engine;
 
 mod indexes;
 mod load;
 
 const MIB: u64 = 1024 * 1024;
 
-fn config() -> Result<DbConfig, Box<dyn Error>> {
+fn config() -> Result<DbConfig, Error> {
     let vector = VectorMemorySettings::try_new(VectorMemoryBudget::bounded(32 * MIB)?, 5)?
         .with_simhasher_cache(SimHasherCacheSettings::try_new(2 * MIB as usize, 4)?);
     let cache = CacheConfig::new(
@@ -57,7 +61,7 @@ fn config() -> Result<DbConfig, Box<dyn Error>> {
 }
 
 #[tokio::main(worker_threads = 2)]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> Result<(), Error> {
     let args: Vec<_> = std::env::args_os().collect();
     if !(3..=4).contains(&args.len()) {
         return Err("usage: akasha-helix-probe OWNED_DATABASE_DIRECTORY CYPHER [before-execute|before-reply|after-reply]".into());
@@ -65,6 +69,34 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if args[2] == "--load" {
         let input = args.get(3).ok_or("--load requires a prepared JSONL path")?;
         return load::run(PathBuf::from(&args[1]), PathBuf::from(input)).await;
+    }
+    if args[2] == "--oracle-seed" || args[2] == "--oracle-verify" {
+        let count = args
+            .get(3)
+            .and_then(|v| v.to_str())
+            .ok_or("oracle operation requires count")?
+            .parse()?;
+        let client = Engine::open_with_config(
+            HelixDbSource::Disk {
+                root: PathBuf::from(&args[1]),
+                database: "akasha-storage-spike".into(),
+            },
+            config()?,
+        )
+        .await?;
+        let authority = authority::Authority::open(client).await?;
+        let progress = PathBuf::from(&args[1]).join(format!(
+            "{}-{count}.json",
+            args[2].to_string_lossy().trim_start_matches('-')
+        ));
+        let result = if args[2] == "--oracle-seed" {
+            authority::seed(&authority, count, &progress).await
+        } else {
+            authority::verify(&authority, count, &progress).await
+        };
+        authority.engine.close().await?;
+        println!("{}", result?);
+        return Ok(());
     }
     let hold = args
         .get(3)
@@ -78,7 +110,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if query.len() > 64 * 1024 {
         return Err("probe query exceeds 64 KiB".into());
     }
-    let client = Client::open_with_config(
+    let client = Engine::open_with_config(
         HelixDbSource::Disk {
             root: PathBuf::from(&args[1]),
             database: "akasha-storage-spike".into(),
@@ -104,7 +136,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Ok(value) => value,
         Err(error) => {
             client.close().await?;
-            return Err(error.into());
+            return Err(error);
         }
     };
     checkpoint(hold, "before-reply").await;

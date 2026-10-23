@@ -1,0 +1,25 @@
+{
+  "binary_sha256": "bba37581ccf5586a444a7b1813b6269c0ca1c740d8adb940ea16c310944858af",
+  "changes": 4096,
+  "checks": 5163,
+  "kind": "diagnostic_history_after_separate_process_reopen",
+  "max_sampled_rss_bytes": 38989824,
+  "not_tested": [
+    "50GB",
+    "100_clients",
+    "derived_watermark",
+    "live_permission_revocation"
+  ],
+  "phase": "oracle_verified",
+  "result": "passed",
+  "review": "implementing-agent source self-check; not independent review",
+  "seconds": 15.096093581,
+  "sources": {
+    "spikes/helix/Cargo.lock": "bf4a9496d101f3d1c3efb32791e14c32f22f4cc5a1f24ab00d21637a14c851f8",
+    "spikes/helix/src/authority.rs": "c657a5064b1863b8b64e535f840e49adc533ffa3dffa5c2f6f6d182a0620b1d2",
+    "spikes/helix/src/engine.rs": "3c7b3b151aad84f67434e6820bed8b82ab19b30199f4d0a05feae0f8d3273cb8",
+    "spikes/helix/src/indexes.rs": "315dd1e15f7848bfc4d03f6d135a2f75473dd66b58977b2f6e3f48c87baf8a5c",
+    "spikes/helix/src/load.rs": "02c86d1134acb08a165fe6ed0a266824aaf7284068b0644a8f9688ad4e3ea832",
+    "spikes/helix/src/main.rs": "0b53a25057194ce169446cee2a99159bef6abbc65c17071f8d928ef2dba10d02"
+  }
+}
