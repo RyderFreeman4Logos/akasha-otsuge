@@ -31,7 +31,9 @@ All three do establish failed completion under the required recovery budget.
 Observer exit events are absent after OOM; journal records supply the terminal
 classification. Exact processes are gone, units inactive and retained artifact
 hashes verified. Explicit abandonment preserves failed outcomes and unknown
-effects; the retained database is not presented as cleanly aborted.
+effects; the database was not presented as cleanly aborted. It has since been
+[retired as an unused experiment](results/retired-helix-database/summary.json),
+with original metadata and failure evidence retained separately.
 
 [Raw evidence and per-file hashes](results/compaction-range-recovery/) preserve
 the controlled crash, three failed runs, exact settings, journal messages,
@@ -188,3 +190,28 @@ pinned generation was2. Both the native shared scheduler and controller now
 retain81,212,254,720B for either generation. Native and controller RED/GREEN
 controls verify that boundary before database access. Both candidates' release
 units and Clippy pass; no frozen acceptance threshold changed.
+
+### Derived corruption and experiment cleanup
+
+[The corruption fixture](results/fallback-derived-corruption/summary.json)
+passes85 native checks. It truncates both text-token and vector-index files only
+after their native processes exit. BM25 fails on the zero-sized token object;
+ANN fails with UnexpectedEof. Neither returns a success body. The fixture moves
+the damaged generation offline, builds a new generation from unchanged authority,
+and verifies BM25 and ANN in all eight scopes. Complete authority verification
+retains the original source hash before and after rebuild. This is explicit
+offline quarantine on1,057 synthetic records, not product automatic quarantine.
+
+The first fixture attempt expected a filename absent from Lance's memory-store
+error. Its native failure and missing child-identity limitation are retained;
+the corrected driver records command/PID/start before each invocation. The final
+run takes6.910s, sampled process-tree RSS max142,204,928B. Native processes, unit,
+temporary fixture and scratch are confirmed gone.
+
+The unused rejected Helix database contained20,134 files with38,603,812,864
+allocated bytes. Exact ownership, stopped known consumers, exclusive locks and
+retained receipt hashes were checked before deletion. Its path is absent and
+its import/failure metadata is archived. Btrfs free space rose from168,431,259,648
+to206,998,777,856B at later verification; delayed reclaim and concurrent activity
+prevent exact attribution of that delta. Source shards and active fallback data
+remain available; this retired database cannot be reused by later acceptance.

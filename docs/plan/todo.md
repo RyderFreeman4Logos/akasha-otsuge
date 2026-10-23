@@ -160,6 +160,11 @@ before admitting the full corpus, so memory-layout failures surface earlier.
 - [ ] Test all required commit/index/watermark/activation crash barriers,
       derived corruption/rebuild, authority corruption, isolated disk-full,
       child resource failure, invalid config and competing reloads.
+      The fallback now passes85 native search/recovery checks, including physical
+      text-token and vector-index truncation, explicit errors, offline quarantine,
+      rebuild into a new generation and all-eight-scope BM25/ANN recovery.
+      Original authority hashes remain unchanged. This is a1,057-record fixture;
+      automatic product quarantine and the remaining full-size matrix stay open.
 - [ ] Validate the specified SurrealKV/LanceDB fallback after Helix's measured
       low-recovery failure. Pin Rust dependencies/licenses; prove primitive
       transactions/history, bounded import and search before the full unchanged
@@ -236,6 +241,10 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       separate dictionaries; legacy generations retain their original layout.
       The complete scope-column backfill now passes; full index build is separate.
       Full scoped-layout/query/activation/workload acceptance is still pending.
+      The rejected Helix experiment database has been retired after exact-owner,
+      stopped-unit, lock and evidence checks:20,134 files/38,603,812,864 allocated
+      bytes removed. Failure/import metadata and42 source shards remain retained;
+      no later test may claim to reuse that deleted database.
       The lifecycle implementation now applies real delta indexes, validates
       embedding bundles/source hashes, records gap-free watermarks and atomically
       activates generations. Its 103-command fixture covers six SIGKILL cuts,

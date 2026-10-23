@@ -18,7 +18,7 @@ def main():
     binary, output = pathlib.Path(sys.argv[1]).resolve(strict=True), pathlib.Path(sys.argv[2]).resolve()
     legacy = pathlib.Path(sys.argv[3]).resolve(strict=True) if len(sys.argv) == 4 else None
     selected_binary = binary
-    total = 70 if legacy else 56
+    total = 99 if legacy else 85
     output.mkdir(mode=0o700)
     (output / 'OWNER').write_text('akasha-otsuge MVP-003 fallback search receipts\n')
     records, started = [], time.monotonic()
@@ -52,6 +52,11 @@ def main():
                 child = subprocess.Popen(command, stdout=stdout, stderr=subprocess.PIPE,
                     env=env)
                 identity, prefix = process_identity(child.pid), b''
+                record = dict(command=command, child=identity, phase='running',
+                    request=json.loads(request.read_text()) if arguments[0] == '--generation' else None,
+                    kill=kill, expected_error=error, config_overrides=overrides)
+                records.append(record)
+                publish(output / 'commands.json', records)
                 try:
                     if kill:
                         with selectors.DefaultSelector() as selector:
@@ -69,6 +74,8 @@ def main():
                         child.kill()
                     _, tail = child.communicate(timeout=600)
                     (output / (name + '.stderr')).write_bytes(prefix + tail)
+                    record.update(phase='completed', exit=child.returncode)
+                    publish(output / 'commands.json', records)
                     assert child.returncode == (-9 if kill else 1 if error else 0), (name, tail[-2000:])
                     if error:
                         assert error.encode() in tail, (name, tail[-2000:])
@@ -77,9 +84,6 @@ def main():
                         child.kill()
                     child.communicate(timeout=10)
             assert process_identity(child.pid) is None
-            records.append(dict(command=command, child=identity, exit=child.returncode,
-                request=json.loads(request.read_text()) if arguments[0] == '--generation' else None,
-                kill=kill, expected_error=error, config_overrides=overrides))
             elapsed = time.monotonic() - started
             publish(output / 'progress.json', dict(phase=name, completed=len(records), total=total,
                 elapsed_s=elapsed, rate_per_s=len(records)/elapsed,
@@ -149,6 +153,41 @@ def main():
             for scope in range(8):
                 ids = call('query', bundle=bundle, scope=scope, term='astronomy')['ids']
                 assert ids and all((memory-1_000_000) % 8 == scope for memory in ids)
+        database = root / 'database'
+        call('begin', 8, bundle=bundle)
+        call('backfill', 8, waves=100)
+        call('build', 8)
+        assert call('query', 8, bundle=bundle, scope=0, term='astronomy')['ids']
+        vector = [1.0] + [0.0] * 1535
+        assert call('query', 8, bundle=bundle, scope=0, vector=vector)['ids'][0] == 1_000_000
+        tokens = sorted((database / 'derived/g8_text.lance/_indices').rglob('*tokens.lance'))
+        vector_files = [p for p in (database / 'derived/g8_vector.lance/_indices').rglob('*') if p.is_file()]
+        assert len(tokens) >= 8
+        assert vector_files
+        damaged = []
+        for path in tokens + vector_files:
+            before = dict(file=str(path.relative_to(database)), bytes=path.stat().st_size, sha256=digest(path))
+            with path.open('wb') as target:
+                target.flush(); os.fsync(target.fileno())
+            damaged.append(before | dict(damaged_sha256=digest(path)))
+        publish(output / 'derived-corruption.json', dict(fault='truncate owned generation8 text-token and vector-index files after native exit', files=damaged))
+        call('query', 8, bundle=bundle, scope=0, term='astronomy', error='object of size 0 bytes')
+        call('query', 8, bundle=bundle, scope=0, vector=vector, error='Lance')
+        assert invoke('verify-import')['prefix'] == sha.hexdigest()
+        quarantine = root / 'quarantined-generation8'
+        quarantine.mkdir()
+        for name in ['g8_text.lance', 'g8_vector.lance']:
+            (database / 'derived' / name).rename(quarantine / name)
+        call('query', 8, bundle=bundle, scope=0, term='astronomy', error='g8_text')
+        call('begin', 9, bundle=bundle)
+        call('backfill', 9, waves=100)
+        assert call('build', 9)['ready']
+        for scope in range(8):
+            ids = call('query', 9, bundle=bundle, scope=scope, term='astronomy')['ids']
+            assert ids and all((memory-1_000_000) % 8 == scope for memory in ids)
+            vector = [float(i == scope) for i in range(1536)]
+            assert call('query', 9, bundle=bundle, scope=scope, vector=vector)['ids'][0] == 1_000_000 + scope
+        assert invoke('verify-import')['prefix'] == sha.hexdigest()
         assert len(records) == total, len(records)
     elapsed = time.monotonic() - started
     publish(output / 'progress.json', dict(phase='completed', completed=total, total=total,
@@ -156,7 +195,7 @@ def main():
     publish(output / 'result.json', dict(status='passed', checks=total, seconds=elapsed, records=records,
         temporary_root_removed=not pathlib.Path(temporary).exists(),
         artifact_sha256={str(p.relative_to(output)):digest(p) for p in output.iterdir() if p.is_file()},
-        not_tested=['full corpus', 'ordinary concurrent changes', 'active generation switch', 'power loss']))
+        not_tested=['full corpus', 'ordinary concurrent changes', 'active generation switch', 'automatic quarantine in product', 'power loss']))
     print(json.dumps(dict(status='passed', checks=total, seconds=elapsed)))
 
 
