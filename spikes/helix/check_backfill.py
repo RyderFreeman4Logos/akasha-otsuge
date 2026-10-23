@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import pathlib
+import re
 import selectors
 import subprocess
 import sys
@@ -20,7 +21,7 @@ def main():
     (output / 'OWNER').write_text('akasha-otsuge MVP-003 corpus backfill receipts\n')
     started = time.monotonic()
     records = []
-    planned_commands = 123
+    planned_commands = 141
     rows = [json.loads(line) for line in source.read_text().splitlines()]
     assert len(rows) == 8 and source.stat().st_size < 4 * 1024**2
     rows += [{'key': f'fixture:{i}', 'body': f'Synthetic backfill diagnostic only {i}', 'partition': 'p0'} for i in range(17)]
@@ -190,6 +191,27 @@ def main():
         invoke({'op': 'activate', 'generation': 2})
         assert invoke({**query, 'generation': 2, 'bundle': second['bundle']})['hits'][0]['seq'] == 1
         assert invoke(query)['hits'][0]['seq'] == 1
+        for seq, active, scope in [(2, False, 7), (3, True, 6)]:
+            mutation = {**change, 'request_id': f'corpus-restore-{seq}', 'expected': seq-1, 'active': active, 'scope': scope}
+            assert invoke({'op': 'commit', 'change': mutation})['commit_seq'] == seq
+            for family in ['text', 'vector']:
+                invoke({'op': 'apply', 'generation': 2, 'family': family, 'seq': seq, 'vector': vector if family == 'vector' and active else None})
+            if not active:
+                assert all(hit['memory'] != 1_000_000 for hit in invoke({**query, 'generation': 2, 'bundle': second['bundle']})['hits'])
+        restored = {**query, 'generation': 2, 'bundle': second['bundle'], 'scope': 6}
+        lexical_restored = {**restored, 'vector': None, 'term': re.findall(r'\b[a-z]{8,24}\b', rows[0]['body'].lower())[0]}
+        for request in [restored, lexical_restored]:
+            hits = invoke(request)['hits']
+            assert any(hit['memory'] == 1_000_000 and hit['seq'] == 3 and hit['source_key'] == rows[0]['key'] for hit in hits), hits
+        for family in ['Vector', 'Text']:
+            invoke({'op': 'raw', 'cypher': f"MATCH (d:Derived2{family} {{memory:1000000}}) SET d.source_key='forged-source'"})
+        for request in [restored, lexical_restored]:
+            assert any(hit['memory'] == 1_000_000 and hit['source_key'] == rows[0]['key'] for hit in invoke(request)['hits'])
+        assert all(hit['memory'] != 1_000_000 for hit in invoke({**restored, 'scope': 7})['hits'])
+        invoke({'op': 'grant', 'principal': 'reader', 'scope': 6, 'allowed': False})
+        assert invoke(restored)['hits'] == []
+        invoke({'op': 'grant', 'principal': 'reader', 'scope': 6, 'allowed': True})
+        assert invoke(history)['entry'] == original(0)
         changed_manifest = output / 'changed-manifest.json'
         changed_manifest.write_text(manifest.read_text() + '\n')
         invoke({**second, 'manifest': str(changed_manifest)}, failure=True)

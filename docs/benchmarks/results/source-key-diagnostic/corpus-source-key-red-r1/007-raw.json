@@ -1,0 +1,1 @@
+{"op": "raw", "cypher": "MATCH (d:Document {memory:99}) DELETE d"}

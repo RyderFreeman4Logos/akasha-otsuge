@@ -451,3 +451,13 @@ The resulting `queries.json` can be passed to `--search-corpus`, which reports
 recall@20 separately from exact scope checks. On the 38,462-vector diagnostic,
 32 exact-reference ANN queries achieved recall@20 of 1.0; full-corpus measured
 recall remains pending even though its reference has been prepared.
+
+Candidate revalidation hydrates corpus `source_key` from the same authoritative
+snapshot used for head/scope checks. A retracted then restored derived row may
+have no stored source key; a corrupt derived key is also replaced by this verified
+identity. Current/history entry formats are unchanged and no extra query is added.
+The 141-command corpus fixture covers both retrieval families, restoration with
+a scope change, forged derived keys, live revocation and immutable history; a
+separate visibility/reopen check also passes. See `source-key-diagnostic/` for
+the earlier failing binary and exact receipts. Sustained concurrent corpus
+corrections and full-size retrieval remain required.

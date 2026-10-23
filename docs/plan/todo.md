@@ -89,6 +89,9 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       corpus/pagination commands, visibility/reopen and 5,163 checks over 100,000
       changes pass. The 60-second case passes with 144 real current checks, but
       full-duration memory, unvectorized text and generation-backed reads remain.
+      A 141-command extension verifies restored generation candidates recover
+      their source identity from authority, reject forged derived provenance,
+      obey changed scope/live permissions and preserve original history.
 - [ ] Verify generation-specific indexed receipts and gap-free watermarks,
       concurrent writes/reindex, failed-build rollback and model separation.
       A 96-command revision-only diagnostic passes real text/vector reads,

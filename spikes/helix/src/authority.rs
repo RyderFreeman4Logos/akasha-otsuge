@@ -464,6 +464,9 @@ impl Authority {
             } else {
                 None
             };
+            let source_key = baseline
+                .as_ref()
+                .map(|_| result[format!("source{index}")][0]["key"].clone());
             match (heads, revisions) {
                 ([], []) => entries.push(baseline),
                 ([head], [revision])
@@ -478,6 +481,9 @@ impl Authority {
                     entries.push(Some(revision.clone()))
                 }
                 _ => return Err("authority head/history integrity mismatch".into()),
+            }
+            if !with_body && let Some(Some(entry)) = entries.last_mut() {
+                entry["source_key"] = source_key.unwrap_or(Value::Null);
             }
         }
         Ok(entries)
@@ -615,14 +621,15 @@ impl Authority {
                     return Err("candidate scope mismatch".into());
                 }
                 // Imported immutable documents are revision zero until a correction creates a head.
-                let valid = match head {
-                    None => false,
-                    Some(row) => {
-                        row["seq"] == indexed && row["scope"] == scope && row["active"] == true
-                    }
-                };
-                if valid {
-                    visible.push(hit.clone());
+                if let Some(row) = head
+                    && row["seq"] == indexed
+                    && row["scope"] == scope
+                    && row["active"] == true
+                {
+                    let mut verified = hit.clone();
+                    // Restored or corrupted derived rows cannot supply authoritative provenance.
+                    verified["source_key"] = row["source_key"].clone();
+                    visible.push(verified);
                 }
             }
         }
