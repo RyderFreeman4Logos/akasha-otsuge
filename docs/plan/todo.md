@@ -51,6 +51,10 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       streaming import and completed-run reconciliation on diagnostic input.
 - [x] Freeze distributed 3,328-query input and exact ANN top-20 references for
       32 queries against all one million vectors, with source/binary hashes.
+- [x] Prepare 512 additional unvectorized text queries across all eight partitions
+      by replaying the complete deduplicated source order. Source/body hashes and
+      global memory IDs verify; completed reuse changes no retained files.
+      Native mixed-query consumption and crash-resume testing remain pending.
 - [x] Finish the full corpus import. The first attempt stopped at its disk
       reservation after about 4.7 million documents; the durable prefix remains.
       Native Zstd continuation and journaled run transfer are verified on small

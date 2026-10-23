@@ -1,0 +1,66 @@
+{
+  "status": "prepared_not_engine_acceptance",
+  "result": {
+    "documents": 11428831,
+    "elapsed_s": 454.01600971538574,
+    "queries": 512,
+    "sha256": "87a07d022c43c378365422d1494c011802fe225e4176975037476ef6b9443546"
+  },
+  "identity": {
+    "config_epoch": 1,
+    "config_sha256": "178c712215da90900d8b9c1750db818d5198657927519643e881800a1fc1a50d",
+    "environment": {
+      "pyarrow": "26.0.0",
+      "python": "3.14.7"
+    },
+    "input": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/corpus-full-v1",
+    "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+    "script_sha256": "7bf52782646e9a14450077c53de7853bce1478df9d1d37550bf38484e41973b1",
+    "source_code_sha256": {
+      "download.py": "e16de77ee3a17962c335ba4efc2df157b13e30cbf63d2ceaf17b8a572a1ea4e1",
+      "prepare_corpus.py": "d222cf1ee8601aa6f7e35832b7065a9534fbfeb7995a7bbf77059c1aa9748b02",
+      "sources.json": "fcc8ed51c3691224f0bdf54d5fd86be0fff97104e77d52fc98efcf851ca509bf"
+    }
+  },
+  "partitions": {
+    "p0": 54,
+    "p1": 77,
+    "p2": 69,
+    "p3": 52,
+    "p4": 60,
+    "p5": 81,
+    "p6": 55,
+    "p7": 64
+  },
+  "completed_reuse": "explicit --resume leaves all retained files byte-identical; exact PID absent and unit inactive",
+  "source_sha256": {
+    "spikes/data/prepare_text_population.py": "7bf52782646e9a14450077c53de7853bce1478df9d1d37550bf38484e41973b1",
+    "spikes/data/check_text_population.py": "8e808016b7a10a40e1aae218870d7d516367163726a05af41c8ee23528d13e5d",
+    "spikes/measure.py": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029"
+  },
+  "observer_limits": {
+    "memory.high": "max",
+    "memory.max": "8589934592",
+    "memory.swap.max": "0"
+  },
+  "exits": [
+    {
+      "event": "exit",
+      "code": 0,
+      "seconds": 454.8923676069826
+    }
+  ],
+  "not_tested": [
+    "native consumption of text-only queries",
+    "prepared stream byte hash reserialization",
+    "process-kill interruption of this preparer",
+    "engine resource profile",
+    "file-cache-cold"
+  ],
+  "preparation_rss_bytes": {
+    "samples": 449,
+    "p99": 3810205696,
+    "max": 3874426880,
+    "scope": "Python source preparation only; not engine acceptance"
+  }
+}

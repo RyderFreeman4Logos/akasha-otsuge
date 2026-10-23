@@ -82,3 +82,24 @@ changed process identity fails the preparation. Per-shard progress is fsynced ne
 to the requested manifest as `.progress.json`. Incomplete preparation can be
 restarted with a new manifest path: it rereads sources and does not claim saved
 hash state or exactly-once execution. No database is modified by preparation.
+
+## Unvectorized query coverage
+
+`prepare_text_population.py DIRECTORY MANIFEST NEW_OUTPUT` replays the pinned
+deduplicated corpus and selects 512 evenly spaced text-only queries across its
+unvectorized tail. Each query binds the original body hash, global memory ID,
+partition and an ASCII search term. It never invents an embedding or retains a
+second corpus stream. Use the same pinned PyArrow environment as preparation.
+
+`--resume` revalidates completed selections while replaying the source prefix;
+completed runs verify their artifact and return without changing retained files.
+The immutable code/environment/config identity, fsynced selection journal and
+per-4,096-document progress are recorded in the owned output directory. Source
+hashes and all corpus statistics are rechecked; this operation does not reserialize
+the prepared byte-stream hash. A process-kill resume has not yet been exercised.
+
+The retained full run selected all 512 queries from 11,428,831 documents in
+454 seconds, with all eight partitions represented. Its separate 8 GiB preparation
+limit is not an engine memory result. Native mixed-query consumption, lexical
+ranking and file-cache-cold coverage remain separate checks. Receipts are in
+`docs/benchmarks/results/text-query-population/`.

@@ -14,3 +14,4 @@
 - `docs/benchmarks/results/generation-workload-diagnostic/` 使用上述八条公开记录及其预计算向量，另有明确排除于语料规模的仅文本历史/负载数据；未调用模型或伪造向量。公开摘录仍遵循上述来源许可。
 - `docs/benchmarks/results/generation-runner-diagnostic/` 复用上述八条公开记录的导入与回填测试，来源许可不变；`full-import-zstd-v1/` 保存完整公开语料导入的命令、哈希和资源观测，不包含私有用户会话。
 - `docs/benchmarks/results/disk-admission-diagnostic/` 复用相同公开摘录与明确标记的合成变更，记录磁盘准入、进程恢复及混合负载；原始数据许可与上述来源相同。
+- `docs/benchmarks/results/text-query-population/` 保存 FineWeb-Edu 固定版本的 512 个检索词、正文哈希和全局记录位置，不包含向量或完整正文。来源版本见 `spikes/data/sources.json`；FineWeb-Edu 数据集遵循 ODC-BY，原文权利仍归原权利人，不改为 Apache-2.0。
