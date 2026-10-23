@@ -21,7 +21,7 @@ use crate::{
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
-struct Bundle {
+pub(crate) struct Bundle {
     model: String,
     model_fingerprint: String,
     dimension: usize,
@@ -101,6 +101,10 @@ enum Request {
         generation: u64,
         waves: u64,
         hold: Option<String>,
+    },
+    CatchUp {
+        generation: u64,
+        waves: u64,
     },
     Build {
         generation: u64,
@@ -209,6 +213,48 @@ pub async fn run(authority: &Authority, path: &Path, root: &Path) -> Result<Valu
             waves,
             hold,
         } => corpus::backfill(authority, generation, waves, hold.as_deref(), root).await,
+        Request::CatchUp { generation, waves } => {
+            if !(1..=1_000_000).contains(&waves) {
+                return Err("invalid catch-up wave bound".into());
+            }
+            let started = std::time::Instant::now();
+            let initial = self::generation(authority, generation).await?;
+            let before = initial.text.min(initial.vector);
+            let mut saved_s = 0.0;
+            let mut last = json!(null);
+            for wave in 0..waves {
+                last = catch_up_one(authority, generation).await?;
+                let seconds = started.elapsed().as_secs_f64();
+                let completed = number(&last["text"])?.min(number(&last["vector"])?);
+                let rate = (completed - before) as f64 / seconds.max(0.000001);
+                last["completed"] = json!(completed);
+                last["total"] = last["committed"].clone();
+                last["elapsed_s"] = json!(seconds);
+                last["rate_per_s"] = json!(rate);
+                last["eta_s"] = if rate > 0.0 {
+                    json!(number(&last["remaining"])? as f64 / rate)
+                } else {
+                    Value::Null
+                };
+                last["pid"] = json!(std::process::id());
+                if wave == 0
+                    || wave + 1 == waves
+                    || last["remaining"] == 0
+                    || seconds - saved_s >= 1.0
+                {
+                    crate::workload::atomic_json(
+                        &root.join(format!("generation-{generation}-catch-up.json")),
+                        &last,
+                    )?;
+                    saved_s = seconds;
+                }
+                if last["remaining"] == 0 {
+                    break;
+                }
+                tokio::task::yield_now().await;
+            }
+            Ok(last)
+        }
         Request::Build {
             generation,
             fail_after_text,
@@ -517,7 +563,7 @@ async fn apply(
     let revisions = a
         .engine
         .cypher(
-            "MATCH (r:Revision {order:$order}) RETURN r.memory,r.seq,r.scope,r.active,r.body",
+            "MATCH (r:Revision {order:$order}) RETURN r.memory,r.seq,r.scope,r.active,r.body,r.text_only",
             params(json!({"order":job[0]})),
             None,
         )
@@ -533,6 +579,14 @@ async fn apply(
     }
     let active = revision[3].as_bool().ok_or("invalid active flag")?;
     let body = revision[4].as_str().ok_or("invalid immutable body")?;
+    let text_only = match revision[5] {
+        Value::Null | Value::Bool(false) => false,
+        Value::Bool(true) => true,
+        _ => return Err("invalid immutable vector policy".into()),
+    };
+    if text_only && vector.is_some() {
+        return Err("text-only source cannot consume vector output".into());
+    }
     let at = a.read_point().await?;
     let head = a
         .checked_heads(&[memory], at)
@@ -547,7 +601,7 @@ async fn apply(
     }
     let reason = if head_seq > seq {
         "superseded"
-    } else if !active {
+    } else if !active || (text_only && matches!(family, Family::Vector)) {
         a.engine
             .cypher(
                 &format!("MATCH (d:{label} {{memory:$memory}}) DELETE d"),
@@ -555,7 +609,7 @@ async fn apply(
                 None,
             )
             .await?;
-        "retracted"
+        if active { "not_required" } else { "retracted" }
     } else {
         let payload = match family {
             Family::Text => {
@@ -678,9 +732,10 @@ fn contiguous_prefix(id: u64, family: Family, before: u64, rows: &[Value]) -> Re
         if row["key"] != family.key(id, seq)
             || row["generation"] != id
             || row["family"] != family.name()
+            || (row["reason"] == "not_required" && !matches!(family, Family::Vector))
             || !matches!(
                 row["reason"].as_str(),
-                Some("applied" | "superseded" | "retracted")
+                Some("applied" | "superseded" | "retracted" | "not_required")
             )
         {
             return Err("derived completion integrity mismatch".into());
@@ -777,7 +832,7 @@ async fn receipt(a: &Authority, id: u64, request: &str) -> Result<Value, Error> 
     )
 }
 
-async fn query(
+pub(crate) async fn query(
     a: &Authority,
     id: u64,
     bundle: Bundle,
@@ -814,7 +869,7 @@ async fn query(
             read_batch()
                 .var_as(
                     "hits",
-                    traversal.value_map(Some(vec!["memory", "seq", "partition"])),
+                    traversal.value_map(Some(vec!["memory", "seq", "partition", "source_key"])),
                 )
                 .returning(["hits"]),
         ))
@@ -827,6 +882,46 @@ async fn query(
     validated["bundle"] = json!(record.bundle);
     validated["watermarks"] = json!({"text":record.text,"vector":record.vector});
     Ok(validated)
+}
+
+pub(crate) async fn pin(a: &Authority, id: u64, manifest: &str) -> Result<Bundle, Error> {
+    initialize(a).await?;
+    let state = status(a).await?;
+    let record = generation(a, id).await?;
+    if state["active"] != id
+        || record.status != "active"
+        || record
+            .base
+            .as_ref()
+            .is_none_or(|base| !base.complete || base.manifest_sha256 != manifest)
+    {
+        return Err("workload needs the active generation for its exact corpus".into());
+    }
+    Ok(record.bundle)
+}
+
+pub(crate) async fn catch_up_one(a: &Authority, id: u64) -> Result<Value, Error> {
+    let before = generation(a, id).await?;
+    if !before.ready || !matches!(before.status.as_str(), "building" | "active" | "retired") {
+        return Err("generation not ready for catch-up".into());
+    }
+    let at = a.read_point().await?;
+    if before.text == at && before.vector == at {
+        return Ok(json!({"generation":id,"committed":at,"text":at,"vector":at,"remaining":0}));
+    }
+    for (family, watermark) in [(Family::Text, before.text), (Family::Vector, before.vector)] {
+        if watermark < at {
+            apply(a, id, family, watermark + 1, None, None).await?;
+        } else if watermark > at {
+            return Err("generation watermark ahead of committed authority".into());
+        }
+    }
+    let after = generation(a, id).await?;
+    let at = a.read_point().await?;
+    Ok(
+        json!({"generation":id,"committed":at,"text":after.text,"vector":after.vector,
+        "remaining":at.saturating_sub(after.text.min(after.vector))}),
+    )
 }
 
 async fn status(a: &Authority) -> Result<Value, Error> {

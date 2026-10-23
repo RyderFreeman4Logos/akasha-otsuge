@@ -328,6 +328,31 @@ The corpus command fixture has no independent RSS/cgroup attestation; workload,
 visibility and 100,000-change checks retain their separate resource observations.
 Unvectorized text coverage and generation-backed concurrent search remain open.
 
+The [generation-workload diagnostic](../../docs/benchmarks/results/generation-workload-diagnostic/summary.json)
+now runs real generation searches alongside ordinary commits and one bounded
+outbox worker. A case can pin `run.generation`; full cases require an active
+generation bound to the exact corpus. `catch_up` processes durable sequence
+prefixes and reports progress. Final native derived text, vector exclusion and
+indexed-job counts are checked independently against raw acknowledged changes.
+Eight corrupted derived-state controls fail, alongside seven source-current
+controls. The 106-command generation fixture retains crash/reopen, model
+separation and explicit text-only policy checks.
+
+`text_only: true` is persisted atomically with a revision. Its vector completion
+is `not_required` and removes an older vector; no embedding is invented. Absent
+or false keeps legacy request serialization and hashes. The explicit
+`--oracle-seed-text` / `--oracle-verify-text` modes prepare synthetic historical
+changes for this policy; existing oracle modes retain their prior hashes. The
+historical verifier limits its expected IDs to the synthetic oracle domain;
+imported revision-zero content has separate source checks.
+
+The final eight-document, 4,096-change, 60-second/100-client diagnostic passes:
+1,698 requests, 793 distinct commits, 144 source-current checks and 50 independently
+verified derived current records. Both watermarks reach 4,889 with zero remaining
+work. Writes reach 12.18/s with P95 21 ms, current P95 42 ms, history P95 241 ms;
+RSS P99/maximum is 306,741,248 bytes. This small generation does not replace
+full-size profiles, concurrent rebuild or real-corpus corrections during load.
+
 The probe admits at most two generation identities over the database lifetime. This
 is an explicit rebuild limit because the pinned engine does not reclaim native
 text split blobs, not a claim of garbage collection. Full-size disk admission,

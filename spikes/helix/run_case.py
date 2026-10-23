@@ -111,9 +111,19 @@ def verify_requests(directory):
         raise ValueError("missing baseline identity or unexplained commit-sequence gap")
     if any(point > max(sequences) for point in corpus_points):
         raise ValueError("current corpus read claims an uncommitted point")
+    derived_checks = 0
+    if generation := request.get("generation"):
+        derived = json.loads((directory / "runtime/derived-oracle.json").read_text())
+        committed = max(sequences)
+        expected_progress = dict(generation=generation, committed=committed, text=committed, vector=committed, remaining=0)
+        expected_text = sorted((row for row in heads.values() if row["active"]), key=lambda row: row["memory"])
+        if (derived.get("progress") != expected_progress or derived.get("indexed_jobs") != committed * 2
+                or derived.get("vectors") != [] or derived.get("text") != expected_text):
+            raise ValueError("derived generation differs from acknowledged source revisions")
+        derived_checks = len(expected_text)
     return {"requests": records, "current_checks": current_checks, "corpus_current_checks": len(corpus_points),
             "corpus_current_distinct": len(corpus_memories), "corpus_current_partitions": corpus_partitions,
-            "distinct_commits": len(sequences)}
+            "distinct_commits": len(sequences), "derived_current_checks": derived_checks}
 
 
 def summarize(directory, profile, binary_sha256):
@@ -138,7 +148,7 @@ def summarize(directory, profile, binary_sha256):
     memory_ok = bool(rss) and p99 <= (512 if profile == "low" else 2048) * 1024**2 and maximum <= (640 if profile == "low" else 2048) * 1024**2
     status = "passed" if exits[0]["code"] == 0 and result["status"] == "passed" and memory_ok else "failed"
     paths = ["request.json", "memory.jsonl", "engine.log"]
-    paths += [name for name in ["runtime/result.json", "runtime/requests.jsonl", "runtime/metrics.jsonl", "runtime/admission.json", "runtime/baseline.json"] if (directory / name).exists()]
+    paths += [name for name in ["runtime/result.json", "runtime/requests.jsonl", "runtime/metrics.jsonl", "runtime/admission.json", "runtime/baseline.json", "runtime/derived-oracle.json"] if (directory / name).exists()]
     return {"status": status, "effects": "measured" if runtime.exists() else "unknown", "content_oracle": oracle, "engine": result, "exit": exits[0], "rss_p99_bytes": p99,
             "rss_max_bytes": maximum, "memory_thresholds_passed": memory_ok,
             "artifact_sha256": {name: digest(directory / name) for name in paths}}
@@ -156,7 +166,7 @@ def main():
     if set(config) != {"run", "paths", "reliability"} or config["reliability"] != {"max_attempts": 1}:
         raise ValueError("case has no network retries; exactly one measured attempt is required")
     run, paths = config["run"], config["paths"]
-    if set(run) != {"id", "profile", "phase", "seconds", "diagnostic"} or set(paths) != {"binary", "database", "fixture", "output", "corpus_manifest"}:
+    if set(run) - {"generation"} != {"id", "profile", "phase", "seconds", "diagnostic"} or set(paths) != {"binary", "database", "fixture", "output", "corpus_manifest"}:
         raise ValueError("unknown or missing case setting")
     if run["profile"] not in {"low", "high"} or run["phase"] not in {"steady", "burst", "overload"}:
         raise ValueError("unknown profile or phase")
@@ -164,6 +174,8 @@ def main():
         raise ValueError("invalid duration")
     if not isinstance(run["diagnostic"], bool):
         raise ValueError("diagnostic must be a boolean")
+    if "generation" in run and (type(run["generation"]) is not int or run["generation"] not in {1, 2}):
+        raise ValueError("generation must be an explicit retained identity")
     if args.abandon is not None and args.abandon != run["id"]:
         raise ValueError("abandonment requires the exact run ID")
     directory = pathlib.Path(paths["output"]).resolve()
@@ -239,6 +251,8 @@ def main():
         request = {"run_id": run["id"], "phase": run["phase"], "seconds": run["seconds"], "diagnostic": run["diagnostic"],
                    "fixture": str(fixture), "corpus_manifest": str(manifest) if manifest else None,
                    "output": str(directory / "runtime")}
+        if "generation" in run:
+            request["generation"] = run["generation"]
         publish(directory / "request.json", request)
         limit = (640 if run["profile"] == "low" else 2048) * 1024**2
         command = ["systemd-run", "--user", "--wait", "--pipe", "--collect", "--unit=" + state["unit"],

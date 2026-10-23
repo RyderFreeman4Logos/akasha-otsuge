@@ -48,6 +48,24 @@ class CorpusCurrentOracle(unittest.TestCase):
             result = verify_requests(root)
             self.assertEqual(result["corpus_current_checks"], 1)
             self.assertEqual(result["current_checks"], 1)
+            (root / "request.json").write_text(json.dumps(dict(fixture=str(fixture), generation=1)))
+            derived = dict(progress=dict(generation=1, committed=50, text=50, vector=50, remaining=0), indexed_jobs=100, text=heads, vectors=[])
+            derived_path = root / "runtime/derived-oracle.json"
+            for case in ["body", "jobs", "generation", "watermark", "commit", "vectors", "missing", "duplicate"]:
+                changed = copy.deepcopy(derived)
+                if case == "body":changed["text"][0]["body_sha256"] = "0" * 64
+                if case == "jobs":changed["indexed_jobs"] -= 1
+                if case == "generation":changed["progress"]["generation"] = 2
+                if case == "watermark":changed["progress"]["text"] -= 1
+                if case == "commit":changed["progress"]["committed"] += 1
+                if case == "vectors":changed["vectors"] = [dict(memory=base)]
+                if case == "missing":changed["text"].pop()
+                if case == "duplicate":changed["text"].append(changed["text"][0])
+                derived_path.write_text(json.dumps(changed))
+                with self.subTest(derived=case), self.assertRaises(ValueError):
+                    verify_requests(root)
+            derived_path.write_text(json.dumps(derived))
+            self.assertEqual(verify_requests(root)["derived_current_checks"], 50)
 
 
 if __name__ == "__main__":

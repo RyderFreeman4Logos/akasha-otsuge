@@ -10,7 +10,7 @@ use std::{
     time::Duration,
 };
 
-use helix_db::HelixDbSource;
+use helix_db::{HelixDbSource, prelude::*};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -19,7 +19,7 @@ use tokio::{sync::Semaphore, task::JoinSet, time::Instant};
 use crate::{
     authority::{self, Authority, Change},
     engine::{Engine, Error},
-    search,
+    generations, search,
 };
 
 const KINDS: [&str; 6] = ["write", "current", "bm25", "ann", "history", "correction"];
@@ -36,6 +36,7 @@ struct Config {
     output: PathBuf,
     corpus_manifest: Option<PathBuf>,
     diagnostic: bool,
+    generation: Option<u64>,
 }
 
 struct Tally {
@@ -88,9 +89,11 @@ struct Shared {
     metrics: Mutex<Metrics>,
     log: Mutex<BufWriter<File>>,
     samples: Mutex<BufWriter<File>>,
+    bundle: Option<generations::Bundle>,
+    derived: Mutex<Value>,
 }
 
-fn atomic_json(path: &Path, value: &Value) -> Result<(), Error> {
+pub(crate) fn atomic_json(path: &Path, value: &Value) -> Result<(), Error> {
     let temporary = path.with_extension("tmp");
     let mut file = File::create(&temporary)?;
     writeln!(file, "{value}")?;
@@ -160,6 +163,7 @@ impl Shared {
                     scope: ((client as u64 + ordinal) % 8) as u8,
                     active: kind == 0 || ordinal.is_multiple_of(2),
                     body: body(&self.config.run_id, client, ordinal),
+                    text_only: true,
                 };
                 let mut receipt = self.authority.apply(&change).await?;
                 if receipt.get("conflict").is_some() {
@@ -227,22 +231,43 @@ impl Shared {
             2 | 3 => {
                 let index = (client * 101 + ordinal as usize * 97) % self.fixture.queries.len();
                 let query = self.fixture.query(index)?;
-                let read_seq = self.authority.read_point().await?;
-                let response =
-                    search::query(&self.authority.engine, &query, &query.partition, kind == 3)
-                        .await?;
-                let validated = self
-                    .authority
-                    .revalidate(
+                let validated = if let (Some(id), Some(bundle)) =
+                    (self.config.generation, &self.bundle)
+                {
+                    let mut result = generations::query(
+                        &self.authority,
+                        id,
+                        bundle.clone(),
                         &self.config.run_id,
                         query.partition.as_bytes()[1] - b'0',
-                        read_seq,
-                        read_seq,
-                        response["hits"]
-                            .as_array()
-                            .ok_or("invalid search response")?,
+                        (kind == 3).then(|| query.embedding.clone()),
+                        (kind == 2).then(|| query.term.clone()),
                     )
                     .await?;
+                    for hit in result["hits"]
+                        .as_array_mut()
+                        .ok_or("invalid generation hits")?
+                    {
+                        hit["key"] = hit["source_key"].clone();
+                    }
+                    result
+                } else {
+                    let read_seq = self.authority.read_point().await?;
+                    let response =
+                        search::query(&self.authority.engine, &query, &query.partition, kind == 3)
+                            .await?;
+                    self.authority
+                        .revalidate(
+                            &self.config.run_id,
+                            query.partition.as_bytes()[1] - b'0',
+                            read_seq,
+                            read_seq,
+                            response["hits"]
+                                .as_array()
+                                .ok_or("invalid search response")?,
+                        )
+                        .await?
+                };
                 let hits = validated["hits"]
                     .as_array()
                     .ok_or("invalid search response")?;
@@ -298,7 +323,7 @@ impl Shared {
             "clients":metrics.clients.to_vec(),"operations":operations,"queued":self.queued.load(Ordering::Relaxed),
             "queued_bytes_upper_bound":self.queued.load(Ordering::Relaxed)*8192,"peak_queued":metrics.peak_queued,
             "active":self.active.load(Ordering::Relaxed),"admission_slots":4,"queue_entry_bound":100,
-            "queue_bytes_bound":100*8192,"wave_seconds":1,"derived_lag":null}),
+            "queue_bytes_bound":100*8192,"wave_seconds":1,"derived":*self.derived.lock().map_err(|_|"derived progress poisoned")?}),
         )
     }
 
@@ -313,6 +338,69 @@ impl Shared {
         samples.get_ref().sync_all()?;
         atomic_json(&self.config.output.join("progress.json"), &value)?;
         Ok(value)
+    }
+
+    async fn derived_oracle(&self, id: u64) -> Result<Value, Error> {
+        let range = SourcePredicate::between(
+            "memory",
+            i64::try_from(self.base)?,
+            i64::try_from(self.base + 49)?,
+        );
+        let response = self
+            .authority
+            .engine
+            .query(QueryRequest::read(
+                read_batch()
+                    .var_as(
+                        "text",
+                        g().n_with_label_where(format!("Derived{id}Text"), range.clone())
+                            .limit(51)
+                            .value_map(Some(vec!["memory", "seq", "partition", "body"])),
+                    )
+                    .var_as(
+                        "vector",
+                        g().n_with_label_where(format!("Derived{id}Vector"), range)
+                            .limit(1)
+                            .value_map(Some(vec!["memory"])),
+                    )
+                    .returning(["text", "vector"]),
+            ))
+            .await?;
+        let mut rows = match &response["text"] {
+            Value::Null => vec![],
+            Value::Array(rows) => rows.clone(),
+            _ => return Err("invalid derived workload text".into()),
+        };
+        for row in &mut rows {
+            let scope = row["partition"]
+                .as_str()
+                .ok_or("invalid derived partition")?;
+            if !matches!(scope, "p0" | "p1" | "p2" | "p3" | "p4" | "p5" | "p6" | "p7") {
+                return Err("invalid derived partition".into());
+            }
+            *row = json!({"memory":row["memory"],"seq":row["seq"],"scope":scope.as_bytes()[1]-b'0',"active":true,
+                "body_sha256":hash(row["body"].as_str().ok_or("missing derived body")?.as_bytes())});
+        }
+        rows.sort_by_key(|row| row["memory"].as_u64());
+        if !response["vector"].is_null() && response["vector"] != json!([]) {
+            return Err("text-only workload has derived vectors".into());
+        }
+        let count = self
+            .authority
+            .engine
+            .cypher(
+                "MATCH (j:IndexedJob {generation:$generation}) RETURN count(j)",
+                authority::params(json!({"generation":id})),
+                None,
+            )
+            .await?
+            .rows;
+        let [row] = count.as_slice() else {
+            return Err("invalid indexed job count".into());
+        };
+        Ok(
+            json!({"progress":*self.derived.lock().map_err(|_|"derived progress poisoned")?,"indexed_jobs":row[0],"text":rows,"vectors":[]}),
+        )
     }
 }
 
@@ -460,6 +548,9 @@ async fn run_open(
     fixture: search::Fixture,
 ) -> Result<Value, Error> {
     if !config.diagnostic {
+        if config.generation.is_none() {
+            return Err("full workload requires a pinned active generation".into());
+        }
         let path = config
             .corpus_manifest
             .as_ref()
@@ -501,6 +592,21 @@ async fn run_open(
         }
     }
     let authority = Authority::open(engine).await?;
+    let bundle = if let Some(id) = config.generation {
+        Some(
+            generations::pin(
+                &authority,
+                id,
+                fixture
+                    .corpus_manifest_sha256
+                    .as_deref()
+                    .ok_or("generation workload requires corpus identity")?,
+            )
+            .await?,
+        )
+    } else {
+        None
+    };
     for scope in 0..8 {
         authority
             .set_permission(&config.run_id, scope, true)
@@ -523,6 +629,7 @@ async fn run_open(
             scope: (id % 8) as u8,
             active: true,
             body: body(&config.run_id, id as usize, 0),
+            text_only: true,
         };
         let receipt = authority.apply(&change).await?;
         if receipt.get("conflict").is_some() {
@@ -534,6 +641,22 @@ async fn run_open(
         &config.output.join("baseline.json"),
         &json!({"base":base,"run_id":config.run_id,"heads":baseline}),
     )?;
+    let derived = if let Some(id) = config.generation {
+        let deadline = Instant::now() + Duration::from_secs(300);
+        loop {
+            let progress = tokio::time::timeout_at(
+                deadline,
+                Box::pin(generations::catch_up_one(&authority, id)),
+            )
+            .await??;
+            atomic_json(&config.output.join("index-preparation.json"), &progress)?;
+            if progress["remaining"] == 0 {
+                break progress;
+            }
+        }
+    } else {
+        Value::Null
+    };
     let log = BufWriter::new(File::create_new(config.output.join("requests.jsonl"))?);
     let samples = BufWriter::new(File::create_new(config.output.join("metrics.jsonl"))?);
     let shared = Arc::new(Shared {
@@ -548,6 +671,8 @@ async fn run_open(
         metrics: Mutex::new(Metrics::default()),
         log: Mutex::new(log),
         samples: Mutex::new(samples),
+        bundle,
+        derived: Mutex::new(derived),
     });
     let mut tasks = JoinSet::new();
     for id in 0..100 {
@@ -555,6 +680,29 @@ async fn run_open(
     }
     let mut tick = tokio::time::interval(Duration::from_secs(1));
     let mut failures = Vec::new();
+    let indexing_done = Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let indexer = shared.config.generation.map(|id| {
+        let shared = shared.clone();
+        let done = indexing_done.clone();
+        tokio::spawn(async move {
+            loop {
+                let progress = Box::pin(generations::catch_up_one(&shared.authority, id)).await?;
+                let caught_up = progress["remaining"] == 0;
+                *shared
+                    .derived
+                    .lock()
+                    .map_err(|_| "derived progress poisoned")? = progress;
+                if caught_up {
+                    if done.load(Ordering::Acquire) {
+                        return Ok::<_, Error>(());
+                    }
+                    tokio::time::sleep(Duration::from_millis(50)).await;
+                } else {
+                    tokio::task::yield_now().await;
+                }
+            }
+        })
+    });
     while !tasks.is_empty() {
         tokio::select! {
             _=tick.tick()=>{shared.checkpoint(false)?;},
@@ -566,35 +714,59 @@ async fn run_open(
     if shared.config.phase == "steady" {
         tokio::time::sleep_until(shared.start + Duration::from_secs(shared.config.seconds)).await;
     }
+    indexing_done.store(true, Ordering::Release);
+    if let Some(mut indexer) = indexer {
+        let deadline = shared.start + Duration::from_secs(shared.config.seconds + 300);
+        match tokio::time::timeout_at(deadline, &mut indexer).await {
+            Ok(Ok(Ok(()))) => {}
+            Ok(Ok(Err(error))) => failures.push(format!("indexer failed: {error}")),
+            Ok(Err(error)) => failures.push(format!("indexer task failed: {error}")),
+            Err(_) => {
+                indexer.abort();
+                let _ = indexer.await;
+                failures.push(
+                    "indexing drain exceeded 300 seconds; persisted work remains pending".into(),
+                );
+            }
+        }
+    }
     let snapshot = shared.checkpoint(true)?;
     let drain = (shared.start.elapsed().as_secs_f64() - shared.config.seconds as f64).max(0.0);
-    let metrics = shared.metrics.lock().map_err(|_| "metrics poisoned")?;
-    if metrics.clients.contains(&0) {
-        failures.push("some of the 100 clients completed no request".into());
-    }
-    for (i, tally) in metrics.tallies.iter().enumerate() {
-        if tally.errors > 0 {
-            failures.push(format!("{}: {} errors", KINDS[i], tally.errors));
+    {
+        let metrics = shared.metrics.lock().map_err(|_| "metrics poisoned")?;
+        if metrics.clients.contains(&0) {
+            failures.push("some of the 100 clients completed no request".into());
         }
-        if shared.config.phase == "steady" {
-            if tally.within_window as f64 / (shared.config.seconds as f64) < MIN_RATES[i] {
-                failures.push(format!("{} minimum successful rate missed", KINDS[i]));
+        for (i, tally) in metrics.tallies.iter().enumerate() {
+            if tally.errors > 0 {
+                failures.push(format!("{}: {} errors", KINDS[i], tally.errors));
             }
-            if snapshot["operations"][KINDS[i]]["p95_upper_ms"]
-                .as_u64()
-                .is_none_or(|ms| ms > P95_MS[i])
-            {
-                failures.push(format!("{} P95 exceeded", KINDS[i]));
+            if shared.config.phase == "steady" {
+                if tally.within_window as f64 / (shared.config.seconds as f64) < MIN_RATES[i] {
+                    failures.push(format!("{} minimum successful rate missed", KINDS[i]));
+                }
+                if snapshot["operations"][KINDS[i]]["p95_upper_ms"]
+                    .as_u64()
+                    .is_none_or(|ms| ms > P95_MS[i])
+                {
+                    failures.push(format!("{} P95 exceeded", KINDS[i]));
+                }
             }
         }
+        if drain > 300.0 {
+            failures.push("overload drain exceeded 300 seconds".into());
+        }
     }
-    if drain > 300.0 {
-        failures.push("overload drain exceeded 300 seconds".into());
+    if let Some(id) = shared.config.generation {
+        atomic_json(
+            &shared.config.output.join("derived-oracle.json"),
+            &Box::pin(shared.derived_oracle(id)).await?,
+        )?;
     }
-    drop(metrics);
     let result = json!({"status":if failures.is_empty(){"passed"}else{"failed"},"diagnostic":shared.config.diagnostic,"phase":shared.config.phase,
         "snapshot":snapshot,"drain_s":drain,"failures":failures,
-        "not_tested":["derived_watermarks","live_permission_revocation","correction_of_search_candidates","RSS_thresholds_checked_by_outer_observer"]});
+        "not_tested":["live_permission_revocation","correction_of_search_candidates","RSS_thresholds_checked_by_outer_observer"],
+        "generation_workload":shared.config.generation});
     atomic_json(&shared.config.output.join("result.json"), &result)?;
     if !failures.is_empty() {
         return Err(format!("workload failed: {result}").into());

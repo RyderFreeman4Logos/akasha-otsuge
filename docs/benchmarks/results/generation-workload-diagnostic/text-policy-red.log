@@ -1,0 +1,22 @@
+   Compiling akasha-helix-probe v0.0.0 (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix)
+    Finished `release` profile [optimized] target(s) in 27.35s
+     Running unittests src/main.rs (target/storage-spike/release/deps/akasha_helix_probe-23e0d933abb571b5)
+
+running 1 test
+test authority::change_tests::text_policy_is_explicit_without_changing_legacy_request_hashes ... FAILED
+
+failures:
+
+---- authority::change_tests::text_policy_is_explicit_without_changing_legacy_request_hashes stdout ----
+
+thread 'authority::change_tests::text_policy_is_explicit_without_changing_legacy_request_hashes' (4069714) panicked at src/authority.rs:978:67:
+called `Result::unwrap()` on an `Err` value: Error("unknown field `text_only`, expected one of `request_id`, `memory`, `expected`, `scope`, `active`, `body`", line: 0, column: 0)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    authority::change_tests::text_policy_is_explicit_without_changing_legacy_request_hashes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin akasha-helix-probe`

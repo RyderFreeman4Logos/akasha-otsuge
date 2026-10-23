@@ -103,7 +103,10 @@ async fn main() -> Result<(), Error> {
         println!("{}", result?);
         return Ok(());
     }
-    if args[2] == "--oracle-seed" || args[2] == "--oracle-verify" {
+    if matches!(
+        args[2].to_str(),
+        Some("--oracle-seed" | "--oracle-verify" | "--oracle-seed-text" | "--oracle-verify-text")
+    ) {
         let count = args
             .get(3)
             .and_then(|v| v.to_str())
@@ -122,10 +125,11 @@ async fn main() -> Result<(), Error> {
             "{}-{count}.json",
             args[2].to_string_lossy().trim_start_matches('-')
         ));
-        let result = if args[2] == "--oracle-seed" {
-            authority::seed(&authority, count, &progress).await
+        let text_only = args[2].to_string_lossy().ends_with("-text");
+        let result = if args[2].to_string_lossy().starts_with("--oracle-seed") {
+            authority::seed(&authority, count, &progress, text_only).await
         } else {
-            authority::verify(&authority, count, &progress).await
+            authority::verify(&authority, count, &progress, text_only).await
         };
         authority.engine.close().await?;
         println!("{}", result?);

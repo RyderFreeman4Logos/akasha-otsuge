@@ -22,6 +22,8 @@ pub struct Change {
     pub scope: u8,
     pub active: bool,
     pub body: String,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub text_only: bool,
 }
 
 pub struct Authority {
@@ -180,7 +182,7 @@ impl Authority {
         let statement = format!(
             "MATCH (c:Counter {{key:'global'}}) WHERE c.seq=$before \
              {head_clause} SET c.seq=$seq,h.seq=$seq,h.scope=$scope,h.active=$active \
-             CREATE (:Revision {{order:$order,memory:$memory,seq:$seq,previous:$expected,scope:$scope,active:$active,body:$body}}), \
+             CREATE (:Revision {{order:$order,memory:$memory,seq:$seq,previous:$expected,scope:$scope,active:$active,body:$body,text_only:$text_only}}), \
                     (:Receipt {{key:$request,hash:$hash,result:$receipt,seq:$seq}}), \
                     (:Job {{seq:$seq,revision:$order,config_generation:1,status:'pending'}}) \
              {member_clause} RETURN c.seq"
@@ -193,7 +195,7 @@ impl Authority {
                     "before":before,"seq":seq,"memory":change.memory,"expected":change.expected,
                     "scope":change.scope,"active":change.active,"body":change.body,"order":order,
                     "request":change.request_id,"hash":digest,"receipt":receipt.to_string(),
-                    "membership":membership,
+                    "membership":membership,"text_only":change.text_only,
                 })),
                 None,
             )
@@ -793,6 +795,7 @@ pub fn oracle_change(seq: u64) -> Change {
         expected: seq.saturating_sub(ORACLE_MEMORIES),
         scope: ((memory + round) % 8) as u8,
         active: round % 4 != 1,
+        text_only: false,
         body: format!(
             "Synthetic oracle only; excluded from corpus bytes. Memory {memory}, revision round {round}."
         ),
@@ -831,14 +834,20 @@ fn checkpoint(
     Ok(())
 }
 
-pub async fn seed(authority: &Authority, count: u64, progress: &Path) -> Result<Value, Error> {
+pub async fn seed(
+    authority: &Authority,
+    count: u64,
+    progress: &Path,
+    text_only: bool,
+) -> Result<Value, Error> {
     if count == 0 || count > 1_000_000 {
         return Err("oracle count must be in 1..=1000000".into());
     }
     let started = std::time::Instant::now();
     checkpoint(progress, "oracle_seed", 0, count, started)?;
     for seq in 1..=count {
-        let change = oracle_change(seq);
+        let mut change = oracle_change(seq);
+        change.text_only = text_only;
         let receipt = authority.apply(&change).await?;
         if receipt["commit_seq"] != seq {
             return Err(format!("unexpected oracle receipt at {seq}: {receipt}").into());
@@ -853,16 +862,22 @@ pub async fn seed(authority: &Authority, count: u64, progress: &Path) -> Result<
     }
     checkpoint(progress, "oracle_seeded", count, count, started)?;
     Ok(
-        json!({"phase":"oracle_seeded","changes":count,"version":1,"seconds":started.elapsed().as_secs_f64()}),
+        json!({"phase":"oracle_seeded","changes":count,"version":1,"text_only":text_only,"seconds":started.elapsed().as_secs_f64()}),
     )
 }
 
-pub async fn verify(authority: &Authority, count: u64, progress: &Path) -> Result<Value, Error> {
+pub async fn verify(
+    authority: &Authority,
+    count: u64,
+    progress: &Path,
+    text_only: bool,
+) -> Result<Value, Error> {
     if count == 0 || count > 1_000_000 {
         return Err("invalid oracle count".into());
     }
     let started = std::time::Instant::now();
-    let first = oracle_change(1);
+    let mut first = oracle_change(1);
+    first.text_only = text_only;
     let receipt = authority.apply(&first).await?;
     assert_eq!(
         receipt["commit_seq"], 1,
@@ -917,13 +932,24 @@ pub async fn verify(authority: &Authority, count: u64, progress: &Path) -> Resul
             let mut cursor = None;
             loop {
                 let page = authority.state(scope, at, cursor, 100).await?;
+                let rows = page["entries"].as_array().ok_or("invalid page")?;
                 actual.extend(
-                    page["entries"]
-                        .as_array()
-                        .ok_or("invalid page")?
-                        .iter()
+                    rows.iter()
+                        .filter(|row| {
+                            row["memory"]
+                                .as_u64()
+                                .is_some_and(|id| id < ORACLE_MEMORIES)
+                        })
                         .cloned(),
                 );
+                // Imported revision-zero records have a separate source-content oracle.
+                if rows.iter().any(|row| {
+                    row["memory"]
+                        .as_u64()
+                        .is_some_and(|id| id >= ORACLE_MEMORIES)
+                }) {
+                    break;
+                }
                 let next = page["next"].as_u64();
                 if let Some(next) = next {
                     assert!(
@@ -959,9 +985,26 @@ pub async fn verify(authority: &Authority, count: u64, progress: &Path) -> Resul
     }
     checkpoint(progress, "oracle_verified", checks, total, started)?;
     Ok(
-        json!({"phase":"oracle_verified","changes":count,"checks":checks,"seconds":started.elapsed().as_secs_f64(),
+        json!({"phase":"oracle_verified","changes":count,"checks":checks,"text_only":text_only,"memory_domain":[0,ORACLE_MEMORIES],"seconds":started.elapsed().as_secs_f64(),
         "not_tested":["50GB","100_clients","derived_watermark","live_permission_revocation"]}),
     )
+}
+
+#[cfg(test)]
+mod change_tests {
+    use super::*;
+
+    #[test]
+    fn text_policy_is_explicit_without_changing_legacy_request_hashes() {
+        let legacy = r#"{"request_id":"policy","memory":1,"expected":0,"scope":0,"active":true,"body":"original"}"#;
+        let change: Change = serde_json::from_str(legacy).unwrap();
+        assert_eq!(serde_json::to_string(&change).unwrap(), legacy);
+        let mut text: Value = serde_json::from_str(legacy).unwrap();
+        text["text_only"] = json!(true);
+        let change: Change = serde_json::from_value(text.clone()).unwrap();
+        assert_eq!(serde_json::to_value(&change).unwrap(), text);
+        assert_ne!(serde_json::to_string(&change).unwrap(), legacy);
+    }
 }
 
 #[cfg(test)]
@@ -1006,6 +1049,7 @@ mod history_concurrency_tests {
                     scope: 0,
                     active: true,
                     body: format!("Synthetic history race {memory}"),
+                    text_only: false,
                 })
                 .await
                 .unwrap();
@@ -1034,6 +1078,7 @@ mod history_concurrency_tests {
                     scope: 0,
                     active: true,
                     body: "Synthetic change during historical page".into(),
+                    text_only: false,
                 })
                 .await
         });

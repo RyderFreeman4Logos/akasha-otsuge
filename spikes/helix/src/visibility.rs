@@ -93,6 +93,7 @@ pub async fn probe(authority: &Authority, fixture: &Path, verify: bool) -> Resul
                     scope: next_scope,
                     active,
                     body: body.to_owned(),
+                    text_only: false,
                 })
                 .await?;
             assert_eq!(result["commit_seq"], expected + 1);

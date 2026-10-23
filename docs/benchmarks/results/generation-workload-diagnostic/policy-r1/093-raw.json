@@ -1,0 +1,1 @@
+{"op": "raw", "cypher": "MATCH (p:IndexState {key:'active'}) SET p.generation=0"}

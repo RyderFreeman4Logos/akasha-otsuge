@@ -85,6 +85,11 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       A 96-command revision-only diagnostic passes real text/vector reads,
       provenance rejection, four process-crash barriers, activation and bounded
       prefix advancement; the full-size obligations below remain open.
+      The extended 106-command fixture verifies persisted text-only policy and
+      not-required vector completion. A separate eight-source-document generation
+      runs 100 clients for 60 seconds with background indexing, reaches both
+      watermarks without gaps and passes independent derived-content/job-count
+      verification. Full-size execution and concurrent rebuild remain required.
 - [ ] Backfill the full corpus into a candidate generation with resumable coverage
       accounting. The explicit corpus-generation path has bounded atomic cursor
       batches and native fixture coverage; full-size execution remains pending.

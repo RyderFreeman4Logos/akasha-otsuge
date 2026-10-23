@@ -22,7 +22,7 @@ def main():
     rows = [json.loads(line) for line in source.read_text().splitlines()]
     assert len(rows)==8
     records=[]
-    planned_commands=96
+    planned_commands=106
     publish(output/'admission.json',{'controller':process_identity(os.getpid()),'binary_sha256':digest(binary),'harness_sha256':digest(pathlib.Path(__file__)),'source_sha256':digest(source),'planned_commands':planned_commands})
     started=time.monotonic()
     with tempfile.TemporaryDirectory(prefix='akasha-generations-') as directory:
@@ -138,6 +138,19 @@ def main():
         changed={'model':'wrong-model','model_fingerprint':fingerprint,'body_sha256':hashlib.sha256(rows[0]['body'].encode()).hexdigest(),'values':rows[0]['embedding']}
         invoke({'op':'apply','generation':2,'family':'vector','seq':6,'vector':changed},failure=True)
         invoke({'op':'query','generation':2,'bundle':{**bundle,'schema':2,'model_fingerprint':'0'*64},'principal':'reader','scope':0,'vector':rows[0]['embedding']},failure=True)
+        text_change={'request_id':'g-8','memory':1,'expected':6,'scope':int(rows[0]['partition'][1]),'active':True,'body':rows[0]['body'],'text_only':True}
+        assert invoke({'op':'commit','change':text_change})['commit_seq']==8
+        apply(2,'text',8)
+        apply(2,'vector',8,0,failure=True)
+        assert apply(2,'vector',8)['reason']=='not_required'
+        policy_receipt=receipt(8,2)
+        assert policy_receipt['stage']=='indexed' and policy_receipt['reasons']=={'text':'applied','vector':'not_required'}
+        assert policy_receipt['watermarks']=={'text':8,'vector':8}
+        assert query(2,schema=2)['hits']==[]
+        assert query(2,text=True,schema=2)['hits'][0]['seq']==8
+        assert invoke({'op':'raw','cypher':'MATCH (r:Revision {seq:8}) RETURN r.text_only'})['rows']==[[True]]
+        assert invoke({'op':'commit','change':{**text_change,'text_only':False}})=={'conflict':'idempotency'}
+        assert invoke({'op':'commit','change':text_change})['commit_seq']==8
         invoke({'op':'raw','cypher':"MATCH (p:IndexState {key:'active'}) SET p.generation=0"})
         invoke({'op':'status'},failure=True)
         invoke({'op':'raw','cypher':"MATCH (p:IndexState {key:'active'}) SET p.generation=2"})
