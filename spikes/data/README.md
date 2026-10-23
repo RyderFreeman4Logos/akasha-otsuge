@@ -58,3 +58,19 @@ bounded retries for transient transport errors, HTTP 429 and 5xx; each file reco
 the policy hash. A failed file is recorded while other files finish. Partial and
 failed receipts are retained. Verified downloads are preparation, not indexed
 benchmark coverage. ETA remains unavailable across unequal shard sizes.
+
+## Reproducible full-corpus stream
+
+`prepare_corpus.py scan DIRECTORY VECTOR_SHARDS TEXT_SHARDS NEW_MANIFEST` checks
+source hashes, deduplicates content and counts real UTF-8 bytes and float32 vectors.
+Long text is split on UTF-8 boundaries into at most 64 KiB records. Added title/text
+separators are excluded from eligible bytes. All vectors precede text shards; text
+stops once eligible content reaches 50,000,000,000 bytes. Smaller input produces an
+explicitly diagnostic manifest. Synthetic revision-oracle text never contributes.
+
+`prepare_corpus.py stream DIRECTORY MANIFEST` reproduces the same stream without
+retaining another large JSONL file. It rejects code/environment drift before
+output and verifies the complete statistics and stream hash at EOF. Consumers
+must reject an import if the producer fails; receiving a prefix is not acceptance.
+Run these commands with the pinned private PyArrow environment. Corpus preparation
+memory is separate from measured database RSS. Neither command claims indexing.
