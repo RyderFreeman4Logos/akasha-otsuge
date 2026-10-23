@@ -54,7 +54,8 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
 - [ ] Finish the full corpus import. The first attempt stopped at its disk
       reservation after about 4.7 million documents; the durable prefix remains.
       Native Zstd continuation and journaled run transfer are verified on small
-      fixtures. More writable capacity is required before full-size continuation.
+      fixtures. After exact owned-fixture cleanup, explicit compressed continuation
+      was admitted; its first phase verifies the retained 4,723,072-record prefix.
 - [ ] Observe full-size hot/cold read coverage; partition labels and process
       restart alone do not prove file-cache coldness.
 - [ ] Index every declared searchable text/vector record at full size.
@@ -72,6 +73,13 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       heads. Full-size coverage and the generation lifecycle remain required.
 - [ ] Verify generation-specific indexed receipts and gap-free watermarks,
       concurrent writes/reindex, failed-build rollback and model separation.
+      A 96-command revision-only diagnostic passes real text/vector reads,
+      provenance rejection, four process-crash barriers, activation and bounded
+      prefix advancement; the full-size obligations below remain open.
+- [ ] Backfill the full corpus into a candidate generation with resumable coverage
+      accounting; the revision-only generation diagnostic refuses imported data.
+- [ ] Measure and enforce disk admission for ordinary indexed writes and reindex,
+      including retained native text splits; verify the explicit rebuild bound.
 - [ ] Test low-budget reopen of full data/backlog/interrupted builds and
       2GiB-to-512MiB draining with original work deadlines preserved.
 - [ ] Test all required commit/index/watermark/activation crash barriers,

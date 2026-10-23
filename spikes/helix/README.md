@@ -253,6 +253,31 @@ an orphaned revision beyond the global commit counter. Each
 observed command has its own cgroup. This is a functional diagnostic, not a
 full-scale, physical-file-corruption or sustained-profile acceptance result.
 
+`check_generations.py PROBE PUBLIC_EIGHT_DOCUMENT_SUBSET NEW_EVIDENCE` drives
+`--generation REQUEST_JSON` in separate native processes. A committed outbox
+record identifies its configuration generation; completion records separately
+bind the source sequence, target index generation and text/vector family.
+Out-of-order completions cannot advance a watermark across a gap. One `advance`
+request processes at most 256 records under the writer lock; callers can repeat
+it between other admitted work. Indexed receipts report both family watermarks
+and the native strong-search contract, including its bounded pending overlay.
+
+Bundles bind the model name and immutable source fingerprint, dimension, chunker
+and schema. Vector output must match that bundle and the exact source body hash.
+Activation changes the bundle pointer atomically only after both families cover
+the current commit point. Failed candidate builds leave the old bundle readable;
+retained old bundles still revalidate current heads and permissions. Deliberate
+process kills bracket index application, watermark publication and activation.
+The ordinary write in the build fixture occurs between native text and vector
+build phases; it is not a full-size concurrent-build throughput measurement.
+
+This probe covers authority revisions only and explicitly refuses an imported
+`Document` corpus until resumable backfill and its coverage accounting exist.
+It admits at most two generation identities over the database lifetime. This
+is an explicit rebuild limit because the pinned engine does not reclaim native
+text split blobs, not a claim of garbage collection. Full-size disk admission,
+backfill, concurrent reindex performance and physical corruption remain pending.
+
 The [visibility diagnostic receipts](../../docs/benchmarks/results/visibility-diagnostic/summary.json)
 retain the serial-validation failure (write P95 9,316 ms), the batch-read fix and
 the unchanged 60-second, 100-client workload: 1,698 requests, 12.12 writes/s,

@@ -26,7 +26,7 @@ pub struct Change {
 
 pub struct Authority {
     pub engine: Engine,
-    writer: Mutex<()>,
+    pub(crate) writer: Mutex<()>,
 }
 
 impl Authority {
@@ -159,7 +159,7 @@ impl Authority {
              {head_clause} SET c.seq=$seq,h.seq=$seq,h.scope=$scope,h.active=$active \
              CREATE (:Revision {{order:$order,memory:$memory,seq:$seq,previous:$expected,scope:$scope,active:$active,body:$body}}), \
                     (:Receipt {{key:$request,hash:$hash,result:$receipt,seq:$seq}}), \
-                    (:Job {{seq:$seq,revision:$order,generation:1,status:'pending'}}) \
+                    (:Job {{seq:$seq,revision:$order,config_generation:1,status:'pending'}}) \
              {member_clause} RETURN c.seq"
         );
         let result = self
@@ -285,7 +285,11 @@ impl Authority {
         Ok(revision)
     }
 
-    async fn checked_heads(&self, memories: &[u64], at: u64) -> Result<Vec<Option<Value>>, Error> {
+    pub(crate) async fn checked_heads(
+        &self,
+        memories: &[u64],
+        at: u64,
+    ) -> Result<Vec<Option<Value>>, Error> {
         if memories.len() > 20 {
             return Err("head validation exceeds top-20 bound".into());
         }
@@ -567,7 +571,7 @@ fn permission_key(principal: &str, scope: u8) -> Result<String, Error> {
     Ok(format!("{principal}/{scope}"))
 }
 
-fn params(value: Value) -> BTreeMap<String, Value> {
+pub(crate) fn params(value: Value) -> BTreeMap<String, Value> {
     value
         .as_object()
         .expect("literal parameter object")

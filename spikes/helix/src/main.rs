@@ -7,6 +7,7 @@ use std::{io::Write, path::PathBuf};
 
 mod authority;
 mod engine;
+mod generations;
 
 mod indexes;
 mod load;
@@ -33,6 +34,22 @@ async fn main() -> Result<(), Error> {
     }
     if args.len() > 4 {
         return Err("unexpected extra argument".into());
+    }
+    if args[2] == "--generation" {
+        let request = args.get(3).ok_or("--generation requires a request path")?;
+        let client = Engine::open_with_config(
+            HelixDbSource::Disk {
+                root: PathBuf::from(&args[1]),
+                database: "akasha-storage-spike".into(),
+            },
+            config()?,
+        )
+        .await?;
+        let authority = authority::Authority::open(client).await?;
+        let result = Box::pin(generations::run(&authority, &PathBuf::from(request))).await;
+        authority.engine.close().await?;
+        println!("{}", result?);
+        return Ok(());
     }
     if args[2] == "--workload" {
         return workload::run(
