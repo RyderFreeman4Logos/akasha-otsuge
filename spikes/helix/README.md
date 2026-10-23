@@ -358,6 +358,33 @@ is an explicit rebuild limit because the pinned engine does not reclaim native
 text split blobs, not a claim of garbage collection. Full-size disk admission,
 backfill execution, concurrent reindex performance and physical corruption remain pending.
 
+`run_generation.py CONFIG [--resume]` observes one immutable generation operation.
+The TOML has `run.id/profile/seconds`, `paths.binary/database/request/output`,
+`disk.start_bytes/reserve_bytes` and `reliability.max_attempts = 1`. The request
+is an existing `begin_corpus`, `backfill`, `build`, `catch_up` or `activate` JSON.
+It verifies the completed import receipt, excludes simultaneous case owners,
+retains the executed binary and exact request/manifest/config snapshots, and
+observes the dedicated cgroup and native cursor.
+Disk polling preserves the configured reserve; this is not native per-write
+space admission. Full runs retain the frozen current/next-index plan plus scratch
+and 30 GiB free. Resource changes belong to a later operation config, not a live
+case. No network or automatic operation retries are involved.
+
+The [runner diagnostic](../../docs/benchmarks/results/generation-runner-diagnostic/summary.json)
+kills the controller after a real native backfill commit, refuses the still-live
+child and a new workload, then kills that exact child and resumes the committed
+cursor. Completion reuse, changed request rejection and an insufficient-space
+preflight pass; eight source rows remain exactly eight. Raw failed/prelaunch
+records are retained. `check_generation_runner.py PROBE EIGHT_SOURCE_RUN OUTPUT`
+reproduces the checks with the generation-workload fixture's inputs.
+
+The [complete import receipt](../../docs/benchmarks/results/full-import-zstd-v1/summary.json)
+verifies the entire prepared stream and 11,428,831 documents. The compressed
+continuation, including prefix verification, took 12,557 seconds with high-profile
+RSS maximum 886,087,680 bytes. The closed database occupied 48,987,971,584 allocated
+bytes; this single observation does not isolate compression from compaction or
+reopen effects. Full derived indexes and sustained workload acceptance remain open.
+
 The [visibility diagnostic receipts](../../docs/benchmarks/results/visibility-diagnostic/summary.json)
 retain the serial-validation failure (write P95 9,316 ms), the batch-read fix and
 the unchanged 60-second, 100-client workload: 1,698 requests, 12.12 writes/s,

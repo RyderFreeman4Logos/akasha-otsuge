@@ -1,0 +1,15 @@
+[run]
+id = "generation-work-eb22b6a88fe1"
+profile = "low"
+phase = "steady"
+seconds = 60
+diagnostic = true
+generation = 1
+[paths]
+binary = "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/generation-workload-r3/probe"
+database = "/tmp/akasha-generation-runner-ijfbq595/database"
+fixture = "/tmp/akasha-otsuge-storage-20261022/generation-workload-r3/queries.json"
+output = "/tmp/akasha-otsuge-storage-20261022/generation-runner-r2/must-not-start-case"
+corpus_manifest = "/tmp/akasha-otsuge-storage-20261022/generation-workload-r3/manifest.json"
+[reliability]
+max_attempts = 1

@@ -12,3 +12,4 @@
 - `docs/benchmarks/results/corpus-views-diagnostic/` 延续上述公开摘录与 synthetic 测试文本，保留当前/历史视图、权限与并发诊断的请求及结果；适用相同来源许可，均不替代完整语料验收。
 - `docs/benchmarks/results/corpus-current-diagnostic/` 复用相同公开摘录、向量和 synthetic 文本，新增固定来源的 current 内容校验及分页诊断；失败运行、临时性能测量源码和最终结果均保留，数据继续适用上述来源许可。
 - `docs/benchmarks/results/generation-workload-diagnostic/` 使用上述八条公开记录及其预计算向量，另有明确排除于语料规模的仅文本历史/负载数据；未调用模型或伪造向量。公开摘录仍遵循上述来源许可。
+- `docs/benchmarks/results/generation-runner-diagnostic/` 复用上述八条公开记录的导入与回填测试，来源许可不变；`full-import-zstd-v1/` 保存完整公开语料导入的命令、哈希和资源观测，不包含私有用户会话。

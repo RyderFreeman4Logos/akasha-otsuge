@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generation_runner.py", line 128, in <module>
+    main()
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generation_runner.py", line 60, in main
+    run('load', [str(binary), str(database), '--load', str(source_run / 'input.jsonl'), str(source_run / 'manifest.json')])
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generation_runner.py", line 34, in run
+    assert result.returncode == expected if expected == 0 else result.returncode != 0, name
+                                                               ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: load

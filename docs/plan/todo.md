@@ -51,11 +51,16 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       streaming import and completed-run reconciliation on diagnostic input.
 - [x] Freeze distributed 3,328-query input and exact ANN top-20 references for
       32 queries against all one million vectors, with source/binary hashes.
-- [ ] Finish the full corpus import. The first attempt stopped at its disk
+- [x] Finish the full corpus import. The first attempt stopped at its disk
       reservation after about 4.7 million documents; the durable prefix remains.
       Native Zstd continuation and journaled run transfer are verified on small
       fixtures. After exact owned-fixture cleanup, explicit compressed continuation
-      was admitted; its first phase verifies the retained 4,723,072-record prefix.
+      was admitted and verified the retained 4,723,072-record prefix. The complete
+      source stream and all 11,428,831 documents now verify, with 50,001,002,783
+      indexed-body bytes (50,000,002,783 eligible unique-content bytes). Its
+      high-profile continuation took 12,557 seconds, RSS maximum 886,087,680B;
+      database allocated size was 48,987,971,584B after close. Indexes and the
+      full-size workloads remain separate acceptance below.
 - [ ] Observe full-size hot/cold read coverage; partition labels and process
       restart alone do not prove file-cache coldness.
 - [ ] Index every declared searchable text/vector record at full size.
@@ -93,6 +98,10 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
 - [ ] Backfill the full corpus into a candidate generation with resumable coverage
       accounting. The explicit corpus-generation path has bounded atomic cursor
       batches and native fixture coverage; full-size execution remains pending.
+      A dedicated operation controller now checks exclusive import/case ownership,
+      disk reservations, exact binary identity and explicit resume. Native
+      controller-crash/live-child refusal and committed-cursor reuse pass; the
+      full-size generation initialization is running under the retained probe.
 - [ ] Measure and enforce disk admission for ordinary indexed writes and reindex,
       including retained native text splits; verify the explicit rebuild bound.
 - [ ] Test low-budget reopen of full data/backlog/interrupted builds and

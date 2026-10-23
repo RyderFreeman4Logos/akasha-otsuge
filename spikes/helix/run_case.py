@@ -197,6 +197,11 @@ def main():
     # One controller owns this database; the durable pointer survives its death.
     owner_lock = (root / ".akasha-case-owner.lock").open("a")
     fcntl.flock(owner_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    generation_owner = root / ".akasha-generation-owner.json"
+    if generation_owner.exists():
+        prior = json.loads((pathlib.Path(json.loads(generation_owner.read_text())["output"]) / "state.json").read_text())
+        if prior["phase"] != "completed":
+            raise ValueError("generation operation must be reconciled before starting a workload")
     owner_path = root / ".akasha-case-owner.json"
     if owner_path.exists():
         owner = json.loads(owner_path.read_text())

@@ -1,0 +1,112 @@
+{
+  "adoption": {
+    "binary_sha256": "18b13ffbdea345996121bdac8ad0515f8f57e0b37a7385091252696f86576991",
+    "complete": true,
+    "progress_sha256": "4485a392748340826e7818ac48c5999be5a636680a7b46c589d97ac530f8242f",
+    "run": "/tmp/akasha-otsuge-storage-20261022/full-import-v1",
+    "state_sha256": "6842ead5234a87aaba8430e6fd720648b92b073b8d46ea1b493ecd2224b9b2fa"
+  },
+  "attempts": [
+    {
+      "consumer_command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=43200",
+        "--unit=akasha-import-66fad502824f47adadd68d76e3919405",
+        "-p",
+        "MemoryMax=2147483648",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=high",
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/full-import-zstd-v1/66fad502824f47adadd68d76e3919405/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/full-import-zstd-v1/probe",
+        "/tmp/akasha-otsuge-storage-20261022/full-import-zstd-v1/database",
+        "--resume-load",
+        "/dev/stdin",
+        "/tmp/akasha-otsuge-storage-20261022/full-corpus-v2.json"
+      ],
+      "consumer_exit": 0,
+      "elapsed_seconds": 12557.003977064975,
+      "failure": null,
+      "id": "66fad502824f47adadd68d76e3919405",
+      "phase": "completed",
+      "producer_command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=43200",
+        "--unit=akasha-stream-66fad502824f47adadd68d76e3919405",
+        "-p",
+        "MemoryMax=8589934592",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/data-env/bin/python",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/data/prepare_corpus.py",
+        "stream",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/corpus-full-v1",
+        "/tmp/akasha-otsuge-storage-20261022/full-corpus-v2.json"
+      ],
+      "producer_exit": 0,
+      "started_unix_s": 1792752395.0528007,
+      "units": [
+        "akasha-stream-66fad502824f47adadd68d76e3919405",
+        "akasha-import-66fad502824f47adadd68d76e3919405"
+      ]
+    }
+  ],
+  "binary_sha256": "c694650e219fc4e20d1cd06e4933096cae421a1d9bac5668bd1b0b392b86318e",
+  "controller": {
+    "pid": 3803343,
+    "start_ticks": "457029183",
+    "state": "R"
+  },
+  "identity": {
+    "controller_sha256": "87d005878e0e3c2d27be859493b4255ad1d67ecf1b7dda3bde87284b9885098f",
+    "data_python": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/data-env/bin/python",
+    "disk_plan": {
+      "authority_bytes": 75000000000,
+      "current_index_bytes": 45000000000,
+      "free_reserve_bytes": 32212254720,
+      "next_index_bytes": 45000000000,
+      "scratch_bytes": 4000000000
+    },
+    "engine_memory_max": 2147483648,
+    "input": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/corpus-full-v1",
+    "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+    "observer_sha256": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029",
+    "preparer_sha256": "d222cf1ee8601aa6f7e35832b7065a9534fbfeb7995a7bbf77059c1aa9748b02",
+    "producer_memory_max": 8589934592,
+    "profile": "high",
+    "runtime_max_seconds": 43200
+  },
+  "phase": "completed",
+  "result": {
+    "acceptance": "not_run",
+    "artifact_sha256": {
+      "66fad502824f47adadd68d76e3919405/consumer.log": "e9fb39e005df980a15ca03f688fa9fab212e68e2dedf06ce570925d137fb69a8",
+      "66fad502824f47adadd68d76e3919405/memory.jsonl": "cd1ac7f6693b17e28395d0e6033e9b92dec28ff484a16c4f783bd4656c8cb7a6",
+      "66fad502824f47adadd68d76e3919405/producer.log": "5548cd1b19a94425748b2a4e26ac0240573187192a5d23ce9563dd111fcb08c4",
+      "database/import-progress.json": "4957586fe81af39bba2d0cd2b0a0df3ea50b1b3ee4b5d4b487dab99110f0a271"
+    },
+    "attempt": "66fad502824f47adadd68d76e3919405",
+    "binary_sha256": "c694650e219fc4e20d1cd06e4933096cae421a1d9bac5668bd1b0b392b86318e",
+    "documents": 11428831,
+    "elapsed_seconds": 12557.003977064975,
+    "failure": null,
+    "indexes": "not_built",
+    "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+    "status": "passed"
+  }
+}

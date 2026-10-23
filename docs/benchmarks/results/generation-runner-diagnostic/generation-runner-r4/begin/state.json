@@ -1,0 +1,101 @@
+{
+  "attempts": [
+    {
+      "command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "--unit=akasha-generation-ab55d9f86e2342968802c3669876ec00",
+        "-p",
+        "MemoryMax=671088640",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=180",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=low",
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/begin/ab55d9f86e2342968802c3669876ec00/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/begin/probe",
+        "/tmp/akasha-generation-runner-ctm4mzz7/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/begin/request.json"
+      ],
+      "id": "ab55d9f86e2342968802c3669876ec00",
+      "log": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/begin/ab55d9f86e2342968802c3669876ec00/engine.log",
+      "phase": "completed",
+      "result": {
+        "artifact_sha256": {
+          "ab55d9f86e2342968802c3669876ec00/engine.log": "bd90b1f060516d139ae01138ff931abec6367bd78a28b5f20a41dd0e64ec41b3",
+          "ab55d9f86e2342968802c3669876ec00/memory.jsonl": "10bdd3625b92768a6c009f6d14d75c21472dd9bbfdd9e00e136b6f07cb395ab0",
+          "config.toml": "aa8fbaaa4947b485c0f22c97adb9cf4942c92d4db149dfbb38ddbf4bca92d460",
+          "manifest.json": "86383ee70a53cbe7203d61cc5aef720b2f10f526162bf6548b42ed09a2422dfc",
+          "request.json": "71a951fc2082d42bbf87eb512d8ed4403777c516d72b63e231d61de9a13f7255"
+        },
+        "elapsed_s": 4.028090267442167,
+        "exit": 0,
+        "failure": null,
+        "generation": 1,
+        "operation": "begin_corpus",
+        "status": "passed"
+      },
+      "started_unix_s": 1792766143.8515432,
+      "unit": "akasha-generation-ab55d9f86e2342968802c3669876ec00"
+    }
+  ],
+  "config_epoch": 1,
+  "controller": {
+    "pid": 4177270,
+    "start_ticks": "458404074",
+    "state": "R"
+  },
+  "identity": {
+    "binary_sha256": "1ee2001a5f77fc03db30cf8e87a4f8181d35aa6091193a62a766d69966c5b249",
+    "config": {
+      "disk": {
+        "reserve_bytes": 36212254720,
+        "start_bytes": 81212254720
+      },
+      "paths": {
+        "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/generation-workload-r3/probe",
+        "database": "/tmp/akasha-generation-runner-ctm4mzz7/database",
+        "output": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/begin",
+        "request": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/begin.json"
+      },
+      "reliability": {
+        "max_attempts": 1
+      },
+      "run": {
+        "id": "begin",
+        "profile": "low",
+        "seconds": 180
+      }
+    },
+    "controller_sha256": "c569cdd5054f20d8e292dcfb30f7a1ca8ea0dc57bd0a53bdb73895366a5b2770",
+    "execution_request_sha256": "71a951fc2082d42bbf87eb512d8ed4403777c516d72b63e231d61de9a13f7255",
+    "helpers_sha256": "c647b72392641f7626c718f479e7da4b001a2aca5bbf802465e0e6bfed95ca21",
+    "manifest_sha256": "86383ee70a53cbe7203d61cc5aef720b2f10f526162bf6548b42ed09a2422dfc",
+    "observer_sha256": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029",
+    "request_sha256": "293b9844810b87950d99ee9f68438d00a6cce1b2c71930adccad20b258db7ec9"
+  },
+  "phase": "completed",
+  "result": {
+    "artifact_sha256": {
+      "ab55d9f86e2342968802c3669876ec00/engine.log": "bd90b1f060516d139ae01138ff931abec6367bd78a28b5f20a41dd0e64ec41b3",
+      "ab55d9f86e2342968802c3669876ec00/memory.jsonl": "10bdd3625b92768a6c009f6d14d75c21472dd9bbfdd9e00e136b6f07cb395ab0",
+      "config.toml": "aa8fbaaa4947b485c0f22c97adb9cf4942c92d4db149dfbb38ddbf4bca92d460",
+      "manifest.json": "86383ee70a53cbe7203d61cc5aef720b2f10f526162bf6548b42ed09a2422dfc",
+      "request.json": "71a951fc2082d42bbf87eb512d8ed4403777c516d72b63e231d61de9a13f7255"
+    },
+    "elapsed_s": 4.028090267442167,
+    "exit": 0,
+    "failure": null,
+    "generation": 1,
+    "operation": "begin_corpus",
+    "status": "passed"
+  }
+}

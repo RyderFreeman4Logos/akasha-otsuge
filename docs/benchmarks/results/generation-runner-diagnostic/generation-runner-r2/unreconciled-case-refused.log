@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_case.py", line 286, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_case.py", line 204, in main
+    raise ValueError("generation operation must be reconciled before starting a workload")
+ValueError: generation operation must be reconciled before starting a workload
