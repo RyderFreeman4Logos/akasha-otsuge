@@ -73,7 +73,17 @@ from process RSS. The observer terminates only its owned child on failure.
 38,462-vector import and its raw memory samples. This first shard is 13,344,347
 indexed UTF-8 body bytes, including 38,462 added title/text separators, far below
 the required full corpus. The first long vector build exhausted its observation
-deadline without completing. No production backend has been selected.
+deadline without completing. Reopening the persistent operation under a 2 GiB
+cgroup completed it in a further 1,201 seconds; the engine retained its original
+32 MiB build cache. The 76,932 reported entities include validation passes over
+38,462 inputs. No production backend has been selected.
+
+`../data/prepare_search_fixture.py FIRST_VECTOR_PARQUET NEW_JSON` verifies the
+pinned shard and selects one real document with a rare term in each partition.
+`--search-corpus FIXTURE_JSON` reopens the database and checks BM25/self-vector
+top-20 inclusion and partition exclusion. All 24 queries passed in 2.32 seconds
+under a 640 MiB cgroup maximum. This is a process reopen, without dropping the
+OS page cache, and not complete recall coverage or a sustained load result.
 
 ## Immutable history and idempotency oracle
 

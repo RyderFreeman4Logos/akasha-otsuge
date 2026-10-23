@@ -14,6 +14,7 @@ mod engine;
 
 mod indexes;
 mod load;
+mod search;
 
 const MIB: u64 = 1024 * 1024;
 
@@ -78,6 +79,23 @@ async fn main() -> Result<(), Error> {
     }
     if args.len() > 4 {
         return Err("unexpected extra argument".into());
+    }
+    if args[2] == "--search-corpus" {
+        let fixture = args
+            .get(3)
+            .ok_or("--search-corpus requires a fixture path")?;
+        let client = Engine::open_with_config(
+            HelixDbSource::Disk {
+                root: PathBuf::from(&args[1]),
+                database: "akasha-storage-spike".into(),
+            },
+            config()?,
+        )
+        .await?;
+        let result = search::verify(&client, &PathBuf::from(fixture)).await;
+        client.close().await?;
+        println!("{}", result?);
+        return Ok(());
     }
     if args[2] == "--oracle-seed" || args[2] == "--oracle-verify" {
         let count = args

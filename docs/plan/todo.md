@@ -43,7 +43,8 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
 - [x] Import 38,462 real 1536-dimensional embeddings (diagnostic only).
 - [x] Correct and instrument the historical query probe; verify 100,000 changes
       and exact contents across revision/retraction/restore/scope boundaries.
-- [ ] Reconcile the interrupted real vector build and validate search coverage.
+- [x] Reconcile the interrupted diagnostic vector build and verify real search
+      in all eight partitions (24 queries); full-size coverage remains below.
 - [ ] Resume public corpus downloads and independently verify all source hashes.
 - [ ] Freeze reproducible >=50GB unique-content / >=1M unique-vector manifest,
       exclusions, hot/cold partitions, oracle identity and disk headroom.
