@@ -49,12 +49,16 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
 - [x] Freeze reproducible >=50GB unique-content / >=1M unique-vector input
       manifest, deduplication/exclusions and import disk reservations; validate
       streaming import and completed-run reconciliation on diagnostic input.
-- [ ] Freeze full-size query/oracle coverage for hot/cold reads; input partition
-      labels alone do not prove cold-cache coverage.
+- [x] Freeze distributed 3,328-query input and exact ANN top-20 references for
+      32 queries against all one million vectors, with source/binary hashes.
+- [ ] Observe full-size hot/cold read coverage; partition labels and process
+      restart alone do not prove file-cache coldness.
 - [ ] Index every declared searchable text/vector record at full size.
 - [x] Implement bounded admission and 100 independent harness clients with actual
       conflicts, durable latency/error records and per-second checkpoints;
       full-size measured cases and recovery remain below.
+      Exact-child SIGKILL after a durable write, refusal of ambiguous replay,
+      explicit abandonment, subsequent execution and prior-receipt reuse pass.
 - [ ] Run >=30 minutes each at 512MiB and 2GiB; meet every frozen rate/latency/RSS
       threshold; include cold reads, burst, overload fairness and bounded drain.
 - [ ] Verify atomic revision/head/receipt/job/sequence commit; request-hash reuse;

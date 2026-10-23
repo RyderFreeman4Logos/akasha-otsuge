@@ -1,0 +1,23 @@
+{
+  "status": "reference_prepared",
+  "full_reference_vectors": 1000000,
+  "full_reference_queries": 32,
+  "small_native_vectors": 38462,
+  "small_native_exact_queries": 32,
+  "small_native_recall_at_20": 1.0,
+  "native_binary_sha256": "e97b7ba3d5b7408590a7ffe1116df03095fa4a7c0939a1b381b36895b2a12b16",
+  "standalone_oracle_rustc": "1.99.1",
+  "compiler_options": [
+    "--edition",
+    "2024",
+    "-O",
+    "-C",
+    "target-cpu=native"
+  ],
+  "full_corpus_native_quality": "not_run",
+  "not_tested": [
+    "full corpus indexing and performance",
+    "cache coldness",
+    "generation/permission recovery"
+  ]
+}

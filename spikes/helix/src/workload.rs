@@ -197,19 +197,24 @@ impl Shared {
                 Ok(current)
             }
             2 | 3 => {
-                let query = &self.fixture.queries[(client + ordinal as usize) % 8];
+                let index = (client * 101 + ordinal as usize * 97) % self.fixture.queries.len();
+                let query = self.fixture.query(index)?;
                 let response =
-                    search::query(&self.authority.engine, query, &query.partition, kind == 3)
+                    search::query(&self.authority.engine, &query, &query.partition, kind == 3)
                         .await?;
                 let hits = response["hits"]
                     .as_array()
                     .ok_or("invalid search response")?;
-                if !hits.iter().any(|hit| hit["key"] == query.key)
+                let self_at_20 = hits.iter().any(|hit| hit["key"] == query.key);
+                if hits.is_empty()
+                    || (!self.fixture.population() && !self_at_20)
                     || hits.iter().any(|hit| hit["partition"] != query.partition)
                 {
                     return Err("real search oracle mismatch".into());
                 }
-                Ok(json!({"hits":hits.len(),"partition":query.partition}))
+                Ok(
+                    json!({"hits":hits,"partition":query.partition,"query_key":query.key,"query_index":index,"self_at_20":self_at_20}),
+                )
             }
             4 => {
                 let scope = ((client as u64 + ordinal) % 8) as u8;
@@ -424,6 +429,14 @@ async fn run_open(
             || manifest["corpus"]["unique_vectors"].as_u64().unwrap_or(0) < 1_000_000
         {
             return Err("corpus does not meet frozen scale".into());
+        }
+        if !fixture.population()
+            || fixture.queries.len() < 1024
+            || fixture.corpus_manifest_sha256.as_deref() != Some(hash(&bytes).as_str())
+        {
+            return Err(
+                "full workload requires a distributed query population bound to its corpus".into(),
+            );
         }
         let state = engine
             .cypher(

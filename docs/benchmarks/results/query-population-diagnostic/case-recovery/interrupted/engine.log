@@ -1,0 +1,13 @@
+Running as unit: akasha-case-0304d6ee6cd54ce980280b9b4c7612fc.service
+ENGINE_PROFILE:{"profile":"low","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"3","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"4","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"5","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"6","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"7","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"8","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"9","kind":"already_active"}}
+Finished with result: exit-code
+Main processes terminated with: code=exited/status=137
+Service runtime: 2.060s
+CPU time consumed: 2.079s

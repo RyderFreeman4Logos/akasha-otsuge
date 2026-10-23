@@ -186,3 +186,36 @@ clients; burst and ten-second overload diagnostics also passed. These are
 controller checks, not 50 GB or 30-minute profile acceptance. Current synthetic
 corrections do not yet modify the real search candidates; generation watermarks,
 live permissions, broad cold-query coverage and recovery remain required.
+
+`../data/prepare_query_population.py INPUT_DIR CORPUS_MANIFEST NEW_OUTPUT`
+freezes 128 real queries from each vector shard (3,328 for the full corpus).
+Per-shard preparation checkpoints support explicit `--resume`; completed results
+are reused after hash validation. Query metadata stays bounded and vectors live
+in a checked float32 sidecar, read by offset only for the admitted request.
+Full workload cases require this distributed population bound to their corpus.
+Each raw search receipt records query identity, returned identities and self@20.
+Self inclusion is a ranking measurement for this population, separate from the
+exact scope oracle and from recall against an exhaustive top-20 reference.
+Neither disjoint partition names nor process restart proves file-cache coldness.
+
+`check_query_population.py PROBE DATABASE QUERY_JSON NEW_RESULT` checks real
+BM25/ANN/excluded-scope queries and rejects bad offsets, traversal paths,
+dimensions, hashes, zero vectors and NaNs before workload admission.
+`check_case_recovery.py PROBE DATABASE QUERY_JSON NEW_EVIDENCE` runs a 60-second
+case, kills its exact child after a fsynced successful write, verifies ordinary
+resume refuses ambiguity, explicitly abandons that run without modifying raw
+artifacts, then executes a successor case and revalidates the prior completion.
+The tested abandonment record keeps effects unknown; it never invents success.
+
+`../data/ann_oracle.rs` is a standalone standard-library Rust exact-cosine
+scanner. Compile with `rustc --edition 2024 -O -C target-cpu=native` and run
+`../data/prepare_ann_oracle.py INPUT MANIFEST QUERY_JSON ORACLE_BINARY NEW_OUTPUT`.
+The preparation selects four queries per partition by a frozen hash order,
+verifies every source shard and scans all one million float32 vectors. It uses
+float64 accumulation, filters by the same partition and resolves ties by key.
+Per-shard conversion and exact-scan checkpoints support explicit reconciliation;
+temporary vector streams are deleted after the complete result is durable.
+The resulting `queries.json` can be passed to `--search-corpus`, which reports
+recall@20 separately from exact scope checks. On the 38,462-vector diagnostic,
+32 exact-reference ANN queries achieved recall@20 of 1.0; full-corpus measured
+recall remains pending even though its reference has been prepared.

@@ -1,0 +1,14 @@
+[run]
+id = "recovery-completed-359561c56c6445d9"
+profile = "low"
+phase = "steady"
+seconds = 60
+diagnostic = true
+[paths]
+binary = "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/storage-spike/release/akasha-helix-probe"
+database = "/tmp/akasha-otsuge-storage-20261022/helix-vector-stage"
+fixture = "/tmp/akasha-otsuge-storage-20261022/query-population-contract/queries.json"
+output = "/tmp/akasha-otsuge-storage-20261022/case-recovery-r2/completed"
+corpus_manifest = ""
+[reliability]
+max_attempts = 1

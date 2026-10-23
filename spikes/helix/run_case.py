@@ -144,6 +144,17 @@ def main():
     root = pathlib.Path(paths["database"]).resolve(strict=True)
     binary = pathlib.Path(paths["binary"]).resolve(strict=True)
     fixture = pathlib.Path(paths["fixture"]).resolve(strict=True)
+    if fixture.stat().st_size > 4 * 1024**2:
+        raise ValueError("query metadata exceeds 4 MiB")
+    metadata = json.loads(fixture.read_text())
+    vector_sha256 = None
+    if vector := metadata.get("vector_file"):
+        if pathlib.Path(vector["name"]).name != vector["name"] or not 0 < vector["bytes"] <= 4096 * 1536 * 4:
+            raise ValueError("invalid query vector sidecar")
+        sidecar = fixture.parent / vector["name"]
+        vector_sha256 = digest(sidecar)
+        if sidecar.stat().st_size != vector["bytes"] or vector_sha256 != vector["sha256"]:
+            raise ValueError("query vector sidecar changed")
     manifest = pathlib.Path(paths["corpus_manifest"]).resolve(strict=True) if paths["corpus_manifest"] else None
     # One controller owns this database; the durable pointer survives its death.
     owner_lock = (root / ".akasha-case-owner.lock").open("a")
@@ -157,6 +168,7 @@ def main():
                 raise ValueError("previous case must be reconciled or explicitly abandoned: " + owner["run_id"])
     observer = pathlib.Path(__file__).resolve().parents[1] / "measure.py"
     identity = {"config": config, "binary_sha256": digest(binary), "fixture_sha256": digest(fixture),
+                "fixture_vector_sha256": vector_sha256,
                 "manifest_sha256": digest(manifest) if manifest else None, "database": str(root),
                 "controller_sha256": digest(__file__), "observer_sha256": digest(observer)}
     state_path = directory / "state.json"

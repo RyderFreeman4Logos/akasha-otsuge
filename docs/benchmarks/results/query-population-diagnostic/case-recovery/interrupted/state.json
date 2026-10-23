@@ -1,0 +1,91 @@
+{
+  "admitted_unix_s": 1792745301.513744,
+  "command": [
+    "systemd-run",
+    "--user",
+    "--wait",
+    "--pipe",
+    "--collect",
+    "--unit=akasha-case-0304d6ee6cd54ce980280b9b4c7612fc",
+    "-p",
+    "MemoryMax=671088640",
+    "-p",
+    "MemorySwapMax=0",
+    "-p",
+    "RuntimeMaxSec=960",
+    "-p",
+    "Environment=AKASHA_SPIKE_PROFILE=low",
+    "/home/obj/.local/bin/python3",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+    "/tmp/akasha-otsuge-storage-20261022/case-recovery-r2/interrupted/memory.jsonl",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/storage-spike/release/akasha-helix-probe",
+    "/tmp/akasha-otsuge-storage-20261022/helix-vector-stage",
+    "--workload",
+    "/tmp/akasha-otsuge-storage-20261022/case-recovery-r2/interrupted/request.json"
+  ],
+  "config_epoch": 1,
+  "controller": {
+    "pid": 3655143,
+    "start_ticks": "456319848",
+    "state": "R"
+  },
+  "identity": {
+    "binary_sha256": "25811689b85801e5d557283f44d1c05c79a699aa6b34773fa92715710a626094",
+    "config": {
+      "paths": {
+        "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/storage-spike/release/akasha-helix-probe",
+        "corpus_manifest": "",
+        "database": "/tmp/akasha-otsuge-storage-20261022/helix-vector-stage",
+        "fixture": "/tmp/akasha-otsuge-storage-20261022/query-population-contract/queries.json",
+        "output": "/tmp/akasha-otsuge-storage-20261022/case-recovery-r2/interrupted"
+      },
+      "reliability": {
+        "max_attempts": 1
+      },
+      "run": {
+        "diagnostic": true,
+        "id": "recovery-interrupted-934152299bcd41f0",
+        "phase": "steady",
+        "profile": "low",
+        "seconds": 60
+      }
+    },
+    "controller_sha256": "b87ac9240266e6d91da5a40cc48fc4ee565a865a5bedacf8535781f710d916d2",
+    "database": "/tmp/akasha-otsuge-storage-20261022/helix-vector-stage",
+    "fixture_sha256": "321eb775189a1679a297cef31d1708ea9d503606a69006005763c1895fa228b7",
+    "fixture_vector_sha256": "f3482d0399c899387d840f56946633f8fe779e6a125e8d09e4f6801c4ba16064",
+    "manifest_sha256": null,
+    "observer_sha256": "a3ef0fb18220f8b0145ebd96f131c5ef9a5e28a0ce2ac5402b99a88d03bf6160"
+  },
+  "phase": "abandoned",
+  "result": {
+    "artifact_sha256": {
+      "engine.log": "c4db4cae4c4a66775ef7ffc8bb9a447dd3111637e2d9adbf04f7c85e301fdfad",
+      "memory.jsonl": "3c72409c30d7f8dd00b8360fa82b24481f22d50307c810f14ea7e396e396f199",
+      "request.json": "78184cc6c421d048baadffbcd6c2dff62eeebe958477d2ea1ae2b8fbb7fa0092",
+      "runtime/admission.json": "89afbdac4915ecf916e42ef8e7aa631d8306321b633ce60980919994881ec206",
+      "runtime/baseline.json": "d840d42d5c0f57c4e90a660169b1c4ff7bf28ab3fa749687e05ea81f9b785911",
+      "runtime/metrics.jsonl": "812e0f3d1717444208205423eeeadf78055a736c790b730dc6d42f0b5371dec9",
+      "runtime/requests.jsonl": "ed0ee8073d13ebd9368465d816633e27c24e0db1d0599c60c26f9b0c0178c9de"
+    },
+    "content_oracle": null,
+    "effects": "unknown",
+    "engine": {
+      "reason": "engine has no terminal result",
+      "status": "failed"
+    },
+    "exit": {
+      "code": -9,
+      "event": "exit",
+      "seconds": 2.03660259116441
+    },
+    "memory_thresholds_passed": true,
+    "reason": "explicit interrupted-case abandonment",
+    "rss_max_bytes": 89194496,
+    "rss_p99_bytes": 89194496,
+    "status": "failed",
+    "unit_exit_code": 137
+  },
+  "runtime_id": "0304d6ee6cd54ce980280b9b4c7612fc",
+  "unit": "akasha-case-0304d6ee6cd54ce980280b9b4c7612fc"
+}
