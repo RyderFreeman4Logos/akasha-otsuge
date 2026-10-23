@@ -39,6 +39,7 @@ impl Authority {
             IndexSpec::node_range_desc("Revision", "order"),
             IndexSpec::node_unique_equality("ScopeMember", "key"),
             IndexSpec::node_range("ScopeMember", "key"),
+            IndexSpec::node_unique_equality("Permission", "key"),
         ] {
             indexes::create(&engine, spec).await?;
         }
@@ -211,8 +212,7 @@ impl Authority {
         Ok(rows.first().cloned())
     }
 
-    pub async fn current(&self, memory: u64) -> Result<Value, Error> {
-        let _writer = self.writer.lock().await;
+    pub async fn read_point(&self) -> Result<u64, Error> {
         let counter = self
             .engine
             .cypher(
@@ -221,12 +221,272 @@ impl Authority {
                 None,
             )
             .await?;
-        let at = counter
+        counter
             .rows
             .first()
             .and_then(|row| row[0].as_u64())
-            .ok_or("missing current commit point")?;
-        Ok(json!({"at":at,"entry":self.get(memory,at).await?.filter(|row|row["active"]==true)}))
+            .ok_or_else(|| "missing current commit point".into())
+    }
+
+    async fn permission(&self, principal: &str, scope: u8) -> Result<(bool, u64), Error> {
+        let key = permission_key(principal, scope)?;
+        let rows = self
+            .engine
+            .cypher(
+                "MATCH (p:Permission {key:$key}) RETURN p.allowed,p.revision",
+                params(json!({"key":key})),
+                None,
+            )
+            .await?
+            .rows;
+        match rows.as_slice() {
+            [] => Ok((false, 0)),
+            [row] => Ok((
+                row[0].as_bool().ok_or("invalid permission flag")?,
+                row[1].as_u64().ok_or("invalid permission revision")?,
+            )),
+            _ => Err("duplicate permission records".into()),
+        }
+    }
+
+    pub async fn set_permission(
+        &self,
+        principal: &str,
+        scope: u8,
+        allowed: bool,
+    ) -> Result<u64, Error> {
+        let key = permission_key(principal, scope)?;
+        let _writer = self.writer.lock().await;
+        let (prior, before) = self.permission(principal, scope).await?;
+        if before > 0 && prior == allowed {
+            return Ok(before);
+        }
+        let revision = before
+            .checked_add(1)
+            .filter(|value| *value <= i64::MAX as u64)
+            .ok_or("permission revision exhausted")?;
+        let clause = if before == 0 {
+            "CREATE (p:Permission {key:$key})"
+        } else {
+            "MATCH (p:Permission {key:$key}) WHERE p.revision=$before"
+        };
+        let rows = self
+            .engine
+            .cypher(
+                &format!("{clause} SET p.allowed=$allowed,p.revision=$revision RETURN p.revision"),
+                params(json!({"key":key,"allowed":allowed,"before":before,"revision":revision})),
+                None,
+            )
+            .await?
+            .rows;
+        if rows != vec![vec![json!(revision)]] {
+            return Err("permission compare-and-swap did not commit".into());
+        }
+        Ok(revision)
+    }
+
+    async fn checked_heads(&self, memories: &[u64], at: u64) -> Result<Vec<Option<Value>>, Error> {
+        if memories.len() > 20 {
+            return Err("head validation exceeds top-20 bound".into());
+        }
+        let mut batch = read_batch();
+        let mut names = Vec::new();
+        for (index, memory) in memories.iter().enumerate() {
+            let memory_i64 = i64::try_from(*memory)?;
+            let head = format!("head{index}");
+            let revision = format!("revision{index}");
+            batch = batch
+                .var_as(
+                    &head,
+                    g().n_with_label_where("Head", SourcePredicate::eq("key", memory_i64))
+                        .limit(2)
+                        .value_map(Some(vec!["seq", "scope", "active"])),
+                )
+                .var_as(
+                    &revision,
+                    g().n_with_label_where(
+                        "Revision",
+                        SourcePredicate::between(
+                            "order",
+                            format!("{memory:020}:00000000000000000000"),
+                            format!("{memory:020}:{:020}", i64::MAX),
+                        ),
+                    )
+                    .order_by("order", Order::Desc)
+                    .limit(1)
+                    .value_map(Some(vec!["memory", "seq", "scope", "active"])),
+                );
+            names.extend([head, revision]);
+        }
+        // One read snapshot and one bounded engine call for the whole candidate set.
+        let result = self
+            .engine
+            .query(QueryRequest::read(batch.returning(names)))
+            .await?;
+        let mut entries = Vec::new();
+        for (index, memory) in memories.iter().enumerate() {
+            let rows = |name: String| -> Result<&[Value], Error> {
+                match result.get(&name) {
+                    Some(Value::Null) => Ok(&[]),
+                    Some(Value::Array(rows)) => Ok(rows),
+                    _ => Err("invalid authority batch response".into()),
+                }
+            };
+            let heads = rows(format!("head{index}"))?;
+            let revisions = rows(format!("revision{index}"))?;
+            match (heads, revisions) {
+                ([], []) => entries.push(None),
+                ([head], [revision])
+                    if head["seq"].as_u64().is_some_and(|seq| seq > 0 && seq <= at)
+                        && head["scope"].as_u64().is_some_and(|scope| scope < 8)
+                        && head["active"].is_boolean()
+                        && revision["memory"] == *memory
+                        && ["seq", "scope", "active"]
+                            .iter()
+                            .all(|key| head[key] == revision[key]) =>
+                {
+                    entries.push(Some(revision.clone()))
+                }
+                _ => return Err("authority head/history integrity mismatch".into()),
+            }
+        }
+        Ok(entries)
+    }
+
+    pub async fn current(&self, principal: &str, memory: u64) -> Result<Value, Error> {
+        permission_key(principal, 0)?;
+        let _writer = self.writer.lock().await;
+        let at = self.read_point().await?;
+        let head = self.checked_heads(&[memory], at).await?.pop().flatten();
+        let mut entry = if head.is_some_and(|row| row["active"] == true) {
+            let row = self
+                .get(memory, at)
+                .await?
+                .ok_or("current revision disappeared")?;
+            if !row["body"].is_string() {
+                return Err("invalid authoritative body".into());
+            }
+            Some(row)
+        } else {
+            None
+        };
+        let mut permission_revision = None;
+        if let Some(row) = &entry {
+            let scope = u8::try_from(row["scope"].as_u64().ok_or("invalid current scope")?)?;
+            let (allowed, revision) = self.permission(principal, scope).await?;
+            permission_revision = Some(revision);
+            if !allowed {
+                entry = None;
+            }
+        }
+        Ok(json!({"at":at,"entry":entry,"permission_revision":permission_revision}))
+    }
+
+    pub async fn history_for(
+        &self,
+        principal: &str,
+        memory: u64,
+        at: u64,
+        scope: u8,
+    ) -> Result<Value, Error> {
+        let _writer = self.writer.lock().await;
+        let (allowed, revision) = self.permission(principal, scope).await?;
+        let validated = self.read_point().await?;
+        if at > validated {
+            return Err("historical read point is not committed".into());
+        }
+        let entry = if allowed {
+            self.get(memory, at)
+                .await?
+                .filter(|row| row["active"] == true && row["scope"] == scope)
+        } else {
+            None
+        };
+        Ok(
+            json!({"entry":entry,"read_seq":at,"validated_at_seq":validated,
+            "permission_revision":revision,"retrieval_mode":"historical_state"}),
+        )
+    }
+
+    pub async fn state_for(
+        &self,
+        principal: &str,
+        scope: u8,
+        at: u64,
+        cursor: Option<u64>,
+        limit: usize,
+    ) -> Result<Value, Error> {
+        let _writer = self.writer.lock().await;
+        let (allowed, revision) = self.permission(principal, scope).await?;
+        let validated = self.read_point().await?;
+        if at > validated {
+            return Err("historical read point is not committed".into());
+        }
+        let mut page = if allowed {
+            self.state(scope, at, cursor, limit).await?
+        } else {
+            json!({"entries":[],"next":null,"at":at})
+        };
+        page["permission_revision"] = json!(revision);
+        page["validated_at_seq"] = json!(validated);
+        page["retrieval_mode"] = json!("historical_state");
+        Ok(page)
+    }
+
+    pub async fn revalidate(
+        &self,
+        principal: &str,
+        scope: u8,
+        read_seq: u64,
+        min_commit_seq: u64,
+        hits: &[Value],
+    ) -> Result<Value, Error> {
+        if hits.len() > 20 {
+            return Err("candidate count exceeds top-20 bound".into());
+        }
+        let _writer = self.writer.lock().await;
+        let (allowed, permission_revision) = self.permission(principal, scope).await?;
+        let at = self.read_point().await?;
+        if at < read_seq || at < min_commit_seq {
+            return Err("min_commit_seq_not_reached".into());
+        }
+        let mut visible = Vec::new();
+        if allowed && !hits.is_empty() {
+            let memories: Vec<_> = hits
+                .iter()
+                .map(|hit| {
+                    hit["memory"]
+                        .as_u64()
+                        .filter(|value| *value <= i64::MAX as u64)
+                        .ok_or("invalid candidate memory")
+                })
+                .collect::<Result<_, _>>()?;
+            let heads = self.checked_heads(&memories, at).await?;
+            for ((hit, memory), head) in hits.iter().zip(memories).zip(heads) {
+                let indexed = match hit.get("seq") {
+                    None | Some(Value::Null) => 0,
+                    Some(value) => value.as_u64().ok_or("invalid candidate revision")?,
+                };
+                if hit["partition"] != format!("p{scope}") {
+                    return Err("candidate scope mismatch".into());
+                }
+                // Imported immutable documents are revision zero until a correction creates a head.
+                let valid = match head {
+                    None => indexed == 0 && memory >= 1_000_000,
+                    Some(row) => {
+                        row["seq"] == indexed && row["scope"] == scope && row["active"] == true
+                    }
+                };
+                if valid {
+                    visible.push(hit.clone());
+                }
+            }
+        }
+        Ok(
+            json!({"hits":visible,"read_seq":read_seq,"validated_at_seq":at,
+            "permission_revision":permission_revision,"retrieval_mode":"current_candidates",
+            "coverage":"candidate_set_only","filtered":hits.len()-visible.len()}),
+        )
     }
 
     pub async fn state(
@@ -292,6 +552,19 @@ impl Authority {
             }
         }
     }
+}
+
+fn permission_key(principal: &str, scope: u8) -> Result<String, Error> {
+    if scope > 7
+        || principal.is_empty()
+        || principal.len() > 64
+        || !principal
+            .bytes()
+            .all(|value| value.is_ascii_alphanumeric() || b"-_".contains(&value))
+    {
+        return Err("invalid permission principal or scope".into());
+    }
+    Ok(format!("{principal}/{scope}"))
 }
 
 fn params(value: Value) -> BTreeMap<String, Value> {
@@ -463,8 +736,8 @@ pub async fn verify(authority: &Authority, count: u64, progress: &Path) -> Resul
         let rows = authority
             .engine
             .cypher(
-                &format!("MATCH (n:{label}) RETURN count(n)"),
-                BTreeMap::new(),
+                &format!("MATCH (n:{label}) WHERE n.seq <= $at RETURN count(n)"),
+                params(json!({"at":count})),
                 None,
             )
             .await?

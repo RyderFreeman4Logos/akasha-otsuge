@@ -12,6 +12,7 @@ mod indexes;
 mod load;
 mod profile;
 mod search;
+mod visibility;
 mod workload;
 
 #[tokio::main(worker_threads = 2)]
@@ -54,6 +55,29 @@ async fn main() -> Result<(), Error> {
         .await?;
         let result = search::verify(&client, &PathBuf::from(fixture)).await;
         client.close().await?;
+        println!("{}", result?);
+        return Ok(());
+    }
+    if args[2] == "--visibility-seed" || args[2] == "--visibility-verify" {
+        let fixture = args
+            .get(3)
+            .ok_or("visibility probe requires a query fixture")?;
+        let client = Engine::open_with_config(
+            HelixDbSource::Disk {
+                root: PathBuf::from(&args[1]),
+                database: "akasha-storage-spike".into(),
+            },
+            config()?,
+        )
+        .await?;
+        let authority = authority::Authority::open(client).await?;
+        let result = Box::pin(visibility::probe(
+            &authority,
+            &PathBuf::from(fixture),
+            args[2] == "--visibility-verify",
+        ))
+        .await;
+        authority.engine.close().await?;
         println!("{}", result?);
         return Ok(());
     }

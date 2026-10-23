@@ -1,0 +1,5 @@
+ENGINE_PROFILE:{"profile":"high","sst_compression":"zstd","vector_cache_mib":128,"slate_block_cache_mib":64,"slate_metadata_cache_mib":16,"fts_cache_mib":32,"vector_build_cache_mib":512,"unflushed_mib":64}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"1","kind":"already_active"}}
+TEXT_COMPLETE:{"index":{"generation":"1","index_id":"1","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"2","kind":"already_active"}}
+{"elapsed_seconds":0.016189378,"phase":"indexes_built","text":{"index":{"generation":"1","index_id":"1","kind":"already_active"}},"vector":{"index":{"generation":"1","index_id":"2","kind":"already_active"}}}

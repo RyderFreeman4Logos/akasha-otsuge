@@ -203,7 +203,10 @@ pub async fn query(
     engine
         .query(QueryRequest::read(
             read_batch()
-                .var_as("hits", traversal.value_map(Some(vec!["key", "partition"])))
+                .var_as(
+                    "hits",
+                    traversal.value_map(Some(vec!["key", "partition", "memory", "seq"])),
+                )
                 .returning(["hits"]),
         ))
         .await

@@ -192,6 +192,11 @@ If cgroup I/O accounting is unavailable, `/proc` counters are explicitly labelle
 as currently sampled processes. Derived lag remains unavailable until that
 separate acceptance leaf is implemented.
 
+The observer tolerates an exit-time procfs permission error only after confirming
+the PID disappeared or became a zombie. Its I/O sample remains unavailable; a
+permission error for a live process still fails observation. Run
+`python3 spikes/check_measure.py` for the focused exit-race checks.
+
 An independent controller oracle reconstructs committed contents from request
 identities and compares every current read at its recorded commit point, including
 retractions. It rejects wrong content, duplicate/gapped sequences, executable or
@@ -217,6 +222,43 @@ Each raw search receipt records query identity, returned identities and self@20.
 Self inclusion is a ranking measurement for this population, separate from the
 exact scope oracle and from recall against an exhaustive top-20 reference.
 Neither disjoint partition names nor process restart proves file-cache coldness.
+
+The workload now grants its own diagnostic principal explicit scope permissions.
+Current reads and candidate validation share the authority writer boundary with
+corrections and permission updates. Candidate results record `read_seq`,
+`validated_at_seq` and permission revision; an unmet `min_commit_seq` is an error.
+Validation compares each indexed revision with the latest head and immutable
+history in one bounded native read batch (at most 20 candidates, without bodies).
+A malformed or missing head with surviving history is an explicit
+integrity error, not permission to revive an original corpus entry. Missing
+grants deny access. Historical reads retain their fixed contents while checking
+the current principal's permission. The historical oracle counts its original
+commit prefix so later workload writes cannot invalidate an earlier exact view.
+
+These checks require corpus `memory` identities written by the current importer.
+An older diagnostic database without them is rejected. Recreate that disposable
+fixture from its verified source; do not invent identities at query time.
+Coverage is still labelled `candidate_set_only` until generation watermarks are
+implemented. The steady workload's synthetic corrections remain separate from
+the real-candidate invalidation fixture below.
+
+`check_visibility.py PROBE EIGHT_QUERY_FIXTURE PREPARED_SOURCE NEW_EVIDENCE`
+selects the eight actual source documents, builds real BM25/ANN indexes, keeps
+their old entries deliberately present and exercises retraction, restoration,
+scope moves, permission changes during a query, principal isolation and reopen.
+Later corrections preserve historical content, while current permission
+revocation denies its use. The reopen phase injects invalid and missing heads
+only in its disposable database and checks explicit integrity failures, including
+an orphaned revision beyond the global commit counter. Each
+observed command has its own cgroup. This is a functional diagnostic, not a
+full-scale, physical-file-corruption or sustained-profile acceptance result.
+
+The [visibility diagnostic receipts](../../docs/benchmarks/results/visibility-diagnostic/summary.json)
+retain the serial-validation failure (write P95 9,316 ms), the batch-read fix and
+the unchanged 60-second, 100-client workload: 1,698 requests, 12.12 writes/s,
+write P95 1,932 ms and RSS maximum 166,715,392 bytes. All small-case thresholds
+pass; this does not replace either full-size 30-minute profile. The earlier
+history oracle result explicitly identifies its earlier binary and workload.
 
 `check_query_population.py PROBE DATABASE QUERY_JSON NEW_RESULT` checks real
 BM25/ANN/excluded-scope queries and rejects bad offsets, traversal paths,

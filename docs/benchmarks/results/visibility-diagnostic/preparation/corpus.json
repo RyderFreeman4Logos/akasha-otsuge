@@ -1,0 +1,10 @@
+{
+  "corpus": {
+    "documents": 38462,
+    "indexed_body_utf8_bytes": 13344347,
+    "prepared_bytes": 1273224971,
+    "prepared_sha256": "83704596cac9a4e772e46bc65816981136585fc721a1ffba2c198566f36082ab",
+    "vectors": 38462
+  },
+  "source_manifest_sha256": "29752cabfc85a23d115ba5b9abffaf83c892d8bbb35a7c9d3224a838a48c6865"
+}

@@ -67,6 +67,9 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       threshold; include cold reads, burst, overload fairness and bounded drain.
 - [ ] Verify atomic revision/head/receipt/job/sequence commit; request-hash reuse;
       historical pages; current head/scope revalidation and live permissions.
+      Small real-index fixtures now cover stale candidates, permission races,
+      historical content preservation, principal isolation and malformed/missing
+      heads. Full-size coverage and the generation lifecycle remain required.
 - [ ] Verify generation-specific indexed receipts and gap-free watermarks,
       concurrent writes/reindex, failed-build rollback and model separation.
 - [ ] Test low-budget reopen of full data/backlog/interrupted builds and

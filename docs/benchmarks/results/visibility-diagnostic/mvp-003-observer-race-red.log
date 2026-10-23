@@ -1,0 +1,61 @@
+.EEEE.
+======================================================================
+ERROR: test_permission_denial_after_exit_is_an_unavailable_terminal_sample (__main__.ProcfsExitRace.test_permission_denial_after_exit_is_an_unavailable_terminal_sample) (function='process_io', state='Z')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/check_measure.py", line 23, in test_permission_denial_after_exit_is_an_unavailable_terminal_sample
+    result = function(101)
+             ^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py", line 27, in process_io
+    (line.split(":", 1) for line in pathlib.Path(f"/proc/{pid}/io").read_text().splitlines())}
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/check_measure.py", line 15, in read
+    raise PermissionError("procfs denied during exit")
+PermissionError: procfs denied during exit
+
+======================================================================
+ERROR: test_permission_denial_after_exit_is_an_unavailable_terminal_sample (__main__.ProcfsExitRace.test_permission_denial_after_exit_is_an_unavailable_terminal_sample) (function='process_io', state='X')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/check_measure.py", line 23, in test_permission_denial_after_exit_is_an_unavailable_terminal_sample
+    result = function(101)
+             ^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py", line 27, in process_io
+    (line.split(":", 1) for line in pathlib.Path(f"/proc/{pid}/io").read_text().splitlines())}
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/check_measure.py", line 15, in read
+    raise PermissionError("procfs denied during exit")
+PermissionError: procfs denied during exit
+
+======================================================================
+ERROR: test_permission_denial_after_exit_is_an_unavailable_terminal_sample (__main__.ProcfsExitRace.test_permission_denial_after_exit_is_an_unavailable_terminal_sample) (function='memory', state='Z')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/check_measure.py", line 23, in test_permission_denial_after_exit_is_an_unavailable_terminal_sample
+    result = function(101)
+             ^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py", line 15, in memory
+    for line in pathlib.Path(f"/proc/{pid}/smaps_rollup").read_text().splitlines():
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/check_measure.py", line 15, in read
+    raise PermissionError("procfs denied during exit")
+PermissionError: procfs denied during exit
+
+======================================================================
+ERROR: test_permission_denial_after_exit_is_an_unavailable_terminal_sample (__main__.ProcfsExitRace.test_permission_denial_after_exit_is_an_unavailable_terminal_sample) (function='memory', state='X')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/check_measure.py", line 23, in test_permission_denial_after_exit_is_an_unavailable_terminal_sample
+    result = function(101)
+             ^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py", line 15, in memory
+    for line in pathlib.Path(f"/proc/{pid}/smaps_rollup").read_text().splitlines():
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/check_measure.py", line 15, in read
+    raise PermissionError("procfs denied during exit")
+PermissionError: procfs denied during exit
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (errors=4)

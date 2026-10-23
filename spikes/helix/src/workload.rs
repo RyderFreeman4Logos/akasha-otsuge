@@ -180,7 +180,7 @@ impl Shared {
                 Ok(receipt)
             }
             1 => {
-                let mut current = self.authority.current(memory).await?;
+                let mut current = self.authority.current(&self.config.run_id, memory).await?;
                 if !current["entry"].is_null() {
                     let value = &mut current["entry"];
                     let body = value["body"].as_str().ok_or("missing current body")?;
@@ -199,10 +199,23 @@ impl Shared {
             2 | 3 => {
                 let index = (client * 101 + ordinal as usize * 97) % self.fixture.queries.len();
                 let query = self.fixture.query(index)?;
+                let read_seq = self.authority.read_point().await?;
                 let response =
                     search::query(&self.authority.engine, &query, &query.partition, kind == 3)
                         .await?;
-                let hits = response["hits"]
+                let validated = self
+                    .authority
+                    .revalidate(
+                        &self.config.run_id,
+                        query.partition.as_bytes()[1] - b'0',
+                        read_seq,
+                        read_seq,
+                        response["hits"]
+                            .as_array()
+                            .ok_or("invalid search response")?,
+                    )
+                    .await?;
+                let hits = validated["hits"]
                     .as_array()
                     .ok_or("invalid search response")?;
                 let self_at_20 = hits.iter().any(|hit| hit["key"] == query.key);
@@ -213,12 +226,15 @@ impl Shared {
                     return Err("real search oracle mismatch".into());
                 }
                 Ok(
-                    json!({"hits":hits,"partition":query.partition,"query_key":query.key,"query_index":index,"self_at_20":self_at_20}),
+                    json!({"hits":hits,"partition":query.partition,"query_key":query.key,"query_index":index,"self_at_20":self_at_20,"validation":validated}),
                 )
             }
             4 => {
                 let scope = ((client as u64 + ordinal) % 8) as u8;
-                let page = self.authority.state(scope, 4096, None, 100).await?;
+                let page = self
+                    .authority
+                    .state_for(&self.config.run_id, scope, 4096, None, 100)
+                    .await?;
                 let expected: Vec<_> = (0..authority::ORACLE_MEMORIES)
                     .filter_map(|id| authority::oracle_state(id, 4096))
                     .filter(|row| row["scope"] == scope && row["active"] == true)
@@ -450,6 +466,11 @@ async fn run_open(
         }
     }
     let authority = Authority::open(engine).await?;
+    for scope in 0..8 {
+        authority
+            .set_permission(&config.run_id, scope, true)
+            .await?;
+    }
     if authority.get(0, 4096).await? != authority::oracle_state(0, 4096) {
         return Err("historical oracle must be seeded before workload".into());
     }

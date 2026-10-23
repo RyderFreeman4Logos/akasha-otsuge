@@ -1,0 +1,2 @@
+# Preserve native command output, including its final empty line.
+docs/benchmarks/results/**/*.log whitespace=-blank-at-eof

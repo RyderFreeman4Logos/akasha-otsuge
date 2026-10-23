@@ -1,0 +1,108 @@
+{
+  "controller": {
+    "pid": 3753172,
+    "start_ticks": "456764101",
+    "state": "R"
+  },
+  "error": "indexes failed; retain exact logs and reconcile effects",
+  "identity": {
+    "binary_sha256": "75562b77915a79736afd74d9d22973aea8cc3e6f9c9ec54521fdf2ece126a7ba",
+    "index_observation_seconds": 7200,
+    "input": "/tmp/akasha-otsuge-storage-20261022/vectors-00000.jsonl",
+    "max_attempts": 1,
+    "measured_workload_profile": "low",
+    "not_scale_acceptance": true,
+    "setup_profile": "high",
+    "source_bytes": 1273224971,
+    "source_sha256": "83704596cac9a4e772e46bc65816981136585fc721a1ffba2c198566f36082ab"
+  },
+  "phase": "failed",
+  "started_utc": "2026-10-23T10:02:24.050863+00:00",
+  "steps": [
+    {
+      "child": {
+        "pid": 3753176,
+        "start_ticks": "456764111",
+        "state": "R"
+      },
+      "command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "--unit=akasha-visibility-setup-e3e341336745466bb492c86354564105",
+        "-p",
+        "MemoryMax=2147483648",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=high",
+        "-p",
+        "RuntimeMaxSec=600",
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/import-memory.jsonl",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/probe",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/database",
+        "--load",
+        "/tmp/akasha-otsuge-storage-20261022/vectors-00000.jsonl",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/corpus.json"
+      ],
+      "exit": 0,
+      "log_sha256": "e54a647d367d31a33d6f05b19a94f41f3a8f9f634cb250351960059f4f4e42dc",
+      "name": "import",
+      "phase": "completed",
+      "profile": "high",
+      "result": {
+        "content_bytes": 13344347,
+        "documents": 38462,
+        "elapsed_seconds": 23.095085315,
+        "phase": "import_complete",
+        "prepared_sha256": "83704596cac9a4e772e46bc65816981136585fc721a1ffba2c198566f36082ab",
+        "resumed_documents": 0
+      },
+      "started_unix_s": 1792749744.062554,
+      "unit": "akasha-visibility-setup-e3e341336745466bb492c86354564105"
+    },
+    {
+      "child": {
+        "pid": 3753596,
+        "start_ticks": "456766541",
+        "state": "R"
+      },
+      "command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "--unit=akasha-visibility-setup-e4991409618d45edb26eac3ea5b91442",
+        "-p",
+        "MemoryMax=2147483648",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=high",
+        "-p",
+        "RuntimeMaxSec=14500",
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/indexes-memory.jsonl",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/probe",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/database",
+        "--build-indexes",
+        "7200"
+      ],
+      "exit": 1,
+      "log_sha256": "12976eee8fb6f63055e1dfb952fc496992dec0de221709ba19eb3c480d446f7a",
+      "name": "indexes",
+      "phase": "running",
+      "profile": "high",
+      "started_unix_s": 1792749768.353522,
+      "unit": "akasha-visibility-setup-e4991409618d45edb26eac3ea5b91442"
+    }
+  ]
+}

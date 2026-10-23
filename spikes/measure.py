@@ -9,6 +9,13 @@ import sys
 import time
 
 
+def exited(pid):
+    try:
+        return pathlib.Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[0] in {"Z", "X", "x"}
+    except (FileNotFoundError, ProcessLookupError):
+        return True
+
+
 def memory(pid):
     values = {}
     try:
@@ -18,6 +25,10 @@ def memory(pid):
                 values[key] = int(value.split()[0]) * 1024
     except (FileNotFoundError, ProcessLookupError):
         return {"Rss": 0, "Pss": 0}
+    except PermissionError:
+        if not exited(pid):
+            raise
+        return {"Rss": 0, "Pss": 0}
     return values
 
 
@@ -26,6 +37,10 @@ def process_io(pid):
         return {key: int(value) for key, value in
                 (line.split(":", 1) for line in pathlib.Path(f"/proc/{pid}/io").read_text().splitlines())}
     except (FileNotFoundError, ProcessLookupError):
+        return None
+    except PermissionError:
+        if not exited(pid):
+            raise
         return None
 
 
