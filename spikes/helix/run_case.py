@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import time
@@ -163,7 +164,7 @@ def main():
     if args.config.stat().st_size > 65536:
         raise ValueError("case TOML exceeds 64 KiB")
     config = tomllib.loads(args.config.read_text())
-    if set(config) != {"run", "paths", "reliability"} or config["reliability"] != {"max_attempts": 1}:
+    if set(config) - {"disk"} != {"run", "paths", "reliability"} or config["reliability"] != {"max_attempts": 1}:
         raise ValueError("case has no network retries; exactly one measured attempt is required")
     run, paths = config["run"], config["paths"]
     if set(run) - {"generation"} != {"id", "profile", "phase", "seconds", "diagnostic"} or set(paths) != {"binary", "database", "fixture", "output", "corpus_manifest"}:
@@ -176,6 +177,12 @@ def main():
         raise ValueError("diagnostic must be a boolean")
     if "generation" in run and (type(run["generation"]) is not int or run["generation"] not in {1, 2}):
         raise ValueError("generation must be an explicit retained identity")
+    disk = config.get("disk")
+    minimum = 30 * 1024**3 + 4_000_000_000 + (45_000_000_000 if not run["diagnostic"] and run.get("generation") == 1 else 0)
+    if (not run["diagnostic"] and disk is None) or (disk is not None and (
+            set(disk) != {"start_bytes", "reserve_bytes"} or any(type(v) is not int for v in disk.values())
+            or not disk["start_bytes"] >= disk["reserve_bytes"] >= minimum)):
+        raise ValueError("full case requires its current/next index disk reservation")
     if args.abandon is not None and args.abandon != run["id"]:
         raise ValueError("abandonment requires the exact run ID")
     directory = pathlib.Path(paths["output"]).resolve()
@@ -246,6 +253,8 @@ def main():
     else:
         if args.resume or args.abandon:
             raise ValueError("cannot reconcile a nonexistent case")
+        if disk is not None and shutil.disk_usage(root).free < disk["start_bytes"]:
+            raise ValueError("case disk reservation cannot be admitted")
         directory.mkdir(mode=0o700)
         case_id = uuid.uuid4().hex
         state = {"phase": "admitted", "runtime_id": case_id, "identity": identity,
@@ -263,6 +272,7 @@ def main():
         command = ["systemd-run", "--user", "--wait", "--pipe", "--collect", "--unit=" + state["unit"],
                    "-p", f"MemoryMax={limit}", "-p", "MemorySwapMax=0", "-p", f"RuntimeMaxSec={run['seconds'] + 900}",
                    "-p", "Environment=AKASHA_SPIKE_PROFILE=" + run["profile"],
+                   *(["-p", "Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES="+str(disk["reserve_bytes"])] if disk is not None else []),
                    sys.executable, str(observer), str(directory / "memory.jsonl"),
                    str(binary), str(root), "--workload", str(directory / "request.json")]
         state["command"] = command

@@ -352,6 +352,7 @@ async fn initialize(a: &Authority) -> Result<(), Error> {
         if count != vec![vec![json!(0)]] {
             return Err("missing active generation pointer".into());
         }
+        a.engine.admit_write(0)?;
         a.engine
             .cypher(
                 "CREATE (:IndexState {key:'active',generation:0,fingerprint:''})",
@@ -463,6 +464,7 @@ async fn begin_record(
     }
     let encoded = serde_json::to_string(&bundle)?;
     let fingerprint = hash(encoded.as_bytes());
+    a.engine.admit_write(0)?;
     a.engine.cypher("CREATE (:Generation {key:$id,bundle:$bundle,fingerprint:$fingerprint,status:'building',ready:false,text:0,vector:0,base:$base})",params(json!({"id":id,"bundle":encoded,"fingerprint":fingerprint,"base":base.as_ref().map(serde_json::to_string).transpose()?})),None).await?;
     Ok(serde_json::to_value(generation(a, id).await?)?)
 }
@@ -482,6 +484,7 @@ async fn build(
         if g.base.as_ref().is_some_and(|base| !base.complete) {
             return Err("corpus backfill is incomplete".into());
         }
+        a.engine.admit_write(0)?;
         a.engine
             .cypher(
                 "MATCH (g:Generation {key:$id}) SET g.status='building',g.ready=false",
@@ -599,6 +602,8 @@ async fn apply(
     if head_seq < seq {
         return Err("outbox source revision is ahead of its head".into());
     }
+    a.engine
+        .admit_write(body.len() as u64 + (g.bundle.dimension * 4) as u64)?;
     let reason = if head_seq > seq {
         "superseded"
     } else if !active || (text_only && matches!(family, Family::Vector)) {
@@ -713,6 +718,7 @@ async fn advance(a: &Authority, id: u64, family: Family) -> Result<u64, Error> {
     if next == before {
         return Ok(0);
     }
+    a.engine.admit_write(0)?;
     let field = family.name();
     let rows = a.engine.cypher(&format!("MATCH (g:Generation {{key:$id}}),(c:Counter {{key:'global'}}) WHERE g.{field}=$before AND c.seq>=$next SET g.{field}=$next RETURN g.{field}"),
         params(json!({"id":id,"before":before,"next":next})),None).await?.rows;
@@ -778,6 +784,7 @@ async fn activate(a: &Authority, id: u64, hold: Option<&str>) -> Result<Value, E
     if previous == id {
         return Ok(json!({"active":id,"at":at,"reused":true}));
     }
+    a.engine.admit_write(0)?;
     crate::checkpoint(hold, "before-activation").await;
     let old = if previous == 0 {
         String::new()

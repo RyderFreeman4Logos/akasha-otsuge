@@ -104,6 +104,10 @@ without repeatedly rebuilding unchanged product code. Continue one main Issue.
       full-size generation initialization is running under the retained probe.
 - [ ] Measure and enforce disk admission for ordinary indexed writes and reindex,
       including retained native text splits; verify the explicit rebuild bound.
+      Native per-write and index admission now have 26-command diagnostic coverage,
+      including refusal of an insufficient full-workload plan and continued
+      reads/idempotent receipt reuse. Full-size allocation and physical disk-full
+      recovery remain required; logical input allowances are not physical bounds.
 - [ ] Test low-budget reopen of full data/backlog/interrupted builds and
       2GiB-to-512MiB draining with original work deadlines preserved.
 - [ ] Test all required commit/index/watermark/activation crash barriers,

@@ -393,6 +393,8 @@ async fn step(a: &Authority, id: u64, hold: Option<&str>) -> Result<Generation, 
             .set_property("base", serde_json::to_string(base)?),
     );
     crate::checkpoint(hold, "before-backfill-commit").await;
+    a.engine
+        .admit_write(serde_json::to_vec(rows)?.len() as u64)?;
     a.engine.query(QueryRequest::write(batch)).await?;
     crate::checkpoint(hold, "after-backfill-commit").await;
     Ok(record)

@@ -156,7 +156,7 @@ def main():
     state.update(phase='running', controller=process_identity(os.getpid()))
     publish(state_path, state)
     publish(owner_path, dict(output=str(output), run_id=run['id']))
-    command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit, '-p', f'MemoryMax={(640 if run["profile"] == "low" else 2048)*1024**2}', '-p', 'MemorySwapMax=0', '-p', f'RuntimeMaxSec={run["seconds"]}', '-p', 'Environment=AKASHA_SPIKE_PROFILE='+run['profile'], sys.executable, str(observer), str(attempt_dir / 'memory.jsonl'), str(output / 'probe'), str(database), '--generation', str(output / 'request.json')]
+    command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit, '-p', f'MemoryMax={(640 if run["profile"] == "low" else 2048)*1024**2}', '-p', 'MemorySwapMax=0', '-p', f'RuntimeMaxSec={run["seconds"]}', '-p', 'Environment=AKASHA_SPIKE_PROFILE='+run['profile'], '-p', 'Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES='+str(disk['reserve_bytes']), sys.executable, str(observer), str(attempt_dir / 'memory.jsonl'), str(output / 'probe'), str(database), '--generation', str(output / 'request.json')]
     attempt['command'] = command
     publish(state_path, state)
     started, failure = time.monotonic(), None

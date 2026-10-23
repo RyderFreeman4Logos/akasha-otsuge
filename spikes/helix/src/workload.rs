@@ -551,6 +551,15 @@ async fn run_open(
         if config.generation.is_none() {
             return Err("full workload requires a pinned active generation".into());
         }
+        engine.require_disk_reserve(
+            30 * 1024u64.pow(3)
+                + 4_000_000_000
+                + if config.generation == Some(1) {
+                    45_000_000_000
+                } else {
+                    0
+                },
+        )?;
         let path = config
             .corpus_manifest
             .as_ref()

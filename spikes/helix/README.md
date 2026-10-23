@@ -365,10 +365,38 @@ is an existing `begin_corpus`, `backfill`, `build`, `catch_up` or `activate` JSO
 It verifies the completed import receipt, excludes simultaneous case owners,
 retains the executed binary and exact request/manifest/config snapshots, and
 observes the dedicated cgroup and native cursor.
-Disk polling preserves the configured reserve; this is not native per-write
-space admission. Full runs retain the frozen current/next-index plan plus scratch
+The controller passes the reserve to native admission and polls free space.
+Full runs retain the frozen current/next-index plan plus scratch
 and 30 GiB free. Resource changes belong to a later operation config, not a live
 case. No network or automatic operation retries are involved.
+
+`AKASHA_SPIKE_DISK_RESERVE_BYTES` binds one immutable disk reserve at native open.
+Ordinary authority/permission writes, generation records, bounded backfill,
+derived writes, watermark advancement and activation check available filesystem
+bytes before mutation. New indexes check before submission and while constructing;
+an exhausted reserve requests native operation abort. Active authority indexes,
+read-only operations and already committed authority receipts remain usable.
+Abort/failure bookkeeping uses the reserved scratch. The logical input allowance
+is not a measured bound on physical write amplification or a physical disk-full
+test. Raw diagnostic Cypher and the separately controlled importer are outside
+these ordinary/generation entry points.
+
+Workload TOML accepts `[disk] start_bytes/reserve_bytes`. Full cases require it:
+generation one retains 45 GB for the next index, 4 GB scratch and 30 GiB free;
+generation two retains scratch/free space under the explicit two-build limit.
+The native full-workload entry point also rejects a missing or smaller reserve.
+`check_disk_admission.py PROBE EIGHT_SOURCE_RUN OUTPUT` verifies rejection before
+new durable effects and continued reads/idempotent receipt reuse using an
+impossible requested reserve, without filling a shared filesystem. Full-size
+allocation measurements and isolated physical disk-full recovery remain pending.
+
+The [disk admission diagnostic](../../docs/benchmarks/results/disk-admission-diagnostic/summary.json)
+retains the old binary's erroneous commit under an impossible reserve, 26 passing
+native checks, nine controller recovery checks and the unchanged 60-second,
+100-client mixed case. The latter completes 1,698 requests at 12.17 writes/s,
+write P95 23 ms, matching text/vector watermark 4,888 and RSS maximum 319,324,160B.
+This fixture does not exercise actual mid-build space exhaustion or physical
+disk-full; those remain in the full recovery matrix.
 
 The [runner diagnostic](../../docs/benchmarks/results/generation-runner-diagnostic/summary.json)
 kills the controller after a real native backfill commit, refuses the still-live

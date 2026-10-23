@@ -45,7 +45,7 @@ def main():
     def invoke(name, args):
         unit = 'akasha-gen-work-' + uuid.uuid4().hex
         units.append(unit)
-        command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit, '-p', 'MemoryMax=671088640', '-p', 'MemorySwapMax=0', '-p', 'RuntimeMaxSec=7200', '-p', 'Environment=AKASHA_SPIKE_PROFILE=low', sys.executable, str(observer), str(output / (name+'-memory.jsonl')), str(binary), str(database), *args]
+        command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit, '-p', 'MemoryMax=671088640', '-p', 'MemorySwapMax=0', '-p', 'RuntimeMaxSec=7200', '-p', 'Environment=AKASHA_SPIKE_PROFILE=low', '-p', 'Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES=36212254720', sys.executable, str(observer), str(output / (name+'-memory.jsonl')), str(binary), str(database), *args]
         publish(output / 'progress.json', dict(phase=name, completed=len(records), total=9, elapsed_s=time.monotonic()-started, child_progress=str(database / 'generation-1-catch-up.json')))
         with (output / (name+'.log')).open('x') as log:
             terminal = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT)
@@ -84,6 +84,9 @@ database = {json.dumps(str(database))}
 fixture = {json.dumps(str(fixture))}
 output = {json.dumps(str(output / 'case'))}
 corpus_manifest = {json.dumps(str(manifest))}
+[disk]
+start_bytes = 36212254720
+reserve_bytes = 36212254720
 [reliability]
 max_attempts = 1
 ''')

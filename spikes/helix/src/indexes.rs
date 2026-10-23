@@ -105,6 +105,7 @@ pub(crate) async fn create_measured(
     progress: Option<&Path>,
 ) -> Result<Value, Error> {
     let started = tokio::time::Instant::now();
+    client.admit_index(&spec)?;
     let receipt: Value = client
         .query(QueryRequest::write(
             write_batch()
@@ -145,6 +146,18 @@ pub(crate) async fn create_measured(
         match status["operation"]["status"].as_str() {
             Some("succeeded") => return Ok(status),
             Some("queued" | "running") if tokio::time::Instant::now() < deadline => {
+                if let Err(error) = client.admit_write(0) {
+                    // Abort metadata uses reserved scratch to stop further allocation.
+                    let aborted = client
+                        .query(QueryRequest::write(
+                            write_batch()
+                                .var_as("aborted", g().abort_index_operation(operation))
+                                .returning(["aborted"]),
+                        ))
+                        .await?;
+                    eprintln!("INDEX_DISK_ABORT:{aborted}");
+                    return Err(error);
+                }
                 tokio::time::sleep(Duration::from_millis(100)).await;
             }
             _ => return Err(format!("index did not become active: {status}").into()),

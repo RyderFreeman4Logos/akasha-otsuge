@@ -59,6 +59,7 @@ impl Authority {
             )
             .await?;
         if counter.rows.is_empty() {
+            engine.admit_write(0)?;
             engine
                 .cypher(
                     "CREATE (:Counter {key:'global',seq:0})",
@@ -187,6 +188,7 @@ impl Authority {
                     (:Job {{seq:$seq,revision:$order,config_generation:1,status:'pending'}}) \
              {member_clause} RETURN c.seq"
         );
+        self.engine.admit_write(change.body.len() as u64)?;
         let result = self
             .engine
             .cypher(
@@ -348,6 +350,7 @@ impl Authority {
         } else {
             "MATCH (p:Permission {key:$key}) WHERE p.revision=$before"
         };
+        self.engine.admit_write(0)?;
         let rows = self
             .engine
             .cypher(
