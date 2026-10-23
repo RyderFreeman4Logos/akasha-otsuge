@@ -18,6 +18,8 @@ from run_case import digest, process_identity, publish
 def main():
     binary, source = [pathlib.Path(p).resolve(strict=True) for p in sys.argv[1:3]]
     output = pathlib.Path(sys.argv[3]).resolve()
+    backend = sys.argv[4] if len(sys.argv) == 5 else 'helix'
+    assert backend in {'helix', 'fallback'} and len(sys.argv) in {4, 5}
     output.mkdir(mode=0o700)
     (output / 'OWNER').write_text('akasha-otsuge MVP-003 generation workload receipts\n')
     assert source.stat().st_size < 4 * 1024**2
@@ -37,7 +39,7 @@ def main():
     records, units = [], []
     started = time.monotonic()
     temporary = pathlib.Path(tempfile.mkdtemp(prefix='akasha-generation-workload-'))
-    (temporary / 'OWNER').write_text('akasha-otsuge MVP-003 disposable generation workload database\n')
+    (temporary / 'OWNER').write_text('akasha-otsuge MVP-003 owned corpus import and database\n' if backend == 'fallback' else 'akasha-otsuge MVP-003 disposable generation workload database\n')
     database = temporary / 'database'
     observer = pathlib.Path(__file__).resolve().parents[1] / 'measure.py'
     admission = dict(binary_sha256=digest(binary), harness_sha256=digest(__file__), source_sha256=digest(source), temporary_root=str(temporary), controller=process_identity(os.getpid()))
@@ -47,6 +49,11 @@ def main():
         unit = 'akasha-gen-work-' + uuid.uuid4().hex
         units.append(unit)
         command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit, '-p', 'MemoryMax=671088640', '-p', 'MemorySwapMax=0', '-p', 'RuntimeMaxSec=7200', '-p', 'Environment=AKASHA_SPIKE_PROFILE=low', '-p', 'Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES=36212254720', sys.executable, str(observer), str(output / (name+'-memory.jsonl')), str(binary), str(database), *args]
+        if backend == 'fallback':
+            position = command.index(sys.executable)
+            command[position:position] = ['-p', 'LimitNOFILE=8192', '-p', 'Environment=LANCE_CPU_THREADS=2',
+                '-p', 'Environment=LANCE_DEFAULT_IO_BUFFER_SIZE=16777216', '-p', 'Environment=LANCE_SHUFFLE_BATCH_BYTES=16777216',
+                '-p', 'Environment=LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES=0']
         publish(output / 'progress.json', dict(phase=name, completed=len(records), total=9, elapsed_s=time.monotonic()-started, child_progress=str(database / 'generation-1-catch-up.json')))
         with (output / (name+'.log')).open('x') as log:
             terminal = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT)
@@ -68,7 +75,10 @@ def main():
         request('backfill', dict(op='backfill', generation=1, waves=2))
         request('build', dict(op='build', generation=1))
         caught = request('catch-up', dict(op='catch_up', generation=1, waves=4096))
-        assert caught['text'] == caught['vector'] == 4096 and caught['remaining'] == 0
+        if backend == 'fallback':
+            assert caught['text']['watermark'] == caught['vector']['watermark'] == 4096 and caught['done']
+        else:
+            assert caught['text'] == caught['vector'] == 4096 and caught['remaining'] == 0
         request('activate', dict(op='activate', generation=1))
         invoke('verify-text', ['--oracle-verify-text', '4096'])
         config = output / 'case.toml'

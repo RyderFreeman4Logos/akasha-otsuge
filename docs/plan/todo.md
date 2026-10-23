@@ -207,8 +207,20 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       activates generations. Its 103-command fixture covers six SIGKILL cuts,
       failed-build old reads, model separation and live permissions. A deterministic
       release unit proves ordinary writes continue while index publication pauses.
-      Full 100k outbox drain, persistent concurrent workloads and full activation
-      remain required. Read-only status works below the write reservation; new
+      On the real 38,462-vector shard, all 100,000 outbox jobs now reach both
+      family watermarks in 40.045s; 352 current active text rows and no synthetic
+      vectors are materialized, and generation 1 activates at sequence 100,000.
+      The shared 100-client harness passes a real-shard 60s mixed case: 1,698
+      requests, 144 synthetic/144 corpus current checks, 72 BM25/15 ANN queries,
+      50 final derived heads, writes 22.2/s with P95 219ms, RSS max 299,061,248B.
+      Burst and 12,031-request overload also pass; overload drains in 0.621s.
+      A separate 16-record fixture verifies 70 unvectorized current reads and 36
+      BM25 queries across all eight scopes plus 15 real ANN queries. Both backends
+      use one unchanged scheduler, query validator and independent content oracle.
+      Invalid full-scale admission rejects before authority initialization in both.
+      Full-corpus activation, both 30-minute profiles and
+      the remaining failure matrix remain required. Read-only status works below
+      the write reservation; new
       mutations still fail. Catch-up rates use this attempt's starting watermark.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.

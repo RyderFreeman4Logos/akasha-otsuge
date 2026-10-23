@@ -8,13 +8,17 @@ use std::{io::Write, path::PathBuf};
 mod authority;
 mod engine;
 mod generations;
+#[path = "../../query_fixture.rs"]
+mod query_fixture;
+#[path = "../../workload.rs"]
+mod workload;
+mod workload_backend;
 
 mod indexes;
 mod load;
 mod profile;
 mod search;
 mod visibility;
-mod workload;
 
 #[tokio::main(worker_threads = 2)]
 async fn main() -> Result<(), Error> {

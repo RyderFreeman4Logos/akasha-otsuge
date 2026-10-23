@@ -66,3 +66,20 @@ The [frozen contract](storage-contract.md) and [remaining checklist](../plan/tod
 apply unchanged. If this route also fails a required contract, report the concrete
 failure and decision needed; do not choose a third backend or mark dependent
 Issues complete.
+
+### Shared workload and real-shard outbox
+
+[Outbox receipts](results/fallback-history100k-catchup/summary.json) verify all
+100,000 text-only jobs and activation on the real 38,462-vector shard.
+[Shared workload receipts](results/fallback-shared-workload/summary.json) preserve
+the original scheduler, thresholds, fixtures and independent Python oracle for
+both candidates. Fallback passes burst, a 60-second mixed run (1,698 requests,
+22.2 successful writes/s, write P95 219ms, sampled RSS max 299,061,248B), and
+12,031-request overload with 0.621s drain. The 16-record mixed fixture additionally
+checks unvectorized current/BM25 results in every scope. Helix compatibility is
+retained separately; none of these diagnostics replaces full-size acceptance.
+
+The final admission-only correction has a retained failing control and passing
+controls for both rebuilt backends: malformed full-scale evidence is rejected
+before authority initialization. Runtime measurements remain bound to their
+recorded earlier binaries; the correction does not change scheduling or queries.

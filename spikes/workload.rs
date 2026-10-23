@@ -10,16 +10,16 @@ use std::{
     time::Duration,
 };
 
-use helix_db::{HelixDbSource, prelude::*};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use tokio::{sync::Semaphore, task::JoinSet, time::Instant};
 
 use crate::{
+    Error,
     authority::{self, Authority, Change},
-    engine::{Engine, Error},
-    generations, search,
+    query_fixture as search,
+    workload_backend::Bundle,
 };
 
 const KINDS: [&str; 6] = ["write", "current", "bm25", "ann", "history", "correction"];
@@ -78,7 +78,7 @@ impl Default for Metrics {
 }
 
 struct Shared {
-    authority: Authority,
+    authority: Arc<Authority>,
     fixture: search::Fixture,
     config: Config,
     base: u64,
@@ -89,7 +89,7 @@ struct Shared {
     metrics: Mutex<Metrics>,
     log: Mutex<BufWriter<File>>,
     samples: Mutex<BufWriter<File>>,
-    bundle: Option<generations::Bundle>,
+    bundle: Option<Bundle>,
     derived: Mutex<Value>,
 }
 
@@ -103,7 +103,7 @@ pub(crate) fn atomic_json(path: &Path, value: &Value) -> Result<(), Error> {
     Ok(())
 }
 
-fn hash(bytes: &[u8]) -> String {
+pub(crate) fn hash(bytes: &[u8]) -> String {
     Sha256::digest(bytes)
         .iter()
         .map(|b| format!("{b:02x}"))
@@ -153,7 +153,7 @@ impl Shared {
             0 | 5 => {
                 let prior = self
                     .authority
-                    .get(memory, i64::MAX as u64)
+                    .work_get(memory, i64::MAX as u64)
                     .await?
                     .ok_or("missing workload seed")?;
                 let change = Change {
@@ -165,7 +165,7 @@ impl Shared {
                     body: body(&self.config.run_id, client, ordinal),
                     text_only: true,
                 };
-                let mut receipt = self.authority.apply(&change).await?;
+                let mut receipt = self.authority.work_apply(&change).await?;
                 if receipt.get("conflict").is_some() {
                     if receipt["conflict"] != "expected_revision" {
                         return Err("unexpected idempotency conflict".into());
@@ -175,7 +175,7 @@ impl Shared {
                 let seq = receipt["commit_seq"]
                     .as_u64()
                     .ok_or("missing durable receipt")?;
-                let actual = self.authority.get(memory, seq).await?;
+                let actual = self.authority.work_get(memory, seq).await?;
                 let expected = json!({"memory":memory,"seq":seq,"scope":change.scope,"active":change.active,"body":change.body});
                 if actual != Some(expected) {
                     return Err("committed revision content mismatch".into());
@@ -184,7 +184,10 @@ impl Shared {
                 Ok(receipt)
             }
             1 => {
-                let mut current = self.authority.current(&self.config.run_id, memory).await?;
+                let mut current = self
+                    .authority
+                    .work_current(&self.config.run_id, memory)
+                    .await?;
                 if !current["entry"].is_null() {
                     let value = &mut current["entry"];
                     let body = value["body"].as_str().ok_or("missing current body")?;
@@ -203,7 +206,7 @@ impl Shared {
                 let source_memory = query.memory.ok_or("missing current corpus identity")?;
                 let mut source = self
                     .authority
-                    .current(&self.config.run_id, source_memory)
+                    .work_current(&self.config.run_id, source_memory)
                     .await?;
                 let entry = &mut source["entry"];
                 let body = entry["body"]
@@ -233,43 +236,16 @@ impl Shared {
                     .fixture
                     .select_index(client * 101 + ordinal as usize * 97, kind == 3);
                 let query = self.fixture.query(index)?;
-                let validated = if let (Some(id), Some(bundle)) =
-                    (self.config.generation, &self.bundle)
-                {
-                    let mut result = generations::query(
-                        &self.authority,
-                        id,
-                        bundle.clone(),
+                let validated = self
+                    .authority
+                    .work_query(
+                        &query,
+                        kind == 3,
                         &self.config.run_id,
-                        query.partition.as_bytes()[1] - b'0',
-                        (kind == 3).then(|| query.embedding.clone()),
-                        (kind == 2).then(|| query.term.clone()),
+                        self.config.generation,
+                        self.bundle.as_ref(),
                     )
                     .await?;
-                    for hit in result["hits"]
-                        .as_array_mut()
-                        .ok_or("invalid generation hits")?
-                    {
-                        hit["key"] = hit["source_key"].clone();
-                    }
-                    result
-                } else {
-                    let read_seq = self.authority.read_point().await?;
-                    let response =
-                        search::query(&self.authority.engine, &query, &query.partition, kind == 3)
-                            .await?;
-                    self.authority
-                        .revalidate(
-                            &self.config.run_id,
-                            query.partition.as_bytes()[1] - b'0',
-                            read_seq,
-                            read_seq,
-                            response["hits"]
-                                .as_array()
-                                .ok_or("invalid search response")?,
-                        )
-                        .await?
-                };
                 let hits = validated["hits"]
                     .as_array()
                     .ok_or("invalid search response")?;
@@ -288,7 +264,7 @@ impl Shared {
                 let scope = ((client as u64 + ordinal) % 8) as u8;
                 let page = self
                     .authority
-                    .state_for(&self.config.run_id, scope, 4096, None, 100)
+                    .work_history(&self.config.run_id, scope, 4096, None, 100)
                     .await?;
                 let expected: Vec<_> = (0..authority::ORACLE_MEMORIES)
                     .filter_map(|id| authority::oracle_state(id, 4096))
@@ -340,69 +316,6 @@ impl Shared {
         samples.get_ref().sync_all()?;
         atomic_json(&self.config.output.join("progress.json"), &value)?;
         Ok(value)
-    }
-
-    async fn derived_oracle(&self, id: u64) -> Result<Value, Error> {
-        let range = SourcePredicate::between(
-            "memory",
-            i64::try_from(self.base)?,
-            i64::try_from(self.base + 49)?,
-        );
-        let response = self
-            .authority
-            .engine
-            .query(QueryRequest::read(
-                read_batch()
-                    .var_as(
-                        "text",
-                        g().n_with_label_where(format!("Derived{id}Text"), range.clone())
-                            .limit(51)
-                            .value_map(Some(vec!["memory", "seq", "partition", "body"])),
-                    )
-                    .var_as(
-                        "vector",
-                        g().n_with_label_where(format!("Derived{id}Vector"), range)
-                            .limit(1)
-                            .value_map(Some(vec!["memory"])),
-                    )
-                    .returning(["text", "vector"]),
-            ))
-            .await?;
-        let mut rows = match &response["text"] {
-            Value::Null => vec![],
-            Value::Array(rows) => rows.clone(),
-            _ => return Err("invalid derived workload text".into()),
-        };
-        for row in &mut rows {
-            let scope = row["partition"]
-                .as_str()
-                .ok_or("invalid derived partition")?;
-            if !matches!(scope, "p0" | "p1" | "p2" | "p3" | "p4" | "p5" | "p6" | "p7") {
-                return Err("invalid derived partition".into());
-            }
-            *row = json!({"memory":row["memory"],"seq":row["seq"],"scope":scope.as_bytes()[1]-b'0',"active":true,
-                "body_sha256":hash(row["body"].as_str().ok_or("missing derived body")?.as_bytes())});
-        }
-        rows.sort_by_key(|row| row["memory"].as_u64());
-        if !response["vector"].is_null() && response["vector"] != json!([]) {
-            return Err("text-only workload has derived vectors".into());
-        }
-        let count = self
-            .authority
-            .engine
-            .cypher(
-                "MATCH (j:IndexedJob {generation:$generation}) RETURN count(j)",
-                authority::params(json!({"generation":id})),
-                None,
-            )
-            .await?
-            .rows;
-        let [row] = count.as_slice() else {
-            return Err("invalid indexed job count".into());
-        };
-        Ok(
-            json!({"progress":*self.derived.lock().map_err(|_|"derived progress poisoned")?,"indexed_jobs":row[0],"text":rows,"vectors":[]}),
-        )
     }
 }
 
@@ -523,6 +436,7 @@ pub async fn run(root: PathBuf, request: &Path) -> Result<(), Error> {
     {
         return Err("workload requires pinned corpus current-read identities".into());
     }
+    let corpus = corpus_admission(&config, &fixture)?;
     std::fs::create_dir(&config.output)?;
     atomic_json(
         &config.output.join("admission.json"),
@@ -530,38 +444,28 @@ pub async fn run(root: PathBuf, request: &Path) -> Result<(), Error> {
         "pid":std::process::id(),"start_ticks":std::fs::read_to_string("/proc/self/stat")?.rsplit_once(')').ok_or("invalid proc stat")?.1.split_whitespace().nth(19),
         "resume":"completed units are reusable only by the outer controller; an interrupted unit requires explicit abandonment"}),
     )?;
-    let engine = Engine::open_with_config(
-        HelixDbSource::Disk {
-            root,
-            database: "akasha-storage-spike".into(),
-        },
-        crate::config()?,
-    )
-    .await?;
-    let outcome = run_open(engine.clone(), config, fixture).await;
-    engine.close().await?;
+    let authority = Arc::new(Authority::work_open(root, corpus).await?);
+    let outcome = run_open(authority.clone(), config, fixture).await;
+    authority.work_close().await?;
     println!("{}", outcome?);
     Ok(())
 }
 
-async fn run_open(
-    engine: Engine,
-    config: Config,
-    fixture: search::Fixture,
-) -> Result<Value, Error> {
+fn corpus_admission(
+    config: &Config,
+    fixture: &search::Fixture,
+) -> Result<Option<(String, u64)>, Error> {
     if !config.diagnostic {
         if config.generation.is_none() {
             return Err("full workload requires a pinned active generation".into());
         }
-        engine.require_disk_reserve(
-            30 * 1024u64.pow(3)
-                + 4_000_000_000
-                + if config.generation == Some(1) {
-                    45_000_000_000
-                } else {
-                    0
-                },
-        )?;
+        let reserve = 30 * 1024u64.pow(3)
+            + 4_000_000_000
+            + if config.generation == Some(1) {
+                45_000_000_000
+            } else {
+                0
+            };
         let path = config
             .corpus_manifest
             .as_ref()
@@ -600,29 +504,27 @@ async fn run_open(
                 "full workload requires a distributed query population bound to its corpus".into(),
             );
         }
-        let state = engine
-            .cypher(
-                "MATCH (s:ImportState) RETURN s.manifest,s.complete",
-                BTreeMap::new(),
-                None,
-            )
-            .await?;
-        if state.rows != vec![vec![json!(hash(&bytes)), json!(true)]] {
-            return Err("corpus import identity is incomplete or different".into());
-        }
+        return Ok(Some((hash(&bytes), reserve)));
     }
-    let authority = Authority::open(engine).await?;
+    Ok(None)
+}
+
+async fn run_open(
+    authority: Arc<Authority>,
+    config: Config,
+    fixture: search::Fixture,
+) -> Result<Value, Error> {
     let bundle = if let Some(id) = config.generation {
         Some(
-            generations::pin(
-                &authority,
-                id,
-                fixture
-                    .corpus_manifest_sha256
-                    .as_deref()
-                    .ok_or("generation workload requires corpus identity")?,
-            )
-            .await?,
+            authority
+                .work_pin(
+                    id,
+                    fixture
+                        .corpus_manifest_sha256
+                        .as_deref()
+                        .ok_or("generation workload requires corpus identity")?,
+                )
+                .await?,
         )
     } else {
         None
@@ -632,14 +534,18 @@ async fn run_open(
             .set_permission(&config.run_id, scope, true)
             .await?;
     }
-    if authority.get(0, 4096).await? != authority::oracle_state(0, 4096) {
+    if authority.work_get(0, 4096).await? != authority::oracle_state(0, 4096) {
         return Err("historical oracle must be seeded before workload".into());
     }
     let digest = Sha256::digest(config.run_id.as_bytes());
     let base = 1_000_000_000 + u32::from_le_bytes(digest[..4].try_into()?) as u64 * 64;
     let mut baseline = Vec::new();
     for id in 0..50 {
-        if authority.get(base + id, i64::MAX as u64).await?.is_some() {
+        if authority
+            .work_get(base + id, i64::MAX as u64)
+            .await?
+            .is_some()
+        {
             return Err("workload run identity already has effects; do not replay".into());
         }
         let change = Change {
@@ -651,7 +557,7 @@ async fn run_open(
             body: body(&config.run_id, id as usize, 0),
             text_only: true,
         };
-        let receipt = authority.apply(&change).await?;
+        let receipt = authority.work_apply(&change).await?;
         if receipt.get("conflict").is_some() {
             return Err("workload seed conflicted".into());
         }
@@ -664,11 +570,8 @@ async fn run_open(
     let derived = if let Some(id) = config.generation {
         let deadline = Instant::now() + Duration::from_secs(300);
         loop {
-            let progress = tokio::time::timeout_at(
-                deadline,
-                Box::pin(generations::catch_up_one(&authority, id)),
-            )
-            .await??;
+            let progress =
+                tokio::time::timeout_at(deadline, Box::pin(authority.work_catch_up(id))).await??;
             atomic_json(&config.output.join("index-preparation.json"), &progress)?;
             if progress["remaining"] == 0 {
                 break progress;
@@ -706,7 +609,7 @@ async fn run_open(
         let done = indexing_done.clone();
         tokio::spawn(async move {
             loop {
-                let progress = Box::pin(generations::catch_up_one(&shared.authority, id)).await?;
+                let progress = Box::pin(shared.authority.work_catch_up(id)).await?;
                 let caught_up = progress["remaining"] == 0;
                 *shared
                     .derived
@@ -778,9 +681,19 @@ async fn run_open(
         }
     }
     if let Some(id) = shared.config.generation {
+        let progress = shared
+            .derived
+            .lock()
+            .map_err(|_| "derived progress poisoned")?
+            .clone();
         atomic_json(
             &shared.config.output.join("derived-oracle.json"),
-            &Box::pin(shared.derived_oracle(id)).await?,
+            &Box::pin(
+                shared
+                    .authority
+                    .work_derived_oracle(id, shared.base, progress),
+            )
+            .await?,
         )?;
     }
     let result = json!({"status":if failures.is_empty(){"passed"}else{"failed"},"diagnostic":shared.config.diagnostic,"phase":shared.config.phase,

@@ -35,6 +35,7 @@ use surrealkv::{Durability, LSMIterator, Tree};
 use crate::{Error, MIB, authority::Authority, checkpoint, load};
 
 mod changes;
+pub(crate) mod workload_backend;
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Settings {
@@ -107,7 +108,7 @@ pub(crate) fn start_ticks() -> Result<String, Error> {
 
 #[derive(Clone, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
-struct Bundle {
+pub(crate) struct Bundle {
     model: String,
     model_fingerprint: String,
     dimension: usize,

@@ -16,7 +16,7 @@ use crate::{Error, checkpoint, load, open_authority, search::Settings};
 const SEQ: &[u8] = b"authority:seq";
 
 mod oracle;
-pub(crate) use oracle::run as run_oracle;
+pub(crate) use oracle::{ORACLE_MEMORIES, oracle_state, run as run_oracle};
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

@@ -1,4 +1,9 @@
 mod authority;
+#[path = "../../query_fixture.rs"]
+mod query_fixture;
+#[path = "../../workload.rs"]
+mod workload;
+use search::workload_backend;
 mod load;
 mod search;
 
@@ -308,6 +313,12 @@ async fn main() -> Result<(), Error> {
         }
         println!("{}", search::run(root, Path::new(&args[3])).await?);
         return Ok(());
+    }
+    if operation == "--workload" {
+        if args.len() != 4 {
+            return Err("workload requires one configuration path".into());
+        }
+        return workload::run(root.to_owned(), Path::new(&args[3])).await;
     }
     if operation == "--authority" {
         if args.len() != 4 {
