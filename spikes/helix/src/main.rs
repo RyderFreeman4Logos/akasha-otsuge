@@ -63,12 +63,21 @@ fn config() -> Result<DbConfig, Error> {
 #[tokio::main(worker_threads = 2)]
 async fn main() -> Result<(), Error> {
     let args: Vec<_> = std::env::args_os().collect();
-    if !(3..=4).contains(&args.len()) {
+    if !(3..=5).contains(&args.len()) {
         return Err("usage: akasha-helix-probe OWNED_DATABASE_DIRECTORY CYPHER [before-execute|before-reply|after-reply]".into());
     }
-    if args[2] == "--load" {
+    if args[2] == "--load" || args[2] == "--resume-load" {
         let input = args.get(3).ok_or("--load requires a prepared JSONL path")?;
-        return load::run(PathBuf::from(&args[1]), PathBuf::from(input)).await;
+        return load::run(
+            PathBuf::from(&args[1]),
+            PathBuf::from(input),
+            args.get(4).map(PathBuf::from),
+            args[2] == "--resume-load",
+        )
+        .await;
+    }
+    if args.len() > 4 {
+        return Err("unexpected extra argument".into());
     }
     if args[2] == "--oracle-seed" || args[2] == "--oracle-verify" {
         let count = args

@@ -51,10 +51,15 @@ indexes, and checks matching, excluded scope, nearest self and reuse of an
 already active definition. Its vectors have only three dimensions; this checks
 API behavior, not production-size performance.
 
-`--load PREPARED_JSONL` requires a new directory, imports bounded records in
-16-record transactions and closes cleanly. Failed imports are deliberately not
-resumable. Real precomputed 1536-dimensional input is prepared by
-`../data/prepare_vectors.py`. `--build-indexes` builds the Document text and
+`--load PREPARED_JSONL [MANIFEST]` requires a new directory and imports bounded
+records in 16-record transactions. With a `prepare_corpus.py` manifest, each batch
+atomically stores its document count and input-prefix hash. `--resume-load INPUT
+MANIFEST` revalidates that prefix before any new writes and rejects changed
+manifests. It checks complete stream size/hash, body bytes, vector and document
+counts before marking the import complete. Progress is fsynced to the owned root.
+The manifest-free diagnostic form is not resumable. Real precomputed
+1536-dimensional input is prepared by `../data/prepare_vectors.py` or the full
+corpus preparer. `--build-indexes` builds the Document text and
 1536-dimensional vector indexes; its two-hour observation deadline is a harness
 limit, not a performance acceptance threshold.
 
@@ -92,3 +97,9 @@ made the diagnostic scan much slower. Membership cursors must strictly advance.
 This oracle proves the measured history/transaction leaf only: derived watermarks,
 live permission revocation, 100 clients and the full-scale profiles remain separate
 required acceptance work.
+
+`check_import.py ABSOLUTE_PROBE_BINARY` force-kills its own child after 32 durable
+documents, rejects a changed prefix, resumes 1,057 documents including a partial
+last batch, repeats resume without duplicates and rejects a changed manifest.
+`AKASHA_SPIKE_IMPORT_HOLD_AFTER` is only an explicit crash-fixture barrier; normal
+imports leave it unset. Test directories are owned and removed after children exit.
