@@ -11,14 +11,16 @@ from run_case import digest, publish
 
 
 def main():
-    binary, source, output = [pathlib.Path(p).resolve() for p in sys.argv[1:]]
+    binary, source, output = [pathlib.Path(p).resolve() for p in sys.argv[1:4]]
+    backend = sys.argv[4] if len(sys.argv) == 5 else 'helix'
+    assert backend in {'helix', 'fallback'} and len(sys.argv) in {4, 5}
     runner = pathlib.Path(__file__).with_name('run_generation.py').resolve()
     output.mkdir(mode=0o700)
     (output/'OWNER').write_text('akasha-otsuge MVP-003 owned oracle runner evidence\n')
     records, started = [], time.monotonic()
     with tempfile.TemporaryDirectory(prefix='akasha-oracle-runner-') as temporary:
         root=pathlib.Path(temporary);database=root/'database'
-        (root/'OWNER').write_text('akasha-otsuge MVP-003 disposable oracle database\n')
+        (root/'OWNER').write_text('akasha-otsuge MVP-003 owned corpus import and database\n')
         publish(output/'admission.json',dict(binary_sha256=digest(binary),runner_sha256=digest(runner),harness_sha256=digest(__file__),temporary_root=temporary))
         def run(name,command,success=True):
             result=subprocess.run(command,capture_output=True,text=True,timeout=300)
@@ -68,8 +70,14 @@ max_attempts = 1
         checkpoint=json.loads((database/'oracle-verify-text-2048.json').read_text())
         assert checkpoint['completed']==checkpoint['total'] and checkpoint['completed']>4000
         publish(output/'verify-checkpoint.json',checkpoint)
-        count=run('count',[str(binary),str(database),"MATCH (c:Counter {key:'global'}) RETURN c.seq"])
-        assert json.loads(count)['rows']==[[2048]] and len(records)==10
+        if backend == 'fallback':
+            status = output/'status.json';publish(status,dict(op='status'))
+            count=run('count',[str(binary),str(database),'--authority',str(status)])
+            assert json.loads(count)['commit_seq']==2048
+        else:
+            count=run('count',[str(binary),str(database),"MATCH (c:Counter {key:'global'}) RETURN c.seq"])
+            assert json.loads(count)['rows']==[[2048]]
+        assert len(records)==10
     publish(output/'result.json',dict(status='passed',records=records,seconds=time.monotonic()-started,
         exact_commits=2048,temporary_database_removed=True,not_tested=['full database history performance','power loss']))
     print(json.dumps(dict(status='passed',checks=len(records),seconds=time.monotonic()-started)))

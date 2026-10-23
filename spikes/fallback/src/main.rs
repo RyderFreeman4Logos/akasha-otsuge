@@ -316,6 +316,16 @@ async fn main() -> Result<(), Error> {
         println!("{}", authority::run(root, Path::new(&args[3])).await?);
         return Ok(());
     }
+    if matches!(operation, "--oracle-seed-text" | "--oracle-verify-text") {
+        if args.len() != 4 {
+            return Err("usage: probe ROOT --oracle-seed-text|--oracle-verify-text COUNT".into());
+        }
+        println!(
+            "{}",
+            authority::run_oracle(root, operation, args[3].parse()?).await?
+        );
+        return Ok(());
+    }
     if matches!(operation, "import-state" | "verify-import" | "corpus-get") {
         if args.len() != if operation == "corpus-get" { 4 } else { 3 } {
             return Err("invalid corpus command arguments".into());

@@ -36,7 +36,7 @@ use crate::{Error, MIB, checkpoint, load, open_authority};
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Settings {
-    seconds: u64,
+    pub(crate) seconds: u64,
     reserve: u64,
 }
 
@@ -78,14 +78,14 @@ impl Settings {
     }
 }
 
-fn now_ms() -> Result<u64, Error> {
+pub(crate) fn now_ms() -> Result<u64, Error> {
     Ok(SystemTime::now()
         .duration_since(UNIX_EPOCH)?
         .as_millis()
         .try_into()?)
 }
 
-fn remaining(deadline: u64) -> Result<Duration, Error> {
+pub(crate) fn remaining(deadline: u64) -> Result<Duration, Error> {
     let ms = deadline
         .checked_sub(now_ms()?)
         .filter(|v| *v > 0)
@@ -93,7 +93,7 @@ fn remaining(deadline: u64) -> Result<Duration, Error> {
     Ok(Duration::from_millis(ms))
 }
 
-fn start_ticks() -> Result<String, Error> {
+pub(crate) fn start_ticks() -> Result<String, Error> {
     Ok(std::fs::read_to_string("/proc/self/stat")?
         .rsplit_once(')')
         .ok_or("invalid process identity")?

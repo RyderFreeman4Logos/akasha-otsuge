@@ -15,6 +15,9 @@ use crate::{Error, checkpoint, load, open_authority, search::Settings};
 
 const SEQ: &[u8] = b"authority:seq";
 
+mod oracle;
+pub(crate) use oracle::run as run_oracle;
+
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Change {
@@ -611,7 +614,7 @@ mod tests {
     };
     use tokio::sync::Notify;
 
-    fn fixture() -> Result<(PathBuf, Authority), Error> {
+    pub(super) fn fixture() -> Result<(PathBuf, Authority), Error> {
         let path = std::env::temp_dir().join(format!(
             "akasha-authority-unit-{}-{}",
             std::process::id(),

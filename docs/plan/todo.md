@@ -187,8 +187,12 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       current permissions. Three release units include a deterministic concurrent
       revocation race and corrupted head/sequence refusal; 47 search regressions
       pass on the preceding candidate. Encoded-record escape expansion has a real
-      failing/passing regression. Full 100k history, concurrent workloads and actual
-      outbox application/activation remain required.
+      failing/passing regression. The fallback now shares the unchanged frozen
+      history model with Helix. Ten owned-runner cases pass 2,048 changes/replay
+      and 5,163 historical checks; a fourth native unit rejects work after the
+      original persisted deadline. A separate 100k run on real-shard storage is
+      ongoing. Full-corpus history, concurrent workloads and actual outbox
+      application/activation remain required.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 

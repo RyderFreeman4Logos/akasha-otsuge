@@ -14,6 +14,17 @@ Pinned source:
 | LanceDB derived search | 0.40.0 | `b1b080b97c3edd2fd9f2aae8a3b71ff19487b1f8` | Apache-2.0 |
 | Lance Rust components | 13.0.0 | registry checksums in Cargo.lock | Apache-2.0 |
 
+`--oracle-seed-text COUNT` and `--oracle-verify-text COUNT` reuse the frozen
+version-1 history model in `spikes/oracle_model.rs`. Both run through the existing
+exclusive generation controller, publish durable process-identified checkpoints
+and preserve the first absolute operation deadline across native replay. The
+[history receipts](../../docs/benchmarks/results/fallback-history/summary.json)
+cover ten controller cases, 2,048 changes and 5,163 exact historical checks on
+eight real source records. Four release units include expired-deadline refusal
+before a new commit. The separate 100k real-shard run and full-corpus history are
+not claimed by this small receipt. Build with the repository's fixed installed
+Rust 1.99.1; a retained `mise rust@stable` update failure preceded compilation.
+
 The initial LanceDB build with no features failed in upstream `job.rs`: it names
 `Error::Http` even though that variant is gated behind `remote`. The probe enables
 the existing `remote` compilation feature to resolve this tag's feature mismatch;
