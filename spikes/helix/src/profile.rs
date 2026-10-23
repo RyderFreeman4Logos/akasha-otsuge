@@ -27,6 +27,7 @@ struct Budget {
     fts_cache_mib: u64,
     vector_build_cache_mib: u64,
     unflushed_mib: usize,
+    slate_subcompactions: usize,
 }
 
 impl Budget {
@@ -41,6 +42,7 @@ impl Budget {
                 fts_cache_mib: 8,
                 vector_build_cache_mib: 32,
                 unflushed_mib: 32,
+                slate_subcompactions: 1,
             }),
             Some(Some("high")) => Ok(Self {
                 profile: "high",
@@ -51,6 +53,7 @@ impl Budget {
                 fts_cache_mib: 32,
                 vector_build_cache_mib: 512,
                 unflushed_mib: 64,
+                slate_subcompactions: 4,
             }),
             _ => Err("AKASHA_SPIKE_PROFILE must be low or high".into()),
         }
@@ -116,6 +119,8 @@ impl Budget {
             .and_then(|options| options.worker.as_mut())
         {
             worker.compression_codec = slate.compression_codec;
+            // Each range holds its own merge/read-ahead buffers.
+            worker.max_subcompactions = self.slate_subcompactions;
         }
         Ok(DbConfig::new()
             .with_query_telemetry(QueryTelemetry::Disabled)
@@ -175,5 +180,20 @@ mod tests {
         assert_eq!(backfill.vector_build_cache_bytes().get(), 512 * MIB);
         assert_eq!(backfill.batch().max_output_bytes().get(), 8 * MIB);
         assert_eq!(backfill.edge_property_read_batch().get(), 1);
+    }
+
+    #[test]
+    fn low_profile_bounds_compaction_ranges_in_actual_writer_settings() {
+        for (profile, ranges) in [("low", 1), ("high", 4)] {
+            let config = Budget::parse(Some(OsStr::new(profile)))
+                .unwrap()
+                .config()
+                .unwrap();
+            let settings = config.slate().to_writer_settings(None);
+            let worker = settings.compactor_options.unwrap().worker.unwrap();
+            assert_eq!(worker.max_subcompactions, ranges, "{profile}");
+            assert_eq!(worker.max_fetch_tasks, 4);
+            assert_eq!(worker.bytes_to_fetch, 2 * MIB as usize);
+        }
     }
 }
