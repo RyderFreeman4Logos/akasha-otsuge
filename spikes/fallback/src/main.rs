@@ -301,7 +301,7 @@ async fn main() -> Result<(), Error> {
     if std::fs::read_to_string(root.join("OWNER"))? != OWNER {
         return Err("foreign probe root".into());
     }
-    if operation == "derive" {
+    if matches!(operation, "derive" | "--generation") {
         if args.len() != 4 {
             return Err("usage: probe ROOT derive REQUEST.json".into());
         }

@@ -178,8 +178,12 @@ def main():
         native_args = ['--generation', str(output / 'request.json')]
     command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit,
                '-p', f'MemoryMax={(640 if run["profile"] == "low" else 2048)*1024**2}',
-               '-p', 'MemorySwapMax=0', '-p', f'RuntimeMaxSec={run["seconds"]}',
+               '-p', 'MemorySwapMax=0', '-p', 'LimitNOFILE=8192',
+               '-p', f'RuntimeMaxSec={run["seconds"]}',
                '-p', 'Environment=AKASHA_SPIKE_PROFILE='+run['profile'],
+               '-p', 'Environment=LANCE_CPU_THREADS=2',
+               '-p', 'Environment=LANCE_SHUFFLE_BATCH_BYTES=16777216',
+               '-p', 'Environment=LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES=0',
                '-p', 'Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES='+str(disk['reserve_bytes']),
                '-p', 'Environment=AKASHA_SPIKE_INDEX_OBSERVE_SECONDS='+str(run['seconds']),
                sys.executable, str(observer), str(attempt_dir / 'memory.jsonl'), str(output / 'probe'),

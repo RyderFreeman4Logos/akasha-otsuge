@@ -5,7 +5,7 @@ use std::{
     io::Read,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
-    time::Instant,
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 use arrow_array::{
@@ -33,6 +33,76 @@ use sha2::{Digest, Sha256};
 use surrealkv::{Durability, LSMIterator, Tree};
 
 use crate::{Error, MIB, checkpoint, load, open_authority};
+
+#[derive(Clone, Copy, Debug)]
+struct Settings {
+    seconds: u64,
+    reserve: u64,
+}
+
+impl Settings {
+    fn read(root: &Path) -> Result<Self, Error> {
+        let env = |name: &str| -> Result<Option<String>, Error> {
+            std::env::var_os(name)
+                .map(|v| v.into_string().map_err(|_| "non-UTF8 index setting".into()))
+                .transpose()
+        };
+        let seconds = env("AKASHA_SPIKE_INDEX_OBSERVE_SECONDS")?
+            .map(|v| v.parse::<u64>())
+            .transpose()?
+            .unwrap_or(7200);
+        if !(1..=604800).contains(&seconds) {
+            return Err("invalid index observation seconds".into());
+        }
+        let reserve = env("AKASHA_SPIKE_DISK_RESERVE_BYTES")?
+            .map(|v| v.parse::<u64>())
+            .transpose()?;
+        if reserve.is_some_and(|v| v < 30 * 1024u64.pow(3) + 4_000_000_000) {
+            return Err("disk reservation must retain scratch and 30 GiB".into());
+        }
+        let settings = Self {
+            seconds,
+            reserve: reserve.unwrap_or(0),
+        };
+        settings.check_disk(root)?;
+        eprintln!("INDEX_OBSERVATION_SECONDS:{seconds}");
+        eprintln!("DISK_RESERVATION_BYTES:{}", settings.reserve);
+        Ok(settings)
+    }
+
+    fn check_disk(&self, root: &Path) -> Result<(), Error> {
+        if fs4::available_space(root)? < self.reserve {
+            return Err("disk reservation reached".into());
+        }
+        Ok(())
+    }
+}
+
+fn now_ms() -> Result<u64, Error> {
+    Ok(SystemTime::now()
+        .duration_since(UNIX_EPOCH)?
+        .as_millis()
+        .try_into()?)
+}
+
+fn remaining(deadline: u64) -> Result<Duration, Error> {
+    let ms = deadline
+        .checked_sub(now_ms()?)
+        .filter(|v| *v > 0)
+        .ok_or("original operation deadline expired")?;
+    Ok(Duration::from_millis(ms))
+}
+
+fn start_ticks() -> Result<String, Error> {
+    Ok(std::fs::read_to_string("/proc/self/stat")?
+        .rsplit_once(')')
+        .ok_or("invalid process identity")?
+        .1
+        .split_whitespace()
+        .nth(19)
+        .ok_or("missing process start ticks")?
+        .into())
+}
 
 #[derive(Clone, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -67,9 +137,11 @@ impl Bundle {
 #[derive(Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 enum Request {
+    #[serde(alias = "begin_corpus")]
     Begin {
         generation: u64,
         bundle: Bundle,
+        manifest: Option<PathBuf>,
     },
     Backfill {
         generation: u64,
@@ -113,6 +185,8 @@ struct State {
     vector_version: u64,
     pending: Option<Wave>,
     ready: bool,
+    backfill_deadline_ms: Option<u64>,
+    index_deadline_ms: Option<u64>,
 }
 
 fn key(generation: u64) -> Result<String, Error> {
@@ -159,6 +233,37 @@ async fn save(tree: &Tree, state: &State) -> Result<(), Error> {
     )?;
     tx.commit().await?;
     Ok(())
+}
+
+async fn deadline(
+    tree: &Tree,
+    state: &mut State,
+    settings: Settings,
+    index: bool,
+) -> Result<u64, Error> {
+    let stored = if index {
+        state.index_deadline_ms
+    } else {
+        state.backfill_deadline_ms
+    };
+    let value = match stored {
+        Some(value) => value,
+        None => {
+            let value = now_ms()?
+                .checked_add(settings.seconds * 1000)
+                .ok_or("operation deadline overflow")?;
+            if index {
+                state.index_deadline_ms = Some(value);
+            } else {
+                state.backfill_deadline_ms = Some(value);
+            }
+            save(tree, state).await?;
+            value
+        }
+    };
+    remaining(value)?;
+    eprintln!("ORIGINAL_OPERATION_DEADLINE_MS:{value}");
+    Ok(value)
 }
 
 async fn connect(root: &Path) -> Result<Connection, Error> {
@@ -371,6 +476,7 @@ async fn backfill(
     state: &mut State,
     waves: u64,
     hold: Option<&str>,
+    settings: Settings,
 ) -> Result<(), Error> {
     if !(1..=1_000_000).contains(&waves) {
         return Err("invalid wave count".into());
@@ -386,10 +492,17 @@ async fn backfill(
     let connection = connect(root).await?;
     let started = Instant::now();
     let initial = state.cursor;
+    let identity = start_ticks()?;
     for _ in 0..waves {
         if state.cursor == state.documents {
             break;
         }
+        settings.check_disk(root)?;
+        remaining(
+            state
+                .backfill_deadline_ms
+                .ok_or("missing backfill deadline")?,
+        )?;
         let rows = {
             let tx = tree.begin()?;
             let mut iter = tx.range(
@@ -460,14 +573,11 @@ async fn backfill(
         let elapsed = started.elapsed().as_secs_f64();
         let done = state.cursor - initial;
         load::atomic_json(
-            &root.join(format!(
-                "generation-{}-backfill-progress.json",
-                state.generation
-            )),
+            &root.join(format!("generation-{}-backfill.json", state.generation)),
             &json!({
                 "phase":"backfill","completed":state.cursor,"total":state.documents,"elapsed_s":elapsed,
                 "rate_per_s":done as f64/elapsed,"eta_s":(state.documents-state.cursor) as f64*elapsed/done as f64,
-                "pid":std::process::id(),"state":state
+                "pid":std::process::id(),"start_ticks":identity,"deadline_unix_ms":state.backfill_deadline_ms,"state":state
             }),
         )?;
         checkpoint(hold, "after-cursor").await;
@@ -487,17 +597,35 @@ struct Stage {
 struct Progress {
     path: PathBuf,
     stages: Mutex<BTreeMap<String, Stage>>,
+    settings: Settings,
+    deadline: u64,
+    start_ticks: String,
 }
 impl Progress {
     fn write(&self, active: &str, stages: &BTreeMap<String, Stage>) -> lance_core::Result<()> {
+        self.settings
+            .check_disk(
+                self.path
+                    .parent()
+                    .ok_or_else(|| lance_core::Error::io("missing progress parent"))?,
+            )
+            .map_err(|e| lance_core::Error::io(e.to_string()))?;
+        remaining(self.deadline).map_err(|e| lance_core::Error::io(e.to_string()))?;
         let values:BTreeMap<_,_>=stages.iter().map(|(name,s)|{
             let elapsed=s.started.elapsed().as_secs_f64();
-            (name,json!({"total":s.total,"completed":s.completed,"unit":s.unit,"elapsed_s":elapsed,"done":s.done,
+            (name.as_str(),json!({"total":s.total,"completed":s.completed,"unit":s.unit,"elapsed_s":elapsed,"done":s.done,
                 "rate_per_s":s.completed as f64/elapsed,"eta_s":s.total.filter(|_|s.completed>0).map(|t|t.saturating_sub(s.completed) as f64*elapsed/s.completed as f64)}))
         }).collect();
+        let current = values
+            .get(active)
+            .ok_or_else(|| lance_core::Error::io("missing active progress stage"))?;
+        eprintln!(
+            "INDEX_PROGRESS:{}",
+            json!({"phase":active,"progress":current,"pid":std::process::id(),"start_ticks":self.start_ticks,"deadline_unix_ms":self.deadline})
+        );
         load::atomic_json(
             &self.path,
-            &json!({"phase":active,"pid":std::process::id(),"stages":values}),
+            &json!({"phase":active,"pid":std::process::id(),"start_ticks":self.start_ticks,"deadline_unix_ms":self.deadline,"stages":values}),
         )
         .map_err(|e| lance_core::Error::io(format!("persist index progress: {e}")))
     }
@@ -550,9 +678,15 @@ impl IndexBuildProgress for Progress {
     }
 }
 
+struct BuildContext<'a> {
+    root: &'a Path,
+    settings: Settings,
+    deadline: u64,
+}
+
 async fn index(
     table: &Table,
-    root: &Path,
+    context: &BuildContext<'_>,
     name: &str,
     column: &str,
     kind: IndexType,
@@ -560,6 +694,8 @@ async fn index(
     rows: u64,
 ) -> Result<(), Error> {
     if !table.list_indices().await?.iter().any(|i| i.name == name) {
+        context.settings.check_disk(context.root)?;
+        remaining(context.deadline)?;
         let wrapper = table.dataset().ok_or("local dataset required")?;
         let mut dataset = (*wrapper.get().await?).clone();
         dataset
@@ -567,8 +703,13 @@ async fn index(
             .name(name.into())
             .replace(false)
             .progress(Arc::new(Progress {
-                path: root.join(format!("{}-{name}-progress.json", table.name())),
+                path: context
+                    .root
+                    .join(format!("{}-{name}-progress.json", table.name())),
                 stages: Mutex::new(BTreeMap::new()),
+                settings: context.settings,
+                deadline: context.deadline,
+                start_ticks: start_ticks()?,
             }))
             .await?;
         wrapper.update(dataset);
@@ -583,7 +724,12 @@ async fn index(
     Ok(())
 }
 
-async fn build(tree: &Tree, root: &Path, state: &mut State) -> Result<(), Error> {
+async fn build(
+    tree: &Tree,
+    root: &Path,
+    state: &mut State,
+    settings: Settings,
+) -> Result<(), Error> {
     if state.cursor != state.documents
         || state.vector_rows != state.vectors
         || state.pending.is_some()
@@ -591,6 +737,11 @@ async fn build(tree: &Tree, root: &Path, state: &mut State) -> Result<(), Error>
         return Err("backfill is incomplete".into());
     }
     let connection = connect(root).await?;
+    let context = BuildContext {
+        root,
+        settings,
+        deadline: state.index_deadline_ms.ok_or("missing index deadline")?,
+    };
     let text = connection
         .open_table(table_name(state.generation, false))
         .execute()
@@ -598,10 +749,19 @@ async fn build(tree: &Tree, root: &Path, state: &mut State) -> Result<(), Error>
     if text.count_rows(None).await? as u64 != state.documents {
         return Err("text row coverage mismatch".into());
     }
+    if state.ready {
+        let indexes = text.list_indices().await?;
+        if !["scope_bitmap", "body_fts"]
+            .iter()
+            .all(|name| indexes.iter().any(|i| i.name == *name))
+        {
+            return Err("ready index missing; create another generation".into());
+        }
+    }
     let bitmap = ScalarIndexParams::for_builtin(BuiltinIndexType::Bitmap);
     index(
         &text,
-        root,
+        &context,
         "scope_bitmap",
         "scope",
         IndexType::Bitmap,
@@ -615,7 +775,7 @@ async fn build(tree: &Tree, root: &Path, state: &mut State) -> Result<(), Error>
         .with_position(false);
     index(
         &text,
-        root,
+        &context,
         "body_fts",
         "body",
         IndexType::Inverted,
@@ -631,9 +791,18 @@ async fn build(tree: &Tree, root: &Path, state: &mut State) -> Result<(), Error>
         if vector.count_rows(None).await? as u64 != state.vectors {
             return Err("vector row coverage mismatch".into());
         }
+        if state.ready {
+            let indexes = vector.list_indices().await?;
+            if !["scope_bitmap", "vector_ivf"]
+                .iter()
+                .all(|name| indexes.iter().any(|i| i.name == *name))
+            {
+                return Err("ready index missing; create another generation".into());
+            }
+        }
         index(
             &vector,
-            root,
+            &context,
             "scope_bitmap",
             "scope",
             IndexType::Bitmap,
@@ -649,7 +818,7 @@ async fn build(tree: &Tree, root: &Path, state: &mut State) -> Result<(), Error>
             VectorIndexParams::with_ivf_flat_params(lancedb::DistanceType::Cosine.into(), ivf);
         index(
             &vector,
-            root,
+            &context,
             "vector_ivf",
             "vector",
             IndexType::Vector,
@@ -658,8 +827,11 @@ async fn build(tree: &Tree, root: &Path, state: &mut State) -> Result<(), Error>
         )
         .await?;
     }
-    state.ready = true;
-    save(tree, state).await
+    if !state.ready {
+        state.ready = true;
+        save(tree, state).await?;
+    }
+    Ok(())
 }
 
 async fn query(
@@ -722,14 +894,30 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
         return Err("derived request exceeds 1 MiB".into());
     }
     let request: Request = serde_json::from_slice(&bytes)?;
+    let settings = Settings::read(root)?;
     let tree = open_authority(root)?;
     let corpus = load::read_state(&tree.begin()?)?;
     if !corpus.complete {
         return Err("corpus import is incomplete".into());
     }
     let result = match request {
-        Request::Begin { generation, bundle } => {
+        Request::Begin {
+            generation,
+            bundle,
+            manifest,
+        } => {
             bundle.validate()?;
+            if let Some(path) = manifest {
+                let mut bytes = Vec::new();
+                File::open(path)?
+                    .take(1024 * 1024 + 1)
+                    .read_to_end(&mut bytes)?;
+                if bytes.len() > 1024 * 1024
+                    || load::hex(&Sha256::new_with_prefix(&bytes)) != corpus.manifest_sha256
+                {
+                    return Err("generation corpus manifest mismatch".into());
+                }
+            }
             let existing = tree.begin()?.get(key(generation)?.as_bytes())?;
             let value = if existing.is_some() {
                 let value = state(&tree, generation)?;
@@ -750,6 +938,8 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
                     vector_version: 0,
                     pending: None,
                     ready: false,
+                    backfill_deadline_ms: None,
+                    index_deadline_ms: None,
                 };
                 save(&tree, &value).await?;
                 value
@@ -762,12 +952,44 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
             hold,
         } => {
             let mut value = state(&tree, generation)?;
-            backfill(&tree, root, &mut value, waves, hold.as_deref()).await?;
+            if !(1..=1_000_000).contains(&waves) {
+                return Err("invalid wave count".into());
+            }
+            if hold.as_deref().is_some_and(|h| {
+                !matches!(
+                    h,
+                    "before-text" | "after-text" | "after-vector" | "after-cursor"
+                )
+            }) {
+                return Err("invalid backfill checkpoint".into());
+            }
+            if value.cursor < value.documents {
+                let until = deadline(&tree, &mut value, settings, false).await?;
+                tokio::time::timeout(
+                    remaining(until)?,
+                    backfill(&tree, root, &mut value, waves, hold.as_deref(), settings),
+                )
+                .await
+                .map_err(|_| "original operation deadline expired")??;
+            }
             serde_json::to_value(value)?
         }
         Request::Build { generation } => {
             let mut value = state(&tree, generation)?;
-            build(&tree, root, &mut value).await?;
+            if value.ready {
+                build(&tree, root, &mut value, settings).await?;
+            } else {
+                if value.cursor != value.documents
+                    || value.vector_rows != value.vectors
+                    || value.pending.is_some()
+                {
+                    return Err("backfill is incomplete".into());
+                }
+                let until = deadline(&tree, &mut value, settings, true).await?;
+                tokio::time::timeout(remaining(until)?, build(&tree, root, &mut value, settings))
+                    .await
+                    .map_err(|_| "original operation deadline expired")??;
+            }
             serde_json::to_value(value)?
         }
         Request::Status { generation } => serde_json::to_value(state(&tree, generation)?)?,

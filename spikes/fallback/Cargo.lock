@@ -90,6 +90,7 @@ dependencies = [
  "arrow-array",
  "arrow-schema",
  "async-trait",
+ "fs4",
  "futures",
  "lance",
  "lance-core",

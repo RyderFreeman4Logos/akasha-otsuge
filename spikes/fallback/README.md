@@ -134,8 +134,8 @@ uncompressed VLog layout). Low reopen verifies original bytes and mappings in
 These short samples do not establish sustained P99 or full-size memory behavior.
 No new resolved package was added; only the probe gained a direct Zstd edge.
 
-Remaining: enlarge the corpus with the verified compressed layout,
-complete full-size import/indexes, authority/outbox and derived generation
+Remaining: verify the completed full import at the low resource profile,
+complete full-size indexes, authority/outbox and derived generation
 reconciliation, then the unchanged workload and recovery matrix. The original
 84GB expanded stream is never materialized. Existing Helix diagnostic passes do
 not transfer to this implementation.
@@ -162,3 +162,35 @@ operation RED and the first append-mode failure: explicit native WriteParams
 defaulted to Create, so subsequent appends must set Append explicitly. No
 upstream code was changed. The three new direct dependency edges reuse already
 resolved packages; no new package was added.
+
+`--generation` now uses the existing exclusive `run_generation.py` controller.
+Backfill and index construction persist separate absolute deadlines before work;
+resume cannot extend them. Native progress includes PID/start ticks, and disk
+reservations are checked before effects and at wave/index boundaries. The
+[47-command extension](../../docs/benchmarks/results/fallback-owned-search/summary.json)
+proves deadline refusal after SIGKILL and continued reads of the ready generation.
+It also binds the requested corpus manifest to the imported source hash.
+
+The real 38,462-row shard backfills in 10.311s. Its first low-profile index build
+OOMs during partition merging, retained with the systemd journal. Lance defaults
+to 128MiB shuffle batches and preloaded partition windows. The controller now
+uses the existing `LANCE_SHUFFLE_BATCH_BYTES=16777216` and
+`LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES=0` controls, selecting bounded singleton
+partition reads, with two compute threads. After explicit failed-run abandonment,
+the same binary completes the remaining index build in 19.730s, preserving its
+original native deadline. Seventeen samples show native RSS max 464,904,192B;
+the 640MiB/swap=0 group reclaims cache but records no OOM. This is not sustained
+P99 evidence. The observer records the effective native environment and file limit.
+
+Eight source-bound query vectors exercise BM25 and ANN in every scope: 16 queries,
+297 native commands and 272 independently checked authority candidates pass.
+All eight ANN queries return their source at top20; six BM25 queries do, reported
+without claiming an expected BM25 rank or full-corpus ANN recall. The query group
+uses at most 178,450,432B sampled harness-plus-child RSS without throttling/OOM.
+The checker retains hashes instead of duplicating complete source records.
+
+Full corpus import has completed at 37,799,542,784 allocated database bytes.
+The default systemd soft file limit of 1,024 cannot open its 2,202 native VLogs;
+generation services therefore explicitly use `LimitNOFILE=8192`. This is local
+to the measured services, with no global configuration change. Full-data low
+verification, full indexes and the unchanged workload matrix remain separate.

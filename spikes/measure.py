@@ -4,6 +4,7 @@
 import hashlib
 import json
 import pathlib
+import resource
 import subprocess
 import sys
 import time
@@ -59,7 +60,12 @@ def main():
         raise SystemExit("requires a memory hard limit and disabled cgroup swap")
     started = time.monotonic()
     with open(sys.argv[1], "x", encoding="utf-8") as samples:
-        samples.write(json.dumps({"event": "start", "limits": limits, "command": sys.argv[2:]}) + "\n")
+        samples.write(json.dumps({"event": "start", "limits": limits,
+                                  "nofile_soft_hard": resource.getrlimit(resource.RLIMIT_NOFILE),
+                                  "native_environment": {name: os.environ.get(name) for name in (
+                                      "LANCE_CPU_THREADS", "LANCE_SHUFFLE_BATCH_BYTES",
+                                      "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES")},
+                                  "command": sys.argv[2:]}) + "\n")
         child = subprocess.Popen(sys.argv[2:])
         try:
             with open(f"/proc/{child.pid}/exe", "rb") as executable:

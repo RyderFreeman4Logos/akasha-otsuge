@@ -170,7 +170,18 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       four cross-store SIGKILL/resume barriers, native append receipts, complete
       index coverage, reopened scope-filtered BM25/ANN and bundle validation.
       This is a synthetic baseline; ordinary changes, activation and real/full
-      corpus index measurements remain pending. Full compressed import is running.
+      corpus index measurements remain pending. The compressed full import now
+      completes at 37,799,542,784 allocated database bytes. Its initial low reopen
+      fails at systemd's soft 1024 file limit against 2,202 VLogs; verification with
+      an explicit service-local 8192 limit is running, under the original memory
+      limits and observation deadline. Full low acceptance is not yet claimed.
+      The controller/deadline extension passes 47 native commands. Real-shard
+      backfill succeeds; default Lance shuffle/window buffering OOMs on index
+      merge. Existing 16MiB shuffle and no-offset-preload controls then complete
+      the same native build with its original deadline preserved, RSS sampled
+      max 464,904,192B. Sixteen real queries across all eight scopes and 272
+      independently checked source candidates pass. Full indexes and all ordinary
+      change/permission/activation obligations remain open.
 - [ ] Publish ADR, exact-source gates/review, raw receipts and CI; merge PR #31
       and close #3 only with its acceptance complete.
 
