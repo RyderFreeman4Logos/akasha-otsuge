@@ -53,6 +53,28 @@ impl Authority {
     pub(crate) async fn work_apply(&self, change: &Change) -> Result<Value, Error> {
         self.apply(change, None).await
     }
+    pub(crate) async fn work_correction_source(&self, memory: u64) -> Result<Value, Error> {
+        let tx = self.tree.begin_with_mode(Mode::ReadOnly)?;
+        let original = self
+            .get(&tx, memory, 0)?
+            .ok_or("missing original correction source")?;
+        let current = self
+            .get(&tx, memory, authority::point(&tx)?)?
+            .ok_or("missing correction head")?;
+        if !original.text_only
+            || !current.text_only
+            || !current.active
+            || original.source_key.is_none()
+            || original.source_key != current.source_key
+            || original.body != current.body
+            || original.scope != current.scope
+        {
+            return Err("corrections require restored unvectorized corpus sources".into());
+        }
+        Ok(
+            json!({"memory":memory,"seq":current.seq,"scope":current.scope,"body":current.body,"key":current.source_key}),
+        )
+    }
     pub(crate) async fn work_current(&self, principal: &str, memory: u64) -> Result<Value, Error> {
         let mut result = self.current(principal, memory).await?;
         result["entry"] = projected(result["entry"].take());
@@ -157,7 +179,19 @@ impl Authority {
         id: u64,
         base: u64,
         progress: Value,
+        corrections: &[u64],
     ) -> Result<Value, Error> {
+        let mut filter = format!("id >= {base} AND id <= {}", base + 49);
+        if !corrections.is_empty() {
+            filter = format!(
+                "({filter}) OR id IN ({})",
+                corrections
+                    .iter()
+                    .map(u64::to_string)
+                    .collect::<Vec<_>>()
+                    .join(",")
+            );
+        }
         let connection = connect(&self.root).await?;
         let table = connection
             .open_table(format!("g{id}_delta_text"))
@@ -171,7 +205,7 @@ impl Authority {
                 "scope".into(),
                 "body".into(),
             ]))
-            .only_if(format!("id >= {base} AND id <= {}", base + 49))
+            .only_if(filter.clone())
             .execute()
             .await?;
         let mut latest: BTreeMap<u64, Value> = BTreeMap::new();
@@ -183,7 +217,9 @@ impl Authority {
             for row in 0..batch.num_rows() {
                 let memory = ids.value(row);
                 let seq = seqs.value(row);
-                if !(base..=base + 49).contains(&memory) || scopes.value(row) > 7 {
+                if (!(base..=base + 49).contains(&memory) && !corrections.contains(&memory))
+                    || scopes.value(row) > 7
+                {
                     return Err("derived workload row outside requested range".into());
                 }
                 let value = json!({"memory":memory,"seq":seq,"scope":scopes.value(row),"active":true,"body_sha256":hash(bodies.value(row).as_bytes())});
@@ -232,11 +268,7 @@ impl Authority {
                 .open_table(format!("g{id}_delta_vector"))
                 .execute()
                 .await?;
-            if table
-                .count_rows(Some(format!("id >= {base} AND id <= {}", base + 49)))
-                .await?
-                > 0
-            {
+            if table.count_rows(Some(filter)).await? > 0 {
                 return Err("text-only workload has derived vectors".into());
             }
         }

@@ -72,6 +72,9 @@ impl Authority {
     pub(crate) async fn work_rebuild(&self, _id: u64, _active: u64) -> Result<Value, Error> {
         Err("concurrent rebuild is unsupported for the rejected Helix candidate".into())
     }
+    pub(crate) async fn work_correction_source(&self, _memory: u64) -> Result<Value, Error> {
+        Err("corpus correction workload is unsupported for the rejected Helix candidate".into())
+    }
     pub(crate) async fn work_query(
         &self,
         query: &Query,
@@ -118,7 +121,13 @@ impl Authority {
         id: u64,
         base: u64,
         progress: Value,
+        corrections: &[u64],
     ) -> Result<Value, Error> {
+        if !corrections.is_empty() {
+            return Err(
+                "corpus correction workload is unsupported for the rejected Helix candidate".into(),
+            );
+        }
         let range =
             SourcePredicate::between("memory", i64::try_from(base)?, i64::try_from(base + 49)?);
         let response = self

@@ -350,6 +350,18 @@ steps; completed reuse makes no native calls. The small fixture covers a killed
 commit/reply boundary and tamper refusals. These are serial checks; simultaneous
 query/build behavior uses the separate workload controller.
 
+The workload controller optionally accepts `[paths].corrections`: a pinned JSON
+array of eight original unvectorized corpus candidates, one per scope, each with
+`memory`, `scope`, `key`, `body` and `query_index`. Native admission verifies
+original authority content and a current BM25 hit before starting. The existing
+correction clients cycle through correction, rescoping, retraction and original
+restoration; duration must be a multiple of160seconds. Fixed query IDs are
+protected. The controller snapshots and hashes this file, independently checks
+acknowledged revisions and returned candidates, and refuses changed-source reuse.
+`check_generation_workload.py ... fallback --rebuild` exercises this on24
+records/eight real vectors for160seconds. This does not cover vectorized candidate
+corrections or replace the full concurrent build measurement.
+
 The 103-command native fixture covers six process-crash boundaries, out-of-order
 completion/gaps, source validation, retraction/supersession/text-only behavior,
 failed build/old reads, activation/model isolation and revocation. Five release

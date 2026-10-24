@@ -94,5 +94,68 @@ class CorpusCurrentOracle(unittest.TestCase):
             self.assertEqual(checked['search_checks'], dict(bm25=1, ann=0))
 
 
+class CorpusCorrectionOracleTest(unittest.TestCase):
+    def test_real_candidate_changes_restore_and_reject_stale_hits(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = pathlib.Path(temporary)
+            (root / 'runtime').mkdir()
+            run, base = 'corpus-corrections', 1_000_000_000
+            def body(client, ordinal):
+                prefix = f'Synthetic workload; excluded from corpus. Run {run}; client {client}; request {ordinal}. '
+                return prefix + 'x' * (4096-len(prefix))
+            def hashed(value):
+                return hashlib.sha256(value.encode()).hexdigest()
+            heads = [dict(memory=base+i, seq=i+1, scope=i%8, active=True, body_sha256=hashed(body(i, 0))) for i in range(50)]
+            queries = [dict(memory=1_000_000+i, key=f'protected:{i}', partition=f'p{i}', body_sha256=hashed(f'protected {i}'), text_only=True) for i in range(8)]
+            corrections = [dict(memory=2_000_000+i, scope=i, key=f'original:{i}', body=f'original public body {i}', query_index=i) for i in range(8)]
+            fixture, correction_file = root/'queries.json', root/'corrections.json'
+            fixture.write_text(json.dumps(dict(queries=queries)))
+            correction_file.write_text(json.dumps(corrections))
+            original = [dict(memory=s['memory'], seq=0, scope=s['scope'], active=True, body_sha256=hashed(s['body']),
+                key=s['key'], query_index=i, candidates=[dict(memory=s['memory'], seq=0, partition=f'p{i}', key=s['key'])]) for i,s in enumerate(corrections)]
+            (root/'request.json').write_text(json.dumps(dict(fixture=str(fixture), corrections=str(correction_file), generation=1, diagnostic=True)))
+            (root/'runtime/admission.json').write_text(json.dumps(dict(fixture_sha256=digest(fixture), corrections_sha256=digest(correction_file))))
+            (root/'runtime/baseline.json').write_text(json.dumps(dict(base=base, run_id=run, heads=heads, corrections=original)))
+            rows, restored = [], []
+            for stage in range(4):
+                ordinal = stage + 1
+                for i, s in enumerate(corrections):
+                    seq = 51 + stage*8 + i
+                    entry = dict(memory=s['memory'], seq=seq, scope=i if stage in (0,3) else (i+1)%8,
+                        active=stage != 2, body_sha256=hashed(s['body'] if stage==3 else body(92+i, ordinal)))
+                    rows.append(dict(client=92+i, ordinal=ordinal, operation='correction', status='success', receipt=dict(commit_seq=seq, oracle=entry)))
+                    if stage == 3: restored.append(entry)
+            derived = dict(progress=dict(generation=1, committed=82, text=82, vector=82, remaining=0), indexed_jobs=164,
+                           text=sorted(heads+restored, key=lambda x:x['memory']), vectors=[])
+            (root/'runtime/derived-oracle.json').write_text(json.dumps(derived))
+            requests = root/'runtime/requests.jsonl'
+            def write(values): requests.write_text(''.join(json.dumps(v)+'\n' for v in values))
+            write(rows)
+            result = verify_requests(root)
+            self.assertEqual(result['corpus_correction_checks'], 32)
+            self.assertEqual(result['corpus_correction_scopes'], list(range(8)))
+            hit = dict(memory=2_000_000, seq=0, partition='p0', key='original:0')
+            stale = dict(client=72, ordinal=0, operation='bm25', status='success', receipt=dict(query_index=0,
+                query_key=queries[0]['key'], partition='p0', hits=[hit], validation=dict(generation=1, read_seq=51,
+                validated_at_seq=51, hits=[hit], permission_revision=1)))
+            write(rows+[stale])
+            with self.assertRaisesRegex(ValueError, 'stale|acknowledged'):
+                verify_requests(root)
+            for case in ['body', 'scope', 'missing_restore', 'protected', 'identity']:
+                changed = copy.deepcopy(rows)
+                if case == 'body': changed[0]['receipt']['oracle']['body_sha256'] = '0'*64
+                if case == 'scope': changed[8]['receipt']['oracle']['scope'] = 0
+                if case == 'missing_restore': changed[-1]['status'] = 'error'
+                if case == 'protected':
+                    changed_source=copy.deepcopy(corrections);changed_source[0]['memory']=queries[0]['memory']
+                    correction_file.write_text(json.dumps(changed_source))
+                    (root/'runtime/admission.json').write_text(json.dumps(dict(fixture_sha256=digest(fixture),corrections_sha256=digest(correction_file))))
+                if case == 'identity': correction_file.write_text(correction_file.read_text()+'\n')
+                write(changed)
+                with self.subTest(case=case), self.assertRaises(ValueError): verify_requests(root)
+                correction_file.write_text(json.dumps(corrections))
+                (root/'runtime/admission.json').write_text(json.dumps(dict(fixture_sha256=digest(fixture),corrections_sha256=digest(correction_file))))
+
+
 if __name__ == "__main__":
     unittest.main()

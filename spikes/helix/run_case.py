@@ -57,6 +57,27 @@ def verify_requests(directory):
     if len(fixture_bytes) > 4 * 1024**2 or hashlib.sha256(fixture_bytes).hexdigest() != admission["fixture_sha256"]:
         raise ValueError("current corpus oracle source differs from admission")
     queries = json.loads(fixture_bytes)["queries"]
+    corrections = []
+    if request.get('corrections'):
+        with pathlib.Path(request['corrections']).open('rb') as source:
+            correction_bytes = source.read(1024**2 + 1)
+        if len(correction_bytes) > 1024**2 or hashlib.sha256(correction_bytes).hexdigest() != admission.get('corrections_sha256'):
+            raise ValueError('correction source differs from admission')
+        corrections = json.loads(correction_bytes)
+        protected = {q['memory'] for q in queries}
+        if not isinstance(corrections, list) or len(corrections) != 8:
+            raise ValueError('corrections require eight distinct scoped sources')
+        for i, s in enumerate(corrections):
+            if (not isinstance(s, dict) or set(s) != {'memory','scope','key','body','query_index'}
+                    or type(s['memory']) is not int or not 1_000_000 <= s['memory'] <= 2**63-1 or s['memory'] in protected
+                    or type(s['scope']) is not int or s['scope'] != i
+                    or not isinstance(s['key'], str) or not 1 <= len(s['key'].encode()) <= 256
+                    or not isinstance(s['body'], str) or not 1 <= len(s['body'].encode()) <= 128*1024
+                    or type(s['query_index']) is not int or not 0 <= s['query_index'] < len(queries)
+                    or queries[s['query_index']]['partition'] != f'p{i}'):
+                raise ValueError('invalid or protected correction source')
+        if len({s['memory'] for s in corrections}) != 8:
+            raise ValueError('duplicate correction source')
     base, run = baseline["base"], baseline["run_id"]
     def expected_body(client, ordinal):
         prefix = f"Synthetic workload; excluded from corpus. Run {run}; client {client}; request {ordinal}. "
@@ -68,6 +89,21 @@ def verify_requests(directory):
             raise ValueError("baseline content or sequence mismatch")
         sequences.add(value["seq"])
         events.append((value["seq"], 0, value))
+    if len(baseline.get('corrections', [])) != len(corrections):
+        raise ValueError('correction baseline differs from admission')
+    for i, (s, value) in enumerate(zip(corrections, baseline.get('corrections', []))):
+        expected = dict(memory=s['memory'], seq=value.get('seq'), scope=i, active=True,
+                        body_sha256=hashlib.sha256(s['body'].encode()).hexdigest())
+        candidates = value.get('candidates')
+        if (type(expected['seq']) is not int or not 0 <= expected['seq'] < min(sequences)
+                or value != dict(expected, key=s['key'], query_index=s['query_index'], candidates=candidates)
+                or not isinstance(candidates, list) or not any(h.get('memory') == s['memory'] and h.get('seq') == expected['seq']
+                    and h.get('partition') == f'p{i}' and h.get('key') == s['key'] for h in candidates)):
+            raise ValueError('correction baseline is not an original scoped candidate')
+        events.append((expected['seq'], 0, expected))
+    correction_ids = {s['memory'] for s in corrections}
+    correction_keys = {s['memory']:s['key'] for s in corrections}
+    correction_commits, correction_stages = [], {i:set() for i in range(len(corrections))}
     records = current_checks = 0
     corpus_points = []
     corpus_memories, corpus_partitions = set(), {}
@@ -86,6 +122,14 @@ def verify_requests(directory):
                 expected = dict(memory=base + (client // 2 if write else client % 30), seq=receipt["commit_seq"],
                                 scope=(client + ordinal) % 8, active=write or ordinal % 2 == 0,
                                 body_sha256=expected_body(client, ordinal))
+                if not write and corrections:
+                    if type(client) is not int or not 92 <= client < 100 or type(ordinal) is not int or ordinal < 1:
+                        raise ValueError('invalid correction client or ordinal')
+                    s, stage = corrections[client-92], (ordinal-1) % 4
+                    expected.update(memory=s['memory'], scope=s['scope'] if stage in (0,3) else (s['scope']+1)%8,
+                                    active=stage != 2, body_sha256=hashlib.sha256(s['body'].encode()).hexdigest() if stage == 3 else expected_body(client, ordinal))
+                    correction_commits.append((s['scope'], expected['seq']))
+                    correction_stages[s['scope']].add(stage)
                 if receipt["oracle"] != expected or expected["seq"] in sequences:
                     raise ValueError("acknowledged write content or sequence mismatch")
                 sequences.add(expected["seq"])
@@ -124,6 +168,8 @@ def verify_requests(directory):
                     raise ValueError('search receipt differs from pinned query or validated candidates')
                 search_points.append(validated)
                 search_intervals.append((row['operation'], read, validated))
+                if corrections:
+                    events.append((validated, 2, dict(hits=hits, partition=query['partition'])))
                 search_checks[row['operation']] += 1
                 if query.get('text_only'):
                     text_bm25.append(query['partition'])
@@ -131,13 +177,26 @@ def verify_requests(directory):
     for _, kind, value in sorted(events, key=lambda event: event[:2]):
         if kind == 0:
             heads[value["memory"]] = value
-        else:
+        elif kind == 1:
             expected = heads.get(value["memory"])
             if expected is None:
                 raise ValueError("current read precedes its baseline")
             if value["entry"] != (expected if expected["active"] else None):
                 raise ValueError("current snapshot differs from acknowledged writes at its commit point")
             current_checks += 1
+        else:
+            for hit in value['hits']:
+                if hit['memory'] in correction_ids:
+                    expected = heads.get(hit['memory'])
+                    if (expected is None or not expected['active'] or hit.get('seq') != expected['seq']
+                            or value['partition'] != f"p{expected['scope']}"
+                            or hit.get('key') != correction_keys[hit['memory']]):
+                        raise ValueError('search exposes stale acknowledged correction')
+    for s in corrections:
+        last = heads[s['memory']]
+        if (correction_stages[s['scope']] != {0,1,2,3} or not last['active'] or last['scope'] != s['scope']
+                or last['body_sha256'] != hashlib.sha256(s['body'].encode()).hexdigest()):
+            raise ValueError('correction cycle did not restore its original source')
     if len(baseline["heads"]) != 50 or len(sequences) != max(sequences) - min(sequences) + 1:
         raise ValueError("missing baseline identity or unexplained commit-sequence gap")
     if any(point > max(sequences) for point in corpus_points + search_points):
@@ -173,13 +232,19 @@ def verify_requests(directory):
                                for kind in search_checks}
             if not request['diagnostic'] and not all(rebuild_overlap.values()):
                 raise ValueError('full rebuild has no completed old-generation BM25/ANN overlap')
-    return {"requests": records, "current_checks": current_checks, "corpus_current_checks": len(corpus_points),
+            if corrections and not request['diagnostic'] and {scope for scope,seq in correction_commits
+                    if rebuild['start_seq'] < seq < rebuild['end_seq']} != set(range(8)):
+                raise ValueError('full rebuild lacks real candidate corrections across all scopes')
+    result = {"requests": records, "current_checks": current_checks, "corpus_current_checks": len(corpus_points),
             "corpus_current_distinct": len(corpus_memories), "corpus_current_partitions": corpus_partitions,
             "text_only_current_checks": len(text_current), "text_only_bm25_checks": len(text_bm25),
             "text_only_current_partitions": sorted(set(text_current)), "text_only_bm25_partitions": sorted(set(text_bm25)),
             "search_checks": search_checks,
             "distinct_commits": len(sequences), "derived_current_checks": derived_checks,
             "rebuild_search_overlap": rebuild_overlap}
+    if corrections:
+        result.update(corpus_correction_checks=len(correction_commits), corpus_correction_scopes=sorted({s for s,_ in correction_commits}))
+    return result
 
 
 def summarize(directory, profile, binary_sha256):
@@ -207,6 +272,8 @@ def summarize(directory, profile, binary_sha256):
     status = "passed" if exits[0]["code"] == 0 and result["status"] == "passed" and memory_ok and (rebuild is None or rebuild['status'] == 'passed') else "failed"
     paths = ["request.json", "memory.jsonl", "engine.log"]
     paths += [name for name in ["runtime/result.json", "runtime/requests.jsonl", "runtime/metrics.jsonl", "runtime/admission.json", "runtime/baseline.json", "runtime/derived-oracle.json", "runtime/rebuild.json"] if (directory / name).exists()]
+    if (directory / 'corrections.json').exists():
+        paths.append('corrections.json')
     cold = None
     if json.loads((directory / 'state.json').read_text())['identity']['config']['run'].get('cold_cache'):
         cold = json.loads((directory / 'cold-cache.json').read_text())
@@ -232,7 +299,7 @@ def main():
     if set(config) - {"disk"} != {"run", "paths", "reliability"} or config["reliability"] != {"max_attempts": 1}:
         raise ValueError("case has no network retries; exactly one measured attempt is required")
     run, paths = config["run"], config["paths"]
-    if set(run) - {"generation", "rebuild_generation", "cold_cache"} != {"id", "profile", "phase", "seconds", "diagnostic"} or set(paths) != {"binary", "database", "fixture", "output", "corpus_manifest"}:
+    if set(run) - {"generation", "rebuild_generation", "cold_cache"} != {"id", "profile", "phase", "seconds", "diagnostic"} or set(paths) - {'corrections'} != {"binary", "database", "fixture", "output", "corpus_manifest"}:
         raise ValueError("unknown or missing case setting")
     if run["profile"] not in {"low", "high"} or run["phase"] not in {"steady", "burst", "overload"}:
         raise ValueError("unknown profile or phase")
@@ -271,6 +338,14 @@ def main():
         if sidecar.stat().st_size != vector["bytes"] or vector_sha256 != vector["sha256"]:
             raise ValueError("query vector sidecar changed")
     manifest = pathlib.Path(paths["corpus_manifest"]).resolve(strict=True) if paths["corpus_manifest"] else None
+    correction_bytes = None
+    if 'corrections' in paths:
+        if 'generation' not in run or run['phase'] != 'steady' or run['seconds'] % 160:
+            raise ValueError('corrections require an active generation and complete160second cycles')
+        with pathlib.Path(paths['corrections']).resolve(strict=True).open('rb') as source:
+            correction_bytes = source.read(1024**2+1)
+        if len(correction_bytes) > 1024**2:
+            raise ValueError('correction fixture exceeds1MiB')
     # One controller owns this database; the durable pointer survives its death.
     owner_lock = (root / ".akasha-case-owner.lock").open("a")
     fcntl.flock(owner_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -293,6 +368,8 @@ def main():
                 "controller_sha256": digest(__file__), "observer_sha256": digest(observer)}
     if run.get('cold_cache'):
         identity['cold_cache_sha256'] = digest(observer.with_name('cold_cache.py'))
+    if correction_bytes is not None:
+        identity['corrections_sha256'] = hashlib.sha256(correction_bytes).hexdigest()
     state_path = directory / "state.json"
     if directory.exists():
         if not args.resume and not args.abandon:
@@ -300,6 +377,8 @@ def main():
         state = json.loads(state_path.read_text())
         if state["identity"] != identity:
             raise ValueError("immutable case identity changed")
+        if correction_bytes is not None and digest(directory/'corrections.json') != identity['corrections_sha256']:
+            raise ValueError('admitted correction source changed')
         if state["phase"] in {"completed", "abandoned"}:
             for name, expected in state["result"].get("artifact_sha256", {}).items():
                 if digest(directory / name) != expected:
@@ -341,6 +420,13 @@ def main():
             request["generation"] = run["generation"]
         if 'rebuild_generation' in run:
             request['rebuild_generation'] = run['rebuild_generation']
+        if correction_bytes is not None:
+            path = directory/'corrections.json'
+            with path.open('xb') as target:
+                target.write(correction_bytes)
+                target.flush()
+                os.fsync(target.fileno())
+            request['corrections'] = str(path)
         publish(directory / "request.json", request)
         if run.get('cold_cache'):
             sys.path.insert(0, str(observer.parent))

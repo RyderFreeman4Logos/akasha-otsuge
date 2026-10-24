@@ -543,3 +543,29 @@ string memory-event counters to integers; a corrected collector reused those
 unchanged receipts before admitting retirement. Both failures and the explicit
 continuation are retained. Online deletion, extension of an expired retirement
 deadline and the next concurrent build's physical peak are not established.
+
+[Concurrent corpus-candidate corrections](results/fallback-corpus-concurrent/summary.json)
+now reuse the existing eight correction clients, with pinned original bodies,
+scopes, keys and initial BM25 candidate proofs. The160s/24-record diagnostic
+passes32 corrections over all eight scopes,58 final derived-head checks, original
+restoration, ten evidence-tamper controls and unchanged completed reuse. Both
+old-generation search types overlap its rebuild (three BM25 and one ANN).
+RSS P99/max is144,699,392/144,740,352B; all original performance thresholds pass.
+This covers unvectorized candidates; serial vectorized coverage remains separate.
+
+The first native attempt exposed an ordinal error: runtime requests start at1,
+so the four stages must use `(ordinal-1)%4`. Its restoration failure and latency
+failures are retained. The corrected candidate's following ordinary60s run
+passes correctness but fails BM25 window throughput at55/60 requests. A retained
+old-binary control passes. One bounded new-then-old comparison then uses identical
+initial database file hashes and the same run ID; both pass at1.2 BM25/s, with
+all original thresholds and content oracles. Host/cache/order effects remain
+uncontrolled; this is not a causal performance-equivalence claim, and the earlier
+failed measurement stays failed. All disposable fixtures, exact processes/units
+and scratch paths are verified and collected.
+
+The frozen native candidate also passes11 release units, release all-targets
+Clippy for both spike crates, and eight Python controller units. Review is the
+implementing agent's self-review. Full generation3 backfill is prepared, but its
+bounded uninterrupted build, concurrent corrections/queries, recovery and actual
+physical peak remain unmeasured. #3 and draft PR#31 stay open.

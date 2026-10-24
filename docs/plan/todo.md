@@ -119,6 +119,17 @@ Completed, with the limits shown:
       Completed reuse, exact process/unit exits and scratch cleanup verify;
       the disposable controller copy is retired after reuse verification.
 
+- [x] Add opt-in real unvectorized corpus candidates to the existing eight
+      correction clients. The160s native fixture passes32 corrections across
+      eight scopes, original-body restoration,58 derived checks and ten evidence
+      tamper controls. Both search types overlap its rebuild. Preserve the
+      initial one-based-ordinal failure and the ordinary60s throughput failure;
+      this diagnostic does not establish full-size overlap or vectorized changes.
+- [x] Prepare full generation3 after pruning obsolete active2 versions. Its
+      backfill covers11,428,831 documents and1,000,000 vectors; build has not
+      started. Select and verify eight actual unvectorized search candidates,
+      excluding all3,840 fixed query IDs. No backend is selected.
+
 Remaining acceptance, in execution order:
 
 - [ ] Complete an uninterrupted full scoped build within the640MiB low peak and

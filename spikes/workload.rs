@@ -1,5 +1,5 @@
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     fs::File,
     io::{BufWriter, Read, Write},
     path::{Path, PathBuf},
@@ -38,6 +38,17 @@ struct Config {
     diagnostic: bool,
     generation: Option<u64>,
     rebuild_generation: Option<u64>,
+    corrections: Option<PathBuf>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CorrectionSource {
+    memory: u64,
+    scope: u8,
+    key: String,
+    body: String,
+    query_index: usize,
 }
 
 struct Tally {
@@ -93,6 +104,7 @@ struct Shared {
     samples: Mutex<BufWriter<File>>,
     bundle: Option<Bundle>,
     derived: Mutex<Value>,
+    corrections: Vec<CorrectionSource>,
 }
 
 pub(crate) fn atomic_json(path: &Path, value: &Value) -> Result<(), Error> {
@@ -150,7 +162,19 @@ fn planned_requests(phase: &str, seconds: u64) -> Option<u64> {
 
 impl Shared {
     async fn operation(&self, kind: usize, client: usize, ordinal: u64) -> Result<Value, Error> {
-        let memory = self.base + (if kind == 0 { client / 2 } else { client % 30 }) as u64;
+        let source = if kind == 5 && !self.corrections.is_empty() {
+            Some(
+                self.corrections
+                    .get(client.checked_sub(92).ok_or("invalid correction client")?)
+                    .ok_or("invalid correction client")?,
+            )
+        } else {
+            None
+        };
+        let memory = source.map_or_else(
+            || self.base + (if kind == 0 { client / 2 } else { client % 30 }) as u64,
+            |s| s.memory,
+        );
         match kind {
             0 | 5 => {
                 let prior = self
@@ -158,13 +182,23 @@ impl Shared {
                     .work_get(memory, i64::MAX as u64)
                     .await?
                     .ok_or("missing workload seed")?;
+                let stage = ordinal.checked_sub(1).ok_or("invalid workload ordinal")? % 4;
                 let change = Change {
                     request_id: format!("{}:{client}:{ordinal}", self.config.run_id),
                     memory,
                     expected: prior["seq"].as_u64().ok_or("invalid current sequence")?,
-                    scope: ((client as u64 + ordinal) % 8) as u8,
-                    active: kind == 0 || ordinal.is_multiple_of(2),
-                    body: body(&self.config.run_id, client, ordinal),
+                    scope: source.map_or(((client as u64 + ordinal) % 8) as u8, |s| {
+                        if matches!(stage, 0 | 3) {
+                            s.scope
+                        } else {
+                            (s.scope + 1) % 8
+                        }
+                    }),
+                    active: source.map_or(kind == 0 || ordinal.is_multiple_of(2), |_| stage != 2),
+                    body: match source {
+                        Some(s) if stage == 3 => s.body.clone(),
+                        _ => body(&self.config.run_id, client, ordinal),
+                    },
                     text_only: true,
                 };
                 let mut receipt = self.authority.work_apply(&change).await?;
@@ -469,10 +503,50 @@ pub async fn run(root: PathBuf, request: &Path) -> Result<(), Error> {
         return Err("workload requires pinned corpus current-read identities".into());
     }
     let corpus = corpus_admission(&config, &fixture)?;
+    let (corrections, corrections_sha256) = if let Some(path) = &config.corrections {
+        if config.generation.is_none()
+            || config.phase != "steady"
+            || !config.seconds.is_multiple_of(160)
+        {
+            return Err(
+                "corrections require an active generation and complete160second cycles".into(),
+            );
+        }
+        let mut input = Vec::new();
+        File::open(path)?
+            .take(1024 * 1024 + 1)
+            .read_to_end(&mut input)?;
+        if input.len() > 1024 * 1024 {
+            return Err("correction fixture exceeds1MiB".into());
+        }
+        let sources: Vec<CorrectionSource> = serde_json::from_slice(&input)?;
+        let mut seen = BTreeSet::new();
+        if sources.len() != 8
+            || sources.iter().enumerate().any(|(i, s)| {
+                s.scope as usize != i
+                    || !(1_000_000..=i64::MAX as u64).contains(&s.memory)
+                    || !seen.insert(s.memory)
+                    || s.key.is_empty()
+                    || s.key.len() > 256
+                    || s.body.is_empty()
+                    || s.body.len() > 128 * 1024
+                    || fixture.queries.iter().any(|q| q.memory == Some(s.memory))
+                    || fixture
+                        .queries
+                        .get(s.query_index)
+                        .is_none_or(|q| q.partition != format!("p{i}"))
+            })
+        {
+            return Err("invalid or protected correction source".into());
+        }
+        (sources, Some(hash(&input)))
+    } else {
+        (Vec::new(), None)
+    };
     std::fs::create_dir(&config.output)?;
     atomic_json(
         &config.output.join("admission.json"),
-        &json!({"state":"admitted","config":config,"config_sha256":hash(&bytes),"fixture_sha256":fixture_hash,"config_epoch":1,
+        &json!({"state":"admitted","config":config,"config_sha256":hash(&bytes),"fixture_sha256":fixture_hash,"corrections_sha256":corrections_sha256,"config_epoch":1,
         "pid":std::process::id(),"start_ticks":std::fs::read_to_string("/proc/self/stat")?.rsplit_once(')').ok_or("invalid proc stat")?.1.split_whitespace().nth(19),
         "resume":"completed units are reusable only by the outer controller; an interrupted unit requires explicit abandonment"}),
     )?;
@@ -505,7 +579,7 @@ pub async fn run(root: PathBuf, request: &Path) -> Result<(), Error> {
     };
     // Both operations finish before closing their shared authority, even on error.
     let (outcome, rebuilt) = tokio::join!(
-        run_open(authority.clone(), config, fixture, ready),
+        run_open(authority.clone(), config, fixture, corrections, ready),
         rebuilding
     );
     authority.work_close().await?;
@@ -570,6 +644,7 @@ async fn run_open(
     authority: Arc<Authority>,
     config: Config,
     fixture: search::Fixture,
+    corrections: Vec<CorrectionSource>,
     ready: tokio::sync::oneshot::Sender<()>,
 ) -> Result<Value, Error> {
     let bundle = if let Some(id) = config.generation {
@@ -591,6 +666,38 @@ async fn run_open(
         authority
             .set_permission(&config.run_id, scope, true)
             .await?;
+    }
+    let mut correction_baseline = Vec::new();
+    for source in &corrections {
+        let current = authority.work_correction_source(source.memory).await?;
+        if current["body"] != source.body
+            || current["scope"] != source.scope
+            || current["key"] != source.key
+        {
+            return Err("correction fixture differs from original authority".into());
+        }
+        let query = fixture.query(source.query_index)?;
+        let found = Box::pin(authority.work_query(
+            &query,
+            false,
+            &config.run_id,
+            config.generation,
+            bundle.as_ref(),
+        ))
+        .await?;
+        let hits = found["hits"]
+            .as_array()
+            .ok_or("missing correction candidates")?;
+        if !hits.iter().any(|h| {
+            h["memory"] == source.memory && h["seq"] == current["seq"] && h["key"] == source.key
+        }) {
+            return Err("correction source is not a current search candidate".into());
+        }
+        correction_baseline.push(
+            json!({"memory":source.memory,"seq":current["seq"],"scope":source.scope,
+            "active":true,"body_sha256":hash(source.body.as_bytes()),"key":source.key,
+            "query_index":source.query_index,"candidates":hits}),
+        );
     }
     if authority.work_get(0, 4096).await? != authority::oracle_state(0, 4096) {
         return Err("historical oracle must be seeded before workload".into());
@@ -623,7 +730,7 @@ async fn run_open(
     }
     atomic_json(
         &config.output.join("baseline.json"),
-        &json!({"base":base,"run_id":config.run_id,"heads":baseline}),
+        &json!({"base":base,"run_id":config.run_id,"heads":baseline,"corrections":correction_baseline}),
     )?;
     let derived = if let Some(id) = config.generation {
         let deadline = Instant::now() + Duration::from_secs(300);
@@ -655,6 +762,7 @@ async fn run_open(
         samples: Mutex::new(samples),
         bundle,
         derived: Mutex::new(derived),
+        corrections,
     });
     let mut tasks = JoinSet::new();
     for id in 0..100 {
@@ -749,16 +857,41 @@ async fn run_open(
         atomic_json(
             &shared.config.output.join("derived-oracle.json"),
             &Box::pin(
-                shared
-                    .authority
-                    .work_derived_oracle(id, shared.base, progress),
+                shared.authority.work_derived_oracle(
+                    id,
+                    shared.base,
+                    progress,
+                    &shared
+                        .corrections
+                        .iter()
+                        .map(|s| s.memory)
+                        .collect::<Vec<_>>(),
+                ),
             )
             .await?,
         )?;
     }
+    for source in &shared.corrections {
+        match shared.authority.work_correction_source(source.memory).await {
+            Ok(current)
+                if current["body"] == source.body
+                    && current["scope"] == source.scope
+                    && current["key"] == source.key => {}
+            _ => failures.push("correction cycle did not restore original source".into()),
+        }
+    }
+    let mut not_tested = vec![
+        "live_permission_revocation",
+        "RSS_thresholds_checked_by_outer_observer",
+    ];
+    not_tested.push(if shared.corrections.is_empty() {
+        "correction_of_search_candidates"
+    } else {
+        "vectorized_candidate_corrections"
+    });
     let result = json!({"status":if failures.is_empty(){"passed"}else{"failed"},"diagnostic":shared.config.diagnostic,"phase":shared.config.phase,
         "snapshot":snapshot,"drain_s":drain,"failures":failures,
-        "not_tested":["live_permission_revocation","correction_of_search_candidates","RSS_thresholds_checked_by_outer_observer"],
+        "not_tested":not_tested,
         "generation_workload":shared.config.generation});
     atomic_json(&shared.config.output.join("result.json"), &result)?;
     if !failures.is_empty() {
@@ -828,6 +961,7 @@ mod tests {
             diagnostic: false,
             generation: Some(1),
             rebuild_generation: None,
+            corrections: None,
         };
         let first = corpus_admission(&config, &fixture);
         config.generation = Some(2);

@@ -29,6 +29,8 @@ def main():
     rows = [json.loads(line) for line in source.read_text().splitlines()]
     assert len(rows) == 8 and {r['partition'] for r in rows} == {f'p{i}' for i in range(8)}
     rows += [dict(key=f'fixture:text:{i}', partition=f'p{i}', body=f'Synthetic unvectorized diagnostic {i}; excluded from corpus scale.') for i in range(8)]
+    if rebuild:
+        rows += [{**row, 'key':f'fixture:correction:{i}'} for i, row in enumerate(rows[8:16])]
     data = b''.join((json.dumps(row, separators=(',', ':')) + '\n').encode() for row in rows)
     prepared = output / 'input.jsonl'
     prepared.write_bytes(data)
@@ -36,9 +38,12 @@ def main():
     fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     bundle = dict(model=identity['model'], model_fingerprint=fingerprint, dimension=1536, chunker='source-document-v1', schema=1)
     manifest = output / 'manifest.json'
-    manifest.write_text(json.dumps(dict(dimensions=1536, embedding_model=identity['model'], precomputed_at='2024-02 (publisher)', chunk_bytes=65536, synthetic_text_documents=8, corpus=dict(documents=len(rows), vectors=8, prepared_bytes=len(data), prepared_sha256=hashlib.sha256(data).hexdigest(), indexed_body_utf8_bytes=sum(len(r['body'].encode()) for r in rows), inputs=[dict(file='vectors-00000.parquet', repository=identity['repository'], revision=identity['revision'])]))))
+    manifest.write_text(json.dumps(dict(dimensions=1536, embedding_model=identity['model'], precomputed_at='2024-02 (publisher)', chunk_bytes=65536, synthetic_text_documents=len(rows)-8, corpus=dict(documents=len(rows), vectors=8, prepared_bytes=len(data), prepared_sha256=hashlib.sha256(data).hexdigest(), indexed_body_utf8_bytes=sum(len(r['body'].encode()) for r in rows), inputs=[dict(file='vectors-00000.parquet', repository=identity['repository'], revision=identity['revision'])]))))
     fixture = output / 'queries.json'
-    fixture.write_text(json.dumps(dict(source_sha256=digest(manifest), corpus_manifest_sha256=digest(manifest), model=identity['model'], dimension=1536, queries=[dict(key=r['key'], partition=r['partition'], term=max(re.findall(r'[A-Za-z]{4,}', r['body']), key=len), memory=1_000_000+i, body_sha256=hashlib.sha256(r['body'].encode()).hexdigest(), embedding=r.get('embedding', []), text_only='embedding' not in r) for i, r in enumerate(rows)])))
+    fixture.write_text(json.dumps(dict(source_sha256=digest(manifest), corpus_manifest_sha256=digest(manifest), model=identity['model'], dimension=1536, queries=[dict(key=r['key'], partition=r['partition'], term=max(re.findall(r'[A-Za-z]{4,}', r['body']), key=len), memory=1_000_000+i, body_sha256=hashlib.sha256(r['body'].encode()).hexdigest(), embedding=r.get('embedding', []), text_only='embedding' not in r) for i, r in enumerate(rows[:16])])))
+    corrections = output / 'corrections.json'
+    if rebuild:
+        corrections.write_text(json.dumps([dict(memory=1_000_016+i, scope=i, key=r['key'], body=r['body'], query_index=8+i) for i,r in enumerate(rows[16:])]))
     records, units = [], []
     started = time.monotonic()
     temporary = pathlib.Path(tempfile.mkdtemp(prefix='akasha-generation-workload-'))
@@ -89,12 +94,13 @@ def main():
             request('begin-next', dict(op='begin_corpus', generation=2, bundle={**bundle, 'schema': 2}, manifest=str(manifest)))
             request('backfill-next', dict(op='backfill', generation=2, waves=2))
         rebuild_setting = 'rebuild_generation = 2\n' if rebuild else ''
+        correction_setting = 'corrections = ' + json.dumps(str(corrections)) + '\n' if rebuild else ''
         config = output / 'case.toml'
         config.write_text(f'''[run]
 id = "generation-work-{uuid.uuid4().hex[:12]}"
 profile = "low"
 phase = "steady"
-seconds = 60
+seconds = {160 if rebuild else 60}
 diagnostic = true
 generation = 1
 {rebuild_setting}[paths]
@@ -103,6 +109,7 @@ database = {json.dumps(str(database))}
 fixture = {json.dumps(str(fixture))}
 output = {json.dumps(str(output / 'case'))}
 corpus_manifest = {json.dumps(str(manifest))}
+{correction_setting}\
 [disk]
 start_bytes = 36212254720
 reserve_bytes = 36212254720
@@ -111,9 +118,10 @@ max_attempts = 1
 ''')
         with (output / 'case-controller.log').open('x') as log:
             terminal = subprocess.run([sys.executable, str(pathlib.Path(__file__).with_name('run_case.py')), str(config)], stdout=log, stderr=subprocess.STDOUT)
-        state = json.loads((output / 'case/state.json').read_text())
-        units.append(state['unit'])
+        if (output / 'case/state.json').exists():
+            units.append(json.loads((output / 'case/state.json').read_text())['unit'])
         assert terminal.returncode == 0, ('case', terminal.returncode)
+        state = json.loads((output / 'case/state.json').read_text())
         oracle = state['result']['content_oracle']
         assert oracle['text_only_current_checks'] > 0 and oracle['text_only_bm25_checks'] > 0
         assert oracle['text_only_current_partitions'] == [f'p{i}' for i in range(8)]
@@ -123,6 +131,25 @@ max_attempts = 1
         assert derived['remaining'] == 0 and derived['text'] == derived['vector'] == derived['committed']
         rebuild_controls = []
         if rebuild:
+            assert oracle['corpus_correction_checks'] == 32
+            assert oracle['corpus_correction_scopes'] == list(range(8))
+            state_hash = digest(output/'case/state.json')
+            for source, expected_error in [(corrections, 'immutable case identity changed'),
+                    (output/'case/corrections.json', 'admitted correction source changed')]:
+                original_source = source.read_bytes()
+                try:
+                    source.write_bytes(original_source+b'\n')
+                    rejected = subprocess.run([sys.executable, str(pathlib.Path(__file__).with_name('run_case.py')),
+                        str(config), '--resume'], capture_output=True, text=True, timeout=30)
+                    assert rejected.returncode != 0 and expected_error in rejected.stderr
+                    assert digest(output/'case/state.json') == state_hash
+                    rebuild_controls.append(dict(mutation='correction source '+source.name, rejection=expected_error))
+                finally:
+                    source.write_bytes(original_source)
+            reused = subprocess.run([sys.executable, str(pathlib.Path(__file__).with_name('run_case.py')),
+                str(config), '--resume'], capture_output=True, text=True, timeout=30)
+            assert reused.returncode == 0 and json.loads(reused.stdout) == state['result']
+            assert digest(output/'case/state.json') == state_hash
             path = output / 'case/runtime/rebuild.json'
             original = path.read_bytes()
             report = json.loads(original)
@@ -157,7 +184,7 @@ max_attempts = 1
             finally:
                 requests.write_bytes(original_requests)
             assert digest(requests) == state['result']['artifact_sha256']['runtime/requests.jsonl']
-        publish(output / 'result.json', dict(status='passed_diagnostic_only', binary_sha256=admission['binary_sha256'], commands=records, case=state['result'], rebuild_controls=rebuild_controls, seconds=time.monotonic()-started, not_tested=['full scale', '30-minute profiles', 'corpus corrections'] + ([] if rebuild else ['concurrent rebuild'])))
+        publish(output / 'result.json', dict(status='passed_diagnostic_only', binary_sha256=admission['binary_sha256'], commands=records, case=state['result'], rebuild_controls=rebuild_controls, seconds=time.monotonic()-started, not_tested=['full scale', '30-minute profiles', 'vectorized candidate corrections'] + ([] if rebuild else ['concurrent rebuild', 'corpus corrections'])))
         publish(output / 'progress.json', dict(phase='completed', completed=total, total=total, elapsed_s=time.monotonic()-started, eta_s=0))
         print(json.dumps(dict(status='passed', seconds=time.monotonic()-started)))
     finally:
