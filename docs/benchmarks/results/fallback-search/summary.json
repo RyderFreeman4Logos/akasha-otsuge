@@ -1,0 +1,37 @@
+{
+  "binary_sha256": "f144927a64949c5923f2317fbb06bcc6299f6655c0c85057ebb961c99d1c90cb",
+  "cgroup_peak_bytes": 237768704,
+  "checks": 39,
+  "exact_children_absent": true,
+  "harness_and_children_rss_max_bytes": 190279680,
+  "last_memory_events": {
+    "high": "0",
+    "low": "0",
+    "max": "0",
+    "oom": "0",
+    "oom_group_kill": "0",
+    "oom_kill": "0"
+  },
+  "max_sample_gap_s": 1.0051717208698392,
+  "not_tested": [
+    "full corpus",
+    "real-shard derived indexes",
+    "ordinary concurrent changes",
+    "activation",
+    "power loss"
+  ],
+  "raw_files_verified": 81,
+  "regression": "20 primitive and 21 import native commands plus one release codec unit passed",
+  "samples": 11,
+  "seconds": 9.321083679795265,
+  "source_sha256": {
+    "spikes/fallback/Cargo.lock": "a407f18471088a9db8dfa53bf8a4070d0e83952b64cb934f97b916a76eaa0b69",
+    "spikes/fallback/check_search.py": "3267c23479c881b5610b7edecffe037350a25bb597899f464d2e9d141412fab3",
+    "spikes/fallback/src/load.rs": "b0b041bafbc0f1f56ae9e800c3e015cdaffb542c3d49ac1fcdf074376e18d2e5",
+    "spikes/fallback/src/main.rs": "c0f420033ba3f0ffdd5f5d9a57356b5bd66a20ea4adc0b969c57a417790c9d86",
+    "spikes/fallback/src/search.rs": "126df94b375cdc6eabb3f31a2cea8a50a8da30a6e52b60c30d5866ccd3cd83c0"
+  },
+  "status": "passed_diagnostic_only",
+  "temporary_removed": true,
+  "unit_state": "inactive"
+}

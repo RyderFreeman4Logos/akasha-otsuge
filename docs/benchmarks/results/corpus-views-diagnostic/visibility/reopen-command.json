@@ -1,0 +1,27 @@
+{
+  "command": [
+    "systemd-run",
+    "--user",
+    "--quiet",
+    "--wait",
+    "--pipe",
+    "--collect",
+    "--unit=akasha-visibility-5956127b1ef24ca1b8266e2616c63e5e-reopen",
+    "-p",
+    "MemoryMax=671088640",
+    "-p",
+    "MemorySwapMax=0",
+    "-p",
+    "RuntimeMaxSec=600",
+    "-p",
+    "Environment=AKASHA_SPIKE_PROFILE=low",
+    "/home/obj/.local/bin/python3",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+    "/tmp/akasha-otsuge-storage-20261022/corpus-views-visibility-r3/reopen-memory.jsonl",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/corpus-views-diagnostic-r4/probe",
+    "/tmp/akasha-visibility-3xzn2xta/database",
+    "--visibility-verify",
+    "/tmp/akasha-otsuge-storage-20261022/search-eight-partitions.json"
+  ],
+  "unit": "akasha-visibility-5956127b1ef24ca1b8266e2616c63e5e-reopen"
+}

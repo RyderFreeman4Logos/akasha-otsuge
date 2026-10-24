@@ -1,0 +1,41 @@
+{
+  "archive_bytes": 2751722,
+  "archive_files": 3057,
+  "archive_sha256": "c93e84d31dc0c029a83b79d0454d527d84cc9324ba714d07d82ba1cc3c581e92",
+  "artifacts_verified": true,
+  "binary_sha256": "d3dd3451a948277ecd20d3d2782bb8b3e79c3f4e58316aeb9179ea2180485106",
+  "cases": 16,
+  "changed_fixture_refused": true,
+  "changed_reply_refused": true,
+  "collector_failures": [
+    "original KeyError reused: native result already passed",
+    "first continuation ModuleNotFoundError: no effects; second supplies explicit PYTHONPATH"
+  ],
+  "commands": 10,
+  "commits": 64,
+  "completed_reuse_no_effects": true,
+  "continuation_seconds": 4.3184951432049274,
+  "controller_units": 6,
+  "crash_resume": "durable native commit before reply-cache publication; no duplicate revision",
+  "exact_processes_gone": true,
+  "fixture_removed": true,
+  "native_case_seconds": 34.823228949680924,
+  "native_commands": 756,
+  "negative_controls": [
+    "memory",
+    "seq",
+    "scope",
+    "active",
+    "body",
+    "text_only",
+    "source_key"
+  ],
+  "not_proven": [
+    "full corpus",
+    "simultaneous query/build scheduling"
+  ],
+  "rss_max_bytes": 119308288,
+  "source_parent": "0090035bc333871b8f93caff2b5429c67e41c82d",
+  "status": "passed_diagnostic_only",
+  "units_inactive": true
+}

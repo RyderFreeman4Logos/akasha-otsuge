@@ -1,0 +1,130 @@
+{
+  "artifact_sha256": {
+    "OWNER": "63cb401aa19d070cb5c6ee9185011c4375dadb48998ac10c39df9ef2e14e8e04",
+    "admission.json": "4a7015e52e4db3cbb904dedca3c80e89dab4944356d1ee28bd71262b0ec97a4c",
+    "import-command.json": "ab1882d42e5079d743a29e1625da79ffe6c455c1a21710dab92de5e55bbd1cbd",
+    "import-memory.jsonl": "c015571880eaa3d30929e8a374adde7b8bd43e355055e19f028dcba8281f4cd5",
+    "import.log": "171040513fc91774f2023278fa55ef2f1f3c1bc3e663d87c3e030fa1f336db98",
+    "indexes-command.json": "351654a4c6304dec1b1460873139cab0ffca3ffcbc9fe7279c9f80aedf02d23c",
+    "indexes-memory.jsonl": "473f6b2ee1a930bc5dee8fce2f06f5ce7eb43942da472031887bc53a69f5081f",
+    "indexes.log": "8774c65563ff5002608023f2be3dedf4893f9145debc9380c12880ade82f1876",
+    "input.jsonl": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+    "progress.json": "e40aed097f60648365ae6514bddcd6284586292d9d305da0bb6f9f929a6f01e9",
+    "reopen-command.json": "d8d2ecd90920916309b8eb9eb4c91a2d25731138503fa149ea300c49d1917472",
+    "reopen-memory.jsonl": "d3e06c1b083d530c5362252c0b4034e5db31ed51788b067bda2d1ea559e16bbb",
+    "reopen.log": "8b7c333e615305cc37f18e87469766778e273ccc8daa4bdf9132c25333454538",
+    "seed-command.json": "5f88d69e4415937105c202f61d7e5bc01cc75f559db039eef4038130d0173f73",
+    "seed-memory.jsonl": "bff577eaa8efe3d23a89d97e6f78981bc420d8d00ed72e51b77ac5f67a880d7a",
+    "seed.log": "a116da0e9ecc0986b81da346dcfb7bd6ec04cc21201d92c08c53b5b2545826ce"
+  },
+  "native": {
+    "import": {
+      "content_bytes": 3588,
+      "documents": 8,
+      "elapsed_seconds": 0.053200701,
+      "phase": "import_complete",
+      "prepared_sha256": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+      "resumed_documents": 0
+    },
+    "indexes": {
+      "elapsed_seconds": 1.816187341,
+      "phase": "indexes_built",
+      "text": {
+        "operation": {
+          "attempt": 43,
+          "family": "text",
+          "generation": "1",
+          "index_id": "1",
+          "operation_id": "00204861-26f8-461c-bb7c-e315e33273ff",
+          "operation_kind": "build",
+          "progress": {
+            "entities": "16",
+            "input_bytes": "165328",
+            "output_bytes": "67691",
+            "output_operations": "469"
+          },
+          "stage": "activate",
+          "status": "succeeded"
+        }
+      },
+      "vector": {
+        "operation": {
+          "attempt": 3,
+          "family": "vector",
+          "generation": "1",
+          "index_id": "2",
+          "operation_id": "d410833e-ac7a-449a-b3e4-b6b5bff839d3",
+          "operation_kind": "build",
+          "progress": {
+            "entities": "24",
+            "input_bytes": "55864",
+            "output_bytes": "53136",
+            "output_operations": "88"
+          },
+          "stage": "activate",
+          "status": "succeeded"
+        }
+      }
+    },
+    "reopen": {
+      "changes": 4,
+      "checks": [
+        "stale_bm25",
+        "stale_ann",
+        "old_read_seq_new_validation",
+        "scope_move",
+        "retraction",
+        "restoration_does_not_revive_old_index_revision",
+        "historical_content_preserved",
+        "live_permission_revocation",
+        "principal_isolation",
+        "default_deny",
+        "minimum_commit_point",
+        "permission_idempotency",
+        "invalid_or_missing_head_explicit_error_on_reopen"
+      ],
+      "fixture_sha256": "1ec12178668947ebdcc79e3cfa33668748825d6a7b93515134a73555fff2cb1c",
+      "memory": 1000000,
+      "not_tested": [
+        "full_size",
+        "indexed_receipts",
+        "generation_watermarks",
+        "power_loss"
+      ],
+      "phase": "separate_process_reopen",
+      "scope": 0,
+      "status": "passed"
+    },
+    "seed": {
+      "changes": 4,
+      "checks": [
+        "stale_bm25",
+        "stale_ann",
+        "old_read_seq_new_validation",
+        "scope_move",
+        "retraction",
+        "restoration_does_not_revive_old_index_revision",
+        "historical_content_preserved",
+        "live_permission_revocation",
+        "principal_isolation",
+        "default_deny",
+        "minimum_commit_point",
+        "permission_idempotency",
+        "invalid_or_missing_head_explicit_error_on_reopen"
+      ],
+      "fixture_sha256": "1ec12178668947ebdcc79e3cfa33668748825d6a7b93515134a73555fff2cb1c",
+      "memory": 1000000,
+      "not_tested": [
+        "full_size",
+        "indexed_receipts",
+        "generation_watermarks",
+        "power_loss"
+      ],
+      "phase": "seed_and_invalidate",
+      "scope": 0,
+      "status": "passed"
+    }
+  },
+  "seconds": 6.735322767868638,
+  "status": "passed"
+}

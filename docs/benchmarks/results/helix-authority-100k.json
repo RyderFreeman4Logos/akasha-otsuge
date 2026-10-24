@@ -1,0 +1,71 @@
+{
+  "kind": "diagnostic_100000_change_history_oracle",
+  "not_tested": [
+    "50GB",
+    "100_clients",
+    "30_minute_mixed_profiles",
+    "derived_watermarks",
+    "live_permission_revocation",
+    "power_loss"
+  ],
+  "result": "passed",
+  "source_commit": "2f06ed44fc239d8e67ccac480f007ffc858890e0",
+  "stages": {
+    "seed": {
+      "binary_sha256": "bba37581ccf5586a444a7b1813b6269c0ca1c740d8adb940ea16c310944858af",
+      "exit": {
+        "code": 0,
+        "event": "exit",
+        "seconds": 1043.1382879754528
+      },
+      "last_memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "472",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "result": {
+        "changes": 100000,
+        "phase": "oracle_seeded",
+        "seconds": 1042.130905102,
+        "version": 1
+      },
+      "rss_max_bytes": 215273472,
+      "rss_p99_bytes": 215273472,
+      "samples": 1041
+    },
+    "verify": {
+      "binary_sha256": "bba37581ccf5586a444a7b1813b6269c0ca1c740d8adb940ea16c310944858af",
+      "exit": {
+        "code": 0,
+        "event": "exit",
+        "seconds": 34.08119225408882
+      },
+      "last_memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "result": {
+        "changes": 100000,
+        "checks": 5163,
+        "not_tested": [
+          "50GB",
+          "100_clients",
+          "derived_watermark",
+          "live_permission_revocation"
+        ],
+        "phase": "oracle_verified",
+        "seconds": 33.877956297
+      },
+      "rss_max_bytes": 106024960,
+      "rss_p99_bytes": 106024960,
+      "samples": 34
+    }
+  }
+}

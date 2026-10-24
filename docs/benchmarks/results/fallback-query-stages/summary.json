@@ -1,0 +1,185 @@
+{
+  "archive_bytes": 1762300,
+  "archive_files": 37,
+  "archive_sha256": "7815c7da08b1954647d878712cd0990628ae6c7fd4c670b5a57ae761a6525a5a",
+  "artifacts_verified": true,
+  "controller": {
+    "pid": 1406814,
+    "start_ticks": "462129228",
+    "state": "R"
+  },
+  "exact_processes_gone": true,
+  "interpretation": "baseline result streaming dominates; connect/open are milliseconds. Instrumented run passes all60s thresholds; earlier uninstrumented short failures remain. Source shows session shared with opened table; no connection-drop fix demonstrated. Per-run host contention was not captured and attribution remains unknown.",
+  "low_acceptance": false,
+  "native": {
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-case-f6a94f73d5734b2684f6db8728b0b1da.service",
+    "event": "executable",
+    "pid": 1406922,
+    "sha256": "02a306fc176488fac8bf079d555f62a850864f68f0c75ceb2bdc858b6c46a94f",
+    "start_ticks": "462129928"
+  },
+  "operations": {
+    "ann": {
+      "attempted": 15,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 5008,
+      "successful": 15,
+      "successful_per_s": 0.25,
+      "within_window": 15
+    },
+    "bm25": {
+      "attempted": 72,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 3794,
+      "successful": 72,
+      "successful_per_s": 1.2,
+      "within_window": 72
+    },
+    "correction": {
+      "attempted": 12,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 47,
+      "successful": 12,
+      "successful_per_s": 0.2,
+      "within_window": 12
+    },
+    "current": {
+      "attempted": 144,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 64,
+      "successful": 144,
+      "successful_per_s": 2.4,
+      "within_window": 144
+    },
+    "history": {
+      "attempted": 15,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 286,
+      "successful": 15,
+      "successful_per_s": 0.25,
+      "within_window": 15
+    },
+    "write": {
+      "attempted": 1440,
+      "conflicts": 95,
+      "errors": 0,
+      "p95_upper_ms": 53,
+      "successful": 1345,
+      "successful_per_s": 22.416666666666668,
+      "within_window": 1345
+    }
+  },
+  "reason": "stage instrumentation perturbs timings; canonical throughput remains failed",
+  "rss_max_bytes": 360960000,
+  "rss_p99_bytes": 360960000,
+  "scratch_removed": true,
+  "seconds": 63.30604255665094,
+  "stages": {
+    "g2_delta_text": {
+      "connect_s": {
+        "max": 0.01042069,
+        "mean": 0.0013688522083333333,
+        "total": 0.09855735899999998
+      },
+      "count": 72,
+      "drop_s": {
+        "max": 0.0025435690000000025,
+        "mean": 0.0007658939444444448,
+        "total": 0.05514436400000003
+      },
+      "execute_s": {
+        "max": 0.007699263999999997,
+        "mean": 0.0011712551527777778,
+        "total": 0.08433037099999997
+      },
+      "open_s": {
+        "max": 0.010536524,
+        "mean": 0.0021667280277777776,
+        "total": 0.15600441800000006
+      },
+      "stream_s": {
+        "max": 0.08008475799999999,
+        "mean": 0.02913506326388889,
+        "total": 2.097724554999999
+      },
+      "total_s": {
+        "max": 0.086129081,
+        "mean": 0.03460794444444444,
+        "total": 2.4917719999999997
+      }
+    },
+    "g2_text": {
+      "connect_s": {
+        "max": 0.001104346,
+        "mean": 0.000427188875,
+        "total": 0.030757598999999997
+      },
+      "count": 72,
+      "drop_s": {
+        "max": 0.004936072999999985,
+        "mean": 0.0023929526111111073,
+        "total": 0.17229258799999972
+      },
+      "execute_s": {
+        "max": 0.006371397,
+        "mean": 0.0034421659583333333,
+        "total": 0.24783594900000003
+      },
+      "open_s": {
+        "max": 0.013212003,
+        "mean": 0.005593682833333333,
+        "total": 0.40274516400000004
+      },
+      "stream_s": {
+        "max": 0.735659163,
+        "mean": 0.3912276043333333,
+        "total": 28.168387512
+      },
+      "total_s": {
+        "max": 0.746892153,
+        "mean": 0.4030837428333333,
+        "total": 29.022029484000004
+      }
+    },
+    "g2_vector": {
+      "connect_s": {
+        "max": 0.003175665,
+        "mean": 0.0014789870666666667,
+        "total": 0.022184805999999998
+      },
+      "count": 15,
+      "drop_s": {
+        "max": 0.0015887750000000977,
+        "mean": 0.0011917476666666613,
+        "total": 0.017876214999999918
+      },
+      "execute_s": {
+        "max": 0.005001921999999999,
+        "mean": 0.002294533733333333,
+        "total": 0.034418005999999994
+      },
+      "open_s": {
+        "max": 0.018390665,
+        "mean": 0.0071059134,
+        "total": 0.106588701
+      },
+      "stream_s": {
+        "max": 1.7372018329999999,
+        "mean": 1.1078290388666667,
+        "total": 16.617435583
+      },
+      "total_s": {
+        "max": 1.747805784,
+        "mean": 1.1199003582666667,
+        "total": 16.798505374
+      }
+    }
+  },
+  "status": "instrumented_diagnostic_pass",
+  "unit": "inactive"
+}

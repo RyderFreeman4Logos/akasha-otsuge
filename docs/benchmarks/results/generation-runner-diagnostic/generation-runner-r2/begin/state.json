@@ -1,0 +1,98 @@
+{
+  "attempts": [
+    {
+      "command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "--unit=akasha-generation-207ac46dd53a461aadd12dfa7a82ef6e",
+        "-p",
+        "MemoryMax=671088640",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=180",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=low",
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r2/begin/207ac46dd53a461aadd12dfa7a82ef6e/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r2/begin/probe",
+        "/tmp/akasha-generation-runner-ijfbq595/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r2/begin/request.json"
+      ],
+      "id": "207ac46dd53a461aadd12dfa7a82ef6e",
+      "log": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r2/begin/207ac46dd53a461aadd12dfa7a82ef6e/engine.log",
+      "phase": "completed",
+      "result": {
+        "artifact_sha256": {
+          "207ac46dd53a461aadd12dfa7a82ef6e/engine.log": "c1f511ad599b2802a91f13c326b59c24580887bf99a2a8dec113bfc880a3ac75",
+          "207ac46dd53a461aadd12dfa7a82ef6e/memory.jsonl": "2d206edde61b4097a9b54dec01ed23bbb06b766af1a195c851c0cf7b9f2e3ca0",
+          "config.toml": "f3acfc23fc1ade63275f7be438ac85e66b578ddb7e1f23ecb5b9442125bf34f2",
+          "request.json": "293b9844810b87950d99ee9f68438d00a6cce1b2c71930adccad20b258db7ec9"
+        },
+        "elapsed_s": 4.047761034220457,
+        "exit": 0,
+        "failure": null,
+        "generation": 1,
+        "operation": "begin_corpus",
+        "status": "passed"
+      },
+      "started_unix_s": 1792765052.2931483,
+      "unit": "akasha-generation-207ac46dd53a461aadd12dfa7a82ef6e"
+    }
+  ],
+  "config_epoch": 1,
+  "controller": {
+    "pid": 4152778,
+    "start_ticks": "458294922",
+    "state": "R"
+  },
+  "identity": {
+    "binary_sha256": "1ee2001a5f77fc03db30cf8e87a4f8181d35aa6091193a62a766d69966c5b249",
+    "config": {
+      "disk": {
+        "reserve_bytes": 36212254720,
+        "start_bytes": 81212254720
+      },
+      "paths": {
+        "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/generation-workload-r3/probe",
+        "database": "/tmp/akasha-generation-runner-ijfbq595/database",
+        "output": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r2/begin",
+        "request": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r2/begin.json"
+      },
+      "reliability": {
+        "max_attempts": 1
+      },
+      "run": {
+        "id": "begin",
+        "profile": "low",
+        "seconds": 180
+      }
+    },
+    "controller_sha256": "f485cdc29afd8d60963888dceebab4d27ba0859b134965a97bece7b88dc5a0f3",
+    "helpers_sha256": "c647b72392641f7626c718f479e7da4b001a2aca5bbf802465e0e6bfed95ca21",
+    "manifest_sha256": "86383ee70a53cbe7203d61cc5aef720b2f10f526162bf6548b42ed09a2422dfc",
+    "observer_sha256": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029",
+    "request_sha256": "293b9844810b87950d99ee9f68438d00a6cce1b2c71930adccad20b258db7ec9"
+  },
+  "phase": "completed",
+  "result": {
+    "artifact_sha256": {
+      "207ac46dd53a461aadd12dfa7a82ef6e/engine.log": "c1f511ad599b2802a91f13c326b59c24580887bf99a2a8dec113bfc880a3ac75",
+      "207ac46dd53a461aadd12dfa7a82ef6e/memory.jsonl": "2d206edde61b4097a9b54dec01ed23bbb06b766af1a195c851c0cf7b9f2e3ca0",
+      "config.toml": "f3acfc23fc1ade63275f7be438ac85e66b578ddb7e1f23ecb5b9442125bf34f2",
+      "request.json": "293b9844810b87950d99ee9f68438d00a6cce1b2c71930adccad20b258db7ec9"
+    },
+    "elapsed_s": 4.047761034220457,
+    "exit": 0,
+    "failure": null,
+    "generation": 1,
+    "operation": "begin_corpus",
+    "status": "passed"
+  }
+}

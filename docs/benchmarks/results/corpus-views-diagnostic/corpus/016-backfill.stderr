@@ -1,0 +1,17 @@
+ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"1","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"2","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"3","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"4","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"5","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"6","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"7","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"8","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"9","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"10","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"11","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"12","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"13","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"15","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"16","kind":"already_active"}}
+Error: "corpus coverage integrity mismatch"

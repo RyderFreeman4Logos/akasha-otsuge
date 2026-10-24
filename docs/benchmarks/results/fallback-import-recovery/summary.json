@@ -1,0 +1,89 @@
+{
+  "checks": {
+    "fallback-corruption-r1": {
+      "damaged_wal_unchanged": true,
+      "status": "passed",
+      "temporary_root_removed": true
+    },
+    "fallback-corruption-r2": {
+      "damaged_wal_unchanged": true,
+      "status": "passed",
+      "temporary_root_removed": true
+    },
+    "fallback-enospc-r1": {
+      "failed_keys_absent": true,
+      "filler_bytes": 8372224,
+      "kernel_errno": 28,
+      "prior_history_preserved": true,
+      "retry_committed": true,
+      "status": "passed"
+    },
+    "fallback-import-r3": {
+      "checks": 21,
+      "seconds": 1.9323761062696576,
+      "status": "passed"
+    },
+    "fallback-primitives-r3": {
+      "seconds": 1.1529377698898315,
+      "status": "passed"
+    }
+  },
+  "current_binary_sha256": "04f53240fc7af5576a31407781de6ecbf3a43879b2ce7bbc60b2dfffe167a1f4",
+  "enospc_cleanup_r2": {
+    "change": "persist exact mount admission before effects; always unmount if snapshot copy fails",
+    "native_binary": "unchanged 04f53240",
+    "status": "passed",
+    "temporary_removed": true
+  },
+  "low_reopen": "running separately; no pass claimed",
+  "measured_small_checks": {
+    "fallback-import-r2": {
+      "binary_sha256": "03c21fbc1a5c2e163a0c0c7c7b46a0e93e23069be52c96e7d92208b46017c0bf",
+      "cgroup_observed_peak_bytes": 54308864,
+      "checks": 21,
+      "harness_children_rss_max_bytes": 52678656,
+      "raw_hashes_verified": 45,
+      "sample_count": 3,
+      "seconds": 1.892450856976211,
+      "temporary_removed": true,
+      "unit_state": "inactive"
+    },
+    "fallback-primitives-r2": {
+      "binary_sha256": "03c21fbc1a5c2e163a0c0c7c7b46a0e93e23069be52c96e7d92208b46017c0bf",
+      "cgroup_observed_peak_bytes": 31707136,
+      "checks": 20,
+      "harness_children_rss_max_bytes": 19046400,
+      "raw_hashes_verified": 43,
+      "sample_count": 3,
+      "seconds": 1.1560299778357148,
+      "temporary_removed": true,
+      "unit_state": "inactive"
+    }
+  },
+  "real_stream": {
+    "acceptance": "not_run",
+    "artifact_sha256": {
+      "b1e336a8693a4d08a40528f0c622302f/consumer.log": "7ec5ea39cd008542260ca8608be3a415cd78028315ac5f525ce44599858ff8e5",
+      "b1e336a8693a4d08a40528f0c622302f/memory.jsonl": "a70931f40b52badcf83f19f63acf3c5653309c73b332eb04bf38f5f5b442b78d",
+      "b1e336a8693a4d08a40528f0c622302f/producer.log": "8cb05e9175778bef5bd24003f3eb19b0f749f9f74d46181241cc6e021bd87b64",
+      "database/import-progress.json": "265db57a67fbbf0de522a555b6f3e844f24f004ac84d71bdb4a531b6ca66b710"
+    },
+    "attempt": "b1e336a8693a4d08a40528f0c622302f",
+    "binary_sha256": "03c21fbc1a5c2e163a0c0c7c7b46a0e93e23069be52c96e7d92208b46017c0bf",
+    "documents": 38462,
+    "elapsed_seconds": 28.04173309262842,
+    "failure": null,
+    "indexes": "not_built",
+    "manifest_sha256": "5d28ca68dc34d108d9887c6306eafe7182ac50e9222ca3a44acdc39b0656641a",
+    "status": "passed"
+  },
+  "source_sha256": {
+    "spikes/fallback/check_corruption.py": "5017a5ec0498ed01be4d6f29e5494740fb9fedfd0dc75a76578533d4e99433d8",
+    "spikes/fallback/check_enospc.py": "f12af87ed2589879ddd6a628a9ec8069d87a4f951cfb0a89e2122bd0adfb7807",
+    "spikes/fallback/check_import.py": "d1563594506806fea178a59abd40d3963497ebf6456484c9219cef03d12c94c8",
+    "spikes/fallback/check_primitives.py": "43dccfffd1ee963905b36241ca2cd344493b4e3a81480a05abcafd2793464c90",
+    "spikes/fallback/src/load.rs": "fccf0bfbafb1b2d24602a5de086daf7039a6c6ede8573b50ff3851e14a7e6c7b",
+    "spikes/fallback/src/main.rs": "f70c323835d10f7693dd94a454f315043c08c3901c01edffa5caf8cbbf0f5895"
+  },
+  "status": "diagnostics_passed_full_acceptance_pending"
+}

@@ -1,0 +1,1 @@
+{"op": "apply", "generation": 1, "family": "vector", "seq": 1, "vector": {"model": "text-embedding-3-large", "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af", "body_sha256": "56164615261c76015058b05f91061f3c728649070143a82de789208ec58886d3", "values": [1.0, 2.0, 3.0]}}

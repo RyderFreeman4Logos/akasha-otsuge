@@ -1,0 +1,26 @@
+{
+  "binary_sha256": "152531626e736362e950a4d14637dded7866a1548a90dd30ebc5530f2d593cd5",
+  "checks": [
+    "process_crash",
+    "changed_prefix_rejected",
+    "no_duplicate_resume",
+    "manifest_change_rejected",
+    "partial_final_batch",
+    "durable_progress",
+    "legacy_unpinned_import"
+  ],
+  "documents": 1057,
+  "killed_after_durable_documents": 32,
+  "not_tested": [
+    "50GB",
+    "disk_full",
+    "100_clients"
+  ],
+  "result": "passed",
+  "review": "implementing-agent source self-check; not independent review",
+  "source_sha256": {
+    "spikes/helix/check_import.py": "cae22d9d5a552b7591a0c7fa0ec641a98e9f1e9740421f6b896be09e981e82b3",
+    "spikes/helix/src/load.rs": "d6e19228715f542149fd88ad8dcdd9f8785cc7dbb99b94732b4234dfb44f4b0a",
+    "spikes/helix/src/main.rs": "8d037a4f21809d24a12ee8061f3a138113bbe988ab566979db56efd15a4af4dc"
+  }
+}

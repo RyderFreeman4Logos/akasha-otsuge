@@ -1,0 +1,6 @@
+{
+  "allowed": true,
+  "op": "grant",
+  "principal": "reader",
+  "scope": 0
+}

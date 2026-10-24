@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generations.py", line 123, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generations.py", line 70, in main
+    begin()
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generations.py", line 60, in begin
+    def begin(g=1, **updates):return invoke({'op':'begin','generation':g,'bundle':{**bundle,**updates}})
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generations.py", line 56, in invoke
+    if not kill:assert (child.returncode!=0)==failure,text
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+Error: ObjectStore(Generic { store: "LocalFileSystem", source: UnableToCanonicalize { path: "/tmp/akasha-generations-hj7si2re/database", source: Os { code: 2, kind: NotFound, message: "No such file or directory" } } })
+

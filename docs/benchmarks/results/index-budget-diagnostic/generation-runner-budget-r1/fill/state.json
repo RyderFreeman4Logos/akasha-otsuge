@@ -1,0 +1,142 @@
+{
+  "attempts": [
+    {
+      "command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "--unit=akasha-generation-90665782cef54987a9b9eb08e70401a6",
+        "-p",
+        "MemoryMax=671088640",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=180",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=low",
+        "-p",
+        "Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES=36212254720",
+        "-p",
+        "Environment=AKASHA_SPIKE_INDEX_OBSERVE_SECONDS=180",
+        "/home/obj/.local/share/mise/installs/python/3.13/bin/python",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill/90665782cef54987a9b9eb08e70401a6/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill/probe",
+        "/tmp/akasha-generation-runner-er3mvedj/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill/request.json"
+      ],
+      "id": "90665782cef54987a9b9eb08e70401a6",
+      "log": "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill/90665782cef54987a9b9eb08e70401a6/engine.log",
+      "outcome": "controller result absent; native idempotent operation will reconcile durable effects",
+      "phase": "interrupted",
+      "started_unix_s": 1792768993.3499925,
+      "unit": "akasha-generation-90665782cef54987a9b9eb08e70401a6"
+    },
+    {
+      "command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "--unit=akasha-generation-03841a3d700f4437843e9b07ca4e2a12",
+        "-p",
+        "MemoryMax=671088640",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=180",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=low",
+        "-p",
+        "Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES=36212254720",
+        "-p",
+        "Environment=AKASHA_SPIKE_INDEX_OBSERVE_SECONDS=180",
+        "/home/obj/.local/share/mise/installs/python/3.13/bin/python",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill/03841a3d700f4437843e9b07ca4e2a12/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill/probe",
+        "/tmp/akasha-generation-runner-er3mvedj/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill/request.json"
+      ],
+      "id": "03841a3d700f4437843e9b07ca4e2a12",
+      "log": "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill/03841a3d700f4437843e9b07ca4e2a12/engine.log",
+      "phase": "completed",
+      "result": {
+        "artifact_sha256": {
+          "03841a3d700f4437843e9b07ca4e2a12/engine.log": "b1be8b17d3f0b03477fa62e807f37911bad24c922a33d663cc73aa0178366e44",
+          "03841a3d700f4437843e9b07ca4e2a12/memory.jsonl": "12d25b1c03e4d5fe181ee8a95cf80e781957840641c020e2bcfe8a15ec313a5a",
+          "90665782cef54987a9b9eb08e70401a6/engine.log": "33e621e877cb5ea179dc5d22c0908e4ef7c4c0b9b39b02ef501588b0ce3a870f",
+          "90665782cef54987a9b9eb08e70401a6/memory.jsonl": "afd3bab6623e76d8ff50103144d18cb720b875e341790952d71a3900b1f434c4",
+          "config.toml": "6a9d80978571109964dfc792d0de435c4431af74731c1f2583ab9a0739062e07",
+          "request.json": "b2c89ca2f70416e17aead96bf20594593597f3c7e9a94ca3a3fa2e0cad20a88a"
+        },
+        "elapsed_s": 2.0147543931379914,
+        "exit": 0,
+        "failure": null,
+        "generation": 1,
+        "operation": "backfill",
+        "status": "passed"
+      },
+      "started_unix_s": 1792768994.0734785,
+      "unit": "akasha-generation-03841a3d700f4437843e9b07ca4e2a12"
+    }
+  ],
+  "config_epoch": 1,
+  "controller": {
+    "pid": 55097,
+    "start_ticks": "458689097",
+    "state": "R"
+  },
+  "identity": {
+    "binary_sha256": "2e1a13c0eca59f25c4bb6b961d92edddfa3aa5238d53f3d5381337326afda597",
+    "config": {
+      "disk": {
+        "reserve_bytes": 36212254720,
+        "start_bytes": 81212254720
+      },
+      "paths": {
+        "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/index-budget-r1/probe",
+        "database": "/tmp/akasha-generation-runner-er3mvedj/database",
+        "output": "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill",
+        "request": "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r1/fill.json"
+      },
+      "reliability": {
+        "max_attempts": 1
+      },
+      "run": {
+        "id": "fill",
+        "profile": "low",
+        "seconds": 180
+      }
+    },
+    "controller_sha256": "8921188f265164236f21d92fdb1d1f42e4ddbfac17e2152db7d73ef8e6210593",
+    "execution_request_sha256": "b2c89ca2f70416e17aead96bf20594593597f3c7e9a94ca3a3fa2e0cad20a88a",
+    "helpers_sha256": "a46ca6c522a995a1cfcd69f3fd32f92d03a8c4b42eeb1485f3e5ddb70516d8e9",
+    "observer_sha256": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029",
+    "request_sha256": "e462fbc59d5ee0595a434e8d75059c2269680775c3f027f30130a3c7101df33c"
+  },
+  "phase": "completed",
+  "result": {
+    "artifact_sha256": {
+      "03841a3d700f4437843e9b07ca4e2a12/engine.log": "b1be8b17d3f0b03477fa62e807f37911bad24c922a33d663cc73aa0178366e44",
+      "03841a3d700f4437843e9b07ca4e2a12/memory.jsonl": "12d25b1c03e4d5fe181ee8a95cf80e781957840641c020e2bcfe8a15ec313a5a",
+      "90665782cef54987a9b9eb08e70401a6/engine.log": "33e621e877cb5ea179dc5d22c0908e4ef7c4c0b9b39b02ef501588b0ce3a870f",
+      "90665782cef54987a9b9eb08e70401a6/memory.jsonl": "afd3bab6623e76d8ff50103144d18cb720b875e341790952d71a3900b1f434c4",
+      "config.toml": "6a9d80978571109964dfc792d0de435c4431af74731c1f2583ab9a0739062e07",
+      "request.json": "b2c89ca2f70416e17aead96bf20594593597f3c7e9a94ca3a3fa2e0cad20a88a"
+    },
+    "elapsed_s": 2.0147543931379914,
+    "exit": 0,
+    "failure": null,
+    "generation": 1,
+    "operation": "backfill",
+    "status": "passed"
+  }
+}

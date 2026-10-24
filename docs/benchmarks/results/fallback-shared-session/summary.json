@@ -1,0 +1,138 @@
+{
+  "archive_bytes": 1535615,
+  "archive_files": 481,
+  "archive_sha256": "6b54386a0978f88c9476263b3d47be43057e60289093c9b6ea62833aa75b46e6",
+  "behavioral_red": "actual two native dataset sessions have distinct identity under old connection ownership",
+  "capacities_unchanged": {
+    "index_cache_bytes": 16777216,
+    "metadata_cache_bytes": 8388608,
+    "spill_cap_bytes": 67108864
+  },
+  "concurrent": {
+    "artifacts_verified": true,
+    "case_seconds": 162.51999408006668,
+    "controls": 10,
+    "exact_processes_gone": true,
+    "fixture_removed": true,
+    "native_sha256": "68e74e4ca3b31f96bb762fb5ce25ae7eaa145d3680c0f474adcfab37caeb832d",
+    "operations": {
+      "ann": {
+        "attempted": 40,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 56,
+        "successful": 40,
+        "successful_per_s": 0.25,
+        "within_window": 40
+      },
+      "bm25": {
+        "attempted": 192,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 68,
+        "successful": 192,
+        "successful_per_s": 1.2,
+        "within_window": 192
+      },
+      "correction": {
+        "attempted": 32,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 59,
+        "successful": 32,
+        "successful_per_s": 0.2,
+        "within_window": 32
+      },
+      "current": {
+        "attempted": 384,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 54,
+        "successful": 384,
+        "successful_per_s": 2.4,
+        "within_window": 384
+      },
+      "history": {
+        "attempted": 40,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 51,
+        "successful": 40,
+        "successful_per_s": 0.25,
+        "within_window": 40
+      },
+      "write": {
+        "attempted": 3840,
+        "conflicts": 1111,
+        "errors": 0,
+        "p95_upper_ms": 43,
+        "successful": 2729,
+        "successful_per_s": 17.05625,
+        "within_window": 2729
+      }
+    },
+    "rebuild": {
+      "active_generation": 1,
+      "end_seq": 4198,
+      "generation": 2,
+      "ready": true,
+      "seconds": 3.028424298,
+      "start_seq": 4146,
+      "state": {
+        "backfill_deadline_ms": 1792834414121,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "cursor": 24,
+        "documents": 24,
+        "generation": 2,
+        "index_deadline_ms": 1792834416379,
+        "pending": null,
+        "ready": true,
+        "source": "03e76bbf49929a2bf387f2d2fbbe1349522d87b45a60d3147e387ed8b64353b8",
+        "text_layout": "scope_columns",
+        "text_version": 1,
+        "vector_rows": 8,
+        "vector_version": 1,
+        "vectors": 8
+      },
+      "status": "passed"
+    },
+    "requests": 4528,
+    "rss_max_bytes": 210227200,
+    "rss_p99_bytes": 210034688,
+    "scratch_removed": true,
+    "seconds": 212.1982779605314,
+    "status": "passed",
+    "units_inactive": true
+  },
+  "lifecycle": {
+    "artifacts_verified": true,
+    "commands": 179,
+    "contenders": 2,
+    "exact_processes_gone": true,
+    "fixture_removed": true,
+    "native_sha256": "68e74e4ca3b31f96bb762fb5ce25ae7eaa145d3680c0f474adcfab37caeb832d",
+    "rss_max_bytes": 127815680,
+    "scratch_removed": true,
+    "seconds": 12.057507368735969,
+    "sigkill_barriers": 12,
+    "status": "passed",
+    "unit_inactive": true
+  },
+  "native_sha256": "68e74e4ca3b31f96bb762fb5ce25ae7eaa145d3680c0f474adcfab37caeb832d",
+  "not_proven": [
+    "full concurrent build memory/performance",
+    "exclusive causal attribution of prior OOM",
+    "sole backend decision"
+  ],
+  "release_all_targets_clippy": "passed",
+  "release_units": 12,
+  "review": "implementing-agent self-review only",
+  "source_parent": "621d1338f9f796afd179126da181e6531186722e",
+  "status": "passed_diagnostic_only"
+}

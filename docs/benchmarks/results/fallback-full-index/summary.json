@@ -1,0 +1,83 @@
+{
+  "archive_sha256": "0ee074a1536d9a284b00f706ef1e1e252daae31573b9cb26958dcf9b80db9503",
+  "artifact_hashes_verified": true,
+  "base_commit": "52e658d823b4efefc472dd48dfa1bfcd019c2be0",
+  "binary_sha256": "95081e9e4f5666c4141d53fd111f85d6b9c26735280fb7e4fe3b42d3c05e15e2",
+  "comparison": "same95081e9binary/privateTMPDIR; only native worker2to1; retained total sample16/streaming4/1000partitions/20iterations and original deadline",
+  "exact_processes_exited": true,
+  "limits": {
+    "command": [
+      "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-index-r5/build/probe",
+      "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-compressed-r1/database",
+      "--generation",
+      "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-index-r5/build/request.json"
+    ],
+    "event": "start",
+    "limits": {
+      "memory.high": "max",
+      "memory.max": "671088640",
+      "memory.swap.max": "0"
+    },
+    "native_environment": {
+      "LANCE_CPU_THREADS": "1",
+      "LANCE_DEFAULT_IO_BUFFER_SIZE": "16777216",
+      "LANCE_SHUFFLE_BATCH_BYTES": "16777216",
+      "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES": "0",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-index-r5/build/946f6742034f45a6a841441dfe737d03/native-scratch-fffqa23u"
+    },
+    "nofile_soft_hard": [
+      8192,
+      8192
+    ]
+  },
+  "memory_events": {
+    "high": "0",
+    "low": "0",
+    "max": "283206",
+    "oom": "0",
+    "oom_group_kill": "0",
+    "oom_kill": "0"
+  },
+  "native": {
+    "backfill_deadline_ms": 1792795655252,
+    "bundle": {
+      "chunker": "source-document-v1",
+      "dimension": 1536,
+      "model": "text-embedding-3-large",
+      "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+      "schema": 1
+    },
+    "cursor": 11428831,
+    "documents": 11428831,
+    "generation": 1,
+    "index_deadline_ms": 1792796647085,
+    "pending": null,
+    "ready": true,
+    "source": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+    "text_version": 5014,
+    "vector_rows": 1000000,
+    "vector_version": 1973,
+    "vectors": 1000000
+  },
+  "not_proven": [
+    "steady workload RSS",
+    "full exact ANN recall",
+    "activation",
+    "cold reads"
+  ],
+  "preceding_failures": [
+    "../fallback-index-training/summary.json",
+    "../fallback-private-scratch/summary.json"
+  ],
+  "rss_max_bytes": 610480128,
+  "rss_p99_bytes": 610480128,
+  "samples": 162,
+  "scratch_cleanup": {
+    "path": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-index-r5/build/946f6742034f45a6a841441dfe737d03/native-scratch-fffqa23u",
+    "removed": true
+  },
+  "seconds": 164.2653049295768,
+  "source_verified": "all frozen Rust/Cargo files; exact executed Python controller and observer independently verified",
+  "status": "passed_full_native_index_coverage",
+  "unit": "inactive"
+}

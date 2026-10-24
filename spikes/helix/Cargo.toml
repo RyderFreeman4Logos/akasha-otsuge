@@ -1,0 +1,24 @@
+[package]
+name = "akasha-helix-probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+license = "Apache-2.0"
+
+[workspace]
+
+[dependencies]
+db = { git = "https://github.com/HelixDB/helix-db", rev = "c72e64f0c7e480f3d125f071659d5e3ad7b8da15" }
+helix-db = { git = "https://github.com/HelixDB/helix-db", rev = "c72e64f0c7e480f3d125f071659d5e3ad7b8da15", features = ["embedded"] }
+slatedb = { git = "https://github.com/HelixDB/slatedb.git", rev = "2fb25fdaa61d42cc3756f979a8a7b37dbfc483fd", features = ["zstd"] }
+tokio = { version = "1.54.1", features = ["macros", "rt-multi-thread", "time", "sync"] }
+serde_json = "1.0.154"
+serde = { version = "1.0.229", features = ["derive"] }
+sha2 = "0.11.1"
+rustix = { version = "1.1.5", features = ["fs"] }
+
+[profile.release]
+debug = 0
+
+[lints.rust]
+unsafe_code = "forbid"

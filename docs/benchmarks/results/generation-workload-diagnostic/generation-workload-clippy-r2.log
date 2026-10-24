@@ -1,0 +1,20 @@
+    Checking akasha-helix-probe v0.0.0 (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix)
+error: this `MutexGuard` is held across an await point
+   --> src/workload.rs:735:9
+    |
+735 |     let metrics = shared.metrics.lock().map_err(|_| "metrics poisoned")?;
+    |         ^^^^^^^
+    |
+    = help: consider using an async-aware `Mutex` type or ensuring the `MutexGuard` is dropped before calling `await`
+note: these are all the await points this lock is held through
+   --> src/workload.rs:762:50
+    |
+762 |             &Box::pin(shared.derived_oracle(id)).await?,
+    |                                                  ^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#await_holding_lock
+    = note: `-D clippy::await-holding-lock` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::await_holding_lock)]`
+
+error: could not compile `akasha-helix-probe` (bin "akasha-helix-probe") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `akasha-helix-probe` (bin "akasha-helix-probe" test) due to 1 previous error

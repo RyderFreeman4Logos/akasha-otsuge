@@ -1,0 +1,10 @@
+   Compiling akasha-helix-probe v0.0.0 (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix)
+error: no rules expected `"fake"`
+   --> src/search.rs:323:40
+    |
+323 |             ("exact_neighbors", json!(["fake"; 20])),
+    |                                        ^^^^^^ no rules expected this token in macro call
+    |
+    = note: while trying to match end of macro
+
+error: could not compile `akasha-helix-probe` (bin "akasha-helix-probe" test) due to 1 previous error

@@ -1,0 +1,1 @@
+{"op": "begin_corpus", "generation": 1, "bundle": {"model": "text-embedding-3-large", "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5", "dimension": 1536, "chunker": "source-document-v1", "schema": 1}, "manifest": "/tmp/akasha-otsuge-storage-20261022/corpus-source-key-r1/manifest.json"}

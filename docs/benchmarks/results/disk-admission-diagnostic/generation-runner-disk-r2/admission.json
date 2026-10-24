@@ -1,0 +1,6 @@
+{
+  "binary_sha256": "a5a4dd73633e962a639c778713b7ecacfe33830569a0255bbaacda1ec2e428b4",
+  "harness_sha256": "2ce1f20ca8aeeaa4ae23b7a2f12b5e3889a315f5441436646169d56b54c7d709",
+  "runner_sha256": "dcca22c689db36558dd6f13878a2ed421b957890c0030a3b0d48f139d26e1b17",
+  "temporary_root": "/tmp/akasha-generation-runner-dhcmmsgn"
+}

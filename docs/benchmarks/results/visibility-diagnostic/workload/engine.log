@@ -1,0 +1,15 @@
+Running as unit: akasha-case-5ffe01f2d0e547fd94ffd89efb960589.service
+ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"3","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"4","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"5","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"6","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"7","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"8","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"9","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"10","kind":"already_active"}}
+{"diagnostic":true,"drain_s":0.027766462000002434,"failures":[],"not_tested":["derived_watermarks","live_permission_revocation","correction_of_search_candidates","RSS_thresholds_checked_by_outer_observer"],"phase":"steady","snapshot":{"active":0,"admission_slots":4,"clients":[24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,6,6,6,6,6,6,6,6,6,6,6,6,4,4,4,3,4,4,4,3,2,2,2,2,1,1,1,1],"completed":1698,"completed_waves":60,"config_epoch":1,"derived_lag":null,"elapsed_s":60.001128545,"eta_s":0.0,"operations":{"ann":{"attempted":15,"conflicts":0,"errors":0,"p95_upper_ms":2154,"successful":15,"successful_per_s":0.25,"within_window":15},"bm25":{"attempted":72,"conflicts":0,"errors":0,"p95_upper_ms":1980,"successful":72,"successful_per_s":1.2,"within_window":72},"correction":{"attempted":12,"conflicts":0,"errors":0,"p95_upper_ms":2112,"successful":12,"successful_per_s":0.2,"within_window":12},"current":{"attempted":144,"conflicts":0,"errors":0,"p95_upper_ms":1880,"successful":144,"successful_per_s":2.4,"within_window":144},"history":{"attempted":15,"conflicts":0,"errors":0,"p95_upper_ms":2049,"successful":15,"successful_per_s":0.25,"within_window":15},"write":{"attempted":1440,"conflicts":713,"errors":0,"p95_upper_ms":1932,"successful":727,"successful_per_s":12.116666666666667,"within_window":727}},"peak_queued":58,"phase":"completed","pid":3792217,"queue_bytes_bound":819200,"queue_entry_bound":100,"queued":0,"queued_bytes_upper_bound":0,"rate_per_s":28.299467712953497,"run_id":"visibility-workload-v4","start_ticks":"456986310","total":1698,"wave_seconds":1},"status":"passed"}
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 1min 2.172s
+CPU time consumed: 1min 25.371s

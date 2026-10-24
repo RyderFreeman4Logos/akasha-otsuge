@@ -1,0 +1,110 @@
+{
+  "artifacts_verified": true,
+  "binary_sha256": "9b09f83c8a225eb608600b2a3f7d6106c7ab2d1c8726956aee97cfea5cbb36d1",
+  "checks": 85,
+  "classified_failures": [
+    {
+      "command_index": 61,
+      "exit": 1,
+      "expected_error": "object of size 0 bytes",
+      "stderr": "INDEX_OBSERVATION_SECONDS:600\nDISK_RESERVATION_BYTES:0\nError: Lance { source: IO { source: Generic { store: \"memory\", source: \"Invalid range 0..666 for object of size 0 bytes\" }, location: Location { file: \"/mnt/ssd/mirror-rootfs/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ops/function.rs\", line: 250, column: 5 }, backtrace: MaybeBacktrace } }\n"
+    },
+    {
+      "command_index": 62,
+      "exit": 1,
+      "expected_error": "Lance",
+      "stderr": "INDEX_OBSERVATION_SECONDS:600\nDISK_RESERVATION_BYTES:0\nError: Lance { source: IO { source: Generic { store: \"LocalFileSystem\", source: Error { kind: UnexpectedEof, message: \"failed to fill whole buffer\" } }, location: Location { file: \"/home/obj/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lance-13.0.0/src/index.rs\", line: 3462, column: 29 }, backtrace: MaybeBacktrace } }\n"
+    },
+    {
+      "command_index": 64,
+      "exit": 1,
+      "expected_error": "g8_text",
+      "stderr": "INDEX_OBSERVATION_SECONDS:600\nDISK_RESERVATION_BYTES:0\nError: TableNotFound { name: \"g8_text\", source: DatasetNotFound { path: \"mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-derived-corruption-r3/native-scratch-_pkvy6rx/akasha-fallback-search-ozqoi862/database/derived/g8_text.lance\", source: NotFound { uri: \"mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-derived-corruption-r3/native-scratch-_pkvy6rx/akasha-fallback-search-ozqoi862/database/derived/g8_text.lance/_versions\", location: Location { file: \"/home/obj/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lance-table-13.0.0/src/io/commit.rs\", line: 653, column: 26 }, backtrace: MaybeBacktrace }, location: Location { file: \"/home/obj/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lance-13.0.0/src/dataset/builder.rs\", line: 913, column: 29 }, backtrace: MaybeBacktrace } }\n"
+    }
+  ],
+  "fault": {
+    "fault": "truncate owned generation8 text-token and vector-index files after native exit",
+    "files": [
+      {
+        "bytes": 666,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_text.lance/_indices/0042d8c7-67f5-48b3-8eaf-6f7d3cdcde88/part_0_tokens.lance",
+        "sha256": "036def72904c2d26716fe39df19f49f941f24cdc62ada239bc0a94ec85530004"
+      },
+      {
+        "bytes": 666,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_text.lance/_indices/07e3a75f-1fd2-4ad3-899e-5a243bd053d0/part_0_tokens.lance",
+        "sha256": "036def72904c2d26716fe39df19f49f941f24cdc62ada239bc0a94ec85530004"
+      },
+      {
+        "bytes": 666,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_text.lance/_indices/0ce94c87-303d-49c8-8d86-df4e5260bade/part_0_tokens.lance",
+        "sha256": "5368e3ed9719497c8f775222a4432016fa2d4cae87803240aa6acbe1b1b8da35"
+      },
+      {
+        "bytes": 666,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_text.lance/_indices/289bdb2b-1f04-4cd1-ab3f-fe47a0f72195/part_0_tokens.lance",
+        "sha256": "036def72904c2d26716fe39df19f49f941f24cdc62ada239bc0a94ec85530004"
+      },
+      {
+        "bytes": 666,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_text.lance/_indices/9af17586-e8c0-4d5b-8ea4-5cd7ef977933/part_0_tokens.lance",
+        "sha256": "036def72904c2d26716fe39df19f49f941f24cdc62ada239bc0a94ec85530004"
+      },
+      {
+        "bytes": 666,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_text.lance/_indices/9c4c89be-ff7e-45f9-92ec-aea38357eeab/part_0_tokens.lance",
+        "sha256": "036def72904c2d26716fe39df19f49f941f24cdc62ada239bc0a94ec85530004"
+      },
+      {
+        "bytes": 666,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_text.lance/_indices/9f49e540-8144-4dc1-b180-0feeb2c431fd/part_0_tokens.lance",
+        "sha256": "036def72904c2d26716fe39df19f49f941f24cdc62ada239bc0a94ec85530004"
+      },
+      {
+        "bytes": 666,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_text.lance/_indices/d06f4cde-6bad-4d4b-aadf-51df20fbe219/part_0_tokens.lance",
+        "sha256": "036def72904c2d26716fe39df19f49f941f24cdc62ada239bc0a94ec85530004"
+      },
+      {
+        "bytes": 3243,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_vector.lance/_indices/723c92d2-53d5-4c3d-a187-59b583d9e1dd/bitmap_page_lookup.lance",
+        "sha256": "0be44b8d3c0722870d13d4f95434ba9b4c58b545a5d2c01a9b14a4dea5c2bab1"
+      },
+      {
+        "bytes": 6503428,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_vector.lance/_indices/d50675e1-cc22-4af1-985a-76d55a3d747b/auxiliary.idx",
+        "sha256": "cf2eef41d7df598f98d2c8c3a74110d748fde96784a1d5d266c4f2f1728f6159"
+      },
+      {
+        "bytes": 197098,
+        "damaged_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "file": "derived/g8_vector.lance/_indices/d50675e1-cc22-4af1-985a-76d55a3d747b/index.idx",
+        "sha256": "28a4d77d80e712ffebd1a64fea84f290c0d33566a88eecdedff016e7738da585"
+      }
+    ]
+  },
+  "fixture_removed": true,
+  "natives_exited": true,
+  "prior_attempts": {
+    "r1": "native correctly rejected zero-sized dictionary; harness expected a filename omitted by memory-store error; failure and missing child identity limitation preserved",
+    "r2": "83 checks pass text-only physical corruption; r3 adds vector-index corruption"
+  },
+  "raw_archive_files": 492,
+  "raw_archive_sha256": "0358708dafb0fff291c343da3edaa18a742e0562245e13e3c766af42694f5cb8",
+  "rss_max_bytes": 142204928,
+  "scope": "1057 synthetic records; explicit offline quarantine and rebuild from unchanged authority; not automatic product quarantine or full-scale corruption",
+  "scratch_removed": true,
+  "seconds": 6.909976375289261,
+  "status": "passed_diagnostic_both_derived_families",
+  "unit_inactive": true
+}

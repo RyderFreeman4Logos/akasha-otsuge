@@ -1,0 +1,5 @@
+[reliability]
+max_attempts = 5
+base_backoff_s = 1
+max_backoff_s = 30
+request_timeout_s = 14400

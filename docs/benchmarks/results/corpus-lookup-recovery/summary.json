@@ -1,0 +1,166 @@
+{
+  "abort_binary_sha256": "4e50aeb7e399b1c0115f4ada10c2d84c953b38605ff971026b2725cb7bac10e0",
+  "backfill": {
+    "commands": 146,
+    "seconds": 94.27729665022343,
+    "temporary_root_removed": true
+  },
+  "baseline_unique_rejected_deliberate_duplicate": true,
+  "full_initialization": {
+    "artifact_hashes_verified": 4,
+    "attested_limits": {
+      "memory.high": "max",
+      "memory.max": "2147483648",
+      "memory.swap.max": "0"
+    },
+    "exits": [
+      {
+        "code": 1,
+        "event": "exit",
+        "seconds": 7202.793072978035
+      }
+    ],
+    "free_bytes": 172417384448,
+    "last_index": {
+      "operation": {
+        "attempt": 11633,
+        "family": "secondary",
+        "generation": "1",
+        "index_id": "1",
+        "operation_id": "56d3557e-7c36-4554-8b0d-6a45436f69fa",
+        "operation_kind": "build",
+        "progress": {
+          "entities": "11911136",
+          "input_bytes": "58713197080",
+          "output_bytes": "1738775716",
+          "output_operations": "23339967"
+        },
+        "stage": "validate",
+        "status": "queued"
+      }
+    },
+    "native_terminal": "Error: \"index did not become active: {\\\"operation\\\":{\\\"attempt\\\":11633,\\\"family\\\":\\\"secondary\\\",\\\"generation\\\":\\\"1\\\",\\\"index_id\\\":\\\"1\\\",\\\"operation_id\\\":\\\"56d3557e-7c36-4554-8b0d-6a45436f69fa\\\",\\\"operation_kind\\\":\\\"build\\\",\\\"progress\\\":{\\\"entities\\\":\\\"11911136\\\",\\\"input_bytes\\\":\\\"58713197080\\\",\\\"output_bytes\\\":\\\"1738775716\\\",\\\"output_operations\\\":\\\"23339967\\\"},\\\"stage\\\":\\\"validate\\\",\\\"status\\\":\\\"queued\\\"}}\"",
+    "observed_utc": "2026-10-23T16:22:04.639911+00:00",
+    "processes": {
+      "4156098": null,
+      "4156109": null
+    },
+    "result": {
+      "artifact_sha256": {
+        "379a471eab3442108485ac8ab2f40de5/engine.log": "4107d2f2d4455bf78736bdc9ec3e02f5a3a3620a4341230ef560d37c6bec2c79",
+        "379a471eab3442108485ac8ab2f40de5/memory.jsonl": "53780029792b4c782ff2ed823ff4c3fd7e03852a111ada09446466430b127cde",
+        "config.toml": "b8c5e76df4a36f89351abee8f6c592ecf296ef749cd0416f3ad5a8ed287acd1d",
+        "request.json": "5bde098171f163d696146c0789a2f83c460f02e31d037769c32cdc37a09ab286"
+      },
+      "elapsed_s": 7203.794507551007,
+      "exit": 1,
+      "failure": null,
+      "generation": 1,
+      "operation": "begin_corpus",
+      "status": "failed"
+    },
+    "rss_max": 1363169280,
+    "rss_p99": 1323646976,
+    "rss_samples": 7130,
+    "state": "interrupted",
+    "unit": "MemoryMax=infinity\nMemorySwapMax=infinity\nActiveState=inactive\n"
+  },
+  "lookup_binary_sha256": "1643feeb6d1447bc74f27d8277cf76ccd3d50ab38c7f3c06aaff18dd513307e7",
+  "not_tested": [
+    "full ordinary-index build",
+    "full backfill and query workload",
+    "full abort cleanup latency",
+    "physical power loss"
+  ],
+  "recovery": {
+    "generation-abandon-r3": {
+      "checks": 12,
+      "seconds": 7.995458792895079,
+      "status": "passed"
+    },
+    "generation-runner-abort-r1": {
+      "checks": 9,
+      "seconds": 8.00361755862832,
+      "status": "passed"
+    },
+    "index-abort-r1": {
+      "checks": 10,
+      "seconds": 3.1120887519791722,
+      "status": "passed"
+    }
+  },
+  "source_sha256": {
+    "spikes/helix/Cargo.lock": "eea014793e18b0eb30d594f9056d19460b867d3178901a859bc0b86995831fd8",
+    "spikes/helix/check_backfill.py": "55144aac0a07017e7571925878f2c2e27f431805d71d04fe66e0f75cb1bb062f",
+    "spikes/helix/check_generation_abandon.py": "2933e29c9c7d148aa85679aa3933248b6fd2956c3062b511b3a3fe7fe13d1d0e",
+    "spikes/helix/check_generation_runner.py": "27eec37132a696d655a2ff2843e147090fb083dfaa2a07110bd5813da1cd0744",
+    "spikes/helix/check_generation_workload.py": "730641b1f1b74cf0a62898c734185f8144b08a6c832f68c393ab61f2f36e7498",
+    "spikes/helix/check_index_abort.py": "d83e49c8f003815366b18a089b33e261e58d6a3ff200cbf4cab70f939538e0f2",
+    "spikes/helix/reconcile_generation.py": "51992153019623ff7492418fffe3b96b4e1203c596acb982daa085c01bcad160",
+    "spikes/helix/run_case.py": "f87f30b15e492431723d106640e13a961763e0f4795c98449b958148780788b0",
+    "spikes/helix/run_generation.py": "13fa0f1e30c4629be10897b48dccb62cf1f283935574a1d48666eb0eaa03b61c",
+    "spikes/helix/src/authority.rs": "0653dfb3d8580890330a672207b9f45da49a0453077be22db34cf11e9b0a7248",
+    "spikes/helix/src/engine.rs": "7a47a818c2132c58c24e511941c29f33b58027d0dd892ce10f02539a6392e9a1",
+    "spikes/helix/src/generations.rs": "cefbca1611f5b2acae4a40287d8192a9dc8e655f05a0e4466f39659c5216c25b",
+    "spikes/helix/src/generations/corpus.rs": "9bbf36412c9a24188546e03488862c8ba556d6227cfff4cde78b668d93cfd7b7",
+    "spikes/helix/src/indexes.rs": "d378700cf20bb77c9e362675da452e39b9ea9b05f2f8e1f1e5b41e74841dd791",
+    "spikes/helix/src/load.rs": "784fa363ecb55eba29183073b24f33e6c7b60085231b2898ffdf14f65b8e2c40",
+    "spikes/helix/src/main.rs": "ec87bb9f856d9b1c0860200bab8de4f88f82bf163cc57e07bb1058ba44dffbdf",
+    "spikes/helix/src/profile.rs": "ccbed0c2479c625c5b226cd28827e9b28807c9e1cb025d48677569dd934f5658",
+    "spikes/helix/src/search.rs": "d7848974a9d1977276258c093b38f9524f1758f4bc36dd6d99c5a915508f32ad",
+    "spikes/helix/src/visibility.rs": "32d5b151b79bc9d0d412c3a726990a7402959e60aa56945ee287a5ff37e96d79",
+    "spikes/helix/src/workload.rs": "7466026660647985b13c9d3b4a8e3dc9eeed86e27f13e0ba589ff0afe3ac65d3",
+    "spikes/helix/test_generation_abandon.py": "62ec4d8893dcac0cdeb11136611ebb1faba697c6f35021193f68ff8e21133e79",
+    "spikes/measure.py": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029"
+  },
+  "status": "diagnostics_passed_full_acceptance_pending",
+  "workload": {
+    "content_oracle": {
+      "corpus_current_checks": 144,
+      "corpus_current_distinct": 16,
+      "corpus_current_partitions": {
+        "p0": 18,
+        "p1": 17,
+        "p2": 18,
+        "p3": 17,
+        "p4": 18,
+        "p5": 19,
+        "p6": 18,
+        "p7": 19
+      },
+      "current_checks": 144,
+      "derived_current_checks": 50,
+      "distinct_commits": 791,
+      "requests": 1698,
+      "search_checks": {
+        "ann": 15,
+        "bm25": 72
+      },
+      "text_only_bm25_checks": 36,
+      "text_only_bm25_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ],
+      "text_only_current_checks": 70,
+      "text_only_current_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ]
+    },
+    "rss_max_bytes": 274837504,
+    "rss_p99_bytes": 274837504,
+    "seconds": 281.84734013676643
+  }
+}

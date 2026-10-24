@@ -1,0 +1,27 @@
+{
+  "command": [
+    "systemd-run",
+    "--user",
+    "--quiet",
+    "--wait",
+    "--pipe",
+    "--collect",
+    "--unit=akasha-visibility-44a2a0a5cbcc441da1326e6041384573-indexes",
+    "-p",
+    "MemoryMax=671088640",
+    "-p",
+    "MemorySwapMax=0",
+    "-p",
+    "RuntimeMaxSec=600",
+    "-p",
+    "Environment=AKASHA_SPIKE_PROFILE=low",
+    "/usr/bin/python3",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+    "/tmp/akasha-otsuge-storage-20261022/visibility-r5/indexes-memory.jsonl",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/probe",
+    "/tmp/akasha-visibility-w8_j21kb/database",
+    "--build-indexes",
+    "300"
+  ],
+  "unit": "akasha-visibility-44a2a0a5cbcc441da1326e6041384573-indexes"
+}

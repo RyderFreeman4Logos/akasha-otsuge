@@ -1,0 +1,915 @@
+{
+  "binary_sha256": "21551ab916fc32e2b114d1c6b2916cd89acee2dfcb2266f77b58cd8154df2141",
+  "dimension": 1536,
+  "exit": {
+    "code": 0,
+    "event": "exit",
+    "seconds": 3.0400094678625464
+  },
+  "fixture_checks": {
+    "fixture_reproduction": "byte_identical",
+    "negative_controls": [
+      "wrong_dimension_rejected",
+      "missing_expected_self_rejected"
+    ],
+    "result": "passed"
+  },
+  "input_documents": 38462,
+  "kind": "diagnostic_real_search_after_recovery",
+  "limits": {
+    "memory.high": "max",
+    "memory.max": "671088640",
+    "memory.swap.max": "0"
+  },
+  "not_tested": [
+    "full_coverage_of_all_vectors",
+    "50GB",
+    "100_clients",
+    "30_minute_mixed_profiles",
+    "cold_OS_cache",
+    "retraction",
+    "model_generations"
+  ],
+  "os_page_cache_dropped": false,
+  "process_reopened_database": true,
+  "result": "passed",
+  "result_receipt": {
+    "fixture_sha256": "1ec12178668947ebdcc79e3cfa33668748825d6a7b93515134a73555fff2cb1c",
+    "not_tested": [
+      "50GB",
+      "100_clients",
+      "retraction",
+      "model_generations"
+    ],
+    "phase": "real_search_verified",
+    "queries": 24,
+    "results": [
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+        "mode": "bm25",
+        "partition": "p0",
+        "seconds": 0.035389227
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Il_manifesto>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Scotland_on_Sunday>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Prague_Post>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Washington_Square_News>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:San_Francisco_Chronicle>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Novinar>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Field_Enterprises>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Korea_Herald>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Atlanta_Journal-Constitution>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:National_Publications>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Asbury_Park_Press>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Daily_Cougar>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Central_newspapers_of_the_Soviet_Union>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:El_Siglo_(Argentina)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mabuhay_Gardens>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Standards-compliant>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mark_Cardona>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:When_Saturday_Comes>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nama_(department_store)>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+        "mode": "ann",
+        "partition": "p0",
+        "seconds": 0.625517958
+      },
+      {
+        "hits": [],
+        "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+        "mode": "excluded_scope",
+        "partition": "p1",
+        "seconds": 0.023441749
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Quebec_general_election,_1989>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Quebec_general_election,_1989>",
+        "mode": "bm25",
+        "partition": "p1",
+        "seconds": 0.029023677
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Quebec_general_election,_1989>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ontario_general_election,_1898>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:List_of_1999_Canadian_incumbents>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Greek_legislative_election,_1990>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1989_French_Grand_Prix>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:United_Kingdom_general_election,_1966>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Canadian_federal_election_results_in_Eastern_Montreal>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:South_African_general_election,_1924>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dutch_general_election,_1956>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gordon_Chalk>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Manitoba_general_election,_1874>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:15th_Legislative_Assembly_of_Puerto_Rico>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Roch_Bolduc>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:P._J._Patterson>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Central_Nova>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Scott_Brison>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Richmond\u2014South_Delta>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1985_CFL_season>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1987_Mexican_Grand_Prix>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1984_in_India>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Quebec_general_election,_1989>",
+        "mode": "ann",
+        "partition": "p1",
+        "seconds": 0.278631737
+      },
+      {
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Quebec_general_election,_1989>",
+        "mode": "excluded_scope",
+        "partition": "p2",
+        "seconds": 0.002356407
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Azhdarcho>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Azhdarcho>",
+        "mode": "bm25",
+        "partition": "p2",
+        "seconds": 0.009056175
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Azhdarcho>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ajancingenia>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Zigongosaurus>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tapejara_(pterosaur)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Juravenator>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Aetosaur>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mixosaurus>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sauropelta>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Azarethes>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Spinosauridae>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Azteca_horse>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Glossopteridales>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Corynexochida>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Echinorhinus>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Behzad_Ghorbani>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pachliopta_aristolochiae>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Azara's_night_monkey>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Etidorhpa>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Arianites_(genus)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Eurasian_crimson-winged_finch>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Azhdarcho>",
+        "mode": "ann",
+        "partition": "p2",
+        "seconds": 0.333009487
+      },
+      {
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Azhdarcho>",
+        "mode": "excluded_scope",
+        "partition": "p3",
+        "seconds": 0.002003536
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+        "mode": "bm25",
+        "partition": "p3",
+        "seconds": 0.004965813
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Racon>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Parallelepiped>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Moon_dog>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Formant>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Preamplifier>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Compass_(drawing_tool)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Attenuator_(electronics)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Portal_frame>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:RIM-8_Talos>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Active_listening>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Broadseam>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Beltrami\u2013Klein_model>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Curvature_form>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Poggendorff_illusion>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brodmann_area_49>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Spiral_(railway)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:SCR-584_radar>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Picocell>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alexander's_band>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+        "mode": "ann",
+        "partition": "p3",
+        "seconds": 0.125583633
+      },
+      {
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+        "mode": "excluded_scope",
+        "partition": "p4",
+        "seconds": 0.001526265
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Heart_rot>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Heart_rot>",
+        "mode": "bm25",
+        "partition": "p4",
+        "seconds": 0.004385895
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Heart_rot>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Acarapis_woodi>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Soil_retrogression_and_degradation>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Saraca_declinata>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mangrove_crab>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Leucadendron_argenteum>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ashvattha>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rambutan>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Formica_rufa_group>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Return_on_equity>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tubercle>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Afterload>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Medium-density_fibreboard>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Root_name_server>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Phthisis_bulbi>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Leptospermum>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ventricular_escape_beat>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Yule_log>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Roderick_Green>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bulkhead_(barrier)>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Heart_rot>",
+        "mode": "ann",
+        "partition": "p4",
+        "seconds": 0.272735578
+      },
+      {
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Heart_rot>",
+        "mode": "excluded_scope",
+        "partition": "p5",
+        "seconds": 0.003765121
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Dale_Reid>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Dale_Reid>",
+        "mode": "bm25",
+        "partition": "p5",
+        "seconds": 0.007285282
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Dale_Reid>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nancy_Scranton>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Trevor_Dodds>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Whitelaw_Reid>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hilary_Rose_(field_hockey)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Virada_Nirapathpongporn>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Margaret_Beckett>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dale_Thomas_(footballer)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Enn_Reitel>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alan_Rees_(racing_driver)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dale_R._Cathell>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Virginia_Van_Wie>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ruth_Grier>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Prayad_Marksaeng>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Joan_Regan>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mary_Nevill_(field_hockey)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Amanda_Coetzer>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ray_Bellm>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Erica_Batchelor>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ben_Curtis_(golfer)>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Dale_Reid>",
+        "mode": "ann",
+        "partition": "p5",
+        "seconds": 0.304059757
+      },
+      {
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Dale_Reid>",
+        "mode": "excluded_scope",
+        "partition": "p6",
+        "seconds": 0.002216111
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:G\u00e9za_Anda>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:G\u00e9za_Anda>",
+        "mode": "bm25",
+        "partition": "p6",
+        "seconds": 0.004919935
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:G\u00e9za_Anda>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gioacchino_Conti>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Simon_Tedeschi>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Severin_Eisenberger>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alexander_Moyzes>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:August_Labitzky>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:G\u00fcnther_Schifter>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:George_Cosac>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Aldo_Ciccolini>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mario_Bezzi>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Baron_Karl_von_Hasenauer>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alfred_Tauber>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:An'ei>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Anne_Teresa_De_Keersmaeker>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:B\u00e9la_Bar\u00e9nyi>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Michael_Garrick>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Anne-Sophie_Mutter>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hans_Makart>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Leo_Ornstein>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kurt_Sanderling>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:G\u00e9za_Anda>",
+        "mode": "ann",
+        "partition": "p6",
+        "seconds": 0.121238689
+      },
+      {
+        "hits": [],
+        "key": "dbpedia:<dbpedia:G\u00e9za_Anda>",
+        "mode": "excluded_scope",
+        "partition": "p7",
+        "seconds": 0.00187162
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Iron-sulfur_protein>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Iron-sulfur_protein>",
+        "mode": "bm25",
+        "partition": "p7",
+        "seconds": 0.005456529
+      },
+      {
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Iron-sulfur_protein>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sulfonucleotide_reductase>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Iron_supplement>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Oxidase>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Inorganic_ions>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sulforidazine>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Von_Hippel\u2013Lindau_binding_protein_1>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Antioxidant_effect_of_polyphenols_and_natural_phenols>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mucin>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Soybean_rust>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chlorfenapyr>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:In_situ_hybridization>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Iron_pillar_of_Delhi>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Imposex>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Copperhead_(climbing)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Norbornadiene>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Glucosepane>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Saiphos>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Shellfish_poisoning>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sand_wedge>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Iron-sulfur_protein>",
+        "mode": "ann",
+        "partition": "p7",
+        "seconds": 0.1107729
+      },
+      {
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Iron-sulfur_protein>",
+        "mode": "excluded_scope",
+        "partition": "p0",
+        "seconds": 0.001255824
+      }
+    ],
+    "seconds": 2.31852442,
+    "source_sha256": "27519d7104c8ac6d0f51ac18e8ac23b29d67cbab8465bc3302b458ca3dcbbb78"
+  },
+  "rss_max_bytes": 126308352,
+  "samples": 3,
+  "source_parent": "a4022d3",
+  "source_sha256": {
+    "spikes/data/prepare_search_fixture.py": "b108d603da5c4353576f6fcde090c9e0996abb5e3506e56aec7a2b220b5a12d3",
+    "spikes/helix/src/main.rs": "7580510f822f575dd5a8a6aead20a6c44d50177dfc6fea4afae92704bbd7d008",
+    "spikes/helix/src/search.rs": "03e6515d7c5c8693bb02188e636ebf47fcea1ccd405067f68f909593e931ccc1"
+  }
+}

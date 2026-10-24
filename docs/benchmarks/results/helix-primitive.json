@@ -1,0 +1,44 @@
+{
+  "result": "passed",
+  "kind": "small_process_crash_probe",
+  "binary_sha256": "6ce85b8ae5450f482f1ede7c6f35157956eb3763c25b8a7ce7e9178511c0c63f",
+  "cgroup_limits": {
+    "memory.high": "536870912",
+    "memory.max": "671088640",
+    "memory.swap.max": "0"
+  },
+  "cgroup_after": {
+    "memory.current": "8982528",
+    "memory.peak": "15417344",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "records": [
+    {
+      "phase": "before-execute",
+      "exit": -9,
+      "stderr": ""
+    },
+    {
+      "phase": "before-reply",
+      "exit": -9,
+      "stderr": ""
+    },
+    {
+      "phase": "after-reply",
+      "exit": -9,
+      "stderr": ""
+    },
+    {
+      "phase": "runtime-error-rollback",
+      "exit": 1,
+      "stderr": "Error: EmbeddedError { code: \"TypeError:Runtime:InvalidPropertyType\", details: \"TypeError: InvalidPropertyType: stored properties must be scalars or homogeneous scalar lists\" }\n"
+    }
+  ],
+  "not_tested": [
+    "power_loss",
+    "50GB",
+    "100_clients",
+    "indexes",
+    "historical_pagination"
+  ]
+}

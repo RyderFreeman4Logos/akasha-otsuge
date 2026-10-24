@@ -1,0 +1,607 @@
+{
+  "archive_bytes": 3032560,
+  "archive_files": 346,
+  "archive_sha256": "c6600412db7a0699b5bd08b1e1f7ef2d11d84b6a08b03e52db77f0551f5df7a7",
+  "comparison_limits": "One new-then-old observation per binary; identical initial file hashes and run_id, host/cache/order differences uncontrolled. Earlier failed run stays failed; no causal equivalence or confidence interval.",
+  "controller_units": 8,
+  "controls": [
+    {
+      "mutation": "correction source corrections.json",
+      "rejection": "immutable case identity changed"
+    },
+    {
+      "mutation": "correction source corrections.json",
+      "rejection": "admitted correction source changed"
+    },
+    {
+      "mutation": {
+        "generation": 1
+      },
+      "rejection": "rebuild identity differs from admission"
+    },
+    {
+      "mutation": {
+        "active_generation": 2
+      },
+      "rejection": "rebuild identity differs from admission"
+    },
+    {
+      "mutation": {
+        "ready": false
+      },
+      "rejection": "rebuild lacks ordinary commits under the unchanged active generation"
+    },
+    {
+      "mutation": {
+        "start_seq": 4185
+      },
+      "rejection": "rebuild lacks ordinary commits under the unchanged active generation"
+    },
+    {
+      "mutation": {
+        "end_seq": 4146
+      },
+      "rejection": "rebuild lacks ordinary commits under the unchanged active generation"
+    },
+    {
+      "mutation": {
+        "start_seq": 0
+      },
+      "rejection": "rebuild lacks ordinary commits under the unchanged active generation"
+    },
+    {
+      "mutation": {
+        "error": "",
+        "status": "failed"
+      },
+      "rejection": "rebuild failure has no error evidence"
+    },
+    {
+      "mutation": "search claims candidate generation",
+      "rejection": "search receipt differs from pinned query or validated candidates"
+    }
+  ],
+  "disposable_fixtures_removed": true,
+  "exact_processes_units_scratch_verified": true,
+  "failures_retained": [
+    "old native rejects corrections field",
+    "r1 treated one-based ordinals as zero-based and failed original restoration; write/current latency also failed",
+    "r2 ordinary60s failed BM25 window rate at55/60"
+  ],
+  "fallback_and_helix_release_clippy": "passed",
+  "legacy_comparison": {
+    "cleanup": true,
+    "records": [
+      {
+        "binary_sha256": "8852be89a011f6b14a4cdb9647886d68ce897a62d580dd68bef1e8c266bd2b3a",
+        "config_sha256": "13d901dc9df5d9a4415c382956eadde90f8efb65779ff2988ed364d57c3d70e3",
+        "exit": 0,
+        "failures": [],
+        "fixture": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-corpus-legacy-pair-r1/new-fixture",
+        "label": "new",
+        "operations": {
+          "ann": {
+            "attempted": 15,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 2283,
+            "successful": 15,
+            "successful_per_s": 0.25,
+            "within_window": 15
+          },
+          "bm25": {
+            "attempted": 72,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 1026,
+            "successful": 72,
+            "successful_per_s": 1.2,
+            "within_window": 72
+          },
+          "correction": {
+            "attempted": 12,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 207,
+            "successful": 12,
+            "successful_per_s": 0.2,
+            "within_window": 12
+          },
+          "current": {
+            "attempted": 144,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 553,
+            "successful": 144,
+            "successful_per_s": 2.4,
+            "within_window": 144
+          },
+          "history": {
+            "attempted": 15,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 2071,
+            "successful": 15,
+            "successful_per_s": 0.25,
+            "within_window": 15
+          },
+          "write": {
+            "attempted": 1440,
+            "conflicts": 461,
+            "errors": 0,
+            "p95_upper_ms": 603,
+            "successful": 979,
+            "successful_per_s": 16.316666666666666,
+            "within_window": 979
+          }
+        },
+        "output": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-corpus-legacy-pair-r1/new",
+        "status": "passed"
+      },
+      {
+        "binary_sha256": "a0edd192cb4a85efa74221cbc8def58a1fbb002523eecaf05da10981c9adfe7e",
+        "config_sha256": "4c03474e25f96cf98ddeaf45c882e0ab6bd044ebe0608ea282cdc3b3fcd681b8",
+        "exit": 0,
+        "failures": [],
+        "fixture": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-corpus-legacy-pair-r1/old-fixture",
+        "label": "old",
+        "operations": {
+          "ann": {
+            "attempted": 15,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 1355,
+            "successful": 15,
+            "successful_per_s": 0.25,
+            "within_window": 15
+          },
+          "bm25": {
+            "attempted": 72,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 498,
+            "successful": 72,
+            "successful_per_s": 1.2,
+            "within_window": 72
+          },
+          "correction": {
+            "attempted": 12,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 1283,
+            "successful": 12,
+            "successful_per_s": 0.2,
+            "within_window": 12
+          },
+          "current": {
+            "attempted": 144,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 347,
+            "successful": 144,
+            "successful_per_s": 2.4,
+            "within_window": 144
+          },
+          "history": {
+            "attempted": 15,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 545,
+            "successful": 15,
+            "successful_per_s": 0.25,
+            "within_window": 15
+          },
+          "write": {
+            "attempted": 1440,
+            "conflicts": 448,
+            "errors": 0,
+            "p95_upper_ms": 309,
+            "successful": 992,
+            "successful_per_s": 16.533333333333335,
+            "within_window": 992
+          }
+        },
+        "output": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-corpus-legacy-pair-r1/old",
+        "status": "passed"
+      }
+    ],
+    "seconds": 125.65178348589689,
+    "status": "passed"
+  },
+  "legacy_failed": {
+    "failures": [
+      "bm25 minimum successful rate missed"
+    ],
+    "operations": {
+      "ann": {
+        "attempted": 15,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 12607,
+        "successful": 15,
+        "successful_per_s": 0.2,
+        "within_window": 12
+      },
+      "bm25": {
+        "attempted": 67,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 12432,
+        "successful": 67,
+        "successful_per_s": 0.9166666666666666,
+        "within_window": 55
+      },
+      "correction": {
+        "attempted": 12,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 3013,
+        "successful": 12,
+        "successful_per_s": 0.2,
+        "within_window": 12
+      },
+      "current": {
+        "attempted": 142,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 3146,
+        "successful": 142,
+        "successful_per_s": 2.3333333333333335,
+        "within_window": 140
+      },
+      "history": {
+        "attempted": 15,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 4612,
+        "successful": 15,
+        "successful_per_s": 0.25,
+        "within_window": 15
+      },
+      "write": {
+        "attempted": 1418,
+        "conflicts": 563,
+        "errors": 0,
+        "p95_upper_ms": 3268,
+        "successful": 855,
+        "successful_per_s": 14.033333333333333,
+        "within_window": 842
+      }
+    },
+    "status": "failed"
+  },
+  "native": {
+    "artifact_sha256": {
+      "corrections.json": "92069d44042254a49638255066b02f2e329477c12e7029b5c8fdf0a3922d27a7",
+      "engine.log": "025790dcfc3d4a12831f561e135c26856ccf790ffb4f933c670a61b9af863351",
+      "memory.jsonl": "f06e55102ad36eb65359b4a0355c5c94cda2c6c0d3ddc6b2438969e59b423bca",
+      "request.json": "0cf47b41a51532df675d4b1e04fb63ef73f3d2995c3d468e9db77b276a304e60",
+      "runtime/admission.json": "d590d99d3306371716a57e03feecf633bca880e7f1d79bdf86bfd3ccd2bc2e36",
+      "runtime/baseline.json": "477b4387a3e9bce657b2954158e2375d81626c30f5ef6a68f6e0c3e5f4144033",
+      "runtime/derived-oracle.json": "7d84f0a978b2c59833fd2311cad11bc11ba9bc32a0f4975e05266b78211efb02",
+      "runtime/metrics.jsonl": "9433435659bd43889a053fec2ea9b442423ebe81357d6c25ccd6b7844b321949",
+      "runtime/rebuild.json": "98736ddae6e8963ff823f70a7e87fc22bfccf7d58732e022f4b9949fd416cd4e",
+      "runtime/requests.jsonl": "9e57517ce95a627bf75cdd6133236655e9c38e841d8910ae4d6eacc63bf9d3cb",
+      "runtime/result.json": "e8722c5f072136218a555350bbb0824af2c690e8ca2d269bf4b75e81665500fe"
+    },
+    "cold_cache": null,
+    "content_oracle": {
+      "corpus_correction_checks": 32,
+      "corpus_correction_scopes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "corpus_current_checks": 370,
+      "corpus_current_distinct": 16,
+      "corpus_current_partitions": {
+        "p0": 47,
+        "p1": 46,
+        "p2": 46,
+        "p3": 46,
+        "p4": 46,
+        "p5": 46,
+        "p6": 46,
+        "p7": 47
+      },
+      "current_checks": 370,
+      "derived_current_checks": 58,
+      "distinct_commits": 2656,
+      "rebuild_search_overlap": {
+        "ann": 1,
+        "bm25": 3
+      },
+      "requests": 4301,
+      "search_checks": {
+        "ann": 40,
+        "bm25": 185
+      },
+      "text_only_bm25_checks": 93,
+      "text_only_bm25_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ],
+      "text_only_current_checks": 185,
+      "text_only_current_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ]
+    },
+    "effects": "measured",
+    "engine": {
+      "diagnostic": true,
+      "drain_s": 0.9348372329999961,
+      "failures": [],
+      "generation_workload": 1,
+      "not_tested": [
+        "live_permission_revocation",
+        "RSS_thresholds_checked_by_outer_observer",
+        "vectorized_candidate_corrections"
+      ],
+      "phase": "steady",
+      "snapshot": {
+        "active": 0,
+        "admission_slots": 4,
+        "clients": [
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          61,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          30,
+          30,
+          16,
+          16,
+          16,
+          16,
+          16,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "completed": 4301,
+        "completed_waves": 160,
+        "config_epoch": 1,
+        "derived": {
+          "committed": 6752,
+          "generation": 1,
+          "remaining": 0,
+          "text": 6752,
+          "vector": 6752
+        },
+        "elapsed_s": 160.927106498,
+        "eta_s": 0.0,
+        "operations": {
+          "ann": {
+            "attempted": 40,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 6957,
+            "successful": 40,
+            "successful_per_s": 0.23125,
+            "within_window": 37
+          },
+          "bm25": {
+            "attempted": 185,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 8975,
+            "successful": 185,
+            "successful_per_s": 1.08125,
+            "within_window": 173
+          },
+          "correction": {
+            "attempted": 32,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 5347,
+            "successful": 32,
+            "successful_per_s": 0.1875,
+            "within_window": 30
+          },
+          "current": {
+            "attempted": 370,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 2814,
+            "successful": 370,
+            "successful_per_s": 2.2375,
+            "within_window": 358
+          },
+          "history": {
+            "attempted": 40,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 4355,
+            "successful": 40,
+            "successful_per_s": 0.2375,
+            "within_window": 38
+          },
+          "write": {
+            "attempted": 3634,
+            "conflicts": 1060,
+            "errors": 0,
+            "p95_upper_ms": 1692,
+            "successful": 2574,
+            "successful_per_s": 15.86875,
+            "within_window": 2539
+          }
+        },
+        "peak_queued": 90,
+        "phase": "completed",
+        "pid": 2256510,
+        "queue_bytes_bound": 819200,
+        "queue_entry_bound": 100,
+        "queued": 0,
+        "queued_bytes_upper_bound": 0,
+        "rate_per_s": 26.72638621047631,
+        "run_id": "generation-work-9e4dc370aa33",
+        "search_admission_slots": 1,
+        "start_ticks": "463852297",
+        "total": 4528,
+        "wave_seconds": 1
+      },
+      "status": "passed"
+    },
+    "exit": {
+      "code": 0,
+      "event": "exit",
+      "native_code": 0,
+      "scratch_cleanup": {
+        "path": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-corpus-concurrent-green-r2/case/native-scratch-su7qq5ti",
+        "removed": true
+      },
+      "seconds": 161.86662131920457
+    },
+    "memory_thresholds_passed": true,
+    "rebuild": {
+      "active_generation": 1,
+      "end_seq": 4185,
+      "generation": 2,
+      "ready": true,
+      "seconds": 2.34927319,
+      "start_seq": 4146,
+      "state": {
+        "backfill_deadline_ms": 1792827824612,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "cursor": 24,
+        "documents": 24,
+        "generation": 2,
+        "index_deadline_ms": 1792827826688,
+        "pending": null,
+        "ready": true,
+        "source": "03e76bbf49929a2bf387f2d2fbbe1349522d87b45a60d3147e387ed8b64353b8",
+        "text_layout": "scope_columns",
+        "text_version": 1,
+        "vector_rows": 8,
+        "vector_version": 1,
+        "vectors": 8
+      },
+      "status": "passed"
+    },
+    "rss_max_bytes": 144740352,
+    "rss_p99_bytes": 144699392,
+    "status": "passed",
+    "unit_exit_code": 0
+  },
+  "native_sha256": "8852be89a011f6b14a4cdb9647886d68ce897a62d580dd68bef1e8c266bd2b3a",
+  "not_proven": [
+    "full-size concurrent rebuild",
+    "full build/recovery low resource bound",
+    "vectorized candidate corrections during build",
+    "physical rebuild disk peak"
+  ],
+  "release_units": 11,
+  "review": "Implementing-agent self-review only",
+  "seconds": 202.7223156085238,
+  "source_parent": "bdfbd44b3f06759a878a80d68ca5c5bacd757704",
+  "status": "passed_diagnostic_only"
+}

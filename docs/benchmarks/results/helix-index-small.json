@@ -1,0 +1,67 @@
+{
+  "documents": 100,
+  "excluded_scope": {
+    "hits": []
+  },
+  "fixture_dimension": 3,
+  "not_tested": [
+    "production_embedding_dimension",
+    "50GB",
+    "100_clients",
+    "reindex",
+    "retraction"
+  ],
+  "result": "passed",
+  "text": {
+    "hits": [
+      {
+        "key": 42,
+        "scope": "even"
+      }
+    ]
+  },
+  "text_operation": {
+    "operation": {
+      "attempt": 19,
+      "family": "text",
+      "generation": "1",
+      "index_id": "1",
+      "operation_id": "cbd576ab-393d-4ee7-b2ee-e906882058dd",
+      "operation_kind": "build",
+      "progress": {
+        "entities": "200",
+        "input_bytes": "251848",
+        "output_bytes": "178188",
+        "output_operations": "1310"
+      },
+      "stage": "activate",
+      "status": "succeeded"
+    }
+  },
+  "vector": {
+    "hits": [
+      {
+        "key": 42,
+        "scope": "even"
+      }
+    ]
+  },
+  "vector_operation": {
+    "operation": {
+      "attempt": 3,
+      "family": "vector",
+      "generation": "1",
+      "index_id": "2",
+      "operation_id": "7b29582a-223e-4349-947f-9ba625d22857",
+      "operation_kind": "build",
+      "progress": {
+        "entities": "202",
+        "input_bytes": "31194",
+        "output_bytes": "172848",
+        "output_operations": "5108"
+      },
+      "stage": "activate",
+      "status": "succeeded"
+    }
+  }
+}

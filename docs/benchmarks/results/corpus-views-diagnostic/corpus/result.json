@@ -1,0 +1,3260 @@
+{
+  "artifact_sha256": {
+    "000-load.json": "f990f749f14a8aa9b4c7b5c7fe0ea28da23de91d617a33f1e7754f3c7c47b09a",
+    "000-load.log": "f0b39ee3c52de226da271fb80a3d54ad000566e338c1a3b026094503f529b691",
+    "000-load.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "001-raw.json": "336e9b129a12aeb54599262d81412d993f0fc473baad31f974f91e6cfea8464a",
+    "001-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "001-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "002-begin_corpus.json": "aaa7196acf9917a38063757eb90b88a9ba86f1cd4ef7c0ea5407987ecfb32e58",
+    "002-begin_corpus.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "002-begin_corpus.stderr": "e4e6afa76ab8ff16b57f9194d81d19a6aba2b5c02bc5c5d57686dc23671c6bff",
+    "003-raw.json": "ca7f4276def9789badde126a308564f172003c8c4dbe8cffe616177d394bbd06",
+    "003-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "003-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "004-begin_corpus.json": "aaa7196acf9917a38063757eb90b88a9ba86f1cd4ef7c0ea5407987ecfb32e58",
+    "004-begin_corpus.log": "873c028a757d349f78a32df64e65a2ba55eaa20a436aad4a57253825cba81856",
+    "004-begin_corpus.stderr": "2c160cd4dbb46ceadb1f85cc5a534811baa9e6ab79b9a9293b5ed2680c9a5fe6",
+    "005-raw.json": "8f968ff774e668b8d52ba04237901b0c9c7f934b14b549a1a65051e83414078e",
+    "005-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "005-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "006-begin_corpus.json": "aaa7196acf9917a38063757eb90b88a9ba86f1cd4ef7c0ea5407987ecfb32e58",
+    "006-begin_corpus.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "006-begin_corpus.stderr": "3a8edeccb7f5f5db6ac6d39da8e3f0cf2f033b713b87b2214748b88633321dd0",
+    "007-raw.json": "e1304d438f354042a5430cc6ca7dab49855fe1e7f3a3dfbd8e56b5a6628a96cf",
+    "007-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "007-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "008-begin_corpus.json": "b974d7b53c31f7313d0b4eb28eb696ee692958fda1b7d1cd07c375e929ccc303",
+    "008-begin_corpus.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "008-begin_corpus.stderr": "2c4ea4293bf012e430994c41de612bcca21440304c1414bfde69675b95eb8e65",
+    "009-build.json": "f5d79732918a640924d57cb1003b64df74594146b555b657dc0b5f8b2f411937",
+    "009-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "009-build.stderr": "cafe2e0e9419bed6f53453cdd0f3efa10c2d1568c7a2637537acae38e09728e6",
+    "010-backfill.json": "e59698026b9d088eb0a0898b08fbdadab70206d9e7522519c095ea6f1bb52e1b",
+    "010-backfill.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "010-backfill.stderr": "b6cb9ff7b1725ba7e3b1f8d5893212e9ce069d097dda538ebb90775ca5604829",
+    "011-begin_corpus.json": "aaa7196acf9917a38063757eb90b88a9ba86f1cd4ef7c0ea5407987ecfb32e58",
+    "011-begin_corpus.log": "873c028a757d349f78a32df64e65a2ba55eaa20a436aad4a57253825cba81856",
+    "011-begin_corpus.stderr": "69479d6f1650256a8f2f8edb4ee0cb8e39f9812c34a26976ca9b499bca320933",
+    "012-backfill.json": "293b7cf37582384ddc8305c5b5756f06b248a9fafb4b12536d86e4f2712e0772",
+    "012-backfill.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "012-backfill.stderr": "6e5ad4591efd9c87e95544d3323fe1fae64def70bd35963100819ebf67268fd5",
+    "013-begin_corpus.json": "aaa7196acf9917a38063757eb90b88a9ba86f1cd4ef7c0ea5407987ecfb32e58",
+    "013-begin_corpus.log": "c347bd41c30b01f12dd9aa98dc58970ca9d3dce6acc5974e45b4198a4ba1eb4f",
+    "013-begin_corpus.stderr": "69479d6f1650256a8f2f8edb4ee0cb8e39f9812c34a26976ca9b499bca320933",
+    "014-commit.json": "c8bcf24e840634b00859c5e31c63944e66f71cc791af2eb2d38980e877060de7",
+    "014-commit.log": "961f391320aea3df84b7a9dae493421113db8f3e79b34a377bd0fb1715ee7768",
+    "014-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "015-raw.json": "4e4fdc179f8dd29f7b2857ace4442dd33469e6250dc2d0181eaa2b9266eaef49",
+    "015-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "015-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "016-backfill.json": "9f01bebfb366c6addccfbc41ff2f7f9a478c28e47e4aa93100db28d8d3eacf21",
+    "016-backfill.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "016-backfill.stderr": "8fcfd21460a77856ac9d8224ca0353e76cda75d329e1faaec233124fabb3f0be",
+    "017-begin_corpus.json": "aaa7196acf9917a38063757eb90b88a9ba86f1cd4ef7c0ea5407987ecfb32e58",
+    "017-begin_corpus.log": "c667a8d277639e23176eff0f4daf5f056d00ef137f006d41e6207a80f3a37611",
+    "017-begin_corpus.stderr": "69479d6f1650256a8f2f8edb4ee0cb8e39f9812c34a26976ca9b499bca320933",
+    "018-raw.json": "4bb2934cd3bac40b3e4c594fee16641a1e51ec9fc2188674d998808124e0e3ee",
+    "018-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "018-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "019-backfill.json": "9f01bebfb366c6addccfbc41ff2f7f9a478c28e47e4aa93100db28d8d3eacf21",
+    "019-backfill.log": "ee44c0d9afa66f86ab0f95480766c64d3c2489f4e2bd51d719908dc9bb4e5e08",
+    "019-backfill.stderr": "634676c67c3279a89c499fa37c4b9a2bb2ed0078ad56038296ca47688b03501a",
+    "020-backfill.json": "4b0070862e5fce6e7ace8699e406fc8caf1f12cf4dd3aad7da26aafe989cc616",
+    "020-backfill.log": "ee44c0d9afa66f86ab0f95480766c64d3c2489f4e2bd51d719908dc9bb4e5e08",
+    "020-backfill.stderr": "634676c67c3279a89c499fa37c4b9a2bb2ed0078ad56038296ca47688b03501a",
+    "021-raw.json": "3b0c70b72b749beaadeb4b06a64946fbc392a3d0ce23b3ddf141f6bf9ce1a7c3",
+    "021-raw.log": "e62749f2415db1ad2acec7d5d19761933158dbcdfa6e05b31745a9cf3f1131da",
+    "021-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "022-build.json": "f5d79732918a640924d57cb1003b64df74594146b555b657dc0b5f8b2f411937",
+    "022-build.log": "fc2b7d68baff9ba92ce8866b748eb1245290d83358845187ad3efd839c28b0ad",
+    "022-build.stderr": "b8d0334687fdc9210519f476e4677b5550400217d3412c11c90c8ff739386a6d",
+    "023-activate.json": "356b4ff63aaaa9cde4a733e3c37d2199c43510b3ef156605becddea5522336b9",
+    "023-activate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "023-activate.stderr": "4cd2950fd2231ac5744db23ca0ca0081f15a1a153428ec62c4f24b231ab34f1b",
+    "024-apply.json": "34db3595885179459e01fc5d8338ba932ddbcf7ac8ce8b2c87f97c160a75f9fc",
+    "024-apply.log": "0667cc8f1477f031379e3bba0c0e95e5f12ad3736ab37e3f32ccd599e85d0c46",
+    "024-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "025-apply.json": "8336fc95da956cd240efac320e6d6f191847d4fb42d4a68f2db6523e92b0f134",
+    "025-apply.log": "725b0a94f32a56b2d6186b8b3b6e25e900c9f7e0d87262c1479420a27ae39002",
+    "025-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "026-activate.json": "356b4ff63aaaa9cde4a733e3c37d2199c43510b3ef156605becddea5522336b9",
+    "026-activate.log": "eae53a2ff1cc9b988b5eab71dfc6feebe186dbbf4bf789e5d6aae779953e3041",
+    "026-activate.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "027-grant.json": "7a856eba5b9b51a84893923140afaa48ee292aea9c69b5fe71e50a699fe20a75",
+    "027-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "027-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "028-grant.json": "675c5eeb2b1e820aa2ca4870625f05cf3cf81aed0ccb30ca8be25f6561a827bd",
+    "028-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "028-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "029-grant.json": "91d665c1f36cd7bc69002f3858c37c4e82161bf7b49f56add7c73c2266c9ff86",
+    "029-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "029-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "030-grant.json": "af44c70f78564297243baa2827d44bd37b47da663fae6128cabfe58959850679",
+    "030-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "030-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "031-grant.json": "65fdd4999dc29fbe31955e4b94649b2d0ff8c1ffb4270e2e359997a04481863b",
+    "031-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "031-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "032-grant.json": "c0e90ccecc506f5c42fe45d2cc38ff37f742232c8b9e87334b0eed982cb6fc51",
+    "032-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "032-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "033-grant.json": "0545361561764ad4b8a6e3eebbd158ffec4ab48abcc1423918b27f693811789e",
+    "033-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "033-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "034-grant.json": "70462ac77f009e330c475abe0088a56a87ceb5eded3dbf58f84c7ff7ed3b2b23",
+    "034-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "034-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "035-raw.json": "6e12bc1b0a8eb309920dad47080cbbb757f4a686748cc6674fd7ff0a9c169365",
+    "035-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "035-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "036-query.json": "2a740e7560d761d9423e6d98a81dbcebae8d1935e77d12f51acbc4c835908941",
+    "036-query.log": "0b6a9d94db58c5da4fc3789a33be3ed9c225800adc68ea55b0d019ac105cd638",
+    "036-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "037-raw.json": "ab375f0c82c77e82b85d4b790fcf263e218611fcf5a3877b66ea1a2bc11a3459",
+    "037-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "037-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "038-raw.json": "5e7ee731e438fabf7ea39a2eea9abdfb39c3430992f5f15b76a9034af28e852e",
+    "038-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "038-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "039-query.json": "0229db0eb66ea1849de26631c5b732083e42dcaa432ec3f5a8f8c7a042546b25",
+    "039-query.log": "dd8396fe39845ee7d095d48499e7d12cde22396941c367e5a3bde4b312638d29",
+    "039-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "040-raw.json": "da48cbf4b0cd2397ddba30367663065e72560551d92e921eb5df5df89c4b8183",
+    "040-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "040-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "041-raw.json": "6fe412a330a20f67b69478c67c59cd5f26397491ab73f7229e62982271848cd0",
+    "041-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "041-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "042-query.json": "8a811ce206ad9c97c6766484f3792b223400dd721c9c84c7c7ae69a571de5287",
+    "042-query.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "042-query.stderr": "182b6a989844017a99fe383e90c662c489f80ed5b7ec8b2003f3ebf12822df24",
+    "043-raw.json": "14e089f293ecd2578d23437233a5bf62f10e5ffa8d17227a6ddcc22a70377250",
+    "043-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "043-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "044-current.json": "0745fffb06b518e5e2016705dd6b27622e227f9d88896eefbf0c4d4a10a7e4ff",
+    "044-current.log": "adfd65365d2f3e4d92c00e4b56f010f3851e63eeb361a7a53608e70a1804b057",
+    "044-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "045-current.json": "aeb04ee56a5f4ae82c92e0fe2a0511baa7a3a595069b06b5f24394b1bb3e3d3c",
+    "045-current.log": "3fe8e12c09cb1bfb55e1d8d21f0ed2edfa544766b8a014207a6c1241f3c1f643",
+    "045-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "046-current.json": "b1f3544ac202ce5702d84527386b38b78b94173166a15f383638eed62c327449",
+    "046-current.log": "48962f448810d7ed3c2a99b79081752d05ccf878bf6c9649d955f52297ae9fe7",
+    "046-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "047-current.json": "dca4a8b2d1f447eea14a045780a6614f6dec14aef21211ad5196516ace4c9cb0",
+    "047-current.log": "4e0e19222c9b891f7145308a1bea173730f27505a6e355eb543627d6fb90dd6b",
+    "047-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "048-current.json": "d59b3921b709e05c6c9e8a03fafec8eee3100e765f6c7d9bb5d8b21ca1825b33",
+    "048-current.log": "383b3f193ed544df415b2f607db79cc2dcb468545a5df8f67f75c2ddf89856d3",
+    "048-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "049-current.json": "2255c310321960690315bddcfcab22ea4a9213e1f68724c98ef59e4e041d83e0",
+    "049-current.log": "982e488635ee3330513762af00b15d34c9e05f47d405e87256dcea63cc98348e",
+    "049-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "050-current.json": "922a5991f919f34bdfb75fa5a2f03c669b9a347be7302b76eca277ded2e1a868",
+    "050-current.log": "eafea774ccf5f36e25032de258fe9d4090c035e39e73d3286f7cbed63debeb63",
+    "050-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "051-current.json": "04c5198be7ad2c682779eaccf52aca8657e3587b7fd708cb34875cffc782004c",
+    "051-current.log": "1f2915631fe346885d10cc824f6d78d16456760e2cc42d3d5d439c8dd2fd53af",
+    "051-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "052-current.json": "b601047155d9301d0d68c307a26410d915ffe29fd2ef06b566e726cc7c655cef",
+    "052-current.log": "b349d48fb5ce26a8ceae30c815af022ff5803627a84d54f19e8256d09ad6cbd7",
+    "052-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "053-current.json": "a8ad251b9792b71c8e9b59b597054515cebd91494ce268c2083176686ad679a3",
+    "053-current.log": "475e0eb50c05344816c62cdccacc264cb09000edec6f960131af2322701c9295",
+    "053-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "054-current.json": "03b95cfeb924b902f2b0f10f33c6fa45d0acf3796f60ba4563c5eaed999ffe05",
+    "054-current.log": "ac1ad0f36b0fc0cbb94e8931d025d9f6b781ac492f3ee925e7bdc2a00415cd81",
+    "054-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "055-current.json": "2b53ba3c6727a6bbe8c965542e79493a8649a33901f7d1957d8249d26bda6f04",
+    "055-current.log": "e2ab27dfb33ab4f22432a4529a599e5ece40c0dc1006cb9bf2cda173d04a45c7",
+    "055-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "056-current.json": "6879bd5eb47027120c5545b9a1cdfb26576644b93ea994d5648a0c0dc9fef806",
+    "056-current.log": "112312ca6705b0ce437694eac7a50191113fc447f529c60c41a157a437f8d9b6",
+    "056-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "057-current.json": "f6d4b1ba9a28eab56869a3e0887383e665dab9d310bcef82f16b3d4e317bb7fb",
+    "057-current.log": "b6ca842c685024e1a86b4ffd89a0298b27ff97735a8bff14dab650c2be827365",
+    "057-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "058-current.json": "36a4331cf599b6ec40689b9f6c84b064eed95443f046bc8ed898769f5dfa3a8d",
+    "058-current.log": "e82ab48e8c4e0788f5ccd94b21d331ac5ef28fbf4bcf07a940f132ca5d97b68b",
+    "058-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "059-current.json": "9e512cc9b2cea1144c71b3aca1c3ff335fb6a10294b1cad28dac3b520933bef7",
+    "059-current.log": "998055bc4845432603e17fc2ab7e60d0d90dc8e086122e89b38dbd4832d3b543",
+    "059-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "060-current.json": "a4bf5cc2b64e1300f8b275252a8f81d1d49f9272946958f8518ff6ecb7b211f8",
+    "060-current.log": "177ddd8090f6bb3dd153021499288c9f04f72f6ed5458062c80d20199ae927d0",
+    "060-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "061-current.json": "21aaef62f30b39311c7c552ee474512343c49d43b9df6ac6ae1d826e661db99d",
+    "061-current.log": "51fd1ec199baae80b27d24eb7b05fdbbad3c5af508aaba82fed66941ba0114e2",
+    "061-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "062-current.json": "14f7634fea28065d2e2b71bff9ced87499dcbfbd217c1e9538319a880c8fed28",
+    "062-current.log": "98aeb12c109086e0cc722be8f90bf3140bcb8bf132d82ddc4efe56a441514011",
+    "062-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "063-current.json": "5106e58f8413c4c889f3f1d46733d5f43b4cbae44b29a268350e64d65b1c350c",
+    "063-current.log": "5fffff619687b0bfc9bd19ad725ab446b29f24553ebc0900069f3c86309579dd",
+    "063-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "064-current.json": "730e1d139960f9f15a8fe5b14753fd07c5f8e1243bc5edb2f4f3994260a32cc5",
+    "064-current.log": "b555d55f4569e64e12061e907162638123b4ea7a3c647945981c7ce5a4b616e5",
+    "064-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "065-current.json": "626da6120a1b9d56261371d24a1b7f1034cb7d050c19877932f26b5a66213a1f",
+    "065-current.log": "0f5ec00010ef5fe36189e1b5bfe836f7357fa5ac04889faddd71a38100d1b712",
+    "065-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "066-current.json": "7d8507d8b02dd0e14f7614c122df56783da4f006ea3846f5dc79f6ac8f51c5b9",
+    "066-current.log": "586c77f00e8ad4ef9bc75a6f2ce50f62195fea7b7acf4eaa5fd68e646831144e",
+    "066-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "067-current.json": "3f3b1eea1b52503cbb6e39a8d8b86aaf8bdea7eb9b447cb2a35b8c9b074052f4",
+    "067-current.log": "c508c9a2a6d3233c359edf50ae783a69f38336fa879e136b5aeec764713d5e6e",
+    "067-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "068-current.json": "20a9235a3425643c8912f877321c0e65a46848b40d8f63ee4a5ec981fc01c34b",
+    "068-current.log": "e11a6638b047bc2e10f4f2d504c0d1aad78392d2c099e604fe3af08e1f69497a",
+    "068-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "069-history.json": "769e8a873c692ddfa2ead3b3d8b27e6a2f482246a342d822e2e15b0d195ec68e",
+    "069-history.log": "4d89425fc4a558636cebca7c7da37a3fe4f1cededb68d199ac0217db78426f88",
+    "069-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "070-history.json": "54eb471ace808f57df575a7e3c4663f1872b8038367dd64a1d5dd7f28f843d99",
+    "070-history.log": "f46a32f378b24454fca0e8f5a8810506a20c611584b61cc5cfa2ff288d9a420f",
+    "070-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "071-history.json": "63b0dc9e8b35a630104ca0225b91acc59d0eca7437dfd6e1ef453a3b58cf663a",
+    "071-history.log": "070cca6cb5238e3a4f44355a93713fec0a02ea71950534e4728f54ed1138fec8",
+    "071-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "072-history.json": "7264352f4837f22522ecd89e176e385f740bfd7e5eeede7a433ea819c0277564",
+    "072-history.log": "f4dd9a84281f08f04391a2740a030762b146fe307799853b497236e1022f5d82",
+    "072-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "073-history.json": "d3ceb0167a51cdd6c4353d3398fa589099c88b99fdbba96b2f44556b57cd2f2f",
+    "073-history.log": "e206dce055a9f6731dc96ea71344f9f5089cba5bc676152146290471481b8529",
+    "073-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "074-history.json": "4778348fb3c73f27a26f26fe86b0a6ac29d6cc339cedb116acfea9bbd83bb83c",
+    "074-history.log": "8158728109c75f66518ae30946e4309d2b530d25795588e0316b3990be64c45c",
+    "074-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "075-history.json": "8487998e839492af3d018393a594df59e3763b6a53e54e68cc8d94c925ebbae8",
+    "075-history.log": "df40a1d873092a8ca083902f8a5c584ebd8fdffd231c929d228d3d9684744403",
+    "075-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "076-history.json": "1319843e125f15f24c37b0198ade1b7d8aaa993ed357de9f7c886717601be4f7",
+    "076-history.log": "2bc402c3a3f11e6339c76ce05b48f93d387ba9ccd506c6a96e0909030b23f25e",
+    "076-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "077-state.json": "4b35bfb9ee0c6e002f55bbd08a3858df92cd41ca971450eca91a8cc0f6229706",
+    "077-state.log": "a9ea36cc975a69c526fed131cbc3c9d286e6fc1a27ed6ab5460178c7bf22d57e",
+    "077-state.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "078-state.json": "d7938ec7b61bcbb636d521d1980b9f348749a8824ccdaffc42fddd1a96688268",
+    "078-state.log": "5b2136c505485b18dc19f67e9b2b59737153e5beb3b203e2f55d015f2894bd79",
+    "078-state.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "079-grant.json": "946992f2e74dc57c3876411ed9cd83e790e6f66714cb5a3737f72c5fbb3c4f4e",
+    "079-grant.log": "3e6695b526b0e0e47d2fea0313f56108e540fd3eb799d6e3302f25727fdcb7fa",
+    "079-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "080-history.json": "769e8a873c692ddfa2ead3b3d8b27e6a2f482246a342d822e2e15b0d195ec68e",
+    "080-history.log": "76bcee90e8b139e773802ca86065ae5d27180db09787b295b7bc5b3b30094f22",
+    "080-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "081-current.json": "0745fffb06b518e5e2016705dd6b27622e227f9d88896eefbf0c4d4a10a7e4ff",
+    "081-current.log": "adfd65365d2f3e4d92c00e4b56f010f3851e63eeb361a7a53608e70a1804b057",
+    "081-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "082-grant.json": "e1d527b8ee37bdd56802079f781c51722dd8265d77597e9eaa5db5df2239c98b",
+    "082-grant.log": "3e6695b526b0e0e47d2fea0313f56108e540fd3eb799d6e3302f25727fdcb7fa",
+    "082-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "083-current.json": "0745fffb06b518e5e2016705dd6b27622e227f9d88896eefbf0c4d4a10a7e4ff",
+    "083-current.log": "9167b4f138e80c49515506c5a1533b869928b44956fc80ade0adf46ec87698f3",
+    "083-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "084-grant.json": "7a856eba5b9b51a84893923140afaa48ee292aea9c69b5fe71e50a699fe20a75",
+    "084-grant.log": "19a2373260ea699bf4bc036237a19d9ff7634261563398100757a8206b1056be",
+    "084-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "085-history.json": "769e8a873c692ddfa2ead3b3d8b27e6a2f482246a342d822e2e15b0d195ec68e",
+    "085-history.log": "001ef4774f06bf8be1417dd9568409d621410ec2be1d725c4531fa658eb39d2c",
+    "085-history.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "086-grant.json": "70462ac77f009e330c475abe0088a56a87ceb5eded3dbf58f84c7ff7ed3b2b23",
+    "086-grant.log": "19a2373260ea699bf4bc036237a19d9ff7634261563398100757a8206b1056be",
+    "086-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "087-current.json": "4513148775a090020c876bb782a67c0c28de547adac0ba42080b1c492832bef3",
+    "087-current.log": "79abad5c2b96047ed9234cc938394e258656870059fb1b82faf82afc3fe80074",
+    "087-current.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "088-raw.json": "2176f3da3e7993f9573386424f02107d4c3944c16c3cc4297d15c80b26bde2e3",
+    "088-raw.log": "ffca05ae4dfb256dea9edf45cb75d5c9974e22ed159972a2a049623e0050d238",
+    "088-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "089-query.json": "261d1418ff788668368d0e350e3eb3824e0fcdb769aa1d24b773e03447f06e0e",
+    "089-query.log": "cfdaa74cd2a4c648df24cf193b43d2dab14dd8d6de310a3b68fe9cebd6cd671e",
+    "089-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "090-query.json": "0b2ed6b595decb079c94cf54e8a1af4cb2afcd1c07c2510e9bb44490ab867ab1",
+    "090-query.log": "fa6105a9475e42ea2395fbd4e81e8cb6aacf45a4523bb6b44f1a27ae1f775fe5",
+    "090-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "091-query.json": "13999989815449767a9aafbe7233ffd64a4e8b45e8d55f8d6d8abb9d954952b9",
+    "091-query.log": "eff9beddaa30e848228f169006c13787928deb965798d565befa7c642d19d0fd",
+    "091-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "092-query.json": "2a740e7560d761d9423e6d98a81dbcebae8d1935e77d12f51acbc4c835908941",
+    "092-query.log": "9d6b97b086078b213929a370780f888f6d2e0faa2b7f71c884e2b8a426824fd0",
+    "092-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "093-query.json": "8a811ce206ad9c97c6766484f3792b223400dd721c9c84c7c7ae69a571de5287",
+    "093-query.log": "9856b474cd3bc8d0ce6b0a07b98f8de58ab323f058a8be59feb0ef6adc43ce1c",
+    "093-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "094-query.json": "0d5c02afe5542a69571eb11d9254ff8c2f49bedd79eaff909394340774f634d2",
+    "094-query.log": "b42567c7f4386b3062c6e4e10470910984cfef2590b22f4d11cd7cfca2bf7953",
+    "094-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "095-query.json": "9e8543c0960d764b2c33a21c6ed213f2cd7a8f537a407804fa09366a273eec32",
+    "095-query.log": "ccd37e5c88f02949384411e3046a16633887b143b4302c7d9c17c494cdd633b1",
+    "095-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "096-query.json": "d97ee21d1f1b48a296d111d430ee1518c9841f8e1767140c411e442a3df3d2cd",
+    "096-query.log": "0ed729eeeb7e0ca479dd898ce26f8280b1cc2cc8f3e874b33d5b48c06b631b56",
+    "096-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "097-query.json": "4f2694e102ea747e83f2ad8492b0b3b3415550188b03ca9bbc184aa2cd6d9c5a",
+    "097-query.log": "fcc26f10538b7e5c91914078969f2b5c0a9f09bfd33d387709e602850affa5cd",
+    "097-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "098-query.json": "fecdb6d8bc28ca70330be146ab876e0a0fd3567831a86a450a2a2dbc6676b46d",
+    "098-query.log": "ae5a0876976b27c26f6046d4829cf7b8b3d7eebb6b388d32c7bf2089e4ee89fb",
+    "098-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "099-begin_corpus.json": "5f6904f881089c548c998721bece00809434b846d353eb1649ba87f352407b31",
+    "099-begin_corpus.log": "e4b7ed0e9b796d955e079b9bf9355172795d9cebcc7a303a43b9022857264641",
+    "099-begin_corpus.stderr": "69479d6f1650256a8f2f8edb4ee0cb8e39f9812c34a26976ca9b499bca320933",
+    "100-backfill.json": "b35f26edb49417c8d5eb75fc00f79398cc18ae0310063792560439f065cd1013",
+    "100-backfill.log": "dee1f2cde81516ee3ec364992b05ad5e269b169d88c6c36eb380bf1070e9ff68",
+    "100-backfill.stderr": "8fea602a301ce9c8af80e5edfad37603e380577fa5e93bfb46ecefddf7af579d",
+    "101-raw.json": "15c08ab55fc517062cb5532e5416c2f4c5aeb6595cd5405871d313a3a9112b3a",
+    "101-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "101-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "102-backfill.json": "b35f26edb49417c8d5eb75fc00f79398cc18ae0310063792560439f065cd1013",
+    "102-backfill.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "102-backfill.stderr": "6ae92aac997df27949121b7cc08892ffa502b11433991f64f67d106738f13f51",
+    "103-begin_corpus.json": "5f6904f881089c548c998721bece00809434b846d353eb1649ba87f352407b31",
+    "103-begin_corpus.log": "dee1f2cde81516ee3ec364992b05ad5e269b169d88c6c36eb380bf1070e9ff68",
+    "103-begin_corpus.stderr": "69479d6f1650256a8f2f8edb4ee0cb8e39f9812c34a26976ca9b499bca320933",
+    "104-raw.json": "8f1d931ee44d80df0546bb2ce1692c1589b73a1374722140e09ce188a7d73c29",
+    "104-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "104-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "105-backfill.json": "76f5586e165935b3793d9e0762cddf4c8b6978802b14ab3f1214312b8379b108",
+    "105-backfill.log": "8fe5ae5795bddae10a325e7c5a36f0c10210ac7db4fd7c221b18a288d31ef896",
+    "105-backfill.stderr": "982f40fc7d25478967fc5c1ce770c097f69270c4c8d620c960e1c554e98bd393",
+    "106-build.json": "51751640f58234ae0de5808a4ef435fb2678541654b0baf19fc609832efe6570",
+    "106-build.log": "749018247ae6b2ac670811dd466918b5a30a7f4485276f458ee14adc0256fa62",
+    "106-build.stderr": "b5d2a7d3c28604d68e30b558188838ecb2f0d322d40b6dd1c86b02d384e61b09",
+    "107-apply.json": "0f9368341772a067465f1788950541d237ae741c19984d4dc8c4962a45b5c4cf",
+    "107-apply.log": "f7889727a1e0c1bb7d55b90092d2afbe5f46b0f6f3840e44cc3ee5753f6ec027",
+    "107-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "108-apply.json": "9e0f0440c2ce019d10a1db03c6d14699c891090a89df28c0981f23b2ab8aed36",
+    "108-apply.log": "57daa534178bf8cb0508a3393d5e63ea1d4a9cdd646b9ab644e3f866e091701b",
+    "108-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "109-activate.json": "2e6676bc50135e4c6bd29e556ba31d96451e823e665495aa53de50563efbd45b",
+    "109-activate.log": "005646a639ed75f5d53d3a342d4837a351888f78d83e27e95026a2803a1ba7af",
+    "109-activate.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "110-query.json": "827f7f66f0a38d1b7c41f4f6962c8f3fff3c00fa9b1cad4ff7d9da84583b7bd3",
+    "110-query.log": "c809dde4b8ad84c239beb7147c68778a8d6f22870aea391d21442eb0f0fc18cb",
+    "110-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "111-query.json": "0b2ed6b595decb079c94cf54e8a1af4cb2afcd1c07c2510e9bb44490ab867ab1",
+    "111-query.log": "fa6105a9475e42ea2395fbd4e81e8cb6aacf45a4523bb6b44f1a27ae1f775fe5",
+    "111-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "112-begin_corpus.json": "ae5cd91e5236357d5341201f9e35307ce51ef46a6301c1918c7a5092ac64ae44",
+    "112-begin_corpus.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "112-begin_corpus.stderr": "f89392faa6420b1b316eac2dea63e74f403315c3f6631ddd6acfe2b327d865d5",
+    "113-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "113-status.log": "dc381e03330b7c668bd5f4292e8cd56fb608c2635c0add61e1e60e465fac2ac1",
+    "113-status.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "OWNER": "9c9d2d53dce2b7e256f1fc428038f0f1bc14adf2864cff9cdb2959057d97c916",
+    "admission.json": "4db4a5e27496b12f29ac94d33bfa3c2a4ab58f0357b1cf85536f09e3e3d75556",
+    "changed-manifest.json": "709d2e1fcfe4811c829012abc0d2568c8a7421e6c804afa90fc76abf5ca563ca",
+    "input.jsonl": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+    "manifest.json": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+    "progress.json": "6f6874e8c116bcb928fb98afbe66f6c05fb744da5cc77f6fb06898a0af63a35f"
+  },
+  "binary_sha256": "329bec46bc4213fc0b922109e899aff60f250171e4d8ac48657f24259b960a55",
+  "final": {
+    "active": 2,
+    "generations": [
+      {
+        "base": {
+          "body_bytes": 4207,
+          "complete": true,
+          "completed": 25,
+          "copied_bytes": 4207,
+          "copied_vectors": 8,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "fingerprint": "a6fa829473d6e11e38ecf58b70c5cf12a69112d9c5082331111fa9e0c02be1be",
+        "id": 1,
+        "ready": true,
+        "status": "retired",
+        "text": 1,
+        "vector": 1
+      },
+      {
+        "base": {
+          "body_bytes": 4207,
+          "complete": true,
+          "completed": 25,
+          "copied_bytes": 4207,
+          "copied_vectors": 8,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "fingerprint": "58d880910734e9040ec39b745d65fab4dddfdffbbed776859c67affbf8d97810",
+        "id": 2,
+        "ready": true,
+        "status": "active",
+        "text": 1,
+        "vector": 1
+      }
+    ],
+    "retention": "two builds lifetime bound; no native text blob GC"
+  },
+  "not_tested": [
+    "full corpus",
+    "sustained concurrent build",
+    "space admission",
+    "RSS sampling",
+    "power loss"
+  ],
+  "records": [
+    {
+      "child": {
+        "pid": 3974925,
+        "start_ticks": "457710535",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "000-load.json",
+      "result": {
+        "content_bytes": 4207,
+        "documents": 25,
+        "elapsed_seconds": 0.032482004,
+        "phase": "import_complete",
+        "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+        "resumed_documents": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3974937,
+        "start_ticks": "457710552",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "001-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3974948,
+        "start_ticks": "457710557",
+        "state": "R"
+      },
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "002-begin_corpus.json"
+    },
+    {
+      "child": {
+        "pid": 3975010,
+        "start_ticks": "457710706",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "003-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3975019,
+        "start_ticks": "457710711",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "004-begin_corpus.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": false,
+          "completed": 0,
+          "copied_bytes": 0,
+          "copied_vectors": 0,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "fingerprint": "a6fa829473d6e11e38ecf58b70c5cf12a69112d9c5082331111fa9e0c02be1be",
+        "id": 1,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3975026,
+        "start_ticks": "457710734",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "005-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3975040,
+        "start_ticks": "457710739",
+        "state": "R"
+      },
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "006-begin_corpus.json"
+    },
+    {
+      "child": {
+        "pid": 3975051,
+        "start_ticks": "457710745",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "007-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3975062,
+        "start_ticks": "457710750",
+        "state": "R"
+      },
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "008-begin_corpus.json"
+    },
+    {
+      "child": {
+        "pid": 3975073,
+        "start_ticks": "457710755",
+        "state": "R"
+      },
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "009-build.json"
+    },
+    {
+      "child": {
+        "pid": 3975081,
+        "start_ticks": "457710762",
+        "state": "R"
+      },
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "before-backfill-commit",
+      "request": "010-backfill.json"
+    },
+    {
+      "child": {
+        "pid": 3975089,
+        "start_ticks": "457710793",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "011-begin_corpus.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": false,
+          "completed": 0,
+          "copied_bytes": 0,
+          "copied_vectors": 0,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "fingerprint": "a6fa829473d6e11e38ecf58b70c5cf12a69112d9c5082331111fa9e0c02be1be",
+        "id": 1,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3975110,
+        "start_ticks": "457710802",
+        "state": "R"
+      },
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "after-backfill-commit",
+      "request": "012-backfill.json"
+    },
+    {
+      "child": {
+        "pid": 3975121,
+        "start_ticks": "457710812",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "013-begin_corpus.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": false,
+          "completed": 8,
+          "copied_bytes": 3588,
+          "copied_vectors": 8,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "fingerprint": "a6fa829473d6e11e38ecf58b70c5cf12a69112d9c5082331111fa9e0c02be1be",
+        "id": 1,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3975196,
+        "start_ticks": "457711319",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "014-commit.json",
+      "result": {
+        "commit_seq": 1,
+        "config_generation": 1,
+        "request_id": "corpus-move",
+        "revision": "00000000000001000000:00000000000000000001",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 3975204,
+        "start_ticks": "457711329",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "015-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3975214,
+        "start_ticks": "457711334",
+        "state": "R"
+      },
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "016-backfill.json"
+    },
+    {
+      "child": {
+        "pid": 3975222,
+        "start_ticks": "457711347",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "017-begin_corpus.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": false,
+          "completed": 24,
+          "copied_bytes": 4170,
+          "copied_vectors": 8,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "fingerprint": "a6fa829473d6e11e38ecf58b70c5cf12a69112d9c5082331111fa9e0c02be1be",
+        "id": 1,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3975232,
+        "start_ticks": "457711360",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "018-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3975312,
+        "start_ticks": "457711867",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "019-backfill.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": true,
+          "completed": 25,
+          "copied_bytes": 4207,
+          "copied_vectors": 8,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "fingerprint": "a6fa829473d6e11e38ecf58b70c5cf12a69112d9c5082331111fa9e0c02be1be",
+        "id": 1,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3975320,
+        "start_ticks": "457711879",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "020-backfill.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": true,
+          "completed": 25,
+          "copied_bytes": 4207,
+          "copied_vectors": 8,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "fingerprint": "a6fa829473d6e11e38ecf58b70c5cf12a69112d9c5082331111fa9e0c02be1be",
+        "id": 1,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3975328,
+        "start_ticks": "457711889",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "021-raw.json",
+      "result": {
+        "columns": [
+          "count(d)"
+        ],
+        "rows": [
+          [
+            25
+          ]
+        ]
+      }
+    },
+    {
+      "child": {
+        "pid": 3975345,
+        "start_ticks": "457711894",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "022-build.json",
+      "result": {
+        "concurrent_commit": null,
+        "generation": 1,
+        "text": {
+          "operation": {
+            "attempt": 43,
+            "family": "text",
+            "generation": "1",
+            "index_id": "17",
+            "operation_id": "149d7c04-129b-48f7-bc7d-69d496101738",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "117",
+              "input_bytes": "218638",
+              "output_bytes": "87680",
+              "output_operations": "622"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        },
+        "vector": {
+          "operation": {
+            "attempt": 3,
+            "family": "vector",
+            "generation": "1",
+            "index_id": "18",
+            "operation_id": "245dd75d-b759-4847-8e60-13f6065dc18c",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "108",
+              "input_bytes": "128876",
+              "output_bytes": "53200",
+              "output_operations": "88"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3975437,
+        "start_ticks": "457712061",
+        "state": "R"
+      },
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "023-activate.json"
+    },
+    {
+      "child": {
+        "pid": 3975448,
+        "start_ticks": "457712069",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "024-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3975464,
+        "start_ticks": "457712080",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "025-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3975579,
+        "start_ticks": "457712889",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "026-activate.json",
+      "result": {
+        "active": 1,
+        "at": 1,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "reused": false
+      }
+    },
+    {
+      "child": {
+        "pid": 3975591,
+        "start_ticks": "457712898",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "027-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3975605,
+        "start_ticks": "457712909",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "028-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3975616,
+        "start_ticks": "457712919",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "029-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3975723,
+        "start_ticks": "457713427",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "030-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3975731,
+        "start_ticks": "457713437",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "031-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3975741,
+        "start_ticks": "457713449",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "032-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3975750,
+        "start_ticks": "457713459",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "033-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3975763,
+        "start_ticks": "457713470",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "034-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3975886,
+        "start_ticks": "457713977",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "035-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3975901,
+        "start_ticks": "457713984",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "036-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 1,
+        "generation": 1,
+        "hits": [],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3975912,
+        "start_ticks": "457713996",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "037-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3975924,
+        "start_ticks": "457714003",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "038-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3975943,
+        "start_ticks": "457714009",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "039-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 1,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000002,
+            "partition": "p2",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3976055,
+        "start_ticks": "457714416",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "040-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3976068,
+        "start_ticks": "457714422",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "041-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3976078,
+        "start_ticks": "457714429",
+        "state": "R"
+      },
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "042-query.json"
+    },
+    {
+      "child": {
+        "pid": 3976088,
+        "start_ticks": "457714443",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "043-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3976111,
+        "start_ticks": "457714450",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "044-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "The Standard (Philippines)\nThe Standard is a majority broadsheet newspaper in the Philippines. It is owned by the Romualdez family. Romualdezes also owns Journal Publications, Inc., the proprietor of the People's Journal, a tabloid newspaper.Initially established as the Manila Standard, it merged with another newspaper of record, Today,  on March 6, 2005 and became Manila Standard Today or MST and recently rebranded as The Standard.",
+          "memory": 1000000,
+          "scope": 7,
+          "seq": 1
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976125,
+        "start_ticks": "457714465",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "045-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Quebec general election, 1989\nThe Quebec general election of 1989 was held on September 25, 1989, to elect members of the National Assembly of the Province of Quebec, Canada. The incumbent Quebec Liberal Party, led by Robert Bourassa, won re-election, defeating the Parti Qu\u00e9b\u00e9cois, led by Jacques Parizeau.This election was notable for the arrival of the Equality Party, which advocated English-speaking minority rights.  It won four seats, but never had any success in any subsequent election.",
+          "memory": 1000001,
+          "scope": 1,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976136,
+        "start_ticks": "457714481",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "046-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Azhdarcho\nAzhdarcho /\u0251\u02d0\u0292\u02c8d\u0251rxo\u028a/ is a genus of pterodactyloid pterosaur from the late Cretaceous Period of the Bissekty Formation (middle Turonian stage, about 92 million years ago) of Uzbekistan. It is known from fragmentary remains including the distinctive, elongated neck vertebrae that characterizes members of the family Azhdarchidae, which also includes such giant pterosaurs as Quetzalcoatlus.",
+          "memory": 1000002,
+          "scope": 2,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976146,
+        "start_ticks": "457714494",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "047-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Parabolic reflector\nA parabolic (or paraboloid or paraboloidal) reflector (or dish or mirror) is a reflective surface used to collect or project energy such as light, sound, or radio waves. Its shape is part of a circular paraboloid, that is, the surface generated by a parabola revolving around its axis. The parabolic reflector transforms an incoming plane wave traveling along the axis into a spherical wave converging toward the focus.",
+          "memory": 1000003,
+          "scope": 3,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976161,
+        "start_ticks": "457714510",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "048-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Heart rot\nIn trees, heart rot is a fungal disease that causes the decay of wood at the center of the trunk and branches. Fungi enter the tree through wounds in the bark and decay the heartwood. The diseased heartwood softens resulting in trees being structurally weaker and prone to breakage. Heart rot is a major factor in the economics of logging and the natural growth dynamic of many older forests.",
+          "memory": 1000004,
+          "scope": 4,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976172,
+        "start_ticks": "457714524",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "049-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Dale Reid\nDale Reid OBE (born 20 March 1959) is a Scottish professional golfer from Ladybank, Fife. She is one of the most successful players in the history of the Ladies European Tour, with 21 tournament victories. She topped the Order of Merit in 1984 and 1987 and was made a life member of the tour after collecting her 20th title at the 1991 Ford Classic. She played for Europe in the first four Solheim Cups (1990, 1992, 1994 and 1996) and was Europe's non-playing captain in 2000 and 2002.",
+          "memory": 1000005,
+          "scope": 5,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976183,
+        "start_ticks": "457714538",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "050-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "G\u00e9za Anda\nG\u00e9za Anda (Hungarian pronunciation: [\u02c8\u0261e\u02d0z\u0252 \u02c8\u0252nd\u0252]; 19 November 1921 \u2013 14 June 1976) was a Swiss-Hungarian pianist. A celebrated interpreter of classical and romantic repertoire, particularly noted for his performances and recordings of Mozart, he was also a tremendous interpreter of Beethoven, Schumann, Brahms and Bart\u00f3k.In his heyday he was regarded as an amazing artist, possessed of a beautiful, natural and flawless technique that gave his concerts a unique quality.",
+          "memory": 1000006,
+          "scope": 6,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976195,
+        "start_ticks": "457714554",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "051-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Iron-sulfur protein\nIron-sulfur proteins are proteins characterized by the presence of iron-sulfur clusters containing sulfide-linked di-, tri-, and tetrairon centers in variable oxidation states. Iron-sulfur clusters are found in a variety of metalloproteins, such as the ferredoxins, as well as NADH dehydrogenase, hydrogenases, Coenzyme Q - cytochrome c reductase, Succinate - coenzyme Q reductase and nitrogenase.",
+          "memory": 1000007,
+          "scope": 7,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976213,
+        "start_ticks": "457714570",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "052-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 0",
+          "memory": 1000008,
+          "scope": 0,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976227,
+        "start_ticks": "457714583",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "053-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 1",
+          "memory": 1000009,
+          "scope": 1,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976244,
+        "start_ticks": "457714596",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "054-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 2",
+          "memory": 1000010,
+          "scope": 2,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976260,
+        "start_ticks": "457714611",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "055-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 3",
+          "memory": 1000011,
+          "scope": 3,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976271,
+        "start_ticks": "457714625",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "056-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 4",
+          "memory": 1000012,
+          "scope": 4,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976282,
+        "start_ticks": "457714641",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "057-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 5",
+          "memory": 1000013,
+          "scope": 5,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976293,
+        "start_ticks": "457714657",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "058-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 6",
+          "memory": 1000014,
+          "scope": 6,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976308,
+        "start_ticks": "457714673",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "059-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 7",
+          "memory": 1000015,
+          "scope": 7,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976340,
+        "start_ticks": "457714689",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "060-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 8",
+          "memory": 1000016,
+          "scope": 0,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976355,
+        "start_ticks": "457714704",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "061-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 9",
+          "memory": 1000017,
+          "scope": 1,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976370,
+        "start_ticks": "457714720",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "062-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 10",
+          "memory": 1000018,
+          "scope": 2,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976381,
+        "start_ticks": "457714736",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "063-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 11",
+          "memory": 1000019,
+          "scope": 3,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976397,
+        "start_ticks": "457714753",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "064-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 12",
+          "memory": 1000020,
+          "scope": 4,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976416,
+        "start_ticks": "457714768",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "065-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 13",
+          "memory": 1000021,
+          "scope": 5,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976428,
+        "start_ticks": "457714782",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "066-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 14",
+          "memory": 1000022,
+          "scope": 6,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976446,
+        "start_ticks": "457714796",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "067-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 15",
+          "memory": 1000023,
+          "scope": 7,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976463,
+        "start_ticks": "457714813",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "068-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "Synthetic backfill diagnostic only 16",
+          "memory": 1000024,
+          "scope": 0,
+          "seq": 0
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976489,
+        "start_ticks": "457714826",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "069-history.json",
+      "result": {
+        "entry": {
+          "active": true,
+          "body": "The Standard (Philippines)\nThe Standard is a majority broadsheet newspaper in the Philippines. It is owned by the Romualdez family. Romualdezes also owns Journal Publications, Inc., the proprietor of the People's Journal, a tabloid newspaper.Initially established as the Manila Standard, it merged with another newspaper of record, Today,  on March 6, 2005 and became Manila Standard Today or MST and recently rebranded as The Standard.",
+          "memory": 1000000,
+          "scope": 0,
+          "seq": 0
+        },
+        "permission_revision": 1,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976501,
+        "start_ticks": "457714840",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "070-history.json",
+      "result": {
+        "entry": {
+          "active": true,
+          "body": "Quebec general election, 1989\nThe Quebec general election of 1989 was held on September 25, 1989, to elect members of the National Assembly of the Province of Quebec, Canada. The incumbent Quebec Liberal Party, led by Robert Bourassa, won re-election, defeating the Parti Qu\u00e9b\u00e9cois, led by Jacques Parizeau.This election was notable for the arrival of the Equality Party, which advocated English-speaking minority rights.  It won four seats, but never had any success in any subsequent election.",
+          "memory": 1000001,
+          "scope": 1,
+          "seq": 0
+        },
+        "permission_revision": 1,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976514,
+        "start_ticks": "457714854",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "071-history.json",
+      "result": {
+        "entry": {
+          "active": true,
+          "body": "Azhdarcho\nAzhdarcho /\u0251\u02d0\u0292\u02c8d\u0251rxo\u028a/ is a genus of pterodactyloid pterosaur from the late Cretaceous Period of the Bissekty Formation (middle Turonian stage, about 92 million years ago) of Uzbekistan. It is known from fragmentary remains including the distinctive, elongated neck vertebrae that characterizes members of the family Azhdarchidae, which also includes such giant pterosaurs as Quetzalcoatlus.",
+          "memory": 1000002,
+          "scope": 2,
+          "seq": 0
+        },
+        "permission_revision": 1,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976528,
+        "start_ticks": "457714869",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "072-history.json",
+      "result": {
+        "entry": {
+          "active": true,
+          "body": "Parabolic reflector\nA parabolic (or paraboloid or paraboloidal) reflector (or dish or mirror) is a reflective surface used to collect or project energy such as light, sound, or radio waves. Its shape is part of a circular paraboloid, that is, the surface generated by a parabola revolving around its axis. The parabolic reflector transforms an incoming plane wave traveling along the axis into a spherical wave converging toward the focus.",
+          "memory": 1000003,
+          "scope": 3,
+          "seq": 0
+        },
+        "permission_revision": 1,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976540,
+        "start_ticks": "457714883",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "073-history.json",
+      "result": {
+        "entry": {
+          "active": true,
+          "body": "Heart rot\nIn trees, heart rot is a fungal disease that causes the decay of wood at the center of the trunk and branches. Fungi enter the tree through wounds in the bark and decay the heartwood. The diseased heartwood softens resulting in trees being structurally weaker and prone to breakage. Heart rot is a major factor in the economics of logging and the natural growth dynamic of many older forests.",
+          "memory": 1000004,
+          "scope": 4,
+          "seq": 0
+        },
+        "permission_revision": 1,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976549,
+        "start_ticks": "457714898",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "074-history.json",
+      "result": {
+        "entry": {
+          "active": true,
+          "body": "Dale Reid\nDale Reid OBE (born 20 March 1959) is a Scottish professional golfer from Ladybank, Fife. She is one of the most successful players in the history of the Ladies European Tour, with 21 tournament victories. She topped the Order of Merit in 1984 and 1987 and was made a life member of the tour after collecting her 20th title at the 1991 Ford Classic. She played for Europe in the first four Solheim Cups (1990, 1992, 1994 and 1996) and was Europe's non-playing captain in 2000 and 2002.",
+          "memory": 1000005,
+          "scope": 5,
+          "seq": 0
+        },
+        "permission_revision": 1,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976574,
+        "start_ticks": "457714911",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "075-history.json",
+      "result": {
+        "entry": {
+          "active": true,
+          "body": "G\u00e9za Anda\nG\u00e9za Anda (Hungarian pronunciation: [\u02c8\u0261e\u02d0z\u0252 \u02c8\u0252nd\u0252]; 19 November 1921 \u2013 14 June 1976) was a Swiss-Hungarian pianist. A celebrated interpreter of classical and romantic repertoire, particularly noted for his performances and recordings of Mozart, he was also a tremendous interpreter of Beethoven, Schumann, Brahms and Bart\u00f3k.In his heyday he was regarded as an amazing artist, possessed of a beautiful, natural and flawless technique that gave his concerts a unique quality.",
+          "memory": 1000006,
+          "scope": 6,
+          "seq": 0
+        },
+        "permission_revision": 1,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976593,
+        "start_ticks": "457714927",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "076-history.json",
+      "result": {
+        "entry": {
+          "active": true,
+          "body": "Iron-sulfur protein\nIron-sulfur proteins are proteins characterized by the presence of iron-sulfur clusters containing sulfide-linked di-, tri-, and tetrairon centers in variable oxidation states. Iron-sulfur clusters are found in a variety of metalloproteins, such as the ferredoxins, as well as NADH dehydrogenase, hydrogenases, Coenzyme Q - cytochrome c reductase, Succinate - coenzyme Q reductase and nitrogenase.",
+          "memory": 1000007,
+          "scope": 7,
+          "seq": 0
+        },
+        "permission_revision": 1,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976602,
+        "start_ticks": "457714940",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "077-state.json",
+      "result": {
+        "at": 0,
+        "entries": [
+          {
+            "active": true,
+            "body": "The Standard (Philippines)\nThe Standard is a majority broadsheet newspaper in the Philippines. It is owned by the Romualdez family. Romualdezes also owns Journal Publications, Inc., the proprietor of the People's Journal, a tabloid newspaper.Initially established as the Manila Standard, it merged with another newspaper of record, Today,  on March 6, 2005 and became Manila Standard Today or MST and recently rebranded as The Standard.",
+            "memory": 1000000,
+            "scope": 0,
+            "seq": 0
+          },
+          {
+            "active": true,
+            "body": "Synthetic backfill diagnostic only 0",
+            "memory": 1000008,
+            "scope": 0,
+            "seq": 0
+          },
+          {
+            "active": true,
+            "body": "Synthetic backfill diagnostic only 8",
+            "memory": 1000016,
+            "scope": 0,
+            "seq": 0
+          },
+          {
+            "active": true,
+            "body": "Synthetic backfill diagnostic only 16",
+            "memory": 1000024,
+            "scope": 0,
+            "seq": 0
+          }
+        ],
+        "next": null,
+        "permission_revision": 1,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976650,
+        "start_ticks": "457714960",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "078-state.json",
+      "result": {
+        "at": 1,
+        "entries": [
+          {
+            "active": true,
+            "body": "The Standard (Philippines)\nThe Standard is a majority broadsheet newspaper in the Philippines. It is owned by the Romualdez family. Romualdezes also owns Journal Publications, Inc., the proprietor of the People's Journal, a tabloid newspaper.Initially established as the Manila Standard, it merged with another newspaper of record, Today,  on March 6, 2005 and became Manila Standard Today or MST and recently rebranded as The Standard.",
+            "memory": 1000000,
+            "scope": 7,
+            "seq": 1
+          },
+          {
+            "active": true,
+            "body": "Iron-sulfur protein\nIron-sulfur proteins are proteins characterized by the presence of iron-sulfur clusters containing sulfide-linked di-, tri-, and tetrairon centers in variable oxidation states. Iron-sulfur clusters are found in a variety of metalloproteins, such as the ferredoxins, as well as NADH dehydrogenase, hydrogenases, Coenzyme Q - cytochrome c reductase, Succinate - coenzyme Q reductase and nitrogenase.",
+            "memory": 1000007,
+            "scope": 7,
+            "seq": 0
+          },
+          {
+            "active": true,
+            "body": "Synthetic backfill diagnostic only 7",
+            "memory": 1000015,
+            "scope": 7,
+            "seq": 0
+          },
+          {
+            "active": true,
+            "body": "Synthetic backfill diagnostic only 15",
+            "memory": 1000023,
+            "scope": 7,
+            "seq": 0
+          }
+        ],
+        "next": null,
+        "permission_revision": 1,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976676,
+        "start_ticks": "457714980",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "079-grant.json",
+      "result": {
+        "revision": 2
+      }
+    },
+    {
+      "child": {
+        "pid": 3976988,
+        "start_ticks": "457715489",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "080-history.json",
+      "result": {
+        "entry": null,
+        "permission_revision": 2,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3976999,
+        "start_ticks": "457715499",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "081-current.json",
+      "result": {
+        "at": 1,
+        "entry": {
+          "active": true,
+          "body": "The Standard (Philippines)\nThe Standard is a majority broadsheet newspaper in the Philippines. It is owned by the Romualdez family. Romualdezes also owns Journal Publications, Inc., the proprietor of the People's Journal, a tabloid newspaper.Initially established as the Manila Standard, it merged with another newspaper of record, Today,  on March 6, 2005 and became Manila Standard Today or MST and recently rebranded as The Standard.",
+          "memory": 1000000,
+          "scope": 7,
+          "seq": 1
+        },
+        "permission_revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3977014,
+        "start_ticks": "457715511",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "082-grant.json",
+      "result": {
+        "revision": 2
+      }
+    },
+    {
+      "child": {
+        "pid": 3977026,
+        "start_ticks": "457715523",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "083-current.json",
+      "result": {
+        "at": 1,
+        "entry": null,
+        "permission_revision": 2
+      }
+    },
+    {
+      "child": {
+        "pid": 3977038,
+        "start_ticks": "457715535",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "084-grant.json",
+      "result": {
+        "revision": 3
+      }
+    },
+    {
+      "child": {
+        "pid": 3977048,
+        "start_ticks": "457715547",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "085-history.json",
+      "result": {
+        "entry": {
+          "active": true,
+          "body": "The Standard (Philippines)\nThe Standard is a majority broadsheet newspaper in the Philippines. It is owned by the Romualdez family. Romualdezes also owns Journal Publications, Inc., the proprietor of the People's Journal, a tabloid newspaper.Initially established as the Manila Standard, it merged with another newspaper of record, Today,  on March 6, 2005 and became Manila Standard Today or MST and recently rebranded as The Standard.",
+          "memory": 1000000,
+          "scope": 0,
+          "seq": 0
+        },
+        "permission_revision": 3,
+        "read_seq": 0,
+        "retrieval_mode": "historical_state",
+        "validated_at_seq": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 3977059,
+        "start_ticks": "457715561",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "086-grant.json",
+      "result": {
+        "revision": 3
+      }
+    },
+    {
+      "child": {
+        "pid": 3977076,
+        "start_ticks": "457715572",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "087-current.json",
+      "result": {
+        "at": 1,
+        "entry": null,
+        "permission_revision": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3977087,
+        "start_ticks": "457715584",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "088-raw.json",
+      "result": {
+        "columns": [
+          "d.memory",
+          "d.body"
+        ],
+        "rows": [
+          [
+            1000000,
+            "The Standard (Philippines)\nThe Standard is a majority broadsheet newspaper in the Philippines. It is owned by the Romualdez family. Romualdezes also owns Journal Publications, Inc., the proprietor of the People's Journal, a tabloid newspaper.Initially established as the Manila Standard, it merged with another newspaper of record, Today,  on March 6, 2005 and became Manila Standard Today or MST and recently rebranded as The Standard."
+          ],
+          [
+            1000001,
+            "Quebec general election, 1989\nThe Quebec general election of 1989 was held on September 25, 1989, to elect members of the National Assembly of the Province of Quebec, Canada. The incumbent Quebec Liberal Party, led by Robert Bourassa, won re-election, defeating the Parti Qu\u00e9b\u00e9cois, led by Jacques Parizeau.This election was notable for the arrival of the Equality Party, which advocated English-speaking minority rights.  It won four seats, but never had any success in any subsequent election."
+          ],
+          [
+            1000002,
+            "Azhdarcho\nAzhdarcho /\u0251\u02d0\u0292\u02c8d\u0251rxo\u028a/ is a genus of pterodactyloid pterosaur from the late Cretaceous Period of the Bissekty Formation (middle Turonian stage, about 92 million years ago) of Uzbekistan. It is known from fragmentary remains including the distinctive, elongated neck vertebrae that characterizes members of the family Azhdarchidae, which also includes such giant pterosaurs as Quetzalcoatlus."
+          ],
+          [
+            1000003,
+            "Parabolic reflector\nA parabolic (or paraboloid or paraboloidal) reflector (or dish or mirror) is a reflective surface used to collect or project energy such as light, sound, or radio waves. Its shape is part of a circular paraboloid, that is, the surface generated by a parabola revolving around its axis. The parabolic reflector transforms an incoming plane wave traveling along the axis into a spherical wave converging toward the focus."
+          ],
+          [
+            1000004,
+            "Heart rot\nIn trees, heart rot is a fungal disease that causes the decay of wood at the center of the trunk and branches. Fungi enter the tree through wounds in the bark and decay the heartwood. The diseased heartwood softens resulting in trees being structurally weaker and prone to breakage. Heart rot is a major factor in the economics of logging and the natural growth dynamic of many older forests."
+          ],
+          [
+            1000005,
+            "Dale Reid\nDale Reid OBE (born 20 March 1959) is a Scottish professional golfer from Ladybank, Fife. She is one of the most successful players in the history of the Ladies European Tour, with 21 tournament victories. She topped the Order of Merit in 1984 and 1987 and was made a life member of the tour after collecting her 20th title at the 1991 Ford Classic. She played for Europe in the first four Solheim Cups (1990, 1992, 1994 and 1996) and was Europe's non-playing captain in 2000 and 2002."
+          ],
+          [
+            1000006,
+            "G\u00e9za Anda\nG\u00e9za Anda (Hungarian pronunciation: [\u02c8\u0261e\u02d0z\u0252 \u02c8\u0252nd\u0252]; 19 November 1921 \u2013 14 June 1976) was a Swiss-Hungarian pianist. A celebrated interpreter of classical and romantic repertoire, particularly noted for his performances and recordings of Mozart, he was also a tremendous interpreter of Beethoven, Schumann, Brahms and Bart\u00f3k.In his heyday he was regarded as an amazing artist, possessed of a beautiful, natural and flawless technique that gave his concerts a unique quality."
+          ],
+          [
+            1000007,
+            "Iron-sulfur protein\nIron-sulfur proteins are proteins characterized by the presence of iron-sulfur clusters containing sulfide-linked di-, tri-, and tetrairon centers in variable oxidation states. Iron-sulfur clusters are found in a variety of metalloproteins, such as the ferredoxins, as well as NADH dehydrogenase, hydrogenases, Coenzyme Q - cytochrome c reductase, Succinate - coenzyme Q reductase and nitrogenase."
+          ],
+          [
+            1000008,
+            "Synthetic backfill diagnostic only 0"
+          ],
+          [
+            1000009,
+            "Synthetic backfill diagnostic only 1"
+          ],
+          [
+            1000010,
+            "Synthetic backfill diagnostic only 2"
+          ],
+          [
+            1000011,
+            "Synthetic backfill diagnostic only 3"
+          ],
+          [
+            1000012,
+            "Synthetic backfill diagnostic only 4"
+          ],
+          [
+            1000013,
+            "Synthetic backfill diagnostic only 5"
+          ],
+          [
+            1000014,
+            "Synthetic backfill diagnostic only 6"
+          ],
+          [
+            1000015,
+            "Synthetic backfill diagnostic only 7"
+          ],
+          [
+            1000016,
+            "Synthetic backfill diagnostic only 8"
+          ],
+          [
+            1000017,
+            "Synthetic backfill diagnostic only 9"
+          ],
+          [
+            1000018,
+            "Synthetic backfill diagnostic only 10"
+          ],
+          [
+            1000019,
+            "Synthetic backfill diagnostic only 11"
+          ],
+          [
+            1000020,
+            "Synthetic backfill diagnostic only 12"
+          ],
+          [
+            1000021,
+            "Synthetic backfill diagnostic only 13"
+          ],
+          [
+            1000022,
+            "Synthetic backfill diagnostic only 14"
+          ],
+          [
+            1000023,
+            "Synthetic backfill diagnostic only 15"
+          ],
+          [
+            1000024,
+            "Synthetic backfill diagnostic only 16"
+          ]
+        ]
+      }
+    },
+    {
+      "child": {
+        "pid": 3977098,
+        "start_ticks": "457715591",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "089-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000008,
+            "partition": "p0",
+            "seq": 0
+          },
+          {
+            "memory": 1000016,
+            "partition": "p0",
+            "seq": 0
+          },
+          {
+            "memory": 1000024,
+            "partition": "p0",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 3,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977116,
+        "start_ticks": "457715605",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "090-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000000,
+            "partition": "p7",
+            "seq": 1
+          },
+          {
+            "memory": 1000007,
+            "partition": "p7",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 3,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977130,
+        "start_ticks": "457715619",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "091-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [],
+        "permission_revision": 3,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977140,
+        "start_ticks": "457715631",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "092-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000001,
+            "partition": "p1",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977151,
+        "start_ticks": "457715643",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "093-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000002,
+            "partition": "p2",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977164,
+        "start_ticks": "457715657",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "094-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000003,
+            "partition": "p3",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977176,
+        "start_ticks": "457715668",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "095-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000004,
+            "partition": "p4",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977188,
+        "start_ticks": "457715682",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "096-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000005,
+            "partition": "p5",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977200,
+        "start_ticks": "457715696",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "097-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000006,
+            "partition": "p6",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977220,
+        "start_ticks": "457715710",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "098-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000007,
+            "partition": "p7",
+            "seq": 0
+          },
+          {
+            "memory": 1000000,
+            "partition": "p7",
+            "seq": 1
+          }
+        ],
+        "permission_revision": 3,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977238,
+        "start_ticks": "457715723",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "099-begin_corpus.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": false,
+          "completed": 0,
+          "copied_bytes": 0,
+          "copied_vectors": 0,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "fingerprint": "58d880910734e9040ec39b745d65fab4dddfdffbbed776859c67affbf8d97810",
+        "id": 2,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3977255,
+        "start_ticks": "457715741",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "100-backfill.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": false,
+          "completed": 8,
+          "copied_bytes": 3588,
+          "copied_vectors": 8,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "fingerprint": "58d880910734e9040ec39b745d65fab4dddfdffbbed776859c67affbf8d97810",
+        "id": 2,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3977325,
+        "start_ticks": "457716247",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "101-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3977334,
+        "start_ticks": "457716254",
+        "state": "R"
+      },
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "102-backfill.json"
+    },
+    {
+      "child": {
+        "pid": 3977346,
+        "start_ticks": "457716268",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "103-begin_corpus.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": false,
+          "completed": 8,
+          "copied_bytes": 3588,
+          "copied_vectors": 8,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "fingerprint": "58d880910734e9040ec39b745d65fab4dddfdffbbed776859c67affbf8d97810",
+        "id": 2,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3977354,
+        "start_ticks": "457716285",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "104-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 3977370,
+        "start_ticks": "457716292",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "105-backfill.json",
+      "result": {
+        "base": {
+          "body_bytes": 4207,
+          "complete": true,
+          "completed": 25,
+          "copied_bytes": 4207,
+          "copied_vectors": 8,
+          "documents": 25,
+          "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+          "vectors": 8
+        },
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "fingerprint": "58d880910734e9040ec39b745d65fab4dddfdffbbed776859c67affbf8d97810",
+        "id": 2,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 3977392,
+        "start_ticks": "457716318",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "106-build.json",
+      "result": {
+        "concurrent_commit": null,
+        "generation": 2,
+        "text": {
+          "operation": {
+            "attempt": 43,
+            "family": "text",
+            "generation": "1",
+            "index_id": "21",
+            "operation_id": "c3e0ee3c-d469-4099-ba2f-91452d3205c3",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "161",
+              "input_bytes": "290898",
+              "output_bytes": "87680",
+              "output_operations": "622"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        },
+        "vector": {
+          "operation": {
+            "attempt": 3,
+            "family": "vector",
+            "generation": "1",
+            "index_id": "22",
+            "operation_id": "28a41b2c-0c04-4ab3-a6f7-7601cff6d034",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "152",
+              "input_bytes": "201136",
+              "output_bytes": "53200",
+              "output_operations": "88"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977568,
+        "start_ticks": "457717225",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "107-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3977595,
+        "start_ticks": "457717243",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "108-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 3977606,
+        "start_ticks": "457717261",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "109-activate.json",
+      "result": {
+        "active": 2,
+        "at": 1,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "reused": false
+      }
+    },
+    {
+      "child": {
+        "pid": 3977618,
+        "start_ticks": "457717275",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "110-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 2,
+        "hits": [
+          {
+            "memory": 1000000,
+            "partition": "p7",
+            "seq": 1
+          },
+          {
+            "memory": 1000007,
+            "partition": "p7",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 3,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977629,
+        "start_ticks": "457717290",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "111-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1000000,
+            "partition": "p7",
+            "seq": 1
+          },
+          {
+            "memory": 1000007,
+            "partition": "p7",
+            "seq": 0
+          }
+        ],
+        "permission_revision": 3,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 3977649,
+        "start_ticks": "457717305",
+        "state": "R"
+      },
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "112-begin_corpus.json"
+    },
+    {
+      "child": {
+        "pid": 3977664,
+        "start_ticks": "457717316",
+        "state": "R"
+      },
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "113-status.json",
+      "result": {
+        "active": 2,
+        "generations": [
+          {
+            "base": {
+              "body_bytes": 4207,
+              "complete": true,
+              "completed": 25,
+              "copied_bytes": 4207,
+              "copied_vectors": 8,
+              "documents": 25,
+              "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+              "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+              "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+              "vectors": 8
+            },
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+              "schema": 1
+            },
+            "fingerprint": "a6fa829473d6e11e38ecf58b70c5cf12a69112d9c5082331111fa9e0c02be1be",
+            "id": 1,
+            "ready": true,
+            "status": "retired",
+            "text": 1,
+            "vector": 1
+          },
+          {
+            "base": {
+              "body_bytes": 4207,
+              "complete": true,
+              "completed": 25,
+              "copied_bytes": 4207,
+              "copied_vectors": 8,
+              "documents": 25,
+              "manifest_sha256": "baefcfc3192aa01be024abc4fbab1f1a0c3be579b51f606400f9da003283dad4",
+              "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+              "prepared_sha256": "bc990344876ce637e79dd9123d7f1fb5d24e935dc4e1befb795a909c3206c1dd",
+              "vectors": 8
+            },
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+              "schema": 2
+            },
+            "fingerprint": "58d880910734e9040ec39b745d65fab4dddfdffbbed776859c67affbf8d97810",
+            "id": 2,
+            "ready": true,
+            "status": "active",
+            "text": 1,
+            "vector": 1
+          }
+        ],
+        "retention": "two builds lifetime bound; no native text blob GC"
+      }
+    }
+  ],
+  "seconds": 68.0696895904839,
+  "status": "passed",
+  "temporary_root_removed": true
+}

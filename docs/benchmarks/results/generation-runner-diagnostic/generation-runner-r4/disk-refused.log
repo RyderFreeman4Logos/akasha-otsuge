@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py", line 201, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py", line 148, in main
+    raise ValueError('insufficient disk for the admitted generation plan')
+ValueError: insufficient disk for the admitted generation plan

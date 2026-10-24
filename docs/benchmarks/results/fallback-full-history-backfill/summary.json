@@ -1,0 +1,189 @@
+{
+  "archive_sha256": "61b6d0e2ee61cb76ed62e6cd25c6f83f4b196a3e1f891511d17a882df1e03f61",
+  "binary_sha256": "92339952d55c1aa0904ef333da159879cc7ca53bb17cdd9a40ba86c9f39363e4",
+  "database_allocated_bytes": 68256649216,
+  "exact_native_processes_exited": true,
+  "hashes_verified": true,
+  "index_r1_failure": {
+    "cause": "systemd-confirmed OOM in native FTS tokenize_docs",
+    "elapsed_s": 42.16820973530412,
+    "hashes_verified": true,
+    "last_observer_event": "sample",
+    "native": {
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-c17cbb30330d4c6e9e8521a899ecbe98.service",
+      "event": "executable",
+      "pid": 1025398,
+      "sha256": "eb265fec86b8de1323d22a8741512884351ebfa68ec26e3cfb24d50a6c4ece9c",
+      "start_ticks": "460734293"
+    },
+    "native_absent": true,
+    "observer_terminal_missing": true,
+    "original_index_deadline_ms": 1792796647085,
+    "status": "failed",
+    "unit_inactive": true
+  },
+  "not_proven": [
+    "full corpus indexes",
+    "outbox catch-up/activation",
+    "concurrent mixed workload",
+    "power loss"
+  ],
+  "operations": [
+    {
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "42370",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "native": {
+        "changes": 100000,
+        "phase": "oracle_seeded",
+        "seconds": 249.416959538,
+        "text_only": true,
+        "version": 1
+      },
+      "native_identity": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-6bd0d801d98d43da9426bbfb6849198a.service",
+        "event": "executable",
+        "pid": 948348,
+        "sha256": "92339952d55c1aa0904ef333da159879cc7ca53bb17cdd9a40ba86c9f39363e4",
+        "start_ticks": "460609107"
+      },
+      "operation": "seed_text",
+      "rss_max_bytes": 225300480,
+      "rss_p99_nearest_rank_bytes": 225296384,
+      "samples": 250,
+      "seconds": 251.8273219447583
+    },
+    {
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "native": {
+        "changes": 100000,
+        "checks": 5163,
+        "memory_domain": [
+          0,
+          1024
+        ],
+        "not_tested": [
+          "concurrent clients",
+          "derived watermark",
+          "live permission revocation"
+        ],
+        "phase": "oracle_verified",
+        "seconds": 2.398050369,
+        "text_only": true
+      },
+      "native_identity": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-0140732f8ca8413da72898368c2807a3.service",
+        "event": "executable",
+        "pid": 956262,
+        "sha256": "92339952d55c1aa0904ef333da159879cc7ca53bb17cdd9a40ba86c9f39363e4",
+        "start_ticks": "460634327"
+      },
+      "operation": "verify_text",
+      "rss_max_bytes": 78573568,
+      "rss_p99_nearest_rank_bytes": 78573568,
+      "samples": 5,
+      "seconds": 6.010200587101281
+    },
+    {
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "native": {
+        "backfill_deadline_ms": null,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "cursor": 0,
+        "documents": 11428831,
+        "generation": 1,
+        "index_deadline_ms": null,
+        "pending": null,
+        "ready": false,
+        "source": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+        "text_version": 0,
+        "vector_rows": 0,
+        "vector_version": 0,
+        "vectors": 1000000
+      },
+      "native_identity": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-53ae7001a9c54065b6b04fdd69766f61.service",
+        "event": "executable",
+        "pid": 956353,
+        "sha256": "92339952d55c1aa0904ef333da159879cc7ca53bb17cdd9a40ba86c9f39363e4",
+        "start_ticks": "460634966"
+      },
+      "operation": "begin_corpus",
+      "rss_max_bytes": 23601152,
+      "rss_p99_nearest_rank_bytes": 23601152,
+      "samples": 2,
+      "seconds": 2.003878004848957
+    },
+    {
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "374384",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "native": {
+        "backfill_deadline_ms": 1792795655252,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "cursor": 11428831,
+        "documents": 11428831,
+        "generation": 1,
+        "index_deadline_ms": null,
+        "pending": null,
+        "ready": false,
+        "source": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+        "text_version": 5014,
+        "vector_rows": 1000000,
+        "vector_version": 1973,
+        "vectors": 1000000
+      },
+      "native_identity": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-ef69a16a52924aa0b0d20889e4e2e8a1.service",
+        "event": "executable",
+        "pid": 956390,
+        "sha256": "92339952d55c1aa0904ef333da159879cc7ca53bb17cdd9a40ba86c9f39363e4",
+        "start_ticks": "460635198"
+      },
+      "operation": "backfill",
+      "rss_max_bytes": 334905344,
+      "rss_p99_nearest_rank_bytes": 327643136,
+      "samples": 822,
+      "seconds": 830.9184765936807
+    }
+  ],
+  "scope": "full100k history and all-record native backfill; no full indexes yet",
+  "status": "passed",
+  "units_inactive": true
+}

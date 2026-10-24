@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py", line 182, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py", line 108, in main
+    stopped(state)
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py", line 28, in stopped
+    raise ValueError('generation unit is still live: ' + status)
+ValueError: generation unit is still live: active

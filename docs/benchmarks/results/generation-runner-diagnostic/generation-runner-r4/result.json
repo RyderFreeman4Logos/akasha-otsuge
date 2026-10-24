@@ -1,0 +1,100 @@
+{
+  "binary_sha256": "1ee2001a5f77fc03db30cf8e87a4f8181d35aa6091193a62a766d69966c5b249",
+  "not_tested": [
+    "native ordinary-write disk admission",
+    "full-size operation",
+    "power loss"
+  ],
+  "process_crash_only": true,
+  "records": [
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/generation-workload-r3/probe",
+        "/tmp/akasha-generation-runner-ctm4mzz7/database",
+        "--load",
+        "/tmp/akasha-otsuge-storage-20261022/generation-workload-r3/input.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/generation-workload-r3/manifest.json"
+      ],
+      "exit": 0,
+      "name": "load"
+    },
+    {
+      "command": [
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/begin.toml"
+      ],
+      "exit": 0,
+      "name": "begin-run"
+    },
+    {
+      "command": [
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill.toml",
+        "--resume"
+      ],
+      "exit": 1,
+      "name": "live-unit-refused"
+    },
+    {
+      "command": [
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_case.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/blocked-case.toml"
+      ],
+      "exit": 1,
+      "name": "unreconciled-case-refused"
+    },
+    {
+      "command": [
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill.toml",
+        "--resume"
+      ],
+      "exit": 0,
+      "name": "resumed-fill"
+    },
+    {
+      "command": [
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill.toml",
+        "--resume"
+      ],
+      "exit": 0,
+      "name": "completed-reuse"
+    },
+    {
+      "command": [
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill.toml",
+        "--resume"
+      ],
+      "exit": 1,
+      "name": "changed-request-refused"
+    },
+    {
+      "command": [
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/run_generation.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/disk-blocked.toml"
+      ],
+      "exit": 1,
+      "name": "disk-refused"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/generation-workload-r3/probe",
+        "/tmp/akasha-generation-runner-ctm4mzz7/database",
+        "MATCH (d:Derived1Text) RETURN count(d)"
+      ],
+      "exit": 0,
+      "name": "coverage"
+    }
+  ],
+  "seconds": 7.951096668839455,
+  "status": "passed"
+}

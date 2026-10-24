@@ -1,0 +1,173 @@
+{
+  "binary_sha256": "847ab1ea429d438bcc93f9cfaf794adac30214dd7e285fdabb39e172467a8fa3",
+  "native_checks": {
+    "binary_sha256": "847ab1ea429d438bcc93f9cfaf794adac30214dd7e285fdabb39e172467a8fa3",
+    "cgroup_peak_bytes": 236589056,
+    "checks": 47,
+    "max_sample_gap_s": 1.0085869198665023,
+    "memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "0",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "processes_absent": true,
+    "raw_artifacts_verified": 97,
+    "sampled_harness_and_children_rss_max_bytes": 189595648,
+    "samples": 13,
+    "seconds": 11.256882573477924,
+    "status": "passed",
+    "temporary_root_removed": true,
+    "unit_inactive": true
+  },
+  "not_proven": [
+    "full corpus indexes",
+    "ordinary changes/outbox",
+    "live permissions",
+    "activation",
+    "ANN exact recall",
+    "BM25 expected rank",
+    "cold cache",
+    "sustained memory P99",
+    "power loss"
+  ],
+  "real_build": {
+    "cgroup_peak_bytes": 671191040,
+    "memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "2308",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "native": {
+      "backfill_deadline_ms": 1792791734304,
+      "bundle": {
+        "chunker": "source-document-v1",
+        "dimension": 1536,
+        "model": "text-embedding-3-large",
+        "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+        "schema": 1
+      },
+      "cursor": 38462,
+      "documents": 38462,
+      "generation": 1,
+      "index_deadline_ms": 1792791744844,
+      "pending": null,
+      "ready": true,
+      "source": "5d28ca68dc34d108d9887c6306eafe7182ac50e9222ca3a44acdc39b0656641a",
+      "text_version": 76,
+      "vector_rows": 38462,
+      "vector_version": 76,
+      "vectors": 38462
+    },
+    "original_index_deadline_preserved": true,
+    "processes_absent": true,
+    "raw_start": {
+      "command": [
+        "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-real-search-r1/build-bounded/probe",
+        "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-stream-compressed-r1/database",
+        "--generation",
+        "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-real-search-r1/build-bounded/request.json"
+      ],
+      "event": "start",
+      "limits": {
+        "memory.high": "max",
+        "memory.max": "671088640",
+        "memory.swap.max": "0"
+      },
+      "native_environment": {
+        "LANCE_CPU_THREADS": "2",
+        "LANCE_SHUFFLE_BATCH_BYTES": "16777216",
+        "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES": "0"
+      },
+      "nofile_soft_hard": [
+        8192,
+        8192
+      ]
+    },
+    "result": {
+      "artifact_sha256": {
+        "c8e96b61746b470785bfba326f042c29/engine.log": "4ab569021983e328f634a5178759af52c9a0b1b7edc8c9a51edca3a56292761f",
+        "c8e96b61746b470785bfba326f042c29/memory.jsonl": "55849ef2afedbc15e149567ca3d93b23f91f288fad58465d11514038b43d2685",
+        "config.toml": "e428789aecab4171493aa6859b980addf1d63756a4297b1cda33f9387a19ac05",
+        "request.json": "17caee67564e0f59ac60aec1f41b4dc9ee81a98f9cbbb0be77932acb8b10d0d7"
+      },
+      "elapsed_s": 19.73022016696632,
+      "exit": 0,
+      "failure": null,
+      "generation": 1,
+      "native_config_attested": true,
+      "operation": "build",
+      "status": "passed"
+    },
+    "rss_max_bytes": 464904192,
+    "samples": 17,
+    "status": "passed",
+    "unit_inactive": true
+  },
+  "real_queries": {
+    "all_scopes": [
+      "p0",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ],
+    "exact_children_absent": true,
+    "memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "0",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "native_commands": 297,
+    "not_proven": [
+      "full corpus",
+      "ANN exact recall",
+      "BM25 expected rank",
+      "cold cache",
+      "live permissions"
+    ],
+    "real_queries": 16,
+    "sampled_harness_and_children_rss_max_bytes": 178450432,
+    "samples": 11,
+    "seconds": 9.113551643677056,
+    "self_at_20": {
+      "ann": 8,
+      "bm25": 6
+    },
+    "status": "passed",
+    "unique_candidates": 272,
+    "unit_inactive": true
+  },
+  "retained_failures": [
+    "previous binary lacks --generation",
+    "one BTreeMap key-type compile correction",
+    "real merge_partitions OOM at default128MiB shuffle and preloaded128MiB partition windows",
+    "incorrect initial observer-test selector ran zero tests; corrected selector ran3"
+  ],
+  "source_notes": {
+    "Lance": "vector/v3/shuffler.rs:128MiB default shuffle batch and partition window; offsets preload0 selects singleton partition reads; existing public environment controls only",
+    "SurrealKV": "vlog.rs:1336 eagerly opens each value-log file; systemd unit nofile8192"
+  },
+  "source_sha256": {
+    "spikes/fallback/Cargo.lock": "1be4d933e0e27dbe685febc0ce37ef1e3eb03672a11f1895899f385739807fa2",
+    "spikes/fallback/Cargo.toml": "fabb589543ff7773ec767ba39762441ff2e7416dc591ad769b4c775ed1a4ff89",
+    "spikes/fallback/check_real_search.py": "fe51ec327035b30aaf6d015813ba8a82b97da56f93f27456dcdeccde29a2823e",
+    "spikes/fallback/check_search.py": "c7ea6bfea230205e50b31cffd899ff342682b121e90aba3bff32ac3065d3dfa8",
+    "spikes/fallback/src/main.rs": "c33fe69c8f992e11d4c6b24081565fe81388d3a4b41c16fcfdac22cf4a745dd3",
+    "spikes/fallback/src/search.rs": "9890155314b84ebe430c5feb1555bdcb78e4c1074e7f6847c9c0c7e86b649976",
+    "spikes/helix/run_generation.py": "bdc6af22df268490e13520ecfe8bff6a50c419a8c520ff71ece40581ff1f8f6d",
+    "spikes/measure.py": "79f481c0699151e4c18fb97e37e4cef297c230ebd2963c6f629895d820ad82de"
+  },
+  "status": "passed_real_shard_diagnostic_only"
+}

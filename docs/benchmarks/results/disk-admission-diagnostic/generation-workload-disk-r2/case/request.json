@@ -1,0 +1,10 @@
+{
+  "corpus_manifest": "/tmp/akasha-otsuge-storage-20261022/generation-workload-disk-r2/manifest.json",
+  "diagnostic": true,
+  "fixture": "/tmp/akasha-otsuge-storage-20261022/generation-workload-disk-r2/queries.json",
+  "generation": 1,
+  "output": "/tmp/akasha-otsuge-storage-20261022/generation-workload-disk-r2/case/runtime",
+  "phase": "steady",
+  "run_id": "generation-work-3a19c4b91d97",
+  "seconds": 60
+}

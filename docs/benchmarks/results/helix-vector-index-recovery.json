@@ -1,0 +1,66 @@
+{
+  "binary_sha256": "bba37581ccf5586a444a7b1813b6269c0ca1c740d8adb940ea16c310944858af",
+  "dimension": 1536,
+  "exit": {
+    "code": 0,
+    "event": "exit",
+    "seconds": 1201.1988799544051
+  },
+  "input_documents": 38462,
+  "interpretation": "Persistent operation recovered after the original two-hour harness timeout. Progress entities includes validation passes; it is not unique input cardinality. Engine retained 32 MiB build cache; only cgroup maximum changed to 2 GiB with memory.high unset.",
+  "kind": "diagnostic_interrupted_index_recovery",
+  "last_memory_events": {
+    "high": "0",
+    "low": "0",
+    "max": "0",
+    "oom": "0",
+    "oom_group_kill": "0",
+    "oom_kill": "0"
+  },
+  "limits": {
+    "memory.high": "max",
+    "memory.max": "2147483648",
+    "memory.swap.max": "0"
+  },
+  "not_tested": [
+    "50GB",
+    "100_clients",
+    "30_minute_mixed_profiles",
+    "current_revision_filtering",
+    "power_loss"
+  ],
+  "result": "passed",
+  "result_receipt": {
+    "elapsed_seconds": 1200.975193907,
+    "phase": "indexes_built",
+    "text": {
+      "index": {
+        "generation": "1",
+        "index_id": "1",
+        "kind": "already_active"
+      }
+    },
+    "vector": {
+      "operation": {
+        "attempt": 217,
+        "family": "vector",
+        "generation": "1",
+        "index_id": "2",
+        "operation_id": "af9a050c-db6c-4617-9823-901350cb9595",
+        "operation_kind": "build",
+        "progress": {
+          "entities": "76932",
+          "input_bytes": "260114612",
+          "output_bytes": "628499027",
+          "output_operations": "4561480"
+        },
+        "stage": "activate",
+        "status": "succeeded"
+      }
+    }
+  },
+  "rss_max_bytes": 379604992,
+  "rss_p99_bytes": 379604992,
+  "samples": 1197,
+  "source_commit": "2f06ed44fc239d8e67ccac480f007ffc858890e0"
+}

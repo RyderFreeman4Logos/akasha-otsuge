@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_disk_admission.py", line 78, in <module>
+    main()
+    ~~~~^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_disk_admission.py", line 42, in main
+    run('initialize', dict(op='status'))
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_disk_admission.py", line 36, in run
+    assert (result.returncode != 0) == failure, (name, text[-2000:])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('initialize', 'ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}\nError: ObjectStore(Generic { store: "LocalFileSystem", source: UnableToCanonicalize { path: "/tmp/akasha-disk-admission-me7fyo58/database", source: Os { code: 2, kind: NotFound, message: "No such file or directory" } } })\n')

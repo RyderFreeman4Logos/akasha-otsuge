@@ -1,0 +1,83 @@
+{
+  "archive_sha256": "f58c69a5107369d90f227be9f761ec0e0e11435fe3ceecf502a31efea8e20c4e",
+  "hashes_verified": true,
+  "native_processes_exited": true,
+  "operations": [
+    {
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "native": {
+        "active": 0,
+        "committed": 100000,
+        "done": true,
+        "target": 100000,
+        "text": {
+          "pending": null,
+          "rows": 352,
+          "version": 4,
+          "watermark": 100000
+        },
+        "vector": {
+          "pending": null,
+          "rows": 0,
+          "version": 0,
+          "watermark": 100000
+        }
+      },
+      "native_identity": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-a410ea5124ad4981a2524bc4a9ce3fbb.service",
+        "event": "executable",
+        "pid": 1048463,
+        "sha256": "93da64a225a3b13723d43141ef56f314f311756fddf1dcff8c68d96026012bdd",
+        "start_ticks": "460841179"
+      },
+      "operation": "catch_up",
+      "rss_max_bytes": 110149632,
+      "samples": 39,
+      "seconds": 40.04458017926663
+    },
+    {
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "native": {
+        "active": 1,
+        "at": 100000,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "previous": 0,
+        "reused": false
+      },
+      "native_identity": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-96c2976e52b24bf0ba47d2e9987c9ba9.service",
+        "event": "executable",
+        "pid": 1049077,
+        "sha256": "93da64a225a3b13723d43141ef56f314f311756fddf1dcff8c68d96026012bdd",
+        "start_ticks": "460845224"
+      },
+      "operation": "activate",
+      "rss_max_bytes": 0,
+      "samples": 1,
+      "seconds": 2.0037760883569717
+    }
+  ],
+  "scope": "100k text-only outbox and activation on real38462-vector shard; not full corpus",
+  "status": "passed",
+  "units_inactive": true
+}

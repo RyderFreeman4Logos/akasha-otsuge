@@ -1,0 +1,43 @@
+{
+  "binary_sha256": "c20d26373ade5ab62ab8148b6260fcd436986448214e19a3b359d45b072cbddd",
+  "invalid_profile": "rejected_before_open",
+  "not_tested": [
+    "full_scale_profile_performance",
+    "512MiB_RSS_p99",
+    "2GiB_RSS_max"
+  ],
+  "profiles": [
+    {
+      "budget": {
+        "fts_cache_mib": 8,
+        "profile": "low",
+        "slate_block_cache_mib": 32,
+        "slate_metadata_cache_mib": 8,
+        "unflushed_mib": 32,
+        "vector_build_cache_mib": 32,
+        "vector_cache_mib": 32
+      },
+      "profile": "low",
+      "result": "passed"
+    },
+    {
+      "budget": {
+        "fts_cache_mib": 32,
+        "profile": "high",
+        "slate_block_cache_mib": 64,
+        "slate_metadata_cache_mib": 16,
+        "unflushed_mib": 64,
+        "vector_build_cache_mib": 512,
+        "vector_cache_mib": 128
+      },
+      "profile": "high",
+      "result": "passed"
+    }
+  ],
+  "result": "passed",
+  "source_parent": "e9679287ea19f9d1fb3d234f55fe309ca9852391",
+  "source_sha256": {
+    "spikes/helix/src/main.rs": "6257ae40d1996c45ccaa8fbccfa190b869f69e88850b0ab7faf3123ffb710148",
+    "spikes/helix/src/profile.rs": "6b13c7d380ecbfb3b9c9236b3dec1e7e1f08d515a03eeeef78a2faf4a8a0c77d"
+  }
+}

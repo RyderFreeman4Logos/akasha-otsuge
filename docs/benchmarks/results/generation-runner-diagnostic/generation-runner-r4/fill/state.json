@@ -1,0 +1,134 @@
+{
+  "attempts": [
+    {
+      "command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "--unit=akasha-generation-449f1edd043b493ea2a29bb688b86710",
+        "-p",
+        "MemoryMax=671088640",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=180",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=low",
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill/449f1edd043b493ea2a29bb688b86710/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill/probe",
+        "/tmp/akasha-generation-runner-ctm4mzz7/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill/request.json"
+      ],
+      "id": "449f1edd043b493ea2a29bb688b86710",
+      "log": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill/449f1edd043b493ea2a29bb688b86710/engine.log",
+      "outcome": "controller result absent; native idempotent operation will reconcile durable effects",
+      "phase": "interrupted",
+      "started_unix_s": 1792766148.0973525,
+      "unit": "akasha-generation-449f1edd043b493ea2a29bb688b86710"
+    },
+    {
+      "command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "--unit=akasha-generation-9906ec1a8602480abe9b304e85c90953",
+        "-p",
+        "MemoryMax=671088640",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=180",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=low",
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill/9906ec1a8602480abe9b304e85c90953/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill/probe",
+        "/tmp/akasha-generation-runner-ctm4mzz7/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill/request.json"
+      ],
+      "id": "9906ec1a8602480abe9b304e85c90953",
+      "log": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill/9906ec1a8602480abe9b304e85c90953/engine.log",
+      "phase": "completed",
+      "result": {
+        "artifact_sha256": {
+          "449f1edd043b493ea2a29bb688b86710/engine.log": "6af4e53c60c57fb4d4e6b8bf421010f117c415dbcaf7353802b205bc8d7c0aa2",
+          "449f1edd043b493ea2a29bb688b86710/memory.jsonl": "920b11deb932ad4817fcf776c444c3af9cb58086b790c0758bb6fb81698aef1f",
+          "9906ec1a8602480abe9b304e85c90953/engine.log": "51bbf61270b2704d1ca14071b0c24049df67cb478968483f4bc10e9a0a49484e",
+          "9906ec1a8602480abe9b304e85c90953/memory.jsonl": "f81526e13543cc4c52df582c506328ff0634d0cd637a2cfbd30bc7a25b3d8c12",
+          "config.toml": "e27be52aca368ae7f9229286d6087c406d676d76e3874c726105d88d5f3404ea",
+          "request.json": "b2c89ca2f70416e17aead96bf20594593597f3c7e9a94ca3a3fa2e0cad20a88a"
+        },
+        "elapsed_s": 2.015291690826416,
+        "exit": 0,
+        "failure": null,
+        "generation": 1,
+        "operation": "backfill",
+        "status": "passed"
+      },
+      "started_unix_s": 1792766148.8174767,
+      "unit": "akasha-generation-9906ec1a8602480abe9b304e85c90953"
+    }
+  ],
+  "config_epoch": 1,
+  "controller": {
+    "pid": 4177369,
+    "start_ticks": "458404571",
+    "state": "R"
+  },
+  "identity": {
+    "binary_sha256": "1ee2001a5f77fc03db30cf8e87a4f8181d35aa6091193a62a766d69966c5b249",
+    "config": {
+      "disk": {
+        "reserve_bytes": 36212254720,
+        "start_bytes": 81212254720
+      },
+      "paths": {
+        "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/generation-workload-r3/probe",
+        "database": "/tmp/akasha-generation-runner-ctm4mzz7/database",
+        "output": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill",
+        "request": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r4/fill.json"
+      },
+      "reliability": {
+        "max_attempts": 1
+      },
+      "run": {
+        "id": "fill",
+        "profile": "low",
+        "seconds": 180
+      }
+    },
+    "controller_sha256": "c569cdd5054f20d8e292dcfb30f7a1ca8ea0dc57bd0a53bdb73895366a5b2770",
+    "execution_request_sha256": "b2c89ca2f70416e17aead96bf20594593597f3c7e9a94ca3a3fa2e0cad20a88a",
+    "helpers_sha256": "c647b72392641f7626c718f479e7da4b001a2aca5bbf802465e0e6bfed95ca21",
+    "observer_sha256": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029",
+    "request_sha256": "e462fbc59d5ee0595a434e8d75059c2269680775c3f027f30130a3c7101df33c"
+  },
+  "phase": "completed",
+  "result": {
+    "artifact_sha256": {
+      "449f1edd043b493ea2a29bb688b86710/engine.log": "6af4e53c60c57fb4d4e6b8bf421010f117c415dbcaf7353802b205bc8d7c0aa2",
+      "449f1edd043b493ea2a29bb688b86710/memory.jsonl": "920b11deb932ad4817fcf776c444c3af9cb58086b790c0758bb6fb81698aef1f",
+      "9906ec1a8602480abe9b304e85c90953/engine.log": "51bbf61270b2704d1ca14071b0c24049df67cb478968483f4bc10e9a0a49484e",
+      "9906ec1a8602480abe9b304e85c90953/memory.jsonl": "f81526e13543cc4c52df582c506328ff0634d0cd637a2cfbd30bc7a25b3d8c12",
+      "config.toml": "e27be52aca368ae7f9229286d6087c406d676d76e3874c726105d88d5f3404ea",
+      "request.json": "b2c89ca2f70416e17aead96bf20594593597f3c7e9a94ca3a3fa2e0cad20a88a"
+    },
+    "elapsed_s": 2.015291690826416,
+    "exit": 0,
+    "failure": null,
+    "generation": 1,
+    "operation": "backfill",
+    "status": "passed"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "spikes/helix/src/main.rs": "10790682bd4551b15062718a0ec0e618bb8987fa29b91357c6fc0adb3c8d325d",
+  "spikes/helix/src/indexes.rs": "5febc110543c56956e47b4890a8efb602c2b18a9a7f314b2a25c7e2d5d5655f4",
+  "spikes/helix/src/load.rs": "784fa363ecb55eba29183073b24f33e6c7b60085231b2898ffdf14f65b8e2c40",
+  "spikes/helix/src/engine.rs": "96bfe37468a45e55f3bd2519d8011376d61e821a0ec1475fa80448f9b4f36d14",
+  "spikes/helix/src/authority.rs": "04d939f0bddeadd9f2308630b36e555e9d3ab3bb46e2d4889111d774b4ca3cb6",
+  "spikes/helix/src/search.rs": "04a4bb9627ffeafc1c0a706ec7959dc91237266f1d65e5bba5cdbdf9797bcb05",
+  "spikes/helix/src/profile.rs": "ccbed0c2479c625c5b226cd28827e9b28807c9e1cb025d48677569dd934f5658",
+  "spikes/helix/src/workload.rs": "b008d8de4f937389391ce506a3503d8dcd23bd8f8156bdbdc83c9e8b4668a1eb",
+  "spikes/helix/src/visibility.rs": "32d5b151b79bc9d0d412c3a726990a7402959e60aa56945ee287a5ff37e96d79",
+  "spikes/helix/src/generations.rs": "cefbca1611f5b2acae4a40287d8192a9dc8e655f05a0e4466f39659c5216c25b",
+  "spikes/helix/src/generations/corpus.rs": "582f2dc90339544293a3131b1501fd090b1516f06ae07f4c48553daf140bf429"
+}

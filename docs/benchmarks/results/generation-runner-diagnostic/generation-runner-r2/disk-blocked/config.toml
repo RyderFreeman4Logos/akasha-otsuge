@@ -1,0 +1,14 @@
+[run]
+id = "disk-blocked"
+profile = "low"
+seconds = 180
+[paths]
+binary = "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/generation-workload-r3/probe"
+database = "/tmp/akasha-generation-runner-ijfbq595/database"
+request = "/tmp/akasha-otsuge-storage-20261022/generation-runner-r2/disk-blocked.json"
+output = "/tmp/akasha-otsuge-storage-20261022/generation-runner-r2/disk-blocked"
+[disk]
+start_bytes = 9223372036854775808
+reserve_bytes = 36212254720
+[reliability]
+max_attempts = 1

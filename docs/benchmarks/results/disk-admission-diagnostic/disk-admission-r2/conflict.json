@@ -1,0 +1,12 @@
+{
+  "change": {
+    "active": true,
+    "body": "conflicting text",
+    "expected": 0,
+    "memory": 1,
+    "request_id": "disk-1",
+    "scope": 0,
+    "text_only": true
+  },
+  "op": "commit"
+}

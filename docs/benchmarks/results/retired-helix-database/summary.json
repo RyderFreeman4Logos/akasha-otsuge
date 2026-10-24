@@ -1,0 +1,29 @@
+{
+  "allocated_bytes": 38603812864,
+  "apparent_bytes": 38555531174,
+  "database": "/tmp/akasha-otsuge-storage-20261022/full-import-zstd-v1/database",
+  "database_absent": true,
+  "delta_note": "concurrent filesystem activity prevents attributing the whole free-space delta to deletion",
+  "files": 20134,
+  "filesystem": "btrfs /tmp subvolume; delayed reclaim and concurrent activity mean free-space deltas are observations, not exact attribution",
+  "finished_unix_s": 1792797861.1190126,
+  "free_after": 168769982464,
+  "free_before": 168431259648,
+  "generation_owner_abandoned": true,
+  "known_import_controller_stopped": true,
+  "known_units_inactive": true,
+  "later_observed_free_delta": 38567518208,
+  "later_verified_free_bytes": 206998777856,
+  "observed_filesystem_free_delta": 338722816,
+  "procfs_gap_classification": "inaccessible processes were older sshd, sd-pam, gpg-agent or zombies; no live storage workers among them",
+  "reason": "Helix rejected by three retained full-data low-recovery OOM attempts; this task-owned public-corpus database has no remaining consumers",
+  "retained_metadata_sha256": {
+    ".akasha-generation-owner.json": "05d7437241f00357dcf56d713681ef084771f771a6078251335199abff7fe383",
+    "import-progress.json": "4957586fe81af39bba2d0cd2b0a0df3ea50b1b3ee4b5d4b487dab99110f0a271",
+    "import-state.json": "cec8eb59eb106acced06aa11ad2c526aa47427735317587a34c30feed14f585a"
+  },
+  "scope": "remove only the experiment database; retain original failure logs, import receipts, source shards and active fallback",
+  "started_unix_s": 1792797860.08054,
+  "status": "removed",
+  "visible_process_references": []
+}

@@ -1,0 +1,5897 @@
+{
+  "status": "passed",
+  "negative_controls": [
+    "offset",
+    "path",
+    "dimension",
+    "hash",
+    "zero",
+    "nan",
+    "neighbors"
+  ],
+  "search": {
+    "exact_ann_queries": 32,
+    "fixture_sha256": "151867527072cea77537554ba39c56fc12c1ccbabd03a6c821be8c1042731613",
+    "mean_ann_recall_at_20": 1.0,
+    "not_tested": [
+      "50GB",
+      "100_clients",
+      "retraction",
+      "model_generations"
+    ],
+    "phase": "real_search_verified",
+    "queries": 96,
+    "results": [
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Swagatalakshmi_Dasgupta>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bulgogi>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sulfina_Barbu>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:M\u00f6hlin>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mill_en_Sint_Hubert>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alt_Pened\u00e8s>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ma\u0161\u00edn>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Spiru_Haret>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Miercurea_Ciuc>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Liviu_Rebreanu>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sebastian_Deisler>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:H\u00e9rault>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Roerdalen>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Paul_Wild_(Swiss_astronomer)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pranab_Roy>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sezen_Aksu>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:JJ_Lehto>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Luis_Alberto_Lacalle>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Auguste_Bravais>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:S\u00e3o_Paulo\u2013Congonhas_Airport>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Fichtelberg>",
+        "mode": "bm25",
+        "partition": "p0",
+        "seconds": 0.01473836,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Fichtelberg>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Doupov_Mountains>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mount_Mansfield>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Emory_Peak>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Snowmass_Mountain>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fogo,_Cape_Verde>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fuar_Tholl>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Elbhangfest>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dresden>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hauberg_Mountains>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vitosha_Mountain_TV_Tower>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Owens_Peak_Wilderness>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Middlemount,_Queensland>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lichtenfels,_Hesse>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Manitou_and_Pike's_Peak_Railway>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Oak_Forest,_Illinois>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:La_Plata_Peak>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mount_Baden-Powell>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Blosenbergturm>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Oakfield,_Maine>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Fichtelberg>",
+        "mode": "ann",
+        "partition": "p0",
+        "seconds": 0.154674847,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Walter_Braunfels>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Midden-Delfland>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Adolf_Hurwitz>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edmund_Charaszkiewicz>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pablo_de_Sarasate>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Subrata_Guha>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hunab_Ku>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Scheyville,_New_South_Wales>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Johan_Gielen>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ant\u00f3nio_Vieira>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:M\u00fclheim>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:S\u00e9bastien_Grosjean>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rauma,_Finland>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Czes\u0142aw_Niemen>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Andr\u00e9_Maginot>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Unna_(district)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nueva_Ecija>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:CA_Osasuna>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Francisco_I._Madero>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Causa_sui>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Fichtelberg>",
+        "mode": "excluded_scope",
+        "partition": "p1",
+        "seconds": 0.009853521,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Rick_Atkinson>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:173_Hours_in_Captivity>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Peter_Wilby>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Irvine_(journalist)>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:173_Hours_in_Captivity>",
+        "mode": "bm25",
+        "partition": "p0",
+        "seconds": 0.006946233,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:173_Hours_in_Captivity>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Air_Alg\u00e9rie_Flight_6289>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ibrahim_Fauzee>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:As_the_Crow_Flies_(novel)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Devil's_Guard>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:By_Royal_Command>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Capitol_Air>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mindbend>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Behind_Enemy_Lines_(2001_film)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Crooked_Hinge>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Prefuse_73_Reads_the_Books_E.P.>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Haroun_and_the_Sea_of_Stories>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Aboke_abductions>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gustaw_Herling-Grudzi\u0144ski>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:AN/APQ-174>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ice_(Johnson_novel)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Icehenge>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Captain_Underpants_and_the_Invasion_of_the_Incredibly_Naughty_Cafeteria_Ladies_from_Outer_Space>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Operation_Solomon>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Himalayan_Mountaineering_Institute>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:173_Hours_in_Captivity>",
+        "mode": "ann",
+        "partition": "p0",
+        "seconds": 0.129837816,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Jack_Fuller>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Don_Newman_(broadcaster)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Deyda_Hydara>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fernand_Auberjonois>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Helen_Thomas>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:173_Hours_in_Captivity>",
+        "mode": "excluded_scope",
+        "partition": "p1",
+        "seconds": 0.006434079,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Te_K\u0101ea>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Backyard_Science>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Cynthia_Dale>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Christmas_in_Tattertown>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:UNC-TV>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Saturday-morning_cartoon>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Frank_Morriss>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Paul_Duane>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Aubrey_Dollar>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jay_Sandrich>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Yes_You_Can>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Planet_24>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pam_Ayres>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ian_Hyland>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alex_Ferns>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Emma_Rabbe>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mark_Metcalf>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Media_in_Topeka,_Kansas>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Police_Story_(TV_series)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Charlie_Brooker>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:TRT_Haber>",
+        "mode": "bm25",
+        "partition": "p0",
+        "seconds": 0.010250898,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:TRT_Haber>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:BBC_2W>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Te_K\u0101ea>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Yle>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:China_News_Service>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:KAME-TV>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:KAYU-TV>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:CHCH-DT>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pink_TV_(France)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:RCTV>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:WUAB>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:ITV_Digital_Channels_Ltd>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:International_Islamic_News_Agency>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Khabur_River>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Myx>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tralee_(Parliament_of_Ireland_constituency)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:UNC-TV>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nepal_1>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Irvine_(journalist)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mainichi_Broadcasting_System>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:TRT_Haber>",
+        "mode": "ann",
+        "partition": "p0",
+        "seconds": 0.062576583,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:List_of_programs_broadcast_by_ABC_Television>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:WDTI>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Television_channel>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Newsroom_(Canadian_TV_series)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:American_Dreams>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edgar_Scherick>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:List_of_British_television_series_based_on_American_television_series>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Television_X>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Shake,_Rattle_and_Rock!_(1994_film)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tyler_MacNiven>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Michael_Bukht>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Raising_Dad>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ice_hockey_broadcasting>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chris_Haywood>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Adam_Boland>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:ITV_Digital>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:From_Agnes\u2014With_Love>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Paul_Hartman>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:WMAQ-TV>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:New_Channel>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:TRT_Haber>",
+        "mode": "excluded_scope",
+        "partition": "p1",
+        "seconds": 0.007749739,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:National_Publications>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nathan_Cochrane>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Central_newspapers_of_the_Soviet_Union>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1982_in_literature>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1507_in_literature>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1896_in_literature>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1611_in_literature>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1918_in_literature>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Skrull>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Danny_Baker>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Elvifrance>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Scotland_on_Sunday>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Never_Dream_of_Dying>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:White_Lion_Society>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Florida_Scholastic_Press_Association>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Greg_Fox_(cartoonist)>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+        "mode": "bm25",
+        "partition": "p0",
+        "seconds": 0.009866966,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Il_manifesto>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Scotland_on_Sunday>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Prague_Post>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Washington_Square_News>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:San_Francisco_Chronicle>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Novinar>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Field_Enterprises>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Korea_Herald>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Atlanta_Journal-Constitution>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:National_Publications>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Asbury_Park_Press>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Daily_Cougar>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Central_newspapers_of_the_Soviet_Union>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:El_Siglo_(Argentina)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mabuhay_Gardens>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Standards-compliant>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mark_Cardona>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:When_Saturday_Comes>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nama_(department_store)>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+        "mode": "ann",
+        "partition": "p0",
+        "seconds": 0.053752078,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Thrilling_Publications>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1848_in_literature>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1585_in_literature>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1681_in_literature>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Obscene_Publications_Act_1959>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Joseph_Gurney>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Harry_Benson>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Male_Call>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Heather_Christensen>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:American_Institute_of_Physics>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:The_Standard_(Philippines)>",
+        "mode": "excluded_scope",
+        "partition": "p1",
+        "seconds": 0.008238902,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Somerset_Township,_Somerset_County,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Yoe,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Millersville,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Oneida,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Parker_Township,_Butler_County,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pine_Township,_Crawford_County,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wharton_School_of_the_University_of_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bethel_Township,_Fulton_County,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Homeacre-Lyndora,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:West_Fallowfield_Township,_Crawford_County,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:South_Newton_Township,_Cumberland_County,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:East_Berlin,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Woodbury_Township,_Blair_County,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Silver_Lake_Township,_Susquehanna_County,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Philip_Sousa_Bridge>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Interstate_99>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bradford_County,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Black_Moshannon_Creek>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Progress,_Pennsylvania>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Harry_Clay_Trexler>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Thomas_P._Hughes>",
+        "mode": "bm25",
+        "partition": "p1",
+        "seconds": 0.007876854,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Thomas_P._Hughes>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Richard_Hughes_(writer)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Paul_Hirst>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thomas_Edward_(naturalist)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lester_Thurow>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thomas_Wolstenholme>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Theodore_Postol>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lester_Hogan>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hugh_Critz>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Frank_Thomas_(animator)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:David_Peck_Todd>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thomas_Little_Heath>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Harry_Clay_Trexler>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Peter_C._Fishburn>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Helen_Thomas>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Houston>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thomas_Dolby>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Benjamin_DeMott>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Michael_Les_Benedict>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:James_Hart_Wyld>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Thomas_P._Hughes>",
+        "mode": "ann",
+        "partition": "p1",
+        "seconds": 0.082898979,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Manheim,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hartleton,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Richlandtown,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rouzerville,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Juniata_Township,_Huntingdon_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Landisville,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jefferson_Township,_Berks_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Monroe_Township,_Bradford_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Roulette_Township,_Potter_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Washington_Township,_Schuylkill_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Robeson_Township,_Berks_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Connoquenessing_Township,_Butler_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:West_Mead_Township,_Crawford_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Glen_Osborne,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Allegany_Township,_Potter_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bellwood,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Highland_Township,_Clarion_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Charles_Pettit>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_S._McElroy>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Snyder_County,_Pennsylvania>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Thomas_P._Hughes>",
+        "mode": "excluded_scope",
+        "partition": "p2",
+        "seconds": 0.009350737,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Guyana_Agricultural_and_General_Workers'_Union>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Land_O'Lakes>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Agricultural_Society_Fair_Grounds>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Stanford_Blade>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Neolithic_Revolution>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gary_Paul_Nabhan>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chilham>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Countryfile>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hugh_Critz>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:George_Outlaw>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Keystone_Aircraft>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tammin,_Western_Australia>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Manning_(British_politician)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Maurycy_Klemens_Zamoyski>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lieuvin>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Burrowing_owl>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Donald_F._Jones>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Office_of_Migrant_Education>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Talca>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Denis_O'Donovan>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Office_of_Migrant_Education>",
+        "mode": "bm25",
+        "partition": "p1",
+        "seconds": 0.008829875,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Office_of_Migrant_Education>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Office_of_Global_Programs>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Master_gardener_program>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Public_Health_Emergency_Preparedness>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mount_Edgecumbe_High_School>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Southern_Education_Foundation>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:United_States_Department_of_Justice>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Environmental_Quality_Management>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Otoacoustic_emission>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Department_of_Materials,_University_of_Oxford>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Residential_education>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Memorandum_opinion>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Office_supplies>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:C\u00e9gep_du_Vieux_Montr\u00e9al>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Osteotome>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:E-Rate>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:National_Centers_for_Environmental_Prediction>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Human_resource_management>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Oregon_Trail>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Personal_Finance_Education_Group>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Office_of_Migrant_Education>",
+        "mode": "ann",
+        "partition": "p1",
+        "seconds": 0.051966023,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Crowthorne,_Gauteng>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Czech_University_of_Life_Sciences_Prague>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Beatrice,_Nebraska>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:AgFirst>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Michigan_Farm_Bureau>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Monopoli>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Harris_Ashmead>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:M-72_(Michigan_highway)>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Office_of_Migrant_Education>",
+        "mode": "excluded_scope",
+        "partition": "p2",
+        "seconds": 0.00791509,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Aggregate_pattern>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:WOVI>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wavelength>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Aggregate_pattern>",
+        "mode": "bm25",
+        "partition": "p1",
+        "seconds": 0.007092212,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Aggregate_pattern>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Composite_data_type>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Marker_interface_pattern>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Economies_of_agglomeration>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Particle_statistics>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ancestral_graph>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:List_(abstract_data_type)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Confluence_(abstract_rewriting)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bias_(statistics)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mathematical_morphology>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ground_stone>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Advertising_network>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Purchasing_cooperative>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Saltation_(geology)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Programming_language_theory>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Analysis_paralysis>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Micromechanics>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Adpositional_phrase>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Juice_(aggregator)>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Repast_(modeling_toolkit)>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Aggregate_pattern>",
+        "mode": "ann",
+        "partition": "p1",
+        "seconds": 0.037893449,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Dunnet_(video_game)>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Aggregate_pattern>",
+        "mode": "excluded_scope",
+        "partition": "p2",
+        "seconds": 0.002575492,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Bonilla_observation>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Claremont_serial_murders>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Bonilla_observation>",
+        "mode": "bm25",
+        "partition": "p1",
+        "seconds": 0.00395646,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Bonilla_observation>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Aerial_Phenomena_Research_Organization>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:167_Urda>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Otto_Lilienthal>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:\u014cizumi_Observatory>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Otto_Lesser>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Charles_Fort>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:David_Peck_Todd>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Estevanico>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Agustin_Olvera>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:144_Vibilia>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:NGC_2547>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Abell_1835>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:55_Pandora>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:NGC_2175>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Antonio_F._Coronel>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Land_Without_Bread>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Joseph_Petzval>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Arnoldo_Devonish>",
+            "partition": "p1"
+          },
+          {
+            "key": "dbpedia:<dbpedia:24_Hours_in_Cyberspace>",
+            "partition": "p1"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Bonilla_observation>",
+        "mode": "ann",
+        "partition": "p1",
+        "seconds": 0.043017145,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Bonilla_observation>",
+        "mode": "excluded_scope",
+        "partition": "p2",
+        "seconds": 0.001911928,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Fort_Parramatta>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Canals_in_Nauru>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Driehuizen,_Alkmaar>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ljungby_Municipality>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hackney,_Guyana>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tienhoven,_South_Holland>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:V\u00e6r\u00f8y>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Smithson_(crater)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sersale>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:National_Capital_Region_(Canada)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:City_of_Perth>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jeffrey_St._Clair>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alto_Lucero>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nairobi>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ellewoutsdijk>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Cerro_Negro>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:South_End_Reservoir>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Area_codes_801_and_385>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jonas_Valley>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mocorito>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:South_End_Reservoir>",
+        "mode": "bm25",
+        "partition": "p2",
+        "seconds": 0.008516085,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:South_End_Reservoir>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Stevens_Creek_Reservoir>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Yarrow_Reservoir>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Clarke_Quay>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jerome_Park_Reservoir>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:National_service_in_Singapore>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mandarin_Orchard_Singapore>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Simpson_Falls>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gold_Coast_Broadwater>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kangerlussuaq>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Eunos_MRT_Station>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Hotel_(Singaporean_TV_series)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tenerife-South_Airport>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:CACH>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:South_Station>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fort_Randall_Dam>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:La_Rochelle_\u2013_\u00cele_de_R\u00e9_Airport>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Shades_of_Green_(resort)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rainbow_Springs>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Landport>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:South_End_Reservoir>",
+        "mode": "ann",
+        "partition": "p2",
+        "seconds": 0.078655537,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Barnflair>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:V\u00e4stervik_Municipality>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Blan\u00edk>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Laubach>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Inferior_suprarenal_artery>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Zorgvlied>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rugby_Rural_District>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hamartoma>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gloucester_Tree>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tetecala>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Swan_River,_Manitoba>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dandora>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Self-contained_self-rescue_device>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Renal_capsule>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ortiz,_Gu\u00e1rico>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:SCTV_(Indonesia)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Crabwood_Creek>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Powell's_Books>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dannevirke>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Eddie_Berganza>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:South_End_Reservoir>",
+        "mode": "excluded_scope",
+        "partition": "p3",
+        "seconds": 0.00720011,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Statistical_hypothesis_testing>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Snyder_County,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Abbeville_County,_South_Carolina>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Estherwood,_Louisiana>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ohio,_Illinois>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Goodwater,_Alabama>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Maringouin,_Louisiana>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bellwood,_Pennsylvania>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bena,_Minnesota>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wrightsville,_Arkansas>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Keyser,_West_Virginia>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Henderson,_Louisiana>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bowdoinham,_Maine>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Clinton,_Louisiana>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Orchard_Homes,_Montana>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Text_mining>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Amstelhoek>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Driehuizen,_Alkmaar>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wayne_County,_North_Carolina>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Encantada-Ranchito-El_Calaboz,_Texas>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Statistical_hypothesis_testing>",
+        "mode": "bm25",
+        "partition": "p2",
+        "seconds": 0.008150402,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Statistical_hypothesis_testing>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Falsifiability>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Point_estimation>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Model_selection>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tolman_surface_brightness_test>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ultrasonic_testing>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Average>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Variational_Bayesian_methods>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Clinical_endpoint>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ceiling_effect_(statistics)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thematic_Apperception_Test>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Potentiostat>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Heterarchy>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Syntype>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sales_tax>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Model_building_(particle_physics)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fundamental_theorem_of_poker>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Finite_state_transducer>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Positive_feedback>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Political_communications>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Statistical_hypothesis_testing>",
+        "mode": "ann",
+        "partition": "p2",
+        "seconds": 0.05575772,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Canton,_Illinois>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Cedarville,_New_Jersey>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ector_County,_Texas>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Merryville,_Louisiana>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Louisburg,_Missouri>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alston,_Georgia>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ash_Grove,_Missouri>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Williamsburg,_Pennsylvania>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fairlawn,_Ohio>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Los_Chaves,_New_Mexico>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Minatare,_Nebraska>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jos\u00e9_Fernando_Ferreira_Mendes>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Elwood,_Kansas>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Paul_Ehrenfest>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Barnflair>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Entiat,_Washington>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kandiyohi_County,_Minnesota>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Black,_Alabama>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Franklin,_Iowa>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wilkes_County,_North_Carolina>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Statistical_hypothesis_testing>",
+        "mode": "excluded_scope",
+        "partition": "p3",
+        "seconds": 0.00813741,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Cambridge_Movement>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Progressive_Conservative_Party_of_Ontario_candidates,_1990_Ontario_provincial_election>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Horace_Farquhar,_1st_Earl_Farquhar>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Norman_Macfarlane,_Baron_Macfarlane_of_Bearsden>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:David_Davies_(Welsh_politician)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Baron_Geddes>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Robustness_principle>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sammarinese_National_Alliance>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Robert_Coates_(politician)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Alexander_Mathieson>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Herman_Scheel>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Art_Hanger>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Viscount_Ingleby>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:George_Rous,_3rd_Earl_of_Stradbroke>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Cronin_(convict)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Hay_(Henley_MP)>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Horace_Farquhar,_1st_Earl_Farquhar>",
+        "mode": "bm25",
+        "partition": "p2",
+        "seconds": 0.008721567,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Horace_Farquhar,_1st_Earl_Farquhar>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:George_Rous,_3rd_Earl_of_Stradbroke>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Norman_Macfarlane,_Baron_Macfarlane_of_Bearsden>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Neville,_1st_Earl_of_Kent>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:George_Ramsay,_12th_Earl_of_Dalhousie>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Baron_Playfair>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Hay_(Henley_MP)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:George_Legge,_1st_Baron_Dartmouth>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Baron_Bridges>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thomas_Dundas,_2nd_Earl_of_Zetland>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rowland_FitzEustace,_1st_Baron_Portlester>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lord_Edward_Somerset>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Douglas,_1st_Duke_of_Queensberry>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Knatchbull,_7th_Baron_Brabourne>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Earl_of_Strafford>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edward_Scudamore-Stanhope,_12th_Earl_of_Chesterfield>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Frederick_Hayday>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Charles_Gordon-Lennox,_Earl_of_March_and_Kinrara>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fitzherbert_Marriott>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Walter_Frederick_Ferrier>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Horace_Farquhar,_1st_Earl_Farquhar>",
+        "mode": "ann",
+        "partition": "p2",
+        "seconds": 0.044540288,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Association_of_Conservative_Clubs>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Neil_Gillman>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Frank_Taylor_(British_politician)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_MacKay,_Baron_MacKay_of_Ardbrecknish>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tunbridge_Wells_(UK_Parliament_constituency)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_E._Kaufman>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Epping_Forest_(UK_Parliament_constituency)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Roy_Brassard>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Cummins_(Canadian_politician)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Graham_Riddick>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:North_Texas_Baptist_Association>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Robert_Banks_(politician)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brian_Sussman>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jean_Casselman_Wadds>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Andr\u00e9_Bachand_(Progressive_Conservative_MP)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wellington_Willoughby>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:David_Cecil,_6th_Marquess_of_Exeter>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Baron_Allerton>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Victor_Amadeus_III_of_Sardinia>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Interlingua_grammar>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Horace_Farquhar,_1st_Earl_Farquhar>",
+        "mode": "excluded_scope",
+        "partition": "p3",
+        "seconds": 0.009132429,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Christine_Estabrook>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sault_College>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Betty_Bolton>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Waterloo_Tunnel>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sabbath_(Doctor_Who)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_John_Hamilton>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Christine_Estabrook>",
+        "mode": "bm25",
+        "partition": "p2",
+        "seconds": 0.00575417,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Christine_Estabrook>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Swoosie_Kurtz>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Calista_Flockhart>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Matt_Cede\u00f1o>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Next_(Desperate_Housewives)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jane_Wymark>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chyler_Leigh>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nicole_Sullivan>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alexis_Davis>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Maria_Vacratsis>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brittany_Daniel>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mary_Elizabeth_Winstead>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Harry_Crews>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Susan_Cummings_(actress)>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Joely_Fisher>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Miriam_Flynn>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kendra_Kassebaum>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Julia_Deakin>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Heather_Menzies>",
+            "partition": "p2"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Paul_Bradley_(British_actor)>",
+            "partition": "p2"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Christine_Estabrook>",
+        "mode": "ann",
+        "partition": "p2",
+        "seconds": 0.038880966,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Morgenstern_(band)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:James_Bond_(comics)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Columbia_Encyclopedia>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Federalist_No._63>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Red_River_of_the_North>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:United_States_Navy_Working_Capital_Fund>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Christine_Estabrook>",
+        "mode": "excluded_scope",
+        "partition": "p3",
+        "seconds": 0.00697251,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Carlos_Alfredo_Magari\u00f1os>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:October_Films>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:October_Films>",
+        "mode": "bm25",
+        "partition": "p3",
+        "seconds": 0.003582848,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:October_Films>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Castle_Films>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Filmnight.com>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jeremy_Thomas>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Amblimation>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Apple_Corps>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Dear>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:MGM_Worldwide_Television>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Foxes_(film)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Society_of_Texas_Film_Critics_Awards_1997>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kyle_Cooper>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Canadian_Film_Institute>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bollywood/Hollywood>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:2000_New_York_Film_Critics_Circle_Awards>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lee_National_Denim_Day>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Oceans_of_the_Mind>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Aberration_(film)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Time_Bomb_Recordings>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:18th_Independent_Spirit_Awards>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Autographic_film>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:October_Films>",
+        "mode": "ann",
+        "partition": "p3",
+        "seconds": 0.076695231,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [],
+        "key": "dbpedia:<dbpedia:October_Films>",
+        "mode": "excluded_scope",
+        "partition": "p4",
+        "seconds": 0.002088804,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:NCAA_Skiing_Championships>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:International_Boxing_Association_(professional_body)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:2005_Wimbledon_Championships>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Marina_Andrievskaya>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Running_with_the_Buffaloes>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Henry_Burris>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:World_Scrabble_Championship>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Yao_Bin>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Roland_Dalh\u00e4user>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bj\u00f8rn_Wirkola>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ice_hockey_at_the_1924_Winter_Olympics>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Paolo_Bettini>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Norman_Smiley>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Greg_Herbold>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Cyclomania>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lisa_Misipeka>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Anne_Audain>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wigan_Warriors>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:News_(band)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vicente_Rodr\u00edguez>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Paolo_Bettini>",
+        "mode": "bm25",
+        "partition": "p3",
+        "seconds": 0.006811849,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Paolo_Bettini>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Arnaldo_Pambianco>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gianni_Rivera>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gianni_Morbidelli>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Marco_Pascolo>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Glenn_Michibata>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pietro_Romanelli>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Italy_national_football_team>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Diego_Benaglio>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:250_Bettina>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Raffaele_Cadorna>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Greg_Herbold>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ricardo_La_Volpe>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gianfranco_Fini>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Francisco_Lima>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bob_Haro>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Armando_Dionisi>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bekzat_Sattarkhanov>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Yao_Bin>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Yandro_Quintana>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Paolo_Bettini>",
+        "mode": "ann",
+        "partition": "p3",
+        "seconds": 0.043815921,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:2004_European_Aquatics_Championships>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fi\u021ba_Lovin>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:S\u00e9bastien_Tortelli>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Oksana_Omelianchik>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Markus_P\u00f6yh\u00f6nen>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Roland_Linz>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tobias_Angerer>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Cornelia_Oschkenat>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Joe_Castiglione_(athletic_director)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jamie_Aube>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jarmila_Kratochv\u00edlov\u00e1>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:United_Kingdom_national_football_team>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Johan_Botha_(athlete)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Antonel_Borsan>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:100_metres>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tonya_Verbeek>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chris_Osgood>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Constantin_G\u00e2lc\u0103>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Anna_Stanley>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Paolo_Bettini>",
+        "mode": "excluded_scope",
+        "partition": "p4",
+        "seconds": 0.00894872,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+        "mode": "bm25",
+        "partition": "p3",
+        "seconds": 0.003421318,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Racon>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Parallelepiped>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Moon_dog>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Formant>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Preamplifier>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Compass_(drawing_tool)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Attenuator_(electronics)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Portal_frame>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:RIM-8_Talos>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Active_listening>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Broadseam>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Beltrami\u2013Klein_model>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Curvature_form>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Poggendorff_illusion>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brodmann_area_49>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Spiral_(railway)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:SCR-584_radar>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Picocell>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alexander's_band>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+        "mode": "ann",
+        "partition": "p3",
+        "seconds": 0.038636009,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Parabolic_reflector>",
+        "mode": "excluded_scope",
+        "partition": "p4",
+        "seconds": 0.001996112,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Raymond,_Alberta>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:August_Penguin>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Wilson_Morgan>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Victor_Mishcon,_Baron_Mishcon>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Canada_men's_national_soccer_team>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:August_Penguin>",
+        "mode": "bm25",
+        "partition": "p3",
+        "seconds": 0.007119121,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:August_Penguin>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:DebConf>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Asian_Pacific_Mathematics_Olympiad>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Unity_Gazette>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Toucan_Prize>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:LinuxQuestions.org>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:APIIT>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Augathella>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Glk_(software)>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hardened_Gentoo>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brewster_Kahle>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lime-speck_pug>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:David_Aaronovitch>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Iago_sparrow>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Earthcore>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gustav_Bergmann>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Project_Madurai>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Andhra_Pradesh_Federation_of_Trade_Unions>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:ANALOG_Computing>",
+            "partition": "p3"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Singapore_2006>",
+            "partition": "p3"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:August_Penguin>",
+        "mode": "ann",
+        "partition": "p3",
+        "seconds": 0.03458068,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:4th_Critics'_Choice_Awards>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:August_Penguin>",
+        "mode": "excluded_scope",
+        "partition": "p4",
+        "seconds": 0.003064315,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:James_Crawford_(basketball)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Disney_Sports_Basketball>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:List_of_Olympic_medalists_in_basketball>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nenad_Markovi\u0107>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Borislav_Stankovi\u0107>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Slavko_Vrane\u0161>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Michael_Bradley_(basketball)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Darrell_Armstrong>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jerry_Stackhouse>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Las_Vegas_Rattlers>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:State_Farm_Center>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vonda_Ward>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Center_(basketball)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rick_Mahorn>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Berry_Events_Center>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Colin_Falls>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Richard_DeVos>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Vonda_Ward>",
+        "mode": "bm25",
+        "partition": "p4",
+        "seconds": 0.009542907,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Vonda_Ward>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tonya_Verbeek>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Francine_Fournier>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Heather_McKay>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kenard_Lang>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Cornelia_Oschkenat>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Michelle_Burke>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Stephanie_Wilson>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vance_Air_Force_Base>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nicolle_Payne>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Angelita_Lind>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Carlos_Monz\u00f3n>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Borislav_Stankovi\u0107>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Anna_Stanley>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Godina>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:James_Crawford_(basketball)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vic_McGlynn>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Steve_Sundra>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jennifer_Lyn_Jackson>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Velvalee_Dickinson>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Vonda_Ward>",
+        "mode": "ann",
+        "partition": "p4",
+        "seconds": 0.09264188,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Ukrainian_Basketball_SuperLeague>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Taj_Gray>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tim_Legler>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Othella_Harrington>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bankers_Life_Fieldhouse>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nate_Robinson>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Elvin_Hayes>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Terence_Morris>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mikki_Moore>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Deanna_Nolan>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Igor_Rako\u010devi\u0107>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dick_Snyder>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Samaki_Walker>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Joe_Smith_(basketball)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mediolanum_Forum>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Slam_Dunk_Contest>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:North_Dakota_State_Bison_men's_basketball>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sandefjord_TIF>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Trask_Coliseum>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Amanda_Levens>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Vonda_Ward>",
+        "mode": "excluded_scope",
+        "partition": "p5",
+        "seconds": 0.008536148,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Demographics_of_American_Samoa>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Genotype_frequency>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Grantville,_Georgia>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Adrian,_Texas>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tokoname>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Oak_Ridges\u2014Markham>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Coalescent_theory>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Medijana>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Milford,_Decatur_County,_Indiana>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fixation_index>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ticuantepe>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Stephen,_Minnesota>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lehigh,_Oklahoma>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Silas,_Alabama>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brownville,_Nebraska>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alderson,_Oklahoma>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thurston,_Ohio>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Freeman,_Missouri>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sesser,_Illinois>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Conneautville,_Pennsylvania>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Beni_Mellal>",
+        "mode": "bm25",
+        "partition": "p4",
+        "seconds": 0.008757477,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Beni_Mellal>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mohamed_Mrabet>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mislinja_(settlement)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Meckenheim>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Viljandi>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Marcilla>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:M\u00e2nz\u0103le\u0219ti>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Milwaukee>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mosbach>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bhind_district>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Halle,_Belgium>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lebamba>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Misilmeri>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fort_Bidwell,_California>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chitila>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Emlichheim>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mullaloo,_Western_Australia>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lammi>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Milltown,_County_Kerry>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Limmen>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Beni_Mellal>",
+        "mode": "ann",
+        "partition": "p4",
+        "seconds": 0.048111239,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Westerlo>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Population_viability_analysis>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Islam_in_Chile>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lena,_Mississippi>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kashimadai,_Miyagi>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tunga,_Leyte>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ham,_Belgium>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Delmar,_Maryland>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Shirakawa,_Fukushima>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Shizugawa,_Miyagi>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Baker-Brook,_New_Brunswick>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gulzar-e-Hijri>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Clutier,_Iowa>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Maysville,_Iowa>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Melbourne,_Iowa>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Felicity,_Ohio>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jackman,_Maine>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Skanawan,_Wisconsin>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Henderson,_Nebraska>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Saxton,_Pennsylvania>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Beni_Mellal>",
+        "mode": "excluded_scope",
+        "partition": "p5",
+        "seconds": 0.008367054,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Throttlebots>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Floro_Dery>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Floro_Dery>",
+        "mode": "bm25",
+        "partition": "p4",
+        "seconds": 0.006731707,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Floro_Dery>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Angelo_Torres>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Floyd_Gottfredson>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Miel_Prudencio_Ma>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Irvin_Yeaworth>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Carmine_Infantino>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Maguro_Fujita>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Frank_Evers_(cartoonist)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Throttlebots>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dale_Frank>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rob_Paulsen>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Carroll_Cloar>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Avon>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Don_Freed>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Martin_Baynton>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Willard_Van_Dyke>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:SMS_(illustrator)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mickey_Moore>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gerard_Tsutakawa>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Frederick_William_Fairholt>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Floro_Dery>",
+        "mode": "ann",
+        "partition": "p4",
+        "seconds": 0.046132044,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Runamuck>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Optimus_Primal>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Floro_Dery>",
+        "mode": "excluded_scope",
+        "partition": "p5",
+        "seconds": 0.00723195,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Arrondissement_of_Eeklo>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Arrondissements_of_the_Loire_department>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Arrondissement_of_Eeklo>",
+        "mode": "bm25",
+        "partition": "p4",
+        "seconds": 0.003653958,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Arrondissement_of_Eeklo>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Arrondissements_of_the_Loire_department>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Halle,_Belgium>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vogelwaarde>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Orbe_District>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kootenay_East>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Avil\u00e9s_(comarca)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gembloux_Abbey>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Saint_Louis,_Seychelles>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ellertshaar>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:\u00c5land_(electoral_district)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bourg-Achard>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Eaubonne>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Saarbr\u00fccken_(district)>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Electoral_district_of_Adelaide>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:East_Hampshire>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alnwick_District>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Franschhoek>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:\u00c9vry,_Essonne>",
+            "partition": "p4"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dokki>",
+            "partition": "p4"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Arrondissement_of_Eeklo>",
+        "mode": "ann",
+        "partition": "p4",
+        "seconds": 0.042615906,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Arrondissement_of_Eeklo>",
+        "mode": "excluded_scope",
+        "partition": "p5",
+        "seconds": 0.001847539,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Wenceslaus_III_of_Bohemia>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Strachkvas>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Wenceslaus_III_of_Bohemia>",
+        "mode": "bm25",
+        "partition": "p5",
+        "seconds": 0.003004164,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Wenceslaus_III_of_Bohemia>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Strachkvas>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vsevolod_II_of_Kiev>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_III_of_Trebizond>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Duke_of_Masovia>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Archduke_Carl_Ludwig_of_Austria_(1918\u20132007)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Yolande_of_Dreux,_Queen_of_Scotland>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jarom\u00edr_(Bishop_of_Prague)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:List_of_monarchs_of_Wessex>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Aleksander_Koniecpolski_(1555\u20131609)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:History_of_Poland_(1795\u20131918)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_I,_Count_of_Boulogne>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Polish_Golden_Age>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Radla>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Constantine_II,_King_of_Armenia>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Olafr_Godredsson>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ordo\u00f1o_III_of_Le\u00f3n>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Eadgyth>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Olga_Nikolaevna_of_Russia>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vil\u00e9m_Tausk\u00fd>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Wenceslaus_III_of_Bohemia>",
+        "mode": "ann",
+        "partition": "p5",
+        "seconds": 0.079311344,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Wenceslaus_III_of_Bohemia>",
+        "mode": "excluded_scope",
+        "partition": "p6",
+        "seconds": 0.0024559,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Adjournment_sine_die>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Adjournment_sine_die>",
+        "mode": "bm25",
+        "partition": "p5",
+        "seconds": 0.002643185,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Adjournment_sine_die>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Cadit_quaestio>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Liberal_Assembly>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Res_inter_alios_acta>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Day_Out_of_Days>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Deipnosophistae>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Legislative_Consent_Motion>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Susso>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:SIDPERS>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:So_Long,_and_Thanks_for_All_the_Fish>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:System_identifier>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Infix>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Act_on_petition>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dictionary_of_American_English>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Schweizerische_Industrie_Gesellschaft>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Symbiosism>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Stalemate>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sleeping_Dogs_Don't_Lay>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Summer_vacation>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Direct_digital_synthesizer>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Adjournment_sine_die>",
+        "mode": "ann",
+        "partition": "p5",
+        "seconds": 0.055248018,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Adjournment_sine_die>",
+        "mode": "excluded_scope",
+        "partition": "p6",
+        "seconds": 0.003056674,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:1910_Eastern_Suburbs_season>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1997_Denver_Broncos_season>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wood_putty>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thomas_Holenstein>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brandon_Erwin>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:1997_Denver_Broncos_season>",
+        "mode": "bm25",
+        "partition": "p5",
+        "seconds": 0.00714457,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:1997_Denver_Broncos_season>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1967_NFL_playoffs>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:American_Music_Awards_of_1997>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1992_World_Series>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Richmond_Webb>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1977_in_association_football>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1979_NBA_Finals>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1677>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:2006_Danish_Cup_Final>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:SummerSlam_(1995)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:2007_in_association_football>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Shaun_Berrigan>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1996_AFC_Asian_Cup>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Philadelphia/Baltimore_Stars>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kori_Dickerson>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1965\u201366_in_Scottish_football>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chorley_Borough_Council_election,_1998>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1974_World_Rally_Championship_season>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Roy_Green>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Luxembourg_at_the_1992_Summer_Olympics>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:1997_Denver_Broncos_season>",
+        "mode": "ann",
+        "partition": "p5",
+        "seconds": 0.042274261,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Elwen_Rowlands>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Social_Democratic_Party_(El_Salvador)>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bertil_Lindblad>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Barch>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Henry_Kimbro>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Aivaras_Bal\u017eekas>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:1997_Denver_Broncos_season>",
+        "mode": "excluded_scope",
+        "partition": "p6",
+        "seconds": 0.005835578,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Mobile_BayBears>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Mobile_BayBears>",
+        "mode": "bm25",
+        "partition": "p5",
+        "seconds": 0.002989722,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Mobile_BayBears>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lexington_Legends>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:United_States_Navy_Baseball>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Eastern_Shore_(Alabama)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Daniel_S._Frawley_Stadium>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hammond_Stadium>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Birmingham_News>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Eduardo_Vasconcelos_Stadium>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brian_Harper>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Albuquerque_Biological_Park>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dodger_Stadium>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:New_England_Collegiate_Baseball_League>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Philadelphia/Baltimore_Stars>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Connecticut_Yankees_(soccer)>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sher-e-Bangla_National_Cricket_Stadium>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Siege_of_Fort_Morgan>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bip_Roberts>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Albertville_City_Schools>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Western_International_League>",
+            "partition": "p5"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Damion_Easley>",
+            "partition": "p5"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Mobile_BayBears>",
+        "mode": "ann",
+        "partition": "p5",
+        "seconds": 0.041057331,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Claudio_Vargas>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Mobile_BayBears>",
+        "mode": "excluded_scope",
+        "partition": "p6",
+        "seconds": 0.002031481,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Security_agency>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Internal_Security_Organisation>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Stormontgate>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Manisha>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Service_de_Documentation_Ext\u00e9rieure_et_de_Contre-Espionnage>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bluespace>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:James_Robertson_(monk)>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Beauty_pageant>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Anne-Sofie_\u00d8stvedt>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nous>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edwin_P._Wilson>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Edwin_P._Wilson>",
+        "mode": "bm25",
+        "partition": "p6",
+        "seconds": 0.007348544,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Edwin_P._Wilson>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edwin_E._Willis>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ephraim_King_Wilson_II>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edwin_Anderson,_Jr.>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Waldo_A._Evans>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Willard_Wheatley>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edward_William_Nelson>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Robert_Baltovich>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Willock_Noble>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Frank_Lovell>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Andy_Coulson>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_E._Connolly>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Richard_Wilson,_Baron_Wilson_of_Dinton>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Executive_Outcomes>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bob_Coulson>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Solomon_Wren>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Theodore_Freeman>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:United_States_Ambassador_to_Iraq>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Martin_Clemens>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gideon_Orkar>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Edwin_P._Wilson>",
+        "mode": "ann",
+        "partition": "p6",
+        "seconds": 0.080552432,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Intelligence_services_of_the_Philippines>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Colby>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Direction_centrale_des_renseignements_g\u00e9n\u00e9raux>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Internet_Haganah>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Said_Amir_Jan>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Raj_Reddy>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Simon_Oates>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Covert_operation>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:RAD750>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:SAPgui>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Philip_Robins>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Isabella_of_France>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Edwin_P._Wilson>",
+        "mode": "excluded_scope",
+        "partition": "p7",
+        "seconds": 0.009964095,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Puerto_Rico_de_Gran_Canaria>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:High-speed_steel>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:High-speed_steel>",
+        "mode": "bm25",
+        "partition": "p6",
+        "seconds": 0.008054621,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:High-speed_steel>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hi_Performance_FileSystem>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hessian_(Web_service_protocol)>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:SAE_steel_grades>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Burr_(cutter)>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fire_hardening>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Steelmaking>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sikorsky_H-5>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Straightedge>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:G-code>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Filler_metal>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wellington_Heights_Secondary_School>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hatesphere>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hans_Sachs_(serologist)>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hydraulic_fluid>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Supersonic_speed>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hyperventilation_syndrome>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:List_of_countries_by_steel_production>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Voiceless_pharyngeal_fricative>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Useful_art>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:High-speed_steel>",
+        "mode": "ann",
+        "partition": "p6",
+        "seconds": 0.05954445,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [],
+        "key": "dbpedia:<dbpedia:High-speed_steel>",
+        "mode": "excluded_scope",
+        "partition": "p7",
+        "seconds": 0.002432935,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Vitelline_membrane>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Vitelline_membrane>",
+        "mode": "bm25",
+        "partition": "p6",
+        "seconds": 0.003676244,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Vitelline_membrane>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dermal_bone>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Factor_V>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:VRAM>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Milt>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Virum>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Iliac_fascia>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Spindle_neuron>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tripeptide>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Inferior_ophthalmic_vein>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lymphocystis>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Trichome>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Veraison>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Cyamelide>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Somitogenesis>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gevil>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Evolute>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chemise>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chenille_fabric>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vermilion>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Vitelline_membrane>",
+        "mode": "ann",
+        "partition": "p6",
+        "seconds": 0.042300944,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Muscarinic_acetylcholine_receptor>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Arginine_vasopressin_receptor_2>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Flunisolide>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Vitelline_membrane>",
+        "mode": "excluded_scope",
+        "partition": "p7",
+        "seconds": 0.007633305,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:The_80s:_A_Look_Back_at_the_Tumultuous_Decade_1980-1989>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Psychosocial_hypothesis>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:The_80s:_A_Look_Back_at_the_Tumultuous_Decade_1980-1989>",
+        "mode": "bm25",
+        "partition": "p6",
+        "seconds": 0.003205279,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:The_80s:_A_Look_Back_at_the_Tumultuous_Decade_1980-1989>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Extremism_in_America>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:1986_in_literature>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Devo's_Greatest_Hits>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Who_Put_the_Bomp>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Meng_and_Ecker>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nationalism_and_Ethnic_Conflict_(Current_Controversies)>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rock_n'_Roll_Nights>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Le_Livre_noir_du_Canada_anglais>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Weird_Science_(comics)>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:National_Football_League_1990s_All-Decade_Team>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Third_World_War:_The_Untold_Story>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_David_Letterman_Show>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chuck_Klosterman>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Book_of_Skulls>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Michael_ffolkes>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Time's_Up_(Living_Colour_album)>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Drastic_Measures>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pop_Quiz>",
+            "partition": "p6"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Run_Like_an_Antelope_(book)>",
+            "partition": "p6"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:The_80s:_A_Look_Back_at_the_Tumultuous_Decade_1980-1989>",
+        "mode": "ann",
+        "partition": "p6",
+        "seconds": 0.029936734,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:The_Blind_Watchmaker_(album)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brunching_Shuttlecocks>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:The_80s:_A_Look_Back_at_the_Tumultuous_Decade_1980-1989>",
+        "mode": "excluded_scope",
+        "partition": "p7",
+        "seconds": 0.00348362,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Patricide>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Patricide>",
+        "mode": "bm25",
+        "partition": "p7",
+        "seconds": 0.003639759,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Patricide>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Perdiccas_(general)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Peripatric_speciation>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Abbot>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sins_of_the_Father_(Buffy_novel)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Death_on_Credit>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Affix>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chlorfenapyr>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Patriarchal_blessing>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Antiseptic>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pani>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pannier>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kinship>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Prostitution_of_children>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rachel_Hudson>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Murder_of_JonBen\u00e9t_Ramsey>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Macaire>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Passalidae>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sedan_(automobile)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Paremiology>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Patricide>",
+        "mode": "ann",
+        "partition": "p7",
+        "seconds": 0.081933404,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [],
+        "key": "dbpedia:<dbpedia:Patricide>",
+        "mode": "excluded_scope",
+        "partition": "p0",
+        "seconds": 0.003313072,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Carrickfergus_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thomas_Jefferson_Campbell>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pavol_Bla\u017eek>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Susan_Knowles>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bromley_and_Chislehurst_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Prince_Edward\u2014Hastings>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tottenham_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Battersea_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alta_Vista_Ward>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Greenwich_and_Lewisham_(London_Assembly_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Normanton,_Pontefract_and_Castleford_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Northavon_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Worthing_West_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Wynne_Bradburn>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:FASTA_format>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:California's_3rd_congressional_district>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:List_of_Members_of_Parliament_for_Wolverhampton>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Darlington_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:East_Galway_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Enniskillen_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Prince_Edward\u2014Hastings>",
+        "mode": "bm25",
+        "partition": "p7",
+        "seconds": 0.009119889,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Prince_Edward\u2014Hastings>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Victoria_(Ontario_electoral_district)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edwards,_Ontario>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edmonton_(electoral_district)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Grey\u2014Simcoe>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Humber_East>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:House_of_Commons>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brant_South>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Edward_Blake>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Division_of_Port_Adelaide>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Thomas_Hodgins>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:East_Galway_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Worthing_West_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Electoral_district_of_Capel>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Buckinghamshire_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ed_Helwer>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Canadian_Efficiency_Decoration>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tim_Hudak>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Normanton,_Pontefract_and_Castleford_(UK_Parliament_constituency)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Evansburg,_Alberta>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Prince_Edward\u2014Hastings>",
+        "mode": "ann",
+        "partition": "p7",
+        "seconds": 0.036487367,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Tralee_(Parliament_of_Ireland_constituency)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Cochrane>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Oakville_(electoral_district)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Brantford_City>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:The_Wrekin_(UK_Parliament_constituency)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Waterloo_North>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Croydon_North_(UK_Parliament_constituency)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bipolar_violation>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:List_of_American_Solheim_Cup_golfers>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Compton_(electoral_district)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vanessa_Guzm\u00e1n>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Dennis_DeConcini>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bolsover_(UK_Parliament_constituency)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sestre_(drag_act)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fellowship_of_Isis>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Alexander_Morozevich>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Connected_space>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Basingstoke_(UK_Parliament_constituency)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jannie_de_Beer>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Myles-Mills>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Prince_Edward\u2014Hastings>",
+        "mode": "excluded_scope",
+        "partition": "p0",
+        "seconds": 0.009666348,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Professional_Footballers'_Association>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Morgan_Wade>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Pacific_League>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Eddie_Guerrero>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chris_Elliot>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Henry_Akinwande>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Arron_Oberholser>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Milo\u0161_Pavlovi\u0107_(racing_driver)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:ECWA_Mid_Atlantic_Championship>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Necro_Butcher>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Lu\u00eds_Manuel_Ferreira_Delgado>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Western_A.F.C.>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Donie_Bush>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rosey_Grier>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:International_Association_for_Computing_and_Philosophy>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Nolan_Schaefer>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Joy_Coghill>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ram\u00f3n_Sota>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Paulie_Malignaggi>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Frenchy_Martin>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Bill_Johnson_(center)>",
+        "mode": "bm25",
+        "partition": "p7",
+        "seconds": 0.008338089,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Bill_Johnson_(center)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Earl_Wilson_(baseball)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Joe_Weatherly>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Gilbert_Brown>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Eric_Tindill>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Fenton_Johnson>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:B._S._Johnson>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bob_Taylor_(footballer)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Steve_Nelson_(American_football)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bob_Hill>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Charles_Foster_Johnson>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_Sillett>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Walter_Iooss>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Hall_Johnson>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bill_Brady_(politician)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:George_John_Bell>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Donie_Bush>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Darrin_Nelson>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:John_William_Bailey>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Berrian_Vail>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Bill_Johnson_(center)>",
+        "mode": "ann",
+        "partition": "p7",
+        "seconds": 0.030378139,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Chad_Fortune>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Li_Zhe_(Go_player)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Juha_Helppi>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bates_Battaglia>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Josh_Davis_(basketball,_born_1980)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Marcel_Desailly>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Velimir_Perasovi\u0107>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Magnum_T.A.>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jack_Doan>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Bartholomew_Ogbeche>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ryan_Potulny>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Clint_Bizzell>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Damien_Duff>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:World_Boxing_Association>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Viveca_Lindfors>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mosaic_notation_program>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Boris_Mironov>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:China_Open_(snooker)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Mark_Cardona>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sebastian_Deisler>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Bill_Johnson_(center)>",
+        "mode": "excluded_scope",
+        "partition": "p0",
+        "seconds": 0.006289186,
+        "self_at_20": false
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Monika_Niederst\u00e4tter>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Texaco_Cup>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Vienna_Cup_(association_football)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:NCAA_Women's_Tennis_Championship>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Katherine_Jenkins>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Katherine_Jenkins>",
+        "mode": "bm25",
+        "partition": "p7",
+        "seconds": 0.006727545,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": 1.0,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Katherine_Jenkins>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kathryn_Grayson>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Elena_Kats-Chernin>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Katharine_Schlesinger>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kathy_Lloyd>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Kimberley_Locke>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Geoffrey_Tozer>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Chlo\u00eb_Agnew>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Simon_Estes>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Owen_Jones_(architect)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Virginia_McKenna>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ken_Howard_(artist)>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Katie_Leung>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Joe_Longthorne>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Jo_Kendall>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Ensemble_Vocal_Katimavik>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Sarah-Jane_Hutt>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Adiemus_III:_Dances_of_Time>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:William_Alwyn>",
+            "partition": "p7"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Andrij_Dobriansky>",
+            "partition": "p7"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Katherine_Jenkins>",
+        "mode": "ann",
+        "partition": "p7",
+        "seconds": 0.03163765,
+        "self_at_20": true
+      },
+      {
+        "ann_recall_at_20": null,
+        "hits": [
+          {
+            "key": "dbpedia:<dbpedia:Rugby_league_in_Tonga>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Strongman_(strength_athlete)>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Rebekah_Colberg>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Khachatur_Avetisyan>",
+            "partition": "p0"
+          },
+          {
+            "key": "dbpedia:<dbpedia:Tipperary_GAA>",
+            "partition": "p0"
+          }
+        ],
+        "key": "dbpedia:<dbpedia:Katherine_Jenkins>",
+        "mode": "excluded_scope",
+        "partition": "p0",
+        "seconds": 0.005843716,
+        "self_at_20": false
+      }
+    ],
+    "seconds": 2.284098745,
+    "source_sha256": "5d28ca68dc34d108d9887c6306eafe7182ac50e9222ca3a44acdc39b0656641a"
+  }
+}

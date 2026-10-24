@@ -1,0 +1,377 @@
+{
+  "archive_bytes": 860605,
+  "archive_files": 321,
+  "archive_sha256": "277727f8d9a66897b3bf2c9479d65b8f2476112536c4691f639816535d08c0cb",
+  "artifacts_verified": true,
+  "binary_sha256": "d25f0176bf46db9358d166c3fdb67e308b1a3a1b712c53f578d25c76bb4bfd17",
+  "cgroup_peak_bytes": 671350784,
+  "completed_controller_reuse": "unchanged state and no native execution; disposable controller binary then retired",
+  "disk": {
+    "after": {
+      "allocated_bytes": 131838787584,
+      "allocation_note": "inode st_blocks is not exclusive Btrfs allocation; filesystem free includes concurrent host activity",
+      "components": {
+        "authority": {
+          "allocated_bytes": 37948919808,
+          "files": 2401,
+          "logical_bytes": 37943171880
+        },
+        "derived/g1_text.lance/_indices": {
+          "allocated_bytes": 9366941696,
+          "files": 1337,
+          "logical_bytes": 9364150922
+        },
+        "derived/g1_text.lance/_transactions": {
+          "allocated_bytes": 20582400,
+          "files": 5016,
+          "logical_bytes": 1180323
+        },
+        "derived/g1_text.lance/_versions": {
+          "allocated_bytes": 1124401152,
+          "files": 5017,
+          "logical_bytes": 1114102707
+        },
+        "derived/g1_text.lance/data": {
+          "allocated_bytes": 22953631744,
+          "files": 5014,
+          "logical_bytes": 22943198512
+        },
+        "derived/g1_vector.lance/_indices": {
+          "allocated_bytes": 8847781888,
+          "files": 5,
+          "logical_bytes": 8847773812
+        },
+        "derived/g1_vector.lance/_transactions": {
+          "allocated_bytes": 8089600,
+          "files": 1975,
+          "logical_bytes": 448008
+        },
+        "derived/g1_vector.lance/_versions": {
+          "allocated_bytes": 178429952,
+          "files": 1976,
+          "logical_bytes": 174398784
+        },
+        "derived/g1_vector.lance/data": {
+          "allocated_bytes": 6156038144,
+          "files": 1973,
+          "logical_bytes": 6151990572
+        },
+        "derived/g2_delta_text.lance/_indices": {
+          "allocated_bytes": 1253376,
+          "files": 8,
+          "logical_bytes": 1235173
+        },
+        "derived/g2_delta_text.lance/_transactions": {
+          "allocated_bytes": 4096,
+          "files": 1,
+          "logical_bytes": 682
+        },
+        "derived/g2_delta_text.lance/_versions": {
+          "allocated_bytes": 1314816,
+          "files": 2,
+          "logical_bytes": 1307077
+        },
+        "derived/g2_delta_text.lance/data": {
+          "allocated_bytes": 230486016,
+          "files": 15133,
+          "logical_bytes": 187767728
+        },
+        "derived/g2_delta_vector.lance/_indices": {
+          "allocated_bytes": 73728,
+          "files": 3,
+          "logical_bytes": 63478
+        },
+        "derived/g2_delta_vector.lance/_transactions": {
+          "allocated_bytes": 4096,
+          "files": 1,
+          "logical_bytes": 700
+        },
+        "derived/g2_delta_vector.lance/_versions": {
+          "allocated_bytes": 8192,
+          "files": 2,
+          "logical_bytes": 2128
+        },
+        "derived/g2_delta_vector.lance/data": {
+          "allocated_bytes": 65536,
+          "files": 8,
+          "logical_bytes": 54640
+        },
+        "derived/g2_text.lance/_indices": {
+          "allocated_bytes": 9223204864,
+          "files": 1335,
+          "logical_bytes": 9220530677
+        },
+        "derived/g2_text.lance/_transactions": {
+          "allocated_bytes": 8192,
+          "files": 1,
+          "logical_bytes": 4683
+        },
+        "derived/g2_text.lance/_versions": {
+          "allocated_bytes": 565248,
+          "files": 2,
+          "logical_bytes": 558179
+        },
+        "derived/g2_text.lance/data": {
+          "allocated_bytes": 23463915520,
+          "files": 5014,
+          "logical_bytes": 23453623495
+        },
+        "derived/g2_vector.lance/_indices": {
+          "allocated_bytes": 6156713984,
+          "files": 3,
+          "logical_bytes": 6156703567
+        },
+        "derived/g2_vector.lance/_transactions": {
+          "allocated_bytes": 4096,
+          "files": 1,
+          "logical_bytes": 378
+        },
+        "derived/g2_vector.lance/_versions": {
+          "allocated_bytes": 184320,
+          "files": 2,
+          "logical_bytes": 176607
+        },
+        "derived/g2_vector.lance/data": {
+          "allocated_bytes": 6156038144,
+          "files": 1973,
+          "logical_bytes": 6151990572
+        },
+        "root_metadata": {
+          "allocated_bytes": 126976,
+          "files": 32,
+          "logical_bytes": 14269
+        }
+      },
+      "database": "/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-compressed-r1/database",
+      "files": 48235,
+      "free_bytes": 402619510784,
+      "measured_utc": "2026-10-24T04:16:34.211973+00:00",
+      "seconds": 0.6558349905535579
+    },
+    "before": {
+      "components": {
+        "authority": {
+          "allocated_bytes": 37948919808,
+          "files": 2316,
+          "logical_bytes": 37943171880
+        },
+        "derived/g1_text.lance/_indices": {
+          "allocated_bytes": 9366941696,
+          "files": 1337,
+          "logical_bytes": 9364150922
+        },
+        "derived/g1_text.lance/_transactions": {
+          "allocated_bytes": 20582400,
+          "files": 5016,
+          "logical_bytes": 1180323
+        },
+        "derived/g1_text.lance/_versions": {
+          "allocated_bytes": 1124401152,
+          "files": 5017,
+          "logical_bytes": 1114102707
+        },
+        "derived/g1_text.lance/data": {
+          "allocated_bytes": 22953631744,
+          "files": 5014,
+          "logical_bytes": 22943198512
+        },
+        "derived/g1_vector.lance/_indices": {
+          "allocated_bytes": 8847781888,
+          "files": 5,
+          "logical_bytes": 8847773812
+        },
+        "derived/g1_vector.lance/_transactions": {
+          "allocated_bytes": 8089600,
+          "files": 1975,
+          "logical_bytes": 448008
+        },
+        "derived/g1_vector.lance/_versions": {
+          "allocated_bytes": 178429952,
+          "files": 1976,
+          "logical_bytes": 174398784
+        },
+        "derived/g1_vector.lance/data": {
+          "allocated_bytes": 6156038144,
+          "files": 1973,
+          "logical_bytes": 6151990572
+        },
+        "derived/g2_delta_text.lance/_indices": {
+          "allocated_bytes": 9766117376,
+          "files": 106919,
+          "logical_bytes": 9471314170
+        },
+        "derived/g2_delta_text.lance/_transactions": {
+          "allocated_bytes": 140525568,
+          "files": 34308,
+          "logical_bytes": 14798172
+        },
+        "derived/g2_delta_text.lance/_versions": {
+          "allocated_bytes": 24396988416,
+          "files": 34309,
+          "logical_bytes": 24326756797
+        },
+        "derived/g2_delta_text.lance/data": {
+          "allocated_bytes": 230486016,
+          "files": 15133,
+          "logical_bytes": 187767728
+        },
+        "derived/g2_delta_vector.lance/_indices": {
+          "allocated_bytes": 385024,
+          "files": 24,
+          "logical_bytes": 315505
+        },
+        "derived/g2_delta_vector.lance/_transactions": {
+          "allocated_bytes": 98304,
+          "files": 24,
+          "logical_bytes": 9619
+        },
+        "derived/g2_delta_vector.lance/_versions": {
+          "allocated_bytes": 102400,
+          "files": 25,
+          "logical_bytes": 35697
+        },
+        "derived/g2_delta_vector.lance/data": {
+          "allocated_bytes": 65536,
+          "files": 8,
+          "logical_bytes": 54640
+        },
+        "derived/g2_text.lance/_indices": {
+          "allocated_bytes": 10006597632,
+          "files": 1446,
+          "logical_bytes": 10003719024
+        },
+        "derived/g2_text.lance/_transactions": {
+          "allocated_bytes": 20606976,
+          "files": 5023,
+          "logical_bytes": 1252158
+        },
+        "derived/g2_text.lance/_versions": {
+          "allocated_bytes": 1308274688,
+          "files": 5024,
+          "logical_bytes": 1297995953
+        },
+        "derived/g2_text.lance/data": {
+          "allocated_bytes": 23463915520,
+          "files": 5014,
+          "logical_bytes": 23453623495
+        },
+        "derived/g2_vector.lance/_indices": {
+          "allocated_bytes": 10630008832,
+          "files": 5,
+          "logical_bytes": 10629996367
+        },
+        "derived/g2_vector.lance/_transactions": {
+          "allocated_bytes": 8089600,
+          "files": 1975,
+          "logical_bytes": 448008
+        },
+        "derived/g2_vector.lance/_versions": {
+          "allocated_bytes": 178429952,
+          "files": 1976,
+          "logical_bytes": 174398797
+        },
+        "derived/g2_vector.lance/data": {
+          "allocated_bytes": 6156038144,
+          "files": 1973,
+          "logical_bytes": 6151990572
+        },
+        "root_metadata": {
+          "allocated_bytes": 122880,
+          "files": 31,
+          "logical_bytes": 13170
+        }
+      },
+      "free_bytes": 362145644544,
+      "note": "per-inode allocated blocks, not exclusive Btrfs extents; full lowr3 terminal, no native writer",
+      "root": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-compressed-r1/database",
+      "seconds": 4.26115633174777,
+      "utc": "2026-10-24T03:52:48.520263+00:00"
+    }
+  },
+  "exact_json_matches": true,
+  "exact_processes_gone": true,
+  "failed_first_witness": "NOFILE limit omitted; first read failed EMFILE before any prune; retained separately",
+  "lifecycle": {
+    "active": 2,
+    "committed": 217716,
+    "text": {
+      "pending": null,
+      "rows": 67045,
+      "version": 34308,
+      "watermark": 217716
+    },
+    "vector": {
+      "pending": null,
+      "rows": 8,
+      "version": 24,
+      "watermark": 217716
+    }
+  },
+  "memory_max_bytes": 671088640,
+  "memory_swap_max_bytes": 0,
+  "native_removed_bytes": 40540456938,
+  "not_proven": [
+    "online cleanup",
+    "inactive generation retirement",
+    "full concurrent rebuild peak disk bound"
+  ],
+  "obsolete_versions_removed": 41326,
+  "oom_events": 0,
+  "rss_max_bytes": 200458240,
+  "scratch_removed": true,
+  "seconds": 349.7909299470484,
+  "source_head": "a62f40d43bc28c952c7ab7b51e8f84ebdcc5d6c4",
+  "status": "passed_offline_full_active_generation_prune",
+  "tables": [
+    {
+      "bytes_removed": 2081873596,
+      "data_files_removed": 0,
+      "deletion_files_removed": 0,
+      "failed_deletes": 0,
+      "index_files_removed": 111,
+      "old_versions": 5022,
+      "rows": 11428831,
+      "table": "g2_text",
+      "transaction_files_removed": 5022,
+      "version": 5023
+    },
+    {
+      "bytes_removed": 4647962620,
+      "data_files_removed": 0,
+      "deletion_files_removed": 0,
+      "failed_deletes": 0,
+      "index_files_removed": 2,
+      "old_versions": 1974,
+      "rows": 1000000,
+      "table": "g2_vector",
+      "transaction_files_removed": 1974,
+      "version": 1975
+    },
+    {
+      "bytes_removed": 33810326207,
+      "data_files_removed": 0,
+      "deletion_files_removed": 0,
+      "failed_deletes": 0,
+      "index_files_removed": 106911,
+      "old_versions": 34307,
+      "rows": 67045,
+      "table": "g2_delta_text",
+      "transaction_files_removed": 34307,
+      "version": 34308
+    },
+    {
+      "bytes_removed": 294515,
+      "data_files_removed": 0,
+      "deletion_files_removed": 0,
+      "failed_deletes": 0,
+      "index_files_removed": 21,
+      "old_versions": 23,
+      "rows": 8,
+      "table": "g2_delta_vector",
+      "transaction_files_removed": 23,
+      "version": 24
+    }
+  ],
+  "witnesses_after": 42,
+  "witnesses_before": 42
+}

@@ -1,0 +1,165 @@
+{
+  "archive_bytes": 8378936,
+  "archive_files": 28,
+  "archive_sha256": "a5ffa802a52d6c14e701ab1a1fc89985354962b2e7237a11935e7c3ac8e63589",
+  "artifacts_verified": true,
+  "binary_sha256": "d3dd3451a948277ecd20d3d2782bb8b3e79c3f4e58316aeb9179ea2180485106",
+  "cold_cache": {
+    "database": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-compressed-r1/database",
+    "files": 63366,
+    "finished_unix_s": 1792807408.0762067,
+    "method": "fsync and POSIX_FADV_DONTNEED on owned files; mincore without reading mapped pages",
+    "resident_pages_after": 0,
+    "resident_pages_before": 70919,
+    "scope": "per-file residency immediately after eviction under exclusive database lock",
+    "seconds": 7.559467087499797,
+    "status": "passed"
+  },
+  "content_oracle": {
+    "corpus_current_checks": 4320,
+    "corpus_current_distinct": 3645,
+    "corpus_current_partitions": {
+      "p0": 532,
+      "p1": 541,
+      "p2": 543,
+      "p3": 545,
+      "p4": 557,
+      "p5": 588,
+      "p6": 521,
+      "p7": 493
+    },
+    "current_checks": 4320,
+    "derived_current_checks": 50,
+    "distinct_commits": 33818,
+    "rebuild_search_overlap": null,
+    "requests": 49856,
+    "search_checks": {
+      "ann": 364,
+      "bm25": 1162
+    },
+    "text_only_bm25_checks": 137,
+    "text_only_bm25_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ],
+    "text_only_current_checks": 581,
+    "text_only_current_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ]
+  },
+  "delta_index_work": {
+    "events": {
+      "copy_partitions": 37920,
+      "tokenize_docs": 28440,
+      "write_metadata": 28440
+    },
+    "tokenization_builds": 9480,
+    "tokenization_seconds": 97.31257860900013,
+    "tokenized_documents": 21854
+  },
+  "derived": {
+    "committed": 182001,
+    "generation": 2,
+    "remaining": 0,
+    "text": 182001,
+    "vector": 182001
+  },
+  "drain_s": 15.167363807999891,
+  "exact_processes_gone": true,
+  "failures": [
+    "bm25 minimum successful rate missed",
+    "bm25 P95 exceeded",
+    "ann P95 exceeded"
+  ],
+  "identities": [
+    {
+      "pid": 1496587,
+      "start_ticks": "462529690",
+      "state": "R"
+    },
+    {
+      "pid": 1496752,
+      "start_ticks": "462530541"
+    }
+  ],
+  "not_proven": [
+    "full sustained search acceptance",
+    "full high/burst/overload",
+    "full uninterrupted/concurrent bounded build"
+  ],
+  "operations": {
+    "ann": {
+      "attempted": 364,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 60001,
+      "successful": 364,
+      "successful_per_s": 0.2,
+      "within_window": 360
+    },
+    "bm25": {
+      "attempted": 1162,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 60001,
+      "successful": 1162,
+      "successful_per_s": 0.6388888888888888,
+      "within_window": 1150
+    },
+    "correction": {
+      "attempted": 360,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 115,
+      "successful": 360,
+      "successful_per_s": 0.2,
+      "within_window": 360
+    },
+    "current": {
+      "attempted": 4320,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 77,
+      "successful": 4320,
+      "successful_per_s": 2.4,
+      "within_window": 4320
+    },
+    "history": {
+      "attempted": 450,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 304,
+      "successful": 450,
+      "successful_per_s": 0.25,
+      "within_window": 450
+    },
+    "write": {
+      "attempted": 43200,
+      "conflicts": 9792,
+      "errors": 0,
+      "p95_upper_ms": 55,
+      "successful": 33408,
+      "successful_per_s": 18.56,
+      "within_window": 33408
+    }
+  },
+  "rss_max_bytes": 452685824,
+  "rss_p99_bytes": 441647104,
+  "scratch_removed": true,
+  "seconds": 1818.9884963519871,
+  "status": "failed",
+  "unit": "akasha-case-7d48582f6c734afe835a53b63d3f4aca"
+}

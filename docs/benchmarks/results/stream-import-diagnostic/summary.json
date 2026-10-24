@@ -1,0 +1,35 @@
+{
+  "status": "passed",
+  "checks": {
+    "completed_resume_no_new_attempt_or_effect": true,
+    "changed_completed_artifact_rejected": true,
+    "missing_code_identity_rejected_before_effects": true,
+    "oversize_manifest_rejected_before_effects": true,
+    "foreign_owner_rejected_before_lock": true
+  },
+  "controller_sha256": "e5ba51a28a143904b01895b7fad5dfa60062d1f2df5e8afd09a4337a5cac966e",
+  "manifest_sha256": "5d28ca68dc34d108d9887c6306eafe7182ac50e9222ca3a44acdc39b0656641a",
+  "binary_sha256": "18b13ffbdea345996121bdac8ad0515f8f57e0b37a7385091252696f86576991",
+  "stream_result": {
+    "acceptance": "not_run",
+    "artifact_sha256": {
+      "cd4491bbfee14f42a87b8e254e71c271/consumer.log": "78b8bda4a02b773b0a75a1aeaa97ca6c6a27d668389d946f21635d6f7b5f9ab3",
+      "cd4491bbfee14f42a87b8e254e71c271/memory.jsonl": "108c13ec64cd8781fbb488b8d71dfcc530f1b5847298d2bbd04471d0eeece9aa",
+      "cd4491bbfee14f42a87b8e254e71c271/producer.log": "8cb05e9175778bef5bd24003f3eb19b0f749f9f74d46181241cc6e021bd87b64",
+      "database/import-progress.json": "181af8585c441a13ca59cd9477195d6ef9c93bb7d3723bd0b22bdec7229993ab"
+    },
+    "attempt": "cd4491bbfee14f42a87b8e254e71c271",
+    "binary_sha256": "18b13ffbdea345996121bdac8ad0515f8f57e0b37a7385091252696f86576991",
+    "documents": 38462,
+    "elapsed_seconds": 36.38287431653589,
+    "failure": null,
+    "indexes": "not_built",
+    "manifest_sha256": "5d28ca68dc34d108d9887c6306eafe7182ac50e9222ca3a44acdc39b0656641a",
+    "status": "passed"
+  },
+  "limits": [
+    "diagnostic 38462 records",
+    "no full corpus or index acceptance",
+    "partial database resume tested separately by check_import.py"
+  ]
+}

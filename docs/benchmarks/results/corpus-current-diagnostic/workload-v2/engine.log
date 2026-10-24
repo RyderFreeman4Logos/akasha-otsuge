@@ -1,0 +1,16 @@
+Running as unit: akasha-case-4c6f5dec89934720b09e6f656d34b199.service
+ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"11","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"3","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"4","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"5","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"6","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"7","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"8","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"9","kind":"already_active"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"10","kind":"already_active"}}
+Error: "workload failed: {\"diagnostic\":true,\"drain_s\":4.514154419999997,\"failures\":[\"write minimum successful rate missed\",\"write P95 exceeded\",\"current P95 exceeded\"],\"not_tested\":[\"derived_watermarks\",\"live_permission_revocation\",\"correction_of_search_candidates\",\"RSS_thresholds_checked_by_outer_observer\"],\"phase\":\"steady\",\"snapshot\":{\"active\":0,\"admission_slots\":4,\"clients\":[14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,12,12,12,12,12,12,12,11,11,11,11,11,6,6,6,6,6,6,6,6,6,6,6,6,4,4,4,3,4,4,4,3,2,2,2,2,1,1,1,1],\"completed\":1051,\"completed_waves\":60,\"config_epoch\":1,\"derived_lag\":null,\"elapsed_s\":64.478001251,\"eta_s\":0.0,\"operations\":{\"ann\":{\"attempted\":15,\"conflicts\":0,\"errors\":0,\"p95_upper_ms\":5722,\"successful\":15,\"successful_per_s\":0.23333333333333334,\"within_window\":14},\"bm25\":{\"attempted\":72,\"conflicts\":0,\"errors\":0,\"p95_upper_ms\":5457,\"successful\":72,\"successful_per_s\":1.1166666666666667,\"within_window\":67},\"correction\":{\"attempted\":12,\"conflicts\":0,\"errors\":0,\"p95_upper_ms\":5347,\"successful\":12,\"successful_per_s\":0.2,\"within_window\":12},\"current\":{\"attempted\":139,\"conflicts\":0,\"errors\":0,\"p95_upper_ms\":7466,\"successful\":139,\"successful_per_s\":2.1166666666666667,\"within_window\":127},\"history\":{\"attempted\":15,\"conflicts\":0,\"errors\":0,\"p95_upper_ms\":7370,\"successful\":15,\"successful_per_s\":0.23333333333333334,\"within_window\":14},\"write\":{\"attempted\":798,\"conflicts\":378,\"errors\":0,\"p95_upper_ms\":30204,\"successful\":420,\"successful_per_s\":6.483333333333333,\"within_window\":389}},\"peak_queued\":82,\"phase\":\"completed\",\"pid\":4002427,\"queue_bytes_bound\":819200,\"queue_entry_bound\":100,\"queued\":0,\"queued_bytes_upper_bound\":0,\"rate_per_s\":16.30013306257225,\"run_id\":\"corpus-current-workload-v2\",\"start_ticks\":\"457842290\",\"total\":1698,\"wave_seconds\":1},\"status\":\"failed\"}"
+Finished with result: exit-code
+Main processes terminated with: code=exited/status=1
+Service runtime: 1min 9.195s
+CPU time consumed: 1min 35.624s

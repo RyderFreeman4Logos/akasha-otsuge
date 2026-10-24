@@ -1,0 +1,49 @@
+    Finished `release` profile [optimized] target(s) in 0.12s
+     Running unittests src/main.rs (target/storage-spike/release/deps/akasha_helix_probe-23e0d933abb571b5)
+
+running 1 test
+test authority::history_concurrency_tests::historical_scan_releases_writer_and_rechecks_revocation_before_return ... FAILED
+
+failures:
+
+---- authority::history_concurrency_tests::historical_scan_releases_writer_and_rechecks_revocation_before_return stdout ----
+ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"1","kind":"accepted","operation_id":"27d9f978-e6ae-4654-988c-65dbeb6a2bdb"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"1","operation_id":"27d9f978-e6ae-4654-988c-65dbeb6a2bdb","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"1","operation_id":"27d9f978-e6ae-4654-988c-65dbeb6a2bdb","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"2","kind":"accepted","operation_id":"f656dc49-4742-43f2-ba1b-c4f88c2c4823"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"2","operation_id":"f656dc49-4742-43f2-ba1b-c4f88c2c4823","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"2","operation_id":"f656dc49-4742-43f2-ba1b-c4f88c2c4823","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"3","kind":"accepted","operation_id":"449f5fab-cff7-4c20-bc3a-787c3a91b86a"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"3","operation_id":"449f5fab-cff7-4c20-bc3a-787c3a91b86a","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"3","operation_id":"449f5fab-cff7-4c20-bc3a-787c3a91b86a","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"4","kind":"accepted","operation_id":"dd9e2684-401c-4530-97ba-b431dbc1e5a4"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"4","operation_id":"dd9e2684-401c-4530-97ba-b431dbc1e5a4","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"4","operation_id":"dd9e2684-401c-4530-97ba-b431dbc1e5a4","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"5","kind":"accepted","operation_id":"6c25ecbf-17fa-42bd-8595-b9fefeb94ab9"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"5","operation_id":"6c25ecbf-17fa-42bd-8595-b9fefeb94ab9","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"5","operation_id":"6c25ecbf-17fa-42bd-8595-b9fefeb94ab9","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"6","kind":"accepted","operation_id":"a1a8340f-fe0d-450e-950f-be0a2dcb3952"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"6","operation_id":"a1a8340f-fe0d-450e-950f-be0a2dcb3952","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"6","operation_id":"a1a8340f-fe0d-450e-950f-be0a2dcb3952","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"7","kind":"accepted","operation_id":"4f6b7bd5-9589-4ecf-8007-d7da29fb1b9d"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"7","operation_id":"4f6b7bd5-9589-4ecf-8007-d7da29fb1b9d","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"7","operation_id":"4f6b7bd5-9589-4ecf-8007-d7da29fb1b9d","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"8","kind":"accepted","operation_id":"d1a962f4-6d9b-43f5-8416-933b277d10ca"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"8","operation_id":"d1a962f4-6d9b-43f5-8416-933b277d10ca","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"8","operation_id":"d1a962f4-6d9b-43f5-8416-933b277d10ca","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"activate","status":"succeeded"}}
+INDEX_RECEIPT:{"index":{"generation":"1","index_id":"9","kind":"accepted","operation_id":"947ab86d-f47c-4c08-8b7c-98480b5b4cf0"}}
+INDEX_PROGRESS:{"operation":{"attempt":0,"family":"secondary","generation":"1","index_id":"9","operation_id":"947ab86d-f47c-4c08-8b7c-98480b5b4cf0","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"scan","status":"queued"}}
+INDEX_PROGRESS:{"operation":{"attempt":4,"family":"secondary","generation":"1","index_id":"9","operation_id":"947ab86d-f47c-4c08-8b7c-98480b5b4cf0","operation_kind":"build","progress":{"entities":"0","input_bytes":"0","output_bytes":"0","output_operations":"0"},"stage":"activate","status":"succeeded"}}
+
+thread 'authority::history_concurrency_tests::historical_scan_releases_writer_and_rechecks_revocation_before_return' (3961249) panicked at src/authority.rs:727:9:
+historical scan held the shared writer across immutable reads
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    authority::history_concurrency_tests::historical_scan_releases_writer_and_rechecks_revocation_before_return
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 2.08s
+
+error: test failed, to rerun pass `--bin akasha-helix-probe`

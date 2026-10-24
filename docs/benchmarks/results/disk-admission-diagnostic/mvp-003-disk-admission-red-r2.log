@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_disk_admission.py", line 79, in <module>
+    main()
+    ~~~~^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_disk_admission.py", line 45, in main
+    run('blocked-commit', dict(op='commit', change=change), blocked=True, failure=True)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_disk_admission.py", line 37, in run
+    assert (result.returncode != 0) == failure, (name, text[-2000:])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('blocked-commit', 'ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"1","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"2","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"3","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"4","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"5","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"6","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"7","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"8","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"9","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"10","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"11","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"12","kind":"already_active"}}\nINDEX_RECEIPT:{"index":{"generation":"1","index_id":"13","kind":"already_active"}}\n{"commit_seq":1,"config_generation":1,"request_id":"disk-1","revision":"00000000000000000001:00000000000000000001","stage":"committed"}\n')

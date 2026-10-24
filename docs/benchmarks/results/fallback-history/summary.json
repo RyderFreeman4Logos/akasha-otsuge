@@ -1,0 +1,73 @@
+{
+  "binary_sha256": "92339952d55c1aa0904ef333da159879cc7ca53bb17cdd9a40ba86c9f39363e4",
+  "checks": 10,
+  "exact_children_exited": true,
+  "hashes_verified": true,
+  "model_sha256": "31342645a3a2b32403e734a518245a5b10584ea0e8f4472c62cc58bc7a472ded",
+  "not_proven": [
+    "100k history: separate real-shard run in progress",
+    "full corpus history",
+    "concurrent workload",
+    "outbox activation",
+    "power loss"
+  ],
+  "operations": [
+    {
+      "elapsed_s": 16.15653122588992,
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "name": "seed",
+      "rss_max": 27684864,
+      "samples": 15
+    },
+    {
+      "elapsed_s": 2.014806902036071,
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "name": "native-replay",
+      "rss_max": 0,
+      "samples": 1
+    },
+    {
+      "elapsed_s": 4.036678428761661,
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "name": "verify",
+      "rss_max": 29302784,
+      "samples": 3
+    }
+  ],
+  "release_units": 4,
+  "retained_failures": [
+    "native unknown oracle command RED",
+    "mise stable update conflict before compiling; fixed installed Rust1.99.1 used without update"
+  ],
+  "scope": "2048 changes and 5163 historical checks on eight real source records; owned controller replay and preflight validation",
+  "seconds": 24.567878795787692,
+  "source_sha256": {
+    "spikes/fallback/src/authority/oracle.rs": "93de42df6d83074db5e8b84d5af3ede31e38f384d2b0badae7cc6567bbd23915",
+    "spikes/helix/check_oracle_runner.py": "6ca8fd8eb626df447a126601821e52696fd22466ca33adaaca46c410f04bafa4",
+    "spikes/oracle_model.rs": "31342645a3a2b32403e734a518245a5b10584ea0e8f4472c62cc58bc7a472ded"
+  },
+  "status": "passed_diagnostic_only",
+  "temporary_root_removed": true,
+  "units_inactive": true
+}

@@ -1,0 +1,1 @@
+{"op": "raw", "cypher": "CREATE (:Document {memory:99,key:'stray',body:'excluded fixture',partition:'p0'})"}

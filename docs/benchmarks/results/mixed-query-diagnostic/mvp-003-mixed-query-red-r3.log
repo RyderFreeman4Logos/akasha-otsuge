@@ -1,0 +1,22 @@
+   Compiling akasha-helix-probe v0.0.0 (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix)
+    Finished `release` profile [optimized] target(s) in 29.50s
+     Running unittests src/main.rs (target/storage-spike/release/deps/akasha_helix_probe-15204afa4e8840ca)
+
+running 1 test
+test search::tests::mixed_population_keeps_text_out_of_vector_storage_and_selection ... FAILED
+
+failures:
+
+---- search::tests::mixed_population_keeps_text_out_of_vector_storage_and_selection stdout ----
+
+thread 'search::tests::mixed_population_keeps_text_out_of_vector_storage_and_selection' (109045) panicked at src/search.rs:319:35:
+called `Result::unwrap()` on an `Err` value: "invalid real-document search query"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    search::tests::mixed_population_keeps_text_out_of_vector_storage_and_selection
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin akasha-helix-probe`

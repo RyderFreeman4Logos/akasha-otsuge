@@ -1,0 +1,40 @@
+{
+  "archive_files": 1374,
+  "archive_sha256": "0f0852cde65bf3c5901f81bf764d88f9c825223a94b863b95b37621a681420d0",
+  "artifacts_verified": true,
+  "binary_sha256": "9b09f83c8a225eb608600b2a3f7d6106c7ab2d1c8726956aee97cfea5cbb36d1",
+  "checked_candidates": 1195,
+  "exact_ann_queries": 32,
+  "exact_native_and_controller_exited": true,
+  "fixture_sha256": "ac4e0e77fb3ab7ec4157ca856f9caad60ed6bab2e31463d9f758c34a764dc112",
+  "group_includes_python_query_driver": true,
+  "last_memory_events": {
+    "high": "48305",
+    "low": "0",
+    "max": "0",
+    "oom": "0",
+    "oom_group_kill": "0",
+    "oom_kill": "0"
+  },
+  "limits": {
+    "memory.high": "536870912",
+    "memory.max": "671088640",
+    "memory.swap.max": "0"
+  },
+  "mean_ann_recall_at_20": 0.9124999999999999,
+  "native_commands": 1292,
+  "not_proven": [
+    "BM25 expected rank",
+    "cold cache",
+    "live permissions",
+    "sustained workload"
+  ],
+  "queries": 64,
+  "rss_max_bytes": 392826880,
+  "rss_p99_bytes": 359129088,
+  "sample_count": 336,
+  "scratch_removed": true,
+  "seconds": 334.93327661789954,
+  "status": "passed",
+  "unit": "inactive"
+}

@@ -1,0 +1,93 @@
+{
+  "final_native": {
+    "binary_sha256": "a58a7c878df4e89f34179560fbf34e73d52c01f537551132549a28a9f1ee7923",
+    "checks": 53,
+    "exact_processes_absent": true,
+    "hashes_verified": true,
+    "memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "0",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "rss_max_bytes": 43528192,
+    "samples": 4,
+    "seconds": 2.89704217761755,
+    "temporary_root_removed": true,
+    "unit_inactive": true
+  },
+  "not_proven": [
+    "full corpus",
+    "100k changes",
+    "sustained concurrent workload",
+    "derived outbox application",
+    "generation activation",
+    "power loss"
+  ],
+  "previous_regressions": {
+    "fallback-authority-r2": {
+      "binary_sha256": "a1fb6fe4118cd6e545f354543fbd3e9fdb7204551e6f181dde23c922f85bd307",
+      "checks": 52,
+      "events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "exact_processes_absent": true,
+      "hashes_verified": true,
+      "rss_max_bytes": 19685376,
+      "samples": 5,
+      "seconds": 3.0702678188681602,
+      "temporary_root_removed": true,
+      "unit_inactive": true
+    },
+    "fallback-authority-search-r2": {
+      "binary_sha256": "a1fb6fe4118cd6e545f354543fbd3e9fdb7204551e6f181dde23c922f85bd307",
+      "checks": 47,
+      "events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "exact_processes_absent": true,
+      "hashes_verified": true,
+      "rss_max_bytes": 190337024,
+      "samples": 12,
+      "seconds": 10.329394458793104,
+      "temporary_root_removed": true,
+      "unit_inactive": true
+    }
+  },
+  "release_units": {
+    "coverage": [
+      "codec bounds",
+      "head mismatch and malformed sequence rejection",
+      "paused history releases writer and rechecks live revocation"
+    ],
+    "passed": 3
+  },
+  "retained_failures": [
+    "wrong fixture ownership marker; not product RED",
+    "unknown --authority operation; product RED",
+    "two IntoBytes API compile errors",
+    "escaped control bytes accepted past the512KiB decoded record limit; native regression RED"
+  ],
+  "scope": "53 native authority commands, including three process-crash barriers, scope history, receipt/job atomics and current authorization",
+  "source_sha256": {
+    "spikes/fallback/Cargo.lock": "1be4d933e0e27dbe685febc0ce37ef1e3eb03672a11f1895899f385739807fa2",
+    "spikes/fallback/check_authority.py": "ff8064e17bfee36d6ff04675f3c544ef8d7337234871ae9d54cab727fe7d6815",
+    "spikes/fallback/src/authority.rs": "3b6969add0359a42afdea6737206d6453584365605c30c7da83820248db2f924",
+    "spikes/fallback/src/load.rs": "fd9d8f5d47ce9dd40772b42cdaab6b8833d0931c434c47083a1196510c1dba50",
+    "spikes/fallback/src/main.rs": "5cd5bf885d00aa7a7a59c9b84b267efd98f9d1542bb9463c9a2ba26962c086a7",
+    "spikes/fallback/src/search.rs": "a7d9f0b12a8a94b12073b737c68e67da342377be8010df5fc04b0d7a930e504b"
+  },
+  "status": "passed_diagnostic_only"
+}

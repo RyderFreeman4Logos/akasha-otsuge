@@ -1,18 +1,112 @@
-# Development checkpoint — 2026-10-22
+# Development checkpoint — 2026-10-24
 
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge (public, Apache-2.0).
-All 41 source pages and all 28 real Issues/dependency mappings are preserved.
+All 41 source pages and 28 real Issue/dependency mappings are preserved.
+The current GitHub audit has 26 open Issues (#3–#28); #1/#2 are closed.
 
-- MVP-001 / #1: complete. PR #29 merged as `9c60f50022a4d5b29338e8603e08153037926856`; [clean Linux CI](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/39879774711) passed. Local gate: 4 Rust CLI tests, 6 Python plan tests, formatting, Clippy and release smoke.
-- MVP-002 / #2: implementation candidate on `feat/mvp-002-config`. Configuration resolution, resource preparation, whole-snapshot reload, pending restart, live delivery checks and deadline contracts implemented; 17 configuration tests pass. Exact-commit gate, PR/CI and final closure are recorded on #2.
-- Next: MVP-003 / #3, after #2 acceptance. Read `docs/spec/05.md`, `08.md` and `issues/MVP-003.md`; freeze the storage benchmark/criteria before experimenting. Helix embedded first, specified fallback only after hard failure. No production backend has been chosen.
+- MVP-001 / #1: complete, PR #29 merged as 9c60f50022a4d5b29338e8603e08153037926856.
+  [Clean Linux CI](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/39879774711)
+  and the local CLI/plan/format/Clippy/release gate pass.
+- MVP-002 / #2: complete, PR #30 merged as 349431a350e9e4ae3364b126c4d2a7133dd37d22.
+  [Clean Linux CI](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/39881917776)
+  and the exact-commit local gate pass, including 17 configuration and 4 CLI tests.
+- MVP-003 / #3 is the sole active implementation Issue; PR #31 remains draft.
+  Helix failed three full-data low-budget recoveries and was retired. The specified
+  SurrealKV/LanceDB fallback remains under evaluation; no backend is selected.
 
-The remaining MVP Issues are open. Library configuration tests are not provider,
-daemon, four-host, 1600–1690s or 50GB/100-client acceptance. Persistent configuration
-audit, daemon commands and file watcher integration remain assigned to MVP-008;
-actual notifier dispatch is MVP-023. Installed user tools and running sessions have
-not been changed.
+Use the [complete TODO](todo.md), [storage evidence matrix](../benchmarks/storage-evidence-matrix.md)
+and [decision record](../benchmarks/storage-decision.md) for the remaining work and
+immutable results. Full import/history, both 1800s resource profiles, burst/overload,
+corpus lifecycle and public version/generation reclamation have scoped passes.
+The first concurrent full rebuild failed OOM. Its same-native direct-low recovery,
+recorded-acknowledgement verification and generation3 activation pass separately.
+Ten committed outcomes absent from that failed request log remain unknown.
 
-Use `bash scripts/check.sh` (or `just check`) on the current candidate. Issue closure
-requires its specific evidence, source review and clean Linux CI. Continue one main
-Issue at a time and preserve the original requirement coverage.
+Shared-session repair 78ceb79 passes 12 release units, release Clippy, 179 lifecycle
+commands/12 SIGKILL barriers, a 4,528-request concurrent diagnostic, exact-HEAD root
+gate and [CI 40076368543](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/40076368543).
+Generation4 preparation is complete: 11,428,831 texts/1,000,000 vectors, active3,
+committed269826; preparation is not full build acceptance. Full r2 failed with
+systemd OOM after1762.242s, before its3840s workload completed. Sampled RSS P99/max
+was579,792,896/608,862,208B; the P99 budget also failed. Its recorded prefix has
+16 search errors and excessive search latency. Disk category caps were not
+breached, but a failed run does not establish the completed rebuild peak.
+
+All39,876 complete seed/workload acknowledgements were verified against authority.
+One incomplete trailing log line and committed309703 without a complete logged
+receipt remain unknown. Eight originals were restored with revision guards;
+active3 text/vector watermarks equal committed309711. Generation4 was partial
+and inactive at that reconciliation checkpoint; its later retirement is below.
+
+The [derived-admission repair](../benchmarks/results/fallback-derived-admission/summary.json)
+now makes baseline builds share the existing delta-index mutex, as spec08 requires.
+Its native regression first reproduces the bypass, then verifies queued expiry,
+unchanged deadline, ordinary-write progress and a later successful build. All12
+release units, release Clippy and179 lifecycle commands/12 SIGKILL barriers pass.
+The first160s/4,528-request concurrent check fails write P95 at7.904s, despite
+correct results and memory within budget. That failure remains retained. One
+bounded same-harness baseline/candidate pair subsequently passes; candidate write
+P95 is99ms and RSS P99/max201,355,264/201,494,528B. This does not explain the initial
+timing failure or establish full-size performance. Default ANN chunk size and
+all resource/performance limits remain unchanged; four bounded allocation/query
+controls are archived with their diagnostic limits.
+
+The [partial-retirement repair](../benchmarks/results/fallback-partial-retirement/summary.json)
+now admits incomplete inactive candidates through the existing durable tombstone
+and public table deletion. Its223-command native fixture passes19 SIGKILL barriers,
+two competing-owner refusals, active-search/receipt preservation,12 release units
+and Clippy; RSS max128,020,480B. It covers empty, interrupted-backfill and failed-build
+states. Preserve the behavioral RED and the first GREEN attempt's obsolete
+ready-only refusal expectation; the new regression assertions remain unchanged.
+
+[Full generation5 preparation](../benchmarks/results/fallback-full-generation5-preparation/summary.json)
+passes with native8f0b fromddcf113. Incomplete4 is retired in2.003s, active3's old
+versions are pruned in34.035s and all66 before/after witnesses agree on content,
+receipts and query candidates. One BM25 response changes order only. Filesystem
+free space increases40,334,372,864B; retired4 accounts for36,299,567,104 allocated
+bytes. These measurements have different Btrfs/host-activity boundaries.
+Generation5 backfill covers11,428,831 texts/1,000,000 vectors in801.717s, RSS max
+164,487,168B and no OOM. It is unbuilt with no index deadline; active3 and committed
+309711 remain unchanged. Original generation4 index deadline1792836176755 stays
+in its tombstone. All four operations pass completed reuse and exact process,
+unit, scratch and disposable-copy cleanup checks.
+
+The [independent review](../benchmarks/reviews/ddcf113-r1.md) returned FAIL for the
+corpus/model identity gap and a trailing oracle-file blank line. The
+[identity repair](../benchmarks/results/fallback-corpus-identity/summary.json) now
+binds creation and shared generation reads to the exact original import manifest.
+It also awaits database close after rejected requests; the regression exposed the
+old error path retaining its lock. Native/unit RED and all failed attempts remain
+archived. Legacy binding preserves state/deadlines; synthetic fixtures explicitly
+declare their encoder. All13 release units, Clippy,231 lifecycle commands with19
+SIGKILL barriers,21 import commands and85 search commands pass. The160s/100-client
+diagnostic passes4,528 requests, RSS P99/max202,850,304/202,907,648B, with all owned
+processes, units, fixtures and scratch verified gone. The old text-layout binary
+fixture was not rerun. Next: exact-HEAD gate and independent re-review, then bind
+the existing full database and check its witnesses before full r3. The existing
+corpus uses the correct pinned identity; no reimport or deadline extension is
+needed. No backend selected.
+
+The second independent review closes the original identity/EOF findings but finds
+one new reservation gap in legacy metadata persistence. The
+[reservation repair](../benchmarks/results/fallback-legacy-reserve/summary.json)
+adds one check immediately before that write. A genuine old-native import proves
+behavioral RED, then15 native commands verify refusal without metadata effects,
+unchanged original state/deadlines and readable already-bound reuse/status. All13
+release units and Clippy pass. One initial fixture-owner setup failure is retained
+and excluded from behavioral RED. The prior231/85-command and160s cases were not
+repeated for this single write-admission guard. Exact-HEAD successor gate and
+independent re-review precede full binding/rebuild; the full database is unchanged.
+
+At restart or compaction, first load the WD skill and reconcile the exact managed
+task with its completion listener and durable state in `.git/akasha-evidence`.
+Keep one writer and one dynamic provider-TTL relay; never replay an ambiguous
+case or reset campaign age. A start record is not proof that a process survived.
+Read the terminal artifacts before replacing any current in-progress wording.
+
+Issue closure requires its actual acceptance, source review and clean Linux CI.
+Run the canonical `bash scripts/check.sh` / `just check` on the final candidate;
+avoid competing Cargo work during measured native runs. Continue in dependency
+order after #3; all production Storage, daemon, four-host integration, long-path,
+migration and release work remains #4–#28. Installed tools and user sessions have
+not been changed by this storage experiment.

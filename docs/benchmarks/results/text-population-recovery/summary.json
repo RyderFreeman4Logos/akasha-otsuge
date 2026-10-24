@@ -1,0 +1,38 @@
+{
+  "not_tested": [
+    "engine memory acceptance",
+    "full database search",
+    "physical power loss",
+    "file-cache-cold queries"
+  ],
+  "r1_limitation": "Source recovery assertions pass, but result was sealed before final progress update. Preserve original inconsistent result. Fixed terminal publication order; fresh full-source r2 passes every artifact hash.",
+  "runs": {
+    "text-population-recovery-full-r1": {
+      "final_selected": 512,
+      "interrupted_selected": 17,
+      "preparer_rss_max_bytes": 3835846656,
+      "query_sha256": "87a07d022c43c378365422d1494c011802fe225e4176975037476ef6b9443546",
+      "rss_samples": 609,
+      "seconds": 619.2226095572114,
+      "stale_result_hashes": [
+        "progress.json"
+      ],
+      "status": "passed"
+    },
+    "text-population-recovery-full-r2": {
+      "final_selected": 512,
+      "interrupted_selected": 17,
+      "preparer_rss_max_bytes": 3894874112,
+      "query_sha256": "87a07d022c43c378365422d1494c011802fe225e4176975037476ef6b9443546",
+      "rss_samples": 551,
+      "seconds": 558.0768170431256,
+      "stale_result_hashes": [],
+      "status": "passed"
+    }
+  },
+  "source_sha256": {
+    "spikes/data/check_text_population_recovery.py": "acf1a0c806f4ca37a633d8a8ef85619360543adf1c61181321686214fdcc6006",
+    "spikes/data/prepare_text_population.py": "7bf52782646e9a14450077c53de7853bce1478df9d1d37550bf38484e41973b1"
+  },
+  "status": "passed_full_source_preparation_recovery"
+}

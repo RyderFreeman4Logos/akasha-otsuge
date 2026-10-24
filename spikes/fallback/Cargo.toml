@@ -1,0 +1,33 @@
+[package]
+name = "akasha-fallback-probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+license = "Apache-2.0"
+
+[workspace]
+
+[dependencies]
+surrealkv = { git = "https://github.com/surrealdb/surrealkv", rev = "4338a790c8edc56ef5ea1e46157427af4815be3c" }
+# v0.40.0 job.rs references Error::Http without its remote feature guard.
+lancedb = { git = "https://github.com/lancedb/lancedb", rev = "b1b080b97c3edd2fd9f2aae8a3b71ff19487b1f8", default-features = false, features = ["remote"] }
+lance-index = "=13.0.0"
+lance-io = { version = "=13.0.0", default-features = false }
+lance = { version = "=13.0.0", default-features = false }
+lance-core = { version = "=13.0.0", default-features = false }
+async-trait = "0.1"
+fs4 = "=0.13.1"
+arrow-array = "58.0.0"
+arrow-schema = "58.0.0"
+futures = "0.3"
+tokio = { version = "1.54.1", features = ["macros", "rt-multi-thread", "time", "sync"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+sha2 = "0.11.1"
+zstd = "=0.13.3"
+
+[profile.release]
+debug = 0
+
+[lints.rust]
+unsafe_code = "forbid"

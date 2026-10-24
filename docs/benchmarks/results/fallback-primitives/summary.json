@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "checks": 20,
+  "seconds": 1.1882058940827847,
+  "sample_count": 3,
+  "harness_and_children_rss_max_bytes": 40738816,
+  "cgroup_observed_peak_bytes": 34603008,
+  "binary_sha256": "11ffd72c9c0fbd44c0bbb8b582338eed0a663423e7f182c2afce2c2d96a57636",
+  "raw_artifacts_verified": 43,
+  "native_processes_absent": true,
+  "unit_state": "inactive",
+  "temporary_root_removed": true,
+  "not_tested": [
+    "power loss",
+    "full-scale memory",
+    "large index construction",
+    "cross-store outbox"
+  ],
+  "sampling_limit": "1-second aggregate samples do not resolve subsecond native peaks"
+}

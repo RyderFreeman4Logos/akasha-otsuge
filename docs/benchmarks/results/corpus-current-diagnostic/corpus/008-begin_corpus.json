@@ -1,0 +1,1 @@
+{"op": "begin_corpus", "generation": 1, "bundle": {"model": "text-embedding-3-large", "model_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000", "dimension": 1536, "chunker": "source-document-v1", "schema": 1}, "manifest": "/tmp/akasha-otsuge-storage-20261022/current-pagination-r3/manifest.json"}

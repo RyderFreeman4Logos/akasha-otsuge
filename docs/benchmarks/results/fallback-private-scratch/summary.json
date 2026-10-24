@@ -1,0 +1,153 @@
+{
+  "archive_sha256": "229ff389d752b9299f24112a69cd3cd5ba1b3dba69abb9f4d1c4d7554a92843c",
+  "forensic": {
+    "finding": "scratch source file open succeeds; final rename failsENOENT; no unlink/rmdir of that file/directory found in traced process tree; deleting actor unestablished",
+    "hashes_verified": true,
+    "native": {
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-bf57d3ed81d6490096902b3334915fc5.service",
+      "event": "executable",
+      "pid": 1122060,
+      "sha256": "95081e9e4f5666c4141d53fd111f85d6b9c26735280fb7e4fe3b42d3c05e15e2",
+      "start_ticks": "461115023"
+    },
+    "native_processes_exited": true,
+    "scope": "diagnostic only; copied observer admits exact tracer parent; resource/timing evidence includes tracing",
+    "seconds": 56.378890726715326,
+    "status": "failed_ENOENT_reproduced_under_file_syscall_trace",
+    "trace_sha256": {
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122059": "d99aa214c70489a819168232c3f14b2215f50b095172091c184311708e1f55fd",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122060": "2156c6f4950f0fb47b2e58a2cb5fdbe196eaeed77560b70a03f497a8c41f2b9c",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122061": "1fc0b5a7930294e24c3addf6e630389a5bfaf507d69417123d931f5cc4e585b4",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122062": "a5eb15e72deb462eb93b047b67296256ea837c389d97b86fc98d3fbe363d3385",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122063": "29d50c6fb633dc49972d8ca854afcecf7e4bb5f479cb870f89ccdf6ff854bf31",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122095": "0db1f64afc13e73f4ba6d8f0b87405a399103ea94ee5982884c88d1893abacf9",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122096": "e915b65b7470025d2bf40f6f9085ef73cd8a5dce25985494874ab928bdb8da3b",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122159": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122160": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122161": "24cddd1aafa60e51c402845f0e65ea19175b499019b9bb72ea3f1ce8f73b2a74",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122162": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122163": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122164": "020b0138269fcaa7b83c2a76360e4603e5c22031fb2ce1bdbac088c01bfa2b1d",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122165": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122166": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122167": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122168": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122169": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122170": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122171": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122172": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122173": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122174": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122175": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122176": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122177": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122436": "76c4186c69e3b012e1334d9cfaa5feb3942e8ea86eb09ab3ffdb51f468559a00",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122437": "1d5c26ec8497487f5ae557b9dc91a6c1b75d115fe13e1f4980aeec63280aeec1",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122438": "eace7f7b3c97f455a7dd720eff8c46292ab7f23c8560cd4a960fbe6ba7626067",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122439": "7c89f71aac4823f75a50494d2283007430ed008b75437d7e8255a73daf066b3b",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122440": "879b6613f3cd2f3e2f370da785216ae4440e9c7d708a51b4cd23d9ff826a1521",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122441": "28dcf7683415319e612abe1706b9e602bfe212948e6b083a67e170b86e524d7b",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122442": "448f13265a76a4e0f7fc62abcf373e5644a21c85f006a6e9b7267031d0f86711",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122443": "aae29a1b15b8403d634a17cc51310c325153bf96032a349c088d8b43ae015acb",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122444": "ebb466f759fa91ae16e85b8c7af61b5a492c6aabca146b1eb60fcff4c2b6ae12",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122445": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace",
+      "bf57d3ed81d6490096902b3334915fc5/filesystem.trace.1122446": "60a6949a3c7223cbc875dd8496c4baa8a9a61a7bbeccf01425fcc4e70d2e8ace"
+    },
+    "unit_inactive": true
+  },
+  "full_index_r4": {
+    "binary_sha256": "95081e9e4f5666c4141d53fd111f85d6b9c26735280fb7e4fe3b42d3c05e15e2",
+    "hashes_verified": true,
+    "last_memory": {
+      "cgroup_current_bytes": 670916608,
+      "cgroup_peak_bytes": 671088640,
+      "engine_process_io": {
+        "1134107": {
+          "cancelled_write_bytes": 0,
+          "rchar": 9714395539,
+          "read_bytes": 16055537664,
+          "syscr": 182291,
+          "syscw": 455385,
+          "wchar": 8750956075,
+          "write_bytes": 8873512960
+        }
+      },
+      "engine_pss_bytes": 652948480,
+      "engine_rss_bytes": 655069184,
+      "event": "sample",
+      "io_coverage": "currently sampled processes; cgroup controller unavailable",
+      "io_stat": null,
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "141135",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "observer_rss_bytes": 17223680,
+      "seconds": 99.10838822647929
+    },
+    "native_processes_exited": true,
+    "note": "private TMPDIR resolves prior spill disappearance; completed training/shuffle,OOM at584of1000merge partitions; no final observer event, journal confirmsOOM",
+    "original_deadline_ms": 1792796647085,
+    "rss_max_bytes": 655069184,
+    "rss_p99_bytes": 655069184,
+    "scratch_cleanup": {
+      "allocated_bytes": 6150127616,
+      "basis": "exact executable/controller gone; owning unit inactive; path comes from immutable observer admission under exact owned attempt; no future consumer of failed native tempfile",
+      "files": 4,
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-index-r4/build/7f808d2ffe9d47e39698c16b8bf891f1/native-scratch-dl1b4eb7",
+      "removed": true
+    },
+    "seconds": 101.2374180611223,
+    "stages": {
+      "merge_partitions": {
+        "completed": 584,
+        "done": false,
+        "elapsed_s": 26.91421219,
+        "eta_s": 19.171767587397262,
+        "rate_per_s": 21.698573076457564,
+        "total": 1000,
+        "unit": "partitions"
+      },
+      "shuffle": {
+        "completed": 1000000,
+        "done": true,
+        "elapsed_s": 57.396091384,
+        "eta_s": 0.0,
+        "rate_per_s": 17422.78918105501,
+        "total": 1000000,
+        "unit": "rows"
+      },
+      "train_ivf": {
+        "completed": 5632,
+        "done": true,
+        "elapsed_s": 14.660158484,
+        "eta_s": 0.0,
+        "rate_per_s": 384.17047170033857,
+        "total": 20,
+        "unit": "iterations"
+      },
+      "train_quantizer": {
+        "completed": 0,
+        "done": true,
+        "elapsed_s": 0.000964936,
+        "eta_s": null,
+        "rate_per_s": 0.0,
+        "total": null,
+        "unit": ""
+      }
+    },
+    "status": "failed_oom_merge_partitions",
+    "unit_inactive": true
+  },
+  "next": "same binary with existing LANCE_CPU_THREADS1 instead of2; original deadline and memory limit unchanged",
+  "observer_controls": {
+    "cases": 3,
+    "green": "task-local directory; success/failure cleanup; retained while live descendant remains; diagnostic parent removes only after unit exits",
+    "procfs_units": 4,
+    "red": "default /tmp before fix"
+  },
+  "status": "scratch_fix_verified_full_index_unaccepted"
+}

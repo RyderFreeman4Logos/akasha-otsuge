@@ -1,0 +1,107 @@
+{
+  "attempts": [
+    {
+      "command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "--unit=akasha-generation-41cf762deb9945268af754cb7d658779",
+        "-p",
+        "MemoryMax=671088640",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=180",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=low",
+        "-p",
+        "Environment=AKASHA_SPIKE_DISK_RESERVE_BYTES=36212254720",
+        "-p",
+        "Environment=AKASHA_SPIKE_INDEX_OBSERVE_SECONDS=180",
+        "/home/obj/.local/share/mise/installs/python/3.13/bin/python",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r2/begin/41cf762deb9945268af754cb7d658779/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r2/begin/probe",
+        "/tmp/akasha-generation-runner-l_vnqt_d/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r2/begin/request.json"
+      ],
+      "id": "41cf762deb9945268af754cb7d658779",
+      "log": "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r2/begin/41cf762deb9945268af754cb7d658779/engine.log",
+      "phase": "completed",
+      "result": {
+        "artifact_sha256": {
+          "41cf762deb9945268af754cb7d658779/engine.log": "d6283896f623b780b45b6efb4849a2c70b970ffa21be635ec85160fd7c1c2622",
+          "41cf762deb9945268af754cb7d658779/memory.jsonl": "3585fc2e1b62ad121a72b711a00733da8f5629a89b1756735400816ec2343e5f",
+          "config.toml": "98945bec5cda8e1feb12ea5fa2bcb08182aa7ccde21d3599e86cba7b49a4d598",
+          "manifest.json": "86383ee70a53cbe7203d61cc5aef720b2f10f526162bf6548b42ed09a2422dfc",
+          "request.json": "dc62a68380b4f4cc19e9bf7805a248629e0c34abf8a5b3b124ffaf211794042a"
+        },
+        "elapsed_s": 4.0430812845006585,
+        "exit": 0,
+        "failure": null,
+        "generation": 1,
+        "native_config_attested": true,
+        "operation": "begin_corpus",
+        "status": "passed"
+      },
+      "started_unix_s": 1792769174.5916057,
+      "unit": "akasha-generation-41cf762deb9945268af754cb7d658779"
+    }
+  ],
+  "config_epoch": 1,
+  "controller": {
+    "pid": 57760,
+    "start_ticks": "458707148",
+    "state": "R"
+  },
+  "identity": {
+    "binary_sha256": "2e1a13c0eca59f25c4bb6b961d92edddfa3aa5238d53f3d5381337326afda597",
+    "config": {
+      "disk": {
+        "reserve_bytes": 36212254720,
+        "start_bytes": 81212254720
+      },
+      "paths": {
+        "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/index-budget-r1/probe",
+        "database": "/tmp/akasha-generation-runner-l_vnqt_d/database",
+        "output": "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r2/begin",
+        "request": "/tmp/akasha-otsuge-storage-20261022/generation-runner-budget-r2/begin.json"
+      },
+      "reliability": {
+        "max_attempts": 1
+      },
+      "run": {
+        "id": "begin",
+        "profile": "low",
+        "seconds": 180
+      }
+    },
+    "controller_sha256": "3f2f292e09a640b5e9963d6917d920e4558ac90f6690e0bb58862302f08fba98",
+    "execution_request_sha256": "dc62a68380b4f4cc19e9bf7805a248629e0c34abf8a5b3b124ffaf211794042a",
+    "helpers_sha256": "a46ca6c522a995a1cfcd69f3fd32f92d03a8c4b42eeb1485f3e5ddb70516d8e9",
+    "manifest_sha256": "86383ee70a53cbe7203d61cc5aef720b2f10f526162bf6548b42ed09a2422dfc",
+    "observer_sha256": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029",
+    "request_sha256": "293b9844810b87950d99ee9f68438d00a6cce1b2c71930adccad20b258db7ec9"
+  },
+  "phase": "completed",
+  "result": {
+    "artifact_sha256": {
+      "41cf762deb9945268af754cb7d658779/engine.log": "d6283896f623b780b45b6efb4849a2c70b970ffa21be635ec85160fd7c1c2622",
+      "41cf762deb9945268af754cb7d658779/memory.jsonl": "3585fc2e1b62ad121a72b711a00733da8f5629a89b1756735400816ec2343e5f",
+      "config.toml": "98945bec5cda8e1feb12ea5fa2bcb08182aa7ccde21d3599e86cba7b49a4d598",
+      "manifest.json": "86383ee70a53cbe7203d61cc5aef720b2f10f526162bf6548b42ed09a2422dfc",
+      "request.json": "dc62a68380b4f4cc19e9bf7805a248629e0c34abf8a5b3b124ffaf211794042a"
+    },
+    "elapsed_s": 4.0430812845006585,
+    "exit": 0,
+    "failure": null,
+    "generation": 1,
+    "native_config_attested": true,
+    "operation": "begin_corpus",
+    "status": "passed"
+  }
+}

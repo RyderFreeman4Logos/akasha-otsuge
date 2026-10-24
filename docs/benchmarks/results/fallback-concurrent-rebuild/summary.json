@@ -1,0 +1,110 @@
+{
+  "archive_bytes": 1138728,
+  "archive_files": 297,
+  "archive_sha256": "5ae965159e898c90758dfeb648e1e81f827477898dad065c7a84b15be0b7f08e",
+  "artifacts_verified": true,
+  "binary_sha256": "31493c7fecd44c13ec00694e80c52e26282e8b6e6445f0792f383ac26b894961",
+  "clippy": "both release all-targets PASS",
+  "content_oracle": {
+    "corpus_current_checks": 144,
+    "corpus_current_distinct": 16,
+    "corpus_current_partitions": {
+      "p0": 18,
+      "p1": 17,
+      "p2": 18,
+      "p3": 17,
+      "p4": 18,
+      "p5": 19,
+      "p6": 18,
+      "p7": 19
+    },
+    "current_checks": 144,
+    "derived_current_checks": 50,
+    "distinct_commits": 1428,
+    "rebuild_search_overlap": {
+      "ann": 1,
+      "bm25": 1
+    },
+    "requests": 1698,
+    "search_checks": {
+      "ann": 15,
+      "bm25": 72
+    },
+    "text_only_bm25_checks": 36,
+    "text_only_bm25_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ],
+    "text_only_current_checks": 70,
+    "text_only_current_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ]
+  },
+  "controller_unit_tests": 6,
+  "exact_processes_gone": true,
+  "lifecycle_checks": 103,
+  "lifecycle_scope": "functional direct-subprocess regression; no cgroup memory acceptance inferred",
+  "lifecycle_seconds": 16.366702396422625,
+  "negative_controls": 8,
+  "not_proven": [
+    "full concurrent rebuild",
+    "full bounded uninterrupted build",
+    "full sustained throughput"
+  ],
+  "observer_groups": 11,
+  "owned_fixtures_removed": true,
+  "rebuild": {
+    "active_generation": 1,
+    "end_seq": 4155,
+    "generation": 2,
+    "ready": true,
+    "seconds": 0.321311363,
+    "start_seq": 4146,
+    "state": {
+      "backfill_deadline_ms": 1792813380803,
+      "bundle": {
+        "chunker": "source-document-v1",
+        "dimension": 1536,
+        "model": "text-embedding-3-large",
+        "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+        "schema": 2
+      },
+      "cursor": 16,
+      "documents": 16,
+      "generation": 2,
+      "index_deadline_ms": 1792813381281,
+      "pending": null,
+      "ready": true,
+      "source": "e98cad1faa112f00c48be5ec5af664bb26195e4d30f5754bbca491d0f8e2aed5",
+      "text_layout": "scope_columns",
+      "text_version": 1,
+      "vector_rows": 8,
+      "vector_version": 1,
+      "vectors": 8
+    },
+    "status": "passed"
+  },
+  "release_units": {
+    "fallback": 10,
+    "helix": 13
+  },
+  "requests": 1698,
+  "rss_max_bytes": 138678272,
+  "rss_p99_bytes": 138678272,
+  "status": "passed_diagnostic_only",
+  "units_inactive": true,
+  "workload_seconds": 75.3422840544954
+}

@@ -1,0 +1,507 @@
+# Helix embedded diagnostic probe
+
+Temporary MVP-003 experiment, outside the production Cargo workspace. The tested
+candidate failed full-data low-memory recovery; preserve it as evidence while
+validating the specified fallback. No production backend is selected.
+[Decision and failures](../../docs/benchmarks/storage-decision.md).
+[Frozen acceptance criteria](../../docs/benchmarks/storage-contract.md).
+
+Pinned upstream: [Helix v3.5.1 / c72e64f0](https://github.com/HelixDB/helix-db/tree/c72e64f0c7e480f3d125f071659d5e3ad7b8da15),
+Rust SDK `3.0.0`, engine `db 0.1.0`, Apache-2.0. Its SlateDB fork is pinned to
+`2fb25fdaa61d42cc3756f979a8a7b37dbfc483fd` (`0.16.0`). The independent Cargo.lock
+records all resolved dependencies. No upstream files were modified.
+
+From the repository root:
+
+```sh
+CARGO_TARGET_DIR="$PWD/target/storage-spike" cargo build --release --locked \
+  --manifest-path spikes/helix/Cargo.toml
+systemd-run --user --wait --pipe --collect --unit=akasha-helix-crash-probe \
+  -p MemoryHigh=536870912 -p MemoryMax=671088640 -p MemorySwapMax=0 \
+  -p RuntimeMaxSec=300 \
+  /usr/bin/python3 "$PWD/spikes/helix/check_crash.py" \
+  "$PWD/target/storage-spike/release/akasha-helix-probe"
+```
+
+The controller creates and removes its own fresh temporary directories. It
+kills only its own child process at explicit barriers; then separate processes
+reopen the database and verify revision/head/receipt/job/sequence counts and
+contents. A runtime type error after staging a revision must roll the whole
+statement back. The engine's commit is observed before `close()`, so a clean
+shutdown cannot conceal a missing acknowledgement durability boundary.
+
+The probe disables embedded telemetry. Explicit budgets are vector cache 32 MiB,
+SimHasher 2 MiB, Slate block/metadata 32/8 MiB, FTS 8 MiB, unflushed data 32 MiB,
+pending queue 8 MiB/4096 items per index, strong vector pending 8 MiB, strong text
+analysis 16 MiB, vector build cache 32 MiB and one lifecycle build slot. Remaining
+text backfill limits are explicit pinned values: 512 entities/8 MiB input and
+output, 32,768 output operations, 512 artifacts/4 MiB, compaction fan-in 32,
+64 MiB compaction input/output, 128 MiB temporary disk and a 4 MiB manifest.
+Cypher uses the
+public embedded request boundary with 32 MiB/query, 2 MiB results and a 60-second
+deadline; native queries also receive that deadline. These controls are
+not yet a validated aggregate production budget. Cgroup usage includes the Python
+controller and page cache, and is not the full-scale RSS measurement.
+
+The default remains `AKASHA_SPIKE_PROFILE=low`. The explicit `high` profile uses
+128 MiB vector cache, 64/16 MiB Slate caches, 32 MiB FTS, 512 MiB vector build
+cache and 64 MiB unflushed data; request, staging and concurrency limits stay the
+same. Every open logs the selected profile. An unknown or non-UTF-8 profile fails
+before opening the database. Both configurations pass the native search fixture;
+neither configuration alone proves the full RSS/rate contract.
+
+Both profiles enable the pinned SlateDB fork's native Zstd codec for SST writes
+and its embedded compactor. The feature changes no dependency version. Profile
+receipts identify the codec; compression does not change eligible content bytes.
+`check_import.py OLD_PROBE NEW_PROBE` checks an uncompressed durable prefix,
+forced process death, compressed continuation, changed-prefix refusal and reopen.
+This establishes forward readability, not downgrade compatibility.
+
+Verified source chain: [Helix mutation commit](https://github.com/HelixDB/helix-db/blob/c72e64f0c7e480f3d125f071659d5e3ad7b8da15/crates/db/src/execution/interpreter/mutation/tx.rs)
+uses its owned serializable transaction; [SlateDB transaction](https://github.com/HelixDB/slatedb/blob/2fb25fdaa61d42cc3756f979a8a7b37dbfc483fd/slatedb/src/db_transaction.rs)
+commits with default write options whose `await_durable` is true. The runtime
+probe verifies process-crash recovery. It does not certify arbitrary power loss,
+historical pagination, idempotency, indexing, 100 clients or 50 GB operation.
+
+## Additional diagnostics
+
+`--indexes` creates 100 small fixtures, builds partitioned BM25 and vector
+indexes, and checks matching, excluded scope, nearest self and reuse of an
+already active definition. Its vectors have only three dimensions; this checks
+API behavior, not production-size performance.
+
+`--load PREPARED_JSONL [MANIFEST]` requires a new directory and imports bounded
+records in 16-record transactions. With a `prepare_corpus.py` manifest, each batch
+atomically stores its document count and input-prefix hash. `--resume-load INPUT
+MANIFEST` revalidates that prefix before any new writes and rejects changed
+manifests. It checks complete stream size/hash, body bytes, vector and document
+counts before marking the import complete. Progress is fsynced to the owned root.
+Resume reports prefix verification separately from new writes, including the
+already durable document count; prefix scanning is not ingestion throughput.
+The manifest-free diagnostic form is not resumable. Real precomputed
+1536-dimensional input is prepared by `../data/prepare_vectors.py` or the full
+corpus preparer. `--build-indexes [SECONDS_PER_INDEX]` builds the Document text
+and 1536-dimensional vector indexes. The default two-hour observation deadline
+is a harness limit, not a performance acceptance threshold. Full-size runs pass
+an explicit budget (up to seven days per index). Every five seconds and at
+completion, each family's progress is fsynced with operation identity, actual
+stage and counters. Entity counters include validation visits; total unique
+coverage and ETA are not inferred from them. Reopening resumes the same native
+operation. `check_index_progress.py PROBE REAL_FIXTURE` exercises both native
+builds, terminal checkpoints, reuse and invalid deadlines before database open.
+
+Wrap long runs in `../measure.py NEW_SAMPLES_JSONL COMMAND ...` inside a fresh
+dedicated systemd service cgroup with a finite memory limit and swap disabled.
+The observer records engine RSS/PSS, its own RSS, cgroup usage/events and the
+executed binary hash. Cgroup memory includes file cache; it is reported separately
+from process RSS. The observer terminates only its owned child on failure.
+
+[Published diagnostic results](../../docs/benchmarks/results/) include the real
+38,462-vector import and its raw memory samples. This first shard is 13,344,347
+indexed UTF-8 body bytes, including 38,462 added title/text separators, far below
+the required full corpus. The first long vector build exhausted its observation
+deadline without completing. Reopening the persistent operation under a 2 GiB
+cgroup completed it in a further 1,201 seconds; the engine retained its original
+32 MiB build cache. The 76,932 reported entities include validation passes over
+38,462 inputs. No production backend has been selected.
+
+`../data/prepare_search_fixture.py FIRST_VECTOR_PARQUET NEW_JSON` verifies the
+pinned shard and selects one real document with a rare term in each partition.
+`--search-corpus FIXTURE_JSON` reopens the database and checks BM25/self-vector
+top-20 inclusion and partition exclusion. All 24 queries passed in 2.32 seconds
+under a 640 MiB cgroup maximum. This is a process reopen, without dropping the
+OS page cache, and not complete recall coverage or a sustained load result.
+
+## Immutable history and idempotency oracle
+
+`--oracle-seed COUNT` appends deterministic revisions to 1,024 logical memories,
+cycling scope, retraction and restoration. One authority transaction checks the
+head and global counter, appends the immutable revision, switches the head,
+stores the request hash/receipt and appends pending derived work. Repeating the
+same seed reconciles each durable receipt; changed input with the same ID conflicts.
+Synthetic oracle bodies are excluded from all eligible public-corpus byte counts.
+
+`--oracle-verify COUNT` runs in a separate process after close/reopen. It compares
+exact identities/content at five commit points, paginates all eight scopes,
+checks stale-head and idempotency conflicts and counts revisions/receipts/jobs.
+Each operation publishes fsynced progress in the owned database directory.
+The active database has one writer; do not run seed/verify against the same root
+concurrently. Both commands take the existing database root before the mode.
+
+Historical lookups use one `between` predicate on a composite ordered revision
+key. In this pinned engine, expressing the same range as two separate inequalities
+made the diagnostic scan much slower. Membership cursors must strictly advance.
+This oracle proves the measured history/transaction leaf only: derived watermarks,
+live permission revocation, 100 clients and the full-scale profiles remain separate
+required acceptance work.
+
+`check_import.py ABSOLUTE_PROBE_BINARY` force-kills its own child after 32 durable
+documents, rejects a changed prefix, resumes 1,057 documents including a partial
+last batch, repeats resume without duplicates and rejects a changed manifest.
+`AKASHA_SPIKE_IMPORT_HOLD_AFTER` is only an explicit crash-fixture barrier; normal
+imports leave it unset. Test directories are owned and removed after children exit.
+
+`import_corpus.py INPUT_DIR MANIFEST NEW_RUN_DIR PROBE DATA_PYTHON` pipes the
+reproduced corpus directly to the importer. It retains the exact probe binary,
+admits unique producer/consumer units durably and separates the 8 GiB Python
+preparation limit from the 2 GiB engine limit. Both processes and the complete
+stream hash must succeed. No second 84 GB JSONL file is retained. The controller
+reserves space for authority, two index generations, scratch and 30 GiB free;
+these are planning envelopes, not measured index sizes. It stops its own units
+before import consumes the later-index reservation. `--resume` validates run
+ownership, source/input/binary identities and dead prior units, then reconciles
+the import prefix. Completed runs validate their artifact hashes without writes.
+Use the virtual environment's Python path without resolving its symlink.
+
+An explicit `--adopt-run OLD_RUN` starts a new binary/run from a stopped partial
+import. It checks the old controller, every unit, binary, corpus and unchanged
+disk reservations; archives the old state/progress; then journals a same-filesystem
+database-directory transfer. `--resume` reconciles interruptions on either side
+of the atomic rename. Old logs and the old executable remain separate evidence.
+`check_adoption.py` exercises both transfer crash windows, evidence drift, live
+owners/units and duplicate database locations. Adoption needs the existing index,
+scratch and free-space reservation plus 1 GiB startup room; it does not reserve
+the already occupied authority bytes a second time. Mixed-binary import elapsed
+times must remain separate, never presented as one candidate's throughput.
+
+The streaming controller passes a 38,462-record end-to-end check, completed-run
+reuse and negative identity/artifact checks. Full corpus import, indexing and
+acceptance remain separate steps.
+
+## Bounded workload cases
+
+Copy `workload.example.toml` outside Git and fill its absolute paths. Run
+`python3 spikes/helix/run_case.py CASE.toml`. Use a fresh run ID and output path
+for each `steady`, `burst` and `overload` case. The runner reads configuration only
+between cases and freezes it, the executable, input manifest and fixture hashes
+before effects. Epoch 1 is local to that case's runtime ID; do not aggregate
+different case configuration snapshots. Full steady cases require at least 1,800
+seconds and a completed import bound to the full manifest. Seed the historical
+oracle before starting workload cases in a new full database.
+
+The Rust harness starts 100 independent clients, one operation in flight per
+client, with four fair admission slots and at most 100 waiting requests. It
+records every result/latency, including real conflicts between writers sharing
+identities. Schedules include approximately 4 KiB writes, structured current
+reads, real BM25/ANN and exact 100-entry historical pages. Success rates count
+only operations completed inside the measurement window. Latency includes client
+scheduling delay and queue time. Corrections have their own success count.
+
+Every second the harness syncs request records, appends queue/progress samples and
+atomically checkpoints progress. The separate observer measures the entire
+engine/client process RSS/PSS and I/O; its Python memory is reported separately.
+If cgroup I/O accounting is unavailable, `/proc` counters are explicitly labelled
+as currently sampled processes. Derived lag remains unavailable until that
+separate acceptance leaf is implemented.
+
+The observer tolerates an exit-time procfs permission error only after confirming
+the PID disappeared or became a zombie. Its I/O sample remains unavailable; a
+permission error for a live process still fails observation. Run
+`python3 spikes/check_measure.py` for the focused exit-race checks.
+
+An independent controller oracle reconstructs committed contents from request
+identities and compares every current read at its recorded commit point, including
+retractions. It rejects wrong content, duplicate/gapped sequences, executable or
+resource-profile drift and mismatched raw counts. `--resume` reuses a completed
+case only after validating its identity and artifact hashes. A still-live owner
+is refused; an ambiguous interrupted case requires `--abandon EXACT_RUN_ID`
+before another case may use the database. No measured case is automatically
+replayed. A TOML change is a new case, not an in-place change to old work.
+
+The 60-second, 38,462-vector diagnostic completed 1,698 requests from all 100
+clients; burst and ten-second overload diagnostics also passed. These are
+controller checks, not 50 GB or 30-minute profile acceptance. Current synthetic
+corrections do not yet modify the real search candidates; generation watermarks,
+live permissions, broad cold-query coverage and recovery remain required.
+
+`../data/prepare_query_population.py INPUT_DIR CORPUS_MANIFEST NEW_OUTPUT`
+freezes 128 real queries from each vector shard (3,328 for the full corpus).
+Per-shard preparation checkpoints support explicit `--resume`; completed results
+are reused after hash validation. Query metadata stays bounded and vectors live
+in a checked float32 sidecar, read by offset only for the admitted request.
+Full workload cases require this distributed population bound to their corpus.
+Each raw search receipt records query identity, returned identities and self@20.
+Self inclusion is a ranking measurement for this population, separate from the
+exact scope oracle and from recall against an exhaustive top-20 reference.
+Neither disjoint partition names nor process restart proves file-cache coldness.
+
+The workload now grants its own diagnostic principal explicit scope permissions.
+Current reads and candidate validation share the authority writer boundary with
+corrections and permission updates. Candidate results record `read_seq`,
+`validated_at_seq` and permission revision; an unmet `min_commit_seq` is an error.
+Validation compares each indexed revision with the latest head and immutable
+history in one bounded native read batch (at most 20 candidates, without bodies).
+A malformed or missing head with surviving history is an explicit
+integrity error, not permission to revive an original corpus entry. Missing
+grants deny access. Historical reads retain their fixed contents while checking
+the current principal's permission. The historical oracle counts its original
+commit prefix so later workload writes cannot invalidate an earlier exact view.
+
+These checks require corpus `memory` identities written by the current importer.
+An older diagnostic database without them is rejected. Recreate that disposable
+fixture from its verified source; do not invent identities at query time.
+Coverage is still labelled `candidate_set_only` until generation watermarks are
+implemented. The steady workload's synthetic corrections remain separate from
+the real-candidate invalidation fixture below.
+
+`check_visibility.py PROBE EIGHT_QUERY_FIXTURE PREPARED_SOURCE NEW_EVIDENCE`
+selects the eight actual source documents, builds real BM25/ANN indexes, keeps
+their old entries deliberately present and exercises retraction, restoration,
+scope moves, permission changes during a query, principal isolation and reopen.
+Later corrections preserve historical content, while current permission
+revocation denies its use. The reopen phase injects invalid and missing heads
+only in its disposable database and checks explicit integrity failures, including
+an orphaned revision beyond the global commit counter. Each
+observed command has its own cgroup. This is a functional diagnostic, not a
+full-scale, physical-file-corruption or sustained-profile acceptance result.
+
+`check_generations.py PROBE PUBLIC_EIGHT_DOCUMENT_SUBSET NEW_EVIDENCE` drives
+`--generation REQUEST_JSON` in separate native processes. A committed outbox
+record identifies its configuration generation; completion records separately
+bind the source sequence, target index generation and text/vector family.
+Out-of-order completions cannot advance a watermark across a gap. One `advance`
+request processes at most 256 records under the writer lock; callers can repeat
+it between other admitted work. Indexed receipts report both family watermarks
+and the native strong-search contract, including its bounded pending overlay.
+
+Bundles bind the model name and immutable source fingerprint, dimension, chunker
+and schema. Vector output must match that bundle and the exact source body hash.
+Activation changes the bundle pointer atomically only after both families cover
+the current commit point. Failed candidate builds leave the old bundle readable;
+retained old bundles still revalidate current heads and permissions. Deliberate
+process kills bracket index application, watermark publication and activation.
+The ordinary write in the build fixture occurs between native text and vector
+build phases; it is not a full-size concurrent-build throughput measurement.
+
+The plain `begin` request covers authority revisions only and refuses imported
+`Document` data. `begin_corpus` additionally takes the exact completed import's
+manifest and binds source provenance, byte/vector/document counts and bundle.
+The `backfill` request copies eight immutable source records per transaction;
+derived rows and their cursor commit together. It checks contiguous IDs and final
+coverage before allowing native index construction. Its fsynced progress includes
+actual completed records, totals, current-attempt rate and ETA. Source corpus
+mutation is not allowed during backfill; ordinary revision writes use the durable
+outbox and must catch up before activation. Resume requires the same bundle and
+manifest. Each wave releases the shared writer before the next batch.
+
+`check_backfill.py PROBE PUBLIC_EIGHT_DOCUMENT_SUBSET NEW_EVIDENCE` exercises the
+import/backfill/build/activate path in separate native processes. It uses eight
+public vector documents and 17 explicitly synthetic diagnostic records. Forced
+exits before and after batch commit verify cursor/data atomicity; malformed
+source counts, gaps, final byte counts and changed manifests are rejected. Two
+generations perform real vector reads while retaining the prior bundle. The
+model fingerprint uses SHA-256 of the compact, key-sorted provenance JSON; this
+does not recompute embeddings or claim new-model quality.
+
+Imported documents are authoritative revision zero. Current and historical reads
+use bounded native lookups; candidate filtering checks the actual source identity
+and scope, including before the first correction. Corpus backfill records original
+scope membership atomically so a later scope move preserves historical pages.
+Missing pinned source records fail explicitly. Historical pagination releases the
+writer during immutable reads and rechecks live permission before returning.
+
+The [corpus-view diagnostic](../../docs/benchmarks/results/corpus-views-diagnostic/summary.json)
+passes 114 native commands and a separate visibility/reopen check. It retains the
+forged-candidate regression, writer-lock RED/GREEN test, profiling source and failed
+workload. The corrected 60-second, 100-client workload passes unchanged thresholds:
+11.8 writes/s, write P95 4,303 ms, current P95 2,888 ms, historical-page P95 6,652 ms
+and RSS maximum 162,824,192 bytes. Earlier runs added synthetic revisions to the
+same diagnostic database, so the comparison is not an isolated hardware speedup.
+Full-size current-read coverage and both 30-minute profiles remain required.
+
+The [corpus-current diagnostic](../../docs/benchmarks/results/corpus-current-diagnostic/summary.json)
+adds actual pinned source reads to every current operation, inside its existing
+deadline. An independent Python oracle verifies source identity, content hash,
+scope and committed read point; seven corrupted-receipt controls fail. Population
+admission also rejects missing/duplicate source IDs and malformed body hashes.
+Historical reads batch at most eight records, precommit metadata shares one native
+snapshot, and current reads hydrate the already validated head. The atomic write
+transaction and live permission checks remain in place.
+
+The final retained binary passes 123 corpus/pagination commands, visibility across
+reopen, and 5,163 exact history checks over 100,000 changes. Its 100-client,
+60-second diagnostic records 1,698 requests, 144 synthetic and 144 real corpus
+current checks across eight partitions: 12.28 writes/s, write P95 483 ms, current
+P95 569 ms and historical-page P95 2,575 ms. RSS P99/maximum is 510,844,928 bytes,
+close to the 512 MiB target; the full-duration profiles remain necessary. The
+archive retains three failed workloads and temporary profiling source. Different
+accumulated revisions and concurrent host work prevent isolated speedup claims.
+The corpus command fixture has no independent RSS/cgroup attestation; workload,
+visibility and 100,000-change checks retain their separate resource observations.
+Unvectorized text coverage and generation-backed concurrent search remain open.
+
+The [generation-workload diagnostic](../../docs/benchmarks/results/generation-workload-diagnostic/summary.json)
+now runs real generation searches alongside ordinary commits and one bounded
+outbox worker. A case can pin `run.generation`; full cases require an active
+generation bound to the exact corpus. `catch_up` processes durable sequence
+prefixes and reports progress. Final native derived text, vector exclusion and
+indexed-job counts are checked independently against raw acknowledged changes.
+Eight corrupted derived-state controls fail, alongside seven source-current
+controls. The 106-command generation fixture retains crash/reopen, model
+separation and explicit text-only policy checks.
+
+`text_only: true` is persisted atomically with a revision. Its vector completion
+is `not_required` and removes an older vector; no embedding is invented. Absent
+or false keeps legacy request serialization and hashes. The explicit
+`--oracle-seed-text` / `--oracle-verify-text` modes prepare synthetic historical
+changes for this policy; existing oracle modes retain their prior hashes. The
+historical verifier limits its expected IDs to the synthetic oracle domain;
+imported revision-zero content has separate source checks.
+
+The final eight-document, 4,096-change, 60-second/100-client diagnostic passes:
+1,698 requests, 793 distinct commits, 144 source-current checks and 50 independently
+verified derived current records. Both watermarks reach 4,889 with zero remaining
+work. Writes reach 12.18/s with P95 21 ms, current P95 42 ms, history P95 241 ms;
+RSS P99/maximum is 306,741,248 bytes. This small generation does not replace
+full-size profiles, concurrent rebuild or real-corpus corrections during load.
+
+The probe admits at most two generation identities over the database lifetime. This
+is an explicit rebuild limit because the pinned engine does not reclaim native
+text split blobs, not a claim of garbage collection. Full-size disk admission,
+backfill execution, concurrent reindex performance and physical corruption remain pending.
+
+`run_generation.py CONFIG [--resume]` observes one immutable generation operation.
+The TOML has `run.id/profile/seconds`, `paths.binary/database/request/output`,
+`disk.start_bytes/reserve_bytes` and `reliability.max_attempts = 1`. The request
+is an existing `begin_corpus`, `backfill`, `build`, `catch_up` or `activate` JSON,
+or `{"op":"abort_index","generation":1,"operation_id":"EXACT_NATIVE_UUID"}`.
+The same owner can run the existing deterministic text-history oracle using
+`{"op":"seed_text","generation":1,"count":100000}` and then `verify_text`.
+Counts must be integers in 1..=1000000. Native seeding reconciles existing exact
+receipts; verification reopens and checks content/history without adding changes.
+Their progress includes PID/start time and is observed only inside the admitted
+unit. [Controller checks](../../docs/benchmarks/results/oracle-runner-diagnostic/summary.json)
+cover 2,048 commits, native replay, completed reuse, independent reopen verification
+and invalid-count refusal. Full-database 100,000-change execution remains pending.
+It verifies the completed import receipt, excludes simultaneous case owners,
+retains the executed binary and exact request/manifest/config snapshots, and
+observes the dedicated cgroup and native cursor.
+The controller passes the reserve to native admission and polls free space.
+Full runs retain the frozen current/next-index plan plus scratch
+and 30 GiB free. Resource changes belong to a later operation config, not a live
+case. No network or automatic operation retries are involved.
+
+The operation's `run.seconds` also sets `AKASHA_SPIKE_INDEX_OBSERVE_SECONDS`
+for native metadata/corpus/generation index observation (1..=604800 seconds).
+Direct native calls retain the 7200-second default; query deadlines are unchanged.
+The outer unit still bounds the complete operation. The controller requires the
+executed process to report both this value and its disk reserve; exit zero from
+an older binary that ignores them is insufficient. [Native and controller checks](../../docs/benchmarks/results/index-budget-diagnostic/summary.json)
+cover invalid values before database effects, default/explicit values and this
+unsupported-binary refusal. Existing full initialization retains its original
+binary, controller and time limits.
+
+An interrupted operation can be retired with
+`reconcile_generation.py OUTPUT --abandon EXACT_RUN_ID` after its exact controller
+and native unit have stopped. This checks ownership and retained input/artifact
+hashes, preserves the failed receipts, and records effects as unknown. It does
+not undo native work. A new `abort_index` operation must reach native `aborted`
+before replacing an unfinished index; completed indexes reject abort. Abandoned
+runs cannot execute again. The first controller's external manifest is supported
+only with its pinned controller hash and the original request/manifest hashes.
+
+Imported `Document.memory` values now use an ordinary equality index: the
+streaming importer assigns immutable ordinal IDs, current reads reject duplicate
+matches, and backfill requires exact contiguous coverage. Mutable authority and
+derived-record uniqueness constraints remain. The original full unique-index
+validation reached its 7200-second observation limit; this is a failed preparation
+attempt, not a backend rejection. The [lookup/recovery diagnostic](../../docs/benchmarks/results/corpus-lookup-recovery/summary.json)
+retains that result, 146 corpus checks, the 100-client mixed workload, native abort
+and replacement checks, and controller recovery checks. Its compressed raw archive
+has individual file hashes; binaries remain identified by hash rather than copied.
+
+`AKASHA_SPIKE_DISK_RESERVE_BYTES` binds one immutable disk reserve at native open.
+Ordinary authority/permission writes, generation records, bounded backfill,
+derived writes, watermark advancement and activation check available filesystem
+bytes before mutation. New indexes check before submission and while constructing;
+an exhausted reserve requests native operation abort. Active authority indexes,
+read-only operations and already committed authority receipts remain usable.
+Abort/failure bookkeeping uses the reserved scratch. The logical input allowance
+is not a measured bound on physical write amplification or a physical disk-full
+test. Raw diagnostic Cypher and the separately controlled importer are outside
+these ordinary/generation entry points.
+
+Workload TOML accepts `[disk] start_bytes/reserve_bytes`. Full cases require it:
+generation one retains 45 GB for the next index, 4 GB scratch and 30 GiB free;
+generation two retains scratch/free space under the explicit two-build limit.
+The native full-workload entry point also rejects a missing or smaller reserve.
+`check_disk_admission.py PROBE EIGHT_SOURCE_RUN OUTPUT` verifies rejection before
+new durable effects and continued reads/idempotent receipt reuse using an
+impossible requested reserve, without filling a shared filesystem. Full-size
+allocation measurements and isolated physical disk-full recovery remain pending.
+
+The [disk admission diagnostic](../../docs/benchmarks/results/disk-admission-diagnostic/summary.json)
+retains the old binary's erroneous commit under an impossible reserve, 26 passing
+native checks, nine controller recovery checks and the unchanged 60-second,
+100-client mixed case. The latter completes 1,698 requests at 12.17 writes/s,
+write P95 23 ms, matching text/vector watermark 4,888 and RSS maximum 319,324,160B.
+This fixture does not exercise actual mid-build space exhaustion or physical
+disk-full; those remain in the full recovery matrix.
+
+The [runner diagnostic](../../docs/benchmarks/results/generation-runner-diagnostic/summary.json)
+kills the controller after a real native backfill commit, refuses the still-live
+child and a new workload, then kills that exact child and resumes the committed
+cursor. Completion reuse, changed request rejection and an insufficient-space
+preflight pass; eight source rows remain exactly eight. Raw failed/prelaunch
+records are retained. `check_generation_runner.py PROBE EIGHT_SOURCE_RUN OUTPUT`
+reproduces the checks with the generation-workload fixture's inputs.
+
+The [complete import receipt](../../docs/benchmarks/results/full-import-zstd-v1/summary.json)
+verifies the entire prepared stream and 11,428,831 documents. The compressed
+continuation, including prefix verification, took 12,557 seconds with high-profile
+RSS maximum 886,087,680 bytes. The closed database occupied 48,987,971,584 allocated
+bytes; this single observation does not isolate compression from compaction or
+reopen effects. Full derived indexes and sustained workload acceptance remain open.
+
+The [visibility diagnostic receipts](../../docs/benchmarks/results/visibility-diagnostic/summary.json)
+retain the serial-validation failure (write P95 9,316 ms), the batch-read fix and
+the unchanged 60-second, 100-client workload: 1,698 requests, 12.12 writes/s,
+write P95 1,932 ms and RSS maximum 166,715,392 bytes. All small-case thresholds
+pass; this does not replace either full-size 30-minute profile. The earlier
+history oracle result explicitly identifies its earlier binary and workload.
+
+`check_query_population.py PROBE DATABASE QUERY_JSON NEW_RESULT` checks real
+BM25/ANN/excluded-scope queries and rejects bad offsets, traversal paths,
+dimensions, hashes, zero vectors and NaNs before workload admission.
+`check_case_recovery.py PROBE DATABASE QUERY_JSON NEW_EVIDENCE` runs a 60-second
+case, kills its exact child after a fsynced successful write, verifies ordinary
+resume refuses ambiguity, explicitly abandons that run without modifying raw
+artifacts, then executes a successor case and revalidates the prior completion.
+The tested abandonment record keeps effects unknown; it never invents success.
+
+`../data/ann_oracle.rs` is a standalone standard-library Rust exact-cosine
+scanner. Compile with `rustc --edition 2024 -O -C target-cpu=native` and run
+`../data/prepare_ann_oracle.py INPUT MANIFEST QUERY_JSON ORACLE_BINARY NEW_OUTPUT`.
+The preparation selects four queries per partition by a frozen hash order,
+verifies every source shard and scans all one million float32 vectors. It uses
+float64 accumulation, filters by the same partition and resolves ties by key.
+Per-shard conversion and exact-scan checkpoints support explicit reconciliation;
+temporary vector streams are deleted after the complete result is durable.
+The resulting `queries.json` can be passed to `--search-corpus`, which reports
+recall@20 separately from exact scope checks. On the 38,462-vector diagnostic,
+32 exact-reference ANN queries achieved recall@20 of 1.0; full-corpus measured
+recall remains pending even though its reference has been prepared.
+
+Candidate revalidation hydrates corpus `source_key` from the same authoritative
+snapshot used for head/scope checks. A retracted then restored derived row may
+have no stored source key; a corrupt derived key is also replaced by this verified
+identity. Current/history entry formats are unchanged and no extra query is added.
+The 141-command corpus fixture covers both retrieval families, restoration with
+a scope change, forged derived keys, live revocation and immutable history; a
+separate visibility/reopen check also passes. See `source-key-diagnostic/` for
+the earlier failing binary and exact receipts. Sustained concurrent corpus
+corrections and full-size retrieval remain required.
+
+Search fixtures now explicitly mark unvectorized queries with `text_only`.
+Current/BM25 workloads select the complete population; ANN selects only verified
+vector entries. Sidecar offsets count vectors, so mixed ordering stays valid.
+Full steady cases require text queries and observed current/BM25 coverage in all
+eight partitions. The independent verifier checks query identity, type, scope,
+validated candidates and committed read points, and reports text-only coverage.
+
+The mixed diagnostic uses eight public vector documents plus eight clearly
+synthetic text documents, which never count toward full corpus size. Its 100
+clients/60-second case passes 1,698 requests, 70 text-only current reads and 36
+text-only BM25 queries across all partitions, plus 15 real ANN queries. RSS
+P99/maximum is 300,818,432B. These results and the separately admitted 3,840-query
+full population are in `mixed-query-diagnostic/`; full native reads remain pending.

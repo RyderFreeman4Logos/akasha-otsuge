@@ -1,0 +1,9 @@
+{
+  "corpus_manifest": null,
+  "diagnostic": true,
+  "fixture": "/tmp/akasha-otsuge-storage-20261022/search-eight-partitions.json",
+  "output": "/tmp/akasha-otsuge-storage-20261022/case-burst-r3/runtime",
+  "phase": "burst",
+  "run_id": "diagnostic-burst-r3",
+  "seconds": 5
+}
