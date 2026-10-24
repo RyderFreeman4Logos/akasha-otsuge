@@ -86,7 +86,11 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       already nonresident at admission; its subsequent 60s/100-client case passes
       1,698 requests and independent content checks, RSS max324,235,264B.
       A separate warm-file control proves actual eviction without byte changes.
-      Full database cold coverage remains pending.
+      The full database's47,108 files (138,284,851,200 allocated bytes) now also
+      verify zero resident pages after eviction under the owner lock. Its first
+      cold100-client diagnostic OOMs after2.749s, with29 completed requests at
+      the last checkpoint. Cold preparation passes; workload acceptance fails.
+      Exact processes/scratch are reconciled and the case explicitly abandoned.
 - [x] Index every declared searchable text/vector record at full size. Fallback
       native statistics verify all 11,428,831 text rows and 1,000,000 vector rows
       after bounded streaming training and single-worker partition merge.
@@ -110,6 +114,12 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       explicit abandonment, subsequent execution and prior-receipt reuse pass.
 - [ ] Run >=30 minutes each at 512MiB and 2GiB; meet every frozen rate/latency/RSS
       threshold; include cold reads, burst, overload fairness and bounded drain.
+      Full cold OOM isolation finds retained free glibc arenas; a fixed131072-byte
+      mmap threshold reduces sampled max/P99 to363,409,408B under the original
+      640MiB group. One heavy-search permit misses BM25 throughput, so acceptance
+      remains failed. Two heavy permits also meet short-run memory but reduce
+      throughput further; that control is reverted. Profile query stages with
+      one heavy permit before another change. Build peak memory is separate.
 - [ ] Verify atomic revision/head/receipt/job/sequence commit; request-hash reuse;
       historical pages; current head/scope revalidation and live permissions.
       Small real-index fixtures now cover stale candidates, permission races,

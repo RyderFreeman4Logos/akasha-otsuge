@@ -84,6 +84,7 @@ struct Shared {
     base: u64,
     start: Instant,
     admission: Semaphore,
+    search_admission: Semaphore,
     queued: AtomicUsize,
     active: AtomicUsize,
     metrics: Mutex<Metrics>,
@@ -300,7 +301,7 @@ impl Shared {
             "pid":std::process::id(),"start_ticks":std::fs::read_to_string("/proc/self/stat")?.rsplit_once(')').ok_or("invalid proc stat")?.1.split_whitespace().nth(19),
             "clients":metrics.clients.to_vec(),"operations":operations,"queued":self.queued.load(Ordering::Relaxed),
             "queued_bytes_upper_bound":self.queued.load(Ordering::Relaxed)*8192,"peak_queued":metrics.peak_queued,
-            "active":self.active.load(Ordering::Relaxed),"admission_slots":4,"queue_entry_bound":100,
+            "active":self.active.load(Ordering::Relaxed),"admission_slots":4,"search_admission_slots":1,"queue_entry_bound":100,
             "queue_bytes_bound":100*8192,"wave_seconds":1,"derived":*self.derived.lock().map_err(|_|"derived progress poisoned")?}),
         )
     }
@@ -317,6 +318,26 @@ impl Shared {
         atomic_json(&self.config.output.join("progress.json"), &value)?;
         Ok(value)
     }
+}
+
+async fn admit<'a>(
+    admission: &'a Semaphore,
+    search: &'a Semaphore,
+    kind: usize,
+) -> Result<
+    (
+        tokio::sync::SemaphorePermit<'a>,
+        Option<tokio::sync::SemaphorePermit<'a>>,
+    ),
+    tokio::sync::AcquireError,
+> {
+    // Waiting searches must leave ordinary read/write capacity available.
+    let search = if matches!(kind, 2 | 3) {
+        Some(search.acquire().await?)
+    } else {
+        None
+    };
+    Ok((admission.acquire().await?, search))
 }
 
 async fn client(shared: Arc<Shared>, id: usize) -> Result<(), Error> {
@@ -345,7 +366,11 @@ async fn client(shared: Arc<Shared>, id: usize) -> Result<(), Error> {
             metrics.peak_queued = metrics.peak_queued.max(queued);
         }
         let deadline = Instant::now() + Duration::from_secs(60);
-        let acquired = tokio::time::timeout_at(deadline, shared.admission.acquire()).await;
+        let acquired = tokio::time::timeout_at(
+            deadline,
+            admit(&shared.admission, &shared.search_admission, kind),
+        )
+        .await;
         shared.queued.fetch_sub(1, Ordering::Relaxed);
         let result = match acquired {
             Ok(Ok(permit)) => {
@@ -583,6 +608,7 @@ async fn run_open(
         base,
         start: Instant::now(),
         admission: Semaphore::new(4),
+        search_admission: Semaphore::new(1),
         queued: AtomicUsize::new(0),
         active: AtomicUsize::new(0),
         metrics: Mutex::new(Metrics::default()),
@@ -704,6 +730,31 @@ async fn run_open(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn heavy_search_waits_without_occupying_ordinary_admission() {
+        use std::{
+            future::Future,
+            task::{Context, Waker},
+        };
+        let general = Semaphore::new(4);
+        let search = Semaphore::new(1);
+        let first = admit(&general, &search, 2).await.unwrap();
+        let mut second = Box::pin(admit(&general, &search, 3));
+        let mut cx = Context::from_waker(Waker::noop());
+        assert!(second.as_mut().poll(&mut cx).is_pending());
+        assert_eq!(general.available_permits(), 3);
+        let ordinary = admit(&general, &search, 0).await.unwrap();
+        assert_eq!(general.available_permits(), 2);
+        drop(first);
+        let resumed = match second.as_mut().poll(&mut cx) {
+            std::task::Poll::Ready(Ok(permits)) => permits,
+            _ => panic!("waiting search did not resume"),
+        };
+        drop((ordinary, resumed));
+        assert_eq!(general.available_permits(), 4);
+        assert_eq!(search.available_permits(), 1);
+    }
 
     #[test]
     fn every_full_generation_reserves_rebuild_space() {

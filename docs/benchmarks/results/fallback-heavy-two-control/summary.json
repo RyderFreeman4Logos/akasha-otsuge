@@ -1,0 +1,134 @@
+{
+  "archive_bytes": 1327868,
+  "archive_files": 29,
+  "archive_sha256": "72619cb1ded62c0c7b894a32f5e29864d933167b2eb8f3bbdfd73d16f6ba7cf8",
+  "artifacts_verified": true,
+  "content_oracle": {
+    "corpus_current_checks": 144,
+    "corpus_current_distinct": 144,
+    "corpus_current_partitions": {
+      "p0": 19,
+      "p1": 19,
+      "p2": 25,
+      "p3": 17,
+      "p4": 15,
+      "p5": 19,
+      "p6": 13,
+      "p7": 17
+    },
+    "current_checks": 144,
+    "derived_current_checks": 50,
+    "distinct_commits": 1393,
+    "requests": 1681,
+    "search_checks": {
+      "ann": 14,
+      "bm25": 56
+    },
+    "text_only_bm25_checks": 10,
+    "text_only_bm25_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p4",
+      "p5",
+      "p7"
+    ],
+    "text_only_current_checks": 50,
+    "text_only_current_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ]
+  },
+  "controller": {
+    "pid": 1399194,
+    "start_ticks": "462089152",
+    "state": "R"
+  },
+  "decision": "revert two-search control; profile full query stages on single-search candidate",
+  "exact_processes_gone": true,
+  "failures": [
+    "bm25 minimum successful rate missed",
+    "ann minimum successful rate missed"
+  ],
+  "limits": {
+    "memory.high": "max",
+    "memory.max": "671088640",
+    "memory.swap.max": "0"
+  },
+  "memory_thresholds_passed": true,
+  "native": {
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-case-421c07d622f140c3a5678c91559eb54f.service",
+    "event": "executable",
+    "pid": 1399326,
+    "sha256": "c9578134c33e34ac5e3cf83dc4a2c0e7650246983cdb595c10d1b976a0922616",
+    "start_ticks": "462089947"
+  },
+  "operations": {
+    "ann": {
+      "attempted": 14,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 27594,
+      "successful": 14,
+      "successful_per_s": 0.16666666666666666,
+      "within_window": 10
+    },
+    "bm25": {
+      "attempted": 56,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 33251,
+      "successful": 56,
+      "successful_per_s": 0.7333333333333333,
+      "within_window": 44
+    },
+    "correction": {
+      "attempted": 12,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 86,
+      "successful": 12,
+      "successful_per_s": 0.2,
+      "within_window": 12
+    },
+    "current": {
+      "attempted": 144,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 180,
+      "successful": 144,
+      "successful_per_s": 2.4,
+      "within_window": 144
+    },
+    "history": {
+      "attempted": 15,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 1006,
+      "successful": 15,
+      "successful_per_s": 0.25,
+      "within_window": 15
+    },
+    "write": {
+      "attempted": 1440,
+      "conflicts": 109,
+      "errors": 0,
+      "p95_upper_ms": 206,
+      "successful": 1331,
+      "successful_per_s": 22.183333333333334,
+      "within_window": 1331
+    }
+  },
+  "rss_max_bytes": 530878464,
+  "rss_p99_bytes": 530878464,
+  "scratch_removed": true,
+  "seconds": 82.48038316052407,
+  "status": "memory_pass_throughput_failed",
+  "unit": "inactive"
+}

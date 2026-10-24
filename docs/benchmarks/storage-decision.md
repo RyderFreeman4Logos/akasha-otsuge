@@ -267,3 +267,40 @@ matching checkpoint. Nine release units, three controller units and Clippy pass.
 The independently identified post-activation check verifies all100,000 changes
 and5,163 historical invariants in4.015s observed elapsed time, sampled RSS max
 72,450,048B. This adds no seed changes and does not relax expired-job handling.
+
+The [first full cold mixed workload](results/fallback-full-cold-workload-r1/summary.json)
+fails with a journal-confirmed group OOM after2.749s. Before launch, the exclusive
+owner verifies all47,108 files have zero resident pages, covering138,284,851,200
+allocated bytes. This proves cold preparation only. The last durable checkpoint
+has29/1,698 requests and commit100070; the native terminal receipt is absent.
+Exact native/controller termination, artifact hashes and private scratch cleanup
+are reconciled, then the run is explicitly abandoned without replaying writes.
+Concurrent heavy searches share four general permits; bounding their combined
+working set is the next controlled change. Single-query success did not prove
+concurrent workload acceptance, and the separate build peak remains unresolved.
+
+[Allocator isolation](results/fallback-allocator-diagnosis/summary.json) narrows
+this failure. One heavy-search permit still OOMs. Keeping the low engine settings
+under a diagnostic2GiB cgroup reveals about1.06GB RSS. A child-only malloc_info
+sampler then observes29 glibc arenas retaining729,096,192B at shutdown, of which
+728,283,099B is free; the largest sampled live-allocation estimate is244,664,286B.
+These allocator samples are not simultaneous RSS measurements and do not account
+for every direct mapping. They support retained free arenas as the dominant
+cause, rather than a claim that every retained byte is live application data.
+
+The GNU libc2.36 [allocation tunable documentation](https://sourceware.org/glibc/manual/2.36/html_node/Memory-Allocation-Tunables.html)
+explains that a fixed mmap threshold disables its dynamic adjustment and allows
+large allocations to be returned on free. A control changes only the launch-time
+MALLOC_MMAP_THRESHOLD_=131072 setting, restores the original640MiB cgroup and
+one-second observer, and removes the diagnostic preload. Full cold workload RSS
+max/P99 falls to363,409,408B with no OOM. Content and derived-state checks pass,
+but BM25 reaches only49 in-window successes in60s, below the unchanged1/s gate.
+The result remains failed. A [two-search control](results/fallback-heavy-two-control/summary.json)
+also meets short-run memory (max/P99 530,878,464B) but only44 BM25 and10 ANN
+requests finish inside60s. It is reverted to the verified single-search policy;
+full query-stage profiling is required before another performance change.
+Ten fallback and13 Helix release units plus both Clippy checks cover the shared
+admission behavior. Waiting search requests leave general permits available to
+ordinary reads/writes. Generation and case controllers now apply the fixed GNU
+allocator threshold at child startup, and observer receipts record it. No
+long-duration or build-memory acceptance is inferred from these controls.

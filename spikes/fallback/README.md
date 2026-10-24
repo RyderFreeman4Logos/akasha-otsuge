@@ -6,6 +6,15 @@ full-data low-memory recovery. No production backend is selected.
 See the [decision](../../docs/benchmarks/storage-decision.md) and unchanged
 [acceptance contract](../../docs/benchmarks/storage-contract.md).
 
+Generation/workload controllers set `MALLOC_MMAP_THRESHOLD_=131072` before
+starting the native process. On the measured GNU libc2.36 host this prevents
+large freed index buffers accumulating in allocator arenas; the observer records
+the setting and any `GLIBC_TUNABLES`. The shared workload admits one heavy search
+and four total operations, so waiting searches leave read/write capacity free.
+The [allocator controls](../../docs/benchmarks/results/fallback-allocator-diagnosis/summary.json)
+pass short-run low-memory bounds but still fail full-corpus search throughput.
+Long profiles and concurrent rebuild acceptance remain required.
+
 Pinned source:
 
 | Component | Version | Commit | License |

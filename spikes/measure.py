@@ -97,7 +97,8 @@ def main():
             samples.write(json.dumps({"event": "start", "limits": limits,
                                       "nofile_soft_hard": resource.getrlimit(resource.RLIMIT_NOFILE),
                                       "native_environment": {name: env.get(name) for name in (
-                                          "TMPDIR", "LANCE_CPU_THREADS", "LANCE_DEFAULT_IO_BUFFER_SIZE",
+                                          "TMPDIR", "MALLOC_MMAP_THRESHOLD_", "GLIBC_TUNABLES",
+                                          "LANCE_CPU_THREADS", "LANCE_DEFAULT_IO_BUFFER_SIZE",
                                           "LANCE_SHUFFLE_BATCH_BYTES",
                                           "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES")},
                                       "command": sys.argv[2:]}) + "\n")

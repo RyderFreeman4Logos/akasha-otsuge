@@ -191,6 +191,7 @@ def main():
                '-p', 'MemorySwapMax=0', '-p', 'LimitNOFILE=8192',
                '-p', f'RuntimeMaxSec={run["seconds"]}',
                '-p', 'Environment=AKASHA_SPIKE_PROFILE='+run['profile'],
+               '-p', 'Environment=MALLOC_MMAP_THRESHOLD_=131072',
                '-p', 'Environment=LANCE_CPU_THREADS=1',
                '-p', 'Environment=LANCE_DEFAULT_IO_BUFFER_SIZE=16777216',
                '-p', 'Environment=LANCE_SHUFFLE_BATCH_BYTES=16777216',

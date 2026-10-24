@@ -1,0 +1,21 @@
+{
+  "controller/cold_cache.py": "6a6ddeb46202a7b5cf1a27a3c3046b74cd693edcd2216faa60e4afde6d03e4a0",
+  "controller/helix/run_case.py": "6d45dc5014fc84b5e02054796a48b221180e1a9e8d0546a4e00bd1cf6fcd243a",
+  "controller/measure.py": "5900e6b5808ea5cec5e05c944135f97ce8671f6a7d4e3eec38d8c5e5dab679c1",
+  "diagnostic.toml": "0496b23c779168c5848b8b1dfb304615b99b5a2ad0cd9545f41bc2291e3896e6",
+  "fallback-full-workload-scoped-r1/diagnostic/cold-cache-progress.json": "bd168134495191f50d4325d9c5afc5a21fb5a8ec0472113af1bd7fbed780ebd4",
+  "fallback-full-workload-scoped-r1/diagnostic/cold-cache.json": "216738900c8ca5d12cb0180b36920a2e3b458193137cbd357c0f6f18c526adbf",
+  "fallback-full-workload-scoped-r1/diagnostic/engine.log": "767717c526100bf256d8171ec68040058b767e3c8b1a35db2f786a243c6588e0",
+  "fallback-full-workload-scoped-r1/diagnostic/memory.jsonl": "524c8c791346c627a8269c1e4e0586de7e2870904ce0704c979374e5f684996c",
+  "fallback-full-workload-scoped-r1/diagnostic/request.json": "d680a23978b16c11bb989c864cb407abeaeb1827373c68465a9dd37b982c0166",
+  "fallback-full-workload-scoped-r1/diagnostic/runtime/admission.json": "a596e32f3c976801271bb188c75d556c7d0133e4ee1d52753ba29f9158ef6d0c",
+  "fallback-full-workload-scoped-r1/diagnostic/runtime/baseline.json": "b3d457badd772e2672cacd0938cddfb39b94f778d8d9bb7e190ce9f0c4bed1f4",
+  "fallback-full-workload-scoped-r1/diagnostic/runtime/index-preparation.json": "17e4c7368df1c923223a3331179b1c261e965ceebffd175af042e269cb1ac3cf",
+  "fallback-full-workload-scoped-r1/diagnostic/runtime/metrics.jsonl": "42463af1b65cdd146a523cd75fda95e962cf93d11aca00bcb783eaa3d85257db",
+  "fallback-full-workload-scoped-r1/diagnostic/runtime/progress.json": "177d5f8380a938b4a3bb18d0069437a34d61d2d1a4f3c4a26604d5dbda10e372",
+  "fallback-full-workload-scoped-r1/diagnostic/runtime/requests.jsonl": "aee14e3f6087f4405962694afe254d22d2f45058a4398de72445439135fbef45",
+  "fallback-full-workload-scoped-r1/diagnostic/state.json": "a50fe464df43ff6b4fcc037941cdabebb3712b4e26f1a86c2066c92eba9aa616",
+  "fallback-full-workload-scoped-r1/diagnostic/verified-failure.json": "8fddd8ddbcefdc8613e75570d6b1fd140e5bd8aeb92ed923fb8524c635e4bd55",
+  "reconciliation/fallback-full-workload-scoped-diagnostic-r1-abandon.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "reconciliation/fallback-full-workload-scoped-diagnostic-r1-journal.log": "4c933e1a1f1c18aa7a0268d1e1a52cec42728081ffaaa039c40a9c041e48c7c0"
+}
