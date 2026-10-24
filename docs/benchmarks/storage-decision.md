@@ -60,9 +60,9 @@ intentional stop and unchanged limits. Compressed full import and low-memory
 verification of every original record now pass. Full-corpus 100k history and
 all-record native backfill also pass; see the [retained receipts](results/fallback-full-history-backfill/).
 Full native text/vector index coverage now passes with bounded scan I/O,
-streaming IVF training, private scratch and one build worker. The full low-profile
-sustained workload and offline version pruning now pass below; the high profile,
-fresh construction and remaining recovery matrix are still unproven. All failed attempts and
+streaming IVF training, private scratch and one build worker. Both full required
+sustained profiles, write burst/overload and offline version pruning now pass
+below; fresh construction and the remaining recovery matrix are still unproven. All failed attempts and
 the original native deadline remain retained. Reuse source shards and query oracles, and do not retain
 an expanded corpus copy.
 
@@ -462,8 +462,8 @@ oracle, exact native/controller exits, inactive unit and scratch removal verify.
 
 The measured native binary remains `3ef94b16...8401` from7fba9f0. All raw receipts,
 frozen controllers and source bytes verified against that commit are archived.
-Earlier failed runs remain unchanged. Required high-profile steady load, full
-burst/overload, fresh bounded full construction, concurrent rebuild and its peak
+Earlier failed runs remain unchanged. The high-profile and burst/overload results
+follow below. Fresh bounded full construction, concurrent rebuild and its peak
 disk bound still block backend selection and Issue#3 closure.
 
 ### Full offline version reclamation
@@ -492,3 +492,30 @@ are separate measurements, not an exclusive-allocation assertion. Authority
 and inactive generation1 remain intact; the latter still occupies48,655,896,576
 allocated bytes. Safe inactive-generation retirement and the physical peak of
 the next full concurrent build remain open. No online pruning is claimed.
+
+### Required full high profile, burst and overload
+
+[The remaining full workload cases](results/fallback-full-high-burst-overload-r3/summary.json)
+pass with the same frozen `3ef94b16...8401` native binary and original configs.
+The high1800s/100-client case records50,940 requests and36,049 distinct commits;
+all content/history/scope oracles pass with zero operation errors. BM25 achieves
+1.195/s/P958.489s and ANN0.248889/s/P958.805s; writes achieve19.799444/s/P950.072s.
+RSS P99/max is709,939,200/763,740,160B, within the2GiB profile. The observer spans
+1809.047s and the outbox drains in5.078s to committed/text/vector253765. Owned-file
+cold preparation covers48,232 files and reduces73,573 resident pages to zero.
+
+The low-profile100-client write burst completes all100 writes, P950.097s, with
+RSS max313,585,664B and no remaining drain. The60s low-profile overload records
+7,300 writes:6,507 succeed and793 return expected revision conflicts; none are
+operation errors. Write P95 is2.051s, RSS max353,767,424B and drain1.434s, below
+the unchanged300s bound. Both watermarks reach260472. These two cases exercise
+writes, not additional BM25/ANN measurements. Their caches are not labelled cold.
+
+Independent request oracles, all artifact hashes, exact native/controller exits,
+inactive units and scratch removal verify for each case. The archive includes
+per-case admission, source bytes verified against7fba9f0 and frozen controllers.
+The high host supplement was captured during execution and is explicitly marked;
+one1.008s missing-operation RED and small Python units ran alongside it, with no
+Cargo build or full native fixture. This is a workload pass, not a paired causal
+comparison of profiles. Full construction/recovery, actual corpus-candidate
+mutation during query/build and the physical rebuild bound remain open.

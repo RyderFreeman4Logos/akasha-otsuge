@@ -94,6 +94,13 @@ Completed, with the limits shown:
       All content/scoped oracles pass; both watermarks reach217716 with6.570s
       drain. Raw hashes, exact process/unit exit and scratch cleanup verify.
       This is the required low-profile pass; high and build gates remain below.
+- [x] Pass the full high1800s/100-client cold case:50,940 requests,36,049 distinct
+      commits, BM251.195/s/P958.489s, ANN0.248889/s/P958.805s, RSS P99/max
+      709,939,200/763,740,160B and5.078s drain. Low-profile write burst passes
+      100/100 writes; overload records7,300 writes with6,507 successes,793
+      expected revision conflicts, zero operation errors and1.434s drain.
+      All raw oracles/hashes and exact process/unit/scratch cleanup verify.
+      Both watermarks reach260472. Burst/overload are write cases and are not cold.
 - [x] Retire the rejected Helix experiment database with exact ownership, process,
       lock and artifact checks;38,603,812,864 allocated bytes removed. Preserve
       source shards and receipts. Do not claim later reuse of that database.
@@ -107,11 +114,6 @@ Completed, with the limits shown:
 
 Remaining acceptance, in execution order:
 
-- [ ] Pass the required high1800s/100-client profile at all original rates,
-      P95 and memory limits, then full burst/overload and <=300s drain. The full
-      low profile now passes above. The two earlier low failures and their
-      incremental-FTS/scope-index diagnoses remain in the decision record.
-      Do not repeat a passing low run without a relevant code/state regression.
 - [ ] Complete an uninterrupted full scoped build within the640MiB low peak and
       reopen interrupted builds directly at low budget. The prior vector merge
       OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.
