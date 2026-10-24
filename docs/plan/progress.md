@@ -35,8 +35,8 @@ breached, but a failed run does not establish the completed rebuild peak.
 All39,876 complete seed/workload acknowledgements were verified against authority.
 One incomplete trailing log line and committed309703 without a complete logged
 receipt remain unknown. Eight originals were restored with revision guards;
-active3 text/vector watermarks now equal committed309711. Generation4 is partial
-and remains inactive; its original deadline is unchanged.
+active3 text/vector watermarks equal committed309711. Generation4 was partial
+and inactive at that reconciliation checkpoint; its later retirement is below.
 
 The [derived-admission repair](../benchmarks/results/fallback-derived-admission/summary.json)
 now makes baseline builds share the existing delta-index mutex, as spec08 requires.
@@ -59,10 +59,26 @@ and Clippy; RSS max128,020,480B. It covers empty, interrupted-backfill and faile
 states. Preserve the behavioral RED and the first GREEN attempt's obsolete
 ready-only refusal expectation; the new regression assertions remain unchanged.
 
-Next: retire the actual failed generation4, preserve full before/after witnesses,
-prune active3's obsolete versions, then prepare a fresh full candidate. This avoids
-completing a failed index solely to delete it. Full concurrent acceptance remains
-open; neither build nor retirement deadlines are extended.
+[Full generation5 preparation](../benchmarks/results/fallback-full-generation5-preparation/summary.json)
+passes with native8f0b fromddcf113. Incomplete4 is retired in2.003s, active3's old
+versions are pruned in34.035s and all66 before/after witnesses agree on content,
+receipts and query candidates. One BM25 response changes order only. Filesystem
+free space increases40,334,372,864B; retired4 accounts for36,299,567,104 allocated
+bytes. These measurements have different Btrfs/host-activity boundaries.
+Generation5 backfill covers11,428,831 texts/1,000,000 vectors in801.717s, RSS max
+164,487,168B and no OOM. It is unbuilt with no index deadline; active3 and committed
+309711 remain unchanged. Original generation4 index deadline1792836176755 stays
+in its tombstone. All four operations pass completed reuse and exact process,
+unit, scratch and disposable-copy cleanup checks.
+
+The [independent review](../benchmarks/reviews/ddcf113-r1.md) returns FAIL for the
+corpus/model identity gap and separately records a trailing oracle-file blank line.
+Next: repair that source identity finding. Begin can
+currently label copied source embeddings as another model; the shared generation
+read boundary must bind model/fingerprint/dimension/chunker to the frozen import.
+Query, workload and replay are one root-cause class. Prove RED/GREEN and re-review
+before the next full concurrent run. The existing full corpus uses the correct
+pinned identity; no reimport or deadline extension is planned. No backend selected.
 
 At restart or compaction, first load the WD skill and reconcile the exact managed
 task with its completion listener and durable state in `.git/akasha-evidence`.

@@ -176,10 +176,21 @@ Remaining acceptance, in execution order:
       Twelve release units and Clippy pass; RSS max128,020,480B. Behavioral RED and
       the initial obsolete-fixture expectation failure are retained. Only that
       contradictory old refusal is removed; new regression assertions are unchanged.
-- [ ] Reclaim actual failed inactive generation4 without building it merely for
-      deletion. Verify full before/after witnesses, prune obsolete active3 versions
-      and prepare the next fresh candidate. Never reset an expired/existing build
-      deadline; retirement has its own fixed logical-operation deadline.
+- [x] Retire actual failed inactive generation4 in2.003s without completing its
+      indexes, preserving its original index deadline1792836176755. Prune active3
+      in34.035s; all66 before/after witnesses agree except one BM25 ordering change
+      with identical candidates. Filesystem free space increases40,334,372,864B.
+      Generation5 backfill covers11,428,831 texts/1,000,000 vectors in801.717s,
+      RSS max164,487,168B and no OOM. It remains unbuilt with no index deadline;
+      active3/committed309711 are unchanged. Completed reuse, exact process/unit
+      exit, scratch cleanup and four disposable-copy removals verify.
+- [ ] Bind generation model/fingerprint/dimension/chunker to the imported corpus
+      identity. Independent frozen-source review found that Begin accepts another
+      label while baseline backfill copies existing embeddings; query, workload
+      and replay then trust that label. Repair the shared boundary with behavioral
+      RED/GREEN and re-review before starting the next expensive full case. Retain
+      synthetic fixture provenance and original import hashes/deadlines; no corpus
+      reimport or threshold change is needed.
 - [x] Remove50 obsolete native copies whose hashes appear in published receipts;
       retain current/recent recovery and unattributed files. Inode allocation
       falls7,430,930,432B; filesystem free space increases2,648,940,544B. No build

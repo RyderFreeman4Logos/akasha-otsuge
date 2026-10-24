@@ -734,3 +734,30 @@ unchanged active query/receipt results. Twelve release units and Clippy pass;
 RSS max128,020,480B. The behavioral RED and an obsolete ready-only negative
 fixture failure are retained. Full generation4 cleanup and a successful fresh
 concurrent rebuild remain separate required steps. No backend is selected.
+
+## Full partial-candidate retirement and generation5 preparation — 2026-10-24
+
+[Immutable preparation](results/fallback-full-generation5-preparation/summary.json)
+uses native8f0b fromddcf113. Public retirement removes incomplete inactive4 in
+2.003s without finishing its indexes; its original index deadline1792836176755
+remains in the tombstone. Public pruning removes old active3 versions in34.035s.
+All66 before/after witnesses preserve authority/history/receipts and query
+candidate membership. One BM25 result changes order only; raw order is retained.
+
+Retired4 accounts for36,299,567,104 allocated bytes. Filesystem free space rises
+40,334,372,864B across retirement/pruning, with426,668,142,592B free after candidate
+preparation. Inode allocation and filesystem free space are distinct observations,
+not exclusive Btrfs extent measurements. The42 compressed input shards are reused.
+
+Full5 backfill completes11,428,831 texts and1,000,000 vectors in801.717s, sampled
+RSS max164,487,168B and no OOM. It remains unbuilt with no index deadline allocated;
+active3 and committed/text/vector309711 are unchanged. All four controller runs
+pass completed reuse, exact process/unit exits, scratch cleanup and disposable
+native-copy removal. This is preparation, not a concurrent-build acceptance pass.
+
+Independent frozen-source review identifies a remaining model-provenance defect:
+Begin can relabel the existing corpus embeddings, and later generation consumers
+trust that label. Repair the shared admission/read boundary and prove its negative
+controls before freezing the next full run. The measured corpus uses its correct
+pinned model identity. No source record rewrite, deadline extension, threshold
+relaxation or backend selection follows from this preparation.
