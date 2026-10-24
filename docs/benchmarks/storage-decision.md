@@ -692,3 +692,30 @@ of inode allocation and2,648,940,544B additional filesystem free space. Current,
 recent recovery and unattributed copies remain; source archives and result
 hashes are preserved. No corpus expansion, database deletion or build-cache
 purge is used. The backend decision remains open.
+
+## Single index-builder admission — 2026-10-24
+
+[Immutable evidence](results/fallback-derived-admission/summary.json) records the
+native baseline/delta admission defect and repair. Baseline construction now
+uses the same derived mutex as delta application. A short writer scope persists
+one original deadline before queuing, releases before native work, and refreshes
+state after admission. The queued build expires without creating indexes while
+ordinary authority writes continue; expired work is not revived.
+
+All12 release units, release Clippy and179 lifecycle commands/12 SIGKILL barriers
+pass. The first160s concurrent fixture retains a write-P95 failure of7.904s with
+correct4,528-request content/rebuild overlap and RSS max196,808,704B. One subsequent
+same-harness baseline/candidate pair passes; write P95 is61/99ms and candidate RSS
+P99/max201,355,264/201,494,528B. The initial timing failure remains unexplained;
+these are diagnostic observations, not a full-size memory or latency verdict.
+
+The same archive retains four bounded controls. Reducing ANN scoring chunks from
+64MiB to8MiB lowers sampled long-lived query RSS from424,198,144 to405,676,032B in
+one64-query pair while preserving candidate sets. Child-only allocator samples
+show substantial live allocations. A42.210s same-authority build/query observation
+reaches462,958,592B in a diagnostic2GiB group, cancels the partial build and leaves
+active3/committed309711 unchanged. It excludes ordinary writes/delta construction.
+No production chunk/allocator setting or threshold changes on this evidence.
+
+Next reclaim inactive partial generation4 safely and prepare a fresh full run.
+No backend is selected, PR#31 remains draft and Issue#3 stays open.

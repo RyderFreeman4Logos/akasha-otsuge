@@ -36,10 +36,25 @@ All39,876 complete seed/workload acknowledgements were verified against authorit
 One incomplete trailing log line and committed309703 without a complete logged
 receipt remain unknown. Eight originals were restored with revision guards;
 active3 text/vector watermarks now equal committed309711. Generation4 is partial
-and remains inactive; its original deadline is unchanged. Next: diagnose the
-concurrent memory/performance failure with bounded controls, then validate a
-source-supported correction before another full case. A fixed-query64MiB/8MiB
-Lance scoring-chunk comparison is diagnostic only.
+and remains inactive; its original deadline is unchanged.
+
+The [derived-admission repair](../benchmarks/results/fallback-derived-admission/summary.json)
+now makes baseline builds share the existing delta-index mutex, as spec08 requires.
+Its native regression first reproduces the bypass, then verifies queued expiry,
+unchanged deadline, ordinary-write progress and a later successful build. All12
+release units, release Clippy and179 lifecycle commands/12 SIGKILL barriers pass.
+The first160s/4,528-request concurrent check fails write P95 at7.904s, despite
+correct results and memory within budget. That failure remains retained. One
+bounded same-harness baseline/candidate pair subsequently passes; candidate write
+P95 is99ms and RSS P99/max201,355,264/201,494,528B. This does not explain the initial
+timing failure or establish full-size performance. Default ANN chunk size and
+all resource/performance limits remain unchanged; four bounded allocation/query
+controls are archived with their diagnostic limits.
+
+Next: safely retire the failed, inactive generation4 without building it just to
+permit deletion, preserve before/after authority/search witnesses, then prepare a
+fresh full candidate. The current retirement API unnecessarily rejects unbuilt
+candidates. The full concurrent acceptance remains open.
 
 At restart or compaction, first load the WD skill and reconcile the exact managed
 task with its completion listener and durable state in `.git/akasha-evidence`.

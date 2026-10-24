@@ -1025,21 +1025,33 @@ async fn build_generation(
     generation: u64,
     fail_after_text: bool,
 ) -> Result<Value, Error> {
-    let mut value = state(&a.tree, generation)?;
-    if value.ready {
-        build(a, &mut value, fail_after_text).await?;
+    let (mut value, until) = {
+        let _writer = a.writer.lock().await;
+        let mut value = state(&a.tree, generation)?;
+        let until = if value.ready {
+            None
+        } else {
+            if value.cursor != value.documents
+                || value.vector_rows != value.vectors
+                || value.pending.is_some()
+            {
+                return Err("backfill is incomplete".into());
+            }
+            a.settings.check_disk(&a.root)?;
+            Some(deadline(&a.tree, &mut value, a.settings, true).await?)
+        };
+        (value, until)
+    };
+    if let Some(until) = until {
+        tokio::time::timeout(remaining(until)?, async {
+            let _derived = a.derived.lock().await;
+            value = state(&a.tree, generation)?;
+            build(a, &mut value, fail_after_text).await
+        })
+        .await
+        .map_err(|_| "original operation deadline expired")??;
     } else {
-        if value.cursor != value.documents
-            || value.vector_rows != value.vectors
-            || value.pending.is_some()
-        {
-            return Err("backfill is incomplete".into());
-        }
-        a.settings.check_disk(&a.root)?;
-        let until = deadline(&a.tree, &mut value, a.settings, true).await?;
-        tokio::time::timeout(remaining(until)?, build(a, &mut value, fail_after_text))
-            .await
-            .map_err(|_| "original operation deadline expired")??;
+        build(a, &mut value, fail_after_text).await?;
     }
     Ok(serde_json::to_value(value)?)
 }

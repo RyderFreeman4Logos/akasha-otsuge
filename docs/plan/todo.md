@@ -156,10 +156,25 @@ Remaining acceptance, in execution order:
       are restored at309704..309711; active3 drains both watermarks to309711.
       Generation4 stays partial/inactive under its original deadline. Failed-run
       disk samples stay within caps; no completed rebuild peak is inferred.
-- [ ] Resolve the remaining concurrent memory/performance failure using bounded
-      source-backed controls before another full run. Fixed-query64MiB/8MiB ANN
-      chunk controls preserve candidate sets but do not establish a sufficient
-      reduction or successful concurrent operation. Keep every acceptance limit.
+- [x] Restore spec08's single index-builder admission by sharing the existing
+      derived mutex between baseline and delta construction. The held-delta
+      regression reproduces the bypass, then proves original-deadline expiry,
+      ordinary-write progress and successful construction after release. All12
+      release units, release Clippy and179 lifecycle commands/12 SIGKILL barriers
+      pass. First160s concurrent run fails write P95 at7.904s; retain it. One later
+      same-harness baseline/candidate pair passes, candidate write P95=99ms and
+      RSS P99/max201,355,264/201,494,528B. This bounded source repair is not a
+      full-scale resource pass or a causal explanation of every earlier failure.
+- [ ] Validate the repaired admission at full scale with unchanged limits. Four
+      bounded query/allocation controls are archived. The64MiB/8MiB ANN chunk
+      comparison preserves candidate sets but gives only a limited reduction;
+      retain the default64MiB chunk and fixed allocator configuration.
+- [ ] Reclaim the failed inactive generation4 without building it merely for
+      deletion. The current retirement API unnecessarily requires a ready
+      candidate; add native empty/partial/crash-resume controls, preserve the
+      active-generation and authority guards, then verify full before/after
+      witnesses before preparing the next fresh candidate. Do not reset its
+      expired or existing build deadline.
 - [x] Remove50 obsolete native copies whose hashes appear in published receipts;
       retain current/recent recovery and unattributed files. Inode allocation
       falls7,430,930,432B; filesystem free space increases2,648,940,544B. No build

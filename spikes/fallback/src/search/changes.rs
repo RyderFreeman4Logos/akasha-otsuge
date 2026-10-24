@@ -1111,7 +1111,7 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-    async fn indexing_releases_authority_writer_and_filters_replaced_head() -> Result<(), Error> {
+    async fn indexing_serializes_builds_without_blocking_authority() -> Result<(), Error> {
         let parent = std::env::temp_dir().join(format!(
             "akasha-outbox-unit-{}-{}",
             std::process::id(),
@@ -1130,6 +1130,12 @@ mod tests {
                 load::atomic_json(&parent.join("request.json"),&request)?;
                 super::super::run(&root,&parent.join("request.json")).await?;
             }
+            for generation in [2,3] {
+                for request in [json!({"op":"begin","generation":generation,"bundle":bundle}),json!({"op":"backfill","generation":generation,"waves":1})] {
+                    load::atomic_json(&parent.join("request.json"),&request)?;
+                    super::super::run(&root,&parent.join("request.json")).await?;
+                }
+            }
             let mut a=Authority::open(&root)?;
             let entered=Arc::new(Notify::new());let resume=Arc::new(Notify::new());
             a.derived_barrier=Some((entered.clone(),resume.clone()));
@@ -1139,14 +1145,32 @@ mod tests {
             let worker=a.clone();
             let task=tokio::spawn(async move {apply(&worker,1,Family::Text,&[1],None,None,false).await});
             let reached=tokio::time::timeout(Duration::from_secs(30),entered.notified()).await;
+            let mut queued=state(&a.tree,2)?;
+            let original_deadline=now_ms()?+3_000;
+            queued.index_deadline_ms=Some(original_deadline);save(&a.tree,&queued).await?;
+            let builder=a.clone();
+            let mut building=tokio::spawn(async move {build_generation(&builder,2,false).await});
             let second=Change{request_id:"two".into(),expected:1,body:"new astronomy".into(),..initial};
             let written=tokio::time::timeout(Duration::from_secs(5),a.apply(&second,None)).await;
+            let built=tokio::time::timeout(Duration::from_secs(10),&mut building).await;
+            if built.is_err() {building.abort();let _=building.await;}
+            let queued_state=state(&a.tree,2)?;
+            let queued_indexes=connect(&a).await?.open_table(table_name(2,false)).execute().await?.list_indices().await?;
             resume.notify_one();let indexed=task.await;
+            let continued=build_generation(&a,3,false).await;
+            let retry=build_generation(&a,2,false).await;
+            let retry_deadline=state(&a.tree,2)?.index_deadline_ms;
             let at=point(&a.tree.begin_with_mode(Mode::ReadOnly)?)?;
             let checked=a.revalidate("reader",0,1,1,&[json!({"memory":1,"seq":1,"partition":"p0"})]).await;
             let a=Arc::try_unwrap(a).map_err(|_|"derived test retained authority")?;a.tree.close().await?;
             reached?;assert_eq!(written??["commit_seq"],2);indexed??;
             assert_eq!(at,2);assert_eq!(checked?["hits"],json!([]));
+            assert_eq!(built??.expect_err("baseline build bypassed the shared index admission").to_string(),"original operation deadline expired");
+            assert!(!queued_state.ready && queued_indexes.is_empty());
+            assert_eq!(queued_state.index_deadline_ms,Some(original_deadline));
+            assert_eq!(retry_deadline,Some(original_deadline));
+            assert_eq!(retry.unwrap_err().to_string(),"original operation deadline expired");
+            assert_eq!(continued?["ready"],true);
             Ok::<_,Error>(())
         }.await;
         std::fs::remove_dir_all(&parent)?;
