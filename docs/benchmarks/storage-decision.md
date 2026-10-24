@@ -569,3 +569,47 @@ Clippy for both spike crates, and eight Python controller units. Review is the
 implementing agent's self-review. Full generation3 backfill is prepared, but its
 bounded uninterrupted build, concurrent corrections/queries, recovery and actual
 physical peak remain unmeasured. #3 and draft PR#31 stay open.
+
+### Full concurrent OOM, direct-low recovery and acknowledgement reconciliation
+
+[Retained failure and recovery evidence](results/fallback-full-rebuild-recovery/summary.json)
+records the first full generation3 concurrent attempt: systemd terminates the
+640MiB/no-swap group after403.420s, with sampled RSS686,899,200B. The observer
+also dies, leaving no terminal correctness/performance receipt. Its10,942 complete
+request records contain9,286 successful acknowledgements. Physical samples peak
+at118,985,441,280 allocated bytes with at least401,853,628,416B filesystem free;
+no category cap is breached. These are failed-run samples, not a completed-build
+disk bound. The observer's original ru_maxrss included pre-exec lifetime highwater;
+the corrected observer uses current VmRSS and retains an explicit accounting control.
+
+The same frozen native binary completes build-only recovery directly under the
+low limit, within the original index deadline:2342.712s, all11,428,831 text rows
+and1,000,000 vectors indexed, RSS P99/max215,441,408/250,179,584B, no OOM.
+Completed controller reuse, exact process/unit exit and scratch cleanup verify
+before removing its disposable binary copy. This proves recovery, not a fresh
+uninterrupted or concurrent build. The overlap-specific memory problem remains.
+
+A bounded read-only authority verifier checks all9,286 workload and50 seed
+acknowledgements against durable receipts, immutable revisions/outbox identity,
+body/scope/active state and canonical original request hashes in37 batches.
+No acknowledged loss is observed. Ten later committed sequences have no persisted
+request outcomes and remain unknown. Guarded restoration returns eight sources
+to their exact original bodies/scopes/keys at269819..269826, retaining history.
+Old active generation2 drains to269826 and passes78 pre-activation witnesses.
+
+Generation3 catch-up initially refuses eight earlier vectorized restorations
+without their explicit embeddings. Replay checks the previously hashed original
+vectors against current source bodies and model identities, then resumes the
+unchanged catch-up deadline. Both watermarks reach269826; generation3 activates
+and79 post-activation witnesses pass, including historical/current content,
+generation-specific receipts, eight scoped BM25 and eight ANN queries, and four
+bundle-mismatch refusals. All recovery steps pass their low resource group and
+exact process/scratch cleanup checks. The collector field mismatches and the
+missing-vector-input attempt remain failed receipts in the archive.
+
+The verifier passes12 release units, release all-targets Clippy and77 native
+authority commands with three real SIGKILL barriers. Review is implementing-agent
+self-review. No build/query memory behavior changes in this leaf. Next, share
+one Lance Session per authority so concurrent connections use one cache budget;
+verify that ownership and freshness before another full measurement. Fresh
+concurrent resource/performance acceptance and the backend decision remain open.

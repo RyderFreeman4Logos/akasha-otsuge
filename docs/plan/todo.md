@@ -1,6 +1,6 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-23 after the session restart. GitHub audit: **26 open Issues,
+Updated 2026-10-24 after the session restart. GitHub audit: **26 open Issues,
 2 completed Issues**; #3 is the first unresolved dependency. PR #31 remains draft.
 This checklist supplements each linked Issue's full acceptance criteria; it does
 not narrow them. Check an Issue only after its evidence, review, gate and merge.
@@ -126,8 +126,8 @@ Completed, with the limits shown:
       initial one-based-ordinal failure and the ordinary60s throughput failure;
       this diagnostic does not establish full-size overlap or vectorized changes.
 - [x] Prepare full generation3 after pruning obsolete active2 versions. Its
-      backfill covers11,428,831 documents and1,000,000 vectors; build has not
-      started. Select and verify eight actual unvectorized search candidates,
+      backfill covers11,428,831 documents and1,000,000 vectors. Its first full
+      concurrent build failed below. Select and verify eight actual unvectorized search candidates,
       excluding all3,840 fixed query IDs. No backend is selected.
 
 Remaining acceptance, in execution order:
@@ -136,6 +136,33 @@ Remaining acceptance, in execution order:
       reopen interrupted builds directly at low budget. The prior vector merge
       OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.
       The fixed allocator setting has not yet passed a fresh full build.
+      The first full concurrent attempt also fails at403.420s with systemd
+      oom-kill and sampled RSS686,899,200B. Preserve its10,942 logged requests
+      and9,286 logged successful commits; the missing terminal observer receipt
+      prevents a complete correctness/performance verdict. A same-native,
+      build-only direct-low recovery passes within the original generation3
+      deadline:2342.712s, full11,428,831 text/1,000,000 vector coverage,
+      RSS P99/max215,441,408/250,179,584B and no OOM. Exact processes/unit,
+      scratch cleanup and completed reuse verify. This establishes direct-low
+      recovery; fresh uninterrupted/concurrent build acceptance remains open.
+- [x] Reconcile every recorded acknowledgement after the full concurrent OOM:
+      9,286 workload and50 seed receipts match durable receipts, immutable bodies,
+      outbox revisions and original request hashes in37 bounded batches. Ten
+      committed sequences lack persisted request outcomes and remain unknown.
+      Guarded restoration of all eight original bodies/scopes/keys passes at
+      commits269819..269826; historical revisions remain unchanged. Active2
+      drains to269826 and78 before-activation witnesses pass, including16
+      indexed receipts,32 historical bodies, eight BM25 and eight ANN queries.
+      The drain collector initially compared extra target/done fields; its
+      failure and corrected collection of the unchanged native receipts remain.
+- [x] Finish recovered generation3 catch-up and activation without changing its
+      original deadline. Replay eight pinned original vector outputs for prior
+      vectorized restorations after the first catch-up explicitly refuses their
+      missing embeddings. Both watermarks reach269826;79 after-activation
+      witnesses pass with exact history/current bodies, generation-specific
+      receipts, eight BM25/eight ANN queries and four bundle-mismatch refusals.
+      All low-budget process/unit/scratch checks pass. This is recovery and
+      activation coverage; the failed concurrent attempt stays failed.
 - [ ] Measure a full rebuild while the100-client steady workload continues in the
       same authority/process group. Prove ordinary commits and completed BM25/ANN
       queries overlap the build, keep the old generation active/readable, verify
@@ -143,9 +170,9 @@ Remaining acceptance, in execution order:
       rebuild entrypoint passes the small native fixture:1,698 requests, nine
       commits and both old-generation search types overlap the build. Eight
       receipt mutations are rejected;103 lifecycle commands also pass. Full-size
-      overlap remains unmeasured. The existing shared workload modifies synthetic
-      memory IDs; it does not establish actual corpus-candidate mutation during
-      query/build. Keep the3,840 fixed performance IDs protected in that check.
+      overlap has now been attempted with actual corpus mutations but failed
+      resource acceptance. Keep the3,840 fixed performance IDs protected in
+      the repaired full check. Do not replay the unchanged failing full case.
 - [x] Full-size corpus-candidate corrections/rescopes/retractions/restores and
       live permissions now pass16 distinct candidates,64 revisions and755 native
       commands in306.902s, with RSS max255,275,008B. Exact original/current/history
@@ -165,7 +192,10 @@ Remaining acceptance, in execution order:
       competing-owner refusal and eight total crash barriers; current/history/
       receipts remain unchanged. Full-size obsolete-version reclamation now
       and inactive-generation retirement pass above; concurrent peak disk
-      accounting still needs measured acceptance. Public retirement also passes
+      accounting still needs completed-run acceptance. The failed concurrent
+      run sampled118,985,441,280B total inode allocation and at least
+      401,853,628,416B filesystem free space, without a category-cap violation;
+      this is sampled failure evidence, not a complete rebuild peak. Public retirement also passes
       179 commands, two competing-owner checks and twelve SIGKILL barriers on
       nine documents/eight real vectors, covering all four native table families.
       Retired IDs cannot be reused; historical receipts remain readable.

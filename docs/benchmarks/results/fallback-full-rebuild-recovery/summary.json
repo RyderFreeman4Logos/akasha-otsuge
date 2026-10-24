@@ -1,0 +1,169 @@
+{
+  "acknowledgement_count": 9336,
+  "acknowledgement_native_sha256": "ee7f996375afd7b5a743839e487622a13d9a8e6b847100d229b8140285ddc5f8",
+  "active_generation": 3,
+  "archive_bytes": 4353868,
+  "archive_files": 1495,
+  "archive_sha256": "4b115651770db5a198a6ef0e535fb7081a351e707649f118d04bf3aa5e227dd5",
+  "artifacts_verified": true,
+  "committed_and_both_watermarks": 269826,
+  "concurrent_failure": {
+    "cause": "systemd oom-kill",
+    "complete_logged_requests": 10942,
+    "logged_successful_acknowledgements": 9286,
+    "observer_terminal_missing": true,
+    "rss_max_bytes": 686899200,
+    "seconds": 403.42
+  },
+  "direct_low_recovery": {
+    "full_index_coverage": true,
+    "oom_kill": false,
+    "original_deadline_ms": 1792829082973,
+    "rss_max_bytes": 250179584,
+    "rss_p99_bytes": 215441408,
+    "sampled_seconds": 2342.711774982512,
+    "status": "passed_direct_low_recovery_only"
+  },
+  "disk_failure_samples": {
+    "category_cap_violation": false,
+    "completed_rebuild_peak": false,
+    "filesystem_free_min_bytes": 401853628416,
+    "observer_note": "Original ru_maxrss included pre-exec lifetime highwater; VmRSS observer self-check retained, no retrospective runtime RSS claim",
+    "total_inode_allocation_max_bytes": 118985441280
+  },
+  "harness_failures_retained": [
+    "drain collector compared catch_up target/done extras to lifecycle status",
+    "witness current used read_seq instead of at",
+    "witness hits expected absent source key; source key now checked on authority entry",
+    "generation3 catch_up requires explicit vector outputs for eight restored vectorized sources; frozen original outputs replayed separately"
+  ],
+  "native_authority_commands": 77,
+  "not_proven": [
+    "fresh uninterrupted full low build",
+    "full concurrent workload/rebuild latency throughput and memory acceptance",
+    "complete concurrent rebuild disk peak",
+    "controlled full build SIGKILL",
+    "sole backend decision"
+  ],
+  "real_sigkill_barriers": 3,
+  "release_all_targets_clippy": "passed",
+  "release_units": 12,
+  "restored_sources": 8,
+  "review": "implementing-agent self-review only",
+  "source_parent": "f6827fdfbbc62df985430e84ca132fade79a2133",
+  "status": "recovery_and_acknowledgements_passed_concurrent_acceptance_failed",
+  "steps": {
+    "acknowledgements": {
+      "artifacts_verified": true,
+      "commit_seq": 269818,
+      "processes_gone": true,
+      "sampled_process_tree_rss_max_bytes": 59871232,
+      "scratch_removed": true,
+      "seconds": 10.574972758069634,
+      "seed_acknowledgements": 50,
+      "status": "passed",
+      "total_verified": 9336,
+      "unit_inactive": true,
+      "unlogged_committed_sequences": [
+        269809,
+        269810,
+        269811,
+        269812,
+        269813,
+        269814,
+        269815,
+        269816,
+        269817,
+        269818
+      ],
+      "workload_acknowledgements": 9286
+    },
+    "activation": {
+      "artifacts_verified": true,
+      "commands": 5,
+      "exact_processes_gone": true,
+      "memory_log_sha256": "4bd46a9e91c527dcca0862dd4cafff8d5c54ac33ae55a141b5c09a3e7c1e5bcc",
+      "result_sha256": "cfea19174945edbf2cc8457d9d7ad9f56a8972ea0c448908344ffce6ad351d0c",
+      "sampled_rss_max_bytes": 68554752,
+      "scratch_removed": true,
+      "seconds": 1.1965916752815247,
+      "status": "passed",
+      "unit_inactive": true
+    },
+    "drain-3-r2": {
+      "artifacts_verified": true,
+      "commands": 3,
+      "exact_processes_gone": true,
+      "memory_log_sha256": "898b28a58669eeb8a270924736bfe096dc3229cdf078b6f19d19bba724aaba15",
+      "result_sha256": "50a23708122677e78eba08fadcaf77ac54486f6f0cb7a57ed4f52ed826592808",
+      "sampled_rss_max_bytes": 189931520,
+      "scratch_removed": true,
+      "seconds": 96.25601089280099,
+      "status": "passed",
+      "unit_inactive": true
+    },
+    "restoration": {
+      "artifacts_verified": true,
+      "commands": 36,
+      "committed": 269826,
+      "exact_original_bodies_scopes_keys_restored": true,
+      "prior_histories_unchanged": true,
+      "processes_gone": true,
+      "sampled_rss_max_bytes": 60485632,
+      "scratch_removed": true,
+      "seconds": 9.5895885117352,
+      "sources": 8,
+      "status": "passed",
+      "unit_inactive": true
+    },
+    "vector-replay": {
+      "artifacts_verified": true,
+      "commands": 26,
+      "exact_processes_gone": true,
+      "memory_log_sha256": "602aa2926065a0204f04c1beffadbd89c7ede35535c989417f9aa3eb8be5b99b",
+      "result_sha256": "f671f93ea711657a00a270ddb14be6621a91ce250f4cf80a6d060b1c9e45b594",
+      "sampled_rss_max_bytes": 142913536,
+      "scratch_removed": true,
+      "seconds": 18.139746558852494,
+      "status": "passed",
+      "unit_inactive": true
+    },
+    "witness-after": {
+      "artifacts_verified": true,
+      "commands": 79,
+      "exact_processes_gone": true,
+      "memory_log_sha256": "794fc7afe16fec510ed32fb6ad033fafd886b855df3fdb8fc60d43a1c4725948",
+      "result_sha256": "a85c6005cd3b9603fb20bc80ffabb4435ee7f3a61508bd1d1291ad5abbcaceda",
+      "sampled_rss_max_bytes": 244240384,
+      "scratch_removed": true,
+      "seconds": 26.81604608055204,
+      "status": "passed",
+      "unit_inactive": true
+    },
+    "witness-before-r3": {
+      "artifacts_verified": true,
+      "commands": 78,
+      "exact_processes_gone": true,
+      "memory_log_sha256": "b79f65020d580a6385d0eab019fcfd3dd33284fd180a7c145a871ce78c62392e",
+      "result_sha256": "2fae14d7af930fe9150bcf91317f348913743c5e86f2510387f789cdd560d44c",
+      "sampled_rss_max_bytes": 217534464,
+      "scratch_removed": true,
+      "seconds": 28.176773252896965,
+      "status": "passed",
+      "unit_inactive": true
+    }
+  },
+  "unknown_unlogged_committed_sequences": [
+    269809,
+    269810,
+    269811,
+    269812,
+    269813,
+    269814,
+    269815,
+    269816,
+    269817,
+    269818
+  ],
+  "workload_native_sha256": "8852be89a011f6b14a4cdb9647886d68ce897a62d580dd68bef1e8c266bd2b3a"
+}

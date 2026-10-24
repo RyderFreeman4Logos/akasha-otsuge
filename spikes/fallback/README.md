@@ -273,6 +273,13 @@ to the measured services, with no global configuration change. Full-data low
 verification, full indexes and the unchanged workload matrix remain separate.
 
 `--authority REQUEST.json` now exercises ordinary changes on imported roots.
+`verify_acknowledgements` checks1..=256 recorded workload receipts per request
+against durable receipts, request hashes, immutable revision content hashes and
+outbox identity.
+It reads historical revisions after reopen without changing current heads or
+commit sequence. This bounded diagnostic supports failed-workload reconciliation;
+the caller must verify its complete log identity, unique acknowledgements and
+batch coverage before claiming that every logged success survived.
 One immediate transaction commits the compressed immutable revision, versioned
 head and scope membership, request-hash receipt, pending job and global sequence.
 The revision key orders by memory and sequence; historical heads must agree with

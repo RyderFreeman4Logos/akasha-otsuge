@@ -72,6 +72,9 @@ enum Request {
     Receipt {
         request_id: String,
     },
+    VerifyAcknowledgements {
+        receipts: Vec<Value>,
+    },
     Job {
         seq: u64,
     },
@@ -317,6 +320,54 @@ impl Authority {
             .get(receipt_key(request)?.as_bytes())?
             .ok_or("unknown durable receipt")?;
         Ok(serde_json::from_slice::<Receipt>(&raw)?.result)
+    }
+
+    fn verify_acknowledgements(&self, receipts: &[Value]) -> Result<Value, Error> {
+        if receipts.is_empty() || receipts.len() > 256 {
+            return Err("acknowledgement count must be in 1..=256".into());
+        }
+        let tx = self.tree.begin_with_mode(Mode::ReadOnly)?;
+        for receipt in receipts {
+            let request = receipt["request_id"]
+                .as_str()
+                .ok_or("missing acknowledged request identity")?;
+            let seq = receipt["commit_seq"]
+                .as_u64()
+                .ok_or("missing acknowledged commit sequence")?;
+            let mut expected = receipt.clone();
+            let oracle = expected
+                .as_object_mut()
+                .and_then(|object| object.remove("oracle"))
+                .ok_or("missing acknowledgement content oracle")?;
+            let stored: Receipt = serde_json::from_slice(
+                &tx.get(receipt_key(request)?.as_bytes())?
+                    .ok_or("unknown durable receipt")?,
+            )?;
+            if stored.result != expected {
+                return Err("acknowledged receipt differs from durable receipt".into());
+            }
+            let entry = self.job_entry(&tx, seq)?;
+            let hash = load::hex(&Sha256::new_with_prefix(entry.body.as_bytes()));
+            if oracle
+                != json!({"memory":entry.memory,"seq":entry.seq,"scope":entry.scope,
+                "active":entry.active,"body_sha256":hash})
+            {
+                return Err("acknowledged content differs from immutable revision".into());
+            }
+            let change = Change {
+                request_id: request.into(),
+                memory: entry.memory,
+                expected: entry.previous,
+                scope: entry.scope,
+                active: entry.active,
+                body: entry.body,
+                text_only: entry.text_only,
+            };
+            if stored.hash != load::hex(&Sha256::new_with_prefix(serde_json::to_vec(&change)?)) {
+                return Err("acknowledged request hash differs from durable receipt".into());
+            }
+        }
+        Ok(json!({"verified":receipts.len(),"commit_seq":point(&tx)?}))
     }
 
     pub async fn apply(&self, change: &Change, hold: Option<&str>) -> Result<Value, Error> {
@@ -607,6 +658,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
             .map(|v| serde_json::from_slice::<Receipt>(&v).map(|v| v.result))
             .transpose()?
             .unwrap_or(Value::Null),
+        Request::VerifyAcknowledgements { receipts } => a.verify_acknowledgements(&receipts)?,
         Request::Job { seq } => a
             .tree
             .begin_with_mode(Mode::ReadOnly)?
@@ -689,6 +741,75 @@ mod tests {
             body: "immutable".into(),
             text_only: true,
         }
+    }
+
+    #[tokio::test]
+    async fn acknowledged_receipts_retain_exact_historical_content() -> Result<(), Error> {
+        let (path, a) = fixture()?;
+        let mut change = change();
+        let mut receipts = Vec::new();
+        for seq in 1..=2 {
+            change.request_id = format!("ack-{seq}");
+            change.expected = seq - 1;
+            change.body = format!("revision {seq}");
+            change.scope = seq as u8;
+            change.active = seq == 1;
+            let mut receipt = a.apply(&change, None).await?;
+            receipt["oracle"] = json!({"memory":42,"seq":seq,"scope":change.scope,
+                "active":change.active,"body_sha256":load::hex(&Sha256::new_with_prefix(change.body.as_bytes()))});
+            receipts.push(receipt);
+        }
+        let outcome = async {
+            assert_eq!(
+                a.verify_acknowledgements(&receipts)?,
+                json!({"verified":2,"commit_seq":2})
+            );
+            for field in ["memory", "seq", "scope", "active", "body_sha256"] {
+                let mut tampered = receipts.clone();
+                tampered[0]["oracle"][field] = Value::Null;
+                assert!(a.verify_acknowledgements(&tampered).is_err(), "{field}");
+            }
+            for field in [
+                "request_id",
+                "commit_seq",
+                "revision",
+                "config_generation",
+                "stage",
+                "oracle",
+            ] {
+                let mut tampered = receipts.clone();
+                tampered[0][field] = Value::Null;
+                assert!(a.verify_acknowledgements(&tampered).is_err(), "{field}");
+            }
+            let mut unknown = receipts[0].clone();
+            unknown["request_id"] = json!("unknown");
+            assert!(a.verify_acknowledgements(&[unknown]).is_err());
+            assert!(a.verify_acknowledgements(&[]).is_err());
+            assert!(
+                a.verify_acknowledgements(&vec![receipts[0].clone(); 257])
+                    .is_err()
+            );
+            let key = receipt_key("ack-1")?;
+            let raw = a.tree.begin()?.get(key.as_bytes())?.unwrap();
+            let mut corrupt: Receipt = serde_json::from_slice(&raw)?;
+            corrupt.hash = "0".repeat(64);
+            let mut tx = a.tree.begin()?;
+            tx.set_durability(Durability::Immediate);
+            tx.set(key.as_bytes(), serde_json::to_vec(&corrupt)?)?;
+            tx.commit().await?;
+            assert!(a.verify_acknowledgements(&receipts).is_err());
+            let mut tx = a.tree.begin()?;
+            tx.set_durability(Durability::Immediate);
+            tx.set(key.as_bytes(), raw)?;
+            tx.commit().await?;
+            assert_eq!(a.verify_acknowledgements(&receipts)?["verified"], 2);
+            assert_eq!(point(&a.tree.begin_with_mode(Mode::ReadOnly)?)?, 2);
+            Ok::<_, Error>(())
+        }
+        .await;
+        a.tree.close().await?;
+        std::fs::remove_dir_all(path)?;
+        outcome
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]

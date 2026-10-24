@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Native authority transactions, immutable history and current authorization."""
 import hashlib
+import copy
 import json
 import os
 import pathlib
@@ -65,8 +66,8 @@ def main():
                 request=json.loads(request.read_text()) if args[0]=='--authority' else None,
                 kill=kill,expected_error=error))
             elapsed=time.monotonic()-started
-            publish(output/'progress.json',dict(completed=len(records),total=53,elapsed_s=elapsed,
-                rate_per_s=len(records)/elapsed,eta_s=(53-len(records))*elapsed/len(records),**process_identity(os.getpid())))
+            publish(output/'progress.json',dict(completed=len(records),total=77,elapsed_s=elapsed,
+                rate_per_s=len(records)/elapsed,eta_s=(77-len(records))*elapsed/len(records),**process_identity(os.getpid())))
             if not kill and not error:return json.loads(stdout)
 
         def call(op, **fields):
@@ -137,7 +138,26 @@ def main():
         call('state',scope=8,at=4,cursor=None,limit=100,error='invalid history page')
         assert call('status')['commit_seq']==4
         assert invoke('verify-import')['documents']==3
-        assert len(records)==53,len(records)
+        receipts=[]
+        for seq,request_id in enumerate(['first','second','third','fourth'],1):
+            receipt=call('receipt',request_id=request_id)
+            entry=call('get',memory=1_000_000,at=seq)
+            receipt['oracle']={k:entry[k] for k in ['memory','seq','scope','active']}
+            receipt['oracle']['body_sha256']=hashlib.sha256(entry['body'].encode()).hexdigest()
+            receipts.append(receipt)
+        assert call('verify_acknowledgements',receipts=receipts)==dict(verified=4,commit_seq=4)
+        for field in ['memory','seq','scope','active','body_sha256']:
+            tampered=copy.deepcopy(receipts);tampered[0]['oracle'][field]=None
+            call('verify_acknowledgements',receipts=tampered,error='acknowledged content')
+        for field in ['request_id','commit_seq','revision','config_generation','stage','oracle']:
+            tampered=copy.deepcopy(receipts);tampered[0][field]=None
+            call('verify_acknowledgements',receipts=tampered,error='acknowledge')
+        unknown=copy.deepcopy(receipts[0]);unknown['request_id']='unknown'
+        call('verify_acknowledgements',receipts=[unknown],error='unknown durable receipt')
+        for batch in [[],[receipts[0]]*257]:
+            call('verify_acknowledgements',receipts=batch,error='acknowledgement count')
+        assert call('status')['commit_seq']==4
+        assert len(records)==77,len(records)
     publish(output/'result.json',dict(status='passed',checks=len(records),seconds=time.monotonic()-started,
         records=records,temporary_root_removed=not pathlib.Path(temporary).exists(),
         artifact_sha256={p.name:digest(p) for p in output.iterdir() if p.is_file()},
