@@ -20,8 +20,11 @@ can reclaim space even below the ordinary write-admission floor.
 The [small native regression](../../docs/benchmarks/results/fallback-prune-versions/summary.json)
 passes133 commands plus a competing-owner check, including interruption before
 cleanup/after one table, query-before-resume, repeated cleanup and expired or
-oversized deadline refusal. Full-size pruning memory/physical reclamation and
-retirement of inactive generations remain unverified; this is not online GC.
+oversized deadline refusal. The [full-size run](../../docs/benchmarks/results/fallback-full-prune/summary.json)
+removes41,326 obsolete versions in349.791s with native RSS max200,458,240B.
+All42 before/after witnesses match; measured free space increases by
+40,473,866,240B. Inactive-generation retirement and the concurrent rebuild peak
+disk bound remain unverified; this is not online GC.
 
 Generation/workload controllers set `MALLOC_MMAP_THRESHOLD_=131072` before
 starting the native process. On the measured GNU libc2.36 host this prevents

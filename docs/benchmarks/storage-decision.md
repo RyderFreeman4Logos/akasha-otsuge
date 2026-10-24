@@ -60,8 +60,9 @@ intentional stop and unchanged limits. Compressed full import and low-memory
 verification of every original record now pass. Full-corpus 100k history and
 all-record native backfill also pass; see the [retained receipts](results/fallback-full-history-backfill/).
 Full native text/vector index coverage now passes with bounded scan I/O,
-streaming IVF training, private scratch and one build worker. Sustained workloads
-and the remaining recovery matrix are still unproven. All failed attempts and
+streaming IVF training, private scratch and one build worker. The full low-profile
+sustained workload and offline version pruning now pass below; the high profile,
+fresh construction and remaining recovery matrix are still unproven. All failed attempts and
 the original native deadline remain retained. Reuse source shards and query oracles, and do not retain
 an expanded corpus copy.
 
@@ -462,5 +463,32 @@ oracle, exact native/controller exits, inactive unit and scratch removal verify.
 The measured native binary remains `3ef94b16...8401` from7fba9f0. All raw receipts,
 frozen controllers and source bytes verified against that commit are archived.
 Earlier failed runs remain unchanged. Required high-profile steady load, full
-burst/overload, fresh bounded full construction, concurrent rebuild and measured
-disk reclamation still block backend selection and Issue#3 closure.
+burst/overload, fresh bounded full construction, concurrent rebuild and its peak
+disk bound still block backend selection and Issue#3 closure.
+
+### Full offline version reclamation
+
+[Full pruning receipts](results/fallback-full-prune/summary.json) verify the
+public offline operation on active generation2 after the passing low run.
+Under the640MiB/no-swap group it completes in349.791s, with native RSS max
+200,458,240B and no OOM. The kernel reports cgroup peak671,350,784B, including
+page cache and the observer; that metric is retained separately from native RSS.
+Four tables remove41,326 obsolete versions and40,540,456,938 native-reported bytes,
+with zero failed deletes. Current versions and row counts remain unchanged.
+
+All42 before/after JSON witnesses match exactly: authority/indexed receipts,
+current source records, historical reads/pages and scoped BM25/ANN queries.
+Active generation2, committed217716 and both drained watermarks are unchanged.
+Exact process identities, inactive services, raw hashes and scratch removal
+verify. Completed controller reuse leaves state unchanged and executes no native
+command; its disposable binary copy is then retired, so later reuse of that
+controller is not claimed. The first witness attempt omitted the8192 file limit
+and failed its first read with EMFILE before pruning; its evidence is retained.
+
+Per-inode allocated bytes decrease from172,911,669,248 to131,838,787,584B.
+Filesystem free space increases from362,145,644,544 to402,619,510,784B at the
+paired snapshots. Btrfs shared extents and unrelated host activity mean these
+are separate measurements, not an exclusive-allocation assertion. Authority
+and inactive generation1 remain intact; the latter still occupies48,655,896,576
+allocated bytes. Safe inactive-generation retirement and the physical peak of
+the next full concurrent build remain open. No online pruning is claimed.

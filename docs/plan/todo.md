@@ -97,6 +97,13 @@ Completed, with the limits shown:
 - [x] Retire the rejected Helix experiment database with exact ownership, process,
       lock and artifact checks;38,603,812,864 allocated bytes removed. Preserve
       source shards and receipts. Do not claim later reuse of that database.
+- [x] Prune obsolete native versions of full active generation2 under the low
+      group:349.791s, RSS max200,458,240B,41,326 versions and40,540,456,938
+      native-reported bytes removed. All42 before/after current/history/query/
+      receipt witnesses match. Actual filesystem free-space delta is
+      40,473,866,240B; retain Btrfs/concurrent-activity limits. Completed controller
+      reuse verifies before retiring its disposable binary. Authority and old
+      generation1 remain intact; their retirement/peak-bound work remains below.
 
 Remaining acceptance, in execution order:
 
@@ -134,8 +141,9 @@ Remaining acceptance, in execution order:
       Preserve30GiB headroom and read/idempotent-receipt availability at refusal.
       Public offline derived-version pruning passes133 native commands, one
       competing-owner refusal and eight total crash barriers; current/history/
-      receipts remain unchanged. Full-size reclamation and inactive-generation
-      retirement still need measured acceptance.
+      receipts remain unchanged. Full-size obsolete-version reclamation now
+      passes above; inactive-generation retirement and concurrent peak disk
+      accounting still need measured acceptance.
 - [ ] Reconcile the complete required crash/resource/config matrix against
       immutable receipts: commit/reply/index/watermark/activation barriers,
       authority and derived corruption, child failure/exhaustion, isolated disk
