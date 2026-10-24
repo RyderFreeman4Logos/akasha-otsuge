@@ -298,9 +298,22 @@ but BM25 reaches only49 in-window successes in60s, below the unchanged1/s gate.
 The result remains failed. A [two-search control](results/fallback-heavy-two-control/summary.json)
 also meets short-run memory (max/P99 530,878,464B) but only44 BM25 and10 ANN
 requests finish inside60s. It is reverted to the verified single-search policy;
-full query-stage profiling is required before another performance change.
+the subsequent query-stage profiling below precedes another performance change.
 Ten fallback and13 Helix release units plus both Clippy checks cover the shared
 admission behavior. Waiting search requests leave general permits available to
 ordinary reads/writes. Generation and case controllers now apply the fixed GNU
 allocator threshold at child startup, and observer receipts record it. No
 long-duration or build-memory acceptance is inferred from these controls.
+
+[Isolated query-stage profiling](results/fallback-query-stages/summary.json)
+measures the full cold60s case with one heavy-search permit. It completes all1,698
+requests and content checks, with sampled RSS maximum360,960,000B. Mean baseline
+result-stream time is0.391s for BM25 and1.108s for ANN; connection/table setup
+takes milliseconds, and delta-text queries average0.035s total. The opened table
+retains the shared Lance session; no early-connection-drop defect is demonstrated.
+Instrumentation changes timing, so this pass does not erase earlier canonical
+throughput failures. Their run-to-run difference remains unattributed because
+host contention was not recorded. Subsequent observer samples now retain host
+load and CPU/memory/I/O pressure; a dedicated-service smoke verifies those fields.
+The next required measurement is the first canonical30-minute low case, using
+the unchanged native binary and frozen thresholds, not another short diagnostic.

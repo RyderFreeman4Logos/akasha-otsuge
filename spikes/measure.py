@@ -125,6 +125,10 @@ def main():
                     "cgroup_current_bytes": int((cgroup / "memory.current").read_text()),
                     "cgroup_peak_bytes": int((cgroup / "memory.peak").read_text()),
                     "memory_events": dict(line.split() for line in (cgroup / "memory.events").read_text().splitlines()),
+                    "host_load_average": os.getloadavg(),
+                    "host_pressure": {name: path.read_text() if path.exists() else None
+                                      for name in ("cpu", "memory", "io")
+                                      for path in [pathlib.Path("/proc/pressure") / name]},
                     "io_stat": io_stat,
                     "engine_process_io": {str(pid): process_io(pid) for pid in pids if pid != os.getpid()},
                     "io_coverage": "currently sampled processes; cgroup controller unavailable" if io_stat is None else "cgroup and sampled processes",

@@ -118,8 +118,13 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       mmap threshold reduces sampled max/P99 to363,409,408B under the original
       640MiB group. One heavy-search permit misses BM25 throughput, so acceptance
       remains failed. Two heavy permits also meet short-run memory but reduce
-      throughput further; that control is reverted. Profile query stages with
-      one heavy permit before another change. Build peak memory is separate.
+      throughput further; that control is reverted. Isolated stage instrumentation
+      then passes all1,698 short-run requests: baseline result streaming dominates
+      (BM25 mean0.391s, ANN1.108s), while connection/table setup takes milliseconds.
+      No connection-lifetime defect is established; instrumented timing is not
+      canonical acceptance. Record host load/pressure for subsequent runs and run
+      the first required30-minute low case with the unchanged canonical native
+      binary and thresholds. Build peak memory is separate.
 - [ ] Verify atomic revision/head/receipt/job/sequence commit; request-hash reuse;
       historical pages; current head/scope revalidation and live permissions.
       Small real-index fixtures now cover stale candidates, permission races,
