@@ -23,15 +23,15 @@ fixture does not establish a full-scale resource result.
 | Invalid config, snapshot pinning and competing reloads | [Configuration tests](../../tests/config.rs) |17 product ConfigManager tests. Production storage consumers and worker lifecycle remain#8/#9/#24; model1700s acceptance remains#9. |
 | Safe physical space reclamation | [Pruning](results/fallback-full-prune/summary.json), [retirement](results/fallback-full-retirement/summary.json), [generation4 preparation](results/fallback-full-generation4-preparation/summary.json) | Full public native cleanup preserves authority/history/receipts. Current preparation verifies66 before/after witnesses and removes disposable binary copies after reuse checks. Inode allocation and filesystem free space are separate measurements. |
 | One shared native cache budget per authority | [Shared-session repair](results/fallback-shared-session/summary.json) | Actual native identity assertion fails before the repair, passes after it, and checks fresh rows/indexes.12 release units,179 lifecycle commands and4,528 diagnostic concurrent requests pass. This is not full resource acceptance. |
-| Full build overlapping ordinary writes, both searches and corpus corrections | Full r2 pending | The original concurrent run failed OOM at403.420s; the failure remains. Current full r2 must satisfy unchanged performance,512MiB P99/640MiB peak, no OOM and all content oracles. |
-| Generation-specific receipts/watermarks through a successful concurrent rebuild | Full r2 follow-up pending | Recovered generation3 activation at269826 has78 before/79 after witnesses. Generation4 follow-up requires every logged acknowledgement, explicit original vectors, complete catch-up and activation witnesses. |
-| Complete physical rebuild bound | Full r2 disk observer pending | Original failed run stayed within category caps but does not establish a completed peak. The observer records10-second inode-allocation samples and filesystem headroom, not an instantaneous quota or exclusive Btrfs extents. |
+| Full build overlapping ordinary writes, both searches and corpus corrections | [Full r2 failure](results/fallback-full-rebuild-r2/summary.json) | Original run failed OOM at403.420s; shared-session r2 also fails OOM at1762.242s, RSS P99/max579,792,896/608,862,208B and16 recorded search errors. No successful concurrent acceptance. |
+| Generation-specific receipts/watermarks through a successful concurrent rebuild | [Full r2 reconciliation](results/fallback-full-rebuild-r2/summary.json) |39,876 complete acknowledgements verified; eight originals restored and active3 watermarks reach309711. One unlogged commit and one incomplete log line remain unknown. Generation4 remains partial/inactive; successful rebuild/catch-up/activation still required. |
+| Complete physical rebuild bound | [Full r2 disk samples](results/fallback-full-rebuild-r2/summary.json) |159 samples remain within category caps, total observed peak123,707,609,088B. Both failed runs lack a completed rebuild peak. Ten-second inode-allocation samples do not prove an instantaneous quota or exclusive Btrfs extents. |
 
 The specified interruption coverage is the real full OOM/recovery plus named
 transaction/index/activation SIGKILL barriers. The specification does not require
 an additional duplicate full-build kill after these checks. No accepted criterion
 is removed by that scope decision.
 
-MVP-003 finishes only after the pending full case and its follow-up evidence,
+MVP-003 finishes only after a successful full case and its follow-up evidence,
 review, sole-backend ADR and PR merge. The production Storage, daemon, host
 integrations and final protocol/resource gates remain#4–#28.

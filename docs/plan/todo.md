@@ -148,6 +148,22 @@ Remaining acceptance, in execution order:
       no OOM. All four disposable native copies are retired after completed reuse
       and exact process/unit/scratch checks. Generation4 is unbuilt; active3 and
       committed269826 remain unchanged. No concurrent-build pass is inferred.
+- [x] Preserve and reconcile the second full concurrent failure: systemd OOM at
+      1762.242s; sampled RSS P99/max579,792,896/608,862,208B. The incomplete prefix
+      has48,627 complete logged requests and16 search errors. All39,876 complete
+      seed/workload acknowledgements match authority; one truncated trailing
+      line and unlogged committed309703 remain unknown. Eight guarded originals
+      are restored at309704..309711; active3 drains both watermarks to309711.
+      Generation4 stays partial/inactive under its original deadline. Failed-run
+      disk samples stay within caps; no completed rebuild peak is inferred.
+- [ ] Resolve the remaining concurrent memory/performance failure using bounded
+      source-backed controls before another full run. Fixed-query64MiB/8MiB ANN
+      chunk controls preserve candidate sets but do not establish a sufficient
+      reduction or successful concurrent operation. Keep every acceptance limit.
+- [x] Remove50 obsolete native copies whose hashes appear in published receipts;
+      retain current/recent recovery and unattributed files. Inode allocation
+      falls7,430,930,432B; filesystem free space increases2,648,940,544B. No build
+      cache, corpus, authority database or installed program is removed.
 - [ ] Complete an uninterrupted full scoped build within the640MiB low peak and
       reopen interrupted builds directly at low budget. The prior vector merge
       OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.

@@ -662,3 +662,33 @@ Generation4 backfill completes all11,428,831 text rows and1,000,000 vectors in
 no index deadline allocated. Generation3 stays active at committed269826.
 Exact process/unit exits and scratch cleanup verify. This preparation is not a
 full build or concurrent acceptance result.
+
+### Shared-session full concurrent failure and reconciliation
+
+[Full r2 evidence](results/fallback-full-rebuild-r2/summary.json) preserves a second
+failure with the unchanged3840s/100-client workload and640MiB cgroup. Systemd
+reports OOM at1762.242s; no terminal observer or completed workload receipt exists.
+Sampled RSS P99/max is579,792,896/608,862,208B: the P99 limit also fails, while the
+sampled maximum stays below640MiB. The incomplete prefix contains48,627 complete
+requests, including16 search errors and excessive scheduled-to-completion search
+latency; prefix percentiles are censored observations, not full acceptance.
+
+After exact process/unit termination and explicit case abandonment,156 native
+batches verify all39,826 complete successful workload receipts and50 seed receipts
+against durable content, requests and outbox state in46.590s. The first reader
+refuses one incomplete trailing line before native verification; a controlled
+complete-prefix reader retains the original log unchanged. Committed309703 has
+no complete persisted request receipt; that outcome and the truncated line stay
+unknown. Eight originals are restored under revision guards at309704..309711,
+with historical values preserved. Active3 drains both watermarks to309711 in
+1.173s. Generation4 remains partial and inactive; its original deadline is kept.
+
+The separate disk observer has159 samples, no category-cap breach, a total
+sampled peak123,707,609,088B and minimum free space406,743,638,016B. These readings
+cannot establish the peak of a completed rebuild. The empty owned OOM scratch
+directory is removed after exact process termination. Fifty obsolete native
+copies with published digest references are removed separately:7,430,930,432B
+of inode allocation and2,648,940,544B additional filesystem free space. Current,
+recent recovery and unattributed copies remain; source archives and result
+hashes are preserved. No corpus expansion, database deletion or build-cache
+purge is used. The backend decision remains open.
