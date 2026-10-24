@@ -18,7 +18,7 @@ def main():
     binary, output = pathlib.Path(sys.argv[1]).resolve(strict=True), pathlib.Path(sys.argv[2]).resolve()
     legacy = pathlib.Path(sys.argv[3]).resolve(strict=True) if len(sys.argv) == 4 else None
     selected_binary = binary
-    total = 99 if legacy else 85
+    total = 100 if legacy else 85
     output.mkdir(mode=0o700)
     (output / 'OWNER').write_text('akasha-otsuge MVP-003 fallback search receipts\n')
     records, started = [], time.monotonic()
@@ -38,7 +38,9 @@ def main():
                            embedding=[float(j == i) for j in range(1536)])
                 raw = (json.dumps(row, separators=(',', ':')) + '\n').encode()
                 stream.write(raw); sha.update(raw); size += len(raw); body_size += len(body)
-        manifest.write_text(json.dumps(dict(corpus=dict(documents=1057, vectors=1057,
+        bundle = dict(model='synthetic-basis-1536', model_fingerprint='a' * 64,
+                      dimension=1536, chunker='whole-record-v1', schema=1)
+        manifest.write_text(json.dumps(dict(embedding_bundle=bundle,corpus=dict(documents=1057, vectors=1057,
             prepared_bytes=size, prepared_sha256=sha.hexdigest(), indexed_body_utf8_bytes=body_size))))
 
         def invoke(*arguments, kill=None, error=None, overrides=None):
@@ -95,13 +97,11 @@ def main():
             request.write_text(json.dumps(dict(op=op, generation=generation, **fields)))
             return invoke('--generation', request, kill=kill, error=error, overrides=overrides)
 
-        bundle = dict(model='synthetic-basis-1536', model_fingerprint='a' * 64,
-                      dimension=1536, chunker='whole-record-v1', schema=1)
         assert invoke('--load', source, manifest)['documents'] == 1057
         state = call('begin_corpus', bundle=bundle, manifest=str(manifest))
         assert state['cursor'] == 0 and not state['ready']
         assert call('begin', bundle=bundle) == state
-        call('begin', bundle=dict(bundle, model='different'), error='generation identity conflict')
+        call('begin', bundle=dict(bundle, model='different'), error='corpus encoder/chunker provenance mismatch')
         call('query', bundle=bundle, scope=2, term='beaconfortytwo', error='not ready')
         state = call('backfill', waves=100)
         assert state['cursor'] == state['vector_rows'] == 1057 and state['pending'] is None
@@ -148,6 +148,7 @@ def main():
             call('backfill', waves=100)
             call('build')
             selected_binary = binary
+            call('begin', bundle=bundle, manifest=str(manifest))
             assert call('status')['text_layout'] == 'legacy'
             assert call('build')['text_layout'] == 'legacy'
             for scope in range(8):

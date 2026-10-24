@@ -755,9 +755,36 @@ active3 and committed/text/vector309711 are unchanged. All four controller runs
 pass completed reuse, exact process/unit exits, scratch cleanup and disposable
 native-copy removal. This is preparation, not a concurrent-build acceptance pass.
 
-Independent frozen-source review identifies a remaining model-provenance defect:
-Begin can relabel the existing corpus embeddings, and later generation consumers
-trust that label. Repair the shared admission/read boundary and prove its negative
-controls before freezing the next full run. The measured corpus uses its correct
-pinned model identity. No source record rewrite, deadline extension, threshold
-relaxation or backend selection follows from this preparation.
+Independent frozen-source review identifies a model-provenance defect at this
+checkpoint: Begin can relabel existing corpus embeddings, and later generation
+consumers trust that label. The measured corpus uses its correct pinned model
+identity. No source record rewrite, deadline extension, threshold relaxation or
+backend selection follows from this preparation.
+
+## Original corpus identity binding — 2026-10-24
+
+The [repair fixtures](results/fallback-corpus-identity/summary.json) freeze native
+4028cb8e from parent0060e42. Import retains the original manifest bytes alongside
+the existing SHA. Begin and shared generation reads validate encoder identity
+against those bytes, including the pinned publisher inputs or explicitly declared
+synthetic encoder. Schema-only upgrades remain valid. An existing import without
+the bytes refuses generation access until an idempotent Begin binds the original
+hash-matching manifest; records and original operation deadlines are unchanged.
+The error path now awaits database close before returning its original error.
+
+Behavioral RED demonstrates old-native wrong-model admission and the new unit
+failing the same contract. Earlier Python-syntax and Rust compile failures are
+retained but excluded from behavioral RED. Initial GREEN failures expose the
+unawaited-close lock; the final unit passes without changing its assertions.
+All13 release units and Clippy pass. Native231-command lifecycle validation covers
+19 SIGKILL barriers and two contenders;21 import and85 synthetic search commands
+also pass. A160s/100-client concurrent diagnostic completes4,528 requests with
+RSS P99/max202,850,304/202,907,648B, no errors/OOM and write P95=59ms. Exact-process,
+unit, fixture and scratch cleanup checks pass. The816-file archive is1,523,284B,
+SHA256`bed58ab5094eda25425636130b61c1fd340424df7bb3280425bf88d82ad5c84b`.
+
+Independent re-review and exact-HEAD root gates are pending at this checkpoint.
+The full database still needs its bounded original-manifest binding and witness
+check. The optional legacy text-layout binary fixture was not rerun; native unit
+coverage proves legacy metadata binding. None of these small fixtures establish
+full concurrent resource acceptance or select the sole backend.

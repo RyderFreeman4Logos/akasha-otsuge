@@ -184,13 +184,19 @@ Remaining acceptance, in execution order:
       RSS max164,487,168B and no OOM. It remains unbuilt with no index deadline;
       active3/committed309711 are unchanged. Completed reuse, exact process/unit
       exit, scratch cleanup and four disposable-copy removals verify.
-- [ ] Bind generation model/fingerprint/dimension/chunker to the imported corpus
-      identity. Independent frozen-source review found that Begin accepts another
-      label while baseline backfill copies existing embeddings; query, workload
-      and replay then trust that label. Repair the shared boundary with behavioral
-      RED/GREEN and re-review before starting the next expensive full case. Retain
-      synthetic fixture provenance and original import hashes/deadlines; no corpus
-      reimport or threshold change is needed.
+- [x] Bind generation model/fingerprint/dimension/chunker to the original import
+      manifest at creation and shared reads. Behavioral native/unit RED reproduces
+      relabeling; GREEN covers rejection, explicit synthetic provenance, legacy
+      binding with unchanged state/deadlines, and awaited close after refusal.
+      All13 release units, Clippy,231 lifecycle commands/19 SIGKILL barriers,
+      21 import and85 search commands pass. The160s/100-client diagnostic passes
+      4,528 requests, RSS P99/max202,850,304/202,907,648B. Prior failed attempts
+      remain archived. The independent review's trailing-blank finding is fixed.
+- [ ] Complete exact-HEAD gates and independent re-review of the identity repair,
+      then bind the existing full database to its original manifest and verify
+      active3/candidate5 state, deadlines and witnesses. Do this before full r3;
+      no corpus reimport or threshold change is needed. The optional old text-layout
+      binary fixture was not rerun; legacy metadata binding has native unit coverage.
 - [x] Remove50 obsolete native copies whose hashes appear in published receipts;
       retain current/recent recovery and unattributed files. Inode allocation
       falls7,430,930,432B; filesystem free space increases2,648,940,544B. No build

@@ -52,8 +52,10 @@ original executable identities.
 The [partial-generation regression](../../docs/benchmarks/results/fallback-partial-retirement/summary.json)
 passes223 commands,19 SIGKILL barriers and two competing-owner refusals. It retires
 never-created tables, interrupted baseline backfills and failed native index
-builds without altering the active generation. RSS max is128,020,480B; actual full
-partial-generation reclamation is a separate pending measurement.
+builds without altering the active generation. RSS max is128,020,480B. Subsequent
+[full preparation](../../docs/benchmarks/results/fallback-full-generation5-preparation/summary.json)
+retires partial4, prunes active3 and backfills5 with66 before/after witnesses;
+fresh full concurrent-build acceptance remains open.
 
 Generation/workload controllers set `MALLOC_MMAP_THRESHOLD_=131072` before
 starting the native process. On the measured GNU libc2.36 host this prevents
@@ -264,6 +266,22 @@ reservations are checked before effects and at wave/index boundaries. The
 [47-command extension](../../docs/benchmarks/results/fallback-owned-search/summary.json)
 proves deadline refusal after SIGKILL and continued reads of the ready generation.
 It also binds the requested corpus manifest to the imported source hash.
+
+Import now retains the original manifest in authority metadata. Every generation
+read and creation checks its model, fingerprint, dimension and chunker against
+that hash-bound source; a schema-only generation upgrade remains valid. The
+pinned publisher manifest derives the same model fingerprint as the original
+Helix corpus reader. Diagnostic synthetic manifests declare `embedding_bundle`
+explicitly and cannot mix it with publisher metadata. These labels do not claim
+that synthetic vectors came from the real model.
+
+For a legacy import without persisted manifest bytes, repeat `begin` with the
+existing generation, unchanged bundle and original `manifest` path. Only bytes
+matching the original import SHA can be bound; missing, changed or contradictory
+metadata is refused. Binding does not rewrite originals or refresh deadlines.
+Previously mislabeled generation state is rejected at the common read boundary,
+including query, workload pinning and delta replay. Request failures await
+database close before returning, retaining the original operation error.
 
 The real 38,462-row shard backfills in 10.311s. Its first low-profile index build
 OOMs during partition merging, retained with the systemd journal. Lance defaults

@@ -1,0 +1,184 @@
+{
+  "archive_bytes": 1523284,
+  "archive_files": 816,
+  "archive_sha256": "bed58ab5094eda25425636130b61c1fd340424df7bb3280425bf88d82ad5c84b",
+  "native_sha256": "4028cb8e9164218029f6396c88172ace7d7f356f148247794b14ce4c9d955125",
+  "not_proven": [
+    "full imported-database metadata binding",
+    "optional legacy text-layout binary fixture",
+    "full concurrent resource acceptance",
+    "sole backend decision"
+  ],
+  "oracle_custody": {
+    "excluded_attempts": {
+      "native_r1": "Python syntax before native load",
+      "unit_r1": "ambiguous Vec::as_ref compile error"
+    },
+    "green_r1": "first source guard rejects model; next open fails",
+    "green_r2": "same failure diagnosed as async database close retaining LOCK",
+    "green_r3": "1 exact unit PASS; request boundary awaits close on errors",
+    "green_unit_region_sha256": "654fe81591335540464802233f0f793a97a37d2d3396ef10749d5a723ba3d0ed",
+    "head": "0060e4255d03c485ea58ab34f1ef90ba3f1652c1",
+    "lifecycle_sha256": "f71189dc65e821b511f596d3405c73fa39395add218c57bd30ec16410e6fb86e",
+    "native_red": "wrong-model fresh generation99 was accepted by 8f0b",
+    "unit_oracle_change": "only inspect_err diagnostic and formatting; all predicates/assertions unchanged",
+    "unit_red": "1 collected,0 passed,1 failed: fresh generation accepted mismatched corpus identity",
+    "unit_region_sha256": "c27ac219db8ca937a76d773630a1166ac7790f7e8db6f7014d803830fe889249"
+  },
+  "regression": "Exact original-manifest model/fingerprint/dimension/chunker binding at generation creation and shared reads; legacy binding preserves original state/deadlines; rejected requests await database close",
+  "review": "independent frozen-source re-review pending",
+  "source_parent": "0060e4255d03c485ea58ab34f1ef90ba3f1652c1",
+  "status": "passed_native_fixtures",
+  "validation": {
+    "clippy": "passed_release_all_targets",
+    "native_sha256": "4028cb8e9164218029f6396c88172ace7d7f356f148247794b14ce4c9d955125",
+    "reports": {
+      "concurrent": {
+        "artifacts_verified": true,
+        "case_seconds": 162.5522864665836,
+        "controls": 10,
+        "exact_processes_gone": true,
+        "fixture_removed": true,
+        "native_sha256": "4028cb8e9164218029f6396c88172ace7d7f356f148247794b14ce4c9d955125",
+        "operations": {
+          "ann": {
+            "attempted": 40,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 129,
+            "successful": 40,
+            "successful_per_s": 0.25,
+            "within_window": 40
+          },
+          "bm25": {
+            "attempted": 192,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 135,
+            "successful": 192,
+            "successful_per_s": 1.2,
+            "within_window": 192
+          },
+          "correction": {
+            "attempted": 32,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 70,
+            "successful": 32,
+            "successful_per_s": 0.2,
+            "within_window": 32
+          },
+          "current": {
+            "attempted": 384,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 57,
+            "successful": 384,
+            "successful_per_s": 2.4,
+            "within_window": 384
+          },
+          "history": {
+            "attempted": 40,
+            "conflicts": 0,
+            "errors": 0,
+            "p95_upper_ms": 71,
+            "successful": 40,
+            "successful_per_s": 0.25,
+            "within_window": 40
+          },
+          "write": {
+            "attempted": 3840,
+            "conflicts": 1111,
+            "errors": 0,
+            "p95_upper_ms": 59,
+            "successful": 2729,
+            "successful_per_s": 17.05625,
+            "within_window": 2729
+          }
+        },
+        "rebuild": {
+          "active_generation": 1,
+          "end_seq": 4189,
+          "generation": 2,
+          "ready": true,
+          "seconds": 3.031076442,
+          "start_seq": 4146,
+          "state": {
+            "backfill_deadline_ms": 1792845631237,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+              "schema": 2
+            },
+            "cursor": 24,
+            "documents": 24,
+            "generation": 2,
+            "index_deadline_ms": 1792845633745,
+            "pending": null,
+            "ready": true,
+            "source": "03e76bbf49929a2bf387f2d2fbbe1349522d87b45a60d3147e387ed8b64353b8",
+            "text_layout": "scope_columns",
+            "text_version": 1,
+            "vector_rows": 8,
+            "vector_version": 1,
+            "vectors": 8
+          },
+          "status": "passed"
+        },
+        "requests": 4528,
+        "rss_max_bytes": 202907648,
+        "rss_p99_bytes": 202850304,
+        "scratch_removed": true,
+        "seconds": 218.0149331614375,
+        "status": "passed",
+        "units_inactive": true
+      },
+      "import": {
+        "artifacts_verified": true,
+        "commands": 21,
+        "exact_processes_gone": true,
+        "fixture_removed": true,
+        "native_sha256": "4028cb8e9164218029f6396c88172ace7d7f356f148247794b14ce4c9d955125",
+        "rss_max_bytes": 49905664,
+        "scratch_removed": true,
+        "seconds": 1.1037399070337415,
+        "sigkill_barriers": 1,
+        "status": "passed",
+        "unit_inactive": true
+      },
+      "lifecycle": {
+        "artifacts_verified": true,
+        "commands": 231,
+        "contenders": 2,
+        "exact_processes_gone": true,
+        "fixture_removed": true,
+        "native_sha256": "4028cb8e9164218029f6396c88172ace7d7f356f148247794b14ce4c9d955125",
+        "rss_max_bytes": 117530624,
+        "scratch_removed": true,
+        "seconds": 14.67726375721395,
+        "sigkill_barriers": 19,
+        "status": "passed",
+        "unit_inactive": true
+      },
+      "search": {
+        "artifacts_verified": true,
+        "commands": 85,
+        "exact_processes_gone": true,
+        "fixture_removed": true,
+        "legacy_binary_fixture_run": false,
+        "native_sha256": "4028cb8e9164218029f6396c88172ace7d7f356f148247794b14ce4c9d955125",
+        "rss_max_bytes": 130719744,
+        "scratch_removed": true,
+        "seconds": 14.877118708565831,
+        "sigkill_barriers": 5,
+        "status": "passed",
+        "unit_inactive": true
+      }
+    },
+    "source_parent": "0060e4255d03c485ea58ab34f1ef90ba3f1652c1",
+    "status": "passed_native_fixtures",
+    "unit_tests": 13
+  }
+}

@@ -57,6 +57,11 @@ def main():
             return True
         return check
     add('load',{})
+    for bad in [dict(model='wrong'),dict(model_fingerprint='0'*64),dict(chunker='wrong')]:
+        g('begin',generation=99,bundle={**bundle,**bad},error='corpus encoder/chunker provenance mismatch')
+        g('status',generation=99,error='missing generation')
+    g('begin',generation=99,bundle={**bundle,'dimension':1},error='invalid corpus index bundle')
+    g('status',generation=99,error='missing generation')
     retire(error='retirement requires an active generation')
     for scope in range(8):
         add('authority',dict(op='permission',principal='reader',scope=scope,allowed=True))
@@ -213,7 +218,11 @@ def main():
         documents=[dict(key='baseline',body='baseline content',partition='p7'),*rows]
         raw=b''.join((json.dumps(row,separators=(',',':'))+'\n').encode() for row in documents)
         (root/'input.jsonl').write_bytes(raw)
-        publish(root/'manifest.json',dict(corpus=dict(documents=len(documents),vectors=len(rows),prepared_bytes=len(raw),prepared_sha256=hashlib.sha256(raw).hexdigest(),indexed_body_utf8_bytes=sum(len(row['body'].encode()) for row in documents))))
+        publish(root/'manifest.json',dict(embedding_model=bundle['model'],dimensions=1536,
+            precomputed_at='2024-02 (publisher)',chunk_bytes=65536,
+            corpus=dict(documents=len(documents),vectors=len(rows),prepared_bytes=len(raw),
+                prepared_sha256=hashlib.sha256(raw).hexdigest(),indexed_body_utf8_bytes=sum(len(row['body'].encode()) for row in documents),
+                inputs=[dict(file='vectors-00000.parquet',repository='Qdrant/dbpedia-entities-openai3-text-embedding-3-large-1536-1M',revision='4a9731217921bc476a0f03544f11f22ae4903fa5')])))
         publish(output/'admission.json',dict(binary_sha256=digest(binary),source_sha256=digest(source),harness_sha256=digest(__file__),temporary_root=temporary,controller=process_identity(os.getpid()),planned_commands=len(steps)))
         for channel, value, check, error, kill, overrides in steps:
             name=f'{len(records):03d}';publish(request,value)

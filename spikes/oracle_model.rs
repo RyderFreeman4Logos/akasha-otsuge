@@ -27,4 +27,3 @@ pub fn oracle_state(memory: u64, at: u64) -> Option<Value> {
         json!({"memory":memory,"seq":seq,"scope":change.scope,"active":change.active,"body":change.body}),
     )
 }
-

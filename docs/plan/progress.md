@@ -71,14 +71,21 @@ Generation5 backfill covers11,428,831 texts/1,000,000 vectors in801.717s, RSS ma
 in its tombstone. All four operations pass completed reuse and exact process,
 unit, scratch and disposable-copy cleanup checks.
 
-The [independent review](../benchmarks/reviews/ddcf113-r1.md) returns FAIL for the
-corpus/model identity gap and separately records a trailing oracle-file blank line.
-Next: repair that source identity finding. Begin can
-currently label copied source embeddings as another model; the shared generation
-read boundary must bind model/fingerprint/dimension/chunker to the frozen import.
-Query, workload and replay are one root-cause class. Prove RED/GREEN and re-review
-before the next full concurrent run. The existing full corpus uses the correct
-pinned identity; no reimport or deadline extension is planned. No backend selected.
+The [independent review](../benchmarks/reviews/ddcf113-r1.md) returned FAIL for the
+corpus/model identity gap and a trailing oracle-file blank line. The
+[identity repair](../benchmarks/results/fallback-corpus-identity/summary.json) now
+binds creation and shared generation reads to the exact original import manifest.
+It also awaits database close after rejected requests; the regression exposed the
+old error path retaining its lock. Native/unit RED and all failed attempts remain
+archived. Legacy binding preserves state/deadlines; synthetic fixtures explicitly
+declare their encoder. All13 release units, Clippy,231 lifecycle commands with19
+SIGKILL barriers,21 import commands and85 search commands pass. The160s/100-client
+diagnostic passes4,528 requests, RSS P99/max202,850,304/202,907,648B, with all owned
+processes, units, fixtures and scratch verified gone. The old text-layout binary
+fixture was not rerun. Next: exact-HEAD gate and independent re-review, then bind
+the existing full database and check its witnesses before full r3. The existing
+corpus uses the correct pinned identity; no reimport or deadline extension is
+needed. No backend selected.
 
 At restart or compaction, first load the WD skill and reconcile the exact managed
 task with its completion listener and durable state in `.git/akasha-evidence`.

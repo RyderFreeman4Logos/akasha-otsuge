@@ -1034,6 +1034,83 @@ mod tests {
     use crate::authority::Change;
     use tokio::sync::Notify;
 
+    #[tokio::test]
+    async fn corpus_identity_survives_legacy_binding_and_rejects_relabeling() -> Result<(), Error> {
+        async fn request(root: &Path, value: Value) -> Result<Value, Error> {
+            let path = root
+                .parent()
+                .ok_or("missing fixture parent")?
+                .join("request.json");
+            load::atomic_json(&path, &value)?;
+            super::super::run(root, &path)
+                .await
+                .inspect_err(|error| eprintln!("IDENTITY_REQUEST_ERROR:{error}"))
+        }
+        let parent = std::env::temp_dir().join(format!(
+            "akasha-identity-unit-{}-{}",
+            std::process::id(),
+            SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos()
+        ));
+        std::fs::create_dir(&parent)?;
+        let outcome = async {
+            let root = parent.join("database");
+            std::fs::write(parent.join("OWNER"), "akasha-otsuge MVP-003 owned corpus import and database\n")?;
+            let mut vector = vec![0.0;1536]; vector[0]=1.0;
+            let raw = format!("{}\n",json!({"key":"baseline","body":"baseline","partition":"p0","embedding":vector}));
+            std::fs::write(parent.join("input.jsonl"), &raw)?;
+            let bundle = json!({"model":"synthetic-basis-1536","model_fingerprint":hash(b"synthetic-one-hot-v1"),"dimension":1536,"chunker":"whole-record-v1","schema":1});
+            let manifest = parent.join("manifest.json");
+            load::atomic_json(&manifest, &json!({"embedding_bundle":bundle,"corpus":{"documents":1,"vectors":1,"prepared_bytes":raw.len(),"prepared_sha256":hash(raw.as_bytes()),"indexed_body_utf8_bytes":8}}))?;
+            load::run(&root,&parent.join("input.jsonl"),&manifest,false).await?;
+            let original = request(&root,json!({"op":"begin","generation":1,"bundle":bundle})).await?;
+            for field in ["model","model_fingerprint","chunker"] {
+                let mut wrong=bundle.clone(); wrong[field]=json!(if field=="model_fingerprint" {"0".repeat(64)} else {"wrong".into()});
+                let rejected=request(&root,json!({"op":"begin","generation":99,"bundle":wrong})).await;
+                if !rejected.is_err_and(|e|e.to_string().contains("corpus encoder/chunker provenance mismatch")) {
+                    return Err("fresh generation accepted mismatched corpus identity".into());
+                }
+                if !request(&root,json!({"op":"status","generation":99})).await.is_err_and(|e|e.to_string().contains("missing generation")) {
+                    return Err("rejected generation left usable state".into());
+                }
+            }
+            let mut schema=bundle.clone(); schema["schema"]=json!(2);
+            request(&root,json!({"op":"begin","generation":2,"bundle":schema})).await?;
+            let a=Authority::open(&root)?;
+            let mut retained=original.clone();retained["backfill_deadline_ms"]=json!(now_ms()?+600_000);retained["index_deadline_ms"]=json!(now_ms()?+600_000);
+            let mut tx=a.tree.begin()?;tx.set_durability(Durability::Immediate);
+            tx.set(key(1)?.as_bytes(),serde_json::to_vec(&retained)?)?;
+            tx.delete(b"meta:import-manifest")?;tx.commit().await?;a.tree.close().await?;
+            if !request(&root,json!({"op":"status","generation":1})).await.is_err_and(|e|e.to_string().contains("missing persisted corpus manifest")) {
+                return Err("legacy generation was trusted without source metadata".into());
+            }
+            let wrong=parent.join("wrong-manifest.json");std::fs::write(&wrong,b"{}")?;
+            if !request(&root,json!({"op":"begin","generation":1,"bundle":bundle,"manifest":wrong})).await.is_err_and(|e|e.to_string().contains("generation corpus manifest mismatch")) {
+                return Err("legacy binding accepted another manifest".into());
+            }
+            let a=Authority::open(&root)?;let absent=a.tree.begin()?.get(b"meta:import-manifest")?.is_none();a.tree.close().await?;
+            if !absent { return Err("rejected binding wrote metadata".into()); }
+            for _ in 0..2 {
+                if request(&root,json!({"op":"begin","generation":1,"bundle":bundle,"manifest":manifest})).await? != retained {
+                    return Err("legacy binding changed generation or original deadline".into());
+                }
+            }
+            let a=Authority::open(&root)?;
+            let bytes=a.tree.begin()?.get(b"meta:import-manifest")?.ok_or("binding was not persisted")?;
+            if bytes!=std::fs::read(&manifest)? { return Err("bound source bytes changed".into()); }
+            let mut wrong_state=retained.clone();wrong_state["bundle"]["model"]=json!("wrong");
+            let mut tx=a.tree.begin()?;tx.set_durability(Durability::Immediate);tx.set(key(1)?.as_bytes(),serde_json::to_vec(&wrong_state)?)?;tx.commit().await?;
+            let pinned=a.work_pin(1,original["source"].as_str().ok_or("source absent")?).await;
+            a.tree.close().await?;
+            if !pinned.is_err_and(|e|e.to_string().contains("corpus encoder/chunker provenance mismatch")) { return Err("workload trusted relabeled legacy generation".into()); }
+            for value in [json!({"op":"status","generation":1}),json!({"op":"query_current","generation":1,"bundle":wrong_state["bundle"],"principal":"reader","scope":0,"vector":vector}),json!({"op":"apply","generation":1,"family":"vector","seq":1})] {
+                if !request(&root,value).await.is_err_and(|e|e.to_string().contains("corpus encoder/chunker provenance mismatch")) { return Err("generation consumer trusted relabeled source".into()); }
+            }
+            Ok::<_,Error>(())
+        }.await;
+        std::fs::remove_dir_all(&parent)?;
+        outcome
+    }
+
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     async fn delta_queries_share_session_and_use_scoped_indexes() -> Result<(), Error> {
         let parent = std::env::temp_dir().join(format!(
@@ -1120,9 +1197,9 @@ mod tests {
             std::fs::write(parent.join("OWNER"),"akasha-otsuge MVP-003 owned corpus import and database\n")?;
             let raw=b"{\"key\":\"baseline\",\"body\":\"baseline\",\"partition\":\"p0\"}\n";
             std::fs::write(parent.join("input.jsonl"),raw)?;
-            load::atomic_json(&parent.join("manifest.json"),&json!({"corpus":{"documents":1,"vectors":0,"prepared_bytes":raw.len(),"prepared_sha256":hash(raw),"indexed_body_utf8_bytes":8}}))?;
-            load::run(&root,&parent.join("input.jsonl"),&parent.join("manifest.json"),false).await?;
             let bundle=json!({"model":"unit","model_fingerprint":"a".repeat(64),"dimension":1536,"chunker":"unit","schema":1});
+            load::atomic_json(&parent.join("manifest.json"),&json!({"embedding_bundle":bundle,"corpus":{"documents":1,"vectors":0,"prepared_bytes":raw.len(),"prepared_sha256":hash(raw),"indexed_body_utf8_bytes":8}}))?;
+            load::run(&root,&parent.join("input.jsonl"),&parent.join("manifest.json"),false).await?;
             for request in [json!({"op":"begin","generation":1,"bundle":bundle}),json!({"op":"backfill","generation":1,"waves":1}),json!({"op":"build","generation":1})] {
                 load::atomic_json(&parent.join("request.json"),&request)?;
                 super::super::run(&root,&parent.join("request.json")).await?;

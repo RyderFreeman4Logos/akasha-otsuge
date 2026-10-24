@@ -134,6 +134,72 @@ impl Bundle {
         }
         Ok(())
     }
+
+    fn validate_source(&self, bytes: &[u8]) -> Result<(), Error> {
+        let manifest: Value = serde_json::from_slice(bytes)?;
+        let expected: Self = if let Some(bundle) = manifest.get("embedding_bundle") {
+            if [
+                "embedding_model",
+                "dimensions",
+                "precomputed_at",
+                "chunk_bytes",
+            ]
+            .iter()
+            .any(|key| manifest.get(key).is_some())
+                || manifest["corpus"].get("inputs").is_some()
+            {
+                return Err("ambiguous corpus encoder provenance".into());
+            }
+            serde_json::from_value(bundle.clone())?
+        } else {
+            if manifest["embedding_model"] != "text-embedding-3-large"
+                || manifest["dimensions"] != 1536
+                || manifest["precomputed_at"] != "2024-02 (publisher)"
+                || manifest["chunk_bytes"] != 65536
+            {
+                return Err("missing or invalid corpus encoder provenance".into());
+            }
+            let inputs = manifest["corpus"]["inputs"]
+                .as_array()
+                .ok_or("missing corpus source provenance")?;
+            let vectors: Vec<_> = inputs
+                .iter()
+                .filter(|row| {
+                    row["file"]
+                        .as_str()
+                        .is_some_and(|name| name.starts_with("vectors-"))
+                })
+                .collect();
+            if vectors.is_empty()
+                || vectors.iter().any(|row| {
+                    row["repository"]
+                        != "Qdrant/dbpedia-entities-openai3-text-embedding-3-large-1536-1M"
+                        || row["revision"] != "4a9731217921bc476a0f03544f11f22ae4903fa5"
+                })
+            {
+                return Err("unrecognized precomputed vector provenance".into());
+            }
+            let identity = json!({"model":"text-embedding-3-large","repository":vectors[0]["repository"],"revision":vectors[0]["revision"],"precomputed_at":"2024-02","precision":"float32"});
+            Self {
+                model: "text-embedding-3-large".into(),
+                model_fingerprint: load::hex(&Sha256::new_with_prefix(serde_json::to_vec(
+                    &identity,
+                )?)),
+                dimension: 1536,
+                chunker: "source-document-v1".into(),
+                schema: 1,
+            }
+        };
+        expected.validate()?;
+        if self.model != expected.model
+            || self.model_fingerprint != expected.model_fingerprint
+            || self.dimension != expected.dimension
+            || self.chunker != expected.chunker
+        {
+            return Err("corpus encoder/chunker provenance mismatch".into());
+        }
+        Ok(())
+    }
 }
 
 #[derive(Deserialize)]
@@ -281,13 +347,14 @@ fn key(generation: u64) -> Result<String, Error> {
 }
 
 fn read_state(tree: &Tree, generation: u64) -> Result<State, Error> {
-    let value = tree
-        .begin()?
+    let tx = tree.begin()?;
+    let value = tx
         .get(key(generation)?.as_bytes())?
         .ok_or("missing generation")?;
     let value: State = serde_json::from_slice(&value)?;
     value.bundle.validate()?;
-    let corpus = load::read_state(&tree.begin()?)?;
+    let corpus = load::read_state(&tx)?;
+    value.bundle.validate_source(&load::manifest(&tx)?)?;
     if value.generation != generation
         || value.cursor > value.documents
         || value.vector_rows > value.vectors
@@ -1068,183 +1135,207 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
     let a = Authority::open(root)?;
     let settings = a.settings;
     let tree = &a.tree;
-    let corpus = load::read_state(&tree.begin()?)?;
-    if !corpus.complete {
-        return Err("corpus import is incomplete".into());
-    }
-    let result = match request {
-        Request::Begin {
-            generation,
-            bundle,
-            manifest,
-        } => {
-            bundle.validate()?;
-            if let Some(path) = manifest {
-                let mut bytes = Vec::new();
-                File::open(path)?
-                    .take(1024 * 1024 + 1)
-                    .read_to_end(&mut bytes)?;
-                if bytes.len() > 1024 * 1024
-                    || load::hex(&Sha256::new_with_prefix(&bytes)) != corpus.manifest_sha256
-                {
-                    return Err("generation corpus manifest mismatch".into());
-                }
-            }
-            let existing = tree.begin()?.get(key(generation)?.as_bytes())?;
-            let value = if existing.is_some() {
-                let value = state(tree, generation)?;
-                if value.bundle != bundle || value.source != corpus.manifest_sha256 {
-                    return Err("generation identity conflict".into());
-                }
-                value
-            } else {
-                let value = State {
-                    generation,
-                    text_layout: TextLayout::ScopeColumns,
-                    bundle,
-                    source: corpus.manifest_sha256,
-                    documents: corpus.documents,
-                    vectors: corpus.vectors,
-                    cursor: 0,
-                    vector_rows: 0,
-                    text_version: 0,
-                    vector_version: 0,
-                    pending: None,
-                    ready: false,
-                    backfill_deadline_ms: None,
-                    index_deadline_ms: None,
-                    retirement: None,
+    let result: Result<Value, Error> = async {
+        let corpus = load::read_state(&tree.begin()?)?;
+        if !corpus.complete {
+            return Err("corpus import is incomplete".into());
+        }
+        let result = match request {
+            Request::Begin {
+                generation,
+                bundle,
+                manifest,
+            } => {
+                bundle.validate()?;
+                let bytes = if let Some(path) = manifest {
+                    let mut bytes = Vec::new();
+                    File::open(path)?
+                        .take(1024 * 1024 + 1)
+                        .read_to_end(&mut bytes)?;
+                    if bytes.len() > 1024 * 1024
+                        || load::hex(&Sha256::new_with_prefix(&bytes)) != corpus.manifest_sha256
+                    {
+                        return Err("generation corpus manifest mismatch".into());
+                    }
+                    bytes
+                } else {
+                    load::manifest(&tree.begin()?)?
                 };
-                settings.check_disk(root)?;
-                save(tree, &value).await?;
-                value
-            };
-            serde_json::to_value(value)?
-        }
-        Request::Backfill {
-            generation,
-            waves,
-            hold,
-        } => {
-            let mut value = state(tree, generation)?;
-            if !(1..=1_000_000).contains(&waves) {
-                return Err("invalid wave count".into());
+                bundle.validate_source(&bytes)?;
+                let mut tx = tree.begin()?;
+                if tx.get(load::MANIFEST)?.is_some() {
+                    load::manifest(&tx)?;
+                } else {
+                    // Bind legacy metadata only to the original import hash, before any generation use.
+                    tx.set_durability(Durability::Immediate);
+                    tx.set(load::MANIFEST, &bytes)?;
+                    tx.commit().await?;
+                }
+                drop(tx);
+                let existing = tree.begin()?.get(key(generation)?.as_bytes())?;
+                let value = if existing.is_some() {
+                    let value = state(tree, generation)?;
+                    if value.bundle != bundle || value.source != corpus.manifest_sha256 {
+                        return Err("generation identity conflict".into());
+                    }
+                    value
+                } else {
+                    let value = State {
+                        generation,
+                        text_layout: TextLayout::ScopeColumns,
+                        bundle,
+                        source: corpus.manifest_sha256,
+                        documents: corpus.documents,
+                        vectors: corpus.vectors,
+                        cursor: 0,
+                        vector_rows: 0,
+                        text_version: 0,
+                        vector_version: 0,
+                        pending: None,
+                        ready: false,
+                        backfill_deadline_ms: None,
+                        index_deadline_ms: None,
+                        retirement: None,
+                    };
+                    settings.check_disk(root)?;
+                    save(tree, &value).await?;
+                    value
+                };
+                serde_json::to_value(value)?
             }
-            if hold.as_deref().is_some_and(|h| {
-                !matches!(
-                    h,
-                    "before-text" | "after-text" | "after-vector" | "after-cursor"
-                )
-            }) {
-                return Err("invalid backfill checkpoint".into());
+            Request::Backfill {
+                generation,
+                waves,
+                hold,
+            } => {
+                let mut value = state(tree, generation)?;
+                if !(1..=1_000_000).contains(&waves) {
+                    return Err("invalid wave count".into());
+                }
+                if hold.as_deref().is_some_and(|h| {
+                    !matches!(
+                        h,
+                        "before-text" | "after-text" | "after-vector" | "after-cursor"
+                    )
+                }) {
+                    return Err("invalid backfill checkpoint".into());
+                }
+                if value.cursor < value.documents {
+                    settings.check_disk(root)?;
+                    let until = deadline(tree, &mut value, settings, false).await?;
+                    tokio::time::timeout(
+                        remaining(until)?,
+                        backfill(&a, &mut value, waves, hold.as_deref()),
+                    )
+                    .await
+                    .map_err(|_| "original operation deadline expired")??;
+                }
+                serde_json::to_value(value)?
             }
-            if value.cursor < value.documents {
-                settings.check_disk(root)?;
-                let until = deadline(tree, &mut value, settings, false).await?;
-                tokio::time::timeout(
-                    remaining(until)?,
-                    backfill(&a, &mut value, waves, hold.as_deref()),
-                )
-                .await
-                .map_err(|_| "original operation deadline expired")??;
-            }
-            serde_json::to_value(value)?
-        }
-        Request::Build {
-            generation,
-            fail_after_text,
-        } => build_generation(&a, generation, fail_after_text).await?,
-        Request::Apply {
-            generation,
-            family,
-            seq,
-            vector,
-            hold,
-        } => {
-            changes::apply(
-                &a,
+            Request::Build {
+                generation,
+                fail_after_text,
+            } => build_generation(&a, generation, fail_after_text).await?,
+            Request::Apply {
                 generation,
                 family,
-                &[seq],
-                vector.as_ref(),
-                hold.as_deref(),
-                false,
-            )
-            .await?
-        }
-        Request::Advance { generation, family } => changes::advance(&a, generation, family).await?,
-        Request::CatchUp { generation, waves } => changes::catch_up(&a, generation, waves).await?,
-        Request::Activate { generation, hold } => {
-            changes::activate(&a, generation, hold.as_deref()).await?
-        }
-        Request::IndexedReceipt {
-            generation,
-            request_id,
-        } => changes::receipt(&a, generation, &request_id)?,
-        Request::LifecycleStatus { generation } => changes::status(&a, generation)?,
-        Request::PruneVersions {
-            generation,
-            deadline_ms,
-            hold,
-        } => {
-            let budget = remaining(deadline_ms)?;
-            if budget > Duration::from_secs(settings.seconds) {
-                return Err("prune deadline exceeds observation budget".into());
+                seq,
+                vector,
+                hold,
+            } => {
+                changes::apply(
+                    &a,
+                    generation,
+                    family,
+                    &[seq],
+                    vector.as_ref(),
+                    hold.as_deref(),
+                    false,
+                )
+                .await?
             }
-            tokio::time::timeout(
-                budget,
-                changes::prune_versions(&a, generation, deadline_ms, hold.as_deref()),
-            )
-            .await
-            .map_err(|_| "original operation deadline expired")??
-        }
-        Request::RetireGeneration {
-            generation,
-            deadline_ms,
-            hold,
-        } => {
-            let budget = remaining(deadline_ms)?;
-            if budget > Duration::from_secs(settings.seconds) {
-                return Err("retirement deadline exceeds observation budget".into());
+            Request::Advance { generation, family } => {
+                changes::advance(&a, generation, family).await?
             }
-            tokio::time::timeout(
-                budget,
-                changes::retire_generation(&a, generation, deadline_ms, hold.as_deref()),
-            )
-            .await
-            .map_err(|_| "original operation deadline expired")??
-        }
-        Request::QueryCurrent {
-            generation,
-            bundle,
-            principal,
-            scope,
-            term,
-            vector,
-            min_commit_seq,
-        } => {
-            changes::query_current(
-                &a,
+            Request::CatchUp { generation, waves } => {
+                changes::catch_up(&a, generation, waves).await?
+            }
+            Request::Activate { generation, hold } => {
+                changes::activate(&a, generation, hold.as_deref()).await?
+            }
+            Request::IndexedReceipt {
                 generation,
-                &bundle,
-                &principal,
+                request_id,
+            } => changes::receipt(&a, generation, &request_id)?,
+            Request::LifecycleStatus { generation } => changes::status(&a, generation)?,
+            Request::PruneVersions {
+                generation,
+                deadline_ms,
+                hold,
+            } => {
+                let budget = remaining(deadline_ms)?;
+                if budget > Duration::from_secs(settings.seconds) {
+                    return Err("prune deadline exceeds observation budget".into());
+                }
+                tokio::time::timeout(
+                    budget,
+                    changes::prune_versions(&a, generation, deadline_ms, hold.as_deref()),
+                )
+                .await
+                .map_err(|_| "original operation deadline expired")??
+            }
+            Request::RetireGeneration {
+                generation,
+                deadline_ms,
+                hold,
+            } => {
+                let budget = remaining(deadline_ms)?;
+                if budget > Duration::from_secs(settings.seconds) {
+                    return Err("retirement deadline exceeds observation budget".into());
+                }
+                tokio::time::timeout(
+                    budget,
+                    changes::retire_generation(&a, generation, deadline_ms, hold.as_deref()),
+                )
+                .await
+                .map_err(|_| "original operation deadline expired")??
+            }
+            Request::QueryCurrent {
+                generation,
+                bundle,
+                principal,
                 scope,
                 term,
                 vector,
                 min_commit_seq,
-            )
-            .await?
-        }
-        Request::Status { generation } => serde_json::to_value(read_state(tree, generation)?)?,
-        Request::Query {
-            generation,
-            bundle,
-            scope,
-            term,
-            vector,
-        } => query(&a, &state(tree, generation)?, &bundle, scope, term, vector).await?,
-    };
-    tree.close().await?;
+            } => {
+                changes::query_current(
+                    &a,
+                    generation,
+                    &bundle,
+                    &principal,
+                    scope,
+                    term,
+                    vector,
+                    min_commit_seq,
+                )
+                .await?
+            }
+            Request::Status { generation } => serde_json::to_value(read_state(tree, generation)?)?,
+            Request::Query {
+                generation,
+                bundle,
+                scope,
+                term,
+                vector,
+            } => query(&a, &state(tree, generation)?, &bundle, scope, term, vector).await?,
+        };
+        Ok(result)
+    }
+    .await;
+    let closed = tree.close().await;
+    let result = result?;
+    closed?;
     Ok(result)
 }
 

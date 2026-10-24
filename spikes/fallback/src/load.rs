@@ -14,6 +14,7 @@ use surrealkv::{Durability, LSMIterator, Transaction};
 use crate::{Error, OWNER, open_authority};
 
 const STATE: &[u8] = b"meta:import";
+pub(crate) const MANIFEST: &[u8] = b"meta:import-manifest";
 pub(crate) const FIRST_MEMORY: u64 = 1_000_000;
 pub(crate) const MAX_RECORD: usize = 512 * 1024;
 const STORAGE_FORMAT: u32 = 2;
@@ -118,6 +119,18 @@ pub(crate) fn read_state(tx: &Transaction) -> Result<State, Error> {
     Ok(state)
 }
 
+pub(crate) fn manifest(tx: &Transaction) -> Result<Vec<u8>, Error> {
+    let bytes = tx
+        .get(MANIFEST)?
+        .ok_or("missing persisted corpus manifest; bind the original manifest with begin")?;
+    if bytes.len() > 1024 * 1024
+        || hex(&Sha256::new_with_prefix(&bytes)) != read_state(tx)?.manifest_sha256
+    {
+        return Err("persisted corpus manifest mismatch".into());
+    }
+    Ok(bytes)
+}
+
 pub(crate) fn atomic_json(path: &Path, value: &Value) -> Result<(), Error> {
     let temp = path.with_extension("json.tmp");
     let mut file = File::create(&temp)?;
@@ -187,6 +200,7 @@ pub async fn run(root: &Path, input: &Path, manifest: &Path, resume: bool) -> Re
         let mut tx = tree.begin()?;
         tx.set_durability(Durability::Immediate);
         tx.set(STATE, serde_json::to_vec(&empty)?)?;
+        tx.set(MANIFEST, &manifest_bytes)?;
         tx.commit().await?;
     }
     let stored = read_state(&tree.begin()?)?;
