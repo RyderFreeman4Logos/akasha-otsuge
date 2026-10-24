@@ -87,6 +87,17 @@ the existing full database and check its witnesses before full r3. The existing
 corpus uses the correct pinned identity; no reimport or deadline extension is
 needed. No backend selected.
 
+The second independent review closes the original identity/EOF findings but finds
+one new reservation gap in legacy metadata persistence. The
+[reservation repair](../benchmarks/results/fallback-legacy-reserve/summary.json)
+adds one check immediately before that write. A genuine old-native import proves
+behavioral RED, then15 native commands verify refusal without metadata effects,
+unchanged original state/deadlines and readable already-bound reuse/status. All13
+release units and Clippy pass. One initial fixture-owner setup failure is retained
+and excluded from behavioral RED. The prior231/85-command and160s cases were not
+repeated for this single write-admission guard. Exact-HEAD successor gate and
+independent re-review precede full binding/rebuild; the full database is unchanged.
+
 At restart or compaction, first load the WD skill and reconcile the exact managed
 task with its completion listener and durable state in `.git/akasha-evidence`.
 Keep one writer and one dynamic provider-TTL relay; never replay an ambiguous

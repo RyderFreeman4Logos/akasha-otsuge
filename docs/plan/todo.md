@@ -197,6 +197,13 @@ Remaining acceptance, in execution order:
       active3/candidate5 state, deadlines and witnesses. Do this before full r3;
       no corpus reimport or threshold change is needed. The optional old text-layout
       binary fixture was not rerun; legacy metadata binding has native unit coverage.
+- [x] Close the second review's legacy-binding reservation gap with one check
+      before its metadata write. The genuine old-native import regression first
+      reproduces the write under an impossible reserve, then passes15 commands:
+      both existing/fresh generation refusals leave metadata absent; normal binding
+      preserves state/deadlines; already-bound reuse/status remain allowed. All13
+      release units and Clippy pass. The initial fixture OWNER setup failure is
+      retained separately. Fresh independent successor review is still required.
 - [x] Remove50 obsolete native copies whose hashes appear in published receipts;
       retain current/recent recovery and unattributed files. Inode allocation
       falls7,430,930,432B; filesystem free space increases2,648,940,544B. No build

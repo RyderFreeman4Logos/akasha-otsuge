@@ -283,6 +283,12 @@ Previously mislabeled generation state is rejected at the common read boundary,
 including query, workload pinning and delta replay. Request failures await
 database close before returning, retaining the original operation error.
 
+First-time legacy binding checks the configured native disk reservation before
+writing metadata. Already-bound Begin reuse and status remain readable under an
+exhausted reserve. `check_legacy_binding.py CURRENT_BINARY LEGACY_BINARY OUTPUT`
+verifies both refusals without metadata effects and successful state/deadline
+preservation using a real import created by the supplied pre-binding binary.
+
 The real 38,462-row shard backfills in 10.311s. Its first low-profile index build
 OOMs during partition merging, retained with the systemd journal. Lance defaults
 to 128MiB shuffle batches and preloaded partition windows. The controller now

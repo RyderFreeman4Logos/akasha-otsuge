@@ -1167,6 +1167,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
                     load::manifest(&tx)?;
                 } else {
                     // Bind legacy metadata only to the original import hash, before any generation use.
+                    settings.check_disk(root)?;
                     tx.set_durability(Durability::Immediate);
                     tx.set(load::MANIFEST, &bytes)?;
                     tx.commit().await?;

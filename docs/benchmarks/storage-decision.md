@@ -788,3 +788,26 @@ The full database still needs its bounded original-manifest binding and witness
 check. The optional legacy text-layout binary fixture was not rerun; native unit
 coverage proves legacy metadata binding. None of these small fixtures establish
 full concurrent resource acceptance or select the sole backend.
+
+## Legacy binding reservation — 2026-10-24
+
+The second independent review closes the original model-identity and EOF findings
+but identifies a new disk-reservation bypass: missing legacy manifest metadata
+is committed before Begin checks a fresh generation's write budget; existing
+generation reuse has no later mutation check. The
+[focused successor](results/fallback-legacy-reserve/summary.json) adds one existing
+reservation check immediately before this metadata transaction. Reads and reuse
+of already-bound generations keep their existing admission behavior.
+
+The fixture imports and backfills with retained native8f0b, then invokes the
+candidate with an impossible reserve. Native4028cb8e wrongly succeeds; the fixed
+native860c32fa passes15 commands covering existing/fresh refusal with metadata
+still absent, normal binding, original state/deadline preservation and readable
+reuse/status under the same reserve. All13 release units and Clippy pass. The
+initial fixture OWNER-marker rejection is a retained setup failure, not RED.
+The112-file archive is257,694B, SHA256
+`80f8e5e0efe6dca11b002530d1ff57f758a862691c1a36e282ed0f00b605f3e1`.
+This narrow follow-up does not repeat the earlier231-command lifecycle,85-command
+search or160s concurrent fixtures; their prior native identities remain explicit.
+The successor still needs exact-HEAD root gates and independent review before
+full binding and resource acceptance.
