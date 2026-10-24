@@ -110,6 +110,13 @@ Remaining acceptance, in execution order:
       tokenized across9,480 updates. Per-search service-time estimates rise from
       0.85s to1.77s across successive five-minute windows; directly measure delta
       fragment/manifest and query stages before changing concurrency again.
+      Direct timing now isolates0.579s in delta-text result streaming; its actual
+      plan scans11,091 fragments for scope, while baseline uses a bitmap.
+      Both delta families now maintain scope bitmaps, with complete coverage
+      required for indexed completion/activation. Eleven release units,104
+      lifecycle checks and1,698-request concurrent fixture pass. The full cold60s
+      control passes BM251.2/s/P951.539s, ANN0.25/s/P952.462s and RSS385,216,512B.
+      The required30-minute performance rerun remains pending.
 - [ ] Complete an uninterrupted full scoped build within the640MiB low peak and
       reopen interrupted builds directly at low budget. The prior vector merge
       OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.

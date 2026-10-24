@@ -198,83 +198,95 @@ async fn refresh(
     rows: u64,
     until: u64,
 ) -> Result<(), Error> {
-    let (name, column, kind, params): (&str, &str, IndexType, Box<dyn IndexParams>) =
-        if family == Family::Text {
-            (
-                "body_fts",
-                "body",
-                IndexType::Inverted,
-                Box::new(
-                    FtsIndexBuilder::default()
-                        .memory_limit_mb(32)
-                        .num_workers(1)
-                        .with_position(false),
-                ),
-            )
-        } else {
-            let mut ivf = IvfBuildParams::new(((rows as f64).sqrt() as usize).clamp(1, 256));
-            ivf.sample_rate = 16;
-            ivf.max_iters = 20;
-            (
-                "vector_ivf",
-                "vector",
-                IndexType::Vector,
-                Box::new(VectorIndexParams::with_ivf_flat_params(
-                    lancedb::DistanceType::Cosine.into(),
-                    ivf,
-                )),
-            )
-        };
-    let existing = table.index_stats(name).await?;
-    if existing
-        .as_ref()
-        .is_some_and(|s| s.num_indexed_rows as u64 == rows && s.num_unindexed_rows == 0)
-    {
-        return Ok(());
-    }
-    a.settings.check_disk(&a.root)?;
-    remaining(until)?;
-    let wrapper = table.dataset().ok_or("local delta dataset required")?;
-    let mut dataset = (*wrapper.get().await?).clone();
-    let progress = Arc::new(Progress {
-        path: a
-            .root
-            .join(format!("{}-{name}-progress.json", table.name())),
-        stages: Mutex::new(BTreeMap::new()),
-        settings: a.settings,
-        deadline: until,
-        start_ticks: start_ticks()?,
-    });
-    if family == Family::Text && existing.is_some() {
-        // Lance does not persist build-time limits in FTS metadata.
-        if *LANCE_FTS_NUM_SHARDS != 1 || *LANCE_FTS_PARTITION_SIZE != 32 {
-            return Err(
-                "incremental FTS requires LANCE_FTS_NUM_SHARDS=1 and LANCE_FTS_PARTITION_SIZE=32"
-                    .into(),
-            );
-        }
-        dataset
-            .optimize_indices(
-                &OptimizeOptions::merge(1)
-                    .index_names(vec![name.into()])
-                    .progress(progress),
-            )
-            .await?;
+    let search: (&str, &str, IndexType, Box<dyn IndexParams>) = if family == Family::Text {
+        (
+            "body_fts",
+            "body",
+            IndexType::Inverted,
+            Box::new(
+                FtsIndexBuilder::default()
+                    .memory_limit_mb(32)
+                    .num_workers(1)
+                    .with_position(false),
+            ),
+        )
     } else {
-        dataset
-            .create_index_builder(&[column], kind, params.as_ref())
-            .name(name.into())
-            .replace(true)
-            .progress(progress)
-            .await?;
-    }
-    wrapper.update(dataset);
-    let stats = table
-        .index_stats(name)
-        .await?
-        .ok_or("missing delta index")?;
-    if stats.num_indexed_rows as u64 != rows || stats.num_unindexed_rows != 0 {
-        return Err("incomplete delta index coverage".into());
+        let mut ivf = IvfBuildParams::new(((rows as f64).sqrt() as usize).clamp(1, 256));
+        ivf.sample_rate = 16;
+        ivf.max_iters = 20;
+        (
+            "vector_ivf",
+            "vector",
+            IndexType::Vector,
+            Box::new(VectorIndexParams::with_ivf_flat_params(
+                lancedb::DistanceType::Cosine.into(),
+                ivf,
+            )),
+        )
+    };
+    for (name, column, kind, params) in [
+        (
+            "scope_bitmap",
+            "scope",
+            IndexType::Bitmap,
+            Box::new(ScalarIndexParams::for_builtin(BuiltinIndexType::Bitmap))
+                as Box<dyn IndexParams>,
+        ),
+        search,
+    ] {
+        let existing = table.index_stats(name).await?;
+        if existing
+            .as_ref()
+            .is_some_and(|s| s.num_indexed_rows as u64 == rows && s.num_unindexed_rows == 0)
+        {
+            continue;
+        }
+        a.settings.check_disk(&a.root)?;
+        remaining(until)?;
+        let wrapper = table.dataset().ok_or("local delta dataset required")?;
+        let mut dataset = (*wrapper.get().await?).clone();
+        let progress = Arc::new(Progress {
+            path: a
+                .root
+                .join(format!("{}-{name}-progress.json", table.name())),
+            stages: Mutex::new(BTreeMap::new()),
+            settings: a.settings,
+            deadline: until,
+            start_ticks: start_ticks()?,
+        });
+        if kind != IndexType::Vector && existing.is_some() {
+            // Lance does not persist build-time limits in FTS metadata.
+            if kind == IndexType::Inverted
+                && (*LANCE_FTS_NUM_SHARDS != 1 || *LANCE_FTS_PARTITION_SIZE != 32)
+            {
+                return Err(
+                    "incremental FTS requires LANCE_FTS_NUM_SHARDS=1 and LANCE_FTS_PARTITION_SIZE=32"
+                        .into(),
+                );
+            }
+            dataset
+                .optimize_indices(
+                    &OptimizeOptions::merge(1)
+                        .index_names(vec![name.into()])
+                        .progress(progress),
+                )
+                .await?;
+        } else {
+            dataset
+                .create_index_builder(&[column], kind, params.as_ref())
+                .name(name.into())
+                .replace(true)
+                .progress(progress)
+                .await?;
+        }
+        wrapper.update(dataset);
+        let stats = table
+            .index_stats(name)
+            .await?
+            .ok_or("missing delta index")?;
+        if stats.num_indexed_rows as u64 != rows || stats.num_unindexed_rows != 0 {
+            return Err("incomplete delta index coverage".into());
+        }
     }
     Ok(())
 }
@@ -543,12 +555,14 @@ pub(super) async fn activate(a: &Authority, id: u64, hold: Option<&str>) -> Resu
             } else {
                 "vector_ivf"
             };
-            let stats = table
-                .index_stats(name)
-                .await?
-                .ok_or("candidate delta index missing")?;
-            if stats.num_indexed_rows as u64 != p.rows || stats.num_unindexed_rows != 0 {
-                return Err("candidate delta index incomplete".into());
+            for name in ["scope_bitmap", name] {
+                let stats = table
+                    .index_stats(name)
+                    .await?
+                    .ok_or("candidate delta index missing")?;
+                if stats.num_indexed_rows as u64 != p.rows || stats.num_unindexed_rows != 0 {
+                    return Err("candidate delta index incomplete".into());
+                }
             }
         }
     }
@@ -818,6 +832,59 @@ mod tests {
     use super::*;
     use crate::authority::Change;
     use tokio::sync::Notify;
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn delta_scope_filter_uses_bitmap_in_both_search_plans() -> Result<(), Error> {
+        let parent = std::env::temp_dir().join(format!(
+            "akasha-scope-unit-{}-{}",
+            std::process::id(),
+            SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos()
+        ));
+        std::fs::create_dir(&parent)?;
+        let outcome = async {
+            let root = parent.join("database");
+            std::fs::write(parent.join("OWNER"), "akasha-otsuge MVP-003 owned corpus import and database\n")?;
+            let raw = b"{\"key\":\"baseline\",\"body\":\"baseline\",\"partition\":\"p0\"}\n";
+            std::fs::write(parent.join("input.jsonl"), raw)?;
+            load::atomic_json(&parent.join("manifest.json"), &json!({"corpus":{"documents":1,"vectors":0,"prepared_bytes":raw.len(),"prepared_sha256":hash(raw),"indexed_body_utf8_bytes":8}}))?;
+            load::run(&root, &parent.join("input.jsonl"), &parent.join("manifest.json"), false).await?;
+            let a = Authority::open(&root)?;
+            let connection = connect(&root).await?;
+            let mut plans = Vec::new();
+            for family in [Family::Text, Family::Vector] {
+                let rows: Vec<_> = (0..8).map(|scope| (1_000_000+scope, load::Document {
+                    key: format!("scope:{scope}"), body: "astronomy".into(),
+                    partition: format!("p{scope}"), embedding: Some(vec![1.0;1536]),
+                })).collect();
+                let data = batch(&rows, family == Family::Vector, TextLayout::Legacy)?;
+                let table = connection.create_table(family.table(1), data).execute().await?;
+                refresh(&table, &a, family, 8, now_ms()?+60_000).await?;
+                let query = table.query().only_if("scope = 3").limit(20);
+                let plan = if family == Family::Text {
+                    query.full_text_search(FullTextSearchQuery::new("astronomy".into()).with_column("body".into())?).explain_plan(false).await?
+                } else {
+                    query.nearest_to(vec![1.0;1536])?.distance_type(lancedb::DistanceType::Cosine).explain_plan(false).await?
+                };
+                let hits = candidates(&root, &family.table(1), "body", 3,
+                    (family == Family::Text).then_some("astronomy"),
+                    (family == Family::Vector).then_some(vec![1.0;1536]).as_deref()).await?;
+                plans.push((plan, hits));
+            }
+            a.tree.close().await?;
+            Ok::<_,Error>(plans)
+        }.await;
+        std::fs::remove_dir_all(&parent)?;
+        for (plan, hits) in outcome? {
+            assert!(
+                plan.contains("ScalarIndexQuery") && plan.contains("scope_bitmap(Bitmap)"),
+                "{plan}"
+            );
+            assert_eq!(hits.len(), 1);
+            assert_eq!(hits[0]["memory"], 1_000_003);
+            assert_eq!(hits[0]["partition"], "p3");
+        }
+        Ok(())
+    }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     async fn indexing_releases_authority_writer_and_filters_replaced_head() -> Result<(), Error> {

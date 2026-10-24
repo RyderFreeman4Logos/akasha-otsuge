@@ -1,0 +1,187 @@
+{
+  "archive_bytes": 4232926,
+  "archive_files": 466,
+  "archive_sha256": "33c3c00d55ab287ef1ba1ece9ec80f25008815df31f2164c58cb4092bc500921",
+  "artifacts_verified": true,
+  "binary_sha256": "3ef94b16debfff6309d103d87e0197ef190370b942c467db7589ce511b7d8401",
+  "diagnosis": {
+    "baseline_plan": "scope_bitmap(Bitmap)",
+    "collector_correction": "Expected48 stages:16 delta text+16 baseline text+16 baseline vector. No vector delta exists;64 assumption was incorrect.",
+    "full_plan_delta_fragments": 11091,
+    "native_queries": 32,
+    "no_connection_drop_claim": true,
+    "stages": [
+      {
+        "connect_s": 0.0005294846875,
+        "drop_s": 0.002566360062500002,
+        "execute_s": 0.0048618050625,
+        "open_s": 0.021073438375,
+        "samples": 16,
+        "stream_s": 0.57921863725,
+        "table": "g2_delta_text",
+        "total_s": 0.6082498918125
+      },
+      {
+        "connect_s": 0.0002685676875,
+        "drop_s": 0.0022437933124999972,
+        "execute_s": 0.00376109675,
+        "open_s": 0.006450344625,
+        "samples": 16,
+        "stream_s": 0.2582779406875,
+        "table": "g2_text",
+        "total_s": 0.271001908625
+      },
+      {
+        "connect_s": 0.0005278943124999999,
+        "drop_s": 0.0012896769999999752,
+        "execute_s": 0.003621823,
+        "open_s": 0.0036642595625,
+        "samples": 16,
+        "stream_s": 0.763247009625,
+        "table": "g2_vector",
+        "total_s": 0.7723508378125
+      }
+    ]
+  },
+  "full_short": {
+    "content_oracle": {
+      "corpus_current_checks": 144,
+      "corpus_current_distinct": 144,
+      "corpus_current_partitions": {
+        "p0": 19,
+        "p1": 19,
+        "p2": 25,
+        "p3": 17,
+        "p4": 15,
+        "p5": 19,
+        "p6": 13,
+        "p7": 17
+      },
+      "current_checks": 144,
+      "derived_current_checks": 50,
+      "distinct_commits": 1191,
+      "rebuild_search_overlap": null,
+      "requests": 1698,
+      "search_checks": {
+        "ann": 15,
+        "bm25": 72
+      },
+      "text_only_bm25_checks": 10,
+      "text_only_bm25_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p4",
+        "p5",
+        "p7"
+      ],
+      "text_only_current_checks": 50,
+      "text_only_current_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ]
+    },
+    "drain_s": 0.16409121299999896,
+    "operations": {
+      "ann": {
+        "attempted": 15,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 2462,
+        "successful": 15,
+        "successful_per_s": 0.25,
+        "within_window": 15
+      },
+      "bm25": {
+        "attempted": 72,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 1539,
+        "successful": 72,
+        "successful_per_s": 1.2,
+        "within_window": 72
+      },
+      "correction": {
+        "attempted": 12,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 18,
+        "successful": 12,
+        "successful_per_s": 0.2,
+        "within_window": 12
+      },
+      "current": {
+        "attempted": 144,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 76,
+        "successful": 144,
+        "successful_per_s": 2.4,
+        "within_window": 144
+      },
+      "history": {
+        "attempted": 15,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 840,
+        "successful": 15,
+        "successful_per_s": 0.25,
+        "within_window": 15
+      },
+      "write": {
+        "attempted": 1440,
+        "conflicts": 311,
+        "errors": 0,
+        "p95_upper_ms": 44,
+        "successful": 1129,
+        "successful_per_s": 18.816666666666666,
+        "within_window": 1129
+      }
+    },
+    "requests": 1698,
+    "rss_max_bytes": 385216512,
+    "rss_p99_bytes": 385216512,
+    "seconds": 63.379303990863264,
+    "watermarks": {
+      "committed": 183192,
+      "generation": 2,
+      "remaining": 0,
+      "text": 183192,
+      "vector": 183192
+    }
+  },
+  "lifecycle": {
+    "checks": 104,
+    "fixture_removed": true,
+    "kill_barriers": 6,
+    "seconds": 6.007455655373633
+  },
+  "not_proven": [
+    "sustained30-minute performance after scope index fix",
+    "fresh full bounded build",
+    "full concurrent rebuild"
+  ],
+  "regression": {
+    "actual_red": "qualified native test fails on scope LanceRead instead of bitmap",
+    "non_red_attempts": [
+      "r1 ran zero tests",
+      "r2 missing fixture OWNER"
+    ],
+    "release_all_targets_clippy": "PASS",
+    "release_units": 11
+  },
+  "source_parent": "ec53cdea39e9e12cb396caa7ae652471eb1ccfeb",
+  "status": "passed_diagnostic_only",
+  "workload": {
+    "negative_controls": 8,
+    "requests": 1698,
+    "rss_max_bytes": 133238784,
+    "seconds": 71.04011279158294
+  }
+}

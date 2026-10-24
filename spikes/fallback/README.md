@@ -291,7 +291,10 @@ A minimum commit sequence fails when the relevant watermark lags.
 
 Delta text updates use Lance's incremental FTS optimization, merging into one
 index and tokenizing only new fragments. Native coverage still must include every
-row before publishing the indexed receipt. Initial text construction and vector
+row before publishing the indexed receipt. Both delta families also maintain the
+same scope bitmap used by baseline tables, so prefiltering uses the index instead
+of scanning every appended fragment. Activation checks both scope and search
+index coverage. Initial text construction and vector
 indexing retain their existing builders. The pinned Lance API does not persist
 FTS build-time limits, so incremental operations require child startup settings
 `LANCE_FTS_NUM_SHARDS=1 LANCE_FTS_PARTITION_SIZE=32`. Generation/workload

@@ -398,3 +398,30 @@ continuation verifies the existing native result and runs only remaining control
 All ten observer services and native children exit, and the owned fixture is
 removed. This serial driver establishes neither full-data behavior nor simultaneous
 query/build scheduling. No production code changed in this driver leaf.
+
+### Delta scope-filter scan
+
+[Direct phase diagnosis and the scope-index fix](results/fallback-delta-scope/summary.json)
+retain32 successful full-data queries,35 native commands and the actual physical
+query plan. Delta text spends0.579s on average streaming results, versus0.021s
+opening the table; its scope filter scans all11,091 fragments. The baseline plan
+already uses `scope_bitmap(Bitmap)`. The diagnostic collector's64-stage assertion
+was incorrect because the vector delta is empty:48 actual stages are verified
+without repeating the queries. No connection-lifetime defect is inferred.
+
+Both delta families now build and incrementally maintain the same scope bitmap
+as baseline tables. Indexed completion and activation require scope/search index
+coverage. Existing pending-wave identity, original deadline and native append
+reconciliation remain unchanged. A native regression fails on the old scan plan,
+then passes both BM25 and ANN bitmap plans and scoped results. The initial
+zero-test filter and missing fixture owner are retained as setup failures, not
+behavioral RED. Eleven release units and all-targets Clippy pass;104 lifecycle
+commands cover six SIGKILL barriers, including partial index-publication recovery.
+The small concurrent fixture passes1,698 requests and eight negative controls.
+
+The following full cold60s control passes all1,698 requests and original short-run
+thresholds: BM251.2/s with P951.539s, ANN0.25/s with P952.462s, and RSS P99/max
+385,216,512B. Both watermarks reach183192 with0.164s drain. The source and binary
+are frozen, raw artifacts are hashed, all measured children and units exit, and
+owned temporary fixtures/scratch are removed. Full sustained performance after
+this change, uninterrupted bounded build and concurrent full rebuild remain open.
