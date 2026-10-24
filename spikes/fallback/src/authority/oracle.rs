@@ -183,12 +183,36 @@ pub(crate) async fn run(root: &Path, operation: &str, count: u64) -> Result<Valu
         verify(&a, count, &path, until).await
     };
     a.tree.close().await?;
-    result
+    result.map(|mut value| {
+        value["operation"] = json!(operation);
+        value["deadline_unix_ms"] = json!(until);
+        value
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn new_verification_identity_preserves_expired_original() -> Result<(), Error> {
+        let (root, a) = crate::authority::tests::fixture()?;
+        let original_key = b"oracle:--oracle-verify-text:2:deadline";
+        let mut tx = a.tree.begin()?;
+        tx.set_durability(Durability::Immediate);
+        tx.set(original_key, 1u64.to_be_bytes().as_slice())?;
+        tx.commit().await?;
+        let operation = "--oracle-verify-text-post-index-r1";
+        let new = deadline(&a, operation, 2).await?;
+        assert!(remaining(new).is_ok());
+        assert_eq!(deadline(&a, operation, 2).await?, new);
+        assert_eq!(deadline(&a, "--oracle-verify-text", 2).await?, 1);
+        assert!(remaining(1).is_err());
+        assert_eq!(point(&a.tree.begin_with_mode(Mode::ReadOnly)?)?, 0);
+        a.tree.close().await?;
+        std::fs::remove_dir_all(root)?;
+        Ok(())
+    }
 
     #[tokio::test]
     async fn expired_original_deadline_cannot_admit_changes() -> Result<(), Error> {

@@ -176,7 +176,10 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       generation2 activates at100000. This is the experiment controller, not the
       future production daemon. Interrupted-build peak memory remains unresolved.
       The post-activation history recheck refuses an expired original verifier
-      identity; a separately identified new verification is still required.
+      identity. An explicitly separate verifier now passes all100,000 changes
+      and5,163 history checks in4.015s, RSS max72,450,048B. Its identity preserves
+      its own first deadline;22 native/controller cases and a release regression
+      prove that the old expired identity remains unchanged.
 - [ ] Test all required commit/index/watermark/activation crash barriers,
       derived corruption/rebuild, authority corruption, isolated disk-full,
       child resource failure, invalid config and competing reloads.

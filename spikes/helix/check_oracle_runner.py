@@ -26,11 +26,13 @@ def main():
             result=subprocess.run(command,capture_output=True,text=True,timeout=300)
             (output/(name+'.log')).write_text(result.stdout+result.stderr)
             records.append(dict(name=name,command=command,exit=result.returncode))
-            publish(output/'progress.json',dict(phase=name,completed=len(records),total=10,elapsed_s=time.monotonic()-started))
+            publish(output/'progress.json',dict(phase=name,completed=len(records),total=22 if backend=='fallback' else 10,elapsed_s=time.monotonic()-started))
             assert (result.returncode==0)==success,(name,result.stderr)
             return result.stdout
-        def config(name,op,count):
-            request=output/(name+'.json');publish(request,dict(op=op,generation=1,count=count))
+        def config(name,op,count,verification_id=None):
+            value=dict(op=op,generation=1,count=count)
+            if verification_id is not None:value['verification_id']=verification_id
+            request=output/(name+'.json');publish(request,value)
             path=output/(name+'.toml')
             path.write_text(f'''[run]
 id = "{name}"
@@ -78,6 +80,27 @@ max_attempts = 1
             count=run('count',[str(binary),str(database),"MATCH (c:Counter {key:'global'}) RETURN c.seq"])
             assert json.loads(count)['rows']==[[2048]]
         assert len(records)==10
+        if backend == 'fallback':
+            identity = 'post-index-r1'
+            first = json.loads(run('identified-native', [str(binary),str(database),'--oracle-verify-text','2048',identity]))
+            second = json.loads(run('identified-native-reuse', [str(binary),str(database),'--oracle-verify-text','2048',identity]))
+            assert first['operation'] == '--oracle-verify-text-' + identity
+            assert first['deadline_unix_ms'] == second['deadline_unix_ms']
+            identified = config('identified-controller','verify_text',2048,identity)
+            run('identified-controller',[sys.executable,str(runner),str(identified)])
+            checkpoint=json.loads((database/f'oracle-verify-text-{identity}-2048.json').read_text())
+            assert checkpoint['completed']==checkpoint['total'] and checkpoint['completed']>4000
+            publish(output/'identified-checkpoint.json',checkpoint)
+            for value in ['', '../escape', 'has space', 123, 'a'*65]:
+                name='invalid-identity-'+str(len(records))
+                run(name,[sys.executable,str(runner),str(config(name,'verify_text',2048,value))],False)
+                assert 'invalid verification identity' in (output/(name+'.log')).read_text()
+                assert not (output/name).exists()
+            for value in ['', '../escape', 'has space', 'a'*65]:
+                name='invalid-native-identity-'+str(len(records))
+                run(name,[str(binary),str(database),'--oracle-verify-text','2048',value],False)
+                assert 'invalid verification identity' in (output/(name+'.log')).read_text()
+            assert len(records)==22
     publish(output/'result.json',dict(status='passed',records=records,seconds=time.monotonic()-started,
         exact_commits=2048,temporary_database_removed=True,not_tested=['full database history performance','power loss']))
     print(json.dumps(dict(status='passed',checks=len(records),seconds=time.monotonic()-started)))

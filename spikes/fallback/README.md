@@ -18,6 +18,10 @@ Pinned source:
 version-1 history model in `spikes/oracle_model.rs`. Both run through the existing
 exclusive generation controller, publish durable process-identified checkpoints
 and preserve the first absolute operation deadline across native replay. The
+optional `--oracle-verify-text COUNT VERIFICATION_ID` identifies a new historical
+check after later index work; replay of the same ID keeps its first deadline.
+The controller accepts `verification_id` only for `verify_text`. Existing seed
+and verifier identities retain their deadlines, including expired ones. The
 [history receipts](../../docs/benchmarks/results/fallback-history/summary.json)
 cover ten controller cases, 2,048 changes and 5,163 exact historical checks on
 eight real source records. Four release units include expired-deadline refusal

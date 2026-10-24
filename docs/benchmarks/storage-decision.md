@@ -175,7 +175,7 @@ the original deadline, and completes full native coverage in193.798s without OOM
 However, sampled process-tree RSS reaches691,322,880B, exceeding the671,088,640B
 peak criterion. Its functional recovery passes; its resource gate fails. The hard
 cgroup limit does not replace the frozen RSS test. Uninterrupted bounded building
-and full queries/workloads still require acceptance.
+and sustained workloads still require acceptance.
 
 The reference-query harness now retains all32 exact-ANN references and supports
 an explicit generation. A timeout records the child identity, partial output and
@@ -257,3 +257,13 @@ daemon hot reload is still separate. The following historical recheck fails
 explicitly because it reused the original verifier's expired durable deadline;
 there is no content mismatch or OOM. That failure is retained. A new verification
 identity is required to recheck history without extending the old operation.
+
+[Explicit verifier identities](results/fallback-verification-identity/summary.json)
+now provide that boundary. The old CLI rejects the new form in the retained RED
+run. The new native/controller path passes22 cases, including exact same-identity
+deadline reuse and malformed-ID refusal. A release unit proves a new identity
+leaves the original expired deadline unchanged; the controller observes only the
+matching checkpoint. Nine release units, three controller units and Clippy pass.
+The independently identified post-activation check verifies all100,000 changes
+and5,163 historical invariants in4.015s observed elapsed time, sampled RSS max
+72,450,048B. This adds no seed changes and does not relax expired-job handling.

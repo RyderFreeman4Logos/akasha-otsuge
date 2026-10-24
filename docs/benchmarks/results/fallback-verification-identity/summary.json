@@ -1,0 +1,114 @@
+{
+  "archive_files": 161,
+  "archive_sha256": "b1fcad7cba6ca81bfe907f005245ede0d773437c8ce8a9eff2ff2efa0e714287",
+  "build": "passed",
+  "clippy": "passed",
+  "controller_units": 3,
+  "feature": "explicit new historical verification identity; every identity preserves its own first deadline",
+  "full": {
+    "artifacts_verified": true,
+    "controller": {
+      "pid": 1336463,
+      "start_ticks": "461922629",
+      "state": "R"
+    },
+    "exact_processes_gone": true,
+    "limits": {
+      "memory.high": "max",
+      "memory.max": "671088640",
+      "memory.swap.max": "0"
+    },
+    "native": {
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-2baf103911124d488b5ea514189cde06.service",
+      "event": "executable",
+      "pid": 1336472,
+      "sha256": "52b84ba6bd3b28d2171f0a28e73424407863b49a21435a7732e89d41abd64595",
+      "start_ticks": "461922691"
+    },
+    "reply": {
+      "changes": 100000,
+      "checks": 5163,
+      "deadline_unix_ms": 1792808530089,
+      "memory_domain": [
+        0,
+        1024
+      ],
+      "not_tested": [
+        "concurrent clients",
+        "derived watermark",
+        "live permission revocation"
+      ],
+      "operation": "--oracle-verify-text-post-scoped-activation-r1",
+      "phase": "oracle_verified",
+      "seconds": 1.694968695,
+      "text_only": true
+    },
+    "rss_max_bytes": 72450048,
+    "rss_p99_bytes": 72450048,
+    "scratch_removed": true,
+    "seconds": 4.015257292427123,
+    "status": "passed",
+    "unit": "inactive"
+  },
+  "green": {
+    "artifacts_verified": true,
+    "checks": 22,
+    "controller_operations": [
+      {
+        "native": {
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-aa17ba88488b49c2a834de3c29f92e91.service",
+          "event": "executable",
+          "pid": 1335247,
+          "sha256": "52b84ba6bd3b28d2171f0a28e73424407863b49a21435a7732e89d41abd64595",
+          "start_ticks": "461914802"
+        },
+        "operation": "seed",
+        "unit": "inactive"
+      },
+      {
+        "native": {
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-c033da7843984c9490cb79590f64ba52.service",
+          "event": "executable",
+          "pid": 1335512,
+          "sha256": "52b84ba6bd3b28d2171f0a28e73424407863b49a21435a7732e89d41abd64595",
+          "start_ticks": "461916479"
+        },
+        "operation": "native-replay",
+        "unit": "inactive"
+      },
+      {
+        "native": {
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-16a176eb4c1f4d128a595378e3b60d3f.service",
+          "event": "executable",
+          "pid": 1335546,
+          "sha256": "52b84ba6bd3b28d2171f0a28e73424407863b49a21435a7732e89d41abd64595",
+          "start_ticks": "461916720"
+        },
+        "operation": "verify",
+        "unit": "inactive"
+      },
+      {
+        "native": {
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-0797a16fe3e947c2ac9a089c237d139e.service",
+          "event": "executable",
+          "pid": 1335734,
+          "sha256": "52b84ba6bd3b28d2171f0a28e73424407863b49a21435a7732e89d41abd64595",
+          "start_ticks": "461917839"
+        },
+        "operation": "identified-controller",
+        "unit": "inactive"
+      }
+    ],
+    "seconds": 35.11500823311508,
+    "status": "passed",
+    "temporary_database_removed": true
+  },
+  "red": {
+    "harness_sha256": "442d887a44bc91bf3dd22f724842503583cd5c4bbb227dd9e53e3e2304b2484b",
+    "reason": "old native CLI rejects explicit verifier identity",
+    "status": "failed_expected_red",
+    "temporary_database_removed": true
+  },
+  "release_units": 9,
+  "status": "passed"
+}

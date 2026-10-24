@@ -328,12 +328,25 @@ async fn main() -> Result<(), Error> {
         return Ok(());
     }
     if matches!(operation, "--oracle-seed-text" | "--oracle-verify-text") {
-        if args.len() != 4 {
-            return Err("usage: probe ROOT --oracle-seed-text|--oracle-verify-text COUNT".into());
+        if args.len() != 4 && !(operation == "--oracle-verify-text" && args.len() == 5) {
+            return Err("usage: probe ROOT --oracle-seed-text COUNT | --oracle-verify-text COUNT [VERIFICATION_ID]".into());
         }
+        let operation = if let Some(identity) = args.get(4) {
+            if identity.is_empty()
+                || identity.len() > 64
+                || !identity
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+            {
+                return Err("invalid verification identity".into());
+            }
+            format!("{operation}-{identity}")
+        } else {
+            operation.to_owned()
+        };
         println!(
             "{}",
-            authority::run_oracle(root, operation, args[3].parse()?).await?
+            authority::run_oracle(root, &operation, args[3].parse()?).await?
         );
         return Ok(());
     }

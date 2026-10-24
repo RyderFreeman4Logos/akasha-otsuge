@@ -33,7 +33,8 @@ def observe(database, request, attempt):
     generation = request['generation']
     names = [f'generation-{generation}-backfill.json', f'generation-{generation}-catch-up.json']
     if request['op'] in {'seed_text', 'verify_text'}:
-        names = [f'oracle-{request["op"].replace("_", "-")}-{request["count"]}.json']
+        suffix = '-' + request['verification_id'] if 'verification_id' in request else ''
+        names = [f'oracle-{request["op"].replace("_", "-")}{suffix}-{request["count"]}.json']
     for name in names:
         path = database / name
         if path.exists():
@@ -81,7 +82,14 @@ def main():
         if not isinstance(value, str) or len(value) != 36 or any(
                 c != '-' if i in {8,13,18,23} else c not in '0123456789abcdefABCDEF' for i,c in enumerate(value)):
             raise ValueError('abort requires an exact native operation ID')
-    if request['op'] in {'seed_text', 'verify_text'} and (set(request) != {'op','generation','count'}
+    oracle_fields = {'op','generation','count'}
+    if 'verification_id' in request:
+        value = request['verification_id']
+        if (request['op'] != 'verify_text' or not isinstance(value, str) or not 1 <= len(value) <= 64
+                or not all(c.isascii() and (c.isalnum() or c in '-_') for c in value)):
+            raise ValueError('invalid verification identity')
+        oracle_fields.add('verification_id')
+    if request['op'] in {'seed_text', 'verify_text'} and (set(request) != oracle_fields
             or type(request['count']) is not int or not 1 <= request['count'] <= 1_000_000):
         raise ValueError('oracle count must be an integer in 1..=1000000')
     marker = database.parent / 'OWNER'
@@ -174,6 +182,8 @@ def main():
         native_args = ['--abort-index', request['operation_id']]
     elif request['op'] in {'seed_text', 'verify_text'}:
         native_args = ['--oracle-'+request['op'].replace('_','-'), str(request['count'])]
+        if 'verification_id' in request:
+            native_args.append(request['verification_id'])
     else:
         native_args = ['--generation', str(output / 'request.json')]
     command = ['systemd-run', '--user', '--quiet', '--wait', '--pipe', '--collect', '--unit='+unit,
