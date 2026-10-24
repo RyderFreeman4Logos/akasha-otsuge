@@ -1,0 +1,253 @@
+{
+  "archive_files": 60,
+  "archive_sha256": "a478fd9d912e69548980f71dfa5eb889d0d68af87286d118460408db40611da7",
+  "catch_up": {
+    "completed": 100000,
+    "completed_at_start": 256,
+    "deadline_unix_ms": 1792807840583,
+    "elapsed_s": 31.861202813,
+    "eta_s": 0.0,
+    "phase": "catch_up",
+    "pid": 1310746,
+    "rate_per_s": 3130.5786095213734,
+    "start_ticks": "461854251",
+    "total": 100000
+  },
+  "operations": {
+    "activate": {
+      "artifact_hashes_verified": true,
+      "controller": {
+        "pid": 1311980,
+        "start_ticks": "461857975",
+        "state": "R"
+      },
+      "exact_processes_gone": true,
+      "failure": null,
+      "limits": {
+        "memory.high": "max",
+        "memory.max": "671088640",
+        "memory.swap.max": "0"
+      },
+      "native": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-2ff135bf2354406485109952e998fbe8.service",
+        "event": "executable",
+        "pid": 1311987,
+        "sha256": "9b09f83c8a225eb608600b2a3f7d6106c7ab2d1c8726956aee97cfea5cbb36d1",
+        "start_ticks": "461858019"
+      },
+      "reply": {
+        "active": 2,
+        "at": 100000,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 1
+        },
+        "previous": 0,
+        "reused": false
+      },
+      "rss_max_bytes": 24260608,
+      "rss_p99_bytes": 24260608,
+      "scratch_removed": true,
+      "seconds": 2.0040836045518517,
+      "status": "passed",
+      "unit": "inactive"
+    },
+    "high": {
+      "artifact_hashes_verified": true,
+      "controller": {
+        "pid": 1310733,
+        "start_ticks": "461854194",
+        "state": "R"
+      },
+      "exact_processes_gone": true,
+      "failure": null,
+      "limits": {
+        "memory.high": "max",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0"
+      },
+      "native": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-9cbe3c935624475797c2c98250b67847.service",
+        "event": "executable",
+        "pid": 1310746,
+        "sha256": "9b09f83c8a225eb608600b2a3f7d6106c7ab2d1c8726956aee97cfea5cbb36d1",
+        "start_ticks": "461854251"
+      },
+      "reply": {
+        "active": 0,
+        "committed": 100000,
+        "done": true,
+        "target": 100000,
+        "text": {
+          "pending": null,
+          "rows": 352,
+          "version": 4,
+          "watermark": 100000
+        },
+        "vector": {
+          "pending": null,
+          "rows": 0,
+          "version": 0,
+          "watermark": 100000
+        }
+      },
+      "rss_max_bytes": 215044096,
+      "rss_p99_bytes": 215044096,
+      "scratch_removed": true,
+      "seconds": 34.092424457892776,
+      "status": "passed",
+      "unit": "inactive"
+    },
+    "low": {
+      "artifact_hashes_verified": true,
+      "controller": {
+        "pid": 1311925,
+        "start_ticks": "461857702",
+        "state": "R"
+      },
+      "exact_processes_gone": true,
+      "failure": null,
+      "limits": {
+        "memory.high": "max",
+        "memory.max": "671088640",
+        "memory.swap.max": "0"
+      },
+      "native": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-97ea5b1c96a34b5baac8de15f83353f5.service",
+        "event": "executable",
+        "pid": 1311936,
+        "sha256": "9b09f83c8a225eb608600b2a3f7d6106c7ab2d1c8726956aee97cfea5cbb36d1",
+        "start_ticks": "461857743"
+      },
+      "reply": {
+        "active": 0,
+        "committed": 100000,
+        "done": true,
+        "target": 100000,
+        "text": {
+          "pending": null,
+          "rows": 352,
+          "version": 4,
+          "watermark": 100000
+        },
+        "vector": {
+          "pending": null,
+          "rows": 0,
+          "version": 0,
+          "watermark": 100000
+        }
+      },
+      "rss_max_bytes": 24432640,
+      "rss_p99_bytes": 24432640,
+      "scratch_removed": true,
+      "seconds": 2.0041669122874737,
+      "status": "passed",
+      "unit": "inactive"
+    },
+    "low_prefix": {
+      "artifact_hashes_verified": true,
+      "controller": {
+        "pid": 1310647,
+        "start_ticks": "461853655",
+        "state": "R"
+      },
+      "exact_processes_gone": true,
+      "failure": null,
+      "limits": {
+        "memory.high": "max",
+        "memory.max": "671088640",
+        "memory.swap.max": "0"
+      },
+      "native": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-d69070e179f44288bfef2f93b0cc98e9.service",
+        "event": "executable",
+        "pid": 1310662,
+        "sha256": "9b09f83c8a225eb608600b2a3f7d6106c7ab2d1c8726956aee97cfea5cbb36d1",
+        "start_ticks": "461853738"
+      },
+      "reply": {
+        "active": 0,
+        "committed": 100000,
+        "done": false,
+        "target": 100000,
+        "text": {
+          "pending": null,
+          "rows": 0,
+          "version": 0,
+          "watermark": 256
+        },
+        "vector": {
+          "pending": null,
+          "rows": 0,
+          "version": 0,
+          "watermark": 256
+        }
+      },
+      "rss_max_bytes": 41463808,
+      "rss_p99_bytes": 41463808,
+      "scratch_removed": true,
+      "seconds": 4.15811968781054,
+      "status": "passed",
+      "unit": "inactive"
+    },
+    "verify_old_identity": {
+      "artifact_hashes_verified": true,
+      "controller": {
+        "pid": 1310645,
+        "start_ticks": "461853652",
+        "state": "R"
+      },
+      "exact_processes_gone": true,
+      "failure": "original operation deadline expired",
+      "limits": {
+        "memory.high": "max",
+        "memory.max": "671088640",
+        "memory.swap.max": "0"
+      },
+      "native": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-4b3fafbbb3c448afb2870e4a5961c3a4.service",
+        "event": "executable",
+        "pid": 1312036,
+        "sha256": "9b09f83c8a225eb608600b2a3f7d6106c7ab2d1c8726956aee97cfea5cbb36d1",
+        "start_ticks": "461858255"
+      },
+      "reply": null,
+      "rss_max_bytes": 159440896,
+      "rss_p99_bytes": 159440896,
+      "scratch_removed": true,
+      "seconds": 22.1946371961385,
+      "status": "failed",
+      "unit": "inactive"
+    }
+  },
+  "scope": "experiment operation-controller drain and controlled reopen; production daemon integration separate",
+  "status": "drain_and_activation_passed_history_recheck_failed",
+  "transition": {
+    "artifact_sha256": {
+      "OWNER": "163fd2cf3b61042c3a3e43d22093f81316aefcec1b9584a0442289235ab485ea",
+      "admission-denied.json": "a5295e687744dbd1a85437dca55a3e4e52823a70d67c8fe3d6c210167b3af309",
+      "admission.json": "003a0cfbb3e02bc22e1e9cb26560dc75b792e208a4e64f7c67a8107f0174c1ce",
+      "budget-request.json": "ee3ba63b32bd743eee2214f00922aaf9f52aeb5284342e368658231a8f2a8690",
+      "denied.stderr": "4cd7ff842df25f49e16ddaa61421a566b6854d775c0a5d8ef306cede301febdb",
+      "denied.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "high-child.json": "0421e7c0ea7c0ec5e2902c7f4b63615d0641b4c66a98c0a81da752ef443fdb6d",
+      "high-controller.log": "1c8744c4612cb991e437f1b41a4af6b40c7690803503266db7fcf8b3c34fd627",
+      "low-controller.log": "ff400d724ba96181350e9837ff606308cc54026b1e0385f0021e792d742433fb",
+      "progress.json": "e41027e2104f2f4a49c1b342b14a57adbeb0bf90b82cd25be6f9a629eac0b642"
+    },
+    "completed_checkpoint_unchanged": true,
+    "draining": false,
+    "effective_budget_mib": 512,
+    "high_job_completed_naturally": true,
+    "high_output": "/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-profile-drain-r1/high",
+    "low_output": "/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-profile-drain-r1/low",
+    "new_admission_denied_while_draining": true,
+    "original_deadline_ms": 1792807840583,
+    "requested_budget_mib": 512,
+    "seconds": 37.658272945322096,
+    "status": "passed"
+  }
+}

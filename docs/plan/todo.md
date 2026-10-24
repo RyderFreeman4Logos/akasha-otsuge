@@ -91,6 +91,18 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       native statistics verify all 11,428,831 text rows and 1,000,000 vector rows
       after bounded streaming training and single-worker partition merge.
       Full query quality, activation and sustained memory remain separate below.
+- [ ] Complete scoped-layout build within the declared peak memory bound.
+      Generation2 r2 completes all eight text indexes but OOMs during vector
+      partition merge at812/1000. Same-binary fresh-process recovery completes
+      all coverage in193.798s with the original deadline, but sampled RSS peaks
+      at691,322,880B, above640MiB. Functional completion is not resource acceptance.
+      Both attempts and exact scratch cleanup are retained; no threshold changed.
+- [x] Verify full scoped-generation queries and measure exact ANN recall.
+      All64 BM25/ANN queries pass across eight scopes, checking1,195 distinct
+      candidates against authority. All32 ANN references use the full million
+      vectors; mean recall@20 is0.9125. RSS max392,826,880B includes the driver.
+      Full unvectorized-text workload, coldness, live permissions and duration
+      remain separate acceptance below.
 - [x] Implement bounded admission and 100 independent harness clients with actual
       conflicts, durable latency/error records and per-second checkpoints;
       full-size measured cases and recovery remain below.
@@ -157,6 +169,14 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       native and controller RED/GREEN regressions.
 - [ ] Test low-budget reopen of full data/backlog/interrupted builds and
       2GiB-to-512MiB draining with original work deadlines preserved.
+      The full100k backlog now passes low-prefix admission, high-profile natural
+      completion and controlled low reopen. New operation admission is refused
+      while the high job drains; its original deadline survives both transitions.
+      High catch-up34.092s/RSS215,044,096B, low reopen2.004s/RSS24,432,640B;
+      generation2 activates at100000. This is the experiment controller, not the
+      future production daemon. Interrupted-build peak memory remains unresolved.
+      The post-activation history recheck refuses an expired original verifier
+      identity; a separately identified new verification is still required.
 - [ ] Test all required commit/index/watermark/activation crash barriers,
       derived corruption/rebuild, authority corruption, isolated disk-full,
       child resource failure, invalid config and competing reloads.
@@ -239,8 +259,9 @@ before admitting the full corpus, so memory-layout failures surface earlier.
       identify435 eagerly resident FTS token dictionaries (861,893,690 file bytes).
       A new generation stores each body in one nullable scope column and builds
       separate dictionaries; legacy generations retain their original layout.
-      The complete scope-column backfill now passes; full index build is separate.
-      Full scoped-layout/query/activation/workload acceptance is still pending.
+      The complete scope-column backfill and64 full baseline queries now pass.
+      Index coverage recovers after OOM, but build RSS exceeds the640MiB peak.
+      Bounded building, activation and sustained workload acceptance remain open.
       The rejected Helix experiment database has been retired after exact-owner,
       stopped-unit, lock and evidence checks:20,134 files/38,603,812,864 allocated
       bytes removed. Failure/import metadata and42 source shards remain retained;

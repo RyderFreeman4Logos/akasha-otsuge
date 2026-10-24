@@ -162,12 +162,36 @@ no OOM; there is no native terminal exit receipt. Exact process/unit exit and
 owned scratch cleanup are verified before explicit abandonment. A deterministic
 RED/GREEN check fixes the observer to read only newline-terminated records while
 still rejecting malformed complete records. The successor uses the same native
-binary and original persisted index deadline; its result remains pending.
+binary and original persisted index deadline.
+
+[The subsequent full scoped-index runs](results/fallback-scoped-index/summary.json)
+retain two distinct outcomes. R2 completes all eight text indexes, then its unit
+is OOM-killed during vector partition merge at812/1000 after2374.023s. Its observer
+has no native exit record; systemd's journal establishes the unit OOM. Last sampled
+OOM counters precede the failure and do not override the journal. Exact processes
+and unit are gone before6,150,127,616 allocated bytes of private scratch are removed.
+R3 uses the same native binary and640MiB hard limit in a fresh process, preserves
+the original deadline, and completes full native coverage in193.798s without OOM.
+However, sampled process-tree RSS reaches691,322,880B, exceeding the671,088,640B
+peak criterion. Its functional recovery passes; its resource gate fails. The hard
+cgroup limit does not replace the frozen RSS test. Uninterrupted bounded building
+and full queries/workloads still require acceptance.
 
 The reference-query harness now retains all32 exact-ANN references and supports
 an explicit generation. A timeout records the child identity, partial output and
 exit before failing. The initial failed run lacked those child receipts; its
-cgroup samples and that limitation remain archived. No ANN recall is yet claimed.
+cgroup samples and that limitation remain archived.
+
+[The full generation2 query run](results/fallback-scoped-query/summary.json) now
+passes64 BM25/ANN queries across all eight scopes and1,292 native invocations.
+It verifies1,195 distinct candidates against source authority. All32 ANN queries
+are compared with their exact top20 references over the complete million-vector
+corpus; mean recall@20 is0.9125. This is a measured value, not a newly invented
+acceptance threshold. Elapsed time is334.933s; sampled RSS maximum/P99 is
+392,826,880/359,129,088B, including the Python query driver. The group retains
+memory.high512MiB, memory.max640MiB, zero swap and no OOM. All commands, identities,
+artifact hashes and scratch cleanup verify. BM25 expected rank, full file-cache
+coldness, live permission changes and sustained workload are separate tests.
 
 ### Cold-file preparation and workload reservations
 
@@ -215,3 +239,21 @@ its import/failure metadata is archived. Btrfs free space rose from168,431,259,6
 to206,998,777,856B at later verification; delayed reclaim and concurrent activity
 prevent exact attribution of that delta. Source shards and active fallback data
 remain available; this retired database cannot be reused by later acceptance.
+
+### Full backlog, budget drain and activation
+
+[The full-data transition](results/fallback-full-profile-drain/summary.json)
+first advances256 of100,000 pending jobs in the low profile, then resumes under
+the high profile with the same persisted deadline. At4,864 completions the harness
+requests512MiB while reporting effective2048MiB and draining. The real exclusive
+operation lock refuses new low-profile admission. The high native job finishes
+naturally in34.092s, sampled RSS max215,044,096B; low reopen takes2.004s at
+24,432,640B and leaves the completed checkpoint bytes unchanged. Both watermarks
+reach100,000 and generation2 activates at that sequence. Exact child/unit exit,
+artifact hashes and private scratch cleanup verify for every operation.
+
+This verifies the experiment operation controller and controlled reopen. Product
+daemon hot reload is still separate. The following historical recheck fails
+explicitly because it reused the original verifier's expired durable deadline;
+there is no content mismatch or OOM. That failure is retained. A new verification
+identity is required to recheck history without extending the old operation.
