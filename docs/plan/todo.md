@@ -129,15 +129,13 @@ Remaining acceptance, in execution order:
       commits and both old-generation search types overlap the build. Eight
       receipt mutations are rejected;103 lifecycle commands also pass. Full-size
       overlap remains unmeasured.
-- [ ] Finish full-size corpus-candidate corrections/retractions/restores and live
-      permission checks. Ordinary current/history bodies and scoped filtering
-      have full mixed-workload coverage, but its synthetic corrections do not
-      mutate the actual search candidates; permissions stay fixed in that case.
-      The new resumable native driver passes16 small-fixture cases,64 commits,
-      756 native commands, a SIGKILL after durable commit, unchanged completed
-      reuse and seven forged-entry controls. Its serial checks cover correction,
-      rescope, retract, restoration and permission revoke/restore; they do not
-      prove simultaneous query/build execution or full-data behavior.
+- [x] Full-size corpus-candidate corrections/rescopes/retractions/restores and
+      live permissions now pass16 distinct candidates,64 revisions and755 native
+      commands in306.902s, with RSS max255,275,008B. Exact original/current/history
+      bodies and vectors agree; watermarks reach183256. All3,840 fixed performance
+      IDs are excluded from mutation. Earlier small-fixture SIGKILL/resume,
+      completed reuse and tamper controls pass separately. These serial full-data
+      checks do not replace the concurrent build/query requirement above.
 - [ ] Verify full generation-specific indexed receipts and gap-free watermarks
       across concurrent rebuild, activation and failure. Existing full backlog
       and mixed-workload watermarks pass; reindex overlap remains distinct.

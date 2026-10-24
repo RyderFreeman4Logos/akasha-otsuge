@@ -425,3 +425,21 @@ thresholds: BM251.2/s with P951.539s, ANN0.25/s with P952.462s, and RSS P99/max
 are frozen, raw artifacts are hashed, all measured children and units exit, and
 owned temporary fixtures/scratch are removed. Full sustained performance after
 this change, uninterrupted bounded build and concurrent full rebuild remain open.
+
+### Full corpus-candidate lifecycle
+
+[The full-data serial lifecycle run](results/fallback-full-corpus-lifecycle/summary.json)
+passes16 distinct real returned candidates across eight scopes and both search
+modes,64 logical revisions and755 native commands in306.902s. It uses eight pinned
+real vectors and a broad BM25 `history` term to select neighbors outside all3,840
+fixed performance-query IDs; this fixture is not an ANN-recall benchmark. The
+authority contains the same50,000,002,783 unique UTF-8 bytes,11,428,831 documents
+and one million original vectors.
+
+Corrections, scope moves, retractions and original-body/vector restorations all
+pass committed/indexed receipt, stale-hit, exact current/history and live permission
+checks. Active generation2 remains unchanged, both watermarks reach183256, and
+pending waves are empty. RSS max is255,275,008B without OOM; raw reply/source hashes,
+755 child identities, controller exit, service inactivity and scratch removal are
+verified. This closes the serial full-candidate gap. Concurrent query/build
+scheduling and sustained throughput are separate unfinished requirements.
