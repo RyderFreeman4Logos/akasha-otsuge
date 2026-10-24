@@ -352,6 +352,8 @@ def main():
                    "-p", "Environment=AKASHA_SPIKE_PROFILE=" + run["profile"],
                    "-p", "LimitNOFILE=8192",
                    "-p", "Environment=MALLOC_MMAP_THRESHOLD_=131072",
+                   "-p", "Environment=LANCE_FTS_NUM_SHARDS=1",
+                   "-p", "Environment=LANCE_FTS_PARTITION_SIZE=32",
                    "-p", f"Environment=LANCE_CPU_THREADS={1 if 'rebuild_generation' in run else 2}",
                    "-p", "Environment=LANCE_DEFAULT_IO_BUFFER_SIZE=16777216",
                    "-p", "Environment=LANCE_SHUFFLE_BATCH_BYTES=16777216",

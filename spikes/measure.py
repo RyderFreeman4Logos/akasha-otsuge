@@ -98,6 +98,7 @@ def main():
                                       "nofile_soft_hard": resource.getrlimit(resource.RLIMIT_NOFILE),
                                       "native_environment": {name: env.get(name) for name in (
                                           "TMPDIR", "MALLOC_MMAP_THRESHOLD_", "GLIBC_TUNABLES",
+                                          "LANCE_FTS_NUM_SHARDS", "LANCE_FTS_PARTITION_SIZE",
                                           "LANCE_CPU_THREADS", "LANCE_DEFAULT_IO_BUFFER_SIZE",
                                           "LANCE_SHUFFLE_BATCH_BYTES",
                                           "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES")},

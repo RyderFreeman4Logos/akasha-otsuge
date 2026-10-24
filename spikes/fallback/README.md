@@ -289,6 +289,16 @@ and combine baseline/delta candidates, then recheck live authority and permissio
 coverage explicitly says `candidate_set_only`, with no global BM25 rank claim.
 A minimum commit sequence fails when the relevant watermark lags.
 
+Delta text updates use Lance's incremental FTS optimization, merging into one
+index and tokenizing only new fragments. Native coverage still must include every
+row before publishing the indexed receipt. Initial text construction and vector
+indexing retain their existing builders. The pinned Lance API does not persist
+FTS build-time limits, so incremental operations require child startup settings
+`LANCE_FTS_NUM_SHARDS=1 LANCE_FTS_PARTITION_SIZE=32`. Generation/workload
+controllers supply them and the observer records them; direct probe callers must
+also supply them. A mismatched budget refuses the index operation and leaves its
+original pending wave recoverable with the correct settings.
+
 The 103-command native fixture covers six process-crash boundaries, out-of-order
 completion/gaps, source validation, retraction/supersession/text-only behavior,
 failed build/old reads, activation/model isolation and revocation. Five release

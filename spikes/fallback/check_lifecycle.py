@@ -22,11 +22,11 @@ def main():
     bundle = dict(model='text-embedding-3-large', dimension=1536, chunker='source-document-v1', schema=1,
         model_fingerprint='c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5')
     steps = []
-    def add(channel, request, check=lambda _: True, *, error=None, kill=None):
-        steps.append((channel, request, check, error, kill))
+    def add(channel, request, check=lambda _: True, *, error=None, kill=None, env=None):
+        steps.append((channel, request, check, error, kill, env))
     def g(op, check=lambda _: True, generation=1, **fields):
-        error, kill = fields.pop('error',None), fields.pop('kill',None)
-        add('generation',dict(op=op,generation=generation,**fields),check,error=error,kill=kill)
+        error, kill, env = fields.pop('error',None), fields.pop('kill',None), fields.pop('env',None)
+        add('generation',dict(op=op,generation=generation,**fields),check,error=error,kill=kill,env=env)
     def commit(seq, memory, row, expected=0, active=True, text_only=False):
         change=dict(request_id=f'life:{seq}',memory=memory,expected=expected,active=active,
             scope=int(rows[row]['partition'][1]),body=rows[row]['body'],text_only=text_only)
@@ -58,6 +58,7 @@ def main():
     receipt(1,lambda r:r['stage']=='indexed' and r['watermarks']==dict(text=1,vector=1))
     g('activate');query(has(1,1));query(has(1,1),text=True)
     commit(2,2,1);commit(3,3,2)
+    apply(3,'text',env=dict(LANCE_FTS_PARTITION_SIZE='2048'),error='incremental FTS requires')
     for family in ['text','vector']:apply(3,family,2 if family=='vector' else None)
     receipt(3,lambda r:r['watermarks']==dict(text=1,vector=1))
     for family in ['text','vector']:apply(2,family,1 if family=='vector' else None)
@@ -115,11 +116,13 @@ def main():
         (root/'input.jsonl').write_bytes(raw)
         publish(root/'manifest.json',dict(corpus=dict(documents=1,vectors=0,prepared_bytes=len(raw),prepared_sha256=hashlib.sha256(raw).hexdigest(),indexed_body_utf8_bytes=16)))
         publish(output/'admission.json',dict(binary_sha256=digest(binary),source_sha256=digest(source),harness_sha256=digest(__file__),temporary_root=temporary,controller=process_identity(os.getpid()),planned_commands=len(steps)))
-        for channel, value, check, error, kill in steps:
+        for channel, value, check, error, kill, overrides in steps:
             name=f'{len(records):03d}';publish(request,value)
             args=['--load',str(root/'input.jsonl'),str(root/'manifest.json')] if channel=='load' else ['--'+channel,str(request)]
             command=[str(binary),str(database),*args]
-            child=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            env=dict(os.environ,LANCE_FTS_NUM_SHARDS='1',LANCE_FTS_PARTITION_SIZE='32')
+            env.update(overrides or {})
+            child=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env)
             identity,prefix=process_identity(child.pid),b''
             try:
                 if kill:
@@ -137,6 +140,10 @@ def main():
                 assert child.returncode==(-9 if kill else 1 if error else 0),(name,stderr[-2000:])
                 if error:assert error.encode() in stderr,(name,stderr[-2000:])
                 if not error and not kill:assert check(json.loads(stdout)),(name,stdout)
+                if channel=='generation' and value == dict(op='apply', generation=1, family='text', seq=2, vector=None):
+                    progress=json.loads((database/'g1_delta_text-body_fts-progress.json').read_text())
+                    publish(output/'incremental-text-progress.json',progress)
+                    assert progress['stages']['tokenize_docs']['completed']==1, progress
                 if channel=='generation' and value['op']=='catch_up' and not error and not kill:
                     progress=json.loads((database/f"generation-{value['generation']}-catch-up.json").read_text())
                     assert progress['completed']>progress['completed_at_start']
@@ -145,7 +152,8 @@ def main():
                 if child.poll() is None:child.kill()
                 child.communicate(timeout=10)
             assert process_identity(child.pid) is None
-            records.append(dict(command=command,request=value,child=identity,exit=child.returncode,error=error,kill=kill))
+            records.append(dict(command=command,request=value,child=identity,exit=child.returncode,error=error,kill=kill,
+                fts_environment={key:env[key] for key in ['LANCE_FTS_NUM_SHARDS','LANCE_FTS_PARTITION_SIZE']}))
             elapsed=time.monotonic()-started
             publish(output/'progress.json',dict(completed=len(records),total=len(steps),elapsed_s=elapsed,rate_per_s=len(records)/elapsed,eta_s=(len(steps)-len(records))*elapsed/len(records)))
     publish(output/'result.json',dict(status='passed',records=records,checks=len(records),seconds=time.monotonic()-started,temporary_root_removed=not pathlib.Path(temporary).exists(),artifact_sha256={p.name:digest(p) for p in output.iterdir() if p.is_file()},not_proven=['full corpus','concurrent reindex workload','power loss']))

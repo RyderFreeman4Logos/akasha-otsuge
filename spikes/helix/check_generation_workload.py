@@ -55,6 +55,7 @@ def main():
         if backend == 'fallback':
             position = command.index(sys.executable)
             command[position:position] = ['-p', 'LimitNOFILE=8192', '-p', 'Environment=LANCE_CPU_THREADS=2',
+                '-p', 'Environment=LANCE_FTS_NUM_SHARDS=1', '-p', 'Environment=LANCE_FTS_PARTITION_SIZE=32',
                 '-p', 'Environment=LANCE_DEFAULT_IO_BUFFER_SIZE=16777216', '-p', 'Environment=LANCE_SHUFFLE_BATCH_BYTES=16777216',
                 '-p', 'Environment=LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES=0']
         publish(output / 'progress.json', dict(phase=name, completed=len(records), total=total, elapsed_s=time.monotonic()-started, child_progress=str(database / 'generation-1-catch-up.json')))

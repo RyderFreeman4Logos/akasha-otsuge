@@ -101,6 +101,9 @@ Remaining acceptance, in execution order:
       BM25 and ANN P95 exceed60s, so the case fails. High/full burst/overload
       remain unrun. Retain the failure while investigating691 delta-index full
       replacements,8,286,832 repeated tokenizations and467,116 progress events.
+      Incremental delta FTS now passes104 lifecycle commands and the1,698-request
+      concurrent fixture: only the new document is tokenized, and an incorrect
+      FTS budget is refused/recoverable. Full-data performance must be remeasured.
 - [ ] Complete an uninterrupted full scoped build within the640MiB low peak and
       reopen interrupted builds directly at low budget. The prior vector merge
       OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.

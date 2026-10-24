@@ -347,3 +347,14 @@ both release Clippy checks and six controller units cover the shared plumbing.
 The controller now accepts positive u64 generation identities so a fresh third
 generation can exercise the full build. Full concurrent rebuild and bounded
 uninterrupted full-build acceptance remain pending.
+
+[Incremental delta FTS](results/fallback-incremental-text/summary.json) changes
+only the text update path: merge the current index with new fragments, retaining
+the original pending-wave deadline and complete native coverage before receipt
+publication. A native regression observes three tokenized documents for one new
+document before the fix and exactly one afterward. The104-command lifecycle
+fixture covers six SIGKILL barriers and rejection/recovery of an incorrect FTS
+budget; the same-authority workload again passes1,698 requests. Ten release units,
+release all-targets Clippy and six controller tests pass. Child launch explicitly
+supplies one FTS worker and32MiB because Lance omits build-time limits from stored
+index metadata. Full-data performance after this change remains unmeasured.

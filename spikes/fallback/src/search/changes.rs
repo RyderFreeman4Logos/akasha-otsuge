@@ -1,6 +1,10 @@
 //! Durable outbox completion follows native Lance publication, never precedes it.
 use super::*;
 use crate::authority::{Entry, point};
+use lance_index::{
+    optimize::OptimizeOptions,
+    scalar::inverted::builder::{LANCE_FTS_NUM_SHARDS, LANCE_FTS_PARTITION_SIZE},
+};
 use surrealkv::{Mode, Transaction};
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
@@ -221,9 +225,9 @@ async fn refresh(
                 )),
             )
         };
-    if table
-        .index_stats(name)
-        .await?
+    let existing = table.index_stats(name).await?;
+    if existing
+        .as_ref()
         .is_some_and(|s| s.num_indexed_rows as u64 == rows && s.num_unindexed_rows == 0)
     {
         return Ok(());
@@ -232,20 +236,38 @@ async fn refresh(
     remaining(until)?;
     let wrapper = table.dataset().ok_or("local delta dataset required")?;
     let mut dataset = (*wrapper.get().await?).clone();
-    dataset
-        .create_index_builder(&[column], kind, params.as_ref())
-        .name(name.into())
-        .replace(true)
-        .progress(Arc::new(Progress {
-            path: a
-                .root
-                .join(format!("{}-{name}-progress.json", table.name())),
-            stages: Mutex::new(BTreeMap::new()),
-            settings: a.settings,
-            deadline: until,
-            start_ticks: start_ticks()?,
-        }))
-        .await?;
+    let progress = Arc::new(Progress {
+        path: a
+            .root
+            .join(format!("{}-{name}-progress.json", table.name())),
+        stages: Mutex::new(BTreeMap::new()),
+        settings: a.settings,
+        deadline: until,
+        start_ticks: start_ticks()?,
+    });
+    if family == Family::Text && existing.is_some() {
+        // Lance does not persist build-time limits in FTS metadata.
+        if *LANCE_FTS_NUM_SHARDS != 1 || *LANCE_FTS_PARTITION_SIZE != 32 {
+            return Err(
+                "incremental FTS requires LANCE_FTS_NUM_SHARDS=1 and LANCE_FTS_PARTITION_SIZE=32"
+                    .into(),
+            );
+        }
+        dataset
+            .optimize_indices(
+                &OptimizeOptions::merge(1)
+                    .index_names(vec![name.into()])
+                    .progress(progress),
+            )
+            .await?;
+    } else {
+        dataset
+            .create_index_builder(&[column], kind, params.as_ref())
+            .name(name.into())
+            .replace(true)
+            .progress(progress)
+            .await?;
+    }
     wrapper.update(dataset);
     let stats = table
         .index_stats(name)
