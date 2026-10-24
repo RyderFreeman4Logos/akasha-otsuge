@@ -443,3 +443,24 @@ pending waves are empty. RSS max is255,275,008B without OOM; raw reply/source ha
 755 child identities, controller exit, service inactivity and scratch removal are
 verified. This closes the serial full-candidate gap. Concurrent query/build
 scheduling and sustained throughput are separate unfinished requirements.
+
+### Required full low-profile sustained pass
+
+[The corrected 1800-second low run](results/fallback-full-sustained-low-r3/summary.json)
+passes the unchanged contract on the complete corpus and100 clients. All50,931
+recorded requests and34,460 distinct commits pass independent content/history/
+scope checks. BM25 achieves1.188333/s with P9516.712s; ANN achieves0.248889/s with
+P9511.424s. Writes achieve18.916667/s/P950.077s, current reads P950.100s and
+history pages P950.248s. Every operation category reports zero errors.
+
+RSS P99/max is458,305,536/493,187,072B, below the512/640MiB limits. Both watermarks
+reach217716; remaining work is zero after6.570s drain. The observer spans1810.039s,
+including startup/drain. Owned-file cold preparation covers180,789 files and
+reduces92,407 resident pages to zero. Artifact hashes, the independent request
+oracle, exact native/controller exits, inactive unit and scratch removal verify.
+
+The measured native binary remains `3ef94b16...8401` from7fba9f0. All raw receipts,
+frozen controllers and source bytes verified against that commit are archived.
+Earlier failed runs remain unchanged. Required high-profile steady load, full
+burst/overload, fresh bounded full construction, concurrent rebuild and measured
+disk reclamation still block backend selection and Issue#3 closure.

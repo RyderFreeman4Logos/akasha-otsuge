@@ -1,0 +1,141 @@
+{
+  "archive_bytes": 10050038,
+  "archive_files": 44,
+  "archive_sha256": "4bfd62b948e30cf3bc5f822d6ea5953c42f1243ce3e4f257ea5d45214d7fa640",
+  "artifacts_verified": true,
+  "binary_sha256": "3ef94b16debfff6309d103d87e0197ef190370b942c467db7589ce511b7d8401",
+  "clients": 100,
+  "cold_cache": {
+    "files": 180789,
+    "method": "fsync and POSIX_FADV_DONTNEED on owned files; mincore without reading mapped pages",
+    "resident_pages_after": 0,
+    "resident_pages_before": 92407,
+    "seconds": 14.717025062069297
+  },
+  "content_oracle": {
+    "corpus_current_checks": 4320,
+    "corpus_current_distinct": 3645,
+    "corpus_current_partitions": {
+      "p0": 532,
+      "p1": 541,
+      "p2": 543,
+      "p3": 545,
+      "p4": 557,
+      "p5": 588,
+      "p6": 521,
+      "p7": 493
+    },
+    "current_checks": 4320,
+    "derived_current_checks": 50,
+    "distinct_commits": 34460,
+    "rebuild_search_overlap": null,
+    "requests": 50931,
+    "search_checks": {
+      "ann": 450,
+      "bm25": 2151
+    },
+    "text_only_bm25_checks": 262,
+    "text_only_bm25_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ],
+    "text_only_current_checks": 581,
+    "text_only_current_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ]
+  },
+  "derived": {
+    "committed": 217716,
+    "generation": 2,
+    "remaining": 0,
+    "text": 217716,
+    "vector": 217716
+  },
+  "drain_s": 6.570119328999908,
+  "exact_processes_gone": true,
+  "failures": [],
+  "operations": {
+    "ann": {
+      "attempted": 450,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 11424,
+      "successful": 450,
+      "successful_per_s": 0.24888888888888888,
+      "within_window": 448
+    },
+    "bm25": {
+      "attempted": 2151,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 16712,
+      "successful": 2151,
+      "successful_per_s": 1.1883333333333332,
+      "within_window": 2139
+    },
+    "correction": {
+      "attempted": 360,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 91,
+      "successful": 360,
+      "successful_per_s": 0.2,
+      "within_window": 360
+    },
+    "current": {
+      "attempted": 4320,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 100,
+      "successful": 4320,
+      "successful_per_s": 2.4,
+      "within_window": 4320
+    },
+    "history": {
+      "attempted": 450,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 248,
+      "successful": 450,
+      "successful_per_s": 0.25,
+      "within_window": 450
+    },
+    "write": {
+      "attempted": 43200,
+      "conflicts": 9150,
+      "errors": 0,
+      "p95_upper_ms": 77,
+      "successful": 34050,
+      "successful_per_s": 18.916666666666668,
+      "within_window": 34050
+    }
+  },
+  "profile": "low",
+  "remaining": [
+    "full high1800s",
+    "full burst/overload",
+    "fresh uninterrupted bounded build",
+    "full concurrent rebuild",
+    "physical disk bound and safe reclamation"
+  ],
+  "required_window_seconds": 1800,
+  "rss_max_bytes": 493187072,
+  "rss_p99_bytes": 458305536,
+  "scratch_removed": true,
+  "seconds": 1810.0387589773163,
+  "source_head": "7fba9f0a5c4b69f20cf2c26cdd0826ef5857322c",
+  "status": "passed"
+}

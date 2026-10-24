@@ -88,35 +88,23 @@ Completed, with the limits shown:
       85 physical derived-corruption/quarantine/rebuild checks; authority/WAL/VLog
       corruption and real kernel ENOSPC recovery. Their small-fixture scope does
       not replace the full scenarios below or production automatic quarantine.
+- [x] Pass the full low1800s/100-client cold case after the delta scope-index
+      fix:50,931 requests,34,460 distinct commits, BM251.188333/s/P9516.712s,
+      ANN0.248889/s/P9511.424s, RSS P99/max458,305,536/493,187,072B.
+      All content/scoped oracles pass; both watermarks reach217716 with6.570s
+      drain. Raw hashes, exact process/unit exit and scratch cleanup verify.
+      This is the required low-profile pass; high and build gates remain below.
 - [x] Retire the rejected Helix experiment database with exact ownership, process,
       lock and artifact checks;38,603,812,864 allocated bytes removed. Preserve
       source shards and receipts. Do not claim later reuse of that database.
 
 Remaining acceptance, in execution order:
 
-- [ ] Pass both required1800s/100-client profiles at all original rates, P95 and
-      memory limits; then full burst/overload and <=300s drain. The first full
-      low case runs1811.135s, RSS P99/max430,141,440/453,545,984B, no OOM, and
-      reaches both watermarks at147083 with7.912s drain. BM25 achieves0.968889/s;
-      BM25 and ANN P95 exceed60s, so the case fails. High/full burst/overload
-      remain unrun. Retain the failure while investigating691 delta-index full
-      replacements,8,286,832 repeated tokenizations and467,116 progress events.
-      Incremental delta FTS now passes104 lifecycle commands and the1,698-request
-      concurrent fixture: only the new document is tokenized, and an incorrect
-      FTS budget is refused/recoverable. The full60s incremental diagnosis passes,
-      but the subsequent1800s low run fails: BM25 0.638889/s and ANN0.2/s;
-      both search P95 values exceed60s. RSS P99/max441,647,104/452,685,824B,
-      zero operation errors and15.167s drain pass. Only21,854 new documents are
-      tokenized across9,480 updates. Per-search service-time estimates rise from
-      0.85s to1.77s across successive five-minute windows; directly measure delta
-      fragment/manifest and query stages before changing concurrency again.
-      Direct timing now isolates0.579s in delta-text result streaming; its actual
-      plan scans11,091 fragments for scope, while baseline uses a bitmap.
-      Both delta families now maintain scope bitmaps, with complete coverage
-      required for indexed completion/activation. Eleven release units,104
-      lifecycle checks and1,698-request concurrent fixture pass. The full cold60s
-      control passes BM251.2/s/P951.539s, ANN0.25/s/P952.462s and RSS385,216,512B.
-      The required30-minute performance rerun remains pending.
+- [ ] Pass the required high1800s/100-client profile at all original rates,
+      P95 and memory limits, then full burst/overload and <=300s drain. The full
+      low profile now passes above. The two earlier low failures and their
+      incremental-FTS/scope-index diagnoses remain in the decision record.
+      Do not repeat a passing low run without a relevant code/state regression.
 - [ ] Complete an uninterrupted full scoped build within the640MiB low peak and
       reopen interrupted builds directly at low budget. The prior vector merge
       OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.
