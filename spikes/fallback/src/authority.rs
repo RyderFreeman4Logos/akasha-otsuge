@@ -116,6 +116,7 @@ pub(crate) struct Authority {
     pub(crate) derived: Mutex<()>,
     pub(crate) root: PathBuf,
     pub(crate) settings: Settings,
+    pub(crate) search_session: std::sync::Arc<lancedb::Session>,
     documents: u64,
     #[cfg(test)]
     pub(crate) derived_barrier: Option<(
@@ -211,6 +212,7 @@ impl Authority {
             derived: Mutex::new(()),
             root: root.into(),
             settings,
+            search_session: crate::search::session()?,
             documents: imported.documents,
             #[cfg(test)]
             history_barrier: None,
@@ -723,6 +725,7 @@ mod tests {
             derived: Mutex::new(()),
             root: path.clone(),
             settings: Settings::read(&path)?,
+            search_session: crate::search::session()?,
             documents: 0,
             history_barrier: None,
             #[cfg(test)]

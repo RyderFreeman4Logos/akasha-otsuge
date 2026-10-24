@@ -401,7 +401,7 @@ pub(super) async fn apply(
     remaining(pending.deadline_ms)?;
     let rows = data(&entries, &completions, family, output)?;
     if rows.num_rows() > 0 {
-        let connection = connect(&a.root).await?;
+        let connection = connect(a).await?;
         let name = family.table(id);
         if pending.appended_version.is_none() {
             let tag = format!("outbox:{id}:{}:{}", family.name(), pending.payload_hash);
@@ -540,7 +540,7 @@ pub(super) async fn prune_versions(
         }
     }
     drop(tx);
-    let connection = connect(&a.root).await?;
+    let connection = connect(a).await?;
     let mut tables = Vec::new();
     for (name, rows) in names {
         let table = connection.open_table(name).execute().await?;
@@ -688,7 +688,7 @@ pub(super) async fn retire_generation(
     };
     progress(completed)?;
     checkpoint(hold, "after-retire-intent").await;
-    let connection = connect(&a.root).await?;
+    let connection = connect(a).await?;
     for (index, name) in names.iter().enumerate().skip(completed) {
         remaining(until)?;
         match connection.drop_table(name, &[]).await {
@@ -745,11 +745,11 @@ pub(super) async fn activate(a: &Authority, id: u64, hold: Option<&str>) -> Resu
     if !base.ready {
         return Err("candidate generation has incomplete coverage".into());
     }
-    super::build(&a.tree, &a.root, &mut base, a.settings, false).await?;
+    super::build(a, &mut base, false).await?;
     for family in [Family::Text, Family::Vector] {
         let p = applied(&a.tree.begin_with_mode(Mode::ReadOnly)?, id, family)?;
         if p.rows > 0 {
-            let table = connect(&a.root)
+            let table = connect(a)
                 .await?
                 .open_table(family.table(id))
                 .execute()
@@ -807,14 +807,14 @@ pub(super) async fn activate(a: &Authority, id: u64, hold: Option<&str>) -> Resu
 }
 
 async fn candidates(
-    root: &Path,
+    a: &Authority,
     name: &str,
     text_column: &str,
     scope: u8,
     term: Option<&str>,
     vector: Option<&[f32]>,
 ) -> Result<Vec<Value>, Error> {
-    let table = connect(root).await?.open_table(name).execute().await?;
+    let table = connect(a).await?.open_table(name).execute().await?;
     let base = table
         .query()
         .select(Select::Columns(vec!["id".into(), "revision".into()]))
@@ -904,7 +904,7 @@ pub(super) async fn query_current(
     {
         hits.extend(
             candidates(
-                &a.root,
+                a,
                 &family.table(id),
                 "body",
                 scope,
@@ -917,7 +917,7 @@ pub(super) async fn query_current(
     if family == Family::Text || base.vectors > 0 {
         hits.extend(
             candidates(
-                &a.root,
+                a,
                 &table_name(id, family == Family::Vector),
                 &base.text_layout.column(scope),
                 scope,
@@ -1038,7 +1038,7 @@ mod tests {
     use tokio::sync::Notify;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-    async fn delta_scope_filter_uses_bitmap_in_both_search_plans() -> Result<(), Error> {
+    async fn delta_queries_share_session_and_use_scoped_indexes() -> Result<(), Error> {
         let parent = std::env::temp_dir().join(format!(
             "akasha-scope-unit-{}-{}",
             std::process::id(),
@@ -1053,7 +1053,7 @@ mod tests {
             load::atomic_json(&parent.join("manifest.json"), &json!({"corpus":{"documents":1,"vectors":0,"prepared_bytes":raw.len(),"prepared_sha256":hash(raw),"indexed_body_utf8_bytes":8}}))?;
             load::run(&root, &parent.join("input.jsonl"), &parent.join("manifest.json"), false).await?;
             let a = Authority::open(&root)?;
-            let connection = connect(&root).await?;
+            let connection = connect(&a).await?;
             let mut plans = Vec::new();
             for family in [Family::Text, Family::Vector] {
                 let rows: Vec<_> = (0..8).map(|scope| (1_000_000+scope, load::Document {
@@ -1062,23 +1062,43 @@ mod tests {
                 })).collect();
                 let data = batch(&rows, family == Family::Vector, TextLayout::Legacy)?;
                 let table = connection.create_table(family.table(1), data).execute().await?;
-                refresh(&table, &a, family, 8, now_ms()?+60_000).await?;
+                let reader = connect(&a).await?.open_table(family.table(1)).execute().await?;
+                assert_eq!(reader.count_rows(None).await?, 8);
+                let writer_session = table.dataset().unwrap().get().await?.session();
+                let reader_session = reader.dataset().unwrap().get().await?.session();
+                let shared = Arc::ptr_eq(&writer_session, &reader_session);
+                let extra = batch(&[(1_000_008, load::Document {
+                    key: "fresh".into(), body: "fresh".into(), partition: "p7".into(),
+                    embedding: Some(vec![1.0;1536]),
+                })], family == Family::Vector, TextLayout::Legacy)?;
+                table.add(extra).write_parallelism(1).execute().await?;
+                refresh(&table, &a, family, 9, now_ms()?+60_000).await?;
+                let fresh = connect(&a).await?.open_table(family.table(1)).execute().await?;
+                assert_eq!(fresh.count_rows(None).await?, 9);
+                let fresh_hits = candidates(&a, &family.table(1), "body", 7,
+                    (family == Family::Text).then_some("fresh"),
+                    (family == Family::Vector).then_some(vec![1.0;1536]).as_deref()).await?;
+                assert!(fresh_hits.iter().any(|hit| hit["memory"] == 1_000_008));
                 let query = table.query().only_if("scope = 3").limit(20);
                 let plan = if family == Family::Text {
                     query.full_text_search(FullTextSearchQuery::new("astronomy".into()).with_column("body".into())?).explain_plan(false).await?
                 } else {
                     query.nearest_to(vec![1.0;1536])?.distance_type(lancedb::DistanceType::Cosine).explain_plan(false).await?
                 };
-                let hits = candidates(&root, &family.table(1), "body", 3,
+                let hits = candidates(&a, &family.table(1), "body", 3,
                     (family == Family::Text).then_some("astronomy"),
                     (family == Family::Vector).then_some(vec![1.0;1536]).as_deref()).await?;
-                plans.push((plan, hits));
+                plans.push((plan, hits, shared));
             }
             a.tree.close().await?;
             Ok::<_,Error>(plans)
         }.await;
         std::fs::remove_dir_all(&parent)?;
-        for (plan, hits) in outcome? {
+        for (plan, hits, shared) in outcome? {
+            assert!(
+                shared,
+                "connections for one authority must share the Lance cache and spill budget"
+            );
             assert!(
                 plan.contains("ScalarIndexQuery") && plan.contains("scope_bitmap(Bitmap)"),
                 "{plan}"

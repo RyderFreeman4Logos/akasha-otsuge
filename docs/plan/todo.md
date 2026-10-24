@@ -132,6 +132,13 @@ Completed, with the limits shown:
 
 Remaining acceptance, in execution order:
 
+- [x] Repair per-connection Lance cache-budget multiplication with one Session
+      owned by each authority. The native two-connection assertion fails before
+      the change, then passes with fresh rows/indexes visible after writes. All12
+      release units, release Clippy,179 lifecycle commands/12 SIGKILL barriers and
+      the160s/100-client corpus-concurrent fixture pass (4,528 requests; RSS
+      P99/max210,034,688/210,227,200B). Capacities and acceptance thresholds are
+      unchanged. Full-size resource/performance acceptance remains below.
 - [ ] Complete an uninterrupted full scoped build within the640MiB low peak and
       reopen interrupted builds directly at low budget. The prior vector merge
       OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.

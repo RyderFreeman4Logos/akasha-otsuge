@@ -613,3 +613,25 @@ self-review. No build/query memory behavior changes in this leaf. Next, share
 one Lance Session per authority so concurrent connections use one cache budget;
 verify that ownership and freshness before another full measurement. Fresh
 concurrent resource/performance acceptance and the backend decision remain open.
+
+### One cache budget across each authority's Lance connections
+
+[Shared-session diagnostics](results/fallback-shared-session/summary.json) change
+ownership of the existing16MiB index/8MiB metadata caches and64MiB spill cap.
+Previously every connection created an independent Session; the authority now
+owns one shared Session used by baseline build/backfill, queries, delta writes,
+pruning/retirement, activation and the workload oracle. Capacities, FTS/IVF
+parameters, deadlines and dependency versions stay unchanged.
+
+An actual two-connection dataset-session assertion fails before the repair.
+Afterwards it passes, and fresh connections observe appended rows and their
+indexes for both query families. All12 release units and release all-targets
+Clippy pass. The179-command native lifecycle fixture passes two owner-contention
+checks and12 SIGKILL barriers. The160s/100-client concurrent corpus fixture
+passes4,528 requests, all correctness/performance checks and ten evidence-tamper
+controls; RSS P99/max is210,034,688/210,227,200B. Exact processes, units, scratch
+and disposable fixtures are collected. Review is implementing-agent self-review.
+
+This repairs a demonstrated budget-ownership defect; it does not establish that
+the defect alone caused the full concurrent OOM. A fresh full generation and
+unchanged workload/resource thresholds remain required. #3 stays open.

@@ -134,6 +134,11 @@ Source-grounded controls to exercise:
   exposes per-worker `memory_limit_mb` and `num_workers`; vector training and
   shuffle still require their own budget/call-chain verification.
 
+Each authority now owns one Lance Session: its16MiB index cache,8MiB metadata
+cache and64MiB spill cap are shared by build, query and delta connections. The
+native regression verifies shared dataset-session identity and fresh rows/indexes
+after another connection writes. Aggregate RSS still requires full measurement.
+
 `--load INPUT MANIFEST` and `--resume-load INPUT MANIFEST` now consume the same
 bounded JSONL stream and manifest as the existing `spikes/helix/import_corpus.py`
 controller. The importer stores original record bytes, a unique source-key map

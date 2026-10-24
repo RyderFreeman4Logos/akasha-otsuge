@@ -362,17 +362,22 @@ async fn deadline(
     Ok(value)
 }
 
-async fn connect(root: &Path) -> Result<Connection, Error> {
+pub(crate) fn session() -> Result<Arc<Session>, Error> {
     let session = Session::new(16 * MIB, 8 * MIB, Arc::new(ObjectStoreRegistry::default()))
         .with_spill_store(Arc::new(lance_io::spill::LocalSpillStore::with_cap(
             (64 * MIB) as u64,
         )?));
+    Ok(Arc::new(session))
+}
+
+async fn connect(a: &Authority) -> Result<Connection, Error> {
     Ok(lancedb::connect(
-        root.join("derived")
+        a.root
+            .join("derived")
             .to_str()
             .ok_or("non-UTF8 derived path")?,
     )
-    .session(Arc::new(session))
+    .session(Arc::clone(&a.search_session))
     .execute()
     .await?)
 }
@@ -590,13 +595,12 @@ async fn append(
 }
 
 async fn backfill(
-    tree: &Tree,
-    root: &Path,
+    a: &Authority,
     state: &mut State,
     waves: u64,
     hold: Option<&str>,
-    settings: Settings,
 ) -> Result<(), Error> {
+    let (tree, root, settings) = (&a.tree, &a.root, a.settings);
     if !(1..=1_000_000).contains(&waves) {
         return Err("invalid wave count".into());
     }
@@ -608,7 +612,7 @@ async fn backfill(
     }) {
         return Err("invalid backfill checkpoint".into());
     }
-    let connection = connect(root).await?;
+    let connection = connect(a).await?;
     let started = Instant::now();
     let initial = state.cursor;
     let identity = start_ticks()?;
@@ -843,20 +847,15 @@ async fn index(
     Ok(())
 }
 
-async fn build(
-    tree: &Tree,
-    root: &Path,
-    state: &mut State,
-    settings: Settings,
-    fail_after_text: bool,
-) -> Result<(), Error> {
+async fn build(a: &Authority, state: &mut State, fail_after_text: bool) -> Result<(), Error> {
+    let (tree, root, settings) = (&a.tree, &a.root, a.settings);
     if state.cursor != state.documents
         || state.vector_rows != state.vectors
         || state.pending.is_some()
     {
         return Err("backfill is incomplete".into());
     }
-    let connection = connect(root).await?;
+    let connection = connect(a).await?;
     let context = BuildContext {
         root,
         settings,
@@ -968,7 +967,7 @@ async fn build(
 }
 
 async fn query(
-    root: &Path,
+    a: &Authority,
     state: &State,
     bundle: &Bundle,
     scope: u8,
@@ -990,7 +989,7 @@ async fn query(
     {
         return Err("invalid search request".into());
     }
-    let connection = connect(root).await?;
+    let connection = connect(a).await?;
     let table = connection
         .open_table(table_name(state.generation, vector.is_some()))
         .execute()
@@ -1028,7 +1027,7 @@ async fn build_generation(
 ) -> Result<Value, Error> {
     let mut value = state(&a.tree, generation)?;
     if value.ready {
-        build(&a.tree, &a.root, &mut value, a.settings, fail_after_text).await?;
+        build(a, &mut value, fail_after_text).await?;
     } else {
         if value.cursor != value.documents
             || value.vector_rows != value.vectors
@@ -1038,12 +1037,9 @@ async fn build_generation(
         }
         a.settings.check_disk(&a.root)?;
         let until = deadline(&a.tree, &mut value, a.settings, true).await?;
-        tokio::time::timeout(
-            remaining(until)?,
-            build(&a.tree, &a.root, &mut value, a.settings, fail_after_text),
-        )
-        .await
-        .map_err(|_| "original operation deadline expired")??;
+        tokio::time::timeout(remaining(until)?, build(a, &mut value, fail_after_text))
+            .await
+            .map_err(|_| "original operation deadline expired")??;
     }
     Ok(serde_json::to_value(value)?)
 }
@@ -1135,7 +1131,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
                 let until = deadline(tree, &mut value, settings, false).await?;
                 tokio::time::timeout(
                     remaining(until)?,
-                    backfill(tree, root, &mut value, waves, hold.as_deref(), settings),
+                    backfill(&a, &mut value, waves, hold.as_deref()),
                 )
                 .await
                 .map_err(|_| "original operation deadline expired")??;
@@ -1234,17 +1230,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
             scope,
             term,
             vector,
-        } => {
-            query(
-                root,
-                &state(tree, generation)?,
-                &bundle,
-                scope,
-                term,
-                vector,
-            )
-            .await?
-        }
+        } => query(&a, &state(tree, generation)?, &bundle, scope, term, vector).await?,
     };
     tree.close().await?;
     Ok(result)

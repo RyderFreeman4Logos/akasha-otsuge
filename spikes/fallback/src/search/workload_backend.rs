@@ -192,7 +192,7 @@ impl Authority {
                     .join(",")
             );
         }
-        let connection = connect(&self.root).await?;
+        let connection = connect(self).await?;
         let table = connection
             .open_table(format!("g{id}_delta_text"))
             .execute()
