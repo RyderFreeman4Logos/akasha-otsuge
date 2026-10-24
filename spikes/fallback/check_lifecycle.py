@@ -21,7 +21,7 @@ def main():
     (output/'OWNER').write_text('akasha-otsuge MVP-003 fallback lifecycle receipts\n')
     bundle = dict(model='text-embedding-3-large', dimension=1536, chunker='source-document-v1', schema=1,
         model_fingerprint='c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5')
-    steps = []
+    steps, snapshots, contenders = [], {}, []
     def add(channel, request, check=lambda _: True, *, error=None, kill=None, env=None):
         steps.append((channel, request, check, error, kill, env))
     def g(op, check=lambda _: True, generation=1, **fields):
@@ -44,6 +44,14 @@ def main():
             principal='reader',scope=int(rows[row]['partition'][1]),**clause,**extra)
     def has(memory, seq):
         return lambda r:any(h['memory']==memory and h['seq']==seq for h in r['hits'])
+    def prune(check=lambda _: True, generation=2, **fields):
+        g('prune_versions',check,generation=generation,
+            deadline_ms=fields.pop('deadline_ms',int(time.time()*1000)+600_000),**fields)
+    def remember(name):
+        def check(value):
+            snapshots[name]=value
+            return True
+        return check
     add('load',{})
     for scope in range(8):
         add('authority',dict(op='permission',principal='reader',scope=scope,allowed=True))
@@ -57,6 +65,9 @@ def main():
     apply(1,'text');apply(1,'vector',0)
     receipt(1,lambda r:r['stage']=='indexed' and r['watermarks']==dict(text=1,vector=1))
     g('activate');query(has(1,1));query(has(1,1),text=True)
+    prune(lambda r:sum(t['old_versions'] for t in r['tables'])>0,generation=1,
+          env=dict(AKASHA_SPIKE_DISK_RESERVE_BYTES=str(2**64-1)))
+    query(has(1,1));query(has(1,1),text=True)
     commit(2,2,1);commit(3,3,2)
     apply(3,'text',env=dict(LANCE_FTS_PARTITION_SIZE='2048'),error='incremental FTS requires')
     for family in ['text','vector']:apply(3,family,2 if family=='vector' else None)
@@ -71,6 +82,7 @@ def main():
     commit(6,1,0,5)
     apply(6,'text',hold='before-delta-append',kill='before-delta-append')
     apply(6,'text',hold='after-delta-append',kill='after-delta-append')
+    prune(generation=1,error='prune requires drained outbox')
     apply(6,'text',hold='after-index-application',kill='after-index-application')
     query(has(1,6),text=True)
     receipt(6,lambda r:r['stage']=='committed')
@@ -108,6 +120,28 @@ def main():
     g('catch_up',generation=2,waves=2)
     receipt(12,lambda r:r['watermarks']==dict(text=12,vector=12),generation=2)
     query(has(1,12),generation=2,text=True,min_commit_seq=12)
+    g('lifecycle_status',remember('lifecycle'),generation=2)
+    receipt(12,remember('receipt'),generation=2)
+    query(remember('text'),generation=2,text=True)
+    query(remember('vector'),generation=2,row=1)
+    for at in [1,5,6,12]:
+        add('authority',dict(op='get',memory=1,at=at),remember(f'history:{at}'))
+    prune(generation=1,error='prune requires the active ready generation')
+    prune(deadline_ms=0,error='original operation deadline expired')
+    prune(deadline_ms=2**64-1,error='prune deadline exceeds observation budget')
+    prune(hold='before-prune',kill='before-prune')
+    prune(hold='after-prune-table',kill='after-prune-table')
+    query(lambda r:r==snapshots['text'],generation=2,text=True)
+    query(lambda r:r==snapshots['vector'],generation=2,row=1)
+    prune(lambda r:sum(t['old_versions'] for t in r['tables'])>0
+          and all(t['failed_deletes']==0 for t in r['tables']))
+    prune(lambda r:all(t['old_versions']==t['bytes_removed']==t['failed_deletes']==0 for t in r['tables']))
+    g('lifecycle_status',lambda r:r==snapshots['lifecycle'],generation=2)
+    receipt(12,lambda r:r==snapshots['receipt'],generation=2)
+    query(lambda r:r==snapshots['text'],generation=2,text=True)
+    query(lambda r:r==snapshots['vector'],generation=2,row=1)
+    for at in [1,5,6,12]:
+        add('authority',dict(op='get',memory=1,at=at),lambda r,at=at:r==snapshots[f'history:{at}'])
     records, started = [], time.monotonic()
     with tempfile.TemporaryDirectory(prefix='akasha-fallback-lifecycle-') as temporary:
         root=pathlib.Path(temporary);database=root/'database';request=root/'request.json'
@@ -122,6 +156,7 @@ def main():
             command=[str(binary),str(database),*args]
             env=dict(os.environ,LANCE_FTS_NUM_SHARDS='1',LANCE_FTS_PARTITION_SIZE='32')
             env.update(overrides or {})
+            protected={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file()} if error and value.get('op')=='prune_versions' else None
             child=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env)
             identity,prefix=process_identity(child.pid),b''
             try:
@@ -134,11 +169,27 @@ def main():
                                 prefix+=os.read(child.stderr.fileno(),4096)
                                 if f'PROBE_CHECKPOINT:{kill}\n'.encode() in prefix:break
                         else:raise TimeoutError(kill)
+                    if kill=='before-prune':
+                        before={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file()}
+                        contender=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env)
+                        contender_identity=process_identity(contender.pid)
+                        try:
+                            other_out,other_err=contender.communicate(timeout=30)
+                        finally:
+                            if contender.poll() is None:contender.kill();contender.communicate(timeout=10)
+                        (output/'prune-contender.stdout').write_bytes(other_out)
+                        (output/'prune-contender.stderr').write_bytes(other_err)
+                        assert contender.returncode==1 and b'already locked by another process' in other_err
+                        assert process_identity(contender.pid) is None
+                        assert before=={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file()}
+                        contenders.append(dict(command=command,child=contender_identity,exit=contender.returncode,derived_unchanged=True))
                     assert process_identity(child.pid)['start_ticks']==identity['start_ticks'];child.kill()
                 stdout,stderr=child.communicate(timeout=180)
                 (output/(name+'.stdout')).write_bytes(stdout);(output/(name+'.stderr')).write_bytes(prefix+stderr)
                 assert child.returncode==(-9 if kill else 1 if error else 0),(name,stderr[-2000:])
                 if error:assert error.encode() in stderr,(name,stderr[-2000:])
+                if protected is not None:
+                    assert protected=={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file()}
                 if not error and not kill:assert check(json.loads(stdout)),(name,stdout)
                 if channel=='generation' and value == dict(op='apply', generation=1, family='text', seq=2, vector=None):
                     progress=json.loads((database/'g1_delta_text-body_fts-progress.json').read_text())
@@ -156,7 +207,7 @@ def main():
                 fts_environment={key:env[key] for key in ['LANCE_FTS_NUM_SHARDS','LANCE_FTS_PARTITION_SIZE']}))
             elapsed=time.monotonic()-started
             publish(output/'progress.json',dict(completed=len(records),total=len(steps),elapsed_s=elapsed,rate_per_s=len(records)/elapsed,eta_s=(len(steps)-len(records))*elapsed/len(records)))
-    publish(output/'result.json',dict(status='passed',records=records,checks=len(records),seconds=time.monotonic()-started,temporary_root_removed=not pathlib.Path(temporary).exists(),artifact_sha256={p.name:digest(p) for p in output.iterdir() if p.is_file()},not_proven=['full corpus','concurrent reindex workload','power loss']))
+    publish(output/'result.json',dict(status='passed',records=records,contenders=contenders,checks=len(records),seconds=time.monotonic()-started,temporary_root_removed=not pathlib.Path(temporary).exists(),artifact_sha256={p.name:digest(p) for p in output.iterdir() if p.is_file()},not_proven=['full corpus','concurrent reindex workload','power loss']))
     print(json.dumps(dict(status='passed',checks=len(records),seconds=time.monotonic()-started)))
 
 

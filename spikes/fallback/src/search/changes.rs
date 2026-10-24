@@ -509,6 +509,97 @@ pub(super) fn status(a: &Authority, id: u64) -> Result<Value, Error> {
         json!({"active":active,"committed":point(&tx)?,"text":applied(&tx,id,Family::Text)?,"vector":applied(&tx,id,Family::Vector)?}),
     )
 }
+
+pub(super) async fn prune_versions(
+    a: &Authority,
+    id: u64,
+    until: u64,
+    hold: Option<&str>,
+) -> Result<Value, Error> {
+    if hold.is_some_and(|v| !matches!(v, "before-prune" | "after-prune-table")) {
+        return Err("invalid prune checkpoint".into());
+    }
+    let base = state(&a.tree, id)?;
+    let before = status(a, id)?;
+    if !base.ready || before["active"] != id {
+        return Err("prune requires the active ready generation".into());
+    }
+    let tx = a.tree.begin_with_mode(Mode::ReadOnly)?;
+    let at = point(&tx)?;
+    let mut names = vec![(table_name(id, false), base.documents)];
+    if base.vectors > 0 {
+        names.push((table_name(id, true), base.vectors));
+    }
+    for family in [Family::Text, Family::Vector] {
+        let p = applied(&tx, id, family)?;
+        if p.pending.is_some() || p.watermark != at {
+            return Err("prune requires drained outbox".into());
+        }
+        if p.rows > 0 {
+            names.push((family.table(id), p.rows));
+        }
+    }
+    drop(tx);
+    let connection = connect(&a.root).await?;
+    let mut tables = Vec::new();
+    for (name, rows) in names {
+        let table = connection.open_table(name).execute().await?;
+        if table.count_rows(None).await? as u64 != rows {
+            return Err("prune row coverage mismatch".into());
+        }
+        let version = table.version().await?;
+        tables.push((table, version, rows));
+    }
+    let total = tables.len();
+    let started = Instant::now();
+    let ticks = start_ticks()?;
+    let progress = |reports: &[Value]| {
+        let elapsed = started.elapsed().as_secs_f64();
+        load::atomic_json(
+            &a.root.join(format!("generation-{id}-prune.json")),
+            &json!({"phase":"prune_versions","generation":id,"deadline_ms":until,
+                "pid":std::process::id(),"start_ticks":ticks,"completed":reports.len(),"total":total,
+                "elapsed_s":elapsed,"rate_per_s":reports.len() as f64/elapsed.max(0.001),
+                "eta_s":if reports.is_empty(){None}else{Some((total-reports.len()) as f64*elapsed/reports.len() as f64)},
+                "tables":reports}),
+        )
+    };
+    let mut reports = Vec::new();
+    progress(&reports)?;
+    checkpoint(hold, "before-prune").await;
+    for (table, version, rows) in tables {
+        remaining(until)?;
+        // This single-request CLI holds the native authority lock; no generation reader or writer can overlap.
+        let stats = table
+            .optimize(lancedb::table::OptimizeAction::Prune {
+                older_than: Some(lancedb::table::Duration::zero()),
+                delete_unverified: Some(true),
+                error_if_tagged_old_versions: Some(true),
+            })
+            .await?
+            .prune
+            .ok_or("missing native prune result")?;
+        let reopened = connection.open_table(table.name()).execute().await?;
+        if reopened.version().await? != version || reopened.count_rows(None).await? as u64 != rows {
+            return Err("prune changed the current table".into());
+        }
+        reports.push(json!({"table":table.name(),"version":version,"rows":rows,
+            "bytes_removed":stats.bytes_removed,"old_versions":stats.old_versions,
+            "data_files_removed":stats.data_files_removed,"transaction_files_removed":stats.transaction_files_removed,
+            "index_files_removed":stats.index_files_removed,"deletion_files_removed":stats.deletion_files_removed,
+            "failed_deletes":stats.failed_deletes}));
+        progress(&reports)?;
+        if stats.failed_deletes != 0 {
+            return Err("native prune left failed deletions".into());
+        }
+        checkpoint(hold, "after-prune-table").await;
+    }
+    if status(a, id)? != before {
+        return Err("prune changed authority or watermarks".into());
+    }
+    Ok(json!({"generation":id,"deadline_ms":until,"tables":reports,"lifecycle":before}))
+}
+
 pub(super) fn receipt(a: &Authority, id: u64, request: &str) -> Result<Value, Error> {
     let base = state(&a.tree, id)?;
     let receipt = a.stored_receipt(request)?;

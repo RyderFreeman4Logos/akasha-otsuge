@@ -6,6 +6,23 @@ full-data low-memory recovery. No production backend is selected.
 See the [decision](../../docs/benchmarks/storage-decision.md) and unchanged
 [acceptance contract](../../docs/benchmarks/storage-contract.md).
 
+`prune_versions` is an offline generation request with `generation` and a fixed
+absolute `deadline_ms`. It requires the active ready generation and a fully
+drained outbox before any cleanup. The single-request native process holds the
+SurrealKV exclusive authority lock, excluding generation readers and writers.
+It calls public LanceDB `OptimizeAction::Prune`, retains the current table
+versions, respects tagged-version errors and reports native removal counts.
+It changes no authority revisions, receipts, watermarks or active generation.
+The absolute deadline remains in the immutable controller request on resume;
+per-table checkpoints retain PID/start identity and measured progress. Pruning
+can reclaim space even below the ordinary write-admission floor.
+
+The [small native regression](../../docs/benchmarks/results/fallback-prune-versions/summary.json)
+passes133 commands plus a competing-owner check, including interruption before
+cleanup/after one table, query-before-resume, repeated cleanup and expired or
+oversized deadline refusal. Full-size pruning memory/physical reclamation and
+retirement of inactive generations remain unverified; this is not online GC.
+
 Generation/workload controllers set `MALLOC_MMAP_THRESHOLD_=131072` before
 starting the native process. On the measured GNU libc2.36 host this prevents
 large freed index buffers accumulating in allocator arenas; the observer records

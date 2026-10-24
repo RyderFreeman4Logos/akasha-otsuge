@@ -181,6 +181,11 @@ enum Request {
     LifecycleStatus {
         generation: u64,
     },
+    PruneVersions {
+        generation: u64,
+        deadline_ms: u64,
+        hold: Option<String>,
+    },
     QueryCurrent {
         generation: u64,
         bundle: Bundle,
@@ -1142,6 +1147,22 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
             request_id,
         } => changes::receipt(&a, generation, &request_id)?,
         Request::LifecycleStatus { generation } => changes::status(&a, generation)?,
+        Request::PruneVersions {
+            generation,
+            deadline_ms,
+            hold,
+        } => {
+            let budget = remaining(deadline_ms)?;
+            if budget > Duration::from_secs(settings.seconds) {
+                return Err("prune deadline exceeds observation budget".into());
+            }
+            tokio::time::timeout(
+                budget,
+                changes::prune_versions(&a, generation, deadline_ms, hold.as_deref()),
+            )
+            .await
+            .map_err(|_| "original operation deadline expired")??
+        }
         Request::QueryCurrent {
             generation,
             bundle,

@@ -132,6 +132,10 @@ Remaining acceptance, in execution order:
       shared by all generations, but45GB projected rebuild plus4GB scratch is
       not physical proof; a failed build retained6.15GB scratch before cleanup.
       Preserve30GiB headroom and read/idempotent-receipt availability at refusal.
+      Public offline derived-version pruning passes133 native commands, one
+      competing-owner refusal and eight total crash barriers; current/history/
+      receipts remain unchanged. Full-size reclamation and inactive-generation
+      retirement still need measured acceptance.
 - [ ] Reconcile the complete required crash/resource/config matrix against
       immutable receipts: commit/reply/index/watermark/activation barriers,
       authority and derived corruption, child failure/exhaustion, isolated disk

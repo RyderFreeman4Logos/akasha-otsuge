@@ -1,0 +1,38 @@
+{
+  "archive_bytes": 560106,
+  "archive_files": 366,
+  "archive_sha256": "c78d3242d632ddb96f756c77effd2dc6393103aec5cfb77b5372b063f9efd226",
+  "artifacts_verified": true,
+  "binary_sha256": "d25f0176bf46db9358d166c3fdb67e308b1a3a1b712c53f578d25c76bb4bfd17",
+  "checks": 133,
+  "contenders": 1,
+  "controller_units": 7,
+  "coverage": [
+    "public native cleanup only",
+    "active ready generation and fully drained outbox",
+    "native exclusive authority lock rejects competitor without derived changes",
+    "current queries, history, receipts and watermarks unchanged",
+    "SIGKILL before and after first table, query before continuation",
+    "repeated prune removes zero versions",
+    "expired/oversized deadline refusal before derived mutation",
+    "reclamation allowed below configured admission floor"
+  ],
+  "exact_children_gone": true,
+  "fixture_removed": true,
+  "kill_barriers": 8,
+  "not_proven": [
+    "full-size prune resource bounds",
+    "online prune",
+    "old-generation retirement",
+    "power loss"
+  ],
+  "red": "previous native rejects prune_versions after26 successful setup commands",
+  "release_all_targets_clippy": "passed",
+  "release_units": 11,
+  "rss_max_bytes": 124694528,
+  "scratch_removed": true,
+  "seconds": 4.013647769577801,
+  "source_parent": "78564c45b261e2c605e080f6e3d5b23ff678d906",
+  "status": "passed_small_fixture_only",
+  "unit_inactive": true
+}
