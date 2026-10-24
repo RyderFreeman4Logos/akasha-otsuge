@@ -1,6 +1,8 @@
 # Storage candidate decision record
 
-2026-10-23. MVP-003 remains open; no production backend is selected.
+Updated2026-10-24. MVP-003 remains open; no production backend is selected.
+The [evidence matrix](storage-evidence-matrix.md) distinguishes completed scope
+from the remaining full concurrent acceptance.
 
 ## Helix candidate: failed full-data low-memory recovery
 
@@ -635,3 +637,28 @@ and disposable fixtures are collected. Review is implementing-agent self-review.
 This repairs a demonstrated budget-ownership defect; it does not establish that
 the defect alone caused the full concurrent OOM. A fresh full generation and
 unchanged workload/resource thresholds remain required. #3 stays open.
+
+### Full generation4 preparation with bounded retained storage
+
+[Preparation evidence](results/fallback-full-generation4-preparation/summary.json)
+uses the shared-session native binary from78ceb79. Public retirement removes
+inactive generation2, then public pruning removes obsolete active3 versions.
+All66 before/after authority, history, receipt and scoped-query witnesses agree
+on content and candidate membership. One BM25 response changes the order of two
+adjacent candidates; raw order is preserved. The initial exact-order comparison
+failure is retained and no cause or stable-rank guarantee is inferred from it.
+The interface promises a candidate set, so the continuation compares query sets
+while keeping every other response field exact and reuses completed native work.
+
+Retired generation2 accounts for48,621,268,992 allocated bytes; filesystem free
+space increases48,113,942,528 bytes across cleanup. Inode allocation does not
+measure exclusive Btrfs extents, and filesystem free space includes other host
+activity. The same42 compressed source shards are reused; expanded input is
+streamed without retention. Four disposable236,393,752-byte native copies are
+removed after completed-controller reuse checks.
+
+Generation4 backfill completes all11,428,831 text rows and1,000,000 vectors in
+870.210s, with sampled RSS max158,670,848B and no OOM. It remains unbuilt, with
+no index deadline allocated. Generation3 stays active at committed269826.
+Exact process/unit exits and scratch cleanup verify. This preparation is not a
+full build or concurrent acceptance result.

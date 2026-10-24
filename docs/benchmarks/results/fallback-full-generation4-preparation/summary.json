@@ -1,0 +1,73 @@
+{
+  "active": 3,
+  "archive_bytes": 944931,
+  "archive_files": 513,
+  "archive_sha256": "cce53aeb2d59925136f80eaaf8e47d50a48b50735f90018c7d9dc8bd8a89ee34",
+  "committed": 269826,
+  "comparisons": "66 before and66 after witnesses; non-query responses exact; query candidate sets and all other fields exact; raw ranking order retained",
+  "disk_note": "Inode allocation is not exclusive Btrfs allocation; filesystem free-space delta includes other host activity.",
+  "disposable_copies_removed": true,
+  "free_bytes": 416885882880,
+  "free_bytes_delta_after_cleanup": 48113942528,
+  "generation": 4,
+  "native_sha256": "68e74e4ca3b31f96bb762fb5ce25ae7eaa145d3680c0f474adcfab37caeb832d",
+  "not_proven": [
+    "fresh uninterrupted full index build",
+    "full concurrent rebuild performance and resource acceptance",
+    "sole-backend selection"
+  ],
+  "operations": [
+    "retire_generation",
+    "prune_versions",
+    "begin_corpus",
+    "backfill"
+  ],
+  "query_order_changes": [
+    52
+  ],
+  "retained_failure": "Initial historical exact-order comparison failed at query52 before any mutation; same candidate membership with two adjacent results exchanged. Reuse all completed witnesses under the existing candidate_set_only contract; no cause or stable-rank guarantee inferred.",
+  "retired_generation2_allocated_bytes": 48621268992,
+  "source_commit": "78ceb796ad2174fd8ae5088fefe62bb41bf37c4e",
+  "status": "prepared_not_built",
+  "steps": {
+    "backfill": {
+      "artifacts_verified": true,
+      "elapsed_s": 870.2104562474415,
+      "exact_processes_gone": true,
+      "oom_events": 0,
+      "rss_max_bytes": 158670848,
+      "scratch_removed": true,
+      "unit_state": "inactive"
+    },
+    "begin_corpus": {
+      "artifacts_verified": true,
+      "elapsed_s": 2.003586887381971,
+      "exact_processes_gone": true,
+      "oom_events": 0,
+      "rss_max_bytes": 24346624,
+      "scratch_removed": true,
+      "unit_state": "inactive"
+    },
+    "prune_versions": {
+      "artifacts_verified": true,
+      "elapsed_s": 32.522859854623675,
+      "exact_processes_gone": true,
+      "oom_events": 0,
+      "rss_max_bytes": 65978368,
+      "scratch_removed": true,
+      "unit_state": "inactive"
+    },
+    "retire_generation": {
+      "artifacts_verified": true,
+      "elapsed_s": 65.12075500842184,
+      "exact_processes_gone": true,
+      "oom_events": 0,
+      "rss_max_bytes": 32358400,
+      "scratch_removed": true,
+      "unit_state": "inactive"
+    }
+  },
+  "witnesses_after": 66,
+  "witnesses_before": 66,
+  "witnesses_match_except_query_order": true
+}

@@ -139,6 +139,15 @@ Remaining acceptance, in execution order:
       the160s/100-client corpus-concurrent fixture pass (4,528 requests; RSS
       P99/max210,034,688/210,227,200B). Capacities and acceptance thresholds are
       unchanged. Full-size resource/performance acceptance remains below.
+- [x] Prepare full generation4 with the shared-session candidate after public
+      retirement of inactive2 and pruning of active3. All66 before/after witnesses
+      preserve authority/history/receipts and query candidate sets; one BM25
+      result changes order only, with the initial exact-order failure retained.
+      Filesystem free space increases48,113,942,528B across cleanup. Backfill
+      covers11,428,831 texts/1,000,000 vectors in870.210s, RSS max158,670,848B,
+      no OOM. All four disposable native copies are retired after completed reuse
+      and exact process/unit/scratch checks. Generation4 is unbuilt; active3 and
+      committed269826 remain unchanged. No concurrent-build pass is inferred.
 - [ ] Complete an uninterrupted full scoped build within the640MiB low peak and
       reopen interrupted builds directly at low budget. The prior vector merge
       OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.
