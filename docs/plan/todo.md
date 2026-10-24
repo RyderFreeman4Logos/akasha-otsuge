@@ -103,7 +103,13 @@ Remaining acceptance, in execution order:
       replacements,8,286,832 repeated tokenizations and467,116 progress events.
       Incremental delta FTS now passes104 lifecycle commands and the1,698-request
       concurrent fixture: only the new document is tokenized, and an incorrect
-      FTS budget is refused/recoverable. Full-data performance must be remeasured.
+      FTS budget is refused/recoverable. The full60s incremental diagnosis passes,
+      but the subsequent1800s low run fails: BM25 0.638889/s and ANN0.2/s;
+      both search P95 values exceed60s. RSS P99/max441,647,104/452,685,824B,
+      zero operation errors and15.167s drain pass. Only21,854 new documents are
+      tokenized across9,480 updates. Per-search service-time estimates rise from
+      0.85s to1.77s across successive five-minute windows; directly measure delta
+      fragment/manifest and query stages before changing concurrency again.
 - [ ] Complete an uninterrupted full scoped build within the640MiB low peak and
       reopen interrupted builds directly at low budget. The prior vector merge
       OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.
@@ -120,6 +126,11 @@ Remaining acceptance, in execution order:
       permission checks. Ordinary current/history bodies and scoped filtering
       have full mixed-workload coverage, but its synthetic corrections do not
       mutate the actual search candidates; permissions stay fixed in that case.
+      The new resumable native driver passes16 small-fixture cases,64 commits,
+      756 native commands, a SIGKILL after durable commit, unchanged completed
+      reuse and seven forged-entry controls. Its serial checks cover correction,
+      rescope, retract, restoration and permission revoke/restore; they do not
+      prove simultaneous query/build execution or full-data behavior.
 - [ ] Verify full generation-specific indexed receipts and gap-free watermarks
       across concurrent rebuild, activation and failure. Existing full backlog
       and mixed-workload watermarks pass; reindex overlap remains distinct.

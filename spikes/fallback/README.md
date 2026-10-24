@@ -299,6 +299,17 @@ controllers supply them and the observer records them; direct probe callers must
 also supply them. A mismatched budget refuses the index operation and leaves its
 original pending wave recoverable with the correct settings.
 
+`check_corpus_lifecycle.py BINARY DATABASE FIXTURE OUTPUT --generation N`
+selects returned corpus candidates and checks correction, rescoping, retraction,
+restoration, historical bodies and live permission changes. Run it through
+`measure.py` in a dedicated640MiB/swap=0 service with the startup settings above
+and `MALLOC_MMAP_THRESHOLD_=131072`. Use `--exclude-fixture` to protect the frozen
+mixed-workload population and `--resume` only after the previous owner exits.
+Resume verifies source/reply hashes and uses stable idempotency keys for interrupted
+steps; completed reuse makes no native calls. The small fixture covers a killed
+commit/reply boundary and tamper refusals. These are serial checks; simultaneous
+query/build behavior uses the separate workload controller.
+
 The 103-command native fixture covers six process-crash boundaries, out-of-order
 completion/gaps, source validation, retraction/supersession/text-only behavior,
 failed build/old reads, activation/model isolation and revocation. Five release

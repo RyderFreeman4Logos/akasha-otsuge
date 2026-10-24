@@ -357,4 +357,44 @@ fixture covers six SIGKILL barriers and rejection/recovery of an incorrect FTS
 budget; the same-authority workload again passes1,698 requests. Ten release units,
 release all-targets Clippy and six controller tests pass. Child launch explicitly
 supplies one FTS worker and32MiB because Lance omits build-time limits from stored
-index metadata. Full-data performance after this change remains unmeasured.
+index metadata. Full-data measurements follow below.
+
+[The subsequent full cold60s diagnosis](results/fallback-full-incremental-text-r1/summary.json)
+passes all1,698 requests and unchanged short-run thresholds. BM25 achieves1.2/s
+with P95 1.474s; ANN achieves0.25/s with P95 1.603s. RSS P99/max is367,230,976B,
+and both watermarks reach148183 with0.044s drain. The observer verifies56,261
+owned files have no resident pages after eviction. Delta FTS now tokenizes775
+new documents across592 updates, taking4.776s aggregate in tokenization stages.
+This short result does not establish sustained performance.
+
+[The subsequent1800s low run](results/fallback-full-sustained-low-r2/summary.json)
+fails sustained search performance after1,818.988s: BM25 achieves0.638889/s and
+ANN0.2/s. Both histogram P95 values exceed60s; raw scheduled-latency P95 is
+764.259s for BM25 and315.032s for ANN. These include scheduling debt before
+native admission. All49,856 recorded operations have zero errors, current-content
+and scoped oracles pass, RSS P99/max is441,647,104/452,685,824B with no OOM,
+and both watermarks reach182001 with15.167s drain. Delta tokenization falls to
+21,854 new documents across9,480 updates and97.313s of tokenizer stages.
+An inference from request completion/scheduling times estimates search service
+cost rising from0.85s to1.77s across successive five-minute windows. This includes
+admission overhead and is not direct phase timing; inspect growing fragment and
+metadata work before raising search concurrency. High, burst and overload remain
+unrun. All exact processes, units, scratch removal and archived hashes are checked.
+
+### Actual corpus-candidate lifecycle driver
+
+[The small native fixture](results/fallback-corpus-lifecycle/summary.json) passes
+16 cases across eight scopes and both search modes,64 logical revisions and756
+native commands. It corrects, rescopes, retracts and restores real returned
+candidates, checks stale-hit rejection and exact current/history bodies, restores
+original vectors, and revokes/restores live permissions. A SIGKILL after a durable
+commit but before reply-cache publication resumes with the identical receipt and
+no duplicate revision. Completed reuse leaves all case files unchanged; changed
+fixture/reply bytes and seven forged current-entry fields are rejected.
+
+The initial collector incorrectly expected a `reused` field, and its first
+continuation lacked an import path. Both failures are retained separately; the
+continuation verifies the existing native result and runs only remaining controls.
+All ten observer services and native children exit, and the owned fixture is
+removed. This serial driver establishes neither full-data behavior nor simultaneous
+query/build scheduling. No production code changed in this driver leaf.
