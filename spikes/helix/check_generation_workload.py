@@ -12,14 +12,17 @@ import tempfile
 import time
 import uuid
 
-from run_case import digest, process_identity, publish
+from run_case import digest, process_identity, publish, verify_requests
 
 
 def main():
     binary, source = [pathlib.Path(p).resolve(strict=True) for p in sys.argv[1:3]]
     output = pathlib.Path(sys.argv[3]).resolve()
-    backend = sys.argv[4] if len(sys.argv) == 5 else 'helix'
-    assert backend in {'helix', 'fallback'} and len(sys.argv) in {4, 5}
+    backend = sys.argv[4] if len(sys.argv) >= 5 else 'helix'
+    rebuild = len(sys.argv) == 6
+    assert backend in {'helix', 'fallback'} and len(sys.argv) in {4, 5, 6}
+    assert not rebuild or (backend == 'fallback' and sys.argv[5] == '--rebuild')
+    total = 11 if rebuild else 9
     output.mkdir(mode=0o700)
     (output / 'OWNER').write_text('akasha-otsuge MVP-003 generation workload receipts\n')
     assert source.stat().st_size < 4 * 1024**2
@@ -54,7 +57,7 @@ def main():
             command[position:position] = ['-p', 'LimitNOFILE=8192', '-p', 'Environment=LANCE_CPU_THREADS=2',
                 '-p', 'Environment=LANCE_DEFAULT_IO_BUFFER_SIZE=16777216', '-p', 'Environment=LANCE_SHUFFLE_BATCH_BYTES=16777216',
                 '-p', 'Environment=LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES=0']
-        publish(output / 'progress.json', dict(phase=name, completed=len(records), total=9, elapsed_s=time.monotonic()-started, child_progress=str(database / 'generation-1-catch-up.json')))
+        publish(output / 'progress.json', dict(phase=name, completed=len(records), total=total, elapsed_s=time.monotonic()-started, child_progress=str(database / 'generation-1-catch-up.json')))
         with (output / (name+'.log')).open('x') as log:
             terminal = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT)
         record = dict(name=name, command=command, exit=terminal.returncode)
@@ -81,6 +84,10 @@ def main():
             assert caught['text'] == caught['vector'] == 4096 and caught['remaining'] == 0
         request('activate', dict(op='activate', generation=1))
         invoke('verify-text', ['--oracle-verify-text', '4096'])
+        if rebuild:
+            request('begin-next', dict(op='begin_corpus', generation=2, bundle={**bundle, 'schema': 2}, manifest=str(manifest)))
+            request('backfill-next', dict(op='backfill', generation=2, waves=2))
+        rebuild_setting = 'rebuild_generation = 2\n' if rebuild else ''
         config = output / 'case.toml'
         config.write_text(f'''[run]
 id = "generation-work-{uuid.uuid4().hex[:12]}"
@@ -89,7 +96,7 @@ phase = "steady"
 seconds = 60
 diagnostic = true
 generation = 1
-[paths]
+{rebuild_setting}[paths]
 binary = {json.dumps(str(binary))}
 database = {json.dumps(str(database))}
 fixture = {json.dumps(str(fixture))}
@@ -113,8 +120,44 @@ max_attempts = 1
         assert oracle['search_checks']['ann'] > 0
         derived = state['result']['engine']['snapshot']['derived']
         assert derived['remaining'] == 0 and derived['text'] == derived['vector'] == derived['committed']
-        publish(output / 'result.json', dict(status='passed_diagnostic_only', binary_sha256=admission['binary_sha256'], commands=records, case=state['result'], seconds=time.monotonic()-started, not_tested=['full scale', '30-minute profiles', 'concurrent rebuild', 'corpus corrections']))
-        publish(output / 'progress.json', dict(phase='completed', completed=9, total=9, elapsed_s=time.monotonic()-started, eta_s=0))
+        rebuild_controls = []
+        if rebuild:
+            path = output / 'case/runtime/rebuild.json'
+            original = path.read_bytes()
+            report = json.loads(original)
+            assert report['status'] == 'passed' and report['ready']
+            for patch in [dict(generation=1), dict(active_generation=2), dict(ready=False),
+                          dict(start_seq=report['end_seq']), dict(end_seq=report['start_seq']),
+                          dict(start_seq=0), dict(status='failed', error='')]:
+                try:
+                    path.write_text(json.dumps({**report, **patch}))
+                    try:
+                        verify_requests(output / 'case')
+                    except ValueError as error:
+                        rebuild_controls.append(dict(mutation=patch, rejection=str(error)))
+                    else:
+                        raise AssertionError(('rebuild evidence mutation accepted', patch))
+                finally:
+                    path.write_bytes(original)
+            assert digest(path) == state['result']['artifact_sha256']['runtime/rebuild.json']
+            requests = output / 'case/runtime/requests.jsonl'
+            original_requests = requests.read_bytes()
+            try:
+                rows = [json.loads(line) for line in original_requests.splitlines()]
+                wrong = next(row for row in rows if row['status'] == 'success' and row['operation'] in {'bm25', 'ann'})
+                wrong['receipt']['validation']['generation'] = 2
+                requests.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+                try:
+                    verify_requests(output / 'case')
+                except ValueError as error:
+                    rebuild_controls.append(dict(mutation='search claims candidate generation', rejection=str(error)))
+                else:
+                    raise AssertionError('foreign-generation search receipt accepted')
+            finally:
+                requests.write_bytes(original_requests)
+            assert digest(requests) == state['result']['artifact_sha256']['runtime/requests.jsonl']
+        publish(output / 'result.json', dict(status='passed_diagnostic_only', binary_sha256=admission['binary_sha256'], commands=records, case=state['result'], rebuild_controls=rebuild_controls, seconds=time.monotonic()-started, not_tested=['full scale', '30-minute profiles', 'corpus corrections'] + ([] if rebuild else ['concurrent rebuild'])))
+        publish(output / 'progress.json', dict(phase='completed', completed=total, total=total, elapsed_s=time.monotonic()-started, eta_s=0))
         print(json.dumps(dict(status='passed', seconds=time.monotonic()-started)))
     finally:
         states = [subprocess.run(['systemctl', '--user', 'show', unit, '-p', 'ActiveState', '--value'], check=True, capture_output=True, text=True).stdout.strip() for unit in units]

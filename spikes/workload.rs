@@ -37,6 +37,7 @@ struct Config {
     corpus_manifest: Option<PathBuf>,
     diagnostic: bool,
     generation: Option<u64>,
+    rebuild_generation: Option<u64>,
 }
 
 struct Tally {
@@ -453,6 +454,12 @@ pub async fn run(root: PathBuf, request: &Path) -> Result<(), Error> {
     {
         return Err("invalid workload identity, phase or duration".into());
     }
+    if config
+        .rebuild_generation
+        .is_some_and(|id| id == 0 || config.generation.is_none() || config.generation == Some(id))
+    {
+        return Err("rebuild must target a different positive generation".into());
+    }
     let (fixture, fixture_hash) = search::load(&config.fixture)?;
     if fixture
         .queries
@@ -470,8 +477,39 @@ pub async fn run(root: PathBuf, request: &Path) -> Result<(), Error> {
         "resume":"completed units are reusable only by the outer controller; an interrupted unit requires explicit abandonment"}),
     )?;
     let authority = Arc::new(Authority::work_open(root, corpus).await?);
-    let outcome = run_open(authority.clone(), config, fixture).await;
+    let target = config.rebuild_generation;
+    let active = config.generation;
+    let output = config.output.clone();
+    let (ready, started) = tokio::sync::oneshot::channel();
+    let rebuilding = async {
+        if let Some(id) = target {
+            started
+                .await
+                .map_err(|_| "workload failed before rebuild admission")?;
+            let result = match Box::pin(
+                authority.work_rebuild(id, active.ok_or("missing active generation")?),
+            )
+            .await
+            {
+                Ok(result) => result,
+                Err(error) => {
+                    json!({"status":"failed","generation":id,"active_generation":active,"error":error.to_string()})
+                }
+            };
+            atomic_json(&output.join("rebuild.json"), &result)?;
+            if result["status"] != "passed" {
+                return Err(format!("concurrent rebuild failed: {result}").into());
+            }
+        }
+        Ok::<_, Error>(())
+    };
+    // Both operations finish before closing their shared authority, even on error.
+    let (outcome, rebuilt) = tokio::join!(
+        run_open(authority.clone(), config, fixture, ready),
+        rebuilding
+    );
     authority.work_close().await?;
+    rebuilt?;
     println!("{}", outcome?);
     Ok(())
 }
@@ -532,6 +570,7 @@ async fn run_open(
     authority: Arc<Authority>,
     config: Config,
     fixture: search::Fixture,
+    ready: tokio::sync::oneshot::Sender<()>,
 ) -> Result<Value, Error> {
     let bundle = if let Some(id) = config.generation {
         Some(
@@ -621,6 +660,7 @@ async fn run_open(
     for id in 0..100 {
         tasks.spawn(client(shared.clone(), id));
     }
+    let _ = ready.send(());
     let mut tick = tokio::time::interval(Duration::from_secs(1));
     let mut failures = Vec::new();
     let indexing_done = Arc::new(std::sync::atomic::AtomicBool::new(false));
@@ -787,12 +827,15 @@ mod tests {
             corpus_manifest: Some(path.clone()),
             diagnostic: false,
             generation: Some(1),
+            rebuild_generation: None,
         };
         let first = corpus_admission(&config, &fixture);
         config.generation = Some(2);
         let next = corpus_admission(&config, &fixture);
+        config.generation = Some(3);
+        let third = corpus_admission(&config, &fixture);
         std::fs::remove_file(path).unwrap();
-        for result in [first, next] {
+        for result in [first, next, third] {
             assert_eq!(
                 result.unwrap().unwrap().1,
                 30 * 1024u64.pow(3) + 49_000_000_000

@@ -72,8 +72,8 @@ class CorpusCurrentOracle(unittest.TestCase):
             hits = [dict(memory=query['memory'], seq=0, partition='p3', key=query['key'])]
             search = dict(client=80, ordinal=0, operation='bm25', status='success', receipt=dict(
                 query_index=0, query_key=query['key'], partition='p3', hits=hits,
-                validation=dict(read_seq=50, validated_at_seq=50, hits=hits, permission_revision=1)))
-            for case in ['ann_text', 'index', 'key', 'scope', 'empty', 'unvalidated', 'future']:
+                validation=dict(generation=1, read_seq=50, validated_at_seq=50, hits=hits, permission_revision=1)))
+            for case in ['ann_text', 'index', 'key', 'scope', 'empty', 'unvalidated', 'future', 'generation', 'missing_generation']:
                 changed = copy.deepcopy(search)
                 if case == 'ann_text':changed['operation'] = 'ann'
                 if case == 'index':changed['receipt']['query_index'] = 1
@@ -82,6 +82,8 @@ class CorpusCurrentOracle(unittest.TestCase):
                 if case == 'empty':changed['receipt']['hits'] = []
                 if case == 'unvalidated':changed['receipt']['validation']['hits'] = []
                 if case == 'future':changed['receipt']['validation']['validated_at_seq'] = 51
+                if case == 'generation':changed['receipt']['validation']['generation'] = 2
+                if case == 'missing_generation':del changed['receipt']['validation']['generation']
                 requests.write_text(json.dumps(row)+'\n'+json.dumps(changed)+'\n')
                 with self.subTest(search=case), self.assertRaises(ValueError):
                     verify_requests(root)

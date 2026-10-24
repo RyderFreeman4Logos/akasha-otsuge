@@ -990,6 +990,33 @@ async fn query(
     Ok(json!({"generation":state.generation,"ids":ids,"corpus_baseline_only":true}))
 }
 
+async fn build_generation(
+    a: &Authority,
+    generation: u64,
+    fail_after_text: bool,
+) -> Result<Value, Error> {
+    let mut value = state(&a.tree, generation)?;
+    if value.ready {
+        build(&a.tree, &a.root, &mut value, a.settings, fail_after_text).await?;
+    } else {
+        if value.cursor != value.documents
+            || value.vector_rows != value.vectors
+            || value.pending.is_some()
+        {
+            return Err("backfill is incomplete".into());
+        }
+        a.settings.check_disk(&a.root)?;
+        let until = deadline(&a.tree, &mut value, a.settings, true).await?;
+        tokio::time::timeout(
+            remaining(until)?,
+            build(&a.tree, &a.root, &mut value, a.settings, fail_after_text),
+        )
+        .await
+        .map_err(|_| "original operation deadline expired")??;
+    }
+    Ok(serde_json::to_value(value)?)
+}
+
 pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
     let mut bytes = Vec::new();
     File::open(path)?
@@ -1086,28 +1113,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
         Request::Build {
             generation,
             fail_after_text,
-        } => {
-            let mut value = state(tree, generation)?;
-            if value.ready {
-                build(tree, root, &mut value, settings, fail_after_text).await?;
-            } else {
-                if value.cursor != value.documents
-                    || value.vector_rows != value.vectors
-                    || value.pending.is_some()
-                {
-                    return Err("backfill is incomplete".into());
-                }
-                settings.check_disk(root)?;
-                let until = deadline(tree, &mut value, settings, true).await?;
-                tokio::time::timeout(
-                    remaining(until)?,
-                    build(tree, root, &mut value, settings, fail_after_text),
-                )
-                .await
-                .map_err(|_| "original operation deadline expired")??;
-            }
-            serde_json::to_value(value)?
-        }
+        } => build_generation(&a, generation, fail_after_text).await?,
         Request::Apply {
             generation,
             family,

@@ -20,6 +20,10 @@ def digest(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def generation_id(value):
+    return type(value) is int and 1 <= value <= 2**64 - 1
+
+
 def publish(path, value):
     temporary = path.with_suffix(".tmp")
     with temporary.open("w") as stream:
@@ -68,6 +72,7 @@ def verify_requests(directory):
     corpus_points = []
     corpus_memories, corpus_partitions = set(), {}
     search_points, search_checks = [], dict(bm25=0, ann=0)
+    search_intervals = []
     text_current, text_bm25 = [], []
     with (directory / "runtime/requests.jsonl").open() as source:
         for line in source:
@@ -111,12 +116,14 @@ def verify_requests(directory):
                         or (row['operation'] == 'ann' and query.get('text_only'))
                         or not isinstance(hits, list) or not 1 <= len(hits) <= 20
                         or validation.get('hits') != hits or validation.get('permission_revision') != 1
+                        or (request.get('generation') is not None and validation.get('generation') != request['generation'])
                         or type(read) is not int or type(validated) is not int or not 0 <= read <= validated
                         or any(hit.get('partition') != query['partition'] or type(hit.get('memory')) is not int
                                or not 0 <= hit['memory'] <= 2**63-1
                                or (hit.get('seq') is not None and (type(hit['seq']) is not int or not 0 <= hit['seq'] <= validated)) for hit in hits)):
                     raise ValueError('search receipt differs from pinned query or validated candidates')
                 search_points.append(validated)
+                search_intervals.append((row['operation'], read, validated))
                 search_checks[row['operation']] += 1
                 if query.get('text_only'):
                     text_bm25.append(query['partition'])
@@ -148,12 +155,31 @@ def verify_requests(directory):
                 or derived.get("vectors") != [] or derived.get("text") != expected_text):
             raise ValueError("derived generation differs from acknowledged source revisions")
         derived_checks = len(expected_text)
+    rebuild_overlap = None
+    if target := request.get('rebuild_generation'):
+        rebuild = json.loads((directory / 'runtime/rebuild.json').read_text())
+        if (rebuild.get('generation') != target or rebuild.get('active_generation') != request.get('generation')
+                or rebuild.get('status') not in {'passed', 'failed'}):
+            raise ValueError('rebuild identity differs from admission')
+        if rebuild['status'] == 'passed' and (rebuild.get('ready') is not True
+                or type(rebuild.get('start_seq')) is not int or type(rebuild.get('end_seq')) is not int
+                or not max(row['seq'] for row in baseline['heads']) <= rebuild['start_seq'] < rebuild['end_seq'] <= max(sequences)):
+            raise ValueError('rebuild lacks ordinary commits under the unchanged active generation')
+        if rebuild['status'] == 'failed' and (not isinstance(rebuild.get('error'), str) or not rebuild['error']):
+            raise ValueError('rebuild failure has no error evidence')
+        if rebuild['status'] == 'passed':
+            rebuild_overlap = {kind: sum(rebuild['start_seq'] < read <= validated < rebuild['end_seq']
+                                        for op, read, validated in search_intervals if op == kind)
+                               for kind in search_checks}
+            if not request['diagnostic'] and not all(rebuild_overlap.values()):
+                raise ValueError('full rebuild has no completed old-generation BM25/ANN overlap')
     return {"requests": records, "current_checks": current_checks, "corpus_current_checks": len(corpus_points),
             "corpus_current_distinct": len(corpus_memories), "corpus_current_partitions": corpus_partitions,
             "text_only_current_checks": len(text_current), "text_only_bm25_checks": len(text_bm25),
             "text_only_current_partitions": sorted(set(text_current)), "text_only_bm25_partitions": sorted(set(text_bm25)),
             "search_checks": search_checks,
-            "distinct_commits": len(sequences), "derived_current_checks": derived_checks}
+            "distinct_commits": len(sequences), "derived_current_checks": derived_checks,
+            "rebuild_search_overlap": rebuild_overlap}
 
 
 def summarize(directory, profile, binary_sha256):
@@ -176,9 +202,11 @@ def summarize(directory, profile, binary_sha256):
     p99 = rss[(99 * len(rss) + 99) // 100 - 1] if rss else None
     maximum = max(rss) if rss else None
     memory_ok = bool(rss) and p99 <= (512 if profile == "low" else 2048) * 1024**2 and maximum <= (640 if profile == "low" else 2048) * 1024**2
-    status = "passed" if exits[0]["code"] == 0 and result["status"] == "passed" and memory_ok else "failed"
+    rebuild = (json.loads((directory / 'runtime/rebuild.json').read_text())
+               if json.loads((directory / 'request.json').read_text()).get('rebuild_generation') else None)
+    status = "passed" if exits[0]["code"] == 0 and result["status"] == "passed" and memory_ok and (rebuild is None or rebuild['status'] == 'passed') else "failed"
     paths = ["request.json", "memory.jsonl", "engine.log"]
-    paths += [name for name in ["runtime/result.json", "runtime/requests.jsonl", "runtime/metrics.jsonl", "runtime/admission.json", "runtime/baseline.json", "runtime/derived-oracle.json"] if (directory / name).exists()]
+    paths += [name for name in ["runtime/result.json", "runtime/requests.jsonl", "runtime/metrics.jsonl", "runtime/admission.json", "runtime/baseline.json", "runtime/derived-oracle.json", "runtime/rebuild.json"] if (directory / name).exists()]
     cold = None
     if json.loads((directory / 'state.json').read_text())['identity']['config']['run'].get('cold_cache'):
         cold = json.loads((directory / 'cold-cache.json').read_text())
@@ -188,7 +216,7 @@ def summarize(directory, profile, binary_sha256):
         cold = {key: value for key, value in cold.items() if key != 'rows'}
     return {"status": status, "effects": "measured" if runtime.exists() else "unknown", "content_oracle": oracle, "engine": result, "exit": exits[0], "rss_p99_bytes": p99,
             "rss_max_bytes": maximum, "memory_thresholds_passed": memory_ok,
-            "cold_cache": cold,
+            "cold_cache": cold, "rebuild": rebuild,
             "artifact_sha256": {name: digest(directory / name) for name in paths}}
 
 
@@ -204,7 +232,7 @@ def main():
     if set(config) - {"disk"} != {"run", "paths", "reliability"} or config["reliability"] != {"max_attempts": 1}:
         raise ValueError("case has no network retries; exactly one measured attempt is required")
     run, paths = config["run"], config["paths"]
-    if set(run) - {"generation", "cold_cache"} != {"id", "profile", "phase", "seconds", "diagnostic"} or set(paths) != {"binary", "database", "fixture", "output", "corpus_manifest"}:
+    if set(run) - {"generation", "rebuild_generation", "cold_cache"} != {"id", "profile", "phase", "seconds", "diagnostic"} or set(paths) != {"binary", "database", "fixture", "output", "corpus_manifest"}:
         raise ValueError("unknown or missing case setting")
     if run["profile"] not in {"low", "high"} or run["phase"] not in {"steady", "burst", "overload"}:
         raise ValueError("unknown profile or phase")
@@ -214,8 +242,11 @@ def main():
         raise ValueError("diagnostic must be a boolean")
     if type(run.get('cold_cache', False)) is not bool:
         raise ValueError('cold_cache must be a boolean')
-    if "generation" in run and (type(run["generation"]) is not int or run["generation"] not in {1, 2}):
+    if "generation" in run and not generation_id(run["generation"]):
         raise ValueError("generation must be an explicit retained identity")
+    if 'rebuild_generation' in run and (not generation_id(run['rebuild_generation'])
+            or 'generation' not in run or run['rebuild_generation'] == run['generation']):
+        raise ValueError('rebuild must target a different positive generation')
     disk = config.get("disk")
     minimum = 30 * 1024**3 + 4_000_000_000 + (45_000_000_000 if not run["diagnostic"] and run.get("generation") is not None else 0)
     if (not run["diagnostic"] and disk is None) or (disk is not None and (
@@ -308,6 +339,8 @@ def main():
                    "output": str(directory / "runtime")}
         if "generation" in run:
             request["generation"] = run["generation"]
+        if 'rebuild_generation' in run:
+            request['rebuild_generation'] = run['rebuild_generation']
         publish(directory / "request.json", request)
         if run.get('cold_cache'):
             sys.path.insert(0, str(observer.parent))
@@ -315,11 +348,11 @@ def main():
             prepare(root, directory, owner_lock)
         limit = (640 if run["profile"] == "low" else 2048) * 1024**2
         command = ["systemd-run", "--user", "--wait", "--pipe", "--collect", "--unit=" + state["unit"],
-                   "-p", f"MemoryMax={limit}", "-p", "MemorySwapMax=0", "-p", f"RuntimeMaxSec={run['seconds'] + 900}",
+                   "-p", f"MemoryMax={limit}", "-p", "MemorySwapMax=0", "-p", f"RuntimeMaxSec={max(run['seconds'], 7200 if 'rebuild_generation' in run else 0) + 900}",
                    "-p", "Environment=AKASHA_SPIKE_PROFILE=" + run["profile"],
                    "-p", "LimitNOFILE=8192",
                    "-p", "Environment=MALLOC_MMAP_THRESHOLD_=131072",
-                   "-p", "Environment=LANCE_CPU_THREADS=2",
+                   "-p", f"Environment=LANCE_CPU_THREADS={1 if 'rebuild_generation' in run else 2}",
                    "-p", "Environment=LANCE_DEFAULT_IO_BUFFER_SIZE=16777216",
                    "-p", "Environment=LANCE_SHUFFLE_BATCH_BYTES=16777216",
                    "-p", "Environment=LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES=0",

@@ -69,6 +69,9 @@ impl Authority {
     pub(crate) async fn work_catch_up(&self, id: u64) -> Result<Value, Error> {
         generations::catch_up_one(self, id).await
     }
+    pub(crate) async fn work_rebuild(&self, _id: u64, _active: u64) -> Result<Value, Error> {
+        Err("concurrent rebuild is unsupported for the rejected Helix candidate".into())
+    }
     pub(crate) async fn work_query(
         &self,
         query: &Query,

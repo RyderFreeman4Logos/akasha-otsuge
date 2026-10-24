@@ -97,6 +97,34 @@ impl Authority {
             json!({"generation":id,"committed":committed,"text":text,"vector":vector,"remaining":committed.saturating_sub(text.min(vector))}),
         )
     }
+    pub(crate) async fn work_rebuild(&self, id: u64, active: u64) -> Result<Value, Error> {
+        let candidate = state(&self.tree, id)?;
+        let old = state(&self.tree, active)?;
+        if id == active
+            || candidate.ready
+            || !old.ready
+            || candidate.cursor != candidate.documents
+            || candidate.pending.is_some()
+            || changes::status(self, active)?["active"] != active
+        {
+            return Err(
+                "concurrent rebuild requires an unbuilt candidate and an active old generation"
+                    .into(),
+            );
+        }
+        let start_seq = authority::point(&self.tree.begin_with_mode(Mode::ReadOnly)?)?;
+        let started = Instant::now();
+        let result = build_generation(self, id, false).await?;
+        let end_seq = authority::point(&self.tree.begin_with_mode(Mode::ReadOnly)?)?;
+        if changes::status(self, active)?["active"] != active {
+            return Err("build changed the active generation".into());
+        }
+        Ok(
+            json!({"status":"passed","generation":id,"active_generation":active,
+            "start_seq":start_seq,"end_seq":end_seq,"seconds":started.elapsed().as_secs_f64(),
+            "ready":result["ready"],"state":result}),
+        )
+    }
     pub(crate) async fn work_query(
         &self,
         query: &Query,

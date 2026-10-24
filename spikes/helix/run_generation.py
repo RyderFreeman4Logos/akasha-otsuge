@@ -13,7 +13,7 @@ import time
 import tomllib
 import uuid
 
-from run_case import digest, process_identity, publish
+from run_case import digest, generation_id, process_identity, publish
 
 MIN_RESERVE = 30 * 1024**3 + 4_000_000_000
 OPERATIONS = {'begin_corpus', 'backfill', 'build', 'catch_up', 'activate', 'abort_index', 'seed_text', 'verify_text'}
@@ -75,7 +75,7 @@ def main():
     if len(request_bytes) > 1024**2:
         raise ValueError('request exceeds 1 MiB')
     request = json.loads(request_bytes)
-    if request['op'] not in OPERATIONS or type(request['generation']) is not int or request['generation'] not in {1, 2}:
+    if request['op'] not in OPERATIONS or not generation_id(request['generation']):
         raise ValueError('only idempotent retained-generation operations are resumable')
     if request['op'] == 'abort_index':
         value = request.get('operation_id')

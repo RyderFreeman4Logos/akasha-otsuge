@@ -317,3 +317,33 @@ host contention was not recorded. Subsequent observer samples now retain host
 load and CPU/memory/I/O pressure; a dedicated-service smoke verifies those fields.
 The next required measurement is the first canonical30-minute low case, using
 the unchanged native binary and frozen thresholds, not another short diagnostic.
+
+
+[The first canonical1800s low workload](results/fallback-full-sustained-low-r1/summary.json)
+completes50,536 recorded requests in1811.135s. All current/history/source and
+final derived-content oracles pass, including581 unvectorized current reads and
+198 unvectorized BM25 queries across all eight scopes. Both watermarks reach
+147083 and drain takes7.912s. RSS P99/max is430,141,440/453,545,984B with no OOM;
+low sustained memory passes. BM25 reaches0.968889/s and BM25/ANN P95 exceed60s,
+so the complete case fails. High and full burst/overload remain unrun.
+
+The unchanged delta-text refresh replaces its entire FTS index on each batch.
+The retained native callbacks show691 builds,8,286,832 repeated tokenizations,
+1652.439 aggregate seconds in tokenization stages and467,116 progress events.
+Each event currently persists a checkpoint. Host I/O pressure averages30.36%
+for the sampled ten-second `some` values; this is pressure evidence, not device
+bandwidth or attribution to another process. Source and measured repetition
+justify investigating the pinned Lance incremental FTS path before repeating
+full performance acceptance. Original thresholds and this failed result remain.
+
+[Concurrent rebuild entrypoint](results/fallback-concurrent-rebuild/summary.json)
+keeps the old generation active while the same authority builds its candidate.
+The small60s/100-client fixture completes1,698 requests; nine ordinary commits
+and one completed query of each search type fall within the build's sequence
+interval. Eight corrupted receipts are rejected. All103 lifecycle commands and
+six crash barriers pass separately; those direct subprocess checks are functional
+evidence, not cgroup memory acceptance. Ten fallback and13 Helix release units,
+both release Clippy checks and six controller units cover the shared plumbing.
+The controller now accepts positive u64 generation identities so a fresh third
+generation can exercise the full build. Full concurrent rebuild and bounded
+uninterrupted full-build acceptance remain pending.
