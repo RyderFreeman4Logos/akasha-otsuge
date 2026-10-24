@@ -26,6 +26,23 @@ All42 before/after witnesses match; measured free space increases by
 40,473,866,240B. Inactive-generation retirement and the concurrent rebuild peak
 disk bound remain unverified; this is not online GC.
 
+`retire_generation` accepts an inactive ready generation and an absolute
+`deadline_ms`. The active generation must be ready and drained, and the target
+must have no pending append wave. While holding the native authority lock, it
+persists a retirement marker before calling public `Connection.drop_table` for
+that generation's baseline and delta tables. Each completed deletion is recorded;
+a crash between deletion and that record is reconciled by the same public API.
+Retirement permanently prevents reuse of the generation number. `status` keeps
+its metadata visible and `indexed_receipt` retains the prior result with
+`generation_retired: true`; authority receipts and revisions are not deleted.
+Resume retains the original deadline. Expired deadlines fail closed; this probe
+does not provide an extension or online retirement path. The
+[native regression](../../docs/benchmarks/results/fallback-generation-retirement/summary.json)
+passes179 commands, two competing-owner refusals and twelve total SIGKILL
+barriers on nine baseline documents with eight real vectors. All four table
+families are covered; native RSS max is123,334,656B. Full-size retirement and
+its resource measurements remain pending.
+
 Generation/workload controllers set `MALLOC_MMAP_THRESHOLD_=131072` before
 starting the native process. On the measured GNU libc2.36 host this prevents
 large freed index buffers accumulating in allocator arenas; the observer records

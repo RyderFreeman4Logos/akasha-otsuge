@@ -16,7 +16,7 @@ import uuid
 from run_case import digest, generation_id, process_identity, publish
 
 MIN_RESERVE = 30 * 1024**3 + 4_000_000_000
-OPERATIONS = {'begin_corpus', 'backfill', 'build', 'catch_up', 'activate', 'abort_index', 'seed_text', 'verify_text', 'prune_versions'}
+OPERATIONS = {'begin_corpus', 'backfill', 'build', 'catch_up', 'activate', 'abort_index', 'seed_text', 'verify_text', 'prune_versions', 'retire_generation'}
 
 
 def stopped(state):
@@ -34,6 +34,8 @@ def observe(database, request, attempt):
     names = [f'generation-{generation}-backfill.json', f'generation-{generation}-catch-up.json']
     if request['op'] == 'prune_versions':
         names = [f'generation-{generation}-prune.json']
+    if request['op'] == 'retire_generation':
+        names = [f'generation-{generation}-retire.json']
     if request['op'] in {'seed_text', 'verify_text'}:
         suffix = '-' + request['verification_id'] if 'verification_id' in request else ''
         names = [f'oracle-{request["op"].replace("_", "-")}{suffix}-{request["count"]}.json']

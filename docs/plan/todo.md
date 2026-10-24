@@ -125,7 +125,9 @@ Remaining acceptance, in execution order:
       rebuild entrypoint passes the small native fixture:1,698 requests, nine
       commits and both old-generation search types overlap the build. Eight
       receipt mutations are rejected;103 lifecycle commands also pass. Full-size
-      overlap remains unmeasured.
+      overlap remains unmeasured. The existing shared workload modifies synthetic
+      memory IDs; it does not establish actual corpus-candidate mutation during
+      query/build. Keep the3,840 fixed performance IDs protected in that check.
 - [x] Full-size corpus-candidate corrections/rescopes/retractions/restores and
       live permissions now pass16 distinct candidates,64 revisions and755 native
       commands in306.902s, with RSS max255,275,008B. Exact original/current/history
@@ -145,7 +147,11 @@ Remaining acceptance, in execution order:
       competing-owner refusal and eight total crash barriers; current/history/
       receipts remain unchanged. Full-size obsolete-version reclamation now
       passes above; inactive-generation retirement and concurrent peak disk
-      accounting still need measured acceptance.
+      accounting still need measured acceptance. Public retirement now passes
+      179 commands, two competing-owner checks and twelve SIGKILL barriers on
+      nine documents/eight real vectors, covering all four native table families.
+      Retired IDs cannot be reused; historical receipts remain readable. Full
+      old-generation retirement has not yet run.
 - [ ] Reconcile the complete required crash/resource/config matrix against
       immutable receipts: commit/reply/index/watermark/activation barriers,
       authority and derived corruption, child failure/exhaustion, isolated disk

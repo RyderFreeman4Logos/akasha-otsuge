@@ -47,12 +47,17 @@ def main():
     def prune(check=lambda _: True, generation=2, **fields):
         g('prune_versions',check,generation=generation,
             deadline_ms=fields.pop('deadline_ms',int(time.time()*1000)+600_000),**fields)
+    retire_deadline=int(time.time()*1000)+600_000
+    def retire(check=lambda _: True, generation=1, **fields):
+        g('retire_generation',check,generation=generation,
+            deadline_ms=fields.pop('deadline_ms',retire_deadline),**fields)
     def remember(name):
         def check(value):
             snapshots[name]=value
             return True
         return check
     add('load',{})
+    retire(error='retirement requires an active generation')
     for scope in range(8):
         add('authority',dict(op='permission',principal='reader',scope=scope,allowed=True))
     for op, fields in [('begin',dict(bundle=bundle)),('backfill',dict(waves=10)),('build',{})]:g(op,**fields)
@@ -65,6 +70,7 @@ def main():
     apply(1,'text');apply(1,'vector',0)
     receipt(1,lambda r:r['stage']=='indexed' and r['watermarks']==dict(text=1,vector=1))
     g('activate');query(has(1,1));query(has(1,1),text=True)
+    retire(error='cannot retire the active generation')
     prune(lambda r:sum(t['old_versions'] for t in r['tables'])>0,generation=1,
           env=dict(AKASHA_SPIKE_DISK_RESERVE_BYTES=str(2**64-1)))
     query(has(1,1));query(has(1,1),text=True)
@@ -92,6 +98,7 @@ def main():
     g('catch_up',waves=1)
     apply(6,'vector',0);query(has(1,6))
     g('begin',generation=2,bundle={**bundle,'schema':2});g('backfill',generation=2,waves=10)
+    retire(generation=2,error='retirement requires a ready generation')
     g('build',generation=2,fail_after_text=True,error='injected build failure')
     query(has(1,6));query(has(1,6),text=True)
     commit(7,4,4)
@@ -107,6 +114,7 @@ def main():
     g('query_current',generation=2,bundle=bundle,principal='reader',scope=int(rows[0]['partition'][1]),vector=rows[0]['embedding'],error='query bundle mismatch')
     g('apply',generation=2,family='vector',seq=6,vector={**vector(0),'model':'wrong'},error='embedding bundle or source identity mismatch')
     commit(8,1,0,6,text_only=True)
+    retire(error='retirement requires drained active outbox')
     apply(8,'vector',0,generation=2,error='text-only source cannot consume vector output')
     apply(8,'text',generation=2);apply(8,'vector',generation=2)
     receipt(8,lambda r:r['reasons']==dict(text='applied',vector='not_required'),generation=2)
@@ -142,13 +150,49 @@ def main():
     query(lambda r:r==snapshots['vector'],generation=2,row=1)
     for at in [1,5,6,12]:
         add('authority',dict(op='get',memory=1,at=at),lambda r,at=at:r==snapshots[f'history:{at}'])
+    apply(7,'text',hold='before-delta-append',kill='before-delta-append')
+    retire(error='retirement requires no pending wave')
+    apply(7,'text');apply(7,'vector',4)
+    receipt(7,remember('old-receipt'))
+    add('authority',dict(op='receipt',request_id='life:7'),remember('authority-receipt'))
+    retire(generation=2,error='cannot retire the active generation')
+    retire(generation=999,error='missing generation')
+    retire(deadline_ms=0,error='original operation deadline expired')
+    retire(deadline_ms=2**64-1,error='retirement deadline exceeds observation budget')
+    retire(hold='unknown',error='invalid retirement checkpoint')
+    retire(hold='before-retire',kill='before-retire')
+    query(has(2,2),row=1)
+    retire(hold='after-retire-intent',kill='after-retire-intent')
+    g('status',lambda r:r['retirement']==dict(deadline_ms=retire_deadline,completed=0))
+    query(lambda _:False,row=1,error='generation retired')
+    g('query',bundle=bundle,scope=7,term='baseline',error='generation retired')
+    for op,fields in [('begin',dict(bundle=bundle)),('backfill',dict(waves=1)),('build',{}),
+                      ('activate',{}),('catch_up',dict(waves=1)),('advance',dict(family='text')),
+                      ('apply',dict(family='text',seq=7)),('lifecycle_status',{})]:
+        g(op,**fields,error='generation retired')
+    prune(generation=1,error='generation retired')
+    receipt(7,lambda r:r=={**snapshots['old-receipt'],'generation_retired':True})
+    retire(deadline_ms=retire_deadline+1,error='original retirement deadline mismatch')
+    retire(hold='after-retire-table',kill='after-retire-table')
+    g('status',lambda r:r['retirement']==dict(deadline_ms=retire_deadline,completed=0))
+    query(lambda r:r==snapshots['text'],generation=2,text=True)
+    query(lambda r:r==snapshots['vector'],generation=2,row=1)
+    retire(remember('retired'),env=dict(AKASHA_SPIKE_DISK_RESERVE_BYTES=str(2**64-1)))
+    retire(lambda r:r==snapshots['retired'] and r['retired'] and r['completed']==r['total']==4)
+    g('begin',bundle=bundle,error='generation retired')
+    g('lifecycle_status',lambda r:r==snapshots['lifecycle'],generation=2)
+    receipt(12,lambda r:r==snapshots['receipt'],generation=2)
+    add('authority',dict(op='receipt',request_id='life:7'),lambda r:r==snapshots['authority-receipt'])
+    for at in [1,5,6,12]:
+        add('authority',dict(op='get',memory=1,at=at),lambda r,at=at:r==snapshots[f'history:{at}'])
     records, started = [], time.monotonic()
     with tempfile.TemporaryDirectory(prefix='akasha-fallback-lifecycle-') as temporary:
         root=pathlib.Path(temporary);database=root/'database';request=root/'request.json'
         (root/'OWNER').write_text('akasha-otsuge MVP-003 owned corpus import and database\n')
-        raw=b'{"key":"baseline","body":"baseline content","partition":"p7"}\n'
+        documents=[dict(key='baseline',body='baseline content',partition='p7'),*rows]
+        raw=b''.join((json.dumps(row,separators=(',',':'))+'\n').encode() for row in documents)
         (root/'input.jsonl').write_bytes(raw)
-        publish(root/'manifest.json',dict(corpus=dict(documents=1,vectors=0,prepared_bytes=len(raw),prepared_sha256=hashlib.sha256(raw).hexdigest(),indexed_body_utf8_bytes=16)))
+        publish(root/'manifest.json',dict(corpus=dict(documents=len(documents),vectors=len(rows),prepared_bytes=len(raw),prepared_sha256=hashlib.sha256(raw).hexdigest(),indexed_body_utf8_bytes=sum(len(row['body'].encode()) for row in documents))))
         publish(output/'admission.json',dict(binary_sha256=digest(binary),source_sha256=digest(source),harness_sha256=digest(__file__),temporary_root=temporary,controller=process_identity(os.getpid()),planned_commands=len(steps)))
         for channel, value, check, error, kill, overrides in steps:
             name=f'{len(records):03d}';publish(request,value)
@@ -156,7 +200,8 @@ def main():
             command=[str(binary),str(database),*args]
             env=dict(os.environ,LANCE_FTS_NUM_SHARDS='1',LANCE_FTS_PARTITION_SIZE='32')
             env.update(overrides or {})
-            protected={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file()} if error and value.get('op')=='prune_versions' else None
+            protected={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file()} if error and value.get('op') in {'prune_versions','retire_generation'} else None
+            retained={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file() and not p.relative_to(database/'derived').parts[0].startswith(f"g{value['generation']}_")} if value.get('op')=='retire_generation' else None
             child=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env)
             identity,prefix=process_identity(child.pid),b''
             try:
@@ -169,7 +214,7 @@ def main():
                                 prefix+=os.read(child.stderr.fileno(),4096)
                                 if f'PROBE_CHECKPOINT:{kill}\n'.encode() in prefix:break
                         else:raise TimeoutError(kill)
-                    if kill=='before-prune':
+                    if kill in {'before-prune','before-retire'}:
                         before={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file()}
                         contender=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env)
                         contender_identity=process_identity(contender.pid)
@@ -177,8 +222,8 @@ def main():
                             other_out,other_err=contender.communicate(timeout=30)
                         finally:
                             if contender.poll() is None:contender.kill();contender.communicate(timeout=10)
-                        (output/'prune-contender.stdout').write_bytes(other_out)
-                        (output/'prune-contender.stderr').write_bytes(other_err)
+                        (output/(kill+'-contender.stdout')).write_bytes(other_out)
+                        (output/(kill+'-contender.stderr')).write_bytes(other_err)
                         assert contender.returncode==1 and b'already locked by another process' in other_err
                         assert process_identity(contender.pid) is None
                         assert before=={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file()}
@@ -190,6 +235,15 @@ def main():
                 if error:assert error.encode() in stderr,(name,stderr[-2000:])
                 if protected is not None:
                     assert protected=={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file()}
+                if retained is not None:
+                    assert retained=={str(p.relative_to(database)):digest(p) for p in (database/'derived').rglob('*') if p.is_file() and not p.relative_to(database/'derived').parts[0].startswith(f"g{value['generation']}_")}
+                if value.get('op')=='retire_generation' and not error:
+                    if kill=='after-retire-table':assert not (database/'derived'/f"g{value['generation']}_text.lance").exists()
+                    if not kill:
+                        assert not any(p.name.startswith(f"g{value['generation']}_") for p in (database/'derived').iterdir())
+                        progress=json.loads((database/f"generation-{value['generation']}-retire.json").read_text())
+                        assert progress['completed']==progress['total']
+                        assert abs(progress['rate_per_s']-(progress['completed']-progress['completed_at_start'])/max(progress['elapsed_s'],0.001))<1e-6
                 if not error and not kill:assert check(json.loads(stdout)),(name,stdout)
                 if channel=='generation' and value == dict(op='apply', generation=1, family='text', seq=2, vector=None):
                     progress=json.loads((database/'g1_delta_text-body_fts-progress.json').read_text())

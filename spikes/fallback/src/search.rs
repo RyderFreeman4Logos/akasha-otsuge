@@ -186,6 +186,11 @@ enum Request {
         deadline_ms: u64,
         hold: Option<String>,
     },
+    RetireGeneration {
+        generation: u64,
+        deadline_ms: u64,
+        hold: Option<String>,
+    },
     QueryCurrent {
         generation: u64,
         bundle: Bundle,
@@ -241,6 +246,13 @@ impl TextLayout {
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
+struct Retirement {
+    deadline_ms: u64,
+    completed: usize,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 struct State {
     generation: u64,
     #[serde(default)]
@@ -257,6 +269,8 @@ struct State {
     ready: bool,
     backfill_deadline_ms: Option<u64>,
     index_deadline_ms: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    retirement: Option<Retirement>,
 }
 
 fn key(generation: u64) -> Result<String, Error> {
@@ -266,7 +280,7 @@ fn key(generation: u64) -> Result<String, Error> {
     Ok(format!("derived:{generation:020}"))
 }
 
-fn state(tree: &Tree, generation: u64) -> Result<State, Error> {
+fn read_state(tree: &Tree, generation: u64) -> Result<State, Error> {
     let value = tree
         .begin()?
         .get(key(generation)?.as_bytes())?
@@ -281,6 +295,10 @@ fn state(tree: &Tree, generation: u64) -> Result<State, Error> {
         || value.documents != corpus.documents
         || value.vectors != corpus.vectors
         || value
+            .retirement
+            .as_ref()
+            .is_some_and(|r| !value.ready || r.deadline_ms == 0 || r.completed > 4)
+        || value
             .pending
             .as_ref()
             .is_some_and(|p| p.end <= value.cursor || p.end > value.documents)
@@ -290,6 +308,14 @@ fn state(tree: &Tree, generation: u64) -> Result<State, Error> {
                 || value.pending.is_some()))
     {
         return Err("invalid generation state".into());
+    }
+    Ok(value)
+}
+
+fn state(tree: &Tree, generation: u64) -> Result<State, Error> {
+    let value = read_state(tree, generation)?;
+    if value.retirement.is_some() {
+        return Err("generation retired".into());
     }
     Ok(value)
 }
@@ -1079,6 +1105,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
                     ready: false,
                     backfill_deadline_ms: None,
                     index_deadline_ms: None,
+                    retirement: None,
                 };
                 settings.check_disk(root)?;
                 save(tree, &value).await?;
@@ -1163,6 +1190,22 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
             .await
             .map_err(|_| "original operation deadline expired")??
         }
+        Request::RetireGeneration {
+            generation,
+            deadline_ms,
+            hold,
+        } => {
+            let budget = remaining(deadline_ms)?;
+            if budget > Duration::from_secs(settings.seconds) {
+                return Err("retirement deadline exceeds observation budget".into());
+            }
+            tokio::time::timeout(
+                budget,
+                changes::retire_generation(&a, generation, deadline_ms, hold.as_deref()),
+            )
+            .await
+            .map_err(|_| "original operation deadline expired")??
+        }
         Request::QueryCurrent {
             generation,
             bundle,
@@ -1184,7 +1227,7 @@ pub async fn run(root: &Path, path: &Path) -> Result<Value, Error> {
             )
             .await?
         }
-        Request::Status { generation } => serde_json::to_value(state(tree, generation)?)?,
+        Request::Status { generation } => serde_json::to_value(read_state(tree, generation)?)?,
         Request::Query {
             generation,
             bundle,

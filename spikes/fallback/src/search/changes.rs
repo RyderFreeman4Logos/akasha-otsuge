@@ -600,8 +600,119 @@ pub(super) async fn prune_versions(
     Ok(json!({"generation":id,"deadline_ms":until,"tables":reports,"lifecycle":before}))
 }
 
+pub(super) async fn retire_generation(
+    a: &Authority,
+    id: u64,
+    until: u64,
+    hold: Option<&str>,
+) -> Result<Value, Error> {
+    if hold.is_some_and(|v| {
+        !matches!(
+            v,
+            "before-retire" | "after-retire-intent" | "after-retire-table"
+        )
+    }) {
+        return Err("invalid retirement checkpoint".into());
+    }
+    let tx = a.tree.begin_with_mode(Mode::ReadOnly)?;
+    let active: u64 = tx
+        .get(b"active:generation")?
+        .map(|v| serde_json::from_slice(&v))
+        .transpose()?
+        .filter(|v| *v > 0)
+        .ok_or("retirement requires an active generation")?;
+    if active == id {
+        return Err("cannot retire the active generation".into());
+    }
+    let mut base = read_state(&a.tree, id)?;
+    if !base.ready {
+        return Err("retirement requires a ready generation".into());
+    }
+    if !state(&a.tree, active)?.ready {
+        return Err("retirement requires a ready active generation".into());
+    }
+    let before = status(a, active)?;
+    let at = point(&tx)?;
+    let mut names = vec![table_name(id, false)];
+    if base.vectors > 0 {
+        names.push(table_name(id, true));
+    }
+    for family in [Family::Text, Family::Vector] {
+        let old = applied(&tx, id, family)?;
+        if old.pending.is_some() {
+            return Err("retirement requires no pending wave".into());
+        }
+        if old.rows > 0 {
+            names.push(family.table(id));
+        }
+        let current = applied(&tx, active, family)?;
+        if current.pending.is_some() || current.watermark != at {
+            return Err("retirement requires drained active outbox".into());
+        }
+    }
+    drop(tx);
+    if let Some(retirement) = &base.retirement {
+        if retirement.deadline_ms != until {
+            return Err("original retirement deadline mismatch".into());
+        }
+        if retirement.completed > names.len() {
+            return Err("invalid retirement progress".into());
+        }
+    } else {
+        checkpoint(hold, "before-retire").await;
+        // The durable tombstone excludes future readers/builders before any public native deletion.
+        base.retirement = Some(Retirement {
+            deadline_ms: until,
+            completed: 0,
+        });
+        save(&a.tree, &base).await?;
+    }
+    let started = Instant::now();
+    let ticks = start_ticks()?;
+    let completed = base
+        .retirement
+        .as_ref()
+        .ok_or("missing retirement intent")?
+        .completed;
+    let completed_at_start = completed;
+    let progress = |completed: usize| {
+        let elapsed = started.elapsed().as_secs_f64();
+        let advanced = completed - completed_at_start;
+        load::atomic_json(
+            &a.root.join(format!("generation-{id}-retire.json")),
+            &json!({"phase":"retire_generation","generation":id,"deadline_ms":until,
+                "pid":std::process::id(),"start_ticks":ticks,"completed":completed,"total":names.len(),
+                "completed_at_start":completed_at_start,"elapsed_s":elapsed,"rate_per_s":advanced as f64/elapsed.max(0.001),
+                "eta_s":if completed==names.len(){Some(0.0)}else if advanced==0{None}else{Some((names.len()-completed) as f64*elapsed/advanced as f64)}}),
+        )
+    };
+    progress(completed)?;
+    checkpoint(hold, "after-retire-intent").await;
+    let connection = connect(&a.root).await?;
+    for (index, name) in names.iter().enumerate().skip(completed) {
+        remaining(until)?;
+        match connection.drop_table(name, &[]).await {
+            Ok(()) | Err(lancedb::Error::TableNotFound { .. }) => {}
+            Err(error) => return Err(error.into()),
+        }
+        checkpoint(hold, "after-retire-table").await;
+        base.retirement
+            .as_mut()
+            .ok_or("missing retirement intent")?
+            .completed = index + 1;
+        save(&a.tree, &base).await?;
+        progress(index + 1)?;
+    }
+    if status(a, active)? != before {
+        return Err("retirement changed active authority or watermarks".into());
+    }
+    Ok(
+        json!({"generation":id,"retired":true,"deadline_ms":until,"completed":names.len(),"total":names.len()}),
+    )
+}
+
 pub(super) fn receipt(a: &Authority, id: u64, request: &str) -> Result<Value, Error> {
-    let base = state(&a.tree, id)?;
+    let base = read_state(&a.tree, id)?;
     let receipt = a.stored_receipt(request)?;
     let seq = receipt["commit_seq"]
         .as_u64()
@@ -618,10 +729,12 @@ pub(super) fn receipt(a: &Authority, id: u64, request: &str) -> Result<Value, Er
             json!(applied(&tx, id, family)?.watermark),
         );
     }
-    Ok(
-        json!({"stage":if base.ready && reasons.len()==2 {"indexed"} else {"committed"},"commit_seq":seq,"generation":id,"bundle":base.bundle,
-        "reasons":reasons,"watermarks":watermarks,"visibility":"current_authority_filtered_candidates"}),
-    )
+    let mut result = json!({"stage":if base.ready && reasons.len()==2 {"indexed"} else {"committed"},"commit_seq":seq,"generation":id,"bundle":base.bundle,
+        "reasons":reasons,"watermarks":watermarks,"visibility":"current_authority_filtered_candidates"});
+    if base.retirement.is_some() {
+        result["generation_retired"] = json!(true);
+    }
+    Ok(result)
 }
 pub(super) async fn activate(a: &Authority, id: u64, hold: Option<&str>) -> Result<Value, Error> {
     if hold.is_some_and(|h| !matches!(h, "before-activation" | "after-activation")) {

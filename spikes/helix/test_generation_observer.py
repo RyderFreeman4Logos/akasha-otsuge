@@ -9,22 +9,25 @@ from run_generation import observe
 
 
 class GenerationObserver(unittest.TestCase):
-    def test_prune_observes_its_own_table_checkpoint(self):
+    def test_cleanup_observes_its_own_table_checkpoint(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=pathlib.Path(temporary)
             stale=dict(completed=999,total=1000,pid=42,start_ticks='123')
             current={**stale,'completed':2,'total':4,'deadline_ms':10000}
             (root/'generation-2-backfill.json').write_text(json.dumps(stale))
             (root/'generation-2-prune.json').write_text(json.dumps(current))
+            retired={**current,'completed':1,'total':3}
+            (root/'generation-2-retire.json').write_text(json.dumps(retired))
             log=root/'engine.log';log.write_text('')
             read_text=pathlib.Path.read_text
             def read(path,*args,**kwargs):
                 return '0::/test-unit.service\n' if str(path)=='/proc/42/cgroup' else read_text(path,*args,**kwargs)
             with patch('run_generation.process_identity',return_value=dict(pid=42,start_ticks='123',state='R')):
                 with patch.object(pathlib.Path,'read_text',read):
-                    actual=observe(root,dict(op='prune_versions',generation=2,deadline_ms=10000),
-                                   dict(unit='test-unit',log=str(log)))
-            self.assertEqual(actual,current)
+                    for operation,expected in [('prune_versions',current),('retire_generation',retired)]:
+                        actual=observe(root,dict(op=operation,generation=2,deadline_ms=10000),
+                                       dict(unit='test-unit',log=str(log)))
+                        self.assertEqual(actual,expected)
 
     def test_named_verifier_observes_only_its_checkpoint(self):
         with tempfile.TemporaryDirectory() as temporary:
