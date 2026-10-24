@@ -519,3 +519,27 @@ one1.008s missing-operation RED and small Python units ran alongside it, with no
 Cargo build or full native fixture. This is a workload pass, not a paired causal
 comparison of profiles. Full construction/recovery, actual corpus-candidate
 mutation during query/build and the physical rebuild bound remain open.
+
+### Full inactive-generation retirement
+
+[Full generation1 retirement](results/fallback-full-retirement/summary.json)
+passes under the low group with the native operation published at `d0aa672`.
+It drops the two old baseline tables through public LanceDB APIs in4.333s;
+RSS max is50,991,104B, cgroup peak68,915,200B, with no OOM. All42 before/after
+current/history/query/receipt witnesses match exactly. Active generation2 and
+committed/text/vector260472 remain unchanged, as do its index allocations.
+Authority allocations change by-5,509,120B; retirement metadata is written,
+so byte-identical authority storage is not claimed.
+
+The retired tables occupied48,655,896,576 per-inode allocated bytes. Filesystem
+free space increases from378,895,790,080 to426,862,743,552B; Btrfs shared extents
+and other host activity remain separate from the inode measurement. Exact
+process/unit exits, raw hashes and scratch cleanup verify. Completed controller
+reuse is checked before its disposable binary copy is removed.
+
+The initial service omitted its working directory and failed before opening the
+database. The next42 native witnesses passed, but their collector compared
+string memory-event counters to integers; a corrected collector reused those
+unchanged receipts before admitting retirement. Both failures and the explicit
+continuation are retained. Online deletion, extension of an expired retirement
+deadline and the next concurrent build's physical peak are not established.

@@ -110,7 +110,14 @@ Completed, with the limits shown:
       receipt witnesses match. Actual filesystem free-space delta is
       40,473,866,240B; retain Btrfs/concurrent-activity limits. Completed controller
       reuse verifies before retiring its disposable binary. Authority and old
-      generation1 remain intact; their retirement/peak-bound work remains below.
+      generation1 remain intact in that historical run.
+- [x] Retire full inactive generation1 through the public native operation in
+      4.333s, RSS max50,991,104B, no OOM. All42 before/after witnesses match;
+      authority history, active2 and committed/text/vector260472 are unchanged.
+      Retired tables account for48,655,896,576 allocated bytes; filesystem free
+      space increases47,966,953,472B. Preserve the Btrfs/host-activity distinction.
+      Completed reuse, exact process/unit exits and scratch cleanup verify;
+      the disposable controller copy is retired after reuse verification.
 
 Remaining acceptance, in execution order:
 
@@ -146,12 +153,11 @@ Remaining acceptance, in execution order:
       Public offline derived-version pruning passes133 native commands, one
       competing-owner refusal and eight total crash barriers; current/history/
       receipts remain unchanged. Full-size obsolete-version reclamation now
-      passes above; inactive-generation retirement and concurrent peak disk
-      accounting still need measured acceptance. Public retirement now passes
+      and inactive-generation retirement pass above; concurrent peak disk
+      accounting still needs measured acceptance. Public retirement also passes
       179 commands, two competing-owner checks and twelve SIGKILL barriers on
       nine documents/eight real vectors, covering all four native table families.
-      Retired IDs cannot be reused; historical receipts remain readable. Full
-      old-generation retirement has not yet run.
+      Retired IDs cannot be reused; historical receipts remain readable.
 - [ ] Reconcile the complete required crash/resource/config matrix against
       immutable receipts: commit/reply/index/watermark/activation barriers,
       authority and derived corruption, child failure/exhaustion, isolated disk
