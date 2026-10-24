@@ -297,7 +297,7 @@ fn read_state(tree: &Tree, generation: u64) -> Result<State, Error> {
         || value
             .retirement
             .as_ref()
-            .is_some_and(|r| !value.ready || r.deadline_ms == 0 || r.completed > 4)
+            .is_some_and(|r| r.deadline_ms == 0 || r.completed > 4)
         || value
             .pending
             .as_ref()

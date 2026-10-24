@@ -23,12 +23,14 @@ cleanup/after one table, query-before-resume, repeated cleanup and expired or
 oversized deadline refusal. The [full-size run](../../docs/benchmarks/results/fallback-full-prune/summary.json)
 removes41,326 obsolete versions in349.791s with native RSS max200,458,240B.
 All42 before/after witnesses match; measured free space increases by
-40,473,866,240B. Inactive-generation retirement and the concurrent rebuild peak
-disk bound remain unverified; this is not online GC.
+40,473,866,240B. Full inactive-generation retirement is measured separately
+below; the successful concurrent rebuild peak remains unverified. This is not
+online GC.
 
-`retire_generation` accepts an inactive ready generation and an absolute
+`retire_generation` accepts an inactive generation and an absolute
 `deadline_ms`. The active generation must be ready and drained, and the target
-must have no pending append wave. While holding the native authority lock, it
+must have no pending delta append wave. An incomplete baseline backfill or index
+build can be discarded without completing it first. While holding the native authority lock, it
 persists a retirement marker before calling public `Connection.drop_table` for
 that generation's baseline and delta tables. Each completed deletion is recorded;
 a crash between deletion and that record is reconciled by the same public API.
@@ -40,8 +42,18 @@ does not provide an extension or online retirement path. The
 [native regression](../../docs/benchmarks/results/fallback-generation-retirement/summary.json)
 passes179 commands, two competing-owner refusals and twelve total SIGKILL
 barriers on nine baseline documents with eight real vectors. All four table
-families are covered; native RSS max is123,334,656B. Full-size retirement and
-its resource measurements remain pending.
+families are covered; native RSS max is123,334,656B. The subsequent
+[full-size retirement](../../docs/benchmarks/results/fallback-full-retirement/summary.json)
+preserves42 before/after witnesses and removes an inactive complete generation
+in4.333s with native RSS max50,991,104B. Partial-generation regression and full
+cleanup receipts are recorded separately; historical metrics retain their
+original executable identities.
+
+The [partial-generation regression](../../docs/benchmarks/results/fallback-partial-retirement/summary.json)
+passes223 commands,19 SIGKILL barriers and two competing-owner refusals. It retires
+never-created tables, interrupted baseline backfills and failed native index
+builds without altering the active generation. RSS max is128,020,480B; actual full
+partial-generation reclamation is a separate pending measurement.
 
 Generation/workload controllers set `MALLOC_MMAP_THRESHOLD_=131072` before
 starting the native process. On the measured GNU libc2.36 host this prevents

@@ -719,3 +719,18 @@ No production chunk/allocator setting or threshold changes on this evidence.
 
 Next reclaim inactive partial generation4 safely and prepare a fresh full run.
 No backend is selected, PR#31 remains draft and Issue#3 stays open.
+
+## Reclaim incomplete inactive candidates — 2026-10-24
+
+[Native evidence](results/fallback-partial-retirement/summary.json) removes the
+ready-only restriction on the inactive retirement target. The active generation
+must still be ready and drained, pending delta work is refused, and the existing
+durable tombstone/public table deletion/original deadline behavior is preserved.
+This avoids completing failed indexes merely to reclaim their derived files.
+
+The223-command fixture covers empty tables, interrupted baseline backfill and
+failed index construction,19 SIGKILL barriers, two competing-owner refusals and
+unchanged active query/receipt results. Twelve release units and Clippy pass;
+RSS max128,020,480B. The behavioral RED and an obsolete ready-only negative
+fixture failure are retained. Full generation4 cleanup and a successful fresh
+concurrent rebuild remain separate required steps. No backend is selected.

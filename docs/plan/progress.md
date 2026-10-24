@@ -51,10 +51,18 @@ timing failure or establish full-size performance. Default ANN chunk size and
 all resource/performance limits remain unchanged; four bounded allocation/query
 controls are archived with their diagnostic limits.
 
-Next: safely retire the failed, inactive generation4 without building it just to
-permit deletion, preserve before/after authority/search witnesses, then prepare a
-fresh full candidate. The current retirement API unnecessarily rejects unbuilt
-candidates. The full concurrent acceptance remains open.
+The [partial-retirement repair](../benchmarks/results/fallback-partial-retirement/summary.json)
+now admits incomplete inactive candidates through the existing durable tombstone
+and public table deletion. Its223-command native fixture passes19 SIGKILL barriers,
+two competing-owner refusals, active-search/receipt preservation,12 release units
+and Clippy; RSS max128,020,480B. It covers empty, interrupted-backfill and failed-build
+states. Preserve the behavioral RED and the first GREEN attempt's obsolete
+ready-only refusal expectation; the new regression assertions remain unchanged.
+
+Next: retire the actual failed generation4, preserve full before/after witnesses,
+prune active3's obsolete versions, then prepare a fresh full candidate. This avoids
+completing a failed index solely to delete it. Full concurrent acceptance remains
+open; neither build nor retirement deadlines are extended.
 
 At restart or compaction, first load the WD skill and reconcile the exact managed
 task with its completion listener and durable state in `.git/akasha-evidence`.

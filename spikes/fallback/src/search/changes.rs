@@ -625,9 +625,6 @@ pub(super) async fn retire_generation(
         return Err("cannot retire the active generation".into());
     }
     let mut base = read_state(&a.tree, id)?;
-    if !base.ready {
-        return Err("retirement requires a ready generation".into());
-    }
     if !state(&a.tree, active)?.ready {
         return Err("retirement requires a ready active generation".into());
     }

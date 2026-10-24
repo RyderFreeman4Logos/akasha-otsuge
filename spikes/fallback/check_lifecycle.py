@@ -98,7 +98,6 @@ def main():
     g('catch_up',waves=1)
     apply(6,'vector',0);query(has(1,6))
     g('begin',generation=2,bundle={**bundle,'schema':2});g('backfill',generation=2,waves=10)
-    retire(generation=2,error='retirement requires a ready generation')
     g('build',generation=2,fail_after_text=True,error='injected build failure')
     query(has(1,6));query(has(1,6),text=True)
     commit(7,4,4)
@@ -185,6 +184,28 @@ def main():
     add('authority',dict(op='receipt',request_id='life:7'),lambda r:r==snapshots['authority-receipt'])
     for at in [1,5,6,12]:
         add('authority',dict(op='get',memory=1,at=at),lambda r,at=at:r==snapshots[f'history:{at}'])
+    for generation, phase in [(3,'empty'),(4,'pending-backfill'),(5,'failed-build')]:
+        g('begin',generation=generation,bundle={**bundle,'schema':generation})
+        if phase=='pending-backfill':
+            g('backfill',generation=generation,waves=1,hold='after-text',kill='after-text')
+        elif phase=='failed-build':
+            g('backfill',generation=generation,waves=10)
+            g('build',generation=generation,fail_after_text=True,error='injected build failure')
+        g('status',remember('unready:'+str(generation)),generation=generation)
+        retire(generation=generation,hold='after-retire-intent',kill='after-retire-intent')
+        def tombstone(value,generation=generation):
+            prior=snapshots['unready:'+str(generation)]
+            return not value['ready'] and value=={**prior,'retirement':dict(deadline_ms=retire_deadline,completed=0)}
+        g('status',tombstone,generation=generation)
+        for op,fields in [('begin',dict(bundle={**bundle,'schema':generation})),('backfill',dict(waves=1)),('build',{})]:
+            g(op,generation=generation,**fields,error='generation retired')
+        retire(generation=generation,hold='after-retire-table',kill='after-retire-table')
+        retire(lambda r:r['retired'] and r['completed']==r['total']==2,generation=generation)
+        retire(lambda r:r['retired'] and r['completed']==r['total']==2,generation=generation)
+        g('lifecycle_status',lambda r:r==snapshots['lifecycle'],generation=2)
+        receipt(12,lambda r:r==snapshots['receipt'],generation=2)
+        query(lambda r:r==snapshots['text'],generation=2,text=True)
+        query(lambda r:r==snapshots['vector'],generation=2,row=1)
     records, started = [], time.monotonic()
     with tempfile.TemporaryDirectory(prefix='akasha-fallback-lifecycle-') as temporary:
         root=pathlib.Path(temporary);database=root/'database';request=root/'request.json'

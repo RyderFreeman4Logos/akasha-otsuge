@@ -169,12 +169,17 @@ Remaining acceptance, in execution order:
       bounded query/allocation controls are archived. The64MiB/8MiB ANN chunk
       comparison preserves candidate sets but gives only a limited reduction;
       retain the default64MiB chunk and fixed allocator configuration.
-- [ ] Reclaim the failed inactive generation4 without building it merely for
-      deletion. The current retirement API unnecessarily requires a ready
-      candidate; add native empty/partial/crash-resume controls, preserve the
-      active-generation and authority guards, then verify full before/after
-      witnesses before preparing the next fresh candidate. Do not reset its
-      expired or existing build deadline.
+- [x] Permit safe retirement of incomplete inactive candidates through the
+      existing tombstone/public-delete path. Native223-command regression covers
+      empty, interrupted-backfill and failed-build states,19 SIGKILL barriers,
+      two competing owners, idempotent resume and unchanged active queries/receipts.
+      Twelve release units and Clippy pass; RSS max128,020,480B. Behavioral RED and
+      the initial obsolete-fixture expectation failure are retained. Only that
+      contradictory old refusal is removed; new regression assertions are unchanged.
+- [ ] Reclaim actual failed inactive generation4 without building it merely for
+      deletion. Verify full before/after witnesses, prune obsolete active3 versions
+      and prepare the next fresh candidate. Never reset an expired/existing build
+      deadline; retirement has its own fixed logical-operation deadline.
 - [x] Remove50 obsolete native copies whose hashes appear in published receipts;
       retain current/recent recovery and unattributed files. Inode allocation
       falls7,430,930,432B; filesystem free space increases2,648,940,544B. No build
