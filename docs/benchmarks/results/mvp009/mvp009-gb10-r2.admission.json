@@ -1,0 +1,24 @@
+{
+  "command": [
+    "env",
+    "AKASHA_ACCEPTANCE_BINARY=/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/release/akasha-otsuge",
+    "AKASHA_MODEL_COMPAT_RECEIPT=/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp009-gb10-r2",
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "model_tests::gb10_guard_actual_services",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "process": {
+    "pid": 3603377,
+    "start_ticks": "494078165",
+    "state": "R"
+  },
+  "utc": "2026-10-27T17:41:24.658657+00:00"
+}

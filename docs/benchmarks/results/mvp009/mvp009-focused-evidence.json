@@ -1,0 +1,193 @@
+{
+  "utc": "2026-10-27T16:49:09.545061+00:00",
+  "attribution": "Focused runs name the base HEAD while relevant changes were dirty; exact committed candidate gate is separate. No failed or zero-test receipt is counted as acceptance.",
+  "cases": [
+    {
+      "name": "mvp009-job-contract-red",
+      "classification": "behavior RED: model run unsupported on published #8",
+      "terminal": {
+        "exit_code": 101,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "286e75cc49c5481c22abf4543a91deed9e4b4e181ce135bb59069177ea9d8af6",
+        "seconds": 3.3547378992661834,
+        "utc": "2026-10-27T16:11:16.572876+00:00"
+      }
+    },
+    {
+      "name": "mvp009-error-contract-red",
+      "classification": "behavior RED: missing model CLI/daemon operation",
+      "terminal": {
+        "exit_code": 101,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "a470908968635012e41a4f5f6e8094dc8010135b2b93c39b5aa94e2f99ae0a69",
+        "seconds": 16.2473112186417,
+        "utc": "2026-10-27T16:13:09.342043+00:00"
+      }
+    },
+    {
+      "name": "mvp009-provider-focused1",
+      "classification": "compile setup: import needed cfg(test)",
+      "terminal": {
+        "exit_code": 101,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "cb09f13f08caade33a36cceb8a2f91a98ef6cb39ebf08ad0b034f1bac20f458f",
+        "seconds": 2.294278579764068,
+        "utc": "2026-10-27T16:18:56.696049+00:00"
+      }
+    },
+    {
+      "name": "mvp009-provider-focused2",
+      "classification": "GREEN: three kinds success plus error classifications",
+      "terminal": {
+        "exit_code": 0,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "416581d7f413b0aefe477e0169ca71ed52ac7165d98d0ded733a4c293f115cce",
+        "seconds": 8.402628939598799,
+        "utc": "2026-10-27T16:19:50.483321+00:00"
+      }
+    },
+    {
+      "name": "mvp009-virtual-deadline-red",
+      "classification": "behavior RED: queue trace included provider duration",
+      "terminal": {
+        "exit_code": 101,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "f4562cdb3bdfb703588d2157ae6833178694525a1fb27f60b99ca7a49c6a5d91",
+        "seconds": 0.6778613114729524,
+        "utc": "2026-10-27T16:21:53.142630+00:00"
+      }
+    },
+    {
+      "name": "mvp009-virtual-deadline-green",
+      "classification": "GREEN:1699 success,1700 timeout,three serial stages",
+      "terminal": {
+        "exit_code": 0,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "2734c0eed3c99751893e765a0bd96de26b1f9bef75ec39c039e5c1829d77fdff",
+        "seconds": 1.9848419893532991,
+        "utc": "2026-10-27T16:22:19.165227+00:00"
+      }
+    },
+    {
+      "name": "mvp009-lifecycle-focused",
+      "classification": "HARNESS: graceful-only wait wrongly used for intended SIGKILL",
+      "terminal": {
+        "exit_code": 101,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "a848269995382ffa2502c6facfc95907fd5cd0bc46c0b0c1c9748c51a8c5b6b3",
+        "seconds": 24.381806692108512,
+        "utc": "2026-10-27T16:24:18.031069+00:00"
+      }
+    },
+    {
+      "name": "mvp009-lifecycle-focused2",
+      "classification": "GREEN:44 Rust cases incl cancel,shutdown,crash,reload",
+      "terminal": {
+        "exit_code": 0,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "5241efc4cde642f93d543df32a356a34185a30de764c32ab990ea4e1e7841ada",
+        "seconds": 21.103878248482943,
+        "utc": "2026-10-27T16:25:16.125306+00:00"
+      }
+    },
+    {
+      "name": "mvp009-queue-cancel-red",
+      "classification": "behavior RED: queue trace lost on cancellation",
+      "terminal": {
+        "exit_code": 101,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "64fc6552924bf53628bc63d19b834a3233e2e2446be916dce41c9d25c005ede3",
+        "seconds": 1.842929469421506,
+        "utc": "2026-10-27T16:26:48.407090+00:00"
+      }
+    },
+    {
+      "name": "mvp009-queue-cancel-green",
+      "classification": "GREEN: cancellation retains queue and unsent provider state",
+      "terminal": {
+        "exit_code": 0,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "85774c091616b94b98478312ef040bfc7dedc8ad0b843510d8316c649a4ae5f1",
+        "seconds": 1.6606086334213614,
+        "utc": "2026-10-27T16:28:16.646814+00:00"
+      }
+    },
+    {
+      "name": "mvp009-precommit-focused",
+      "classification": "GREEN:45 Rust cases,fmt,Clippy; phase1 dirty tree",
+      "terminal": {
+        "exit_code": 0,
+        "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+        "log_sha256": "d1826b0ea435f048b6b12fc977d0cb8572c645039b22f8fb77fc6776ca44e990",
+        "seconds": 33.54555842932314,
+        "utc": "2026-10-27T16:29:52.506262+00:00"
+      }
+    },
+    {
+      "name": "mvp009-archive-bound-red",
+      "classification": "behavior RED: valid aggregate output causes daemon I/O failure",
+      "terminal": {
+        "exit_code": 101,
+        "head": "a57d5157e08821f407716b1617014bbba7911492",
+        "log_sha256": "b0d8644976f87472b72e8585cdb01e7a021b10b89e1b586922e9d91b9695710d",
+        "seconds": 1.2176458928734064,
+        "utc": "2026-10-27T16:33:22.170079+00:00"
+      }
+    },
+    {
+      "name": "mvp009-archive-bound-green",
+      "classification": "GREEN:three bounded near512KiB responses survive restart",
+      "terminal": {
+        "exit_code": 0,
+        "head": "a57d5157e08821f407716b1617014bbba7911492",
+        "log_sha256": "01533ca0417b4ec03a73a677112da2f02ffaec58cac5688efecd76e7250cfa70",
+        "seconds": 3.574860601685941,
+        "utc": "2026-10-27T16:35:43.557599+00:00"
+      }
+    },
+    {
+      "name": "mvp009-wall-harness-control",
+      "classification": "HARNESS compile: private hash helper",
+      "terminal": {
+        "exit_code": 101,
+        "head": "a57d5157e08821f407716b1617014bbba7911492",
+        "log_sha256": "fd30815048e493292fec4023a0ac39ec1ee137873085d6dc85a22fb6c3f2ca3a",
+        "seconds": 1.9827102087438107,
+        "utc": "2026-10-27T16:39:39.500125+00:00"
+      }
+    },
+    {
+      "name": "mvp009-wall-harness-control2",
+      "classification": "HARNESS compile: SHA array does not implement LowerHex",
+      "terminal": {
+        "exit_code": 101,
+        "head": "a57d5157e08821f407716b1617014bbba7911492",
+        "log_sha256": "5cb71db97afb448646e516792dd52d7fc29d989aeeb0541b0e9e0d23cc701606",
+        "seconds": 0.713028441183269,
+        "utc": "2026-10-27T16:41:01.845802+00:00"
+      }
+    },
+    {
+      "name": "mvp009-wall-harness-control3",
+      "classification": "GREEN:quick harness; then explicit overlap assertion added",
+      "terminal": {
+        "exit_code": 0,
+        "head": "a57d5157e08821f407716b1617014bbba7911492",
+        "log_sha256": "43545fcf8e035dbd3443c1f250dedaceafc9f210308c564ad3f1782f3738ad3a",
+        "seconds": 5.0744628654792905,
+        "utc": "2026-10-27T16:41:29.205989+00:00"
+      }
+    },
+    {
+      "name": "mvp009-acceptance-focused",
+      "classification": "GREEN:6 model cases,2 manual ignored,Clippy; includes overlapping quick harness",
+      "terminal": {
+        "exit_code": 0,
+        "head": "a57d5157e08821f407716b1617014bbba7911492",
+        "log_sha256": "b01c61679f35b4d6f7c5e3dacb92ff891c2ad599755c4bd56c24b701bbeee7d5",
+        "seconds": 7.843914804980159,
+        "utc": "2026-10-27T16:44:43.456658+00:00"
+      }
+    }
+  ]
+}

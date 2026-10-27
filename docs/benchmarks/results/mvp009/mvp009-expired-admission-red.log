@@ -1,0 +1,21 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.69s
+     Running unittests src/lib.rs (target/debug/deps/akasha_otsuge-9fc719cf70986c3b)
+
+running 1 test
+
+thread 'provider::tests::exhausted_workflow_cannot_start_provider_after_ready_admission' (3569479) panicked at src/provider.rs:453:13:
+expired workflow began a provider attempt: {"automatic_retries":0,"connect_ms":10000,"idle_ms":null,"idle_triggered":false,"local_long_timeout_verified":false,"provider":{"configured_ms":1700000,"effective_ms":0,"elapsed_ms":1,"layer":"provider","limiting_layer":"workflow","remaining_ms":0,"started_at_unix_ms":1793121835201,"triggered_layer":"workflow"},"queue":{"configured_ms":300000,"effective_ms":300000,"elapsed_ms":0,"layer":"queue","limiting_layer":"queue","remaining_ms":299999,"started_at_unix_ms":1793121835201,"triggered_layer":null},"workflow":{"configured_ms":1000,"effective_ms":1000,"elapsed_ms":2001,"layer":"workflow","limiting_layer":"workflow","remaining_ms":0,"started_at_unix_ms":1793121835201,"triggered_layer":"workflow"}}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test provider::tests::exhausted_workflow_cannot_start_provider_after_ready_admission ... FAILED
+
+failures:
+
+failures:
+    provider::tests::exhausted_workflow_cannot_start_provider_after_ready_admission
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

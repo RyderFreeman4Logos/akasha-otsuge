@@ -1,0 +1,115 @@
+{
+  "admission": {
+    "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/release/akasha-otsuge",
+    "binary_sha256": "0596d1142606b83941b3e6d75568f49e8fd6c2e819f737496ac9f40119ccab3d",
+    "max_attempts": 1,
+    "provider_limit_s": 1700,
+    "real_wall_clock": true,
+    "schema_version": 1,
+    "scratch": "/tmp/akasha-daemon-3526355-0",
+    "started_at_ms": 1793120357866,
+    "success_delay_s": 1605,
+    "test_pid": 3526355
+  },
+  "cases": {
+    "over": {
+      "elapsed_s": 1701.274670007,
+      "error": "PROVIDER_TIMEOUT",
+      "observed_at_ms": 1793122059141,
+      "state": "failed",
+      "trace": {
+        "automatic_retries": 0,
+        "connect_ms": 10000,
+        "idle_ms": null,
+        "idle_triggered": false,
+        "local_long_timeout_verified": false,
+        "provider": {
+          "configured_ms": 1700000,
+          "effective_ms": 1700000,
+          "elapsed_ms": 1700000,
+          "layer": "provider",
+          "limiting_layer": "provider",
+          "remaining_ms": 0,
+          "started_at_unix_ms": 1793120358354,
+          "triggered_layer": "provider"
+        },
+        "queue": {
+          "configured_ms": 300000,
+          "effective_ms": 300000,
+          "elapsed_ms": 67,
+          "layer": "queue",
+          "limiting_layer": "queue",
+          "remaining_ms": 299932,
+          "started_at_unix_ms": 1793120358287,
+          "triggered_layer": null
+        },
+        "workflow": {
+          "configured_ms": 2009986,
+          "effective_ms": 2009986,
+          "elapsed_ms": 1700068,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 309917,
+          "started_at_unix_ms": 1793120358287,
+          "triggered_layer": null
+        }
+      }
+    },
+    "success": {
+      "elapsed_s": 1606.097747657,
+      "error": null,
+      "observed_at_ms": 1793121963957,
+      "state": "succeeded",
+      "trace": {
+        "automatic_retries": 0,
+        "connect_ms": 10000,
+        "idle_ms": null,
+        "idle_triggered": false,
+        "local_long_timeout_verified": false,
+        "provider": {
+          "configured_ms": 1700000,
+          "effective_ms": 1700000,
+          "elapsed_ms": 1605029,
+          "layer": "provider",
+          "limiting_layer": "provider",
+          "remaining_ms": 94970,
+          "started_at_unix_ms": 1793120358253,
+          "triggered_layer": null
+        },
+        "queue": {
+          "configured_ms": 300000,
+          "effective_ms": 300000,
+          "elapsed_ms": 0,
+          "layer": "queue",
+          "limiting_layer": "queue",
+          "remaining_ms": 299999,
+          "started_at_unix_ms": 1793120358253,
+          "triggered_layer": null
+        },
+        "workflow": {
+          "configured_ms": 2009980,
+          "effective_ms": 2009980,
+          "elapsed_ms": 1605029,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 404950,
+          "started_at_unix_ms": 1793120358253,
+          "triggered_layer": null
+        }
+      }
+    }
+  },
+  "collected_utc": "2026-10-27T17:28:21.053221+00:00",
+  "owned_pids_absent": true,
+  "release_bytes_unchanged": true,
+  "scope": "historical acceptance on candidate 69853f1/release0596d114; source review R1 required a later clock repair, so not final-candidate acceptance",
+  "scratch_absent": true,
+  "terminal": {
+    "exit_code": 0,
+    "head": "69853f1001aeea840982188c791de05f36ff5952",
+    "log_sha256": "693ffc67f75ab8c88904d553c113c196ffe594632d3937f04e8ebe2d5f51c185",
+    "seconds": 1707.1911083003506,
+    "utc": "2026-10-27T17:27:44.577917+00:00"
+  },
+  "verified_sha256": "557f7b4e1c96c16859ce6acb4b84b0ba7679d989a77f8f832d5786d91d89df32"
+}

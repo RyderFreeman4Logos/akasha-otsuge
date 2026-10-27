@@ -1,0 +1,18 @@
+{
+  "binary_sha256": "6b6cc71fd9dbb1d8ce904b6ad95ed4227b99a78507e0a05f493ffe387a160c3e",
+  "gate": {
+    "exit_code": 0,
+    "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+    "log_sha256": "ac642e7c3e91ac28645138cb510d84324bea122d730ca707a8c1b00a6e600afb",
+    "seconds": 82.5348502555862,
+    "utc": "2026-10-27T17:30:32.240470+00:00"
+  },
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "installed_daemon_tests": 15,
+  "manual_acceptances_excluded": true,
+  "nonignored_rust_tests": 98,
+  "process_absent": true,
+  "python_tests": 8,
+  "tree": "a17fb69214b772612e63f056444beaefb87b5557",
+  "utc": "2026-10-27T17:30:42.601200+00:00"
+}

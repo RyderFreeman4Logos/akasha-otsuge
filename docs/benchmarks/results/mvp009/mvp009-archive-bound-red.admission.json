@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "model_tests::three_bounded_responses_fit_the_durable_archive_and_ipc",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "a57d5157e08821f407716b1617014bbba7911492",
+  "process": {
+    "pid": 3474606,
+    "start_ticks": "493669795",
+    "state": "R"
+  },
+  "utc": "2026-10-27T16:33:20.954998+00:00"
+}

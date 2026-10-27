@@ -1,0 +1,12 @@
+{
+  "binary_sha256": "6b6cc71fd9dbb1d8ce904b6ad95ed4227b99a78507e0a05f493ffe387a160c3e",
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "name": "mvp009-long-r2",
+  "process": {
+    "pid": 3603376,
+    "start_ticks": "494078164",
+    "state": "R"
+  },
+  "tree": "a17fb69214b772612e63f056444beaefb87b5557",
+  "utc": "2026-10-27T17:41:24.613876+00:00"
+}

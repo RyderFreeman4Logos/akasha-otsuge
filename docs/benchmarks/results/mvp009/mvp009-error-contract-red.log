@@ -1,0 +1,84 @@
+   Compiling zeroize v1.9.1
+   Compiling smallvec v1.16.3
+   Compiling block-buffer v0.12.1
+   Compiling futures-core v0.3.34
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling ring v0.17.14
+   Compiling http v1.5.0
+   Compiling percent-encoding v2.3.2
+   Compiling http-body v1.1.0
+   Compiling cipher v0.5.2
+   Compiling rustls-pki-types v1.15.1
+   Compiling getrandom v0.2.17
+   Compiling futures-task v0.3.34
+   Compiling untrusted v0.9.0
+   Compiling httparse v1.10.1
+   Compiling slab v0.4.12
+   Compiling futures-util v0.3.34
+   Compiling icu_normalizer v2.4.0
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling rustls v0.23.46
+   Compiling try-lock v0.2.5
+   Compiling tower-service v0.3.3
+   Compiling digest v0.11.3
+   Compiling want v0.3.2
+   Compiling idna_adapter v1.2.2
+   Compiling parking_lot_core v0.9.12
+   Compiling rustls-webpki v0.103.16
+   Compiling form_urlencoded v1.2.2
+   Compiling atomic-waker v1.1.2
+   Compiling subtle v2.6.1
+   Compiling hyper v1.12.0
+   Compiling parking_lot v0.12.5
+   Compiling idna v1.1.0
+   Compiling polyval v0.7.3
+   Compiling sync_wrapper v1.0.2
+   Compiling futures-channel v0.3.34
+   Compiling ipnet v2.12.2
+   Compiling base64 v0.23.1
+   Compiling tower-layer v0.3.3
+   Compiling tower v0.5.3
+   Compiling hyper-util v0.1.21
+   Compiling tokio-rustls v0.26.6
+   Compiling ghash v0.6.0
+   Compiling url v2.5.8
+   Compiling hmac v0.13.0
+   Compiling aes v0.9.3
+   Compiling webpki-roots v1.0.11
+   Compiling ctr v0.10.1
+   Compiling chacha20 v0.10.2
+   Compiling ryu v1.0.23
+   Compiling quick_cache v0.6.24
+   Compiling serde_urlencoded v0.7.1
+   Compiling chacha20poly1305 v0.11.0
+   Compiling affinitypool v0.8.0
+   Compiling aes-gcm v0.11.1
+   Compiling hyper-rustls v0.27.10
+   Compiling tower-http v0.6.11
+   Compiling hkdf v0.13.0
+   Compiling sha2 v0.11.1
+   Compiling http-body-util v0.1.5
+   Compiling base64 v0.22.1
+   Compiling log v0.4.34
+   Compiling reqwest v0.12.28
+   Compiling surrealkv v1.0.0 (https://github.com/surrealdb/surrealkv?rev=4338a790c8edc56ef5ea1e46157427af4815be3c#4338a790)
+   Compiling akasha-otsuge v0.1.0-dev (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.17s
+     Running tests/daemon.rs (target/debug/deps/daemon-08655992acdec4bc)
+
+running 1 test
+
+thread 'model_tests::all_model_kinds_classify_bad_output_disconnect_timeout_and_rate_limit' (3432821) panicked at tests/daemon.rs:105:9:
+["model", "run", "/tmp/akasha-daemon-3432820-0/plan.json", "--idempotency-key", "failure"]: {"schema_version":1,"error":{"code":"INVALID_ARGUMENT","message":"Use --help for supported arguments"}}
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test model_tests::all_model_kinds_classify_bad_output_disconnect_timeout_and_rate_limit ... FAILED
+
+failures:
+
+failures:
+    model_tests::all_model_kinds_classify_bad_output_disconnect_timeout_and_rate_limit
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `--test daemon`

@@ -3,33 +3,45 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#7 are merged
-and completed; #8–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#8 are merged
+and completed; #9–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-008
+## Current issue: MVP-009
 
-Private IPC, daemon lifecycle and durable jobs are being implemented on
-`feat/mvp-008-daemon`, based on merge `960320a`. The complete remaining acceptance
-checklist is in [todo.md](todo.md). Existing Storage, ConfigManager, Domain and
-Capture remain the shared authority; CLI calls must reach those real components.
-Focused acceptance now covers real daemon/job crash and graceful recovery,
-configuration/profile/chunked snapshots, CLI history/diff pagination and delivery
-ACK. A different kernel UID control verifies private-path and peer denial.
-Candidate `71090cf` passed the complete installed gate; independent R1 found four
-untested lifecycle boundaries. Their repairs cover all mutation owners during
-shutdown, explicit socket-path activation, live capacity under the claim lock,
-and final-batch deadline arbitration. Each class has a causal RED/GREEN receipt.
-Nine real daemon cases now include SIGTERM/SIGINT and pending-path restart;
-focused library/configuration checks and Clippy pass. The repaired candidate
-still requires its own complete installed gate, independent review and publication.
+Independent provider clients and durable model jobs are implemented on
+`feat/mvp-009-providers`, based on merge `a3d278d`. Repaired source `986a027`
+passes its82.535s canonical gate:98 Rust tests,8 Python tests and15 installed
+daemon cases. Independent whole-candidate R2 review passes with0 findings.
+Release6b6cc71 passes actual GB10 text/4096-dimensional embedding/reranking
+compatibility and its own1702.594s real-duration run:1605.030s success and
+1700.001s provider timeout, one physical send each. Original workflow start,
+configured budget and durable deadline match. R1's clock-renewal defect and its
+causal regressions remain archived alongside historical release0596d114 results.
+The [acceptance report](../providers-acceptance.md) links148 hashed original
+receipts/logs/reports totaling228200B. Final documentation-candidate gate/review,
+CI and publication remain required before closing #9.
+Production daemon/provider and later CLI Runner acceptance stay distinct.
 
-The user-requested dua audit found55.39GiB on the home filesystem. Removing
-obsolete owned caches/probes/diagnostic data and checksum-migrating retained
-artifacts leaves374.74MiB locally and44.06GiB in the SSD mirror; all42 corpus
-shards match their original SHA-256 manifest. Original paths are symlinks, and
-future large artifacts must use this layout. The existing full SSD database was
-not opened or modified.
+## Completed daemon: MVP-008
+
+Candidate `7552d97` passed `bash scripts/check.sh` in78.23s:88 Rust tests,
+8 Python tests, formatting, Clippy, release and capture acceptance. The installed
+release reran all9 daemon cases, including SIGTERM/SIGINT, pending socket restart,
+SIGKILL recovery and CLI/API parity. Kernel UID165536 controls and no-owned-TCP
+checks passed. Independent R2 review passed with0 findings; CI40537161260 passed.
+PR #36 merged as `a3d278d` with the same tree, and #8 closed completed. The four
+R1 lifecycle repairs and the harness procfs-exit race retain causal RED/GREEN
+receipts. [The protocol](../daemon.md) records the actual trust/coverage limits.
+
+The user-requested dua audit found55.39GiB in the home checkout. Removing10.95GiB
+of obsolete owned outputs and checksum-migrating retained artifacts leaves about
+378MiB locally. The 2026-10-27 dua recheck reports41.49GiB in .spike-work and8.43GiB in target
+on the SSD mirror; the shared cache includes #10's first Lance/Arrow compilation.
+Its temporary source checkout is198MiB and shares this target. All42 compressed corpus shards match the original
+manifest; preserve them for #24 without retaining the84GB expanded copy. Both
+large artifact roots remain lexical symlinks into `/ssd/mirror-rootfs/home/obj/`.
+The existing full SSD database was not opened or modified.
 
 ## Completed capture: MVP-007
 
@@ -133,7 +145,8 @@ not active computation. Reconcile an exact terminal result before any replay.
 After the current acceptance leaf is archived, run the canonical
 `bash scripts/check.sh` on the exact committed candidate, obtain independent
 review, push and read back the matching Linux CI, then merge and close the corresponding Issue.
-Continue #8–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
+Continue #9–#28 through publication in dependency order. Isolated preparation can
+overlap immutable long acceptance while preserving one build writer. Avoid repeated full-corpus
 runs on unrelated intermediate changes; #24 repeats the same manifest/oracle
 through the actual product protocol. All required product work remains on the
 complete TODO list; no scaffold or diagnostic result counts as its completion.

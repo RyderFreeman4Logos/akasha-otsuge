@@ -1,0 +1,6 @@
+[run]
+real_wall_clock=true
+success_delay_s=1605
+provider_limit_s=1700
+[reliability]
+max_attempts=1

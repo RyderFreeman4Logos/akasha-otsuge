@@ -1,0 +1,13 @@
+{
+  "command": [
+    "bash",
+    "scripts/check.sh"
+  ],
+  "head": "69853f1001aeea840982188c791de05f36ff5952",
+  "process": {
+    "pid": 3500773,
+    "start_ticks": "493755528",
+    "state": "R"
+  },
+  "utc": "2026-10-27T16:47:38.276678+00:00"
+}

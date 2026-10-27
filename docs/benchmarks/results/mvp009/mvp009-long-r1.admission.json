@@ -1,0 +1,24 @@
+{
+  "command": [
+    "env",
+    "AKASHA_ACCEPTANCE_BINARY=/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/release/akasha-otsuge",
+    "AKASHA_PROVIDER_RECEIPT=/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp009-long-r1",
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "model_tests::real_wall_clock_provider_deadlines",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "69853f1001aeea840982188c791de05f36ff5952",
+  "process": {
+    "pid": 3526335,
+    "start_ticks": "493825438",
+    "state": "R"
+  },
+  "utc": "2026-10-27T16:59:17.389903+00:00"
+}

@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "model_tests::wall_clock_harness_short_control",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "a57d5157e08821f407716b1617014bbba7911492",
+  "process": {
+    "pid": 3489091,
+    "start_ticks": "493718113",
+    "state": "R"
+  },
+  "utc": "2026-10-27T16:41:24.134218+00:00"
+}

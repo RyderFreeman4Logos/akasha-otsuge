@@ -1,11 +1,15 @@
 use super::*;
-use crate::capture::{Capture, PendingReason, ReconcileReport};
+#[cfg(test)]
+use crate::capture::ReconcileReport;
+use crate::capture::{Capture, PendingReason};
 use crate::domain::{Domain, ReadContext, Scope};
 use crate::ipc::CaptureInput;
 use crate::storage::{Change, CommitRequest, RecordKey, RecordKind, hash};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeSet;
+#[path = "models.rs"]
+mod models;
 
 const MAX_ACTIVE: usize = 256;
 const MAX_RUNNING: usize = 16;
@@ -51,6 +55,7 @@ mod tests {
             work: Notify::new(),
             stopping: std::sync::atomic::AtomicBool::new(false),
             instance: "new-daemon".into(),
+            providers: crate::provider::Client::new().unwrap(),
             batch_gate: Mutex::new(None),
         });
         let scope = owner_scope();
@@ -91,7 +96,7 @@ mod tests {
         service
             .stopping
             .store(true, std::sync::atomic::Ordering::Release);
-        service.work.notify_one();
+        service.wake_jobs();
         tokio::time::timeout(Duration::from_secs(2), async {
             while Arc::strong_count(&service) > 1 {
                 tokio::task::yield_now().await;
@@ -405,7 +410,7 @@ mod tests {
                 original.execution_deadline_ms
             );
             assert_eq!(terminal.started_at_ms, original.started_at_ms);
-            let report = terminal.result.unwrap();
+            let report: ReconcileReport = serde_json::from_value(terminal.result.unwrap()).unwrap();
             assert_ne!(
                 report.checkpoint.checkpoint.pending,
                 Some(PendingReason::Backlog)
@@ -422,16 +427,138 @@ mod tests {
         }
         service.storage.close().await.unwrap();
     }
+    #[tokio::test]
+    async fn model_workflow_keeps_its_original_clock_through_restore_wait() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt};
+        let mut observed = Vec::new();
+        for (name, advance_s, already_expired) in [
+            ("before", 1, false),
+            ("after", 11, false),
+            ("expired", 0, true),
+        ] {
+            let endpoint = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let address = endpoint.local_addr().unwrap();
+            let sends = Arc::new(AtomicUsize::new(0));
+            let counted = sends.clone();
+            let server = tokio::spawn(async move {
+                let (stream, _) = endpoint.accept().await.unwrap();
+                let mut stream = tokio::io::BufReader::new(stream);
+                let mut length = None;
+                for _ in 0..32 {
+                    let mut line = String::new();
+                    assert!(stream.read_line(&mut line).await.unwrap() > 0);
+                    if line == "\r\n" {
+                        break;
+                    }
+                    if let Some((name, value)) = line.split_once(':')
+                        && name.eq_ignore_ascii_case("content-length")
+                    {
+                        length = Some(value.trim().parse::<usize>().unwrap());
+                    }
+                }
+                let length = length.unwrap();
+                assert!(length < 4096);
+                stream.read_exact(&mut vec![0; length]).await.unwrap();
+                counted.fetch_add(1, Ordering::SeqCst);
+                let body = r#"{"choices":[{"index":0,"message":{"role":"assistant","content":"ok"},"finish_reason":"stop"}]}"#;
+                let response = format!(
+                    "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                    body.len()
+                );
+                let _ = stream.get_mut().write_all(response.as_bytes()).await;
+            });
+            let extra = format!(
+                "[timeouts]\nworkflow='10s'\nrunner='1s'\nstartup='1ms'\ncleanup='1ms'\ntools='1ms'\nsummary='1ms'\n[models.text]\nkind='text'\nendpoint='http://{address}/v1'\nmodel='fixture'\nlocal=true\n"
+            );
+            let (_fixture, service, _) = fixture(&format!("model-clock-{name}"), &extra).await;
+            let plan = serde_json::from_value(json!({"calls":[{"profile":"text","input":{"kind":"text","prompt":"hello","max_output_tokens":32}}]})).unwrap();
+            service.submit_model(name.into(), plan).await.unwrap();
+            assert!(service.claim(name, 0).await.unwrap());
+            if already_expired {
+                let (revision, mut job) = service.job(name).unwrap();
+                let started = ipc::now_ms().unwrap() - 20_000;
+                job.started_at_ms = Some(started);
+                job.execution_deadline_ms = Some(started + job.execution_budget_ms);
+                service
+                    .save_job(&job, Some(revision), vec![])
+                    .await
+                    .unwrap();
+            }
+            let original = service.job(name).unwrap().1;
+            let first = service.admission.lock().await;
+            let mut execution = Box::pin(service.clone().execute_job(name.into()));
+            std::future::poll_fn(|cx| {
+                assert!(std::future::Future::poll(execution.as_mut(), cx).is_pending());
+                std::task::Poll::Ready(())
+            })
+            .await;
+            let mut blocker = Box::pin(service.admission.lock());
+            std::future::poll_fn(|cx| {
+                assert!(std::future::Future::poll(blocker.as_mut(), cx).is_pending());
+                std::task::Poll::Ready(())
+            })
+            .await;
+            drop(first);
+            std::future::poll_fn(|cx| {
+                assert!(std::future::Future::poll(execution.as_mut(), cx).is_pending());
+                std::task::Poll::Ready(())
+            })
+            .await;
+            let second = blocker.await;
+            tokio::time::pause();
+            tokio::time::advance(Duration::from_secs(advance_s)).await;
+            tokio::time::resume();
+            drop(second);
+            let outcome = tokio::time::timeout(Duration::from_secs(5), execution).await;
+            server.abort();
+            let _ = server.await;
+            let terminal = service.show_job(name).await.unwrap();
+            let physical_sends = sends.load(Ordering::SeqCst);
+            service.storage.close().await.unwrap();
+            outcome.unwrap().unwrap();
+            observed.push((name, original, terminal, physical_sends));
+        }
+        for (name, _, terminal, sends) in &observed {
+            eprintln!(
+                "clock-case {name}: state={} error={} sends={sends}",
+                terminal["state"], terminal["error"]
+            );
+        }
+        observed.sort_by_key(|(name, _, _, _)| *name);
+        for (name, original, terminal, sends) in observed {
+            assert_eq!(terminal["started_at_ms"], original.started_at_ms.unwrap());
+            assert_eq!(
+                terminal["execution_deadline_ms"],
+                original.execution_deadline_ms.unwrap()
+            );
+            if name == "before" {
+                assert_eq!(terminal["state"], "succeeded");
+                assert_eq!(sends, 1);
+                let trace = &terminal["result"]["calls"][0]["trace"]["workflow"];
+                assert_eq!(trace["configured_ms"], original.execution_budget_ms);
+                assert_eq!(trace["started_at_unix_ms"], original.started_at_ms.unwrap());
+            } else {
+                assert_eq!(terminal["state"], "failed", "{name}: {terminal}");
+                assert_eq!(terminal["error"], "WORKFLOW_TIMEOUT", "{name}: {terminal}");
+                assert_eq!(sends, 0, "{name}: an exhausted workflow sent a request");
+            }
+        }
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct Job {
+pub(super) struct Job {
     schema_version: u32,
     id: String,
     request_sha256: String,
-    binding: CaptureInput,
-    path: PathBuf,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    binding: Option<CaptureInput>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    path: Option<PathBuf>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    model_plan: Option<crate::provider::Plan>,
     config_generation: u64,
     config_digest: String,
     accepted_at_ms: u64,
@@ -446,7 +573,7 @@ struct Job {
     state: String,
     cancel_requested: bool,
     error: Option<String>,
-    result: Option<ReconcileReport>,
+    result: Option<Value>,
 }
 impl Job {
     fn terminal(&self) -> bool {
@@ -497,6 +624,10 @@ impl Service {
         if job.schema_version != 1
             || job.id != id
             || job.attempt > MAX_ATTEMPTS
+            || !matches!(
+                (&job.binding, &job.path, &job.model_plan),
+                (Some(_), Some(_), None) | (None, None, Some(_))
+            )
             || !["queued", "running", "succeeded", "failed", "cancelled"]
                 .contains(&job.state.as_str())
         {
@@ -539,7 +670,12 @@ impl Service {
         Ok(())
     }
     fn authorize_job(&self, job: &Job) -> Result<()> {
-        Domain::new(&self.storage).permission(&context()?, Some(&job.binding.scope))?;
+        let scope = job
+            .binding
+            .as_ref()
+            .map(|b| b.scope.clone())
+            .unwrap_or_else(owner_scope);
+        Domain::new(&self.storage).permission(&context()?, Some(&scope))?;
         Ok(())
     }
     fn allowed_path(&self, path: &Path) -> Result<PathBuf> {
@@ -575,16 +711,45 @@ impl Service {
         binding: CaptureInput,
         path: PathBuf,
     ) -> Result<Value> {
+        self.submit_job(id, Some(binding), Some(path), None).await
+    }
+    pub(super) async fn submit_model(
+        self: &Arc<Self>,
+        id: String,
+        plan: crate::provider::Plan,
+    ) -> Result<Value> {
+        self.submit_job(id, None, None, Some(plan)).await
+    }
+    async fn submit_job(
+        self: &Arc<Self>,
+        id: String,
+        binding: Option<CaptureInput>,
+        path: Option<PathBuf>,
+        model_plan: Option<crate::provider::Plan>,
+    ) -> Result<Value> {
         let service = self.clone();
         self.operation(async move {
             let _guard = service.admission.lock().await;
             if !ipc::identifier(&id) {
                 return Err(Error("INVALID_REQUEST"));
             }
-            binding.binding()?;
-            Domain::new(&service.storage).permission(&context()?, Some(&binding.scope))?;
-            let path = service.allowed_path(&path)?;
-            let fingerprint = hash(&serde_json::to_vec(&(&binding, &path))?);
+            let path = path
+                .as_deref()
+                .map(|p| service.allowed_path(p))
+                .transpose()?;
+            if let Some(binding) = &binding {
+                binding.binding()?;
+            }
+            let scope = binding
+                .as_ref()
+                .map(|b| b.scope.clone())
+                .unwrap_or_else(owner_scope);
+            Domain::new(&service.storage).permission(&context()?, Some(&scope))?;
+            let fingerprint = if let Some(plan) = &model_plan {
+                hash(&serde_json::to_vec(&("model", plan))?)
+            } else {
+                hash(&serde_json::to_vec(&(&binding, &path))?)
+            };
             if service.storage.current(&job_key(&id))?.is_some() {
                 let (_, job) = service.job(&id)?;
                 if job.request_sha256 != fingerprint {
@@ -611,15 +776,19 @@ impl Service {
             let now = ipc::now_ms()?;
             let queue_ms = u64::try_from(snapshot.resolved().timeouts().queue.as_millis())
                 .map_err(|_| Error("CONFIG_INVALID"))?;
+            let budget = match &model_plan {
+                Some(plan) => plan.validate(snapshot.resolved()).map_err(|e| Error(e.0))?,
+                None => snapshot.resolved().timeouts().tools,
+            };
             let execution_budget_ms =
-                u64::try_from(snapshot.resolved().timeouts().tools.as_millis())
-                    .map_err(|_| Error("CONFIG_INVALID"))?;
+                u64::try_from(budget.as_millis()).map_err(|_| Error("CONFIG_INVALID"))?;
             let job = Job {
                 schema_version: 1,
                 id: id.clone(),
                 request_sha256: fingerprint,
                 binding,
                 path,
+                model_plan,
                 config_generation: snapshot.generation(),
                 config_digest: snapshot.resolved().digest().into(),
                 accepted_at_ms: now,
@@ -648,16 +817,22 @@ impl Service {
                     }],
                 )
                 .await?;
-            service.work.notify_one();
+            service.wake_jobs();
             Ok(serde_json::to_value(job)?)
         })
         .await
     }
     pub(super) async fn show_job(&self, id: &str) -> Result<Value> {
         let _guard = self.admission.lock().await;
-        let (_, job) = self.job(id)?;
+        let (revision, job) = self.job(id)?;
         self.authorize_job(&job)?;
-        Ok(serde_json::to_value(job)?)
+        let mut value = serde_json::to_value(&job)?;
+        if job.model_plan.is_some()
+            && let Some(result) = &job.result
+        {
+            value["result"] = models::load_result(&self.storage, result, revision)?;
+        }
+        Ok(value)
     }
     pub(super) async fn list_jobs(&self, after: Option<&str>) -> Result<Value> {
         let _guard = self.admission.lock().await;
@@ -698,7 +873,7 @@ impl Service {
                 } else {
                     service.save_job(&job, Some(revision), vec![]).await?;
                 }
-                service.work.notify_one();
+                service.wake_jobs();
             }
             Ok(serde_json::to_value(job)?)
         })
@@ -727,7 +902,7 @@ impl Service {
             }],
         )
         .await?;
-        self.work.notify_one();
+        self.wake_jobs();
         Ok(())
     }
     pub(super) async fn recover(&self) -> Result<()> {
@@ -747,6 +922,11 @@ impl Service {
                 return Err(Error("CONFIG_CORRUPT"));
             }
             if job.state == "running" {
+                if job.model_plan.is_some() {
+                    self.finish_job(job, revision, "failed", Some("PROVIDER_INTERRUPTED"))
+                        .await?;
+                    continue;
+                }
                 job.state = "queued".into();
                 job.lease_owner = None;
                 job.lease_until_ms = None;
@@ -801,13 +981,23 @@ impl Service {
         Ok(true)
     }
     async fn execute_job(self: Arc<Self>, id: String) -> Result<()> {
-        let deadline = {
+        let job = {
             let _guard = self.admission.lock().await;
-            self.job(&id)?
-                .1
-                .execution_deadline_ms
-                .ok_or(Error("JOB_CORRUPT"))?
+            self.job(&id)?.1
         };
+        let deadline = job.execution_deadline_ms.ok_or(Error("JOB_CORRUPT"))?;
+        if job.model_plan.is_some() {
+            let started = job.started_at_ms.ok_or(Error("JOB_CORRUPT"))?;
+            if started.checked_add(job.execution_budget_ms) != Some(deadline) {
+                return Err(Error("JOB_CORRUPT"));
+            }
+            let workflow = crate::config::deadline::Deadline::resume(
+                crate::config::deadline::Layer::Workflow,
+                Duration::from_millis(job.execution_budget_ms),
+                started,
+            )?;
+            return self.execute_model(id, workflow).await;
+        }
         let remaining = Duration::from_millis(deadline.saturating_sub(ipc::now_ms()?));
         let end = tokio::time::Instant::now() + remaining;
         loop {
@@ -834,15 +1024,19 @@ impl Service {
             }
             let checked = self
                 .authorize_job(&job)
-                .and_then(|_| self.allowed_path(&job.path));
+                .and_then(|_| self.allowed_path(job.path.as_deref().ok_or(Error("JOB_CORRUPT"))?));
             if let Err(error) = checked {
                 return self
                     .finish_job(job, revision, "failed", Some(error.0))
                     .await;
             }
             let storage = self.storage.clone();
-            let binding = job.binding.binding()?;
-            let path = job.path.clone();
+            let binding = job
+                .binding
+                .as_ref()
+                .ok_or(Error("JOB_CORRUPT"))?
+                .binding()?;
+            let path = job.path.clone().ok_or(Error("JOB_CORRUPT"))?;
             let generation = job.config_generation;
             let runtime = tokio::runtime::Handle::current();
             #[cfg(test)]
@@ -863,7 +1057,7 @@ impl Service {
             match result {
                 Ok(report) => {
                     let more = report.checkpoint.checkpoint.pending == Some(PendingReason::Backlog);
-                    job.result = Some(report);
+                    job.result = Some(serde_json::to_value(report)?);
                     if tokio::time::Instant::now() >= end {
                         return self
                             .finish_job(job, revision, "failed", Some("JOB_TIMEOUT"))
@@ -884,7 +1078,7 @@ impl Service {
                     job.lease_owner = None;
                     job.lease_until_ms = None;
                     self.save_job(&job, Some(revision), vec![]).await?;
-                    self.work.notify_one();
+                    self.wake_jobs();
                     return Ok(());
                 }
                 Err(error) => {
@@ -939,7 +1133,7 @@ impl Service {
             self.stopping
                 .store(true, std::sync::atomic::Ordering::Release);
             self.stop.notify_one();
-            self.work.notify_one();
+            self.wake_jobs();
         }
         while let Some(result) = running.join_next().await {
             let result = result

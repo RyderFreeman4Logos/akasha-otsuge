@@ -1,0 +1,26 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.33s
+     Running unittests src/lib.rs (target/debug/deps/akasha_otsuge-9fc719cf70986c3b)
+
+running 1 test
+clock-case before: state="succeeded" error=null sends=1
+clock-case after: state="succeeded" error=null sends=1
+clock-case expired: state="failed" error="WORKFLOW_TIMEOUT" sends=1
+
+thread 'daemon::jobs::tests::model_workflow_keeps_its_original_clock_through_restore_wait' (3564055) panicked at src/daemon/jobs.rs:542:17:
+assertion `left == right` failed: after: {"accepted_at_ms":1793121649195,"attempt":1,"cancel_requested":false,"config_digest":"bdd731a35f558948e4b86318b43dacb86b1e187887cdd928e5440a036f684837","config_generation":1,"error":null,"execution_budget_ms":10000,"execution_deadline_ms":1793121659211,"id":"after","lease_owner":null,"lease_until_ms":null,"model_plan":{"calls":[{"input":{"kind":"text","max_output_tokens":32,"prompt":"hello"},"profile":"text"}]},"queue_deadline_ms":1793121949195,"request_sha256":"53f743038caa6d53b2164d38158cd1dfbce5b0773af512e3f1d8b4d85c45938a","result":{"calls":[{"error":null,"identity":"93ff5ebb4d9aa1a2be17500af11793f3d5155840adb92bcd0f1481d10ccd99ce","output":{"text":"ok"},"profile":"text","trace":{"automatic_retries":0,"connect_ms":10000,"idle_ms":null,"idle_triggered":false,"local_long_timeout_verified":false,"provider":{"configured_ms":1700000,"effective_ms":9984,"elapsed_ms":0,"layer":"provider","limiting_layer":"workflow","remaining_ms":9984,"started_at_unix_ms":1793121649228,"triggered_layer":null},"queue":{"configured_ms":300000,"effective_ms":300000,"elapsed_ms":0,"layer":"queue","limiting_layer":"queue","remaining_ms":299999,"started_at_unix_ms":1793121649228,"triggered_layer":null},"workflow":{"configured_ms":9985,"effective_ms":9985,"elapsed_ms":0,"layer":"workflow","limiting_layer":"workflow","remaining_ms":9984,"started_at_unix_ms":1793121649228,"triggered_layer":null}}}]},"retry_at_ms":1793121649195,"schema_version":1,"started_at_ms":1793121649211,"state":"succeeded"}
+  left: String("succeeded")
+ right: "failed"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test daemon::jobs::tests::model_workflow_keeps_its_original_clock_through_restore_wait ... FAILED
+
+failures:
+
+failures:
+    daemon::jobs::tests::model_workflow_keeps_its_original_clock_through_restore_wait
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.70s
+
+error: test failed, to rerun pass `--lib`

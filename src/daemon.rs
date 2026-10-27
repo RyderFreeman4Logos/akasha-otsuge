@@ -115,10 +115,15 @@ struct Service {
     work: Notify,
     stopping: std::sync::atomic::AtomicBool,
     instance: String,
+    providers: crate::provider::Client,
     #[cfg(test)]
     batch_gate: Mutex<Option<BatchGate>>,
 }
 impl Service {
+    fn wake_jobs(&self) {
+        self.work.notify_waiters();
+        self.work.notify_one();
+    }
     async fn operation(
         &self,
         future: impl std::future::Future<Output = Result<serde_json::Value>> + Send + 'static,
@@ -142,7 +147,7 @@ impl Service {
     async fn close(&self, mut outcome: Result<()>) -> Result<()> {
         self.stopping
             .store(true, std::sync::atomic::Ordering::Release);
-        self.work.notify_one();
+        self.wake_jobs();
         let mut owners = self.operations.lock().await;
         while let Some(result) = owners.join_next().await {
             outcome = outcome.and(result.map_err(|_| Error("JOB_ERROR")));
@@ -178,6 +183,10 @@ impl Service {
                 path,
                 idempotency_key,
             } => self.submit(idempotency_key, binding, path).await,
+            Command::ModelRun {
+                plan,
+                idempotency_key,
+            } => self.submit_model(idempotency_key, plan).await,
             Command::JobShow { id } => self.show_job(&id).await,
             Command::JobCancel { id } => self.cancel_job(id).await,
             Command::JobList { after } => self.list_jobs(after.as_deref()).await,
@@ -429,6 +438,7 @@ pub async fn run(
     config_path: PathBuf,
     profile: Option<String>,
 ) -> Result<()> {
+    let providers = crate::provider::Client::new().map_err(|e| Error(e.0))?;
     private_dir(&config.config().paths.data_dir)?;
     let (listener, _owner) = listen(&config.config().paths.socket_path)?;
     let storage = Arc::new(Storage::open(&config).await?);
@@ -458,6 +468,7 @@ pub async fn run(
         work: Notify::new(),
         stopping: std::sync::atomic::AtomicBool::new(false),
         instance,
+        providers,
         #[cfg(test)]
         batch_gate: Mutex::new(None),
     });
@@ -559,7 +570,7 @@ where
     service
         .stopping
         .store(true, std::sync::atomic::Ordering::Release);
-    service.work.notify_one();
+    service.wake_jobs();
     while tasks.join_next().await.is_some() {}
     if !scheduler_collected {
         let drained = scheduler

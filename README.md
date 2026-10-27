@@ -14,4 +14,6 @@ A local, traceable memory system for coding agents, written in Rust.
 
 [采集与恢复协议](docs/capture.md)保存原始字节、规范化事件和分支/压缩关系，提供有界离线 reconcile 组件命令及可查询的缺失状态。
 
+[模型调用](docs/providers.md)通过持久 job 调用独立的 text、embedding 和 reranker 配置，记录分层时间预算；具体兼容性和长测证据见 [#9](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9)。
+
 公开仓库按用户要求采用 [Apache-2.0](LICENSE)。[来源与许可证核查](docs/provenance.md)记录迁移边界。

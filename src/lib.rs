@@ -3,4 +3,5 @@ pub mod config;
 pub mod daemon;
 pub mod domain;
 pub mod ipc;
+pub mod provider;
 pub mod storage;
