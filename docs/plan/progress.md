@@ -10,14 +10,17 @@ is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 ## Current issue: MVP-009
 
 Independent provider clients and durable model jobs are implemented on
-`feat/mvp-009-providers`, based on merge `a3d278d`. Candidate `69853f1` passed
-its complete105.27s gate:96 Rust tests,8 Python tests and15 installed daemon
-cases. The actual GB10 production path passed text/4096-dimensional embedding/
-reranking compatibility. Its real-duration release run passed1605.029s success and1700s timeout,
-retaining that original release identity. R1 source review found one workflow-clock renewal across an admission
-wait. The fix carries the original clock and refuses expired admission; causal
-executor/provider regressions and49 focused Rust tests plus Clippy pass. Final
-candidate gate, review and release acceptance remain required before closing #9.
+`feat/mvp-009-providers`, based on merge `a3d278d`. Repaired source `986a027`
+passes its82.535s canonical gate:98 Rust tests,8 Python tests and15 installed
+daemon cases. Independent whole-candidate R2 review passes with0 findings.
+Release6b6cc71 passes actual GB10 text/4096-dimensional embedding/reranking
+compatibility and its own1702.594s real-duration run:1605.030s success and
+1700.001s provider timeout, one physical send each. Original workflow start,
+configured budget and durable deadline match. R1's clock-renewal defect and its
+causal regressions remain archived alongside historical release0596d114 results.
+The [acceptance report](../providers-acceptance.md) links148 hashed original
+receipts/logs/reports totaling228200B. Final documentation-candidate gate/review,
+CI and publication remain required before closing #9.
 Production daemon/provider and later CLI Runner acceptance stay distinct.
 
 ## Completed daemon: MVP-008
@@ -33,8 +36,9 @@ receipts. [The protocol](../daemon.md) records the actual trust/coverage limits.
 
 The user-requested dua audit found55.39GiB in the home checkout. Removing10.95GiB
 of obsolete owned outputs and checksum-migrating retained artifacts leaves about
-376MiB locally. The 2026-10-27 dua recheck reports41.49GiB in .spike-work and4.63GiB in target
-on the SSD mirror; active HTTP/test build outputs explain the target increase. All42 compressed corpus shards match the original
+378MiB locally. The 2026-10-27 dua recheck reports41.49GiB in .spike-work and8.43GiB in target
+on the SSD mirror; the shared cache includes #10's first Lance/Arrow compilation.
+Its temporary source checkout is198MiB and shares this target. All42 compressed corpus shards match the original
 manifest; preserve them for #24 without retaining the84GB expanded copy. Both
 large artifact roots remain lexical symlinks into `/ssd/mirror-rootfs/home/obj/`.
 The existing full SSD database was not opened or modified.
@@ -141,7 +145,8 @@ not active computation. Reconcile an exact terminal result before any replay.
 After the current acceptance leaf is archived, run the canonical
 `bash scripts/check.sh` on the exact committed candidate, obtain independent
 review, push and read back the matching Linux CI, then merge and close the corresponding Issue.
-Continue #8–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
+Continue #9–#28 through publication in dependency order. Isolated preparation can
+overlap immutable long acceptance while preserving one build writer. Avoid repeated full-corpus
 runs on unrelated intermediate changes; #24 repeats the same manifest/oracle
 through the actual product protocol. All required product work remains on the
 complete TODO list; no scaffold or diagnostic result counts as its completion.

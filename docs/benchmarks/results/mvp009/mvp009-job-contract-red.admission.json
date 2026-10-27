@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "model_tests::independent_model_endpoints_run_as_durable_jobs",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+  "process": {
+    "pid": 3425396,
+    "start_ticks": "493537022",
+    "state": "R"
+  },
+  "utc": "2026-10-27T16:11:13.221012+00:00"
+}

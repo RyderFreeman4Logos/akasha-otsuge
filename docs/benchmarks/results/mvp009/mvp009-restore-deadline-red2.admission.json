@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--lib",
+    "daemon::jobs::tests::model_workflow_keeps_its_original_clock_through_restore_wait",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "69853f1001aeea840982188c791de05f36ff5952",
+  "process": {
+    "pid": 3563662,
+    "start_ticks": "493954322",
+    "state": "R"
+  },
+  "utc": "2026-10-27T17:20:46.224413+00:00"
+}

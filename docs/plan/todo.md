@@ -47,7 +47,10 @@ The 2026-10-27 audit finds 20 open Issues (#9–#28). #4–#8 are closed with
 merged PRs #32–#36; no completed implementation is waiting for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
-one dependency leaf through publication before starting the next. Keep already
+one dependency leaf through publication before merging the next. During a fixed
+long acceptance, independent preparation may use one isolated SSD checkout and
+the shared build cache, without changing the frozen source or release executable.
+Keep one build writer and remove the temporary checkout after publication. Keep
 passing unchanged full-data receipts, rather than rerunning them for each leaf.
 
 ## MVP-003 completed acceptance
@@ -244,15 +247,22 @@ retain exact commands, identities, original failures and scope limits.
   executor RED/GREEN covers before/after expiry and already-expired execution;
   the original durable start/budget survives, and expired work sends no request.
   Provider admission also rechecks expired queue/workflow clocks before dispatch.
-- [ ] Recheck the repaired exact candidate, independent review and release
-  acceptances; prior release receipts retain their own immutable identities.
+- [x] Repaired source `986a027` passes its82.535s canonical gate:98 Rust tests,
+  8 Python tests and15 installed daemon cases. Whole-candidate R2 review passes
+  with0 actionable findings. Actual GB10 text/embedding4096/reranker pass on the
+  exact release6b6cc71; prior release receipts retain their own identities.
 - [x] Historical release0596d114 passed the nohup production-daemon1605.029s
   success and1700s provider timeout, one physical send each; all owned processes
   ended and scratch was removed. This predates the R1 workflow repair.
-- [ ] Run the repaired release's own real-wall acceptance after source review;
-  preserve all start/end/deadline identities without transferring historical proof.
-- [ ] Document examples/limits, exact-HEAD canonical gate, independent review,
-  CI, merge and completed closure; then continue #10 through #28.
+- [x] Repaired release6b6cc71 passes its own real-wall run in1702.594s:1605.030s
+  success and1700.001s timeout, one physical send each. Original job/workflow
+  start and2010000ms budget match; owned processes and scratch are gone.
+- [x] Archive148 original receipts/logs/reports (228200B), verify every hash,
+  and document examples, exact identities and limits in
+  [the acceptance report](../providers-acceptance.md).
+- [ ] Complete final documentation-candidate gate/review, CI, merge and closure;
+  then continue #10 through #28. #10's isolated preparation has two passing
+  retrieval/range fixtures; vector/hybrid/rerank and remaining criteria are open.
 
 Host preparation: Codex0.164.0, Hermes0.22.5+1914 and Pi0.78.0 are executable.
 The existing Claude entry points to a missing2.1.170 installation; #12 must repair

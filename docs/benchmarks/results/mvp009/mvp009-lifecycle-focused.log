@@ -1,0 +1,269 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.68s
+     Running unittests src/lib.rs (target/debug/deps/akasha_otsuge-9fc719cf70986c3b)
+
+running 15 tests
+test storage::crash_tests::capture_crash_child ... ignored, launched only by the capture crash supervisor
+test storage::crash_tests::crash_child ... ignored, launched only by the crash supervisor with an isolated database
+test config::manager::tests::failed_durable_commit_keeps_active_pending_history_and_watch_unchanged ... ok
+test capture::file::tests::checkpoint_anchors_use_the_accepted_frame_after_a_concurrent_rewrite ... ok
+test daemon::jobs::tests::serve_accept_error_stops_and_closes_storage ... ok
+test daemon::jobs::tests::disconnected_mutation_owners_are_bounded_and_drained ... ok
+test daemon::jobs::tests::completed_scheduler_error_is_collected_before_storage_close ... ok
+crash checkpoint=before-stage recovered_seq=1 retry_seq=2 all_records_atomic=true
+test daemon::jobs::tests::scheduler_error_collects_a_sibling_physical_batch ... ok
+test daemon::jobs::tests::shutdown_collects_reload_after_its_client_timeout ... ok
+test daemon::jobs::tests::claim_checks_reloaded_cap_after_waiting_for_admission ... ok
+test daemon::jobs::tests::final_physical_batch_obeys_the_original_execution_deadline ... ok
+test daemon::jobs::tests::recovered_jobs_keep_retry_exhaustion_and_original_deadlines ... ok
+crash checkpoint=partial-stage recovered_seq=1 retry_seq=2 all_records_atomic=true
+capture checkpoint=capture-intent SIGKILL_recovered=true checkpoint_atomic=true retry_unchanged=true
+crash checkpoint=before-commit recovered_seq=1 retry_seq=2 all_records_atomic=true
+test capture::file::tests::reconcile_never_adopts_replacement_anchors_at_resume_or_frame_boundaries ... ok
+crash checkpoint=commit-pending recovered_seq=1 retry_seq=2 all_records_atomic=true
+capture checkpoint=capture-raw SIGKILL_recovered=true checkpoint_atomic=true retry_unchanged=true
+crash checkpoint=after-commit recovered_seq=2 retry_seq=2 all_records_atomic=true
+crash checkpoint=after-reply recovered_seq=2 retry_seq=2 all_records_atomic=true
+test storage::crash_tests::killed_transactions_recover_whole_batches_and_retry_exactly_once ... ok
+capture checkpoint=capture-source SIGKILL_recovered=true checkpoint_atomic=true retry_unchanged=true
+capture checkpoint=capture-published SIGKILL_recovered=true checkpoint_atomic=true retry_unchanged=true
+test storage::crash_tests::killed_capture_reuses_staged_chunks_and_publishes_checkpoint_atomically ... ok
+
+test result: ok. 13 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 2.56s
+
+     Running tests/config.rs (target/debug/deps/config-4d3d58c229860954)
+
+running 17 tests
+test workflow_covers_three_starts_and_reports_the_actual_limiting_layer ... ok
+test accepted_tasks_pin_resources_and_subscribers_see_complete_generations ... ok
+test queue_time_does_not_shorten_1700_seconds_or_enable_an_idle_watchdog ... ok
+test profile_and_management_precedence_have_auditable_field_sources ... ok
+test channel_routes_executor_permissions_and_global_limits_use_live_config ... ok
+test diagnostics_redact_credentials_endpoints_and_command_arguments ... ok
+test fallback_references_cycles_and_slowest_selected_executor_are_checked ... ok
+test reload_does_not_change_existing_deadlines ... ok
+test defaults_cover_all_local_model_roles_without_an_endpoint_requirement ... ok
+test concurrent_reload_commits_unique_complete_versions ... ok
+test removing_an_explicit_path_restores_startup_defaults_as_pending ... ok
+{
+  "active_generation": 2,
+  "effective": {
+    "config": {
+      "access": {
+        "read_roots": []
+      },
+      "consult": {
+        "executor": "caller",
+        "instructions_version": "v1",
+        "max_delegation_depth": 1,
+        "max_result_chars": 4000,
+        "max_runner_starts": 3
+      },
+      "executors": {},
+      "logging": {
+        "level": "info"
+      },
+      "models": {},
+      "notifiers": {},
+      "paths": {
+        "data_dir": "/tmp/akasha-config-test/data",
+        "socket_path": "/tmp/akasha-config-test/service.sock"
+      },
+      "retrieval": {
+        "embedding": null,
+        "extraction": null,
+        "max_candidates": 100,
+        "max_original_chars": 64000,
+        "reranker": null,
+        "top_k": 20
+      },
+      "review": {
+        "mode": "policy"
+      },
+      "runtime": {
+        "max_concurrent_jobs": 1,
+        "max_queued_jobs": 100,
+        "memory_budget_mib": 512,
+        "paused": false
+      },
+      "schema_version": 1,
+      "timeouts": {
+        "cleanup": "10s",
+        "idle": "disabled",
+        "local_request": "1700s",
+        "queue": "5m",
+        "runner": "2000s",
+        "startup": "30s",
+        "summary": "60s",
+        "tools": "120s",
+        "workflow": "auto"
+      }
+    },
+    "digest": "4a26884b7c0bfe5a70e7620d00f5884d067ba1e5e59790a2e979a43294eb35ff",
+    "effective_timeouts": {
+      "cleanup": {
+        "nanos": 0,
+        "secs": 10
+      },
+      "executors": {},
+      "idle": null,
+      "local_request": {
+        "nanos": 0,
+        "secs": 1700
+      },
+      "providers": {},
+      "queue": {
+        "nanos": 0,
+        "secs": 300
+      },
+      "runner": {
+        "nanos": 0,
+        "secs": 2000
+      },
+      "startup": {
+        "nanos": 0,
+        "secs": 30
+      },
+      "summary": {
+        "nanos": 0,
+        "secs": 60
+      },
+      "tools": {
+        "nanos": 0,
+        "secs": 120
+      },
+      "workflow": {
+        "nanos": 0,
+        "secs": 6300
+      }
+    },
+    "local_long_timeout_verified": false,
+    "retrieval_fingerprint": "6910e323a75d65887b0ea875fdf6520d0b31526fddb11231dac938f95989333d",
+    "schema_version": 1,
+    "selected_profile": null,
+    "sources": {
+      "access.read_roots": "builtin",
+      "consult.executor": "builtin",
+      "consult.instructions_version": "builtin",
+      "consult.max_delegation_depth": "builtin",
+      "consult.max_result_chars": "builtin",
+      "consult.max_runner_starts": "builtin",
+      "logging.level": "builtin",
+      "paths.data_dir": "startup",
+      "paths.socket_path": "startup",
+      "retrieval.embedding": "builtin",
+      "retrieval.extraction": "builtin",
+      "retrieval.max_candidates": "builtin",
+      "retrieval.max_original_chars": "builtin",
+      "retrieval.reranker": "builtin",
+      "retrieval.top_k": "builtin",
+      "review.mode": "builtin",
+      "runtime.max_concurrent_jobs": "builtin",
+      "runtime.max_queued_jobs": "builtin",
+      "runtime.memory_budget_mib": "builtin",
+      "runtime.paused": "builtin",
+      "schema_version": "builtin",
+      "timeouts.cleanup": "builtin",
+      "timeouts.idle": "builtin",
+      "timeouts.local_request": "builtin",
+      "timeouts.queue": "builtin",
+      "timeouts.runner": "user",
+      "timeouts.startup": "builtin",
+      "timeouts.summary": "builtin",
+      "timeouts.tools": "builtin",
+      "timeouts.workflow": "builtin"
+    }
+  },
+  "pending": null,
+  "revision_log": [
+    {
+      "active_generation": 1,
+      "candidate_digest": null,
+      "pending_generation": null,
+      "reasons": [
+        {
+          "byte_offset": 9,
+          "code": "CONFIG_INVALID",
+          "field": "document",
+          "message": "invalid TOML; source values omitted"
+        }
+      ],
+      "status": "rejected"
+    },
+    {
+      "active_generation": 1,
+      "candidate_digest": "b0e401fc03df1058de7a8979dcdd601325000fb9c38b5cf6307437cc989a5bd1",
+      "pending_generation": null,
+      "reasons": [
+        {
+          "byte_offset": null,
+          "code": "CONFIG_INVALID",
+          "field": "prepare",
+          "message": "resource preparation failed; old configuration retained"
+        }
+      ],
+      "status": "rejected"
+    },
+    {
+      "active_generation": 1,
+      "candidate_digest": "01233fd0ddb5ff651282d372644d564c9540ca8e47b73389af068bb801f94e4a",
+      "pending_generation": 2,
+      "reasons": [
+        {
+          "byte_offset": null,
+          "code": "CONFIG_RESTART_REQUIRED",
+          "field": "paths",
+          "message": "data directory or socket change requires explicit drain and restart"
+        }
+      ],
+      "status": "restart_required"
+    },
+    {
+      "active_generation": 2,
+      "candidate_digest": "4a26884b7c0bfe5a70e7620d00f5884d067ba1e5e59790a2e979a43294eb35ff",
+      "pending_generation": null,
+      "reasons": [],
+      "status": "applied"
+    }
+  ]
+}
+test retrieval_fingerprint_ignores_log_only_changes_but_tracks_model_semantics ... ok
+test embedding_preparation_failure_preserves_the_whole_old_bundle ... ok
+test rejected_or_mixed_restart_changes_never_partially_apply ... ok
+test invalid_configs_fail_closed_and_errors_never_echo_values ... ok
+test bounded_file_reads_handle_partial_writes_and_atomic_replacement ... ok
+test profile_count_and_revision_history_are_bounded ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/daemon.rs (target/debug/deps/daemon-08655992acdec4bc)
+
+running 13 tests
+test configuration_fifo_is_rejected_before_any_blocking_read ... ok
+test production_signals_drain_and_release_the_socket_for_restart ... ok
+test private_daemon_lifecycle_and_bounded_versioned_protocol ... ok
+test model_tests::independent_model_endpoints_run_as_durable_jobs ... ok
+test production_history_diff_and_receipt_reads_use_the_domain_and_live_grant ... ok
+test selected_profile_large_config_and_pending_paths_survive_restart ... ok
+test model_tests::queued_models_keep_endpoint_and_budget_across_reload ... ok
+
+thread 'model_tests::model_cancel_shutdown_and_crash_never_replay_ambiguous_calls' (3451952) panicked at tests/daemon.rs:127:17:
+assertion failed: exit.success()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test configuration_reload_and_watcher_share_durable_generations ... ok
+test explicit_restart_activates_pending_socket_and_preserves_old_job_plan ... ok
+test model_tests::model_cancel_shutdown_and_crash_never_replay_ambiguous_calls ... FAILED
+test queue_expiry_and_running_cancellation_do_not_wait_for_a_free_slot ... ok
+test model_tests::all_model_kinds_classify_bad_output_disconnect_timeout_and_rate_limit ... ok
+test accepted_reconciliation_survives_process_death_and_pins_configuration ... ok
+
+failures:
+
+failures:
+    model_tests::model_cancel_shutdown_and_crash_never_replay_ambiguous_calls
+
+test result: FAILED. 12 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 17.08s
+
+error: test failed, to rerun pass `--test daemon`

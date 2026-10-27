@@ -1,0 +1,69 @@
+{
+  "base": "69853f1001aeea840982188c791de05f36ff5952",
+  "causal_executor_red": "after-expiry job succeeded and sent once; already-expired job sent once",
+  "executor_green": "positive succeeds once; both exhausted cases timeout with zero sends and unchanged original start/deadline",
+  "focused_rust_tests": 49,
+  "initial_red_classification": "HARNESS invalid 10s workflow retained default 1700s Runner; corrected fixture only",
+  "provider_green": "already-expired workflow, workflow expiry during slot wait and queue expiry all refuse provider attempt",
+  "records": [
+    {
+      "exit_code": 101,
+      "head": "69853f1001aeea840982188c791de05f36ff5952",
+      "log_sha256": "f64f0bcc469d1d1b0433e0dda0979aa58a4540166e1fa8b0625a975445399d00",
+      "name": "mvp009-restore-deadline-red",
+      "seconds": 4.469272711314261,
+      "utc": "2026-10-27T17:20:09.641025+00:00"
+    },
+    {
+      "exit_code": 101,
+      "head": "69853f1001aeea840982188c791de05f36ff5952",
+      "log_sha256": "f787a9ea8143f5f6c6629cec4bbf25797467e93e0a0e16643497313fed68aa36",
+      "name": "mvp009-restore-deadline-red2",
+      "seconds": 3.2450580913573503,
+      "utc": "2026-10-27T17:20:49.466776+00:00"
+    },
+    {
+      "exit_code": 0,
+      "head": "69853f1001aeea840982188c791de05f36ff5952",
+      "log_sha256": "70b0f9c49efc4726f6480cf4ff25ae1ebfa198357427634d89e290dc84da4d05",
+      "name": "mvp009-restore-deadline-green",
+      "seconds": 2.288615112192929,
+      "utc": "2026-10-27T17:22:14.910904+00:00"
+    },
+    {
+      "exit_code": 101,
+      "head": "69853f1001aeea840982188c791de05f36ff5952",
+      "log_sha256": "485f447d14cf8b20b83ac2e2bbfb60dbf64e8b5c3adb6f211c4247cbf1e3630a",
+      "name": "mvp009-expired-admission-red",
+      "seconds": 2.5282719088718295,
+      "utc": "2026-10-27T17:23:55.205945+00:00"
+    },
+    {
+      "exit_code": 101,
+      "head": "69853f1001aeea840982188c791de05f36ff5952",
+      "log_sha256": "783386286661a6e02513fa03e83fafc693bd62e7f6c6d3ffa7719b41afb43573",
+      "name": "mvp009-expired-admission-red2",
+      "seconds": 1.5594210587441921,
+      "utc": "2026-10-27T17:24:57.224837+00:00"
+    },
+    {
+      "exit_code": 0,
+      "head": "69853f1001aeea840982188c791de05f36ff5952",
+      "log_sha256": "947e0b12f545ac5c4a2c6a6a919d2ffd4be44cbae99c3d83442b0fcb3be11eb4",
+      "name": "mvp009-expired-admission-green",
+      "seconds": 2.55161302536726,
+      "utc": "2026-10-27T17:25:23.643428+00:00"
+    },
+    {
+      "exit_code": 0,
+      "head": "69853f1001aeea840982188c791de05f36ff5952",
+      "log_sha256": "b446d05267636527edc9a6be03fa1d13d1991d33e195647f91c87aad1f5c2ae8",
+      "name": "mvp009-r1-focused",
+      "seconds": 28.508675446733832,
+      "utc": "2026-10-27T17:26:18.727050+00:00"
+    }
+  ],
+  "review_sha256": "d47479368632bb4d2753b0461e1b320fed0a772f16aa73129f2d0cc1e798c640",
+  "scope": "dirty focused repair, not exact-HEAD gate",
+  "utc": "2026-10-27T17:29:00.430168+00:00"
+}

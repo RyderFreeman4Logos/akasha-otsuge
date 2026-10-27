@@ -1,0 +1,20 @@
+    Checking akasha-otsuge v0.1.0-dev (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.47s
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.60s
+     Running tests/daemon.rs (target/debug/deps/daemon-08655992acdec4bc)
+
+running 8 tests
+test model_tests::gb10_guard_actual_services ... ignored, bounded synthetic inference against explicitly selected GB10 guard
+test model_tests::real_wall_clock_provider_deadlines ... ignored, 1700-second real production daemon/provider acceptance; explicit receipt directory required
+test model_tests::independent_model_endpoints_run_as_durable_jobs ... ok
+test model_tests::model_cancel_shutdown_and_crash_never_replay_ambiguous_calls ... ok
+test model_tests::three_bounded_responses_fit_the_durable_archive_and_ipc ... ok
+test model_tests::queued_models_keep_endpoint_and_budget_across_reload ... ok
+test model_tests::wall_clock_harness_short_control ... ok
+test model_tests::all_model_kinds_classify_bad_output_disconnect_timeout_and_rate_limit ... ok
+
+test result: ok. 6 passed; 0 failed; 2 ignored; 0 measured; 9 filtered out; finished in 3.71s
+

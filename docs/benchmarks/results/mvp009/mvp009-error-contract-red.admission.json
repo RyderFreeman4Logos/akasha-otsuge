@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "model_tests::all_model_kinds_classify_bad_output_disconnect_timeout_and_rate_limit",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "a3d278d9f3968d8ce6eacea79d946b0ed880e2ad",
+  "process": {
+    "pid": 3429090,
+    "start_ticks": "493547010",
+    "state": "R"
+  },
+  "utc": "2026-10-27T16:12:53.097435+00:00"
+}

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--lib",
+    "provider::tests::exhausted_workflow_cannot_start_provider_after_ready_admission",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "69853f1001aeea840982188c791de05f36ff5952",
+  "process": {
+    "pid": 3572032,
+    "start_ticks": "493981809",
+    "state": "R"
+  },
+  "utc": "2026-10-27T17:25:21.094398+00:00"
+}

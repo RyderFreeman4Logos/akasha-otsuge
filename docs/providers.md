@@ -92,7 +92,7 @@ Current fixtures cover independent endpoints, bad output, disconnects, slow
 responses, throttling, cancellation, shutdown/crash recovery, endpoint reload and
 virtual 1699/1700-second boundaries with three serial stages. Explicit actual
 GB10 inference and near-1700-second production daemon acceptance have separate
-receipts in [#9](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9).
+receipts in the [acceptance report](providers-acceptance.md).
 `local_long_timeout_verified` remains false in ordinary runtime diagnostics:
 a controlled fixture receipt cannot certify another provider or a future host
 Runner, and this client does not attest a deployment's previous acceptance runs.

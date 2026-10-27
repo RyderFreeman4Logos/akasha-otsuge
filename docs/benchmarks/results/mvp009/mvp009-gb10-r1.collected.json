@@ -1,0 +1,179 @@
+{
+  "binary_sha256": "0596d1142606b83941b3e6d75568f49e8fd6c2e819f737496ac9f40119ccab3d",
+  "process_absent": true,
+  "report": {
+    "calls": [
+      {
+        "dimension": null,
+        "error": null,
+        "identity": "b7253aa6fd428021d58f8caf527ed9c3cbc96a8581b40b298db8ea51ef980c2c",
+        "profile": "text",
+        "rerank_results": null,
+        "text": "OK",
+        "trace": {
+          "automatic_retries": 0,
+          "connect_ms": 10000,
+          "idle_ms": null,
+          "idle_triggered": false,
+          "local_long_timeout_verified": false,
+          "provider": {
+            "configured_ms": 1700000,
+            "effective_ms": 1700000,
+            "elapsed_ms": 278,
+            "layer": "provider",
+            "limiting_layer": "provider",
+            "remaining_ms": 1699721,
+            "started_at_unix_ms": 1793120358260,
+            "triggered_layer": null
+          },
+          "queue": {
+            "configured_ms": 300000,
+            "effective_ms": 300000,
+            "elapsed_ms": 0,
+            "layer": "queue",
+            "limiting_layer": "queue",
+            "remaining_ms": 299999,
+            "started_at_unix_ms": 1793120358260,
+            "triggered_layer": null
+          },
+          "workflow": {
+            "configured_ms": 6009973,
+            "effective_ms": 6009973,
+            "elapsed_ms": 279,
+            "layer": "workflow",
+            "limiting_layer": "workflow",
+            "remaining_ms": 6009693,
+            "started_at_unix_ms": 1793120358260,
+            "triggered_layer": null
+          }
+        },
+        "vector_count": null
+      },
+      {
+        "dimension": 4096,
+        "error": null,
+        "identity": "aeb6ca94acad0bbfa2a20b66d3b3b2495d856133117ba64ba8387da8dfe9fb51",
+        "profile": "embedding",
+        "rerank_results": null,
+        "text": null,
+        "trace": {
+          "automatic_retries": 0,
+          "connect_ms": 10000,
+          "idle_ms": null,
+          "idle_triggered": false,
+          "local_long_timeout_verified": false,
+          "provider": {
+            "configured_ms": 1700000,
+            "effective_ms": 1700000,
+            "elapsed_ms": 1097,
+            "layer": "provider",
+            "limiting_layer": "provider",
+            "remaining_ms": 1698902,
+            "started_at_unix_ms": 1793120358573,
+            "triggered_layer": null
+          },
+          "queue": {
+            "configured_ms": 300000,
+            "effective_ms": 300000,
+            "elapsed_ms": 0,
+            "layer": "queue",
+            "limiting_layer": "queue",
+            "remaining_ms": 299999,
+            "started_at_unix_ms": 1793120358573,
+            "triggered_layer": null
+          },
+          "workflow": {
+            "configured_ms": 6009973,
+            "effective_ms": 6009973,
+            "elapsed_ms": 1410,
+            "layer": "workflow",
+            "limiting_layer": "workflow",
+            "remaining_ms": 6008562,
+            "started_at_unix_ms": 1793120358260,
+            "triggered_layer": null
+          }
+        },
+        "vector_count": 1
+      },
+      {
+        "dimension": null,
+        "error": null,
+        "identity": "a78b5ce157a2668ef0b868fd4362a0c264915b188e2a558549c2fe0d477205c4",
+        "profile": "reranker",
+        "rerank_results": [
+          {
+            "index": 0,
+            "relevance_score": 0.466796875
+          },
+          {
+            "index": 1,
+            "relevance_score": 0.279296875
+          }
+        ],
+        "text": null,
+        "trace": {
+          "automatic_retries": 0,
+          "connect_ms": 10000,
+          "idle_ms": null,
+          "idle_triggered": false,
+          "local_long_timeout_verified": false,
+          "provider": {
+            "configured_ms": 1700000,
+            "effective_ms": 1700000,
+            "elapsed_ms": 44,
+            "layer": "provider",
+            "limiting_layer": "provider",
+            "remaining_ms": 1699955,
+            "started_at_unix_ms": 1793120359768,
+            "triggered_layer": null
+          },
+          "queue": {
+            "configured_ms": 300000,
+            "effective_ms": 300000,
+            "elapsed_ms": 0,
+            "layer": "queue",
+            "limiting_layer": "queue",
+            "remaining_ms": 299999,
+            "started_at_unix_ms": 1793120359768,
+            "triggered_layer": null
+          },
+          "workflow": {
+            "configured_ms": 6009973,
+            "effective_ms": 6009973,
+            "elapsed_ms": 1552,
+            "layer": "workflow",
+            "limiting_layer": "workflow",
+            "remaining_ms": 6008420,
+            "started_at_unix_ms": 1793120358260,
+            "triggered_layer": null
+          }
+        },
+        "vector_count": null
+      }
+    ],
+    "elapsed_s": 2.593856291,
+    "error": null,
+    "finished_at_ms": 1793120360827,
+    "identity": {
+      "attempts": 1,
+      "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/release/akasha-otsuge",
+      "binary_sha256": "0596d1142606b83941b3e6d75568f49e8fd6c2e819f737496ac9f40119ccab3d",
+      "endpoint": "http://gb10:18009/v1",
+      "scope": "synthetic production-client compatibility; not a long-timeout or semantic-quality claim",
+      "scratch": "/tmp/akasha-daemon-3526352-0",
+      "started_at_ms": 1793120358011
+    },
+    "job_sha256": "4faa16a95bf68cc06148027a3e6af9a61db479996367f873861a16b390eb2fc7",
+    "state": "succeeded"
+  },
+  "scratch_absent": true,
+  "terminal": {
+    "exit_code": 0,
+    "head": "69853f1001aeea840982188c791de05f36ff5952",
+    "log_sha256": "863551b87e270e68222e50e2571de6e1c3ac40425282444631b9b4f0a9d50327",
+    "seconds": 4.1451650634408,
+    "utc": "2026-10-27T16:59:21.541852+00:00"
+  },
+  "utc": "2026-10-27T16:59:56.705155+00:00",
+  "verified_sha256": "7d44727300d64ddd3b3fe8fdcb96e88843bc535a1a102c4ad9dde04ee4d814e2"
+}

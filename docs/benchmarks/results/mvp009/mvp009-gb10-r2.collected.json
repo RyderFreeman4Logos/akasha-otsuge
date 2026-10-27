@@ -1,0 +1,182 @@
+{
+  "binary_sha256": "6b6cc71fd9dbb1d8ce904b6ad95ed4227b99a78507e0a05f493ffe387a160c3e",
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "process_absent": true,
+  "report": {
+    "calls": [
+      {
+        "dimension": null,
+        "error": null,
+        "identity": "b7253aa6fd428021d58f8caf527ed9c3cbc96a8581b40b298db8ea51ef980c2c",
+        "profile": "text",
+        "rerank_results": null,
+        "text": "OK",
+        "trace": {
+          "automatic_retries": 0,
+          "connect_ms": 10000,
+          "idle_ms": null,
+          "idle_triggered": false,
+          "local_long_timeout_verified": false,
+          "provider": {
+            "configured_ms": 1700000,
+            "effective_ms": 1700000,
+            "elapsed_ms": 276,
+            "layer": "provider",
+            "limiting_layer": "provider",
+            "remaining_ms": 1699723,
+            "started_at_unix_ms": 1793122886771,
+            "triggered_layer": null
+          },
+          "queue": {
+            "configured_ms": 300000,
+            "effective_ms": 300000,
+            "elapsed_ms": 0,
+            "layer": "queue",
+            "limiting_layer": "queue",
+            "remaining_ms": 299999,
+            "started_at_unix_ms": 1793122886771,
+            "triggered_layer": null
+          },
+          "workflow": {
+            "configured_ms": 6010000,
+            "effective_ms": 6010000,
+            "elapsed_ms": 295,
+            "layer": "workflow",
+            "limiting_layer": "workflow",
+            "remaining_ms": 6009704,
+            "started_at_unix_ms": 1793122886752,
+            "triggered_layer": null
+          }
+        },
+        "vector_count": null
+      },
+      {
+        "dimension": 4096,
+        "error": null,
+        "identity": "aeb6ca94acad0bbfa2a20b66d3b3b2495d856133117ba64ba8387da8dfe9fb51",
+        "profile": "embedding",
+        "rerank_results": null,
+        "text": null,
+        "trace": {
+          "automatic_retries": 0,
+          "connect_ms": 10000,
+          "idle_ms": null,
+          "idle_triggered": false,
+          "local_long_timeout_verified": false,
+          "provider": {
+            "configured_ms": 1700000,
+            "effective_ms": 1700000,
+            "elapsed_ms": 1270,
+            "layer": "provider",
+            "limiting_layer": "provider",
+            "remaining_ms": 1698729,
+            "started_at_unix_ms": 1793122887072,
+            "triggered_layer": null
+          },
+          "queue": {
+            "configured_ms": 300000,
+            "effective_ms": 300000,
+            "elapsed_ms": 0,
+            "layer": "queue",
+            "limiting_layer": "queue",
+            "remaining_ms": 299999,
+            "started_at_unix_ms": 1793122887072,
+            "triggered_layer": null
+          },
+          "workflow": {
+            "configured_ms": 6010000,
+            "effective_ms": 6010000,
+            "elapsed_ms": 1590,
+            "layer": "workflow",
+            "limiting_layer": "workflow",
+            "remaining_ms": 6008409,
+            "started_at_unix_ms": 1793122886752,
+            "triggered_layer": null
+          }
+        },
+        "vector_count": 1
+      },
+      {
+        "dimension": null,
+        "error": null,
+        "identity": "a78b5ce157a2668ef0b868fd4362a0c264915b188e2a558549c2fe0d477205c4",
+        "profile": "reranker",
+        "rerank_results": [
+          {
+            "index": 0,
+            "relevance_score": 0.466796875
+          },
+          {
+            "index": 1,
+            "relevance_score": 0.279296875
+          }
+        ],
+        "text": null,
+        "trace": {
+          "automatic_retries": 0,
+          "connect_ms": 10000,
+          "idle_ms": null,
+          "idle_triggered": false,
+          "local_long_timeout_verified": false,
+          "provider": {
+            "configured_ms": 1700000,
+            "effective_ms": 1700000,
+            "elapsed_ms": 44,
+            "layer": "provider",
+            "limiting_layer": "provider",
+            "remaining_ms": 1699955,
+            "started_at_unix_ms": 1793122888438,
+            "triggered_layer": null
+          },
+          "queue": {
+            "configured_ms": 300000,
+            "effective_ms": 300000,
+            "elapsed_ms": 0,
+            "layer": "queue",
+            "limiting_layer": "queue",
+            "remaining_ms": 299999,
+            "started_at_unix_ms": 1793122888438,
+            "triggered_layer": null
+          },
+          "workflow": {
+            "configured_ms": 6010000,
+            "effective_ms": 6010000,
+            "elapsed_ms": 1730,
+            "layer": "workflow",
+            "limiting_layer": "workflow",
+            "remaining_ms": 6008269,
+            "started_at_unix_ms": 1793122886752,
+            "triggered_layer": null
+          }
+        },
+        "vector_count": null
+      }
+    ],
+    "elapsed_s": 1.85409074,
+    "error": null,
+    "finished_at_ms": 1793122888606,
+    "identity": {
+      "attempts": 1,
+      "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/release/akasha-otsuge",
+      "binary_sha256": "6b6cc71fd9dbb1d8ce904b6ad95ed4227b99a78507e0a05f493ffe387a160c3e",
+      "endpoint": "http://gb10:18009/v1",
+      "scope": "synthetic production-client compatibility; not a long-timeout or semantic-quality claim",
+      "scratch": "/tmp/akasha-daemon-3603462-0",
+      "started_at_ms": 1793122886552
+    },
+    "job_sha256": "1a48626deb433d36a4cd6969b240a184a00d9ac5904e59484293eec7f2e0db1a",
+    "state": "succeeded"
+  },
+  "scope": "synthetic production-client compatibility; not a long-timeout or semantic-quality claim",
+  "scratch_absent": true,
+  "terminal": {
+    "exit_code": 0,
+    "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+    "log_sha256": "2d494c19df205a1cb079f2fedf74646d20d0d1fe0a731fe9765f954fb7b99b8c",
+    "seconds": 4.0158412996679544,
+    "utc": "2026-10-27T17:41:28.671901+00:00"
+  },
+  "tree": "a17fb69214b772612e63f056444beaefb87b5557",
+  "utc": "2026-10-27T17:42:11.117058+00:00",
+  "verified_sha256": "685431411cb3393532ff69f6e36390bbf9d1ba0eefd7491f86ce6db678e740e7"
+}

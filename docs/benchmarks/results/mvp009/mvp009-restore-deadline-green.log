@@ -1,0 +1,14 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.67s
+     Running unittests src/lib.rs (target/debug/deps/akasha_otsuge-9fc719cf70986c3b)
+
+running 1 test
+clock-case before: state="succeeded" error=null sends=1
+clock-case after: state="failed" error="WORKFLOW_TIMEOUT" sends=0
+clock-case expired: state="failed" error="WORKFLOW_TIMEOUT" sends=0
+test daemon::jobs::tests::model_workflow_keeps_its_original_clock_through_restore_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.56s
+
