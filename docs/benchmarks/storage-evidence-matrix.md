@@ -1,6 +1,6 @@
 # Storage acceptance evidence — MVP-003
 
-Status: **technical storage acceptance passed; final review/merge pending**. Current source is 3b3994a, native SHA-256
+Status: **completed; PR #31 merged and Issue #3 closed**. Current source is 3b3994a, native SHA-256
 `860c32fa49451574f4d1d81bfaae88d9593999e770e1e4966cdb94c35ac41d35`.
 The [contract](storage-contract.md) and [resource specification](../spec/08.md)
 retain their original thresholds. Historical measurements keep their original
@@ -37,5 +37,6 @@ acceptance tracks remain separate; this does not remove a required product test.
 The sole-backend ADR selects SurrealKV authority plus LanceDB derived indexes.
 The 2,116-file full-run archive passes hash/readback verification, and all six
 follow-up phases verify exact process/unit exit and scratch removal. MVP-003
-closes after the final exact-HEAD gate/review and PR merge. Product Storage, daemon, four real hosts,
+closed after exact-HEAD gate/independent review at `8baaccc`, Linux CI40437740462
+and PR #31 merge `13065fc`. Product Storage, daemon, four real hosts,
 provider duration, migration and final protocol/resource acceptance remain #4–#28.

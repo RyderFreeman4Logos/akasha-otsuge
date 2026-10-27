@@ -1,8 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-26 after the session restart. Live GitHub audit: **26 open
-Issues, 2 completed Issues**. #3 is the first unresolved dependency; PR #31
-remains draft. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-27 after PR #31 merged at `13065fc`. Live GitHub audit: **25 open
+Issues, 3 completed Issues**. #4 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -31,15 +30,15 @@ commit is 392298, distinct from the build interval's ending commit 370032.
 The prior pause was intentional: measured work and reviewers ended naturally,
 while follow-up validation, archive, final ADR/review and merge remained undone.
 
-The six prepared phases now pass and the archive verifies; finish the publication
-tail before any new tuning or full measurement. Reuse unchanged passing receipts, preserve each
+The six follow-up phases, final archive verification, exact-HEAD gate, independent
+review and Linux CI passed; PR #31 is merged and #3 closed as completed. Reuse unchanged passing receipts, preserve each
 historical binary's identity and retain all failures. Consolidate the remaining
 checklist instead of appending stale running snapshots. Then implement one Issue
 at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-## MVP-003 acceptance and remaining work
+## MVP-003 completed acceptance
 
 The unchanged [storage contract](../benchmarks/storage-contract.md),
 [specification](../spec/issues/MVP-003.md) and
@@ -99,15 +98,27 @@ retain exact commands, identities, original failures and scope limits.
   receipts. Distinguish experiment recovery from product daemon/worker behavior;
   do not rerun unchanged checks without a concrete missing acceptance case.
 - [x] Publish the sole-backend ADR and unchanged measured operating envelope.
-- [ ] Complete the final exact-HEAD gate and independent review, push/read back
-  CI, merge PR #31 and close #3. No third backend or relaxed
-  threshold is authorized. Product Storage and all later requirements stay below.
+- [x] Final exact-HEAD gate and independent whole-candidate review PASS at
+  `8baaccc`; Linux CI40437740462 passed, PR #31 merged as `13065fc`, and #3
+  closed completed. Product Storage and all later requirements stay below.
+
+## MVP-004 remaining work
+
+- [x] Implement the pinned authority engine and atomic revision/head/receipt/outbox
+  transaction; preserve original evidence and append-only revision history.
+- [x] Enforce durable idempotency, optimistic revision checks and bounded requests.
+- [x] Define and guard storage format/schema; refuse unsupported formats safely.
+- [x] Verify before/during/after commit crashes and whole-batch restart recovery.
+- [x] Implement checksummed native checkpoints and restore into a fresh directory;
+  verify content hashes/revision identity and reject invalid backups.
+- [ ] Record storage layout, migration policy, dependency/runtime no-SQLite audit,
+  focused results, canonical gate, independent review, CI, merge and Issue closure.
 
 ## Complete Issue queue
 
 - [x] [#1 [MVP-001] 建立 Rust/Linux 项目骨架与可执行开发门槛](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/1) — dependencies: none.
 - [x] [#2 [MVP-002] 版本化配置、热重载与 deadline 配置契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/2) — dependencies: #1.
-- [ ] [#3 [MVP-003] 非 SQLite 存储 spike 与唯一 backend 决策](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/3) — dependencies: #1, #2.
+- [x] [#3 [MVP-003] 非 SQLite 存储 spike 与唯一 backend 决策](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/3) — dependencies: #1, #2.
 - [ ] [#4 [MVP-004] 实现唯一正式 Storage、原子提交与恢复基础](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/4) — dependencies: #3.
 - [ ] [#5 [MVP-005] 定义并执行来源、authority、scope 与 taste 数据语义](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5) — dependencies: #4.
 - [ ] [#6 [MVP-006] 持久历史视图、as-of 查询与实际 recall receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/6) — dependencies: #4, #5.

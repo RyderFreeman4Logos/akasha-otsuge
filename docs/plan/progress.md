@@ -1,13 +1,22 @@
-# Development checkpoint — 2026-10-26
+# Development checkpoint — 2026-10-27
 
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1/#2 are merged
-and completed; #3–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#3 are merged
+and completed; #4–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-003
+## Current issue: MVP-004
+
+The authority module is being implemented on `feat/mvp-004-storage`, based on
+merge `13065fc`. Its full remaining checklist is in [todo.md](todo.md). The authority module now
+passes native persistence, bounds, idempotence, conflict, format, content-integrity
+and independent checkpoint/restore fixtures. Six real SIGKILL checkpoints recover
+whole transactions and retry exactly once. The [format and recovery contract](../storage.md)
+records limits; final gate, independent review, CI and merge remain outstanding.
+
+## Completed storage selection: MVP-003
 
 The tested Helix candidate failed three full-data low-memory recovery runs.
 The selected sole backend is SurrealKV1.0.0 authority with LanceDB0.40.0/Lance13
@@ -44,8 +53,11 @@ WD relay is cancelled after collection.
 [The verified archive](../benchmarks/results/fallback-full-rebuild-r3/summary.json)
 contains2,116 files/22,486,670B, SHA256
 `ae38a323030c3b5058550945a7b1368f270ae975147f75457b0337c18272539a`.
-The final evidence/ADR exact-HEAD gate, independent review, CI and PR#31 merge
-remain required before closing#3. Full measurement was reused without rerunning.
+The final evidence candidate `8baaccc` passed the exact-HEAD root gate and
+independent whole-candidate review (zero actionable findings). Linux CI
+[40437740462](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/40437740462)
+passed; [PR #31](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/31) merged
+as `13065fc`, and #3 closed completed. Full measurement was reused without rerunning.
 
 The [matrix](../benchmarks/storage-evidence-matrix.md) connects every storage
 criterion to evidence. Historical low/high1,800-second cases, burst/overload,
@@ -65,7 +77,7 @@ not active computation. Reconcile an exact terminal result before any replay.
 
 After the current acceptance leaf is archived, run the canonical
 `bash scripts/check.sh` on the exact committed candidate, obtain independent
-review, push and read back the matching Linux CI, then merge and close#3.
+review, push and read back the matching Linux CI, then merge and close the corresponding Issue.
 Continue#4–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
 runs on unrelated intermediate changes; #24 repeats the same manifest/oracle
 through the actual product protocol. All required product work remains on the
