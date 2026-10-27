@@ -7,6 +7,8 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
 cargo build --workspace --release --locked
+cargo build --example reconcile --release --locked
+python3 scripts/check_capture_command.py target/release/examples/reconcile
 target/release/akasha-otsuge --help > /dev/null
 target/release/akasha-otsuge --version
 git diff --check

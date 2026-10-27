@@ -145,5 +145,7 @@ that changed the original index context; reads now compare it with the immutable
 prepared record and reject it. Fixture index identities are not a real LanceDB
 switch. No real host/transport delivery, model replay, installed service, 50 GB
 product workload, historical semantic retrieval or format-1 migration is claimed.
-The exact-HEAD canonical gate, independent review and publication are recorded
-with the eventual Issue/PR; development test results alone do not close #6.
+Candidate `e98d4cb` passed the exact-HEAD canonical gate and independent whole-
+candidate R1 review (zero findings). Linux CI40454932598 passed; PR #34 merged
+as `42035bd` and #6 closed completed. Native as-of lookup traverses a key's version
+history; bounded application pages do not imply constant-time hot-key lookup.

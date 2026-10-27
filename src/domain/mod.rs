@@ -65,6 +65,7 @@ pub struct Policy {
 }
 
 /// A server-established channel, deliberately absent from every input JSON schema.
+#[derive(Serialize)]
 pub struct Ingress {
     provenance: Provenance,
     scope: Scope,
@@ -73,6 +74,14 @@ pub struct Ingress {
 }
 
 impl Ingress {
+    pub(crate) fn check_scope(&self, scope: &Scope) -> Result<()> {
+        if self.scope.contains(scope) {
+            Ok(())
+        } else {
+            Err(error("SCOPE_DENIED"))
+        }
+    }
+
     fn new(
         provenance: Provenance,
         scope: Scope,
@@ -292,6 +301,30 @@ pub struct Domain<'a> {
     storage: &'a Storage,
 }
 
+pub(crate) fn source_change(source: &SourceDraft, ingress: &Ingress) -> Result<Change> {
+    if !id(&source.event_id)
+        || source.text.is_empty()
+        || source.text.len() > 64 * 1024
+        || source.reported_role.as_ref().is_some_and(|v| !id(v))
+    {
+        return Err(error("INVALID_SOURCE"));
+    }
+    ingress.check_scope(&source.scope)?;
+    let record = SourceRecord {
+        schema_version: 1,
+        payload: source.clone(),
+        provenance: ingress.provenance.clone(),
+        statement_intent: ingress.intent,
+        review_target: ingress.review.clone(),
+        content_sha256: hash(source.text.as_bytes()),
+    };
+    Ok(Change {
+        key: source_key(&source.event_id),
+        expected_revision: None,
+        content: serde_json::to_string(&record)?,
+    })
+}
+
 impl<'a> Domain<'a> {
     pub fn new(storage: &'a Storage) -> Self {
         Self { storage }
@@ -304,34 +337,13 @@ impl<'a> Domain<'a> {
         ingress: &Ingress,
         config_generation: u64,
     ) -> Result<CommitReceipt> {
-        if !id(&source.event_id)
-            || source.text.is_empty()
-            || source.text.len() > 64 * 1024
-            || source.reported_role.as_ref().is_some_and(|v| !id(v))
-        {
-            return Err(error("INVALID_SOURCE"));
-        }
-        if !ingress.scope.contains(&source.scope) {
-            return Err(error("SCOPE_DENIED"));
-        }
-        let record = SourceRecord {
-            schema_version: 1,
-            payload: source.clone(),
-            provenance: ingress.provenance.clone(),
-            statement_intent: ingress.intent,
-            review_target: ingress.review.clone(),
-            content_sha256: hash(source.text.as_bytes()),
-        };
+        let change = source_change(source, ingress)?;
         self.storage
             .commit(&CommitRequest {
                 request_id: request_id.into(),
                 config_generation,
                 policy_revision: None,
-                changes: vec![Change {
-                    key: source_key(&source.event_id),
-                    expected_revision: None,
-                    content: serde_json::to_string(&record)?,
-                }],
+                changes: vec![change],
             })
             .await
     }
