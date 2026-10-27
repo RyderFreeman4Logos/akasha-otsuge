@@ -1,6 +1,15 @@
 # Development
 
-Linux is the MVP platform. Install Rust using rustup and Python 3.11 or newer.
+Linux is the MVP platform. Install Rust using rustup, Python 3.11 or newer,
+a C/C++ toolchain and the Protocol Buffers compiler (`protoc`). Lance's build
+scripts require `protoc`; it is not a runtime dependency. On Debian/Ubuntu:
+
+```sh
+sudo apt-get install build-essential pkg-config protobuf-compiler
+```
+
+The local acceptance environment uses `protoc` 3.21.12. CI installs the distribution
+package and records its version before building.
 The checked-in toolchain pins Rust 1.99.1, verified against the official stable
 channel manifest on 2026-10-22. No model credentials are required for this bootstrap.
 
@@ -20,6 +29,12 @@ installs that release into a temporary prefix, checks its hash, and exercises th
 installed executable's IPC, configuration, jobs, history and receipts. A separate
 kernel UID must pass an accessible control and be denied private paths/IPC.
 Installing into the user's PATH remains a separate action.
+
+The capture component smoke reuses the debug example already compiled by
+[`cargo test`](https://doc.rust-lang.org/cargo/commands/cargo-test.html#target-selection).
+The installed product and daemon acceptance still use the release artifact.
+This avoids compiling a second release dependency graph with test-only Tokio
+features merely to run the component smoke.
 
 There is one Cargo package in one workspace. `src/main.rs` parses CLI input and
 calls versioned private IPC. The daemon invokes the shared Storage, ConfigManager,
