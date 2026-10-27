@@ -1,0 +1,63 @@
+{
+  "files": [
+    {
+      "file": "src/provider.rs",
+      "tokens": 7166
+    },
+    {
+      "file": "src/retrieval.rs",
+      "tokens": 5754
+    },
+    {
+      "file": "src/retrieval/vector.rs",
+      "tokens": 5705
+    },
+    {
+      "file": "src/daemon.rs",
+      "tokens": 7941
+    },
+    {
+      "file": "src/daemon/models.rs",
+      "tokens": 2810
+    },
+    {
+      "file": "src/daemon/retrieval.rs",
+      "tokens": 2822
+    },
+    {
+      "file": "src/daemon/retrieval/search.rs",
+      "tokens": 6008
+    },
+    {
+      "file": "src/retrieval/tests.rs",
+      "tokens": 3514
+    },
+    {
+      "file": "tests/support/daemon_models.rs",
+      "tokens": 7161
+    },
+    {
+      "file": "tests/support/model_endpoint.rs",
+      "tokens": 2718
+    },
+    {
+      "file": "tests/support/daemon_retrieval.rs",
+      "tokens": 5859
+    },
+    {
+      "file": "tests/support/retrieval_lifecycle.rs",
+      "tokens": 6680
+    },
+    {
+      "file": "tests/support/retrieval_rules.rs",
+      "tokens": 2505
+    },
+    {
+      "file": "tests/support/retrieval_regressions.rs",
+      "tokens": 1676
+    }
+  ],
+  "model": "gpt-4o",
+  "tokenizer": "conservative",
+  "total": 68319
+}

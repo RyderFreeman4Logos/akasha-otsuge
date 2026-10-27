@@ -267,9 +267,10 @@ retain exact commands, identities, original failures and scope limits.
 
 ## MVP-010 acceptance and remaining work
 
-The SSD worktree shares the existing build cache. Thirteen public retrieval fixtures and four native index controls pass. Final
-committed-HEAD gate passed at `987d369`; independent R1 found five regressions.
-Repair validation, fresh review, CI and publication remain.
+The SSD worktree shares the existing build cache. All five independent R1 findings
+are repaired with causal regressions. There are now 21 public retrieval fixtures
+and five native index controls. Final repaired-candidate gate, fresh review, CI
+and publication remain; the historical gate at `987d369` does not attest repairs.
 
 - [x] Implement real on-disk ICU keyword search and exact receipt replay/reopen.
 - [x] Implement actual vector/embedding and reranker paths, model/dimension
@@ -296,8 +297,8 @@ Repair validation, fresh review, CI and publication remain.
   progress publication and activation; test a held embedding across grant shrink.
 - [x] R2: Preserve the owner-wide permission required by archived index metadata
   across receipt show/replay and job show; retain narrow receipt access.
-- [ ] R3: Install both protoc and its standard definitions in CI and document them;
-  require repaired-candidate hosted CI success.
+- [x] R3: Install both protoc and its standard definitions in CI and document them.
+  Repaired-candidate hosted CI remains part of the final publication gate.
 - [x] R4: Persist zero/overflow cosine-vector failure diagnostics and the original
   prefix; verify identical diagnostic readback after restart.
 - [x] R5: Admit a legal maximum-size wrapped Memory in the internal rule scan;

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--lib",
+    "--test",
+    "daemon",
+    "--",
+    "--test-threads=1"
+  ],
+  "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+  "process": {
+    "pid": 4058413,
+    "start_ticks": "495103445",
+    "state": "R"
+  },
+  "utc": "2026-10-27T20:32:17.450729+00:00"
+}

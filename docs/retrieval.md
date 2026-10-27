@@ -72,7 +72,8 @@ identities/traces and coverage. The RecallReceipt binds those exact output bytes
 and hash to selected revisions, source spans, read/validation sequences, accepted
 configuration and **actual lexical/vector generation**. Global index diagnostics
 are returned only with an owner-wide read grant. Such receipts retain that owner-wide
-requirement for every later show/replay, even if their query scope is narrower. A scoped search otherwise emits
+requirement for every later show/replay, even if their query scope is narrower.
+A scoped search otherwise emits
 `index: null`. The standalone `index status` requires that owner-wide grant.
 
 ## Coverage and durable progress
@@ -184,7 +185,9 @@ bash scripts/check.sh
 ```
 
 The [hashed development receipts](benchmarks/results/mvp010/README.md) retain
-failed and successful runs with their actual commands and limits.
+failed and successful runs with their actual commands and limits. The
+[review repair receipts](benchmarks/results/mvp010-review-fixes/README.md) preserve
+eight additional public regressions and two native authority controls.
 
 Focused passes, the final committed-HEAD gate, independent review, hosted CI and
 issue closure are separate evidence; [progress](plan/progress.md) records them.

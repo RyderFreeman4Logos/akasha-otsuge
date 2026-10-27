@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "retrieval_tests::",
+    "--",
+    "--test-threads=1"
+  ],
+  "name": "mvp010-r4-green",
+  "process": {
+    "pid": 4079653,
+    "start_ticks": "495148863",
+    "state": "R"
+  },
+  "utc": "2026-10-27T20:39:51.605064+00:00"
+}
