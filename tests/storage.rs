@@ -309,7 +309,12 @@ fn files(root: &std::path::Path) -> std::collections::BTreeMap<PathBuf, Vec<u8>>
 
 #[tokio::test]
 async fn unsupported_or_missing_format_is_refused_without_touching_database_files() {
-    for marker in [Some(b"{\"schema_version\":999}".as_slice()), None] {
+    let format_one = b"{\"application\":\"akasha-otsuge\",\"schema_version\":1,\"engine\":\"surrealkv-1.0.0\",\"engine_revision\":\"4338a790c8edc56ef5ea1e46157427af4815be3c\"}\n";
+    for marker in [
+        Some(b"{\"schema_version\":999}".as_slice()),
+        Some(format_one.as_slice()),
+        None,
+    ] {
         let fixture = Fixture::new();
         let config = fixture.config();
         let store = Storage::open(&config).await.unwrap();
@@ -797,4 +802,43 @@ async fn retry_and_close_drain_a_commit_after_its_caller_cancels() {
         assert!(reopened.outbox(2).unwrap().is_none());
         reopened.close().await.unwrap();
     }
+}
+
+#[tokio::test]
+async fn committed_as_of_points_survive_later_writes_and_reopen() {
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let first = request();
+    let key = first.changes[1].key.clone();
+    store.commit(&first).await.unwrap();
+    let original = store.current(&key).unwrap().unwrap();
+    let clock = store.recorded_at_ms(1).unwrap();
+    assert!(clock > 1_000_000);
+    assert_eq!(
+        store.recorded_at_ms(0).unwrap_err().code,
+        "INVALID_READ_POINT"
+    );
+    let mut next = first.clone();
+    next.request_id = "second-version".into();
+    next.changes = vec![Change {
+        key: key.clone(),
+        expected_revision: Some(1),
+        content: "later version".into(),
+    }];
+    store.commit(&next).await.unwrap();
+    assert!(store.at(&key, 0).unwrap().is_none());
+    assert_eq!(store.at(&key, 1).unwrap(), Some(original.clone()));
+    assert_eq!(store.at(&key, 2).unwrap().unwrap().content, "later version");
+    assert_eq!(store.at(&key, 3).unwrap_err().code, "INVALID_READ_POINT");
+    assert_eq!(
+        store.at(&key, u64::MAX).unwrap_err().code,
+        "INVALID_READ_POINT"
+    );
+    store.close().await.unwrap();
+    let store = Storage::open(&config).await.unwrap();
+    assert_eq!(store.at(&key, 1).unwrap(), Some(original));
+    assert_eq!(store.recorded_at_ms(1).unwrap(), clock);
+    assert_eq!(store.at(&key, 2).unwrap().unwrap().content, "later version");
+    store.close().await.unwrap();
 }

@@ -46,7 +46,8 @@ project/session evidence into a global principle.
 `hypothesis`), claim, rationale, conditions, assumptions, evidence spans, optional
 reality validity window, original provenance, adoption, policy/config identity
 and the actual authorization settings used. Event time, reality validity and
-Storage commit order remain separate. Time views are implemented in #6.
+Storage commit order remain separate. [Time views](history.md) use durable
+commit points and retain system-clock observations independently of these fields.
 
 The semantic hash is SHA-256 over deterministic JSON of
 `(1, memory_id, draft, provenance)`. It covers scope, conditions, assumptions,
@@ -138,6 +139,8 @@ direct statements, a recomputed hash reusing a generic review channel, a second
 proposal overriding human taste, and rejection accidentally removing the old
 adopted version. These are now focused regressions. Final exact-HEAD gate,
 independent review, CI and merge receipts are recorded on
-[Issue #5](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5); publication
-is still pending at this development checkpoint. No real host/model test or
+[Issue #5](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5). Candidate
+`664e49c` passed the full gate and independent R1 review (0 findings), Linux
+CI40450661442 passed, PR #33 merged as `9b9f483`, and #5 closed completed on
+2026-10-27. No real host/model test or
 whole-product completion is claimed here.
