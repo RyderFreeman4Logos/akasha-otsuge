@@ -58,7 +58,9 @@ The final canonical gate includes both new tests (16 storage integrations total)
 
 The final exact-HEAD canonical gate, independent review, CI, merge and completion
 receipt are recorded on [Issue #4](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/4).
-At this development checkpoint that publication tail is still pending. These
+Candidate `5654abf` passed the complete gate and independent R2 review, with no
+actionable findings. Linux CI40446328008 passed, PR #32 merged as `95ff8f5`, and
+#4 closed completed on 2026-10-27. These
 small native fixtures do not replace the product 50 GB/100-client acceptance in
 MVP-024. SIGKILL is not a hardware power-cut test. Migration, backup space needs
 and the immutable-source assumption are specified in [storage.md](storage.md).

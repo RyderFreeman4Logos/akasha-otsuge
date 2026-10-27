@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-27 after PR #31 merged at `13065fc`. Live GitHub audit: **25 open
-Issues, 3 completed Issues**. #4 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-27 after PR #32 merged at `95ff8f5`. Live GitHub audit: **24 open
+Issues, 4 completed Issues**. #5 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -102,7 +102,7 @@ retain exact commands, identities, original failures and scope limits.
   `8baaccc`; Linux CI40437740462 passed, PR #31 merged as `13065fc`, and #3
   closed completed. Product Storage and all later requirements stay below.
 
-## MVP-004 remaining work
+## MVP-004 completed acceptance
 
 - [x] Implement the pinned authority engine and atomic revision/head/receipt/outbox
   transaction; preserve original evidence and append-only revision history.
@@ -111,15 +111,33 @@ retain exact commands, identities, original failures and scope limits.
 - [x] Verify before/during/after commit crashes and whole-batch restart recovery.
 - [x] Implement checksummed native checkpoints and restore into a fresh directory;
   verify content hashes/revision identity and reject invalid backups.
-- [ ] Record storage layout, migration policy, dependency/runtime no-SQLite audit,
+- [x] Record storage layout, migration policy, dependency/runtime no-SQLite audit,
   focused results, canonical gate, independent review, CI, merge and Issue closure.
+  Candidate `5654abf` passes the complete gate and independent R2 review (0 findings),
+  including the deterministic cancelled-commit/checkpoint fix. CI40446328008 passed;
+  PR #32 merged as `95ff8f5` and #4 closed completed.
+
+## MVP-005 remaining work
+
+- [x] Define bounded source, actor, provenance, scope, conditions, evidence-span,
+  memory-kind, validity, adoption and review schemas on the real Storage.
+- [x] Separate untrusted payloads from verified server ingress; reject forged
+  authority fields and keep worker messages outside trusted human adoption.
+- [x] Enforce source applicability and project/version/session boundaries;
+  preserve global taste alongside local exceptions and distinguish technical facts.
+- [x] Bind review to the exact semantic content hash; retain old revisions,
+  drop inherited approval on edits, and preserve durable retry/conflict behavior.
+- [x] Test explicit trusted decisions under one-time policy, tentative statements,
+  manual candidates and delegated active conclusions without human relabeling.
+- [ ] Publish schema/permission rules and misleading-input fixtures; complete
+  focused tests, exact-HEAD gate, independent review, CI, merge and Issue closure.
 
 ## Complete Issue queue
 
 - [x] [#1 [MVP-001] 建立 Rust/Linux 项目骨架与可执行开发门槛](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/1) — dependencies: none.
 - [x] [#2 [MVP-002] 版本化配置、热重载与 deadline 配置契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/2) — dependencies: #1.
 - [x] [#3 [MVP-003] 非 SQLite 存储 spike 与唯一 backend 决策](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/3) — dependencies: #1, #2.
-- [ ] [#4 [MVP-004] 实现唯一正式 Storage、原子提交与恢复基础](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/4) — dependencies: #3.
+- [x] [#4 [MVP-004] 实现唯一正式 Storage、原子提交与恢复基础](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/4) — dependencies: #3.
 - [ ] [#5 [MVP-005] 定义并执行来源、authority、scope 与 taste 数据语义](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5) — dependencies: #4.
 - [ ] [#6 [MVP-006] 持久历史视图、as-of 查询与实际 recall receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/6) — dependencies: #4, #5.
 - [ ] [#7 [MVP-007] 采集归一化、原文归档及分支/压缩恢复协议](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/7) — dependencies: #4, #6.

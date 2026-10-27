@@ -8,6 +8,6 @@ A local, traceable memory system for coding agents, written in Rust.
 
 构建与验证见 [开发说明](docs/development.md)。配置库的版本切换、资源准备与时间预算见 [配置契约](docs/configuration.md)。
 
-权威存储库提供原子修订、持久幂等回执和独立备份恢复，格式与验证边界见 [存储说明](docs/storage.md)。后续 Issues 接入 daemon、权限语义与检索。
+权威存储库提供原子修订、持久幂等回执和独立备份恢复，格式与验证边界见 [存储说明](docs/storage.md)。[来源与采纳规则](docs/domain.md)区分可信输入、机器候选和精确版本的人审；后续 Issues 接入真实宿主、daemon 与检索。
 
 公开仓库按用户要求采用 [Apache-2.0](LICENSE)。[来源与许可证核查](docs/provenance.md)记录迁移边界。

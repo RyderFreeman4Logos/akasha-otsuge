@@ -3,18 +3,30 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#3 are merged
-and completed; #4–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#4 are merged
+and completed; #5–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-004
+## Current issue: MVP-005
 
-The authority module is being implemented on `feat/mvp-004-storage`, based on
-merge `13065fc`. Its full remaining checklist is in [todo.md](todo.md). The authority module now
-passes native persistence, bounds, idempotence, conflict, format, content-integrity
-and independent checkpoint/restore fixtures. Six real SIGKILL checkpoints recover
-whole transactions and retry exactly once. The [format and recovery contract](../storage.md)
-records limits; final gate, independent review, CI and merge remain outstanding.
+Typed provenance, scope and adoption are being implemented on
+`feat/mvp-005-authority`, based on merge `95ff8f5`. The full remaining checklist is
+in [todo.md](todo.md). External payloads cannot assign human authority; reviews
+must bind exact content and new revisions cannot inherit approval. The native
+Storage component fixtures now cover source ceilings, policy modes, exact review
+grants, local exceptions, candidate/adopted separation and durable retry/reopen.
+[The domain contract](../domain.md) states the trusted integration boundary and
+limits; final gate, independent review and publication remain pending.
+
+## Completed authority storage: MVP-004
+
+Candidate `5654abf` passed the complete canonical gate, 16 Storage integrations,
+six real SIGKILL points and independent whole-candidate R2 review (0 findings).
+R1's cancelled-commit/checkpoint race is retained with its deterministic RED and
+unchanged independent GREEN probe. CI40446328008 passed; PR #32 merged as
+`95ff8f5`, and #4 closed completed. The [storage contract](../storage.md) and
+[validation record](../storage-validation.md) preserve format, backup, migration
+and tested-scope limits. These are native library results, not daemon acceptance.
 
 ## Completed storage selection: MVP-003
 
@@ -78,7 +90,7 @@ not active computation. Reconcile an exact terminal result before any replay.
 After the current acceptance leaf is archived, run the canonical
 `bash scripts/check.sh` on the exact committed candidate, obtain independent
 review, push and read back the matching Linux CI, then merge and close the corresponding Issue.
-Continue#4–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
+Continue#5–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
 runs on unrelated intermediate changes; #24 repeats the same manifest/oracle
 through the actual product protocol. All required product work remains on the
 complete TODO list; no scaffold or diagnostic result counts as its completion.

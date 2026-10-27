@@ -90,7 +90,7 @@ pub struct StorageError {
 }
 
 impl StorageError {
-    fn new(code: &'static str) -> Self {
+    pub(crate) fn new(code: &'static str) -> Self {
         Self { code, source: None }
     }
 }
@@ -222,7 +222,7 @@ impl RecordKey {
     }
 }
 
-fn hash(bytes: &[u8]) -> String {
+pub(crate) fn hash(bytes: &[u8]) -> String {
     Sha256::digest(bytes)
         .iter()
         .map(|byte| format!("{byte:02x}"))
