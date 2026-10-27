@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use tokio::sync::watch;
 
@@ -42,9 +42,31 @@ pub struct ReloadReport {
     pub reasons: Vec<ConfigError>,
 }
 
+#[derive(Clone)]
 struct State {
     pending: Option<(u64, ResolvedConfig)>,
-    history: VecDeque<ReloadReport>,
+    history: VecDeque<Value>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Checkpoint {
+    schema_version: u32,
+    generation: u64,
+    active: super::ArchivedConfig,
+    pending: Option<(u64, super::ArchivedConfig)>,
+    history: VecDeque<Value>,
+}
+
+fn checkpoint(generation: u64, active: &ResolvedConfig, state: &State) -> Value {
+    serde_json::to_value(Checkpoint {
+        schema_version: 1,
+        generation,
+        active: active.archive(),
+        pending: state.pending.as_ref().map(|(g, c)| (*g, c.archive())),
+        history: state.history.clone(),
+    })
+    .expect("JSON-compatible configuration")
 }
 
 /// R holds resources prepared for exactly one generation; pinned jobs retain them.
@@ -93,6 +115,52 @@ impl<R: Send + Sync + 'static> ConfigManager<R> {
         self.snapshots.subscribe()
     }
 
+    pub(crate) fn checkpoint(&self) -> Result<Value, ConfigError> {
+        let state = self
+            .state
+            .lock()
+            .map_err(|_| ConfigError::invalid("reload", "configuration manager unavailable"))?;
+        let active = self.pin();
+        Ok(checkpoint(active.generation, &active.resolved, &state))
+    }
+
+    pub(crate) fn restore(
+        value: Value,
+        prepare: impl FnOnce(&ResolvedConfig) -> Result<R, ()>,
+    ) -> Result<Self, ConfigError> {
+        let saved: Checkpoint = serde_json::from_value(value)
+            .map_err(|_| ConfigError::invalid("generation", "invalid durable configuration"))?;
+        if saved.schema_version != 1
+            || saved.history.len() > 64
+            || saved
+                .pending
+                .as_ref()
+                .is_some_and(|(g, _)| Some(*g) != saved.generation.checked_add(1))
+        {
+            return Err(ConfigError::invalid(
+                "generation",
+                "invalid durable configuration",
+            ));
+        }
+        let manager = Self::new(
+            saved.generation,
+            ResolvedConfig::restore(saved.active)?,
+            prepare,
+        )?;
+        {
+            let mut state = manager
+                .state
+                .lock()
+                .map_err(|_| ConfigError::invalid("reload", "configuration manager unavailable"))?;
+            state.pending = saved
+                .pending
+                .map(|(g, c)| ResolvedConfig::restore(c).map(|c| (g, c)))
+                .transpose()?;
+            state.history = saved.history;
+        }
+        Ok(manager)
+    }
+
     /// File watching and explicit reload both submit complete bytes here.
     /// A prepare callback must not re-enter this manager or publish partial resources.
     pub fn reload(
@@ -101,11 +169,25 @@ impl<R: Send + Sync + 'static> ConfigManager<R> {
         profile: Option<&str>,
         prepare: impl FnOnce(&ResolvedConfig) -> Result<R, ()>,
     ) -> Result<ReloadReport, ConfigError> {
+        self.reload_committing(input, profile, prepare, |_| Ok(()))
+    }
+
+    /// Persist the complete candidate before either active or pending state is visible.
+    /// The callback must not re-enter this manager. Daemon calls this off the async thread.
+    pub(crate) fn reload_committing(
+        &self,
+        input: &str,
+        profile: Option<&str>,
+        prepare: impl FnOnce(&ResolvedConfig) -> Result<R, ()>,
+        persist: impl FnOnce(&Value) -> Result<(), ()>,
+    ) -> Result<ReloadReport, ConfigError> {
         let mut state = self
             .state
             .lock()
             .map_err(|_| ConfigError::invalid("reload", "configuration manager unavailable"))?;
         let active = self.pin();
+        let mut candidate_state = state.clone();
+        let mut replacement = None;
         let mut report = ReloadReport {
             status: ReloadStatus::Rejected,
             active_generation: active.generation,
@@ -128,7 +210,7 @@ impl<R: Send + Sync + 'static> ConfigManager<R> {
                         message: "data directory or socket change requires explicit drain and restart",
                         byte_offset: None,
                     });
-                    state.pending = Some((next, candidate));
+                    candidate_state.pending = Some((next, candidate));
                 } else {
                     match prepare(&candidate) {
                         Err(()) => report.reasons.push(ConfigError::invalid(
@@ -136,12 +218,12 @@ impl<R: Send + Sync + 'static> ConfigManager<R> {
                             "resource preparation failed; old configuration retained",
                         )),
                         Ok(resources) => {
-                            self.snapshots.send_replace(Arc::new(Snapshot {
+                            replacement = Some(Arc::new(Snapshot {
                                 generation: next,
                                 resolved: candidate,
                                 resources,
                             }));
-                            state.pending = None;
+                            candidate_state.pending = None;
                             report.status = ReloadStatus::Applied;
                             report.active_generation = next;
                             report.pending_generation = None;
@@ -150,10 +232,28 @@ impl<R: Send + Sync + 'static> ConfigManager<R> {
                 }
             }
         }
-        if state.history.len() == 64 {
-            state.history.pop_front();
+        if candidate_state.history.len() == 64 {
+            candidate_state.history.pop_front();
         }
-        state.history.push_back(report.clone());
+        candidate_state
+            .history
+            .push_back(serde_json::to_value(&report).expect("JSON-compatible report"));
+        let planned = replacement.as_ref().unwrap_or(&active);
+        persist(&checkpoint(
+            planned.generation,
+            &planned.resolved,
+            &candidate_state,
+        ))
+        .map_err(|_| {
+            ConfigError::invalid(
+                "commit",
+                "durable configuration commit failed; old configuration retained",
+            )
+        })?;
+        *state = candidate_state;
+        if let Some(replacement) = replacement {
+            self.snapshots.send_replace(replacement);
+        }
         Ok(report)
     }
 

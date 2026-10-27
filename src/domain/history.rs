@@ -74,6 +74,21 @@ pub struct StatePage {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct MemoryDifference {
+    pub before: Option<TimedMemory>,
+    pub after: Option<TimedMemory>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct StateDifference {
+    pub from: u64,
+    pub to: u64,
+    pub items: Vec<MemoryDifference>,
+    pub next: Option<StateCursor>,
+    pub examined: usize,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HistoryCursor {
     query_sha256: String,
@@ -172,7 +187,7 @@ impl Domain<'_> {
             .await
     }
 
-    pub(super) fn permission(&self, context: &ReadContext, scope: Option<&Scope>) -> Result<u64> {
+    pub(crate) fn permission(&self, context: &ReadContext, scope: Option<&Scope>) -> Result<u64> {
         let revision = self
             .storage
             .current(&grant_key(&context.principal))?
@@ -189,6 +204,40 @@ impl Domain<'_> {
             return Err(error("READ_DENIED"));
         }
         Ok(revision.commit_seq)
+    }
+
+    pub(crate) async fn ensure_local_reader(
+        &self,
+        principal: &str,
+        scope: &Scope,
+        config: u64,
+    ) -> Result<()> {
+        if self.storage.current(&grant_key(principal))?.is_none() {
+            self.set_read_grant(
+                &format!("local-reader/{}", hash(principal.as_bytes())),
+                principal,
+                Some(scope),
+                None,
+                config,
+            )
+            .await?;
+        }
+        Ok(())
+    }
+
+    pub(crate) async fn change_local_reader(
+        &self,
+        request: &str,
+        principal: &str,
+        scope: Option<&Scope>,
+        config: u64,
+    ) -> Result<CommitReceipt> {
+        let previous = self
+            .storage
+            .current(&grant_key(principal))?
+            .map(|r| r.commit_seq);
+        self.set_read_grant(request, principal, scope, previous, config)
+            .await
     }
 
     fn timed(&self, memory: MemoryView) -> Result<TimedMemory> {
@@ -267,6 +316,32 @@ impl Domain<'_> {
             .await
     }
 
+    fn scoped_memory_at(
+        &self,
+        key: &RecordKey,
+        scope: &Scope,
+        at: u64,
+    ) -> Result<Option<TimedMemory>> {
+        let Some(state) = self.storage.at(key, at)? else {
+            return Ok(None);
+        };
+        let head: AdoptionHead = serde_json::from_str(&state.content)?;
+        if head.scope != *scope || scope_key(&head.scope, &head.memory_id)? != *key {
+            return Err(error("DOMAIN_CORRUPT"));
+        }
+        let seq = state.commit_seq;
+        let memory = self.resolve_adoption(state, &head.memory_id)?;
+        if self
+            .storage
+            .at(&adoption_key(&head.memory_id), at)?
+            .map(|v| v.commit_seq)
+            != Some(seq)
+        {
+            return Err(error("DOMAIN_CORRUPT"));
+        }
+        Ok(Some(self.timed(memory)?))
+    }
+
     /// Exact scope equality; process at most `limit` memberships plus one key of lookahead.
     pub async fn state(
         &self,
@@ -305,34 +380,18 @@ impl Domain<'_> {
                 let mut examined = 0;
                 let mut bytes = 0;
                 for key in keys.iter().take(budget.limit) {
-                    if let Some(state) = self.storage.at(key, at)? {
-                        let head: AdoptionHead = serde_json::from_str(&state.content)?;
-                        if head.scope != *scope || scope_key(&head.scope, &head.memory_id)? != *key
-                        {
-                            return Err(error("DOMAIN_CORRUPT"));
-                        }
-                        let seq = state.commit_seq;
-                        let memory = self.resolve_adoption(state, &head.memory_id)?;
-                        if self
-                            .storage
-                            .at(&adoption_key(&head.memory_id), at)?
-                            .map(|v| v.commit_seq)
-                            != Some(seq)
-                        {
-                            return Err(error("DOMAIN_CORRUPT"));
-                        }
-                        if head.active {
-                            let timed = self.timed(memory)?;
-                            let size = serde_json::to_vec(&timed)?.len();
-                            if bytes + size > budget.max_bytes {
-                                if examined == 0 {
-                                    return Err(error("RESULT_TOO_LARGE"));
-                                }
-                                break;
+                    if let Some(timed) = self.scoped_memory_at(key, scope, at)?
+                        && timed.memory.record.lifecycle == Lifecycle::Active
+                    {
+                        let size = serde_json::to_vec(&timed)?.len();
+                        if bytes + size > budget.max_bytes {
+                            if examined == 0 {
+                                return Err(error("RESULT_TOO_LARGE"));
                             }
-                            bytes += size;
-                            items.push(timed);
+                            break;
                         }
+                        bytes += size;
+                        items.push(timed);
                     }
                     examined += 1;
                 }
@@ -347,6 +406,79 @@ impl Domain<'_> {
                         examined,
                     },
                     read_seq: at,
+                    validated_at_seq: self.storage.sequence()?,
+                    retrieval_mode: RetrievalMode::HistoricalState,
+                })
+            })
+            .await
+    }
+
+    pub async fn diff(
+        &self,
+        context: &ReadContext,
+        scope: &Scope,
+        from: u64,
+        to: u64,
+        cursor: Option<&StateCursor>,
+        budget: PageBudget,
+    ) -> Result<ReadResult<StateDifference>> {
+        budget.validate()?;
+        scope.validate()?;
+        let query = hash(&serde_json::to_vec(&(1, "diff", scope, from, to))?);
+        if cursor.is_some_and(|c| c.query_sha256 != query) {
+            return Err(error("INVALID_CURSOR"));
+        }
+        self.storage
+            .serialized_read(|| {
+                self.permission(context, Some(scope))?;
+                self.storage.check_point(from)?;
+                self.storage.check_point(to)?;
+                let prefix = scope_prefix(scope)?;
+                let keys = self.storage.head_keys(
+                    &RecordKey {
+                        kind: RecordKind::State,
+                        id: format!("{prefix}{}", "0".repeat(64)),
+                    },
+                    &RecordKey {
+                        kind: RecordKind::State,
+                        id: format!("{prefix}{}", "g".repeat(64)),
+                    },
+                    cursor.map(|c| c.after.as_str()),
+                    budget.limit,
+                )?;
+                let mut items = Vec::new();
+                let mut examined = 0;
+                let mut bytes = 0;
+                for key in keys.iter().take(budget.limit) {
+                    let before = self.scoped_memory_at(key, scope, from)?;
+                    let after = self.scoped_memory_at(key, scope, to)?;
+                    if before != after {
+                        let item = MemoryDifference { before, after };
+                        let size = serde_json::to_vec(&item)?.len();
+                        if bytes + size > budget.max_bytes {
+                            if examined == 0 {
+                                return Err(error("RESULT_TOO_LARGE"));
+                            }
+                            break;
+                        }
+                        bytes += size;
+                        items.push(item);
+                    }
+                    examined += 1;
+                }
+                let next = (examined < keys.len()).then(|| StateCursor {
+                    query_sha256: query,
+                    after: keys[examined - 1].id.clone(),
+                });
+                Ok(ReadResult {
+                    data: StateDifference {
+                        from,
+                        to,
+                        items,
+                        next,
+                        examined,
+                    },
+                    read_seq: to,
                     validated_at_seq: self.storage.sequence()?,
                     retrieval_mode: RetrievalMode::HistoricalState,
                 })
