@@ -298,7 +298,7 @@ Repair validation, fresh review, CI and publication remain.
   across receipt show/replay and job show; retain narrow receipt access.
 - [ ] R3: Install both protoc and its standard definitions in CI and document them;
   require repaired-candidate hosted CI success.
-- [ ] R4: Persist zero/overflow cosine-vector failure diagnostics and the original
+- [x] R4: Persist zero/overflow cosine-vector failure diagnostics and the original
   prefix; verify identical diagnostic readback after restart.
 - [ ] R5: Admit a legal maximum-size wrapped Memory in the internal rule scan;
   retain public byte limits and bounded, honest search output.

@@ -1,6 +1,54 @@
 use super::*;
 
 #[test]
+fn invalid_vector_zero_retains_diagnostic() {
+    invalid_vector("invalid-zero");
+}
+
+#[test]
+fn invalid_vector_overflow_retains_diagnostic() {
+    invalid_vector("invalid-overflow");
+}
+
+#[test]
+fn invalid_vector_cancelled_mean_retains_diagnostic() {
+    invalid_vector("invalid-mean");
+}
+
+fn invalid_vector(model: &str) {
+    let endpoint = super::super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    let claim = format!("{}y", "x".repeat(4096));
+    seed_records(&daemon, &[("invalid", "alpha", &claim)], 1);
+    daemon.configure(&format!("[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel={model:?}\ndimension=2\nlocal=true\ntimeout='2s'",endpoint.address));
+    daemon.start();
+    daemon.cli(&["index", "sync", "--idempotency-key", "invalid-build"]);
+    let job = finished(&daemon, "invalid-build");
+    assert_eq!(job["state"], "failed", "{job}");
+    assert_eq!(job["error"], "PROVIDER_OUTPUT_INVALID", "{job}");
+    let status = daemon.cli(&["index", "status"])["data"]["vector"].clone();
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    let reopened = daemon.cli(&["index", "status"])["data"]["vector"].clone();
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    assert_eq!(reopened, status);
+    assert_eq!(status["watermark"], 0);
+    assert_eq!(
+        status["last_call"]["error"], "PROVIDER_OUTPUT_INVALID",
+        "{status}"
+    );
+    assert_eq!(status["last_call"]["identity"], status["model_identity"]);
+    assert_eq!(status["last_call"]["profile"], "embed");
+    assert_eq!(status["last_call"]["trace"]["automatic_retries"], 0);
+    assert_eq!(
+        status["last_call"]["trace"]["provider"]["configured_ms"],
+        2000
+    );
+}
+
+#[test]
 fn sync_stops_after_a_live_grant_shrinks() {
     let endpoint = super::super::model_tests::Endpoint::retrieval();
     let mut daemon = Daemon::new();

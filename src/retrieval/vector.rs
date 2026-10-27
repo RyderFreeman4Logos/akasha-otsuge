@@ -169,39 +169,78 @@ impl VectorIndex {
                     continue;
                 }
                 if let Some(memory) = memory {
-                    let mut vector = vec![0f32; progress.dimension as usize];
-                    let text = &memory.record.draft.claim;
-                    let mut start = 0;
-                    let mut parts = 0;
-                    while start < text.len() {
-                        let mut end = (start + 4096).min(text.len());
-                        while !text.is_char_boundary(end) {
-                            end -= 1;
-                        }
-                        let outcome = client
-                            .call_guarded(
-                                config,
-                                &Call {
-                                    profile: config.config().retrieval.embedding.clone().unwrap(),
-                                    input: Input::Embedding {
-                                        texts: vec![text[start..end].into()],
+                    let embedded = async {
+                        let mut vector = vec![0f32; progress.dimension as usize];
+                        let text = &memory.record.draft.claim;
+                        let mut start = 0;
+                        let mut parts = 0;
+                        while start < text.len() {
+                            let mut end = (start + 4096).min(text.len());
+                            while !text.is_char_boundary(end) {
+                                end -= 1;
+                            }
+                            let outcome = client
+                                .call_guarded(
+                                    config,
+                                    &Call {
+                                        profile: config.config().retrieval.embedding.clone().unwrap(),
+                                        input: Input::Embedding {
+                                            texts: vec![text[start..end].into()],
+                                        },
                                     },
-                                },
-                                workflow,
-                                cancel(),
-                                async {
-                                    storage
-                                        .serialized_read(authorize)
-                                        .await
-                                        .map_err(|e| crate::provider::Error(e.code))
-                                },
-                            )
-                            .await;
-                        progress.last_call = Some(
-                            serde_json::json!({"profile":outcome.profile,"identity":outcome.identity,"error":outcome.error,"trace":outcome.trace}),
-                        );
-                        if let Some(code) = outcome.error {
+                                    workflow,
+                                    cancel(),
+                                    async {
+                                        storage
+                                            .serialized_read(authorize)
+                                            .await
+                                            .map_err(|e| crate::provider::Error(e.code))
+                                    },
+                                )
+                                .await;
+                            progress.last_call = Some(
+                                serde_json::json!({"profile":outcome.profile,"identity":outcome.identity,"error":outcome.error,"trace":outcome.trace}),
+                            );
+                            if let Some(code) = outcome.error {
+                                return Err(error(model_error(&code)));
+                            }
+                            let output = outcome
+                                .output
+                                .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
+                            let values = output["vectors"][0]
+                                .as_array()
+                                .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
+                            if values.len() != vector.len() {
+                                return Err(error("PROVIDER_OUTPUT_INVALID"));
+                            }
+                            for (sum, value) in vector.iter_mut().zip(values) {
+                                let value = value
+                                    .as_f64()
+                                    .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?
+                                    as f32;
+                                if !value.is_finite() {
+                                    return Err(error("PROVIDER_OUTPUT_INVALID"));
+                                }
+                                *sum += value;
+                            }
+                            parts += 1;
+                            start = end;
+                        }
+                        for value in &mut vector {
+                            *value /= parts as f32;
+                        }
+                        validate_vector(&vector, progress.dimension)?;
+                        Ok(vector)
+                    }.await;
+                    let vector = match embedded {
+                        Ok(vector) => vector,
+                        Err(error) => {
                             progress.watermark = before;
+                            if let Some(call) = &mut progress.last_call
+                                && call["error"].is_null()
+                            {
+                                call["error"] = serde_json::json!(error.code);
+                            }
                             publish_progress(
                                 storage,
                                 key(&progress.generation),
@@ -211,34 +250,9 @@ impl VectorIndex {
                                 authorize,
                             )
                             .await?;
-                            return Err(error(model_error(&code)));
+                            return Err(error);
                         }
-                        let output = outcome
-                            .output
-                            .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
-                        let values = output["vectors"][0]
-                            .as_array()
-                            .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
-                        if values.len() != vector.len() {
-                            return Err(error("PROVIDER_OUTPUT_INVALID"));
-                        }
-                        for (sum, value) in vector.iter_mut().zip(values) {
-                            let value = value
-                                .as_f64()
-                                .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?
-                                as f32;
-                            if !value.is_finite() {
-                                return Err(error("PROVIDER_OUTPUT_INVALID"));
-                            }
-                            *sum += value;
-                        }
-                        parts += 1;
-                        start = end;
-                    }
-                    for value in &mut vector {
-                        *value /= parts as f32;
-                    }
-                    validate_vector(&vector, progress.dimension)?;
+                    };
                     let scope = hash(&serde_json::to_vec(&memory.record.draft.scope)?);
                     let batch = RecordBatch::try_new(
                         self.schema.clone(),

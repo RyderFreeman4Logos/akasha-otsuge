@@ -120,6 +120,12 @@ impl Endpoint {
                                 let text = text.as_str().unwrap();
                                 let offline = text.contains("offline") || text.contains("network") || text.contains("离线");
                                 let mut embedding = vec![if offline { 1.0 } else { 0.0 }, if offline { 0.0 } else { 1.0 }];
+                                match body["model"].as_str() {
+                                    Some("invalid-zero") => embedding = vec![0.0, 0.0],
+                                    Some("invalid-overflow") => embedding = vec![1e300, 1.0],
+                                    Some("invalid-mean") => embedding = vec![if text.starts_with('x') { 1.0 } else { -1.0 }, 0.0],
+                                    _ => (),
+                                }
                                 if dimension == 3 { embedding.push(0.0); }
                                 json!({"index":index,"embedding":embedding})
                             }).collect();

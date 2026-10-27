@@ -87,7 +87,8 @@ completion reason: non-Memory entries are `not_required`; Memory revisions are
 `indexed`, `superseded` or `inactive`. A batch publishes its completion ledger and
 watermark atomically **after** physical index updates. Replaying a crash before
 publication replaces the same row keys; a completed prefix does not rewrite them.
-A failed embedding stores its call error/trace without advancing that prefix.
+A failed embedding stores its call error/trace without advancing that prefix,
+including finite-f64 conversion overflow and zero/invalid pooled cosine vectors.
 
 `index status` reports requested-generation progress, its model identity and
 dimension, the active vector generation/configuration, and `building`. Search
