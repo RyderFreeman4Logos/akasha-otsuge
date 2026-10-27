@@ -175,7 +175,8 @@ pub struct Authorization {
     pub adopt_explicit_decisions: bool,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct MemoryView {
     pub revision: crate::storage::RevisionRef,
     pub previous: Option<u64>,

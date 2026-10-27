@@ -1,7 +1,11 @@
 //! Typed provenance and adoption above the internal authority store.
 
+mod history;
+mod recall;
 mod schema;
 
+pub use history::*;
+pub use recall::*;
 pub use schema::*;
 
 use serde::{Deserialize, Serialize};
@@ -434,22 +438,8 @@ impl<'a> Domain<'a> {
         let Some(state) = self.storage.current(&adoption_key(memory_id))? else {
             return Ok(None);
         };
-        let head: AdoptionHead = serde_json::from_str(&state.content)?;
-        let memory = self
-            .revision(memory_id, state.commit_seq)?
-            .ok_or_else(|| error("DOMAIN_CORRUPT"))?;
-        if head.schema_version != 1
-            || head.memory_id != memory_id
-            || head.scope != memory.record.draft.scope
-            || head.active != (memory.record.lifecycle == Lifecycle::Active)
-            || matches!(
-                memory.record.lifecycle,
-                Lifecycle::Candidate | Lifecycle::Rejected
-            )
-        {
-            return Err(error("DOMAIN_CORRUPT"));
-        }
-        Ok(head.active.then_some(memory))
+        let memory = self.resolve_adoption(state, memory_id)?;
+        Ok((memory.record.lifecycle == Lifecycle::Active).then_some(memory))
     }
 
     fn prepare(
@@ -539,16 +529,22 @@ impl<'a> Domain<'a> {
             content: serde_json::to_string(&record)?,
         }];
         if matches!(record.lifecycle, Lifecycle::Active | Lifecycle::Retired) {
-            changes.push(Change {
-                key: adoption_key(&write.memory_id),
-                expected_revision: record.previous_adoption,
-                content: serde_json::to_string(&AdoptionHead {
-                    schema_version: 1,
-                    memory_id: write.memory_id.clone(),
-                    active: record.lifecycle == Lifecycle::Active,
-                    scope: record.draft.scope.clone(),
-                })?,
-            });
+            let content = serde_json::to_string(&AdoptionHead {
+                schema_version: 1,
+                memory_id: write.memory_id.clone(),
+                active: record.lifecycle == Lifecycle::Active,
+                scope: record.draft.scope.clone(),
+            })?;
+            for key in [
+                adoption_key(&write.memory_id),
+                history::scope_key(&record.draft.scope, &write.memory_id)?,
+            ] {
+                changes.push(Change {
+                    key,
+                    expected_revision: record.previous_adoption,
+                    content: content.clone(),
+                });
+            }
         }
         self.storage
             .commit(&CommitRequest {

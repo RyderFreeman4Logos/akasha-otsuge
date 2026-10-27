@@ -10,4 +10,6 @@ A local, traceable memory system for coding agents, written in Rust.
 
 权威存储库提供原子修订、持久幂等回执和独立备份恢复，格式与验证边界见 [存储说明](docs/storage.md)。[来源与采纳规则](docs/domain.md)区分可信输入、机器候选和精确版本的人审；后续 Issues 接入真实宿主、daemon 与检索。
 
+[历史与召回回执](docs/history.md)提供跨重启的 as-of 状态、固定时点分页和实际输出字节归档，并在读取时复核当前权限。当前是库/API，尚未接入生产 CLI/IPC。
+
 公开仓库按用户要求采用 [Apache-2.0](LICENSE)。[来源与许可证核查](docs/provenance.md)记录迁移边界。

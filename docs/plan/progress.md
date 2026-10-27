@@ -3,20 +3,28 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#4 are merged
-and completed; #5–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#5 are merged
+and completed; #6–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-005
+## Current issue: MVP-006
 
-Typed provenance, scope and adoption are being implemented on
-`feat/mvp-005-authority`, based on merge `95ff8f5`. The full remaining checklist is
-in [todo.md](todo.md). External payloads cannot assign human authority; reviews
-must bind exact content and new revisions cannot inherit approval. The native
-Storage component fixtures now cover source ceilings, policy modes, exact review
-grants, local exceptions, candidate/adopted separation and durable retry/reopen.
-[The domain contract](../domain.md) states the trusted integration boundary and
-limits; final gate, independent review and publication remain pending.
+Durable history, fixed-point state pagination and actual RecallReceipt are being
+implemented on `feat/mvp-006-history`, based on merge `9b9f483`. The complete
+remaining checklist is in [todo.md](todo.md). Native as-of reads, atomic scope
+membership, bounded fixed-point pages, live read grants and immutable RecallReceipt
+bytes now pass 17 Domain and 17 Storage tests. [The history contract](../history.md)
+records format 2, prepared/delivered phases and real integration limits. The exact
+committed gate, independent review and publication remain; #6 is still open.
+
+## Completed provenance and adoption: MVP-005
+
+Candidate `664e49c` passed 10 native domain fixtures, the complete canonical gate
+and independent whole-candidate R1 review (0 findings). CI40450661442 passed;
+PR #33 merged as `9b9f483`, and #5 closed completed. [The domain contract](../domain.md)
+records source ceilings, trusted ingress boundaries, exact review grants, local
+exceptions, latest/adopted separation and durable retry/reopen. These component
+results do not authenticate actual host channels or implement the later review UI.
 
 ## Completed authority storage: MVP-004
 
@@ -90,7 +98,7 @@ not active computation. Reconcile an exact terminal result before any replay.
 After the current acceptance leaf is archived, run the canonical
 `bash scripts/check.sh` on the exact committed candidate, obtain independent
 review, push and read back the matching Linux CI, then merge and close the corresponding Issue.
-Continue#5–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
+Continue#6–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
 runs on unrelated intermediate changes; #24 repeats the same manifest/oracle
 through the actual product protocol. All required product work remains on the
 complete TODO list; no scaffold or diagnostic result counts as its completion.

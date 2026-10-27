@@ -3,6 +3,7 @@
 mod backup;
 #[cfg(test)]
 mod crash_tests;
+mod history;
 mod layout;
 
 use std::collections::BTreeSet;
@@ -146,6 +147,7 @@ pub type Result<T> = std::result::Result<T, StorageError>;
 
 const SEQUENCE: &[u8] = b"meta/commit_seq";
 const SCHEMA: &[u8] = b"meta/schema_version";
+pub const FORMAT_VERSION: u8 = 2;
 const MIB: usize = 1024 * 1024;
 
 fn valid_id(id: &str) -> bool {
@@ -279,12 +281,12 @@ impl Storage {
             let mut tx = store.tree.begin()?;
             if created {
                 tx.set_durability(Durability::Immediate);
-                tx.set(SCHEMA, &[1])?;
+                tx.set(SCHEMA, &[FORMAT_VERSION])?;
                 tx.set(SEQUENCE, 0_u64.to_be_bytes().as_slice())?;
                 tx.commit().await?;
                 layout::write_new(&store.root.join("format.json"), layout::FORMAT)?;
                 layout::sync_dir(&store.root)?;
-            } else if tx.get(SCHEMA)?.as_deref() != Some(&[1]) {
+            } else if tx.get(SCHEMA)?.as_deref() != Some(&[FORMAT_VERSION]) {
                 return Err(StorageError::new("UNSUPPORTED_STORAGE_FORMAT"));
             }
             store.sequence()?;
@@ -324,10 +326,23 @@ impl Storage {
 
     pub async fn commit(&self, request: &CommitRequest) -> Result<CommitReceipt> {
         request.validate()?;
-        let mut request = request.clone();
+        self.commit_checked(|| Ok(request.clone())).await
+    }
+
+    pub(crate) async fn serialized_read<T>(&self, read: impl FnOnce() -> Result<T>) -> Result<T> {
+        let _writer = self.writer.lock().await;
+        read()
+    }
+
+    pub(crate) async fn commit_checked(
+        &self,
+        prepare: impl FnOnce() -> Result<CommitRequest>,
+    ) -> Result<CommitReceipt> {
+        let writer = self.writer.clone().lock_owned().await;
+        let mut request = prepare()?;
+        request.validate()?;
         request.changes.sort_by(|a, b| a.key.cmp(&b.key));
         let request_hash = hash(&serde_json::to_vec(&request)?);
-        let writer = self.writer.clone().lock_owned().await;
         let mut tx = self.tree.begin()?;
         let receipt_key = format!("receipt/{}", request.request_id);
         if let Some(bytes) = tx.get_for_update(receipt_key.as_bytes())? {
@@ -340,7 +355,7 @@ impl Storage {
         }
         let seq = sequence(tx.get_for_update(SEQUENCE)?)?
             .checked_add(1)
-            .filter(|seq| *seq < u64::MAX)
+            .filter(|seq| *seq <= i64::MAX as u64)
             .ok_or_else(|| StorageError::new("SEQUENCE_EXHAUSTED"))?;
         let mut revisions = Vec::with_capacity(request.changes.len());
         tx.set_durability(Durability::Immediate);
@@ -394,6 +409,17 @@ impl Storage {
             })?,
         )?;
         tx.set(SEQUENCE, seq.to_be_bytes().as_slice())?;
+        let recorded_at_ms = u64::try_from(
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_err(|_| StorageError::new("INVALID_SYSTEM_CLOCK"))?
+                .as_millis(),
+        )
+        .map_err(|_| StorageError::new("INVALID_SYSTEM_CLOCK"))?;
+        tx.set(
+            format!("clock/{seq:020}").as_bytes(),
+            recorded_at_ms.to_be_bytes().as_slice(),
+        )?;
         let tree = self.tree.clone();
         // Once admitted, the transaction and its serialization lease outlive a cancelled caller.
         tokio::spawn(async move {

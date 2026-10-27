@@ -6,6 +6,9 @@ use akasha_otsuge::domain::*;
 use akasha_otsuge::storage::Storage;
 use serde_json::{Value, json};
 
+#[path = "support/domain_history.rs"]
+mod history;
+
 fn source_json() -> Value {
     json!({"event_id":"event-1","scope":{"user":"user-1","project":"project-a",
         "branch_or_version":null,"session":"session-1"},"text":"这次先用 A",

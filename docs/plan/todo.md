@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-27 after PR #32 merged at `95ff8f5`. Live GitHub audit: **24 open
-Issues, 4 completed Issues**. #5 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-27 after PR #33 merged at `9b9f483`. Live GitHub audit: **23 open
+Issues, 5 completed Issues**. #6 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -117,7 +117,7 @@ retain exact commands, identities, original failures and scope limits.
   including the deterministic cancelled-commit/checkpoint fix. CI40446328008 passed;
   PR #32 merged as `95ff8f5` and #4 closed completed.
 
-## MVP-005 remaining work
+## MVP-005 completed acceptance
 
 - [x] Define bounded source, actor, provenance, scope, conditions, evidence-span,
   memory-kind, validity, adoption and review schemas on the real Storage.
@@ -129,8 +129,27 @@ retain exact commands, identities, original failures and scope limits.
   drop inherited approval on edits, and preserve durable retry/conflict behavior.
 - [x] Test explicit trusted decisions under one-time policy, tentative statements,
   manual candidates and delegated active conclusions without human relabeling.
-- [ ] Publish schema/permission rules and misleading-input fixtures; complete
+- [x] Publish schema/permission rules and misleading-input fixtures; complete
   focused tests, exact-HEAD gate, independent review, CI, merge and Issue closure.
+  Candidate `664e49c` passes 10 native domain fixtures, the complete canonical gate
+  and independent R1 review (0 findings). CI40450661442 passed; PR #33 merged as
+  `9b9f483` and #5 closed completed. Real host authentication remains #11–#15.
+
+## MVP-006 remaining work
+
+- [x] Add bounded native revision/as-of reads and immutable commit-time metadata;
+  keep source/reality time separate from when the system committed a decision.
+- [x] Persist a scope/adoption index in the same authority batch, with fixed-point
+  state/history pagination, bound cursors, byte/scan limits and no event replay.
+- [x] Preserve pending, rejected, active, superseded and retired history; later
+  corrections or backdated validity must not rewrite an earlier known-state view.
+- [x] Store actual prepared/returned output bytes and hashes, selected revisions,
+  source refs, invocation binding, read/validation points, config/index/storage
+  identities, coverage/truncation and explicit delivery phases in RecallReceipt.
+- [x] Recheck current read permissions for historical results without changing
+  history; keep current and historical retrieval modes distinct and honest.
+- [ ] Verify temporal/pagination/replay/corruption/restart fixtures on real Storage,
+  then complete docs, exact-HEAD gate, independent review, CI, merge and closure.
 
 ## Complete Issue queue
 
@@ -138,7 +157,7 @@ retain exact commands, identities, original failures and scope limits.
 - [x] [#2 [MVP-002] 版本化配置、热重载与 deadline 配置契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/2) — dependencies: #1.
 - [x] [#3 [MVP-003] 非 SQLite 存储 spike 与唯一 backend 决策](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/3) — dependencies: #1, #2.
 - [x] [#4 [MVP-004] 实现唯一正式 Storage、原子提交与恢复基础](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/4) — dependencies: #3.
-- [ ] [#5 [MVP-005] 定义并执行来源、authority、scope 与 taste 数据语义](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5) — dependencies: #4.
+- [x] [#5 [MVP-005] 定义并执行来源、authority、scope 与 taste 数据语义](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5) — dependencies: #4.
 - [ ] [#6 [MVP-006] 持久历史视图、as-of 查询与实际 recall receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/6) — dependencies: #4, #5.
 - [ ] [#7 [MVP-007] 采集归一化、原文归档及分支/压缩恢复协议](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/7) — dependencies: #4, #6.
 - [ ] [#8 [MVP-008] CLI、私有 IPC daemon 与持久后台作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8) — dependencies: #2, #4, #7.

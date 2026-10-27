@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use super::{Result, StorageError};
 
-pub(super) const FORMAT: &[u8] = b"{\"application\":\"akasha-otsuge\",\"schema_version\":1,\"engine\":\"surrealkv-1.0.0\",\"engine_revision\":\"4338a790c8edc56ef5ea1e46157427af4815be3c\"}\n";
+pub(super) const FORMAT: &[u8] = b"{\"application\":\"akasha-otsuge\",\"schema_version\":2,\"engine\":\"surrealkv-1.0.0\",\"engine_revision\":\"4338a790c8edc56ef5ea1e46157427af4815be3c\"}\n";
 
 pub(super) fn private_dir(path: &Path, recursive: bool) -> Result<()> {
     let mut builder = fs::DirBuilder::new();

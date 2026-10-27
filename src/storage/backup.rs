@@ -220,7 +220,8 @@ impl Storage {
             // Check both sides of the native copy; published backups are immutable.
             if manifest.files != files(&backup)?
                 || store.sequence()? != manifest.commit_seq
-                || store.tree.begin()?.get(super::SCHEMA)?.as_deref() != Some(&[1])
+                || store.tree.begin()?.get(super::SCHEMA)?.as_deref()
+                    != Some(&[super::FORMAT_VERSION])
             {
                 return Err(invalid());
             }

@@ -1,4 +1,4 @@
-# Authority storage format 1
+# Authority storage format 2
 
 MVP-004 introduces the sole product authority store, using Apache-2.0 SurrealKV
 1.0.0 at `4338a790c8edc56ef5ea1e46157427af4815be3c`. Its source and transitive
@@ -33,7 +33,8 @@ domain payloads/revisions, never a physical delete in this API.
 
 One Immediate-durability transaction checks all previous heads, writes all new
 revisions and heads, stores the `CommitReceipt` and an immutable `OutboxEntry`,
-and advances the application `commit_seq`. No external work runs in it. An error
+records its system-clock milliseconds and advances the application `commit_seq`.
+No external work runs in it. An error
 before native commit rolls back the entire batch, including an already staged
 new evidence row. The native database lock excludes a second store owner.
 
@@ -58,8 +59,9 @@ ingestion module while retaining source identity. Empty content is allowed.
 
 | Native key | Value |
 | --- | --- |
-| `meta/schema_version` | Single byte `1` |
+| `meta/schema_version` | Single byte `2` |
 | `meta/commit_seq` | Big-endian u64; initialized to zero |
+| `clock/{seq:020}` | Immutable big-endian u64 system-clock milliseconds since Unix epoch, staged in the same commit |
 | `revision/{kind}/{id_byte_length:04x}/{id}/{seq:020}` | Zstd level-1 JSON revision with key, sequence, predecessor, content and SHA-256 |
 | `head/{kind}/{id_byte_length:04x}/{id}` | Big-endian revision sequence, versioned at native timestamp `seq + 1` |
 | `receipt/{request_id}` | Normalized request hash, committed sequence, revision references and configuration/policy context |
@@ -68,8 +70,12 @@ ingestion module while retaining source identity. Empty content is allowed.
 `current`, `revision`, `receipt`, `outbox` and `sequence` read committed native
 snapshots. Revision reads decompress at most 1 MiB and check content hash, record
 identity, sequence and predecessor ordering. Missing commit metadata is
-corruption, not sequence zero. Full historical pagination and RecallReceipt are
-separate MVP-006 requirements. No hard-delete or history-pruning API is exposed.
+corruption, not sequence zero. `at(key, commit_seq)` resolves the durable native
+head version; `recorded_at_ms(seq)` reads its immutable commit-time observation.
+Commit sequences range from 1 through i64::MAX; zero is the empty read point.
+The clock is not a monotonic ordering or a source/reality timestamp. Historical
+pagination and RecallReceipt are described in [history.md](history.md).
+No hard-delete or history-pruning API is exposed.
 
 ## Format admission and migration
 
@@ -80,8 +86,10 @@ Configured parent-directory aliases are allowed. A missing native directory,
 missing/unknown marker, or incompatible internal schema fails closed. Native
 files are not opened when the external format marker is missing or unknown.
 
-Format 1 is the first product format. The spike layout is not a product format
-and is not silently imported. No in-place migration is currently defined.
+Format 2 adds mandatory commit clocks and atomic domain scope-membership writes.
+Format 1 development stores are refused unchanged, including by restore; older
+writers also refuse format 2 instead of silently omitting this index. The spike
+layout is separate and is not imported. No in-place migration is currently defined.
 A future migration must recognize the old version explicitly, preserve an
 independent verified backup, write/validate a new directory, and publish the new
 format only after durable completion. Never hand an unknown directory to a
