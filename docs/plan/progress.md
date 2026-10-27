@@ -3,19 +3,45 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#5 are merged
-and completed; #6–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#6 are merged
+and completed; #7–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-006
+## Current issue: MVP-007
 
-Durable history, fixed-point state pagination and actual RecallReceipt are being
-implemented on `feat/mvp-006-history`, based on merge `9b9f483`. The complete
-remaining checklist is in [todo.md](todo.md). Native as-of reads, atomic scope
-membership, bounded fixed-point pages, live read grants and immutable RecallReceipt
-bytes now pass 17 Domain and 17 Storage tests. [The history contract](../history.md)
-records format 2, prepared/delivered phases and real integration limits. The exact
-committed gate, independent review and publication remain; #6 is still open.
+Shared capture, original archival and branch/compaction recovery are implemented
+on `feat/mvp-007-capture`, based on merge `42035bd`. Focused validation passes nine
+capture, 17 Domain and 17 Storage fixtures, plus four real capture SIGKILL points.
+The actual offline command passes missing/partial/reopen/replay/backfill/invalid/
+rotation/truncation/FIFO checks; the FIFO probe first reproduced a blocking open.
+[The capture protocol](../capture.md) documents exact originals, logical finals,
+checkpoints, branch cutoffs and explicit gaps. Full frozen-candidate gate,
+independent review, CI, merge and closure remain on [todo.md](todo.md).
+
+The initial frozen candidate `9573f6a` passed the complete gate (33.177 seconds),
+but independent R1 review found a same-inode rewrite could combine an old event
+with replacement-file anchors and silently skip that replacement. The repair
+derives anchors from accepted bytes and checks the prior boundary; its causal
+regression fails before the repair and passes after it. The retained release
+probe now detects truncation, accepts the replacement and deduplicates backfill.
+The amended candidate still requires its own full gate and independent review.
+
+Candidate `524d1eb` passed its full gate (17.823 seconds). R2 was interrupted by
+the review service before a final verdict; its preliminary saved-cursor sibling
+was reproduced by a regular Rust temporary-file test. The class sweep removes
+all unconditional anchor re-adoption: resume preserves saved hashes, reset uses
+the empty boundary, and publication derives hashes from accepted bytes. The
+interruption is not a review approval; the next frozen candidate requires a new
+gate and independent source review.
+
+## Completed history and receipts: MVP-006
+
+Candidate `e98d4cb` passed 17 Domain and 17 Storage fixtures, the complete canonical
+gate and independent whole-candidate R1 review (0 findings). CI40454932598 passed;
+PR #34 merged as `42035bd`, and #6 closed completed. [The history contract](../history.md)
+records native as-of reads, atomic scope membership, bounded fixed-point pages,
+live read grants and exact RecallReceipt bytes. Native lookup can traverse a key's
+version history; no constant-time hot-key or full-scale product claim is made.
 
 ## Completed provenance and adoption: MVP-005
 
@@ -98,7 +124,7 @@ not active computation. Reconcile an exact terminal result before any replay.
 After the current acceptance leaf is archived, run the canonical
 `bash scripts/check.sh` on the exact committed candidate, obtain independent
 review, push and read back the matching Linux CI, then merge and close the corresponding Issue.
-Continue#6–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
+Continue#7–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
 runs on unrelated intermediate changes; #24 repeats the same manifest/oracle
 through the actual product protocol. All required product work remains on the
 complete TODO list; no scaffold or diagnostic result counts as its completion.

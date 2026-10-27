@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-27 after PR #33 merged at `9b9f483`. Live GitHub audit: **23 open
-Issues, 5 completed Issues**. #6 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-27 after PR #34 merged at `42035bd`. Live GitHub audit: **22 open
+Issues, 6 completed Issues**. #7 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -37,6 +37,12 @@ checklist instead of appending stale running snapshots. Then implement one Issue
 at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
+
+The 2026-10-27 restart audit still finds 22 open Issues (#7–#28). #4–#6 have
+since been closed with merged PRs #32–#34; there is no completed implementation
+waiting for closure. #7's remaining work is command/documentation acceptance,
+the frozen-candidate gate/review and publication. Finish that leaf before adding
+features; retain the same one-Issue pipeline for #8 onward.
 
 ## MVP-003 completed acceptance
 
@@ -135,7 +141,7 @@ retain exact commands, identities, original failures and scope limits.
   and independent R1 review (0 findings). CI40450661442 passed; PR #33 merged as
   `9b9f483` and #5 closed completed. Real host authentication remains #11–#15.
 
-## MVP-006 remaining work
+## MVP-006 completed acceptance
 
 - [x] Add bounded native revision/as-of reads and immutable commit-time metadata;
   keep source/reality time separate from when the system committed a decision.
@@ -148,8 +154,36 @@ retain exact commands, identities, original failures and scope limits.
   identities, coverage/truncation and explicit delivery phases in RecallReceipt.
 - [x] Recheck current read permissions for historical results without changing
   history; keep current and historical retrieval modes distinct and honest.
-- [ ] Verify temporal/pagination/replay/corruption/restart fixtures on real Storage,
+- [x] Verify temporal/pagination/replay/corruption/restart fixtures on real Storage,
   then complete docs, exact-HEAD gate, independent review, CI, merge and closure.
+  Candidate `e98d4cb` passes 17 Domain and 17 Storage fixtures, the canonical gate
+  and independent whole-candidate R1 review (0 findings). CI40454932598 passed;
+  PR #34 merged as `42035bd` and #6 closed completed. Actual transport is #8;
+  real indexes and host binding remain their dependent Issues.
+
+## MVP-007 remaining work
+
+- [x] Define source identity, raw payload, normalized events and derived-summary
+  references with session/entry/parent/branch/fork cutoff and visibility.
+- [x] Archive exact original bytes before derived work, with bounded chunks and
+  durable atomic event/checkpoint publication on the formal Storage.
+- [x] Preserve distinct identical-text events, deduplicate stable replay, reject
+  conflicting identity reuse, and link deltas/final without final duplication.
+- [x] Handle incremental/offline reconcile, incomplete tails, file rotation and
+  truncation; expose missing, pending and unavailable coverage without guessing.
+- [x] Keep compaction originals and branch inheritance cutoffs; verify late/out-of-
+  order events, repeated resume/fork/compact and crash recovery with real fixtures.
+- [x] Provide the reusable reconcile operation and executable component command,
+  document its production CLI/IPC seam in #8 and actual host parsers in #12–#15.
+- [x] Pass focused capture/domain/storage and four capture SIGKILL points;
+  verify the actual command's JSON, exits, reopen, backfill and FIFO refusal.
+- [x] Fix independent R1's accepted-frame/checkpoint-anchor rewrite race; retain
+  causal RED/GREEN, bounded boundary regressions and release-command readback.
+- [x] Sweep the saved-cursor sibling: preserve validated anchors on resume and
+  verify both real reconcile boundaries and append-only control with ordinary
+  temporary-file fixtures. R2 interruption remains no final review verdict.
+- [ ] Complete the exact-HEAD gate, independent review, CI, merge and closure.
+  [The protocol](../capture.md) records coverage and known uncollectable items.
 
 ## Complete Issue queue
 
@@ -158,7 +192,7 @@ retain exact commands, identities, original failures and scope limits.
 - [x] [#3 [MVP-003] 非 SQLite 存储 spike 与唯一 backend 决策](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/3) — dependencies: #1, #2.
 - [x] [#4 [MVP-004] 实现唯一正式 Storage、原子提交与恢复基础](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/4) — dependencies: #3.
 - [x] [#5 [MVP-005] 定义并执行来源、authority、scope 与 taste 数据语义](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5) — dependencies: #4.
-- [ ] [#6 [MVP-006] 持久历史视图、as-of 查询与实际 recall receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/6) — dependencies: #4, #5.
+- [x] [#6 [MVP-006] 持久历史视图、as-of 查询与实际 recall receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/6) — dependencies: #4, #5.
 - [ ] [#7 [MVP-007] 采集归一化、原文归档及分支/压缩恢复协议](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/7) — dependencies: #4, #6.
 - [ ] [#8 [MVP-008] CLI、私有 IPC daemon 与持久后台作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8) — dependencies: #2, #4, #7.
 - [ ] [#9 [MVP-009] 可配置本地模型客户端与 1700 秒全链长测](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9) — dependencies: #2, #8.

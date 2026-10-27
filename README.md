@@ -12,4 +12,6 @@ A local, traceable memory system for coding agents, written in Rust.
 
 [历史与召回回执](docs/history.md)提供跨重启的 as-of 状态、固定时点分页和实际输出字节归档，并在读取时复核当前权限。当前是库/API，尚未接入生产 CLI/IPC。
 
+[采集与恢复协议](docs/capture.md)保存原始字节、规范化事件和分支/压缩关系，提供有界离线 reconcile 组件命令及可查询的缺失状态。
+
 公开仓库按用户要求采用 [Apache-2.0](LICENSE)。[来源与许可证核查](docs/provenance.md)记录迁移边界。

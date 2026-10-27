@@ -2,7 +2,7 @@
 
 mod backup;
 #[cfg(test)]
-mod crash_tests;
+pub(crate) mod crash_tests;
 mod history;
 mod layout;
 
@@ -77,6 +77,11 @@ pub struct CommitReceipt {
     pub revisions: Vec<RevisionRef>,
     pub config_generation: u64,
     pub policy_revision: Option<String>,
+}
+
+pub(crate) enum CommitPlan {
+    Write(CommitRequest),
+    Reuse(CommitReceipt),
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -338,8 +343,19 @@ impl Storage {
         &self,
         prepare: impl FnOnce() -> Result<CommitRequest>,
     ) -> Result<CommitReceipt> {
+        self.commit_or_reuse(|| prepare().map(CommitPlan::Write))
+            .await
+    }
+
+    pub(crate) async fn commit_or_reuse(
+        &self,
+        prepare: impl FnOnce() -> Result<CommitPlan>,
+    ) -> Result<CommitReceipt> {
         let writer = self.writer.clone().lock_owned().await;
-        let mut request = prepare()?;
+        let mut request = match prepare()? {
+            CommitPlan::Write(request) => request,
+            CommitPlan::Reuse(receipt) => return Ok(receipt),
+        };
         request.validate()?;
         request.changes.sort_by(|a, b| a.key.cmp(&b.key));
         let request_hash = hash(&serde_json::to_vec(&request)?);
