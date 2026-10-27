@@ -1,7 +1,7 @@
 # Durable history and actual recall receipts
 
 MVP-006 supplies library APIs on the real pinned SurrealKV authority store.
-It adds no temporary daemonless command. Production CLI/IPC is MVP-008;
+Its [production CLI/IPC](daemon.md) is provided by MVP-008;
 retrieval indexes and real host binding are subsequent dependent Issues.
 
 ## Historical reads
@@ -106,8 +106,8 @@ revision without copying the body or changing original retrieval metadata.
 An acknowledgement can record a delivery that already happened even after a
 subsequent permission withdrawal; it exposes no body and does not authorize a
 new send. A lost/partial transport acknowledgement remains prepared/unknown.
-MVP-008 owns that transport and recovery, so this module does not itself establish
-that an agent received the bytes.
+MVP-008 acknowledges archived output only after the CLI writes and flushes it.
+The library alone does not establish that an agent received the bytes.
 
 Identical preparation and delivery retries return their existing CommitReceipts.
 Changed content/binding is refused; preparation also rechecks live permissions

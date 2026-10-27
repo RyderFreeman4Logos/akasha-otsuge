@@ -37,6 +37,9 @@ Defaults use `$XDG_CONFIG_HOME/akasha-otsuge/config.toml`,
 `.local/share`, and `.local/run`. Relative environment path values are ignored.
 `--socket` locates the running service without parsing a damaged candidate config;
 use it to inspect/reload the retained generation after a rejected file update.
+`--profile NAME` selects the startup profile; the daemon retains that selection
+for validation, explicit reload and watching. With an explicit `--socket`, remote
+management uses the running daemon's profile rather than a client-side override.
 Startup requires a valid configuration. Changing storage/socket paths requires
 explicit drain and restart; the daemon never migrates the old database implicitly.
 
@@ -118,12 +121,17 @@ effects.
 
 ## History, receipts and live access
 
-`memory show ID [--at COMMIT]`, `memory history ID [--to COMMIT]`,
-`state show --scope SCOPE_JSON --at COMMIT`,
-`state diff FROM TO --scope SCOPE_JSON`, and `receipt show ID` call the real Domain
+`memory show ID [--at COMMIT]`,
+`memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]`,
+`state show --scope SCOPE_JSON --at COMMIT [--cursor JSON_FILE]`,
+`state diff FROM TO --scope SCOPE_JSON [--cursor JSON_FILE]`, and `receipt show ID` call the real Domain
 APIs. A state diff compares native adoption revisions at both points with bounded
 scope-index traversal. It retains before/after bodies, including retirement,
 without replaying an unbounded event log.
+Save the returned `data.data.next` object as the cursor JSON file and keep the
+same read point/range/scope on subsequent pages; changed queries reject it.
+When history omits `--to`, the response's `data.read_seq` is the fixed upper point
+to use for subsequent pages. Unknown or repeated pagination flags are rejected.
 
 `access grant SCOPE_JSON` narrows/restores the authenticated local owner's grant;
 `access revoke` revokes it. Restart does not recreate a revoked grant. Historic

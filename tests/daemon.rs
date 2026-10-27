@@ -47,6 +47,10 @@ impl Daemon {
             std::env::var_os("AKASHA_ACCEPTANCE_BINARY").unwrap_or_else(|| BIN.into()),
         );
         command
+            .env("HOME", &self.root)
+            .env_remove("XDG_CONFIG_HOME")
+            .env_remove("XDG_DATA_HOME")
+            .env_remove("XDG_RUNTIME_DIR")
             .arg("--config")
             .arg(self.root.join("config.toml"))
             .arg("--socket")
@@ -54,8 +58,12 @@ impl Daemon {
         command
     }
     fn start(&mut self) {
+        self.start_with(&[]);
+    }
+    fn start_with(&mut self, options: &[&str]) {
         self.child = Some(
             self.command()
+                .args(options)
                 .args(["daemon", "run"])
                 .stdin(Stdio::null())
                 .stdout(Stdio::null())
@@ -116,6 +124,57 @@ impl Daemon {
             std::thread::sleep(Duration::from_millis(20));
         }
     }
+}
+
+#[test]
+fn selected_profile_large_config_and_pending_paths_survive_restart() {
+    let mut daemon = Daemon::new();
+    let roots = serde_json::to_string(&vec!["/large/allowed"; 12000]).unwrap();
+    let extra =
+        format!("[access]\nread_roots={roots}\n[profiles.patient.timeouts]\nrunner='2100s'\n");
+    daemon.configure(&extra);
+    let original = std::fs::read(daemon.root.join("config.toml")).unwrap();
+    assert!(original.len() > 128 * 1024);
+    daemon.start_with(&["--profile", "patient"]);
+    let status = daemon.cli(&["config", "status"])["data"].clone();
+    assert_eq!(status["active_generation"], 1);
+    assert_eq!(status["effective"]["selected_profile"], "patient");
+    assert_eq!(
+        status["effective"]["effective_timeouts"]["runner"]["secs"],
+        2100
+    );
+    assert_eq!(
+        status["effective"]["config"]["access"]["read_roots"]
+            .as_array()
+            .unwrap()
+            .len(),
+        12000
+    );
+    // Removing explicit paths must resolve the same startup defaults in validate and reload.
+    std::fs::write(daemon.root.join("config.toml"), &extra).unwrap();
+    let validated = daemon.cli(&["config", "validate"])["data"].clone();
+    assert_eq!(
+        validated["config"]["paths"]["data_dir"],
+        daemon
+            .root
+            .join(".local/share/akasha-otsuge")
+            .to_str()
+            .unwrap()
+    );
+    assert_eq!(
+        daemon.cli(&["config", "reload"])["data"]["status"],
+        "restart_required"
+    );
+    let pending = daemon.cli(&["config", "status"])["data"].clone();
+    assert_eq!(pending["pending"]["desired"], validated);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    std::fs::write(daemon.root.join("config.toml"), original).unwrap();
+    daemon.start_with(&["--profile", "patient"]);
+    let reopened = daemon.cli(&["config", "status"])["data"].clone();
+    assert_eq!(reopened, pending);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
 }
 impl Drop for Daemon {
     fn drop(&mut self) {
@@ -348,6 +407,128 @@ fn configuration_fifo_is_rejected_before_any_blocking_read() {
 }
 
 #[test]
+fn queue_expiry_and_running_cancellation_do_not_wait_for_a_free_slot() {
+    let mut daemon = Daemon::new();
+    let access = format!("[access]\nread_roots=[{:?}]\n", daemon.root);
+    daemon.configure(&access);
+    let scope = json!({"user":format!("uid:{}",rustix::process::geteuid().as_raw()),"project":null,"branch_or_version":null,"session":null});
+    std::fs::write(daemon.root.join("binding.json"),serde_json::to_vec(&json!({"source":{"adapter":"fixture","profile":"test","session":"queue","thread":"thread","agent":"agent"},"scope":scope,"stream":"stream","coverage":"available_payloads"})).unwrap()).unwrap();
+    let mut file = std::fs::File::create(daemon.root.join("capture.jsonl")).unwrap();
+    for n in 0..4096 {
+        writeln!(file,"{}",json!({"schema_version":1,"event":{"event_id":format!("e-{n}"),"source_version":"1","runtime_instance":"test","branch":"main","parent":null,"fork_cutoff":null,"event_time_ms":null,"observed_time_ms":1,"visibility":"user","kind":{"kind":"resume"},"text":"original"},"raw_hex":"78"})).unwrap();
+    }
+    drop(file);
+    daemon.start();
+    let binding = daemon.root.join("binding.json");
+    let input = daemon.root.join("capture.jsonl");
+    let mut args = [
+        "capture",
+        "reconcile",
+        binding.to_str().unwrap(),
+        input.to_str().unwrap(),
+        "--idempotency-key",
+        "running",
+    ];
+    daemon.cli(&args);
+    let end = Instant::now() + Duration::from_secs(5);
+    loop {
+        let status = daemon.cli(&["job", "show", "running"]);
+        if status["data"]["state"] == "running" {
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "execution slot was never obtained: {status}"
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let original = daemon.cli(&["job", "show", "running"])["data"].clone();
+    daemon.configure(&format!("{access}[runtime]\nmax_queued_jobs=1\n"));
+    daemon.cli(&["config", "reload"]);
+    args[5] = "holds-queue";
+    let queued = daemon.cli(&args)["data"].clone();
+    assert_eq!(queued["state"], "queued");
+    assert_eq!(daemon.cli(&args)["data"], queued);
+    args[5] = "queue-full";
+    let busy = daemon.command().args(args).output().unwrap();
+    assert_eq!(busy.status.code(), Some(4));
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    let recovered = daemon.cli(&["job", "show", "running"])["data"].clone();
+    assert_eq!(recovered["started_at_ms"], original["started_at_ms"]);
+    assert_eq!(
+        recovered["execution_deadline_ms"],
+        original["execution_deadline_ms"]
+    );
+    assert_eq!(
+        recovered["config_generation"],
+        original["config_generation"]
+    );
+    assert_eq!(
+        daemon.cli(&["job", "cancel", "holds-queue"])["data"]["state"],
+        "cancelled"
+    );
+    daemon.configure(&format!("{access}[timeouts]\nqueue='1ms'\n"));
+    daemon.cli(&["config", "reload"]);
+    args[5] = "expires";
+    daemon.cli(&args);
+    let end = Instant::now() + Duration::from_secs(4);
+    loop {
+        let status = daemon.cli(&["job", "show", "expires"]);
+        if status["data"]["state"] == "failed" {
+            assert_eq!(status["data"]["error"], "QUEUE_TIMEOUT");
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "expired queue retained behind running work: {status}"
+        );
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    let cancelled = daemon.cli(&["job", "cancel", "running"]);
+    assert_eq!(cancelled["data"]["cancel_requested"], true);
+    let end = Instant::now() + Duration::from_secs(5);
+    loop {
+        let status = daemon.cli(&["job", "show", "running"]);
+        if status["data"]["state"] == "cancelled" {
+            assert_eq!(status["data"]["error"], "CANCELLED");
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "running cancel was not collected: {status}"
+        );
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    daemon.configure(&format!("{access}[runtime]\npaused=true\n"));
+    daemon.cli(&["config", "reload"]);
+    args[5] = "paused";
+    let busy = daemon.command().args(args).output().unwrap();
+    assert_eq!(busy.status.code(), Some(4));
+    daemon.configure(&format!("{access}[timeouts]\ntools='1ms'\n"));
+    daemon.cli(&["config", "reload"]);
+    args[5] = "short-budget";
+    daemon.cli(&args);
+    let end = Instant::now() + Duration::from_secs(5);
+    loop {
+        let status = daemon.cli(&["job", "show", "short-budget"]);
+        if status["data"]["state"] == "failed" {
+            assert_eq!(status["data"]["error"], "JOB_TIMEOUT");
+            assert_eq!(status["data"]["execution_budget_ms"], 1);
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "job budget was not enforced: {status}"
+        );
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
 fn accepted_reconciliation_survives_process_death_and_pins_configuration() {
     let mut daemon = Daemon::new();
     daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
@@ -514,7 +695,7 @@ fn production_history_diff_and_receipt_reads_use_the_domain_and_live_grant() {
         .enable_all()
         .build()
         .unwrap();
-    let (a, b, expected_history, expected_receipt) = runtime.block_on(async {
+    let (a, b, expected_history, expected_receipt, pages) = runtime.block_on(async {
         let store = Storage::open(&config).await.unwrap();
         let domain = Domain::new(&store);
         let reader =
@@ -573,7 +754,12 @@ fn production_history_diff_and_receipt_reads_use_the_domain_and_live_grant() {
             .await
             .unwrap()
             .commit_seq;
+        write.request_id = "write-other".into();
+        write.memory_id = "other".into();
+        write.draft.claim = "C".into();
+        domain.propose(&write, &ingress, &policy).await.unwrap();
         write.request_id = "write-b".into();
+        write.memory_id = "choice".into();
         write.expected_revision = Some(a);
         write.draft.claim = "B".into();
         let b = domain
@@ -629,8 +815,18 @@ fn production_history_diff_and_receipt_reads_use_the_domain_and_live_grant() {
                 .data,
         )
         .unwrap();
+        let one = PageBudget { limit: 1, max_bytes: 1024 * 1024 };
+        let full = PageBudget { limit: 32, max_bytes: 1024 * 1024 };
+        let h = domain.history(&reader, "choice", 1..=b, None, one).await.unwrap().data.next.unwrap();
+        let s = domain.state(&reader, &scope, b, None, one).await.unwrap().data.next.unwrap();
+        let d = domain.diff(&reader, &scope, a, b, None, one).await.unwrap().data.next.unwrap();
+        let pages = json!({
+            "history": {"cursor": h, "tail": domain.history(&reader,"choice",1..=b,Some(&h),full).await.unwrap().data},
+            "state": {"cursor": s, "tail": domain.state(&reader,&scope,b,Some(&s),full).await.unwrap().data},
+            "diff": {"cursor": d, "tail": domain.diff(&reader,&scope,a,b,Some(&d),full).await.unwrap().data}
+        });
         store.close().await.unwrap();
-        (a, b, history, receipt)
+        (a, b, history, receipt, pages)
     });
     std::fs::write(
         daemon.root.join("scope.json"),
@@ -656,9 +852,13 @@ fn production_history_diff_and_receipt_reads_use_the_domain_and_live_grant() {
         "--at",
         &b.to_string(),
     ]);
-    assert_eq!(
-        state["data"]["data"]["items"][0]["memory"]["record"]["draft"]["claim"],
-        "B"
+    assert_eq!(state["data"]["data"]["items"].as_array().unwrap().len(), 2);
+    assert!(
+        state["data"]["data"]["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|v| v["memory"]["record"]["draft"]["claim"] == "B")
     );
     let diff = daemon.cli(&[
         "state",
@@ -668,15 +868,53 @@ fn production_history_diff_and_receipt_reads_use_the_domain_and_live_grant() {
         "--scope",
         scope_path.to_str().unwrap(),
     ]);
-    assert_eq!(diff["data"]["data"]["items"].as_array().unwrap().len(), 1);
-    assert_eq!(
-        diff["data"]["data"]["items"][0]["before"]["memory"]["record"]["draft"]["claim"],
-        "A"
-    );
-    assert_eq!(
-        diff["data"]["data"]["items"][0]["after"]["memory"]["record"]["draft"]["claim"],
-        "B"
-    );
+    let differences = diff["data"]["data"]["items"].as_array().unwrap();
+    assert_eq!(differences.len(), 2);
+    let changed = differences
+        .iter()
+        .find(|v| v["after"]["memory"]["record"]["draft"]["claim"] == "B")
+        .unwrap();
+    assert_eq!(changed["before"]["memory"]["record"]["draft"]["claim"], "A");
+    assert_eq!(changed["after"]["memory"]["record"]["draft"]["claim"], "B");
+    let cursor = daemon.root.join("cursor.json");
+    for kind in ["history", "state", "diff"] {
+        std::fs::write(&cursor, serde_json::to_vec(&pages[kind]["cursor"]).unwrap()).unwrap();
+        let (a, b) = (a.to_string(), b.to_string());
+        let args = match kind {
+            "history" => vec![
+                "memory",
+                "history",
+                "choice",
+                "--from",
+                "1",
+                "--to",
+                &b,
+                "--cursor",
+                cursor.to_str().unwrap(),
+            ],
+            "state" => vec![
+                "state",
+                "show",
+                "--at",
+                &b,
+                "--scope",
+                scope_path.to_str().unwrap(),
+                "--cursor",
+                cursor.to_str().unwrap(),
+            ],
+            _ => vec![
+                "state",
+                "diff",
+                &a,
+                &b,
+                "--scope",
+                scope_path.to_str().unwrap(),
+                "--cursor",
+                cursor.to_str().unwrap(),
+            ],
+        };
+        assert_eq!(daemon.cli(&args)["data"]["data"], pages[kind]["tail"]);
+    }
     assert_eq!(
         daemon.cli(&["receipt", "show", "fixture-receipt"])["data"]["data"],
         expected_receipt

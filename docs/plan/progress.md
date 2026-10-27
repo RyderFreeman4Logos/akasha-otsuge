@@ -13,7 +13,17 @@ Private IPC, daemon lifecycle and durable jobs are being implemented on
 `feat/mvp-008-daemon`, based on merge `960320a`. The complete remaining acceptance
 checklist is in [todo.md](todo.md). Existing Storage, ConfigManager, Domain and
 Capture remain the shared authority; CLI calls must reach those real components.
-No installed daemon, UID isolation or production job recovery is claimed yet.
+Focused acceptance now covers real daemon/job crash and graceful recovery,
+configuration/profile/chunked snapshots, CLI history/diff pagination and delivery
+ACK. A different kernel UID control verifies private-path and peer denial. The
+installed release gate, independent review and publication remain outstanding.
+
+The user-requested dua audit found55.39GiB on the home filesystem. Removing
+obsolete owned caches/probes/diagnostic data and checksum-migrating retained
+artifacts leaves374.74MiB locally and44.06GiB in the SSD mirror; all42 corpus
+shards match their original SHA-256 manifest. Original paths are symlinks, and
+future large artifacts must use this layout. The existing full SSD database was
+not opened or modified.
 
 ## Completed capture: MVP-007
 

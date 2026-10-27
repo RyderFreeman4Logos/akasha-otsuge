@@ -3,7 +3,7 @@
 `capture` is the shared storage component for [MVP-007](spec/issues/MVP-007.md).
 It stores exact payload bytes separately from normalized visible UTF-8 text and
 derived compaction events. It uses the sole [authority Storage](storage.md), not
-a second database. The installed daemon/CLI integration belongs to #8; real host
+a second database. [Daemon/CLI integration](daemon.md) is implemented by #8; real host
 identity discovery and native format readers belong to #11–#15.
 
 ## Identity and authority
@@ -122,8 +122,9 @@ available. Exit 3 means pending work or retained loss, 2 invalid arguments, and
 1 another fixed-code error. Exactly 64 processed frames can leave `backlog`
 until the next call confirms EOF. Repeating a caught-up call creates no commit.
 FIFO and other nonregular input files are refused. The command opens and closes
-Storage directly for component acceptance; the installed CLI remains a thin
-daemon client when #8 adds the production operation.
+Storage directly for component acceptance. The production CLI instead submits
+`capture reconcile` as a durable daemon job; its acceptance exit is distinct from
+this synchronous example's coverage exit. Inspect `job show` for the final report.
 
 ## Validation and limits
 
@@ -138,8 +139,8 @@ idempotent recovery. These are process-crash tests, not power-loss claims.
 `scripts/check_capture_command.py` invokes the built executable through its real
 exit/stdout/stderr boundary. The canonical gate builds the release example and
 runs this acceptance in temporary stores with owned child cleanup. Actual host
-authentication, filesystem watchers, native host database readers, production
-IPC and model/index integration remain their dependent Issues. Hidden reasoning,
+authentication, host filesystem watchers, native host database readers and
+model/index integration remain their dependent Issues. Hidden reasoning,
 inaccessible payloads, missing pre-install history and all terminal pixels are
 not claimed as captured. No actual host or full-corpus acceptance is replaced by
 these component fixtures.

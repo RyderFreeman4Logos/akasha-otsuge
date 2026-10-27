@@ -13,15 +13,19 @@ bash scripts/check.sh
 just check
 ```
 
-The gate validates the specification hashes and issue map, checks its negative
-controls, runs Rust formatting, Clippy, process-level CLI tests and a release build.
-GitHub Actions runs the same gate in a clean Ubuntu 24.04 checkout. The release
-binary is tested in place; installing it into a user's PATH is a separate action.
+The gate validates specification hashes and the issue map, checks negative
+controls, and runs formatting, Clippy, component/process tests and a release build.
+GitHub Actions runs the same gate in a clean Ubuntu 24.04 checkout. Daemon acceptance
+installs that release into a temporary prefix, checks its hash, and exercises the
+installed executable's IPC, configuration, jobs, history and receipts. A separate
+kernel UID must pass an accessible control and be denied private paths/IPC.
+Installing into the user's PATH remains a separate action.
 
-There is one Cargo package in one workspace. `src/main.rs` currently contains only
-help/version and error handling; `tests/cli.rs` invokes the actual executable.
-Add modules when behavior requires them. Storage selection belongs to MVP-003;
-no database or host integration is implied by this bootstrap.
+There is one Cargo package in one workspace. `src/main.rs` parses CLI input and
+calls versioned private IPC. The daemon invokes the shared Storage, ConfigManager,
+Capture and Domain components; it does not provide placeholder domain results.
+`tests/daemon.rs` exercises real executable and restart boundaries. Model, retrieval
+and host integration retain their own later acceptance criteria.
 
 `src/config/` contains the shared configuration schema, atomic generation manager
 and monotonic deadline contracts. Its controlled consumers are tested in
@@ -36,9 +40,9 @@ Errors use one JSON line on stderr:
 {"schema_version":1,"error":{"code":"INVALID_ARGUMENT","message":"Use --help for supported arguments"}}
 ```
 
-Exit 0 is success, 2 is an invalid command/argument, and 1 is an execution/I/O error.
-Invalid-command errors leave stdout empty and do not echo untrusted arguments. Future error codes
-follow the distinctions in `docs/spec/02.md`. Unsupported features return an error;
+Exit 0 is success, 2 invalid command/argument, 3 daemon unavailable, 4 busy,
+and 1 other failure. Invalid-command errors leave stdout empty and do not echo
+untrusted arguments. See [the protocol](daemon.md). Unsupported features return an error;
 they do not return placeholder success.
 
 Implement one main Issue at a time, preserve its requirement/dependency mapping,

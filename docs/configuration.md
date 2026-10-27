@@ -2,16 +2,17 @@
 
 The configuration library is implemented and tested independently of the daemon.
 Production config commands, automatic file watching and durable generation/audit
-storage are integrated by MVP-008. This document describes the shared contract;
-the current bootstrap CLI does not advertise those commands yet.
+storage are integrated by [MVP-008's daemon](daemon.md). This document describes
+the shared contract; `config validate/reload/status/show --effective` use that
+same manager in the running service.
 
 See [example TOML](../examples/config.toml) and the complete
-[built-in defaults](../src/config/defaults.toml). There is no selected database:
-MVP-003 chooses the single production backend. There is no backend switch setting.
+[built-in defaults](../src/config/defaults.toml). MVP-003 selected the single
+[production backend](benchmarks/storage-decision.md); there is no backend switch.
 
 The daemon supplies absolute data/socket paths at startup. The library never reads
 project configuration, environment overrides, credentials or installed-host state
-implicitly. The daemon's later setup layer resolves the documented XDG paths.
+implicitly. The daemon's setup layer resolves the documented XDG paths.
 Credential references accept only `env:NAME`; values are resolved by prepared
 consumers, never stored in the configuration audit.
 
@@ -69,9 +70,9 @@ discard a previous valid pending candidate. JSON error locations omit untrusted
 values; credentials, endpoints and command arguments are redacted in diagnostics.
 
 The in-memory revision ring is a diagnostic window, not durable audit authority.
-MVP-008 must persist each returned report and accepted task snapshot, restore
-the positive generation passed to `ConfigManager::new`, and record separate live
-revocations. OS permissions and actual read/dispatch operations belong to their
+MVP-008 persists complete checkpoints before publication, including returned
+reports and accepted task snapshots, restores the positive generation, and records
+separate live revocations. OS permissions and actual read/dispatch operations belong to their
 consumers; an old task must not authorize itself using its pinned policy.
 
 Timeout defaults and calculation:

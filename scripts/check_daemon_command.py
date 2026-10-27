@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Real installed CLI, alternate kernel UID, and owned-socket acceptance."""
-import errno
 import hashlib
 import json
 import os
@@ -16,8 +15,36 @@ import time
 
 
 def command(argv, **kwargs):
-    return subprocess.run(argv, stdin=subprocess.DEVNULL, capture_output=True, text=True,
-                          timeout=kwargs.pop('timeout', 20), **kwargs)
+    timeout = kwargs.pop('timeout', 20)
+    child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, text=True, start_new_session=True, **kwargs)
+    try:
+        stdout, stderr = child.communicate(timeout=timeout)
+        return subprocess.CompletedProcess(argv, child.returncode, stdout, stderr)
+    except BaseException:
+        try:
+            os.killpg(child.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        child.communicate()
+        raise
+
+
+def owned_daemons(base):
+    expected = [os.fsencode(arg) for arg in [*base, 'daemon', 'run']]
+    found = []
+    for proc in pathlib.Path('/proc').iterdir():
+        if not proc.name.isdigit():
+            continue
+        try:
+            if (proc / 'cmdline').read_bytes().rstrip(b'\0').split(b'\0') == expected:
+                assert (proc / 'exe').resolve() == pathlib.Path(base[0]).resolve()
+                current = identity(int(proc.name))
+                if current and current[1] != 'Z':
+                    found.append((int(proc.name), current))
+        except (FileNotFoundError, ProcessLookupError, PermissionError):
+            continue
+    return found
 
 
 def identity(pid):
@@ -76,6 +103,7 @@ def main():
             pid = status['data']['pid']
             original = identity(pid)
             assert original and original[1] != 'Z'
+            assert owned_daemons(base) == [(pid, original)]
             assert pathlib.Path(f'/proc/{pid}/exe').resolve() == binary.resolve()
             assert endpoint.stat().st_mode & 0o777 == 0o600
             assert endpoint.parent.stat().st_mode & 0o777 == 0o700
@@ -150,12 +178,15 @@ print('peer_denied')
                               'lifecycle': 'passed', 'private_uid_denial': 'passed', 'peer_uid_denial': 'passed',
                               'tcp_sockets': 0, 'kernel_control_uid': peer_uid}))
         finally:
-            if pid and original and (current := identity(pid)) and current[0] == original[0] and current[1] != 'Z':
-                os.kill(pid, signal.SIGKILL)
-                end = time.monotonic() + 10
-                while (current := identity(pid)) and current[0] == original[0] and current[1] != 'Z':
-                    assert time.monotonic() < end, 'owned daemon did not exit after cleanup'
-                    time.sleep(0.02)
+            # A timed out start can detach successfully before returning its PID.
+            for owned_pid, started_identity in owned_daemons(base):
+                current = identity(owned_pid)
+                if current and current[0] == started_identity[0] and current[1] != 'Z':
+                    os.kill(owned_pid, signal.SIGKILL)
+                    end = time.monotonic() + 10
+                    while (current := identity(owned_pid)) and current[0] == started_identity[0] and current[1] != 'Z':
+                        assert time.monotonic() < end, 'owned daemon did not exit after cleanup'
+                        time.sleep(0.02)
 
 
 if __name__ == '__main__':

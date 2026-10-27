@@ -67,6 +67,9 @@ pub(crate) struct ArchivedConfig {
 }
 
 impl ResolvedConfig {
+    pub(crate) fn base_paths(&self) -> &Paths {
+        &self.base_paths
+    }
     pub(crate) fn archive(&self) -> ArchivedConfig {
         ArchivedConfig {
             base_paths: self.base_paths.clone(),

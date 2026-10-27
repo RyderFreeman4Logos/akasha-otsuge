@@ -18,6 +18,11 @@ does not narrow them. Close an Issue only after evidence, review, gates and merg
   never reset an existing operation deadline or replay ambiguous effects.
 - Keep one database writer. Reuse the 42 verified compressed source shards and
   existing writable SSD; stream the 84 GB expansion without retaining it.
+- Keep `target` and `.spike-work` at the corresponding
+  `/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/`
+  paths, reached through checkout symlinks. Do not recreate large artifact roots
+  on the home filesystem. Remove owned obsolete build/probe/diagnostic outputs
+  after their consumers finish; preserve compact receipts and reusable corpus.
 - At a requested restart barrier, let native agents and non-durable jobs end
   naturally. Do not launch commits, long gates or new native agents; no handoff
   file unless requested. Resume only after the user confirms the restart.
@@ -188,30 +193,30 @@ retain exact commands, identities, original failures and scope limits.
   `960320a`, and #7 closed completed.
   [The protocol](../capture.md) records coverage and known uncollectable items.
 
-## MVP-008 remaining work
+## MVP-008 acceptance and remaining work
 
-- [ ] Implement private Linux Unix socket ownership/modes, peer UID validation,
+- [x] Implement private Linux Unix socket ownership/modes, peer UID validation,
   version/capability/size handshake and bounded requests with stable errors.
-- [ ] Provide thin CLI daemon start/status/stop/doctor and bounded explicit
+- [x] Provide thin CLI daemon start/status/stop/doctor and bounded explicit
   DAEMON_UNAVAILABLE behavior, with no TCP or MCP listener.
-- [ ] Persist accepted jobs, immutable configuration plans, leases, retry and
-  cancellation state; recover real reconciliation without duplicate effects.
-  Basic SIGKILL recovery with pinned generation passes; verify complete event
-  custody, cancellation, queue bounds, retry/deadline and shutdown races.
-- [ ] Wire validate/reload/status/effective config and watcher to one transactional
-  generation pipeline; retain pending restart and reject incomplete candidates.
-  CLI/watcher/rename/restart/invalid-repeat/FIFO fixtures pass; still verify
-  failed durable publication, pending recovery, large config and profile paths.
-- [ ] Expose real memory/history/state/diff/RecallReceipt operations via IPC/CLI,
-  deriving caller identity on the server and enforcing current read permissions.
-  Native/CLI parity and revocation across restart pass. Finish bounded CLI
-  pagination, actual response delivery acknowledgement and diff edge cases.
-- [ ] Verify installed executable/API parity, another kernel UID denial with a
-  working accessible control, TCP-listener absence and malformed/busy requests.
-- [ ] Verify actual process crash/restart, accepted-job recovery, cancellation,
-  pinned config across reload, watcher rename and permission revocation.
-- [ ] Finish docs, exact-HEAD canonical gate, independent review, CI, merge and
-  completed Issue closure; then continue the full queue below.
+- [x] Persist accepted jobs, immutable configuration plans, leases, bounded retry
+  and cancellation state. Real SIGKILL/restart preserves all256 original/event
+  receipts and no-op replay; queue/cancel/pause/overload and graceful restart pass.
+  Durable recovery fixtures retain exhausted attempts and the original deadline.
+- [x] Wire validate/reload/status/effective config and watcher to one transactional
+  generation pipeline. Invalid-repeat/FIFO/rename/profile/large snapshot/pending
+  restore pass; failed durable publication keeps active/pending/history unchanged.
+  Validate/reload/startup share the original base paths when an override is removed.
+- [x] Expose real memory/history/state/diff/RecallReceipt via IPC/CLI with current
+  read permissions. Cursor/range parity, retirement/byte limits, revocation across
+  restart and stdout delivery ACK pass; `/dev/full` does not mark delivery.
+- [x] Verify another kernel UID denial with a working accessible control, no
+  daemon-owned TCP listener, oversized/version-incompatible/busy refusal.
+- [x] Audit disk use with dua; remove owned obsolete outputs, checksum-migrate
+  target/.spike-work to the SSD mirror and verify all42 original shard hashes.
+- [ ] Complete installed release executable/API parity through the canonical gate.
+- [ ] Freeze the candidate, run its complete exact-HEAD gate, obtain independent
+  review, then CI/merge/completed Issue closure; continue the full queue below.
 
 ## Complete Issue queue
 

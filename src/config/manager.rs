@@ -13,6 +13,40 @@ pub struct Snapshot<R> {
     resources: R,
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn failed_durable_commit_keeps_active_pending_history_and_watch_unchanged() {
+        let paths = Paths {
+            data_dir: "/test/data".into(),
+            socket_path: "/test/run/socket".into(),
+        };
+        let manager =
+            ConfigManager::new(1, resolve("", None, "", &paths).unwrap(), |_| Ok(())).unwrap();
+        manager
+            .reload("[paths]\ndata_dir='/test/next'", None, |_| Ok(()))
+            .unwrap();
+        let before = manager.checkpoint().unwrap();
+        let rx = manager.subscribe();
+        for input in [
+            "[timeouts]\nrunner='2100s'",
+            "[paths]\ndata_dir='/test/other'",
+            "[broken",
+        ] {
+            let error = manager
+                .reload_committing(input, None, |_| Ok(()), |_| Err(()))
+                .unwrap_err();
+            assert_eq!(error.field, "commit");
+            assert_eq!(manager.checkpoint().unwrap(), before);
+            assert!(!rx.has_changed().unwrap());
+        }
+        let restored = ConfigManager::restore(before.clone(), |_| Ok(())).unwrap();
+        assert_eq!(restored.checkpoint().unwrap(), before);
+    }
+}
+
 impl<R> Snapshot<R> {
     pub fn generation(&self) -> u64 {
         self.generation

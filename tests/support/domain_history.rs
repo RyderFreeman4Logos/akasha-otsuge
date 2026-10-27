@@ -1,6 +1,133 @@
 use super::*;
 
 #[tokio::test]
+async fn diff_pages_keep_retirements_and_bind_cursors_to_both_points() {
+    let fixture = Fixture::new();
+    let store = fixture.open().await;
+    let domain = Domain::new(&store);
+    grant(&domain).await;
+    for name in ["first", "second"] {
+        let request = fact(&domain, name, name).await;
+        domain
+            .propose(
+                &request,
+                &agent(Origin::Extraction),
+                &policy(ReviewMode::Automatic),
+            )
+            .await
+            .unwrap();
+    }
+    let before = store.sequence().unwrap();
+    let after = review_action(&domain, "first", ReviewAction::Reject, "retire-for-diff").await;
+    let retired = domain
+        .diff(&reader(), &scope(), before, after, None, budget(8))
+        .await
+        .unwrap();
+    assert_eq!(retired.data.items.len(), 1);
+    let change = &retired.data.items[0];
+    assert_eq!(
+        change.before.as_ref().unwrap().memory.record.lifecycle,
+        Lifecycle::Active
+    );
+    assert_eq!(
+        change.after.as_ref().unwrap().memory.record.lifecycle,
+        Lifecycle::Retired
+    );
+    assert_eq!(
+        change.after.as_ref().unwrap().memory.record.draft.claim,
+        "first"
+    );
+    let first = domain
+        .diff(&reader(), &scope(), 0, after, None, budget(1))
+        .await
+        .unwrap();
+    assert_eq!(first.data.examined, 1);
+    assert_eq!(first.data.items.len(), 1);
+    let cursor = first.data.next.unwrap();
+    let second = domain
+        .diff(&reader(), &scope(), 0, after, Some(&cursor), budget(1))
+        .await
+        .unwrap();
+    assert_eq!(second.data.items.len(), 1);
+    assert!(second.data.next.is_none());
+    assert_ne!(
+        first.data.items[0]
+            .after
+            .as_ref()
+            .unwrap()
+            .memory
+            .revision
+            .key,
+        second.data.items[0]
+            .after
+            .as_ref()
+            .unwrap()
+            .memory
+            .revision
+            .key
+    );
+    for (from, to) in [(1, after), (0, before)] {
+        assert_eq!(
+            domain
+                .diff(&reader(), &scope(), from, to, Some(&cursor), budget(1))
+                .await
+                .unwrap_err()
+                .code,
+            "INVALID_CURSOR"
+        );
+    }
+    assert_eq!(
+        domain
+            .state(&reader(), &scope(), after, Some(&cursor), budget(1))
+            .await
+            .unwrap_err()
+            .code,
+        "INVALID_CURSOR"
+    );
+    assert_eq!(
+        domain
+            .diff(
+                &reader(),
+                &scope(),
+                0,
+                after,
+                None,
+                PageBudget {
+                    limit: 1,
+                    max_bytes: 1
+                }
+            )
+            .await
+            .unwrap_err()
+            .code,
+        "RESULT_TOO_LARGE"
+    );
+    let empty = domain
+        .diff(&reader(), &scope(), 0, 0, None, budget(1))
+        .await
+        .unwrap();
+    assert!(empty.data.items.is_empty());
+    assert!(empty.data.next.is_some());
+    assert!(
+        domain
+            .diff(
+                &reader(),
+                &scope(),
+                0,
+                0,
+                empty.data.next.as_ref(),
+                budget(1)
+            )
+            .await
+            .unwrap()
+            .data
+            .next
+            .is_none()
+    );
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
 async fn incomplete_outputs_and_empty_pages_cannot_claim_complete_coverage() {
     let fixture = Fixture::new();
     let store = fixture.open().await;

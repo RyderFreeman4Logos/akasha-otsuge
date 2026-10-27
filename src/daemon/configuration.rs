@@ -175,8 +175,14 @@ impl Service {
     }
     pub(super) fn validate(&self) -> Result<Value> {
         let input = config::read_file(&self.config_path)?;
-        let paths = &self.config.pin().resolved().config().paths.clone();
-        Ok(config::resolve(&input, self.profile.as_deref(), "", paths)?.diagnostic())
+        let active = self.config.pin();
+        Ok(config::resolve(
+            &input,
+            self.profile.as_deref(),
+            "",
+            active.resolved().base_paths(),
+        )?
+        .diagnostic())
     }
 }
 

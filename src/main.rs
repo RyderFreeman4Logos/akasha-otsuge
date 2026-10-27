@@ -7,13 +7,26 @@ use akasha_otsuge::ipc::{self, Command, Error, Request, Result};
 
 const HELP: &str = "akasha-otsuge — local, traceable cross-agent memory
 
-Usage: akasha-otsuge [--config FILE] [--socket PATH] COMMAND
+Usage: akasha-otsuge [--config FILE] [--profile NAME] [--socket PATH] COMMAND
 
 Commands:
   daemon run                 Run the local daemon in the foreground
+  daemon start               Start a detached local daemon
   daemon status              Show daemon and storage status
   daemon stop                Stop intake and drain the daemon
   doctor --json              Inspect the local daemon
+  config validate|reload|status
+  config show --effective
+  capture reconcile BINDING_JSON INPUT_JSONL --idempotency-key ID
+  job show|cancel ID
+  job list [--after KEY]
+  memory show ID [--at COMMIT]
+  memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]
+  state show --scope JSON_FILE --at COMMIT [--cursor JSON_FILE]
+  state diff FROM TO --scope JSON_FILE [--cursor JSON_FILE]
+  receipt show|replay ID
+  access grant SCOPE_JSON
+  access revoke
 
 Options:
   -h, --help                 Print help
@@ -57,6 +70,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     let (mut config_path, defaults) = paths()?;
     let mut explicit_config = false;
     let mut socket = None;
+    let mut profile = None;
     let mut index = 0;
     while index < args.len() {
         match args[index].to_str() {
@@ -68,6 +82,14 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
                 socket = Some(PathBuf::from(
                     args.get(index + 1).ok_or(Error("INVALID_ARGUMENT"))?,
                 ));
+            }
+            Some("--profile") => {
+                profile = Some(
+                    args.get(index + 1)
+                        .and_then(|s| s.to_str())
+                        .ok_or(Error("INVALID_ARGUMENT"))?
+                        .to_owned(),
+                );
             }
             _ => break,
         }
@@ -118,29 +140,36 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             id: (*id).into(),
             at: Some(number(at)?),
         }),
-        ["memory", "history", id] => Some(Command::MemoryHistory {
-            id: (*id).into(),
-            from: 1,
-            to: None,
-            cursor: None,
-        }),
-        ["memory", "history", id, "--to", to] => Some(Command::MemoryHistory {
-            id: (*id).into(),
-            from: 1,
-            to: Some(number(to)?),
-            cursor: None,
-        }),
-        ["state", "show", "--scope", scope, "--at", at] => Some(Command::StateShow {
-            scope: json_file(scope)?,
-            at: number(at)?,
-            cursor: None,
-        }),
-        ["state", "diff", from, to, "--scope", scope] => Some(Command::StateDiff {
-            scope: json_file(scope)?,
-            from: number(from)?,
-            to: number(to)?,
-            cursor: None,
-        }),
+        ["memory", "history", id, flags @ ..] => {
+            let flags = options(flags, &["--from", "--to", "--cursor"])?;
+            Some(Command::MemoryHistory {
+                id: (*id).into(),
+                from: flags
+                    .get("--from")
+                    .map(|v| number(v))
+                    .transpose()?
+                    .unwrap_or(1),
+                to: flags.get("--to").map(|v| number(v)).transpose()?,
+                cursor: flags.get("--cursor").map(|v| json_file(v)).transpose()?,
+            })
+        }
+        ["state", "show", flags @ ..] => {
+            let flags = options(flags, &["--scope", "--at", "--cursor"])?;
+            Some(Command::StateShow {
+                scope: json_file(flags.get("--scope").ok_or(Error("INVALID_ARGUMENT"))?)?,
+                at: number(flags.get("--at").ok_or(Error("INVALID_ARGUMENT"))?)?,
+                cursor: flags.get("--cursor").map(|v| json_file(v)).transpose()?,
+            })
+        }
+        ["state", "diff", from, to, flags @ ..] => {
+            let flags = options(flags, &["--scope", "--cursor"])?;
+            Some(Command::StateDiff {
+                scope: json_file(flags.get("--scope").ok_or(Error("INVALID_ARGUMENT"))?)?,
+                from: number(from)?,
+                to: number(to)?,
+                cursor: flags.get("--cursor").map(|v| json_file(v)).transpose()?,
+            })
+        }
         ["receipt", "show", id] => Some(Command::ReceiptShow { id: (*id).into() }),
         ["receipt", "replay", id] => Some(Command::ReceiptReplay { id: (*id).into() }),
         ["access", "revoke"] => Some(Command::AccessSet { scope: None }),
@@ -156,7 +185,16 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     } else {
         String::new()
     };
-    let resolved = config::resolve(&input, None, "", &defaults)?;
+    let resolved = config::resolve(
+        &input,
+        if operation.is_some() && socket.is_some() {
+            None
+        } else {
+            profile.as_deref()
+        },
+        "",
+        &defaults,
+    )?;
     if let Some(operation) = operation {
         let socket = socket.unwrap_or_else(|| resolved.config().paths.socket_path.clone());
         let now = ipc::now_ms()?;
@@ -203,9 +241,24 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             output(&bytes, false)?;
             return Ok(0);
         }
-        akasha_otsuge::daemon::run(resolved, config_path, None).await?;
+        akasha_otsuge::daemon::run(resolved, config_path, profile).await?;
         Ok(0)
     }
+}
+fn options<'a>(
+    args: &'a [&str],
+    names: &[&str],
+) -> Result<std::collections::BTreeMap<&'a str, &'a str>> {
+    let mut options = std::collections::BTreeMap::new();
+    for pair in args.chunks(2) {
+        if pair.len() != 2
+            || !names.contains(&pair[0])
+            || options.insert(pair[0], pair[1]).is_some()
+        {
+            return Err(Error("INVALID_ARGUMENT"));
+        }
+    }
+    Ok(options)
 }
 fn number(value: &str) -> Result<u64> {
     value.parse().map_err(|_| Error("INVALID_ARGUMENT"))

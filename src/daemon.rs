@@ -400,7 +400,7 @@ pub async fn run(
             &input,
             service.profile.as_deref(),
             "",
-            &active.resolved().config().paths,
+            active.resolved().base_paths(),
         )?;
         if candidate.digest() == active.resolved().digest() {
             *service.last_config.lock().await = Some((

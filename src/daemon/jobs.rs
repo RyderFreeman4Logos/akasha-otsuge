@@ -11,6 +11,92 @@ const MAX_ACTIVE: usize = 256;
 const MAX_RUNNING: usize = 16;
 const MAX_ATTEMPTS: u32 = 3;
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn recovered_jobs_keep_retry_exhaustion_and_original_deadlines() {
+        struct Fixture(PathBuf);
+        impl Drop for Fixture {
+            fn drop(&mut self) {
+                std::fs::remove_dir_all(&self.0).unwrap();
+            }
+        }
+        let fixture = Fixture(
+            std::env::temp_dir().join(format!("akasha-job-recovery-{}", std::process::id())),
+        );
+        private_dir(&fixture.0).unwrap();
+        let initial = crate::config::resolve(
+            &format!("[access]\nread_roots=[{:?}]\n", fixture.0),
+            None,
+            "",
+            &crate::config::Paths {
+                data_dir: fixture.0.join("data"),
+                socket_path: fixture.0.join("run/socket"),
+            },
+        )
+        .unwrap();
+        let storage = Arc::new(Storage::open(&initial).await.unwrap());
+        let manager = configuration::open(&storage, initial).await.unwrap();
+        let service = Arc::new(Service {
+            storage,
+            config: manager,
+            config_path: fixture.0.join("config.toml"),
+            profile: None,
+            admission: Mutex::new(()),
+            last_config: Mutex::new(None),
+            stop: Notify::new(),
+            work: Notify::new(),
+            stopping: std::sync::atomic::AtomicBool::new(false),
+            instance: "new-daemon".into(),
+        });
+        let scope = owner_scope();
+        Domain::new(&service.storage)
+            .ensure_local_reader(&scope.user, &scope, 1)
+            .await
+            .unwrap();
+        let binding: CaptureInput = serde_json::from_value(json!({
+            "source":{"adapter":"fixture","profile":"test","session":"session","thread":"thread","agent":"agent"},
+            "scope":scope,"stream":"stream","coverage":"available_payloads"
+        })).unwrap();
+        for (id, expected) in [("attempts", "RETRY_EXHAUSTED"), ("deadline", "JOB_TIMEOUT")] {
+            service
+                .submit(id.into(), binding.clone(), fixture.0.join("missing.jsonl"))
+                .await
+                .unwrap();
+            assert!(service.claim(id, true).await.unwrap());
+            let (revision, mut interrupted) = service.job(id).unwrap();
+            if id == "attempts" {
+                interrupted.attempt = MAX_ATTEMPTS;
+            } else {
+                interrupted.started_at_ms = Some(1);
+                interrupted.execution_deadline_ms = Some(1 + interrupted.execution_budget_ms);
+            }
+            interrupted.lease_owner = Some("previous-daemon".into());
+            service
+                .save_job(&interrupted, Some(revision), vec![])
+                .await
+                .unwrap();
+            service.recover().await.unwrap();
+            let recovered = service.job(id).unwrap().1;
+            assert_eq!(recovered.attempt, interrupted.attempt);
+            assert_eq!(
+                recovered.execution_deadline_ms,
+                interrupted.execution_deadline_ms
+            );
+            assert_eq!(recovered.started_at_ms, interrupted.started_at_ms);
+            assert!(recovered.lease_owner.is_none());
+            assert!(!service.claim(id, true).await.unwrap());
+            let terminal = service.job(id).unwrap().1;
+            assert_eq!(terminal.state, "failed");
+            assert_eq!(terminal.error.as_deref(), Some(expected));
+            assert!(service.active().unwrap().1.is_empty());
+        }
+        service.storage.close().await.unwrap();
+    }
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Job {
@@ -344,7 +430,7 @@ impl Service {
         }
         Ok(())
     }
-    async fn claim(&self, id: &str) -> Result<bool> {
+    async fn claim(&self, id: &str, can_run: bool) -> Result<bool> {
         let _guard = self.admission.lock().await;
         let (revision, mut job) = self.job(id)?;
         if job.state != "queued" {
@@ -366,7 +452,8 @@ impl Service {
             self.finish_job(job, revision, state, Some(reason)).await?;
             return Ok(false);
         }
-        if self.config.pin().resolved().config().runtime.paused || now < job.retry_at_ms {
+        if !can_run || self.config.pin().resolved().config().runtime.paused || now < job.retry_at_ms
+        {
             return Ok(false);
         }
         job.state = "running".into();
@@ -476,19 +563,16 @@ impl Service {
                     self.active()?.1
                 };
                 for id in ids {
-                    if owned.len()
-                        >= self
+                    let can_run = owned.len()
+                        < self
                             .config
                             .pin()
                             .resolved()
                             .config()
                             .runtime
                             .max_concurrent_jobs
-                            .min(MAX_RUNNING)
-                    {
-                        break;
-                    }
-                    if !owned.contains(&id) && self.claim(&id).await? {
+                            .min(MAX_RUNNING);
+                    if !owned.contains(&id) && self.claim(&id, can_run).await? {
                         owned.insert(id.clone());
                         let service = self.clone();
                         running.spawn(async move {
