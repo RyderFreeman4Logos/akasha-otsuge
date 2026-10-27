@@ -306,7 +306,7 @@ impl Service {
                     {
                         Err(Error("SCOPE_DENIED"))
                     } else {
-                        Ok(serde_json::to_value(
+                        let changed = serde_json::to_value(
                             crate::domain::Domain::new(&service.storage)
                                 .change_local_reader(
                                     &request_id,
@@ -315,7 +315,9 @@ impl Service {
                                     service.config.pin().generation(),
                                 )
                                 .await?,
-                        )?)
+                        )?;
+                        service.wake_jobs();
+                        Ok(changed)
                     }
                 })
                 .await

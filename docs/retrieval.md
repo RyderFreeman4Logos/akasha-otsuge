@@ -77,7 +77,11 @@ requirement for every later show/replay, even if their query scope is narrower. 
 
 ## Coverage and durable progress
 
-Sync pins the authority target sequence at admission. Lexical and vector indexes
+Sync pins the authority target sequence at admission. It rechecks the live owner
+grant for each record read, after provider queueing, and before progress or final
+activation. Narrowing/revoking the grant interrupts ongoing calls and prevents
+subsequent records from being sent. Management stays available during model waits.
+Lexical and vector indexes
 maintain separate contiguous prefixes. Every covered outbox entry has a durable
 completion reason: non-Memory entries are `not_required`; Memory revisions are
 `indexed`, `superseded` or `inactive`. A batch publishes its completion ledger and

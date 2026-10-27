@@ -1,6 +1,66 @@
 use super::*;
 
 #[test]
+fn sync_stops_after_a_live_grant_shrinks() {
+    let endpoint = super::super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    seed_records(
+        &daemon,
+        &[
+            ("first", "alpha", "offline first"),
+            ("forbidden", "beta", "private forbidden"),
+        ],
+        1,
+    );
+    daemon.configure(&format!("[runtime]\nmax_concurrent_jobs=1\n[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel='vectors-2'\ndimension=2\nlocal=true\ntimeout='10s'",endpoint.address));
+    let scope_file = daemon.root.join("scope.json");
+    std::fs::write(&scope_file, serde_json::to_vec(&scope("alpha")).unwrap()).unwrap();
+    let owner_file = daemon.root.join("owner.json");
+    let mut owner = scope("alpha");
+    owner.project = None;
+    std::fs::write(&owner_file, serde_json::to_vec(&owner).unwrap()).unwrap();
+    daemon.start();
+    endpoint.pause();
+    daemon.cli(&["index", "sync", "--idempotency-key", "shrinking-build"]);
+    let until = Instant::now() + Duration::from_secs(5);
+    while endpoint.requests.lock().unwrap().is_empty() {
+        assert!(Instant::now() < until, "first embedding never arrived");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    daemon.cli(&["access", "grant", scope_file.to_str().unwrap()]);
+    // With one worker, this job cannot finish before the sync releases its slot.
+    daemon.cli(&[
+        "search",
+        "sentinel",
+        "--scope",
+        scope_file.to_str().unwrap(),
+        "--idempotency-key",
+        "after-shrink",
+    ]);
+    endpoint.resume();
+    let sentinel = finished(&daemon, "after-shrink");
+    assert_eq!(sentinel["state"], "succeeded", "{sentinel}");
+    daemon.cli(&["access", "grant", owner_file.to_str().unwrap()]);
+    let job = finished(&daemon, "shrinking-build");
+    let status = daemon.cli(&["index", "status"])["data"].clone();
+    let leaked = endpoint
+        .requests
+        .lock()
+        .unwrap()
+        .iter()
+        .any(|(_, body)| body.to_string().contains("private forbidden"));
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    assert!(
+        !leaked,
+        "a forbidden Memory reached the provider after grant shrink"
+    );
+    assert_eq!(job["state"], "failed", "{job}");
+    assert_eq!(job["error"], "READ_DENIED", "{job}");
+    assert_eq!(status["vector"]["watermark"], 0, "{status}");
+}
+
+#[test]
 fn archived_global_metadata_keeps_its_required_grant() {
     let mut daemon = Daemon::new();
     seed(&daemon);

@@ -102,10 +102,40 @@ async fn memory(store: &Storage, id: &str, claim: &str, previous: Option<u64>) -
 }
 async fn sync(index: &Index, store: &Storage, target: u64) -> Status {
     loop {
-        let status = index.sync_batch(store, target, 1).await.unwrap();
+        let status = index
+            .sync_batch(store, target, 1, &|| Ok(()))
+            .await
+            .unwrap();
         if status.lexical_watermark >= target {
             return status;
         }
+    }
+}
+
+#[tokio::test]
+async fn lexical_sync_rechecks_each_read_and_progress_publication() {
+    for deny_at in [3, 4] {
+        let fixture = Fixture::new();
+        let config = fixture.config();
+        let store = Storage::open(&config).await.unwrap();
+        memory(&store, "first", "first keyword", None).await;
+        let target = memory(&store, "second", "second keyword", None).await;
+        let index = Index::open(&config, &store).await.unwrap();
+        let checks = std::sync::atomic::AtomicUsize::new(0);
+        let authorize = || {
+            if checks.fetch_add(1, std::sync::atomic::Ordering::SeqCst) + 1 >= deny_at {
+                Err(error("READ_DENIED"))
+            } else {
+                Ok(())
+            }
+        };
+        let result = index.sync_batch(&store, target, 1, &authorize).await;
+        assert!(matches!(result, Err(e) if e.code == "READ_DENIED"));
+        assert_eq!(status(&store).unwrap().lexical_watermark, 0);
+        let progress = sync(&index, &store, target).await;
+        assert_eq!(progress.indexed_rows, 2);
+        drop(index);
+        store.close().await.unwrap();
     }
 }
 

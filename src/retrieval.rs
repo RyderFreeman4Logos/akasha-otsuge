@@ -249,8 +249,14 @@ impl Index {
         storage: &Storage,
         target: u64,
         config_generation: u64,
+        authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<Status> {
-        let mut progress = status(storage)?;
+        let mut progress = storage
+            .serialized_read(|| {
+                authorize()?;
+                status(storage)
+            })
+            .await?;
         let before = progress.lexical_watermark;
         let end = target.min(before.saturating_add(32));
         let mut changed = false;
@@ -264,7 +270,12 @@ impl Index {
                 .filter(|r| r.key.kind == RecordKind::Memory)
             {
                 let key = hash(reference.key.id.as_bytes());
-                let memory = Domain::new(storage).active(&reference.key.id)?;
+                let memory = storage
+                    .serialized_read(|| {
+                        authorize()?;
+                        Domain::new(storage).active(&reference.key.id)
+                    })
+                    .await?;
                 let outcome = completion_outcome(reference, memory.as_ref());
                 records.push(serde_json::json!({"key_hash":key,"revision":reference.commit_seq,"outcome":outcome}));
                 if outcome == "superseded" {
@@ -356,6 +367,7 @@ impl Index {
             config_generation,
             &progress,
             completions,
+            authorize,
         )
         .await?;
         #[cfg(test)]
@@ -452,6 +464,7 @@ async fn publish_progress(
     config_generation: u64,
     progress: &impl Serialize,
     mut completions: Vec<Change>,
+    authorize: &(impl Fn() -> Result<()> + Sync),
 ) -> Result<()> {
     let current = storage.current(&key)?.map(|r| r.commit_seq);
     let content = serde_json::to_string(progress)?;
@@ -467,11 +480,14 @@ async fn publish_progress(
         content,
     });
     storage
-        .commit(&CommitRequest {
-            request_id,
-            config_generation,
-            policy_revision: None,
-            changes: completions,
+        .commit_checked(|| {
+            authorize()?;
+            Ok(CommitRequest {
+                request_id,
+                config_generation,
+                policy_revision: None,
+                changes: completions,
+            })
         })
         .await?;
     Ok(())

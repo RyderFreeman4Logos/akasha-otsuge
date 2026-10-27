@@ -119,6 +119,7 @@ impl VectorIndex {
         })
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn sync_batch<F, C>(
         &self,
         storage: &Storage,
@@ -127,13 +128,19 @@ impl VectorIndex {
         client: &Client,
         workflow: &Deadline,
         cancel: C,
+        authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<VectorStatus>
     where
         F: std::future::Future<Output = &'static str>,
         C: Fn() -> F,
     {
         let config = snapshot.resolved();
-        let mut progress = status(storage, config)?.ok_or_else(|| error("MODEL_NOT_CONFIGURED"))?;
+        let mut progress = storage
+            .serialized_read(|| {
+                authorize()?;
+                status(storage, config)?.ok_or_else(|| error("MODEL_NOT_CONFIGURED"))
+            })
+            .await?;
         if progress.generation != self.generation {
             return Err(error("INDEX_GENERATION_MISMATCH"));
         }
@@ -150,7 +157,12 @@ impl VectorIndex {
                 .filter(|r| r.key.kind == RecordKind::Memory)
             {
                 let row_key = hash(reference.key.id.as_bytes());
-                let memory = Domain::new(storage).active(&reference.key.id)?;
+                let memory = storage
+                    .serialized_read(|| {
+                        authorize()?;
+                        Domain::new(storage).active(&reference.key.id)
+                    })
+                    .await?;
                 let outcome = completion_outcome(reference, memory.as_ref());
                 records.push(serde_json::json!({"key_hash":row_key,"revision":reference.commit_seq,"outcome":outcome}));
                 if outcome == "superseded" {
@@ -167,7 +179,7 @@ impl VectorIndex {
                             end -= 1;
                         }
                         let outcome = client
-                            .call(
+                            .call_guarded(
                                 config,
                                 &Call {
                                     profile: config.config().retrieval.embedding.clone().unwrap(),
@@ -177,6 +189,12 @@ impl VectorIndex {
                                 },
                                 workflow,
                                 cancel(),
+                                async {
+                                    storage
+                                        .serialized_read(authorize)
+                                        .await
+                                        .map_err(|e| crate::provider::Error(e.code))
+                                },
                             )
                             .await;
                         progress.last_call = Some(
@@ -190,6 +208,7 @@ impl VectorIndex {
                                 snapshot.generation(),
                                 &progress,
                                 vec![],
+                                authorize,
                             )
                             .await?;
                             return Err(error(model_error(&code)));
@@ -304,6 +323,7 @@ impl VectorIndex {
             snapshot.generation(),
             &progress,
             completions,
+            authorize,
         )
         .await?;
         Ok(progress)
@@ -345,6 +365,7 @@ pub(super) fn validate_vector(vector: &[f32], dimension: u32) -> Result<()> {
 
 pub(crate) fn model_error(code: &str) -> &'static str {
     match code {
+        "READ_DENIED" => "READ_DENIED",
         "CANCELLED" => "CANCELLED",
         "PROVIDER_INTERRUPTED" => "PROVIDER_INTERRUPTED",
         "WORKFLOW_TIMEOUT" => "WORKFLOW_TIMEOUT",
@@ -387,6 +408,7 @@ pub(crate) async fn activate_vector(
     progress: &Status,
     snapshot: &crate::config::Snapshot<()>,
     target: u64,
+    authorize: &(impl Fn() -> Result<()> + Sync),
 ) -> Result<()> {
     let Some(vector) = &progress.vector else {
         return Ok(());
@@ -405,18 +427,21 @@ pub(crate) async fn activate_vector(
     }
     let current = storage.current(&active_key())?;
     storage
-        .commit(&CommitRequest {
-            request_id: format!(
-                "vector-active/{}/{}",
-                candidate.config_generation, candidate.generation
-            ),
-            config_generation: snapshot.generation(),
-            policy_revision: None,
-            changes: vec![Change {
-                key: active_key(),
-                expected_revision: current.map(|r| r.commit_seq),
-                content: serde_json::to_string(&candidate)?,
-            }],
+        .commit_checked(|| {
+            authorize()?;
+            Ok(CommitRequest {
+                request_id: format!(
+                    "vector-active/{}/{}",
+                    candidate.config_generation, candidate.generation
+                ),
+                config_generation: snapshot.generation(),
+                policy_revision: None,
+                changes: vec![Change {
+                    key: active_key(),
+                    expected_revision: current.map(|r| r.commit_seq),
+                    content: serde_json::to_string(&candidate)?,
+                }],
+            })
         })
         .await?;
     Ok(())

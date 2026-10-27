@@ -265,6 +265,18 @@ impl Client {
         workflow: &Deadline,
         cancellation: impl Future<Output = &'static str>,
     ) -> Outcome {
+        self.call_guarded(config, call, workflow, cancellation, async { Ok(()) })
+            .await
+    }
+
+    pub(crate) async fn call_guarded(
+        &self,
+        config: &ResolvedConfig,
+        call: &Call,
+        workflow: &Deadline,
+        cancellation: impl Future<Output = &'static str>,
+        authorization: impl Future<Output = Result<()>>,
+    ) -> Outcome {
         let mut provider = None;
         let mut queue = None;
         let mut queue_clock = None;
@@ -284,6 +296,8 @@ impl Client {
                 let mut next = self.next_start.lock().await;
                 tokio::time::sleep_until(*next).await;
                 *next = Instant::now() + Duration::from_millis(100);
+                drop(next);
+                authorization.await?;
                 Ok::<_, Error>(permit)
             })
             .await;
@@ -412,6 +426,59 @@ async fn idle<T>(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn live_authority_is_checked_after_the_provider_queue() {
+        let endpoint = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        endpoint.set_nonblocking(true).unwrap();
+        let config = crate::config::resolve(
+            &format!(
+                "[models.text]\nkind='text'\nendpoint='http://{}/v1'\nmodel='fixture'\nlocal=true",
+                endpoint.local_addr().unwrap()
+            ),
+            None,
+            "",
+            &crate::config::Paths {
+                data_dir: "/unused".into(),
+                socket_path: "/unused/socket".into(),
+            },
+        )
+        .unwrap();
+        let client = Client::new().unwrap();
+        let held = client.slots.acquire_many(4).await.unwrap();
+        let workflow = Deadline::start(Layer::Workflow, Duration::from_secs(10), None).unwrap();
+        let call = Call {
+            profile: "text".into(),
+            input: Input::Text {
+                prompt: "protected".into(),
+                max_output_tokens: 32,
+            },
+        };
+        let allowed = std::sync::atomic::AtomicBool::new(true);
+        let checked = std::sync::atomic::AtomicBool::new(false);
+        let request =
+            client.call_guarded(&config, &call, &workflow, std::future::pending(), async {
+                checked.store(true, std::sync::atomic::Ordering::SeqCst);
+                if allowed.load(std::sync::atomic::Ordering::SeqCst) {
+                    Ok(())
+                } else {
+                    Err(Error("READ_DENIED"))
+                }
+            });
+        tokio::pin!(request);
+        std::future::poll_fn(|cx| {
+            assert!(request.as_mut().poll(cx).is_pending());
+            std::task::Poll::Ready(())
+        })
+        .await;
+        assert!(!checked.load(std::sync::atomic::Ordering::SeqCst));
+        allowed.store(false, std::sync::atomic::Ordering::SeqCst);
+        drop(held);
+        let outcome = request.await;
+        assert_eq!(outcome.error.as_deref(), Some("READ_DENIED"));
+        assert!(outcome.trace["provider"].is_null());
+        assert!(matches!(endpoint.accept(), Err(e) if e.kind() == std::io::ErrorKind::WouldBlock));
+    }
 
     #[tokio::test]
     async fn exhausted_workflow_cannot_start_provider_after_ready_admission() {

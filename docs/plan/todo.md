@@ -292,7 +292,7 @@ Repair validation, fresh review, CI and publication remain.
   immutable sync targets; expose ongoing progress and coverage limits honestly.
 - [x] Cover progressive reads of retained capture originals as required, without
   widening grants or pretending Memory-only indexes cover all capture content.
-- [ ] R1: Recheck live sync authority at every record read, provider admission,
+- [x] R1: Recheck live sync authority at every record read, provider admission,
   progress publication and activation; test a held embedding across grant shrink.
 - [x] R2: Preserve the owner-wide permission required by archived index metadata
   across receipt show/replay and job show; retain narrow receipt access.
