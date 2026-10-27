@@ -26,6 +26,14 @@ regression fails before the repair and passes after it. The retained release
 probe now detects truncation, accepts the replacement and deduplicates backfill.
 The amended candidate still requires its own full gate and independent review.
 
+Candidate `524d1eb` passed its full gate (17.823 seconds). R2 was interrupted by
+the review service before a final verdict; its preliminary saved-cursor sibling
+was reproduced by a regular Rust temporary-file test. The class sweep removes
+all unconditional anchor re-adoption: resume preserves saved hashes, reset uses
+the empty boundary, and publication derives hashes from accepted bytes. The
+interruption is not a review approval; the next frozen candidate requires a new
+gate and independent source review.
+
 ## Completed history and receipts: MVP-006
 
 Candidate `e98d4cb` passed 17 Domain and 17 Storage fixtures, the complete canonical

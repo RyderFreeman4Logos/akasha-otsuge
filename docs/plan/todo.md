@@ -179,6 +179,9 @@ retain exact commands, identities, original failures and scope limits.
   verify the actual command's JSON, exits, reopen, backfill and FIFO refusal.
 - [x] Fix independent R1's accepted-frame/checkpoint-anchor rewrite race; retain
   causal RED/GREEN, bounded boundary regressions and release-command readback.
+- [x] Sweep the saved-cursor sibling: preserve validated anchors on resume and
+  verify both real reconcile boundaries and append-only control with ordinary
+  temporary-file fixtures. R2 interruption remains no final review verdict.
 - [ ] Complete the exact-HEAD gate, independent review, CI, merge and closure.
   [The protocol](../capture.md) records coverage and known uncollectable items.
 

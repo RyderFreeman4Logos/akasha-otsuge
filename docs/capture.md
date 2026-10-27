@@ -150,3 +150,11 @@ silently skipped the replacement on restart. The retained probe is a real
 release-command failure. A deterministic regression now covers short/long frames
 and consumed boundaries around 4 KiB, plus changed-prefix refusal; the fix derives
 anchors from accepted bytes instead of rereading the new frame from the file.
+
+A sibling resume path also reread and replaced saved anchors after validating
+them. Resume now preserves those identities; only a detected rotation/truncation
+resets to the empty boundary. The same reconcile implementation is exercised
+with deterministic temporary-file changes immediately after saved-boundary and
+frame validation, plus an append-only control. The test-only caller supplies a
+private observation callback; the public operation supplies a no-op. There are
+no external scheduling controls in the production command.

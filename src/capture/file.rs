@@ -66,6 +66,18 @@ impl Capture<'_> {
         limit: usize,
         config: u64,
     ) -> Result<ReconcileReport> {
+        self.reconcile_file(binding, path, limit, config, |_| {})
+            .await
+    }
+
+    async fn reconcile_file(
+        &self,
+        binding: &CaptureBinding,
+        path: &Path,
+        limit: usize,
+        config: u64,
+        mut boundary: impl FnMut(&'static str),
+    ) -> Result<ReconcileReport> {
         if limit == 0 || limit > 64 || config == 0 {
             return Err(error("INVALID_CAPTURE_PAGE"));
         }
@@ -139,6 +151,7 @@ impl Capture<'_> {
                 None
             }
         };
+        boundary("resume-validated");
         if let Some(loss) = changed {
             if !checkpoint.loss.contains(&loss) {
                 checkpoint.loss.push(loss);
@@ -150,10 +163,9 @@ impl Capture<'_> {
             cursor.device = metadata.dev();
             cursor.inode = metadata.ino();
             cursor.offset = 0;
+            cursor.prefix_sha256 = hash(b"");
+            cursor.tail_sha256 = cursor.prefix_sha256.clone();
         }
-        let (first, last) = anchor(&mut file, cursor.offset)?;
-        cursor.prefix_sha256 = first;
-        cursor.tail_sha256 = last;
         checkpoint.cursor = serde_json::to_string(&cursor)?;
         checkpoint.pending = Some(PendingReason::Backlog);
         let ingress = Ingress::unverified(
@@ -220,6 +232,7 @@ impl Capture<'_> {
             if verify != line {
                 return Err(error("CAPTURE_SOURCE_CHANGED"));
             }
+            boundary("frame-validated");
             let mut next = cursor.clone();
             next.offset = next
                 .offset
@@ -297,8 +310,21 @@ mod tests {
     use super::*;
     use std::io::Write;
     use std::path::PathBuf;
+    use std::sync::atomic::{AtomicU64, Ordering};
 
     struct Fixture(PathBuf);
+    impl Fixture {
+        fn new() -> Self {
+            static NEXT: AtomicU64 = AtomicU64::new(0);
+            let root = std::env::temp_dir().join(format!(
+                "akasha-anchor-{}-{}",
+                std::process::id(),
+                NEXT.fetch_add(1, Ordering::Relaxed)
+            ));
+            std::fs::create_dir(&root).unwrap();
+            Self(root)
+        }
+    }
     impl Drop for Fixture {
         fn drop(&mut self) {
             std::fs::remove_dir_all(&self.0).unwrap();
@@ -307,9 +333,7 @@ mod tests {
 
     #[test]
     fn checkpoint_anchors_use_the_accepted_frame_after_a_concurrent_rewrite() {
-        let root = std::env::temp_dir().join(format!("akasha-anchor-{}", std::process::id()));
-        std::fs::create_dir(&root).unwrap();
-        let fixture = Fixture(root);
+        let fixture = Fixture::new();
         let mut file = OpenOptions::new()
             .read(true)
             .write(true)
@@ -355,6 +379,140 @@ mod tests {
                     "CAPTURE_SOURCE_CHANGED"
                 );
             }
+        }
+    }
+
+    #[tokio::test]
+    async fn reconcile_never_adopts_replacement_anchors_at_resume_or_frame_boundaries() {
+        use crate::config::{Paths, resolve};
+        fn frame(id: &str) -> Vec<u8> {
+            let mut bytes = serde_json::to_vec(&serde_json::json!({
+                "schema_version": 1,
+                "event": {
+                    "event_id": id, "source_version": "1", "runtime_instance": "runtime",
+                    "branch": "main", "parent": null, "fork_cutoff": null,
+                    "event_time_ms": 10, "observed_time_ms": 20, "visibility": "user",
+                    "kind": {"kind": "message", "message_id": id, "phase": {"phase": "final"}},
+                    "text": id
+                },
+                "raw_hex": "00ff"
+            }))
+            .unwrap();
+            bytes.push(b'\n');
+            bytes
+        }
+        for stage in ["resume-validated", "frame-validated", "append"] {
+            let f = Fixture::new();
+            let store = Storage::open(
+                &resolve(
+                    "",
+                    None,
+                    "",
+                    &Paths {
+                        data_dir: f.0.join("data"),
+                        socket_path: f.0.join("unused.sock"),
+                    },
+                )
+                .unwrap(),
+            )
+            .await
+            .unwrap();
+            let binding = CaptureBinding::from_source(
+                SourceIdentity {
+                    adapter: "fixture".into(),
+                    profile: "profile".into(),
+                    session: "session".into(),
+                    thread: "thread".into(),
+                    agent: "agent".into(),
+                },
+                Scope {
+                    user: "user".into(),
+                    project: None,
+                    branch_or_version: None,
+                    session: None,
+                },
+                "live",
+                CoverageLevel::AvailablePayloads,
+            )
+            .unwrap();
+            let path = f.0.join("events.jsonl");
+            let old = frame("old");
+            let new = frame("new");
+            assert_eq!(old.len(), new.len());
+            std::fs::write(&path, &old).unwrap();
+            let capture = Capture::new(&store);
+            if stage == "resume-validated" {
+                assert_eq!(
+                    capture
+                        .reconcile_jsonl(&binding, &path, 64, 1)
+                        .await
+                        .unwrap()
+                        .processed,
+                    1
+                );
+            }
+            let mut changed = false;
+            let report = capture
+                .reconcile_file(&binding, &path, 64, 1, |at| {
+                    if !changed && (at == stage || stage == "append" && at == "frame-validated") {
+                        if stage == "append" {
+                            OpenOptions::new()
+                                .append(true)
+                                .open(&path)
+                                .unwrap()
+                                .write_all(&new)
+                                .unwrap();
+                        } else {
+                            std::fs::write(&path, &new).unwrap();
+                        }
+                        changed = true;
+                    }
+                })
+                .await
+                .unwrap();
+            assert!(changed);
+            let original = capture
+                .event(
+                    &binding,
+                    &EventRef {
+                        source: binding.source.clone(),
+                        event_id: "old".into(),
+                    },
+                    store.sequence().unwrap(),
+                )
+                .unwrap()
+                .unwrap();
+            assert_eq!(capture.text(&original).unwrap(), "old");
+            if stage != "append" {
+                let cursor: FileCursor =
+                    serde_json::from_str(&report.checkpoint.checkpoint.cursor).unwrap();
+                assert_eq!(cursor.prefix_sha256, hash(&old), "{stage}");
+                assert_eq!(cursor.tail_sha256, hash(&old), "{stage}");
+            }
+            let recovered = capture
+                .reconcile_jsonl(&binding, &path, 64, 1)
+                .await
+                .unwrap();
+            if stage == "append" {
+                assert_eq!(report.processed, 2);
+                assert_eq!(recovered.processed, 0);
+                assert!(recovered.checkpoint.checkpoint.loss.is_empty());
+            } else {
+                assert_eq!(recovered.processed, 1, "{stage}");
+                assert_eq!(
+                    recovered.checkpoint.checkpoint.loss,
+                    [LossReason::Truncation]
+                );
+            }
+            assert!(
+                capture
+                    .message(&binding, "new")
+                    .unwrap()
+                    .unwrap()
+                    .final_event
+                    .is_some()
+            );
+            store.close().await.unwrap();
         }
     }
 }
