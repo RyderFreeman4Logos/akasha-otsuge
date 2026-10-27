@@ -137,7 +137,7 @@ impl Service {
     pub(super) async fn reload(self: &Arc<Self>) -> Result<Value> {
         let service = self.clone();
         // Ownership outlives a disconnected CLI or request timeout.
-        tokio::spawn(async move {
+        self.operation(async move {
             let _guard = service.admission.lock().await;
             let input = config::read_file(&service.config_path)?;
             let digest = hash(input.as_bytes());
@@ -167,7 +167,6 @@ impl Service {
             Ok(report)
         })
         .await
-        .map_err(|_| Error("CONFIG_INVALID"))?
     }
     pub(super) async fn config_status(&self) -> Result<Value> {
         let _guard = self.admission.lock().await;
@@ -188,7 +187,13 @@ impl Service {
 
 pub(super) async fn open(storage: &Storage, initial: ResolvedConfig) -> Result<ConfigManager<()>> {
     if let Some(checkpoint) = load(storage, "daemon/config")? {
-        Ok(ConfigManager::restore(checkpoint, |_| Ok(()))?)
+        let manager = ConfigManager::restore(checkpoint, |_| Ok(()))?;
+        let generation = manager.pin().generation();
+        let manager = manager.restarted(initial, |_| Ok(()))?;
+        if manager.pin().generation() != generation {
+            save(storage, &manager.checkpoint()?).await?;
+        }
+        Ok(manager)
     } else {
         let manager = ConfigManager::new(1, initial, |_| Ok(()))?;
         save(storage, &manager.checkpoint()?).await?;

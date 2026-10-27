@@ -13,6 +13,7 @@ const BIN: &str = env!("CARGO_BIN_EXE_akasha-otsuge");
 
 struct Daemon {
     root: PathBuf,
+    socket_name: String,
     child: Option<Child>,
 }
 impl Daemon {
@@ -27,7 +28,11 @@ impl Daemon {
             .mode(0o700)
             .create(&root)
             .unwrap();
-        let daemon = Self { root, child: None };
+        let daemon = Self {
+            root,
+            socket_name: "service.sock".into(),
+            child: None,
+        };
         daemon.configure("");
         daemon
     }
@@ -40,7 +45,7 @@ impl Daemon {
         std::fs::write(self.root.join("config.toml"), input).unwrap();
     }
     fn socket(&self) -> PathBuf {
-        self.root.join("run/service.sock")
+        self.root.join("run").join(&self.socket_name)
     }
     fn command(&self) -> Command {
         let mut command = Command::new(
@@ -124,6 +129,103 @@ impl Daemon {
             std::thread::sleep(Duration::from_millis(20));
         }
     }
+}
+
+#[test]
+fn production_signals_drain_and_release_the_socket_for_restart() {
+    let mut daemon = Daemon::new();
+    for signal in ["-TERM", "-INT"] {
+        daemon.start();
+        assert_eq!(
+            daemon.cli(&["daemon", "status"])["data"]["state"],
+            "running"
+        );
+        assert!(
+            Command::new("/bin/kill")
+                .args([signal, &daemon.child.as_ref().unwrap().id().to_string()])
+                .status()
+                .unwrap()
+                .success()
+        );
+        daemon.wait();
+        assert!(!daemon.socket().exists());
+    }
+}
+
+#[test]
+fn explicit_restart_activates_pending_socket_and_preserves_old_job_plan() {
+    let mut daemon = Daemon::new();
+    let access = format!("[access]\nread_roots=[{:?}]\n", daemon.root);
+    daemon.configure(&access);
+    daemon.start();
+    for (step, runner) in [(1, 1800), (2, 2200)] {
+        let prior_generation = daemon.cli(&["config", "status"])["data"]["active_generation"]
+            .as_u64()
+            .unwrap();
+        if step == 2 {
+            let binding = json!({"source":{"adapter":"fixture","profile":"test","session":"restart","thread":"thread","agent":"agent"},"scope":{"user":format!("uid:{}",rustix::process::geteuid().as_raw()),"project":null,"branch_or_version":null,"session":null},"stream":"stream","coverage":"available_payloads"});
+            std::fs::write(daemon.root.join("binding.json"), binding.to_string()).unwrap();
+            let mut file = std::fs::File::create(daemon.root.join("capture.jsonl")).unwrap();
+            for n in 0..4096 {
+                writeln!(file,"{}",json!({"schema_version":1,"event":{"event_id":format!("e-{n}"),"source_version":"1","runtime_instance":"test","branch":"main","parent":null,"fork_cutoff":null,"event_time_ms":null,"observed_time_ms":1,"visibility":"user","kind":{"kind":"resume"},"text":"original"},"raw_hex":"78"})).unwrap();
+            }
+            drop(file);
+            let accepted = daemon.cli(&[
+                "capture",
+                "reconcile",
+                daemon.root.join("binding.json").to_str().unwrap(),
+                daemon.root.join("capture.jsonl").to_str().unwrap(),
+                "--idempotency-key",
+                "old-plan",
+            ]);
+            assert_eq!(accepted["data"]["config_generation"], prior_generation);
+        }
+        let old_socket = daemon.socket();
+        let next_name = format!("service-{step}.sock");
+        let next_socket = daemon.root.join("run").join(&next_name);
+        let candidate = format!(
+            "[paths]\ndata_dir={:?}\nsocket_path={:?}\n{access}[timeouts]\nrunner='{runner}s'\n",
+            daemon.root.join("data"),
+            next_socket
+        );
+        std::fs::write(daemon.root.join("config.toml"), candidate).unwrap();
+        assert_eq!(
+            daemon.cli(&["config", "reload"])["data"]["status"],
+            "restart_required"
+        );
+        let previous_job =
+            (step == 2).then(|| daemon.cli(&["job", "show", "old-plan"])["data"].clone());
+        daemon.cli(&["daemon", "stop"]);
+        daemon.wait();
+        assert!(!old_socket.exists());
+        daemon.socket_name = next_name;
+        daemon.start();
+        let status = daemon.cli(&["config", "status"])["data"].clone();
+        assert_eq!(status["active_generation"], prior_generation + 1);
+        assert_eq!(
+            status["effective"]["config"]["paths"]["socket_path"],
+            next_socket.to_str().unwrap()
+        );
+        assert_eq!(
+            status["effective"]["effective_timeouts"]["runner"]["secs"],
+            runner
+        );
+        assert!(status["pending"].is_null());
+        if let Some(previous) = previous_job {
+            let job = daemon.cli(&["job", "show", "old-plan"])["data"].clone();
+            assert_eq!(job["config_generation"], prior_generation);
+            assert_eq!(job["config_digest"], previous["config_digest"]);
+            if !previous["started_at_ms"].is_null() {
+                assert_eq!(job["started_at_ms"], previous["started_at_ms"]);
+                assert_eq!(
+                    job["execution_deadline_ms"],
+                    previous["execution_deadline_ms"]
+                );
+            }
+        }
+    }
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
 }
 
 #[test]

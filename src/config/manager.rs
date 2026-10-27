@@ -195,6 +195,46 @@ impl<R: Send + Sync + 'static> ConfigManager<R> {
         Ok(manager)
     }
 
+    /// Startup owns the requested paths; persist this manager before serving requests.
+    pub(crate) fn restarted(
+        self,
+        initial: ResolvedConfig,
+        prepare: impl FnOnce(&ResolvedConfig) -> Result<R, ()>,
+    ) -> Result<Self, ConfigError> {
+        let active = self.pin();
+        if initial.digest == active.resolved.digest
+            && initial.base_paths == active.resolved.base_paths
+            && initial.selected_profile == active.resolved.selected_profile
+            && initial.sources == active.resolved.sources
+        {
+            return Ok(self);
+        }
+        let next = active.generation.checked_add(1).ok_or_else(|| {
+            ConfigError::invalid("generation", "configuration generation exhausted")
+        })?;
+        let report = ReloadReport {
+            status: ReloadStatus::Applied,
+            active_generation: next,
+            pending_generation: None,
+            candidate_digest: Some(initial.digest().into()),
+            reasons: Vec::new(),
+        };
+        let manager = Self::new(next, initial, prepare)?;
+        let mut state = self
+            .state
+            .into_inner()
+            .map_err(|_| ConfigError::invalid("reload", "configuration manager unavailable"))?;
+        state.pending = None;
+        if state.history.len() == 64 {
+            state.history.pop_front();
+        }
+        state
+            .history
+            .push_back(serde_json::to_value(report).expect("JSON-compatible report"));
+        *manager.state.lock().expect("new manager") = state;
+        Ok(manager)
+    }
+
     /// File watching and explicit reload both submit complete bytes here.
     /// A prepare callback must not re-enter this manager or publish partial resources.
     pub fn reload(

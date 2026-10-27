@@ -28,7 +28,10 @@ akasha-otsuge --socket /absolute/run/service.sock daemon stop
 stdin, a separate process group and private `daemon.log`. `daemon run` is the
 foreground form for a service supervisor. Stop/SIGTERM/SIGINT stop intake, finish
 the current bounded capture batch, retain unfinished accepted jobs for restart,
-and close Storage. A stopped daemon yields `DAEMON_UNAVAILABLE` promptly; no
+and close Storage. Listener/scheduler errors take the same drain path and preserve
+the first error. A request timeout does not discard its mutation owner: accepted
+reload, submit, cancel, permission and delivery writes remain owned until collected.
+Storage closes before the socket/lock owner is released. A stopped daemon yields `DAEMON_UNAVAILABLE` promptly; no
 second database writer or silent daemonless mutation is created.
 
 Defaults use `$XDG_CONFIG_HOME/akasha-otsuge/config.toml`,
@@ -49,7 +52,9 @@ Each frame is a four-byte unsigned big-endian byte length followed by UTF-8 JSON
 The server first sends `protocol_version`, `capabilities`, and
 `max_message_bytes` (2 MiB). A full connection pool sends `RESOURCE_BUSY` in that
 initial greeting, before accepting a request. There are 16 connection slots and
-a ten-second management exchange timeout. Long jobs return durable handles;
+a ten-second management exchange timeout. At most 16 mutation operations can
+remain owned, including requests whose clients disconnected; excess work returns
+`RESOURCE_BUSY`. Long jobs return durable handles;
 this transport timeout is not a job/provider/runner deadline.
 
 A request contains `protocol_version: 1`, `request_id`, optional absolute
@@ -80,7 +85,11 @@ or resolved credential values. Existing credential-reference and diagnostic
 redaction rules remain in force. Snapshots are split into bounded immutable
 Storage chunks and a checked pointer; the pointer and first publication of each
 generation commit together. Restart restores the generation and accepted jobs'
-original configuration identity. Pending restart settings are never half-applied.
+original configuration identity. Starting with a changed valid configuration
+publishes the complete new generation before serving requests, including a pending
+socket change in the same data directory. Old job generations remain archived.
+Starting with the unchanged active configuration preserves any pending candidate.
+Pending restart settings are never half-applied.
 
 ## Capture jobs
 
@@ -107,13 +116,18 @@ future provider and runner clocks are separate. The hard envelope is 256 active
 jobs and 16 executing jobs, additionally restricted by current configuration.
 Capture batches share the admission boundary so cancellation, permissions and
 configuration cannot be changed halfway through a batch.
+The current concurrency cap is checked while claiming a queued job under that
+same boundary; lowering it allows existing jobs to drain without admitting extra
+work from a stale scheduling decision.
 
 Running jobs persist lease owner, expiry, attempt and original execution deadline.
 Restart holds the sole daemon lock before reclaiming old leases. Only this
 idempotent capture operation is recoverable here; ambiguous external model or
 process effects are not automatically replayed. Capture source-change/revision
 conflicts have at most three total attempts with bounded backoff; restart does
-not reset the original deadline. A completed reconcile can still report a partial
+not reset the original deadline. After a physical batch finishes, the original
+deadline is checked again before success; a late batch retains its committed
+checkpoint/result but the job records `JOB_TIMEOUT`. A completed reconcile can still report a partial
 tail, unavailable source, rotation/truncation loss or invalid frame. Inspect the
 checkpoint coverage and pending/loss fields; job completion is not proof of full
 source coverage. Accepted archive events/checkpoints are reused without duplicate

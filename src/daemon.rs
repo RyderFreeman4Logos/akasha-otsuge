@@ -97,19 +97,60 @@ fn listen(path: &Path) -> Result<(UnixListener, SocketOwner)> {
     Ok((listener, owner))
 }
 
+#[cfg(test)]
+struct BatchGate {
+    reached: tokio::sync::oneshot::Sender<tokio::time::Instant>,
+    resume: tokio::sync::oneshot::Receiver<()>,
+}
+
 struct Service {
     storage: Arc<Storage>,
     config: crate::config::ConfigManager<()>,
     config_path: PathBuf,
     profile: Option<String>,
     admission: Mutex<()>,
+    operations: Mutex<JoinSet<()>>,
     last_config: Mutex<Option<(String, serde_json::Value)>>,
     stop: Notify,
     work: Notify,
     stopping: std::sync::atomic::AtomicBool,
     instance: String,
+    #[cfg(test)]
+    batch_gate: Mutex<Option<BatchGate>>,
 }
 impl Service {
+    async fn operation(
+        &self,
+        future: impl std::future::Future<Output = Result<serde_json::Value>> + Send + 'static,
+    ) -> Result<serde_json::Value> {
+        let (send, receive) = tokio::sync::oneshot::channel();
+        {
+            let mut owners = self.operations.lock().await;
+            while let Some(result) = owners.try_join_next() {
+                result.map_err(|_| Error("JOB_ERROR"))?;
+            }
+            if self.stopping.load(std::sync::atomic::Ordering::Acquire) || owners.len() >= 16 {
+                return Err(Error("RESOURCE_BUSY"));
+            }
+            owners.spawn(async move {
+                let _ = send.send(future.await);
+            });
+        }
+        receive.await.map_err(|_| Error("JOB_ERROR"))?
+    }
+
+    async fn close(&self, mut outcome: Result<()>) -> Result<()> {
+        self.stopping
+            .store(true, std::sync::atomic::Ordering::Release);
+        self.work.notify_one();
+        let mut owners = self.operations.lock().await;
+        while let Some(result) = owners.join_next().await {
+            outcome = outcome.and(result.map_err(|_| Error("JOB_ERROR")));
+        }
+        let closed = self.storage.close().await.map_err(Error::from);
+        outcome.and(closed)
+    }
+
     async fn dispatch(
         self: &Arc<Self>,
         request_id: &str,
@@ -204,24 +245,29 @@ impl Service {
                 )
             }
             Command::AccessSet { scope } => {
-                let _guard = self.admission.lock().await;
-                if scope
-                    .as_ref()
-                    .is_some_and(|scope| !jobs::owner_scope().contains(scope))
-                {
-                    Err(Error("SCOPE_DENIED"))
-                } else {
-                    Ok(serde_json::to_value(
-                        crate::domain::Domain::new(&self.storage)
-                            .change_local_reader(
-                                request_id,
-                                &jobs::owner_scope().user,
-                                scope.as_ref(),
-                                self.config.pin().generation(),
-                            )
-                            .await?,
-                    )?)
-                }
+                let service = self.clone();
+                let request_id = request_id.to_owned();
+                self.operation(async move {
+                    let _guard = service.admission.lock().await;
+                    if scope
+                        .as_ref()
+                        .is_some_and(|scope| !jobs::owner_scope().contains(scope))
+                    {
+                        Err(Error("SCOPE_DENIED"))
+                    } else {
+                        Ok(serde_json::to_value(
+                            crate::domain::Domain::new(&service.storage)
+                                .change_local_reader(
+                                    &request_id,
+                                    &jobs::owner_scope().user,
+                                    scope.as_ref(),
+                                    service.config.pin().generation(),
+                                )
+                                .await?,
+                        )?)
+                    }
+                })
+                .await
             }
         }
     }
@@ -275,20 +321,26 @@ impl Service {
                 {
                     return Err(Error("DELIVERY_HASH_MISMATCH"));
                 }
-                if reply["data"]["already_delivered"] != true {
-                    crate::domain::Domain::new(&self.storage)
-                        .record_delivery(
-                            &jobs::context()?,
-                            &receipt_id,
-                            &format!(
-                                "ipc-delivery/{}",
-                                crate::storage::hash(receipt_id.as_bytes())
-                            ),
-                            &ack.output_sha256,
-                        )
-                        .await?;
-                }
-                Ok(json!({"receipt_id":receipt_id,"phase":"delivered"}))
+                let service = self.clone();
+                let delivered = reply["data"]["already_delivered"] == true;
+                self.operation(async move {
+                    let _guard = service.admission.lock().await;
+                    if !delivered {
+                        crate::domain::Domain::new(&service.storage)
+                            .record_delivery(
+                                &jobs::context()?,
+                                &receipt_id,
+                                &format!(
+                                    "ipc-delivery/{}",
+                                    crate::storage::hash(receipt_id.as_bytes())
+                                ),
+                                &ack.output_sha256,
+                            )
+                            .await?;
+                    }
+                    Ok(json!({"receipt_id":receipt_id,"phase":"delivered"}))
+                })
+                .await
             }
             .await;
             let mut acknowledgement = ipc::response(Some(&request.request_id), delivered);
@@ -380,19 +432,36 @@ pub async fn run(
     private_dir(&config.config().paths.data_dir)?;
     let (listener, _owner) = listen(&config.config().paths.socket_path)?;
     let storage = Arc::new(Storage::open(&config).await?);
-    let manager = configuration::open(&storage, config).await?;
+    let manager = match configuration::open(&storage, config).await {
+        Ok(manager) => manager,
+        Err(error) => {
+            let _ = storage.close().await;
+            return Err(error);
+        }
+    };
+    let instance = match ipc::now_ms() {
+        Ok(now) => format!("{}/{now}", std::process::id()),
+        Err(error) => {
+            let _ = storage.close().await;
+            return Err(error);
+        }
+    };
     let service = Arc::new(Service {
         storage,
         config: manager,
         config_path,
         profile,
         admission: Mutex::new(()),
+        operations: Mutex::new(JoinSet::new()),
         last_config: Mutex::new(None),
         stop: Notify::new(),
         work: Notify::new(),
         stopping: std::sync::atomic::AtomicBool::new(false),
-        instance: format!("{}/{}", std::process::id(), ipc::now_ms()?),
+        instance,
+        #[cfg(test)]
+        batch_gate: Mutex::new(None),
     });
+    let initialized = async {
     // Reconcile startup input through the same pipeline, without resetting durable generations.
     if let Ok(input) = crate::config::read_file(&service.config_path) {
         let active = service.config.pin();
@@ -416,19 +485,45 @@ pub async fn run(
         .ensure_local_reader(&scope.user, &scope, service.config.pin().generation())
         .await?;
     service.recover().await?;
+    Ok(())
+    }.await;
+    if let Err(error) = initialized {
+        return service.close(Err(error)).await;
+    }
+    serve(service, || listener.accept()).await
+}
+
+async fn serve<A, F>(service: Arc<Service>, mut accept: A) -> Result<()>
+where
+    A: FnMut() -> F,
+    F: std::future::Future<Output = std::io::Result<(UnixStream, tokio::net::unix::SocketAddr)>>,
+{
+    let signals = (|| -> std::io::Result<_> {
+        Ok((
+            tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())?,
+            tokio::signal::unix::signal(tokio::signal::unix::SignalKind::interrupt())?,
+        ))
+    })();
+    let (mut terminate, mut interrupt) = match signals {
+        Ok(signals) => signals,
+        Err(error) => return service.close(Err(error.into())).await,
+    };
     let mut scheduler = tokio::spawn(service.clone().jobs());
+    let mut scheduler_collected = false;
     let slots = Arc::new(Semaphore::new(16));
     let mut tasks = JoinSet::new();
-    let mut terminate = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())?;
     let mut watcher = tokio::time::interval(Duration::from_millis(500));
     watcher.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
     let mut observed = None;
-    let outcome = loop {
+    let mut outcome = loop {
         tokio::select! {
             _ = service.stop.notified() => break Ok(()),
             _ = terminate.recv() => break Ok(()),
-            _ = tokio::signal::ctrl_c() => break Ok(()),
-            result = &mut scheduler => break result.map_err(|_| Error("JOB_ERROR")).and_then(|r|r),
+            _ = interrupt.recv() => break Ok(()),
+            result = &mut scheduler => {
+                scheduler_collected = true;
+                break result.map_err(|_| Error("JOB_ERROR")).and_then(|r|r);
+            },
             _ = watcher.tick() => {
                 if let Ok(input) = crate::config::read_file(&service.config_path) {
                     let digest = crate::storage::hash(input.as_bytes());
@@ -439,8 +534,11 @@ pub async fn run(
                 }
             },
             Some(_) = tasks.join_next(), if !tasks.is_empty() => {},
-            accepted = listener.accept() => {
-                let (mut stream, _) = accepted?;
+            accepted = accept() => {
+                let (mut stream, _) = match accepted {
+                    Ok(connection) => connection,
+                    Err(error) => break Err(error.into()),
+                };
                 if !stream.peer_cred().is_ok_and(|peer| peer.uid() == rustix::process::geteuid().as_raw()) { continue; }
                 if let Ok(permit) = slots.clone().try_acquire_owned() {
                     let service = service.clone();
@@ -462,11 +560,13 @@ pub async fn run(
         .stopping
         .store(true, std::sync::atomic::Ordering::Release);
     service.work.notify_one();
-    drop(listener);
     while tasks.join_next().await.is_some() {}
-    if !scheduler.is_finished() {
-        scheduler.await.map_err(|_| Error("JOB_ERROR"))??;
+    if !scheduler_collected {
+        let drained = scheduler
+            .await
+            .map_err(|_| Error("JOB_ERROR"))
+            .and_then(|r| r);
+        outcome = outcome.and(drained);
     }
-    service.storage.close().await?;
-    outcome
+    service.close(outcome).await
 }

@@ -214,7 +214,13 @@ retain exact commands, identities, original failures and scope limits.
   daemon-owned TCP listener, oversized/version-incompatible/busy refusal.
 - [x] Audit disk use with dua; remove owned obsolete outputs, checksum-migrate
   target/.spike-work to the SSD mirror and verify all42 original shard hashes.
-- [ ] Complete installed release executable/API parity through the canonical gate.
+- [x] Complete installed release executable/API parity through the first canonical
+  gate at `71090cf`; repeat for the repaired final candidate below.
+- [x] Repair the four R1 review classes: collect mutation/scheduler owners on every
+  shutdown path, activate requested paths on explicit restart, check live capacity
+  at claim, and reject success after the last physical batch crosses its deadline.
+  Causal RED/GREEN receipts and bounded lifecycle/restart regressions are retained.
+- [ ] Run the repaired candidate's installed gate, including actual SIGTERM/SIGINT.
 - [ ] Freeze the candidate, run its complete exact-HEAD gate, obtain independent
   review, then CI/merge/completed Issue closure; continue the full queue below.
 

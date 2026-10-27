@@ -15,20 +15,20 @@ const MAX_ATTEMPTS: u32 = 3;
 mod tests {
     use super::*;
 
-    #[tokio::test]
-    async fn recovered_jobs_keep_retry_exhaustion_and_original_deadlines() {
-        struct Fixture(PathBuf);
-        impl Drop for Fixture {
-            fn drop(&mut self) {
-                std::fs::remove_dir_all(&self.0).unwrap();
-            }
+    struct Fixture(PathBuf);
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            std::fs::remove_dir_all(&self.0).unwrap();
         }
-        let fixture = Fixture(
-            std::env::temp_dir().join(format!("akasha-job-recovery-{}", std::process::id())),
-        );
+    }
+    async fn fixture(name: &str, extra: &str) -> (Fixture, Arc<Service>, CaptureInput) {
+        let fixture =
+            Fixture(std::env::temp_dir().join(format!("akasha-job-{name}-{}", std::process::id())));
         private_dir(&fixture.0).unwrap();
+        let input = format!("[access]\nread_roots=[{:?}]\n{extra}", fixture.0);
+        std::fs::write(fixture.0.join("config.toml"), &input).unwrap();
         let initial = crate::config::resolve(
-            &format!("[access]\nread_roots=[{:?}]\n", fixture.0),
+            &input,
             None,
             "",
             &crate::config::Paths {
@@ -45,11 +45,13 @@ mod tests {
             config_path: fixture.0.join("config.toml"),
             profile: None,
             admission: Mutex::new(()),
+            operations: Mutex::new(JoinSet::new()),
             last_config: Mutex::new(None),
             stop: Notify::new(),
             work: Notify::new(),
             stopping: std::sync::atomic::AtomicBool::new(false),
             instance: "new-daemon".into(),
+            batch_gate: Mutex::new(None),
         });
         let scope = owner_scope();
         Domain::new(&service.storage)
@@ -60,12 +62,278 @@ mod tests {
             "source":{"adapter":"fixture","profile":"test","session":"session","thread":"thread","agent":"agent"},
             "scope":scope,"stream":"stream","coverage":"available_payloads"
         })).unwrap();
+        (fixture, service, binding)
+    }
+
+    #[tokio::test]
+    async fn serve_accept_error_stops_and_closes_storage() {
+        let (_fixture, service, _) = fixture("accept-error", "").await;
+        let error = serve(service.clone(), || async {
+            Err(std::io::Error::other("accept failure"))
+        })
+        .await
+        .unwrap_err();
+        let stopped = service.stopping.load(std::sync::atomic::Ordering::Acquire);
+        let write_after_return = service
+            .storage
+            .commit(&CommitRequest {
+                request_id: "after-return".into(),
+                config_generation: 1,
+                policy_revision: None,
+                changes: vec![Change {
+                    key: job_key("after-return"),
+                    expected_revision: None,
+                    content: "probe".into(),
+                }],
+            })
+            .await;
+        // Collect the old detached scheduler even when the RED assertion below fails.
+        service
+            .stopping
+            .store(true, std::sync::atomic::Ordering::Release);
+        service.work.notify_one();
+        tokio::time::timeout(Duration::from_secs(2), async {
+            while Arc::strong_count(&service) > 1 {
+                tokio::task::yield_now().await;
+            }
+        })
+        .await
+        .unwrap();
+        let _ = service.storage.close().await;
+        assert_eq!(error.0, "IO_ERROR");
+        assert!(stopped, "accept error bypassed daemon drain");
+        assert!(
+            write_after_return.is_err(),
+            "Storage was still writable after run returned"
+        );
+    }
+
+    #[tokio::test]
+    async fn disconnected_mutation_owners_are_bounded_and_drained() {
+        let (fixture, service, binding) = fixture("owner-cap", "").await;
+        let guard = service.admission.lock().await;
+        for n in 0..16 {
+            let mut request = Box::pin(service.submit(
+                format!("owner-{n}"),
+                binding.clone(),
+                fixture.0.join("missing.jsonl"),
+            ));
+            std::future::poll_fn(|cx| {
+                assert!(std::future::Future::poll(request.as_mut(), cx).is_pending());
+                std::task::Poll::Ready(())
+            })
+            .await;
+            drop(request);
+        }
+        assert_eq!(
+            service
+                .submit("over-cap".into(), binding, fixture.0.join("missing.jsonl"))
+                .await
+                .unwrap_err()
+                .0,
+            "RESOURCE_BUSY"
+        );
+        let mut closing = Box::pin(service.close(Ok(())));
+        std::future::poll_fn(|cx| {
+            assert!(std::future::Future::poll(closing.as_mut(), cx).is_pending());
+            std::task::Poll::Ready(())
+        })
+        .await;
+        drop(guard);
+        closing.await.unwrap();
+        assert!(service.operations.lock().await.is_empty());
+    }
+
+    #[tokio::test]
+    async fn shutdown_collects_reload_after_its_client_timeout() {
+        let (fixture, service, _) = fixture("reload-owner", "").await;
+        std::fs::write(
+            &service.config_path,
+            format!(
+                "[access]\nread_roots=[{:?}]\n[timeouts]\nrunner='2200s'\n",
+                fixture.0
+            ),
+        )
+        .unwrap();
+        let guard = service.admission.lock().await;
+        assert!(
+            tokio::time::timeout(Duration::from_millis(10), service.reload())
+                .await
+                .is_err()
+        );
+        let mut closing = Box::pin(service.close(Err(Error("PRIMARY_ERROR"))));
+        std::future::poll_fn(|cx| {
+            assert!(std::future::Future::poll(closing.as_mut(), cx).is_pending());
+            std::task::Poll::Ready(())
+        })
+        .await;
+        assert_eq!(service.config.pin().generation(), 1);
+        assert!(service.stopping.load(std::sync::atomic::Ordering::Acquire));
+        drop(guard);
+        assert_eq!(closing.await.unwrap_err().0, "PRIMARY_ERROR");
+        assert!(service.operation(async { Ok(json!(null)) }).await.is_err());
+        assert_eq!(service.config.pin().generation(), 2);
+        let initial = service.config.pin().resolved().clone();
+        drop(service);
+        let storage = Storage::open(&initial).await.unwrap();
+        let saved = configuration::load(&storage, "daemon/config")
+            .unwrap()
+            .unwrap();
+        assert_eq!(saved["generation"], 2);
+        let restored = crate::config::ConfigManager::restore(saved, |_| Ok(())).unwrap();
+        assert_eq!(
+            restored.pin().resolved().timeouts().runner,
+            Duration::from_secs(2200)
+        );
+        storage.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn scheduler_error_collects_a_sibling_physical_batch() {
+        let (fixture, service, binding) = fixture("sibling-owner", "").await;
+        let path = fixture.0.join("capture.jsonl");
+        std::fs::write(&path, "").unwrap();
+        service
+            .submit("physical".into(), binding, path)
+            .await
+            .unwrap();
+        assert!(service.claim("physical", 0).await.unwrap());
+        let (reached, ready) = tokio::sync::oneshot::channel();
+        let (resume, release) = tokio::sync::oneshot::channel();
+        *service.batch_gate.lock().await = Some(BatchGate {
+            reached,
+            resume: release,
+        });
+        let mut running = JoinSet::new();
+        let worker = service.clone();
+        running.spawn(async move {
+            (
+                "physical".into(),
+                worker.execute_job("physical".into()).await,
+            )
+        });
+        ready.await.unwrap();
+        running.spawn(async { ("failed".into(), Err(Error("PRIMARY_ERROR"))) });
+        let (_, failure) = running.join_next().await.unwrap().unwrap();
+        running.spawn(async { ("another".into(), Err(Error("SECONDARY_ERROR"))) });
+        let mut draining = Box::pin(service.drain_jobs(running, failure));
+        std::future::poll_fn(|cx| {
+            assert!(std::future::Future::poll(draining.as_mut(), cx).is_pending());
+            std::task::Poll::Ready(())
+        })
+        .await;
+        assert_eq!(service.job("physical").unwrap().1.state, "running");
+        resume.send(()).unwrap();
+        assert_eq!(draining.await.unwrap_err().0, "PRIMARY_ERROR");
+        let terminal = service.job("physical").unwrap().1;
+        assert_eq!(terminal.state, "succeeded");
+        assert!(terminal.lease_owner.is_none());
+        assert!(terminal.result.is_some());
+        assert!(service.active().unwrap().1.is_empty());
+        service.close(Ok(())).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn completed_scheduler_error_is_collected_before_storage_close() {
+        let (_fixture, service, _) = fixture("scheduler-error", "").await;
+        service
+            .storage
+            .commit(&CommitRequest {
+                request_id: "corrupt-active".into(),
+                config_generation: 1,
+                policy_revision: None,
+                changes: vec![Change {
+                    key: active_key(),
+                    expected_revision: None,
+                    content: "[\"missing\"]".into(),
+                }],
+            })
+            .await
+            .unwrap();
+        let error = serve(service.clone(), std::future::pending)
+            .await
+            .unwrap_err();
+        assert_eq!(error.0, "JOB_NOT_FOUND");
+        assert!(service.stopping.load(std::sync::atomic::Ordering::Acquire));
+        assert!(
+            service
+                .storage
+                .commit(&CommitRequest {
+                    request_id: "after-close".into(),
+                    config_generation: 1,
+                    policy_revision: None,
+                    changes: vec![Change {
+                        key: job_key("after-close"),
+                        expected_revision: None,
+                        content: "probe".into()
+                    }],
+                })
+                .await
+                .is_err()
+        );
+    }
+
+    #[tokio::test]
+    async fn claim_checks_reloaded_cap_after_waiting_for_admission() {
+        let (fixture, service, binding) =
+            fixture("cap", "[runtime]\nmax_concurrent_jobs=2\n").await;
+        for id in ["owned", "waiting"] {
+            service
+                .submit(id.into(), binding.clone(), fixture.0.join("missing.jsonl"))
+                .await
+                .unwrap();
+        }
+        assert!(service.claim("owned", 0).await.unwrap());
+        let guard = service.admission.lock().await;
+        let old_permission = 1 < service
+            .config
+            .pin()
+            .resolved()
+            .config()
+            .runtime
+            .max_concurrent_jobs;
+        assert!(old_permission);
+        let mut claimant = Box::pin(service.claim("waiting", 1));
+        std::future::poll_fn(|cx| {
+            assert!(std::future::Future::poll(claimant.as_mut(), cx).is_pending());
+            std::task::Poll::Ready(())
+        })
+        .await;
+        let candidate = format!(
+            "[access]\nread_roots=[{:?}]\n[runtime]\nmax_concurrent_jobs=1\n",
+            fixture.0
+        );
+        service.config.reload(&candidate, None, |_| Ok(())).unwrap();
+        configuration::save(&service.storage, &service.config.checkpoint().unwrap())
+            .await
+            .unwrap();
+        drop(guard);
+        assert!(
+            !claimant.await.unwrap(),
+            "claim used the old concurrency cap"
+        );
+        let waiting = service.job("waiting").unwrap().1;
+        assert_eq!(waiting.state, "queued");
+        assert!(waiting.started_at_ms.is_none());
+        assert_eq!(waiting.config_generation, 1);
+        let (revision, owned) = service.job("owned").unwrap();
+        service
+            .finish_job(owned, revision, "cancelled", Some("CANCELLED"))
+            .await
+            .unwrap();
+        assert!(service.claim("waiting", 0).await.unwrap());
+        service.storage.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn recovered_jobs_keep_retry_exhaustion_and_original_deadlines() {
+        let (fixture, service, binding) = fixture("recovery", "").await;
         for (id, expected) in [("attempts", "RETRY_EXHAUSTED"), ("deadline", "JOB_TIMEOUT")] {
             service
                 .submit(id.into(), binding.clone(), fixture.0.join("missing.jsonl"))
                 .await
                 .unwrap();
-            assert!(service.claim(id, true).await.unwrap());
+            assert!(service.claim(id, 0).await.unwrap());
             let (revision, mut interrupted) = service.job(id).unwrap();
             if id == "attempts" {
                 interrupted.attempt = MAX_ATTEMPTS;
@@ -87,10 +355,69 @@ mod tests {
             );
             assert_eq!(recovered.started_at_ms, interrupted.started_at_ms);
             assert!(recovered.lease_owner.is_none());
-            assert!(!service.claim(id, true).await.unwrap());
+            assert!(!service.claim(id, 0).await.unwrap());
             let terminal = service.job(id).unwrap().1;
             assert_eq!(terminal.state, "failed");
             assert_eq!(terminal.error.as_deref(), Some(expected));
+            assert!(service.active().unwrap().1.is_empty());
+        }
+        service.storage.close().await.unwrap();
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn final_physical_batch_obeys_the_original_execution_deadline() {
+        let (fixture, service, binding) = fixture("final-deadline", "").await;
+        let path = fixture.0.join("capture.jsonl");
+        std::fs::write(&path, "").unwrap();
+        for (id, expired) in [("before", false), ("after", true)] {
+            let mut binding = binding.clone();
+            binding.stream = id.into();
+            service
+                .submit(id.into(), binding.clone(), path.clone())
+                .await
+                .unwrap();
+            assert!(service.claim(id, 0).await.unwrap());
+            let original = service.job(id).unwrap().1;
+            let (reached, ready) = tokio::sync::oneshot::channel();
+            let (resume, release) = tokio::sync::oneshot::channel();
+            *service.batch_gate.lock().await = Some(BatchGate {
+                reached,
+                resume: release,
+            });
+            let worker = tokio::spawn(service.clone().execute_job(id.into()));
+            let end = ready.await.unwrap();
+            let until_end = end.saturating_duration_since(tokio::time::Instant::now());
+            assert!(until_end > Duration::from_millis(1));
+            tokio::time::advance(if expired {
+                until_end + Duration::from_millis(1)
+            } else {
+                until_end - Duration::from_millis(1)
+            })
+            .await;
+            assert!(!worker.is_finished());
+            resume.send(()).unwrap();
+            worker.await.unwrap().unwrap();
+            let terminal = service.job(id).unwrap().1;
+            assert_eq!(terminal.state, if expired { "failed" } else { "succeeded" });
+            assert_eq!(terminal.error.as_deref(), expired.then_some("JOB_TIMEOUT"));
+            assert_eq!(
+                terminal.execution_deadline_ms,
+                original.execution_deadline_ms
+            );
+            assert_eq!(terminal.started_at_ms, original.started_at_ms);
+            let report = terminal.result.unwrap();
+            assert_ne!(
+                report.checkpoint.checkpoint.pending,
+                Some(PendingReason::Backlog)
+            );
+            assert_eq!(
+                Capture::new(&service.storage)
+                    .checkpoint(&binding.binding().unwrap())
+                    .unwrap()
+                    .unwrap()
+                    .revision,
+                report.checkpoint.revision
+            );
             assert!(service.active().unwrap().1.is_empty());
         }
         service.storage.close().await.unwrap();
@@ -249,7 +576,7 @@ impl Service {
         path: PathBuf,
     ) -> Result<Value> {
         let service = self.clone();
-        tokio::spawn(async move {
+        self.operation(async move {
             let _guard = service.admission.lock().await;
             if !ipc::identifier(&id) {
                 return Err(Error("INVALID_REQUEST"));
@@ -325,7 +652,6 @@ impl Service {
             Ok(serde_json::to_value(job)?)
         })
         .await
-        .map_err(|_| Error("JOB_ERROR"))?
     }
     pub(super) async fn show_job(&self, id: &str) -> Result<Value> {
         let _guard = self.admission.lock().await;
@@ -358,7 +684,7 @@ impl Service {
     }
     pub(super) async fn cancel_job(self: &Arc<Self>, id: String) -> Result<Value> {
         let service = self.clone();
-        tokio::spawn(async move {
+        self.operation(async move {
             let _guard = service.admission.lock().await;
             let (revision, mut job) = service.job(&id)?;
             service.authorize_job(&job)?;
@@ -377,7 +703,6 @@ impl Service {
             Ok(serde_json::to_value(job)?)
         })
         .await
-        .map_err(|_| Error("JOB_ERROR"))?
     }
     async fn finish_job(
         &self,
@@ -430,7 +755,7 @@ impl Service {
         }
         Ok(())
     }
-    async fn claim(&self, id: &str, can_run: bool) -> Result<bool> {
+    async fn claim(&self, id: &str, running: usize) -> Result<bool> {
         let _guard = self.admission.lock().await;
         let (revision, mut job) = self.job(id)?;
         if job.state != "queued" {
@@ -452,7 +777,12 @@ impl Service {
             self.finish_job(job, revision, state, Some(reason)).await?;
             return Ok(false);
         }
-        if !can_run || self.config.pin().resolved().config().runtime.paused || now < job.retry_at_ms
+        let snapshot = self.config.pin();
+        let runtime = &snapshot.resolved().config().runtime;
+        if running >= runtime.max_concurrent_jobs.min(MAX_RUNNING)
+            || runtime.paused
+            || self.stopping.load(std::sync::atomic::Ordering::Acquire)
+            || now < job.retry_at_ms
         {
             return Ok(false);
         }
@@ -515,10 +845,18 @@ impl Service {
             let path = job.path.clone();
             let generation = job.config_generation;
             let runtime = tokio::runtime::Handle::current();
+            #[cfg(test)]
+            let gate = self.batch_gate.lock().await.take();
             let result = tokio::task::spawn_blocking(move || {
-                runtime.block_on(
+                let result = runtime.block_on(
                     Capture::new(&storage).reconcile_jsonl(&binding, &path, 1, generation),
-                )
+                );
+                #[cfg(test)]
+                if let Some(gate) = gate {
+                    gate.reached.send(end).unwrap();
+                    gate.resume.blocking_recv().unwrap();
+                }
+                result
             })
             .await
             .map_err(|_| Error("JOB_ERROR"))?;
@@ -526,6 +864,11 @@ impl Service {
                 Ok(report) => {
                     let more = report.checkpoint.checkpoint.pending == Some(PendingReason::Backlog);
                     job.result = Some(report);
+                    if tokio::time::Instant::now() >= end {
+                        return self
+                            .finish_job(job, revision, "failed", Some("JOB_TIMEOUT"))
+                            .await;
+                    }
                     if !more {
                         return self.finish_job(job, revision, "succeeded", None).await;
                     }
@@ -556,6 +899,7 @@ impl Service {
         let mut running = JoinSet::new();
         let mut owned = BTreeSet::new();
         let mut tick = tokio::time::interval(Duration::from_secs(1));
+        let outcome = async {
         loop {
             if !self.stopping.load(std::sync::atomic::Ordering::Acquire) {
                 let ids = {
@@ -563,16 +907,7 @@ impl Service {
                     self.active()?.1
                 };
                 for id in ids {
-                    let can_run = owned.len()
-                        < self
-                            .config
-                            .pin()
-                            .resolved()
-                            .config()
-                            .runtime
-                            .max_concurrent_jobs
-                            .min(MAX_RUNNING);
-                    if !owned.contains(&id) && self.claim(&id, can_run).await? {
+                    if !owned.contains(&id) && self.claim(&id, owned.len()).await? {
                         owned.insert(id.clone());
                         let service = self.clone();
                         running.spawn(async move {
@@ -591,5 +926,27 @@ impl Service {
             }
         }
         Ok(())
+        }.await;
+        self.drain_jobs(running, outcome).await
+    }
+
+    async fn drain_jobs(
+        &self,
+        mut running: JoinSet<(String, Result<()>)>,
+        mut outcome: Result<()>,
+    ) -> Result<()> {
+        if outcome.is_err() {
+            self.stopping
+                .store(true, std::sync::atomic::Ordering::Release);
+            self.stop.notify_one();
+            self.work.notify_one();
+        }
+        while let Some(result) = running.join_next().await {
+            let result = result
+                .map_err(|_| Error("JOB_ERROR"))
+                .and_then(|(_, result)| result);
+            outcome = outcome.and(result);
+        }
+        outcome
     }
 }

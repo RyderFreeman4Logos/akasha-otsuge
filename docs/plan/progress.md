@@ -15,8 +15,14 @@ checklist is in [todo.md](todo.md). Existing Storage, ConfigManager, Domain and
 Capture remain the shared authority; CLI calls must reach those real components.
 Focused acceptance now covers real daemon/job crash and graceful recovery,
 configuration/profile/chunked snapshots, CLI history/diff pagination and delivery
-ACK. A different kernel UID control verifies private-path and peer denial. The
-installed release gate, independent review and publication remain outstanding.
+ACK. A different kernel UID control verifies private-path and peer denial.
+Candidate `71090cf` passed the complete installed gate; independent R1 found four
+untested lifecycle boundaries. Their repairs cover all mutation owners during
+shutdown, explicit socket-path activation, live capacity under the claim lock,
+and final-batch deadline arbitration. Each class has a causal RED/GREEN receipt.
+Nine real daemon cases now include SIGTERM/SIGINT and pending-path restart;
+focused library/configuration checks and Clippy pass. The repaired candidate
+still requires its own complete installed gate, independent review and publication.
 
 The user-requested dua audit found55.39GiB on the home filesystem. Removing
 obsolete owned caches/probes/diagnostic data and checksum-migrating retained
