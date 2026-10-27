@@ -7,11 +7,20 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 from check_daemon_command import command, identity
 
 
 class CommandOwnership(unittest.TestCase):
+    def test_proc_identity_disappearance_is_terminal_but_access_failure_is_not(self):
+        for error in (FileNotFoundError(), ProcessLookupError()):
+            with patch('check_daemon_command.pathlib.Path.read_text', side_effect=error):
+                self.assertIsNone(identity(123))
+        with patch('check_daemon_command.pathlib.Path.read_text', side_effect=PermissionError()):
+            with self.assertRaises(PermissionError):
+                identity(123)
+
     def test_timeout_collects_the_owned_subprocess_group(self):
         with tempfile.TemporaryDirectory(prefix='akasha-command-timeout-') as root:
             witness = pathlib.Path(root) / 'child.json'
