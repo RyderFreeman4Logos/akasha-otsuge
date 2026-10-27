@@ -120,7 +120,9 @@ than the candidate budget, and embedding dimension 1–65536. Query text is at m
 reported. The original-character budget covers claims, rationales, conditions and
 assumptions; the returned source-span union is at most 64 and serialized output
 at most 128 KiB. Whole entries are dropped with an explicit budget gap/truncation
-receipt instead of fabricating partial citations.
+receipt instead of fabricating partial citations. The internal rule-scan page
+allows 256 KiB so a maximum legal 128 KiB record and its revision envelope can
+fit. Public page budgets and final search output limits are unchanged.
 
 Reranker inputs use at most eight documents per call, each capped at 4096 UTF-8
 bytes. The actual serialized provider request must fit 32768 bytes; escaping can

@@ -467,7 +467,8 @@ impl Domain<'_> {
                     None,
                     PageBudget {
                         limit: (limit - examined).min(64),
-                        max_bytes: 128 * 1024,
+                        // A legal 128 KiB record also needs its bounded revision envelope.
+                        max_bytes: 256 * 1024,
                     },
                 )
                 .await?

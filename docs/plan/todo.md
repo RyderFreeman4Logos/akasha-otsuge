@@ -300,7 +300,7 @@ Repair validation, fresh review, CI and publication remain.
   require repaired-candidate hosted CI success.
 - [x] R4: Persist zero/overflow cosine-vector failure diagnostics and the original
   prefix; verify identical diagnostic readback after restart.
-- [ ] R5: Admit a legal maximum-size wrapped Memory in the internal rule scan;
+- [x] R5: Admit a legal maximum-size wrapped Memory in the internal rule scan;
   retain public byte limits and bounded, honest search output.
 - [ ] Publish search/show documentation, quality and withdrawal fixtures, focused
   results, final exact-HEAD gate/review, CI, merge and Issue closure. Then #11–#28.
