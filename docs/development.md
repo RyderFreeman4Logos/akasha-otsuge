@@ -1,11 +1,12 @@
 # Development
 
 Linux is the MVP platform. Install Rust using rustup, Python 3.11 or newer,
-a C/C++ toolchain and the Protocol Buffers compiler (`protoc`). Lance's build
-scripts require `protoc`; it is not a runtime dependency. On Debian/Ubuntu:
+a C/C++ toolchain, the Protocol Buffers compiler (`protoc`) and its standard
+`.proto` definitions. Lance's build scripts require both; neither is a runtime
+dependency. On Debian/Ubuntu:
 
 ```sh
-sudo apt-get install build-essential pkg-config protobuf-compiler
+sudo apt-get install build-essential pkg-config protobuf-compiler libprotobuf-dev
 ```
 
 The local acceptance environment uses `protoc` 3.21.12. CI installs the distribution
