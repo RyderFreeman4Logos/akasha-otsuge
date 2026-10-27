@@ -198,7 +198,7 @@ impl CommitRequest {
 
 pub struct Storage {
     tree: Arc<Tree>,
-    writer: Mutex<()>,
+    writer: Arc<Mutex<()>>,
     root: std::path::PathBuf,
 }
 
@@ -272,7 +272,7 @@ impl Storage {
         let (root, created) = layout::open_root(&config.config().paths.data_dir)?;
         let store = Self {
             tree: Self::open_tree(config, &root)?,
-            writer: Mutex::new(()),
+            writer: Arc::new(Mutex::new(())),
             root,
         };
         let result = async {
@@ -327,7 +327,7 @@ impl Storage {
         let mut request = request.clone();
         request.changes.sort_by(|a, b| a.key.cmp(&b.key));
         let request_hash = hash(&serde_json::to_vec(&request)?);
-        let _writer = self.writer.lock().await;
+        let writer = self.writer.clone().lock_owned().await;
         let mut tx = self.tree.begin()?;
         let receipt_key = format!("receipt/{}", request.request_id);
         if let Some(bytes) = tx.get_for_update(receipt_key.as_bytes())? {
@@ -394,23 +394,35 @@ impl Storage {
             })?,
         )?;
         tx.set(SEQUENCE, seq.to_be_bytes().as_slice())?;
-        #[cfg(test)]
-        {
-            use std::future::{Future, poll_fn};
-            crash_tests::checkpoint("before-commit");
-            let mut commit = std::pin::pin!(tx.commit());
-            poll_fn(|cx| {
-                let result = commit.as_mut().poll(cx);
-                if result.is_pending() {
-                    crash_tests::checkpoint("commit-pending");
-                }
-                result
-            })
-            .await?;
-            crash_tests::checkpoint("after-commit");
-        }
-        #[cfg(not(test))]
-        tx.commit().await?;
+        let tree = self.tree.clone();
+        // Once admitted, the transaction and its serialization lease outlive a cancelled caller.
+        tokio::spawn(async move {
+            let _tree = tree;
+            let _writer = writer;
+            #[cfg(test)]
+            {
+                use std::future::{Future, poll_fn};
+                crash_tests::checkpoint("before-commit");
+                let mut commit = std::pin::pin!(tx.commit());
+                poll_fn(|cx| {
+                    let result = commit.as_mut().poll(cx);
+                    if result.is_pending() {
+                        crash_tests::checkpoint("commit-pending");
+                    }
+                    result
+                })
+                .await?;
+                crash_tests::checkpoint("after-commit");
+            }
+            #[cfg(not(test))]
+            tx.commit().await?;
+            Ok::<_, surrealkv::Error>(())
+        })
+        .await
+        .map_err(|source| StorageError {
+            code: "COMMIT_RESULT_UNKNOWN",
+            source: Some(Box::new(source)),
+        })??;
         Ok(receipt)
     }
 

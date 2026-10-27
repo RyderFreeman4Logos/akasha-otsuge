@@ -1,6 +1,7 @@
 use std::fs::{self, File};
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -199,7 +200,7 @@ impl Storage {
         let root = fresh_destination(&data.join("authority"), &backup)?;
         let store = Self {
             tree: Self::open_tree(config, &root)?,
-            writer: Mutex::new(()),
+            writer: Arc::new(Mutex::new(())),
             root,
         };
         let tree = store.tree.clone();
@@ -212,7 +213,7 @@ impl Storage {
         detach_links(&store.root.join("kv"))?;
         let store = Self {
             tree: Self::open_tree(config, &store.root)?,
-            writer: Mutex::new(()),
+            writer: Arc::new(Mutex::new(())),
             root: store.root,
         };
         let result = (|| -> Result<()> {

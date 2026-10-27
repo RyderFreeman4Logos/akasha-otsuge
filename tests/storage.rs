@@ -680,3 +680,121 @@ async fn a_canceled_submission_cannot_publish_an_inconsistent_checkpoint() {
         store.close().await.unwrap();
     }
 }
+
+#[test]
+fn checkpoint_waits_for_a_native_commit_after_its_caller_cancels() {
+    use std::future::{Future, poll_fn};
+    use std::task::Poll;
+    use std::time::{Duration, Instant};
+
+    struct Release(Option<std::sync::mpsc::Sender<()>>);
+    impl Drop for Release {
+        fn drop(&mut self) {
+            if let Some(sender) = self.0.take() {
+                let _ = sender.send(());
+            }
+        }
+    }
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .max_blocking_threads(1)
+        .enable_all()
+        .build()
+        .unwrap();
+    runtime.block_on(async {
+        let fixture = Fixture::new();
+        let store = Storage::open(&fixture.config()).await.unwrap();
+        let (sender, receiver) = std::sync::mpsc::channel();
+        let mut release = Release(Some(sender));
+        let (started, ready) = tokio::sync::oneshot::channel();
+        let blocker = tokio::task::spawn_blocking(move || {
+            started.send(()).unwrap();
+            let _ = receiver.recv_timeout(Duration::from_secs(30));
+        });
+        ready.await.unwrap();
+        let request = request();
+        let mut submission = Box::pin(store.commit(&request));
+        assert!(poll_fn(|cx| Poll::Ready(submission.as_mut().poll(cx).is_pending())).await);
+        drop(submission);
+        assert_eq!(
+            store.sequence().unwrap(),
+            0,
+            "fixture must capture the pre-commit boundary"
+        );
+        let backup = fixture.0.join("backup");
+        let mut checkpoint = Box::pin(store.checkpoint(&backup));
+        assert!(poll_fn(|cx| Poll::Ready(checkpoint.as_mut().poll(cx).is_pending())).await);
+        let deadline = Instant::now() + Duration::from_secs(30);
+        while store.sequence().unwrap() == 0 {
+            assert!(
+                Instant::now() < deadline,
+                "admitted commit was abandoned after caller cancellation"
+            );
+            tokio::task::yield_now().await;
+        }
+        let receipt = store.receipt("request-1").unwrap().unwrap();
+        release.0.take().unwrap().send(()).unwrap();
+        blocker.await.unwrap();
+        assert_eq!(
+            checkpoint.await.unwrap(),
+            1,
+            "checkpoint must bind the actual snapshot sequence"
+        );
+        let destination = Fixture::new();
+        let restored = Storage::restore(&destination.config(), &backup)
+            .await
+            .unwrap();
+        assert_eq!(restored.sequence().unwrap(), 1);
+        assert_eq!(
+            restored.receipt("request-1").unwrap(),
+            Some(receipt.clone())
+        );
+        assert_eq!(
+            restored.outbox(1).unwrap().unwrap().revisions,
+            receipt.revisions
+        );
+        for change in &request.changes {
+            assert_eq!(
+                restored.current(&change.key).unwrap(),
+                store.current(&change.key).unwrap()
+            );
+            assert_eq!(
+                restored.revision(&change.key, 1).unwrap().unwrap().content,
+                change.content
+            );
+        }
+        restored.close().await.unwrap();
+        assert_eq!(store.commit(&request).await.unwrap(), receipt);
+        assert_eq!(store.sequence().unwrap(), 1);
+        store.close().await.unwrap();
+    });
+}
+
+#[tokio::test]
+async fn retry_and_close_drain_a_commit_after_its_caller_cancels() {
+    use std::future::{Future, poll_fn};
+    use std::task::Poll;
+    for retry in [false, true] {
+        let fixture = Fixture::new();
+        let config = fixture.config();
+        let store = Storage::open(&config).await.unwrap();
+        let request = request();
+        let mut submission = Box::pin(store.commit(&request));
+        assert!(poll_fn(|cx| Poll::Ready(submission.as_mut().poll(cx).is_pending())).await);
+        drop(submission);
+        if retry {
+            assert_eq!(store.commit(&request).await.unwrap().commit_seq, 1);
+        }
+        store.close().await.unwrap();
+        let reopened = Storage::open(&config).await.unwrap();
+        assert_eq!(reopened.sequence().unwrap(), 1);
+        assert_eq!(reopened.commit(&request).await.unwrap().commit_seq, 1);
+        for change in &request.changes {
+            assert_eq!(
+                reopened.current(&change.key).unwrap().unwrap().content,
+                change.content
+            );
+        }
+        assert!(reopened.outbox(2).unwrap().is_none());
+        reopened.close().await.unwrap();
+    }
+}

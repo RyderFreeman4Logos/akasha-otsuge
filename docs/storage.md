@@ -43,7 +43,10 @@ including after restart or later corrections. Reusing the request ID with change
 content/context returns `IDEMPOTENCY_CONFLICT`; an outdated expected revision
 returns `REVISION_CONFLICT`. Cancellation or loss of a response does not establish
 that a native commit failed: reconcile by the same request ID and retry the same
-request. A returned receipt means authority committed, not indexed or externally
+request. Admitted native commits retain the tree and writer lease in an owned
+task even if their caller drops the future; retries, checkpoints and `close()`
+wait behind that work. Await `close()` before shutting down the Tokio runtime.
+A returned receipt means authority committed, not indexed or externally
 delivered. Outbox entries describe a committed batch; later workers own durable
 processing state in the job/state namespaces.
 

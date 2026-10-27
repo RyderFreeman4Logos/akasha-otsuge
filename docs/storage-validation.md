@@ -4,7 +4,7 @@ Verification date: 2026-10-27 UTC. Linux x86_64, Rust 1.99.1,
 SurrealKV 1.0.0 commit `4338a790c8edc56ef5ea1e46157427af4815be3c`,
 Zstd crate 0.13.3. No model, external host or provider is involved.
 
-`cargo test --workspace --locked` passed: 14 storage integration tests, one
+`cargo test --workspace --locked` passed before review: 14 storage integration tests, one
 crash-supervisor test, 17 configuration tests and four CLI tests. The only
 ignored unit is the supervisor-owned crash child, invoked six times explicitly.
 
@@ -19,7 +19,7 @@ ignored unit is the supervisor-owned crash child, invoked six times explicitly.
 | Negative backup cases | Corrupt/missing manifest, changed bytes, unlisted files, forged relative paths and symlinks are rejected; no destination authority is created for these invalid inputs |
 | Existing destinations | Creating another backup at the same path, backing up inside the authority, or restoring over a live authority is rejected without overwriting it |
 | File independence | Published backup files have one link; restore adds no backup links; overwriting a backup SST leaves the reopened source and restored stores readable and unchanged |
-| Cancellation | Eight submissions dropped after the first future poll produce checkpoints that restore a complete, internally consistent committed prefix |
+| Initial cancellation fixture | Eight submissions dropped after the first future poll passed, but did not force the later review counterexample below |
 | Ownership and inventory | A second native owner is refused; fixture files contain neither SQLite names nor SQLite database magic; the locked dependency graph has no SQLite package |
 
 The isolated real SIGKILL run reported:
@@ -43,6 +43,18 @@ missing admission/checksum checks, silent empty-store recreation, native Tree
 clone/drop closure and checkpoint hard-link aliasing. They passed after the
 corresponding bounded fixes. The two native API pitfalls are handled in the
 adapter without changing upstream SurrealKV.
+
+Independent review R1 found one additional race at candidate `1136690`: an
+engine-owned commit could finish after its caller released the writer guard and
+checkpoint captured sequence 0, but before the native snapshot copied sequence 1.
+The completed backup then failed restore. A deterministic regression occupies the
+single Tokio blocking worker, polls/drops commit, queues checkpoint, observes the
+committed receipt, and releases the worker; it failed with checkpoint sequence
+0 instead of 1 before the fix. Admitted commits now retain the writer lease and
+native tree in an owned task until completion. The same regression restores a
+successful sequence-1 checkpoint, including all heads, revisions, receipt and
+outbox. A second regression checks immediate retry and close after cancellation.
+The final canonical gate includes both new tests (16 storage integrations total).
 
 The final exact-HEAD canonical gate, independent review, CI, merge and completion
 receipt are recorded on [Issue #4](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/4).
