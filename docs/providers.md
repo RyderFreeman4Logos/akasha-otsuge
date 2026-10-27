@@ -82,6 +82,8 @@ returns the existing job; a changed plan conflicts. Running external requests ar
 never automatically replayed after an ambiguous interruption. Partial completed
 stages remain archived. Results are chunked into immutable Storage records with
 hash/revision checks, so embedding arrays do not overflow one authority record.
+The aggregate bound includes64KiB for profile names and diagnostic traces in
+addition to the three response budgets, and stays below the IPC message ceiling.
 
 Current fixtures cover independent endpoints, bad output, disconnects, slow
 responses, throttling, cancellation, shutdown/crash recovery, endpoint reload and
@@ -89,3 +91,30 @@ virtual 1699/1700-second boundaries with three serial stages. Actual GB10 infere
 and the production daemon's near 1700-second wall-clock acceptance remain pending
 in #9. `local_long_timeout_verified` therefore remains false; a fixture receipt
 must never certify a different provider or a future host Runner.
+
+The long acceptance uses the actual release executable with a controlled local
+endpoint. Its two overlapping requests return at1605 seconds and exceed1700
+seconds respectively. Ordinary tests run a two-second control of the same
+harness. Explicit execution requires fresh, absolute receipt paths:
+
+```sh
+AKASHA_ACCEPTANCE_BINARY=/absolute/path/to/akasha-otsuge \
+AKASHA_PROVIDER_RECEIPT=/ssd/owned-run/long-receipt \
+cargo test --locked --test daemon model_tests::real_wall_clock_provider_deadlines \
+  -- --ignored --exact --nocapture
+
+AKASHA_ACCEPTANCE_BINARY=/absolute/path/to/akasha-otsuge \
+AKASHA_MODEL_COMPAT_RECEIPT=/ssd/owned-run/gb10-receipt \
+cargo test --locked --test daemon model_tests::gb10_guard_actual_services \
+  -- --ignored --exact --nocapture
+```
+
+Run these commands under a nohup supervisor with durable admission, PID/start-time,
+terminal log and one WD completion listener. Receipt directories are exclusive:
+an existing run is never overwritten or replayed. After a parent-session restart,
+resume waiting on the original owned process. If it exited without a terminal
+receipt, inspect its persisted job/process state and classify the interrupted
+attempt before any new run. The harness writes atomic/fsynced per-case state and
+progress, an immutable binary identity, accepted configuration and final checks;
+it never restarts or reconfigures the GB10 services. Synthetic GB10 compatibility
+and controlled duration remain separate from model-quality and host acceptance.

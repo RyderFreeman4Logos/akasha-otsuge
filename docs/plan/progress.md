@@ -9,11 +9,15 @@ is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
 ## Current issue: MVP-009
 
-Independent provider clients and durable model jobs are next on
+Independent provider clients and durable model jobs are implemented on
 `feat/mvp-009-providers`, based on merge `a3d278d`. The complete remaining
-acceptance queue is in [todo.md](todo.md). Read-only contract preparation found
-GB10 guard models metadata reachable; actual inference and long duration remain
-unverified. Production daemon/provider long tests and later CLI Runner tests
+acceptance queue is in [todo.md](todo.md). Candidate phase `a57d515` passed45 focused
+Rust tests and Clippy. Three provider kinds, cancellation, crash ambiguity,
+generation pinning and virtual1699/1700-second serial calls pass. Follow-up tests
+repair aggregate archive accounting and prove three near512KiB outputs survive
+IPC/restart. A synthetic GB10 embedding probe returned4096 finite dimensions;
+the production three-service path and real long duration remain unverified.
+Production daemon/provider long tests and later CLI Runner tests
 retain their separate acceptance boundaries.
 
 ## Completed daemon: MVP-008

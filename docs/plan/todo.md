@@ -227,13 +227,16 @@ retain exact commands, identities, original failures and scope limits.
 
 ## MVP-009 acceptance and remaining work
 
-- [ ] Reuse configured independent text/embedding/reranker routes; validate all
+- [x] Reuse configured independent text/embedding/reranker routes; validate all
   outputs, bounded request/batch/response sizes, rate limits and explicit errors.
-- [ ] Add production CLI/IPC model jobs to the existing durable scheduler, pin
+- [x] Add production CLI/IPC model jobs to the existing durable scheduler, pin
   accepted generations, keep provider clocks separate from queue/CLI clocks,
   support cancellation and never replay ambiguous interrupted external calls.
-- [ ] Cover success/malformed/slow/disconnect for all three endpoint contracts;
+- [x] Cover success/malformed/slow/disconnect for all three endpoint contracts;
   virtual1699/1700 boundaries, sequential stages, cancellation and endpoint reload.
+  Queue-clock and cancellation-trace defects have causal RED/GREEN receipts.
+  Three near512KiB responses expose and repair aggregate archive overhead;
+  the same requests now survive job reads and daemon restart.
 - [ ] Verify the actual available GB10 service contract with bounded inference;
   retain exact model/client identities and output dimension/score semantics.
 - [ ] Run a nohup real-wall-clock1600..1690s success and over-budget failure

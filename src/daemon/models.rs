@@ -2,7 +2,9 @@ use super::*;
 use crate::config::deadline::{Deadline, Layer};
 use crate::storage::RevisionRef;
 
-const MAX_RESULT: usize = crate::provider::MAX_RESPONSE_BYTES * crate::provider::MAX_CALLS;
+// Include bounded profile names and per-stage traces alongside the response bytes.
+const MAX_RESULT: usize =
+    crate::provider::MAX_RESPONSE_BYTES * crate::provider::MAX_CALLS + 64 * 1024;
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -160,14 +162,21 @@ impl Service {
             if job.state != "running" || job.lease_owner.as_deref() != Some(&self.instance) {
                 return Err(Error("LEASE_LOST"));
             }
-            job.result = Some(
-                save_result(
-                    &self.storage,
-                    &json!({"calls":calls}),
-                    job.config_generation,
-                )
-                .await?,
-            );
+            let result = save_result(
+                &self.storage,
+                &json!({"calls":calls}),
+                job.config_generation,
+            )
+            .await;
+            job.result = Some(match result {
+                Ok(result) => result,
+                Err(Error("PROVIDER_OUTPUT_TOO_LARGE")) => {
+                    return self
+                        .finish_job(job, revision, "failed", Some("PROVIDER_OUTPUT_TOO_LARGE"))
+                        .await;
+                }
+                Err(error) => return Err(error),
+            });
             if job.cancel_requested {
                 return self
                     .finish_job(job, revision, "cancelled", Some("CANCELLED"))
