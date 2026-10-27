@@ -1,0 +1,37 @@
+{
+  "attempts": [],
+  "config_epoch": 1,
+  "controller": {
+    "pid": 4159472,
+    "start_ticks": "458338365",
+    "state": "R"
+  },
+  "identity": {
+    "binary_sha256": "1ee2001a5f77fc03db30cf8e87a4f8181d35aa6091193a62a766d69966c5b249",
+    "config": {
+      "disk": {
+        "reserve_bytes": 36212254720,
+        "start_bytes": 9223372036854775808
+      },
+      "paths": {
+        "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/generation-workload-r3/probe",
+        "database": "/tmp/akasha-generation-runner-h_zzqhez/database",
+        "output": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r3/disk-blocked",
+        "request": "/tmp/akasha-otsuge-storage-20261022/generation-runner-r3/disk-blocked.json"
+      },
+      "reliability": {
+        "max_attempts": 1
+      },
+      "run": {
+        "id": "disk-blocked",
+        "profile": "low",
+        "seconds": 180
+      }
+    },
+    "controller_sha256": "f485cdc29afd8d60963888dceebab4d27ba0859b134965a97bece7b88dc5a0f3",
+    "helpers_sha256": "c647b72392641f7626c718f479e7da4b001a2aca5bbf802465e0e6bfed95ca21",
+    "observer_sha256": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029",
+    "request_sha256": "4b0070862e5fce6e7ace8699e406fc8caf1f12cf4dd3aad7da26aafe989cc616"
+  },
+  "phase": "admitted"
+}

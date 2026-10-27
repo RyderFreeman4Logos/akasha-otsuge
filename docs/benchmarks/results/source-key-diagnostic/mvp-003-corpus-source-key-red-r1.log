@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_backfill.py", line 231, in <module>
+    main()
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_backfill.py", line 205, in main
+    assert any(hit['memory'] == 1_000_000 and hit['seq'] == 3 and hit['source_key'] == rows[0]['key'] for hit in hits), hits
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_backfill.py", line 205, in <genexpr>
+    assert any(hit['memory'] == 1_000_000 and hit['seq'] == 3 and hit['source_key'] == rows[0]['key'] for hit in hits), hits
+                                                                  ~~~^^^^^^^^^^^^^^
+KeyError: 'source_key'

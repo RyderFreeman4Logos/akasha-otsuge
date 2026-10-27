@@ -1,0 +1,1 @@
+{"op": "begin", "generation": 1, "bundle": {"model": "text-embedding-3-large", "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af", "dimension": 1536, "chunker": "source-document-v1", "schema": 1}}

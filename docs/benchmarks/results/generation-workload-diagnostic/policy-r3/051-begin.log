@@ -1,0 +1,1 @@
+{"base":null,"bundle":{"chunker":"source-document-v1","dimension":1536,"model":"text-embedding-3-large","model_fingerprint":"176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af","schema":2},"fingerprint":"9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed","id":2,"ready":false,"status":"building","text":0,"vector":0}

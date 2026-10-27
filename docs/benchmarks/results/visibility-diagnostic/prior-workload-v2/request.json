@@ -1,0 +1,9 @@
+{
+  "corpus_manifest": null,
+  "diagnostic": true,
+  "fixture": "/tmp/akasha-otsuge-storage-20261022/query-population-contract/queries.json",
+  "output": "/tmp/akasha-otsuge-storage-20261022/case-visibility-v2/runtime",
+  "phase": "steady",
+  "run_id": "visibility-workload-v2",
+  "seconds": 60
+}

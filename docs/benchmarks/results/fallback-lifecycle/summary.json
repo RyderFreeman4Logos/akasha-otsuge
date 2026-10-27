@@ -1,0 +1,124 @@
+{
+  "archive_sha256": "e7d6e19c0235f04973f47a7ea30fcb8eb980d9c8ba7f791f3e321cb131766b6b",
+  "binary_sha256": "93da64a225a3b13723d43141ef56f314f311756fddf1dcff8c68d96026012bdd",
+  "checks": 103,
+  "exact_children_absent": true,
+  "hashes_verified": true,
+  "memory_events": {
+    "high": "0",
+    "low": "0",
+    "max": "0",
+    "oom": "0",
+    "oom_group_kill": "0",
+    "oom_kill": "0"
+  },
+  "native_environment": {
+    "LANCE_CPU_THREADS": "2",
+    "LANCE_DEFAULT_IO_BUFFER_SIZE": "16777216",
+    "LANCE_SHUFFLE_BATCH_BYTES": "16777216",
+    "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES": "0"
+  },
+  "not_proven": [
+    "full corpus indexes/activation",
+    "100k outbox (separate operation)",
+    "persistent concurrent clients",
+    "sustained P99",
+    "global BM25 ranking",
+    "power loss"
+  ],
+  "observer_unit_tests": 4,
+  "prior_candidate_regressions": [
+    {
+      "binary_sha256": "eb265fec86b8de1323d22a8741512884351ebfa68ec26e3cfb24d50a6c4ece9c",
+      "checks": 48,
+      "exact_children_absent": true,
+      "hashes_verified": true,
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "rss_max_bytes": 179408896,
+      "samples": 12,
+      "seconds": 10.901290474459529,
+      "temporary_root_removed": true,
+      "unit_inactive": true
+    },
+    {
+      "binary_sha256": "eb265fec86b8de1323d22a8741512884351ebfa68ec26e3cfb24d50a6c4ece9c",
+      "checks": 53,
+      "exact_children_absent": true,
+      "hashes_verified": true,
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "rss_max_bytes": 31240192,
+      "samples": 5,
+      "seconds": 2.9665784118697047,
+      "temporary_root_removed": true,
+      "unit_inactive": true
+    },
+    {
+      "binary_sha256": "eb265fec86b8de1323d22a8741512884351ebfa68ec26e3cfb24d50a6c4ece9c",
+      "checks": 48,
+      "exact_children_absent": true,
+      "hashes_verified": true,
+      "memory_events": {
+        "high": "0",
+        "low": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_group_kill": "0",
+        "oom_kill": "0"
+      },
+      "native_environment": {
+        "LANCE_CPU_THREADS": "2",
+        "LANCE_DEFAULT_IO_BUFFER_SIZE": "16777216",
+        "LANCE_SHUFFLE_BATCH_BYTES": "16777216",
+        "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES": "0"
+      },
+      "rss_max_bytes": 178819072,
+      "samples": 13,
+      "seconds": 11.764819968491793,
+      "temporary_root_removed": true,
+      "unit_inactive": true
+    }
+  ],
+  "release_unit_tests": 5,
+  "retained_failures": [
+    "unknown lifecycle command",
+    "read-only disk admission",
+    "attempt-relative progress",
+    "transient procfs permission denial"
+  ],
+  "rss_max_bytes": 117989376,
+  "samples": 16,
+  "seconds": 14.640569255687296,
+  "source_identity": {
+    "base": "35363abc9a44eb45c92d21e0f36b2f42238e628d",
+    "binary_sha256": "93da64a225a3b13723d43141ef56f314f311756fddf1dcff8c68d96026012bdd",
+    "files": {
+      "spikes/fallback/Cargo.lock": "1be4d933e0e27dbe685febc0ce37ef1e3eb03672a11f1895899f385739807fa2",
+      "spikes/fallback/Cargo.toml": "fabb589543ff7773ec767ba39762441ff2e7416dc591ad769b4c775ed1a4ff89",
+      "spikes/fallback/check_lifecycle.py": "ff20e2a051eedef00e5626c0949ec5f8cf3fd26947964ed47bc5b66f5a885088",
+      "spikes/fallback/check_search.py": "62aac27ecd5d39da2812845b39db3ca52e966bfdc9b2663c78ec4b63cc5a3ba1",
+      "spikes/fallback/src/authority.rs": "9a34d575af0f69a6da25845b09192b9e75d5da60fd92358e64773dce69ab181b",
+      "spikes/fallback/src/authority/oracle.rs": "50456afb9d7b51a79d5cdee5e1bbd2877bd7ca20bd4a26c3fd28426d97fd456c",
+      "spikes/fallback/src/load.rs": "fd9d8f5d47ce9dd40772b42cdaab6b8833d0931c434c47083a1196510c1dba50",
+      "spikes/fallback/src/main.rs": "9739f63b1c4ee343e5944aad50b3638b4dc5691a12f10903a1737eaab40e0383",
+      "spikes/fallback/src/search.rs": "7a5055bb891277be0258459a3d681701bbb745e9533f2753c52aaa3e8f0e3070",
+      "spikes/fallback/src/search/changes.rs": "ffcfeb5e0d3bbb152b8a8946029f3d34cd194bc1b715109aa3d19be9f7d2073a"
+    }
+  },
+  "status": "passed_bounded_lifecycle",
+  "temporary_root_removed": true,
+  "unit_inactive": true
+}

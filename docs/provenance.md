@@ -6,3 +6,14 @@
 - 初始化时检查本地 `mempal/LICENSE` 与 `Cargo.toml`：MIT，原版权标记为 `Copyright (c) 2026 Alex`。
 - **目前没有复制 mempal 源代码。** 后续若移植代码，在此登记源仓库、不可变 commit、源/目标路径、改动及适用的 MIT 版权与许可文本。数据迁移须只读并由 MVP-025 验收。
 - Apache-2.0 许可证全文来自 GitHub licenses API 的 `apache-2.0` 模板；项目版权见 `NOTICE`。
+- 存储诊断的 `docs/benchmarks/results/visibility-diagnostic/*invalidation*/input.jsonl` 是八条公开数据的摘录，来源于 [Qdrant 的 DBpedia 数据集](https://huggingface.co/datasets/Qdrant/dbpedia-entities-openai3-text-embedding-3-large-1536-1M/tree/4a9731217921bc476a0f03544f11f22ae4903fa5)。原文标题与正文合并，向量转换为 float32，增加诊断 key/partition；未改写正文含义。数据集标记 MIT，DBpedia 原文遵循 CC-BY-SA-4.0；这些数据保留来源许可，不改为项目代码的 Apache-2.0。固定源文件与校验和见 [sources.json](../spikes/data/sources.json)，选取文件的校验和见相邻 `admission.json` 与 `result.json`。
+- `docs/benchmarks/results/generation-diagnostic/` 的请求记录重用同一公开摘录与向量，适用上述来源许可；模型来源指纹绑定发布者仓库、固定版本、预计算时间与 float32 表示。该实验未调用模型提供商。
+- `docs/benchmarks/results/corpus-backfill-diagnostic/` 复用上述八条公开记录，并加入 17 条明确标为 synthetic 的小型回填测试文本；这些测试文本不计入完整语料规模。请求、原文一致性结果与向量结果保留相同数据来源许可。
+- `docs/benchmarks/results/corpus-views-diagnostic/` 延续上述公开摘录与 synthetic 测试文本，保留当前/历史视图、权限与并发诊断的请求及结果；适用相同来源许可，均不替代完整语料验收。
+- `docs/benchmarks/results/corpus-current-diagnostic/` 复用相同公开摘录、向量和 synthetic 文本，新增固定来源的 current 内容校验及分页诊断；失败运行、临时性能测量源码和最终结果均保留，数据继续适用上述来源许可。
+- `docs/benchmarks/results/generation-workload-diagnostic/` 使用上述八条公开记录及其预计算向量，另有明确排除于语料规模的仅文本历史/负载数据；未调用模型或伪造向量。公开摘录仍遵循上述来源许可。
+- `docs/benchmarks/results/generation-runner-diagnostic/` 复用上述八条公开记录的导入与回填测试，来源许可不变；`full-import-zstd-v1/` 保存完整公开语料导入的命令、哈希和资源观测，不包含私有用户会话。
+- `docs/benchmarks/results/disk-admission-diagnostic/` 复用相同公开摘录与明确标记的合成变更，记录磁盘准入、进程恢复及混合负载；原始数据许可与上述来源相同。
+- `docs/benchmarks/results/text-query-population/` 保存 FineWeb-Edu 固定版本的 512 个检索词、正文哈希和全局记录位置，不包含向量或完整正文。来源版本见 `spikes/data/sources.json`；FineWeb-Edu 数据集遵循 ODC-BY，原文权利仍归原权利人，不改为 Apache-2.0。
+- `docs/benchmarks/results/source-key-diagnostic/` 复用上述八条公开 DBpedia 记录、预计算向量和明确标记的合成测试文本，验证恢复后的来源、scope 与权限；沿用相同数据许可。
+- `docs/benchmarks/results/mixed-query-diagnostic/` 的负载使用上述八条公开 DBpedia 记录与八条明确标为 synthetic 的无向量文本。完整查询元数据另含 FineWeb-Edu 的来源哈希与检索词；沿用上述 MIT/CC-BY-SA-4.0 与 ODC-BY 来源许可，未调用模型或伪造测试负载向量。

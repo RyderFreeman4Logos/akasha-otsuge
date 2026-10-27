@@ -1,0 +1,204 @@
+#!/usr/bin/env python3
+"""Native corpus backfill, cross-store crash reconciliation and indexed queries."""
+import hashlib
+import json
+import os
+import pathlib
+import selectors
+import subprocess
+import sys
+import tempfile
+import time
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'helix'))
+from run_case import digest, process_identity, publish
+
+
+def main():
+    binary, output = pathlib.Path(sys.argv[1]).resolve(strict=True), pathlib.Path(sys.argv[2]).resolve()
+    legacy = pathlib.Path(sys.argv[3]).resolve(strict=True) if len(sys.argv) == 4 else None
+    selected_binary = binary
+    total = 100 if legacy else 85
+    output.mkdir(mode=0o700)
+    (output / 'OWNER').write_text('akasha-otsuge MVP-003 fallback search receipts\n')
+    records, started = [], time.monotonic()
+    with tempfile.TemporaryDirectory(prefix='akasha-fallback-search-') as temporary:
+        root = pathlib.Path(temporary)
+        (root / 'OWNER').write_text('akasha-otsuge MVP-003 owned corpus import and database\n')
+        database, source, manifest, request = [root / n for n in ('database', 'source.jsonl', 'manifest.json', 'request.json')]
+        publish(output / 'admission.json', dict(binary_sha256=digest(binary),
+            harness_sha256=digest(pathlib.Path(__file__)), controller=process_identity(os.getpid()),
+            legacy_binary_sha256=digest(legacy) if legacy else None,
+            temporary_root=temporary, scope='1057 synthetic corpus records; excluded from full-scale accounting'))
+        sha, size, body_size = hashlib.sha256(), 0, 0
+        with source.open('xb') as stream:
+            for i in range(1057):
+                body = ('beaconfortytwo ' if i == 42 else 'ordinary astronomy ') + 'x' * 20480
+                row = dict(key=f'search:{i}', body=body, partition=f'p{i % 8}',
+                           embedding=[float(j == i) for j in range(1536)])
+                raw = (json.dumps(row, separators=(',', ':')) + '\n').encode()
+                stream.write(raw); sha.update(raw); size += len(raw); body_size += len(body)
+        bundle = dict(model='synthetic-basis-1536', model_fingerprint='a' * 64,
+                      dimension=1536, chunker='whole-record-v1', schema=1)
+        manifest.write_text(json.dumps(dict(embedding_bundle=bundle,corpus=dict(documents=1057, vectors=1057,
+            prepared_bytes=size, prepared_sha256=sha.hexdigest(), indexed_body_utf8_bytes=body_size))))
+
+        def invoke(*arguments, kill=None, error=None, overrides=None):
+            name = f'{len(records):03d}'
+            command = [str(selected_binary), str(database), *map(str, arguments)]
+            env = dict(os.environ, AKASHA_SPIKE_PROFILE='low', LANCE_CPU_THREADS='2',
+                       AKASHA_SPIKE_INDEX_OBSERVE_SECONDS='600')
+            env.pop('AKASHA_SPIKE_DISK_RESERVE_BYTES', None)
+            env.update(overrides or {})
+            with (output / (name + '.stdout')).open('xb') as stdout:
+                child = subprocess.Popen(command, stdout=stdout, stderr=subprocess.PIPE,
+                    env=env)
+                identity, prefix = process_identity(child.pid), b''
+                record = dict(command=command, child=identity, phase='running',
+                    request=json.loads(request.read_text()) if arguments[0] == '--generation' else None,
+                    kill=kill, expected_error=error, config_overrides=overrides)
+                records.append(record)
+                publish(output / 'commands.json', records)
+                try:
+                    if kill:
+                        with selectors.DefaultSelector() as selector:
+                            selector.register(child.stderr, selectors.EVENT_READ)
+                            until = time.monotonic() + 180
+                            while time.monotonic() < until:
+                                assert child.poll() is None, prefix
+                                if selector.select(timeout=1):
+                                    prefix += os.read(child.stderr.fileno(), 4096)
+                                    if f'PROBE_CHECKPOINT:{kill}\n'.encode() in prefix:
+                                        break
+                            else:
+                                raise TimeoutError('derived checkpoint absent')
+                        assert process_identity(child.pid)['start_ticks'] == identity['start_ticks']
+                        child.kill()
+                    _, tail = child.communicate(timeout=600)
+                    (output / (name + '.stderr')).write_bytes(prefix + tail)
+                    record.update(phase='completed', exit=child.returncode)
+                    publish(output / 'commands.json', records)
+                    assert child.returncode == (-9 if kill else 1 if error else 0), (name, tail[-2000:])
+                    if error:
+                        assert error.encode() in tail, (name, tail[-2000:])
+                finally:
+                    if child.poll() is None:
+                        child.kill()
+                    child.communicate(timeout=10)
+            assert process_identity(child.pid) is None
+            elapsed = time.monotonic() - started
+            publish(output / 'progress.json', dict(phase=name, completed=len(records), total=total,
+                elapsed_s=elapsed, rate_per_s=len(records)/elapsed,
+                eta_s=max(0, total-len(records))*elapsed/len(records)))
+            if not kill and not error:
+                return json.loads((output / (name + '.stdout')).read_text())
+
+        def call(op, generation=1, kill=None, error=None, overrides=None, **fields):
+            request.write_text(json.dumps(dict(op=op, generation=generation, **fields)))
+            return invoke('--generation', request, kill=kill, error=error, overrides=overrides)
+
+        assert invoke('--load', source, manifest)['documents'] == 1057
+        state = call('begin_corpus', bundle=bundle, manifest=str(manifest))
+        assert state['cursor'] == 0 and not state['ready']
+        assert call('begin', bundle=bundle) == state
+        call('begin', bundle=dict(bundle, model='different'), error='corpus encoder/chunker provenance mismatch')
+        call('query', bundle=bundle, scope=2, term='beaconfortytwo', error='not ready')
+        state = call('backfill', waves=100)
+        assert state['cursor'] == state['vector_rows'] == 1057 and state['pending'] is None
+        ready = call('build')
+        assert ready['ready'] and call('build') == ready
+        assert call('query', bundle=bundle, scope=2, term='beaconfortytwo')['ids'] == [1_000_042]
+        assert call('query', bundle=bundle, scope=0, term='beaconfortytwo')['ids'] == []
+        assert ready['text_layout'] == 'scope_columns'
+        for scope in range(8):
+            ids = call('query', bundle=bundle, scope=scope, term='astronomy')['ids']
+            assert ids and all((memory-1_000_000) % 8 == scope for memory in ids)
+        vector = [1.0] + [0.0] * 1535
+        assert call('query', bundle=bundle, scope=0, vector=vector)['ids'][0] == 1_000_000
+        call('query', bundle=dict(bundle, model='other'), scope=0, vector=vector, error='bundle mismatch')
+        call('query', bundle=bundle, scope=0, vector=[0.0] * 1536, error='invalid search request')
+        call('backfill', waves=0, error='invalid wave count')
+        for generation, barrier in enumerate(('before-text', 'after-text', 'after-vector', 'after-cursor'), 2):
+            call('begin', generation, bundle=bundle)
+            call('backfill', generation, waves=100, hold=barrier, kill=barrier)
+            interrupted = call('status', generation)
+            assert interrupted['cursor'] < 1057 and not interrupted['ready']
+            state = call('backfill', generation, waves=100)
+            assert state['cursor'] == state['vector_rows'] == 1057 and state['pending'] is None
+            ready = call('build', generation)
+            assert ready['ready']
+            assert call('query', generation, bundle=bundle, scope=0, vector=vector)['ids'][0] == 1_000_000
+        call('begin', 6, bundle=bundle)
+        call('backfill', 6, waves=100, hold='before-text', kill='before-text',
+             overrides={'AKASHA_SPIKE_INDEX_OBSERVE_SECONDS':'1'})
+        expired = call('status', 6)
+        time.sleep(1.1)
+        call('backfill', 6, waves=100, error='original operation deadline expired')
+        assert call('status', 6) == expired, 'resume extended the original deadline'
+        assert call('query', bundle=bundle, scope=2, term='beaconfortytwo')['ids'] == [1_000_042]
+        call('status', overrides={'AKASHA_SPIKE_INDEX_OBSERVE_SECONDS':'0'}, error='index observation seconds')
+        assert call('status', overrides={'AKASHA_SPIKE_DISK_RESERVE_BYTES':str(2**64-1)})['ready']
+        call('begin', 7, bundle=bundle, overrides={'AKASHA_SPIKE_DISK_RESERVE_BYTES':str(2**64-1)}, error='disk reservation')
+        assert invoke('verify-import')['prefix'] == sha.hexdigest()
+        if legacy:
+            database = root / 'legacy-database'
+            selected_binary = legacy
+            invoke('--load', source, manifest)
+            call('begin', bundle=bundle)
+            call('backfill', waves=100)
+            call('build')
+            selected_binary = binary
+            call('begin', bundle=bundle, manifest=str(manifest))
+            assert call('status')['text_layout'] == 'legacy'
+            assert call('build')['text_layout'] == 'legacy'
+            for scope in range(8):
+                ids = call('query', bundle=bundle, scope=scope, term='astronomy')['ids']
+                assert ids and all((memory-1_000_000) % 8 == scope for memory in ids)
+        database = root / 'database'
+        call('begin', 8, bundle=bundle)
+        call('backfill', 8, waves=100)
+        call('build', 8)
+        assert call('query', 8, bundle=bundle, scope=0, term='astronomy')['ids']
+        vector = [1.0] + [0.0] * 1535
+        assert call('query', 8, bundle=bundle, scope=0, vector=vector)['ids'][0] == 1_000_000
+        tokens = sorted((database / 'derived/g8_text.lance/_indices').rglob('*tokens.lance'))
+        vector_files = [p for p in (database / 'derived/g8_vector.lance/_indices').rglob('*') if p.is_file()]
+        assert len(tokens) >= 8
+        assert vector_files
+        damaged = []
+        for path in tokens + vector_files:
+            before = dict(file=str(path.relative_to(database)), bytes=path.stat().st_size, sha256=digest(path))
+            with path.open('wb') as target:
+                target.flush(); os.fsync(target.fileno())
+            damaged.append(before | dict(damaged_sha256=digest(path)))
+        publish(output / 'derived-corruption.json', dict(fault='truncate owned generation8 text-token and vector-index files after native exit', files=damaged))
+        call('query', 8, bundle=bundle, scope=0, term='astronomy', error='object of size 0 bytes')
+        call('query', 8, bundle=bundle, scope=0, vector=vector, error='Lance')
+        assert invoke('verify-import')['prefix'] == sha.hexdigest()
+        quarantine = root / 'quarantined-generation8'
+        quarantine.mkdir()
+        for name in ['g8_text.lance', 'g8_vector.lance']:
+            (database / 'derived' / name).rename(quarantine / name)
+        call('query', 8, bundle=bundle, scope=0, term='astronomy', error='g8_text')
+        call('begin', 9, bundle=bundle)
+        call('backfill', 9, waves=100)
+        assert call('build', 9)['ready']
+        for scope in range(8):
+            ids = call('query', 9, bundle=bundle, scope=scope, term='astronomy')['ids']
+            assert ids and all((memory-1_000_000) % 8 == scope for memory in ids)
+            vector = [float(i == scope) for i in range(1536)]
+            assert call('query', 9, bundle=bundle, scope=scope, vector=vector)['ids'][0] == 1_000_000 + scope
+        assert invoke('verify-import')['prefix'] == sha.hexdigest()
+        assert len(records) == total, len(records)
+    elapsed = time.monotonic() - started
+    publish(output / 'progress.json', dict(phase='completed', completed=total, total=total,
+        elapsed_s=elapsed, rate_per_s=total/elapsed, eta_s=0))
+    publish(output / 'result.json', dict(status='passed', checks=total, seconds=elapsed, records=records,
+        temporary_root_removed=not pathlib.Path(temporary).exists(),
+        artifact_sha256={str(p.relative_to(output)):digest(p) for p in output.iterdir() if p.is_file()},
+        not_tested=['full corpus', 'ordinary concurrent changes', 'active generation switch', 'automatic quarantine in product', 'power loss']))
+    print(json.dumps(dict(status='passed', checks=total, seconds=elapsed)))
+
+
+if __name__ == '__main__':
+    main()

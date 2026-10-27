@@ -1,0 +1,105 @@
+{
+  "attempts": [
+    {
+      "consumer_command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=43200",
+        "--unit=akasha-import-79fb780445264d7ebec8e7c308a067a6",
+        "-p",
+        "MemoryMax=2147483648",
+        "-p",
+        "Environment=AKASHA_SPIKE_PROFILE=high",
+        "/home/obj/.local/bin/python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/measure.py",
+        "/tmp/akasha-otsuge-storage-20261022/full-import-v1/79fb780445264d7ebec8e7c308a067a6/memory.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/full-import-v1/probe",
+        "/tmp/akasha-otsuge-storage-20261022/full-import-v1/database",
+        "--load",
+        "/dev/stdin",
+        "/tmp/akasha-otsuge-storage-20261022/full-corpus-v2.json"
+      ],
+      "consumer_exit": 0,
+      "elapsed_seconds": 3873.829285269603,
+      "failure": "disk reservation reached; stop before consuming next-generation or safety reserve",
+      "id": "79fb780445264d7ebec8e7c308a067a6",
+      "phase": "failed",
+      "producer_command": [
+        "systemd-run",
+        "--user",
+        "--quiet",
+        "--wait",
+        "--pipe",
+        "--collect",
+        "-p",
+        "MemorySwapMax=0",
+        "-p",
+        "RuntimeMaxSec=43200",
+        "--unit=akasha-stream-79fb780445264d7ebec8e7c308a067a6",
+        "-p",
+        "MemoryMax=8589934592",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/data-env/bin/python",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/data/prepare_corpus.py",
+        "stream",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/corpus-full-v1",
+        "/tmp/akasha-otsuge-storage-20261022/full-corpus-v2.json"
+      ],
+      "producer_exit": 0,
+      "started_unix_s": 1792743303.3327785,
+      "units": [
+        "akasha-stream-79fb780445264d7ebec8e7c308a067a6",
+        "akasha-import-79fb780445264d7ebec8e7c308a067a6"
+      ]
+    }
+  ],
+  "binary_sha256": "18b13ffbdea345996121bdac8ad0515f8f57e0b37a7385091252696f86576991",
+  "controller": {
+    "pid": 3606886,
+    "start_ticks": "456120002",
+    "state": "R"
+  },
+  "identity": {
+    "controller_sha256": "e5ba51a28a143904b01895b7fad5dfa60062d1f2df5e8afd09a4337a5cac966e",
+    "data_python": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/data-env/bin/python",
+    "disk_plan": {
+      "authority_bytes": 75000000000,
+      "current_index_bytes": 45000000000,
+      "free_reserve_bytes": 32212254720,
+      "next_index_bytes": 45000000000,
+      "scratch_bytes": 4000000000
+    },
+    "engine_memory_max": 2147483648,
+    "input": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/corpus-full-v1",
+    "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+    "observer_sha256": "a3ef0fb18220f8b0145ebd96f131c5ef9a5e28a0ce2ac5402b99a88d03bf6160",
+    "preparer_sha256": "d222cf1ee8601aa6f7e35832b7065a9534fbfeb7995a7bbf77059c1aa9748b02",
+    "producer_memory_max": 8589934592,
+    "profile": "high",
+    "runtime_max_seconds": 43200
+  },
+  "phase": "failed",
+  "result": {
+    "acceptance": "not_run",
+    "artifact_sha256": {
+      "79fb780445264d7ebec8e7c308a067a6/consumer.log": "c41c878a6be21bad2ce8486ed4a8e27c504441ca8300308d013fbf0faebeb915",
+      "79fb780445264d7ebec8e7c308a067a6/memory.jsonl": "05f1d12688d8e53348b4fc38aca3917fbb20349d8640a7352d6f75aeeefa6ff8",
+      "79fb780445264d7ebec8e7c308a067a6/producer.log": "e0e6ca83d2c09f17cd7df0b9a2121c1fb224243b99cd3690d9cbfbf25931faab",
+      "database/import-progress.json": "4485a392748340826e7818ac48c5999be5a636680a7b46c589d97ac530f8242f"
+    },
+    "attempt": "79fb780445264d7ebec8e7c308a067a6",
+    "binary_sha256": "18b13ffbdea345996121bdac8ad0515f8f57e0b37a7385091252696f86576991",
+    "documents": 11428831,
+    "elapsed_seconds": 3873.829285269603,
+    "failure": "disk reservation reached; stop before consuming next-generation or safety reserve",
+    "indexes": "not_built",
+    "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+    "status": "failed"
+  }
+}

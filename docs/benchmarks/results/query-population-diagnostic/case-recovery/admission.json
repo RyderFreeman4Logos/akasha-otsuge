@@ -1,0 +1,15 @@
+{
+  "binary_sha256": "25811689b85801e5d557283f44d1c05c79a699aa6b34773fa92715710a626094",
+  "configs": {
+    "completed": "9df4b388083dad8927019256f32f03b6e7633c360b065c927eeaa701867f5510",
+    "interrupted": "048086cc7b3b745840485f0e82b8dfea698766e7831928ee90c92ee8e3f0a581",
+    "successor": "fda0dda7daa933a8d014bdebb5dbd40065866bcad02964c8c583ac7dcda0fcaf"
+  },
+  "controller_sha256": "b87ac9240266e6d91da5a40cc48fc4ee565a865a5bedacf8535781f710d916d2",
+  "pid": 3654288,
+  "process": {
+    "pid": 3654288,
+    "start_ticks": "456313694",
+    "state": "R"
+  }
+}

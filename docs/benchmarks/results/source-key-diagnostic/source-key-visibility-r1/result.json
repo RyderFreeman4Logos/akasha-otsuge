@@ -1,0 +1,132 @@
+{
+  "artifact_sha256": {
+    "OWNER": "63cb401aa19d070cb5c6ee9185011c4375dadb48998ac10c39df9ef2e14e8e04",
+    "admission.json": "fec5e1a85dd6f8de1c10b15ecc5cfc4a00358bf5478d67eb4dc2ca3df8fd9d8a",
+    "import-command.json": "0c121fe479a19f8f20fff07961244b8aa71cb908a245acaa768372983363eb54",
+    "import-memory.jsonl": "e14aba330b5bf6cd0349e4b3620603640debba0b957d4233112eafec5013de41",
+    "import.log": "30be4a512d9dd14efcb76bd1e78c56a7f33ac30757e0567887e0a259b425eb01",
+    "indexes-command.json": "c2b34c70acf9ad08e1d023fd9b44a7705649c17a0445075086c114d1688f328f",
+    "indexes-memory.jsonl": "96d2fda96adfb30191b3d2e58d4b60e0f7e464785477d363a5cb05033561fb93",
+    "indexes.log": "b15c51a85e8d2dff104c9c00940a1d225f3c3db318a3cbdcdcd5f1a5646759e5",
+    "input.jsonl": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+    "progress.json": "c0917dc4b933d293ee29f0401e215d36f1bb7c5509f6ce8e5dc11327142a7412",
+    "reopen-command.json": "1458ac9bc114ae1d3e72375eaad362030e92066a3a823dc34acf3cf39c57eb5b",
+    "reopen-memory.jsonl": "5ad4ff32a7951c878f5bca4418a89fc02567d107bcc323d9941a55cd2aae2682",
+    "reopen.log": "26c424d06148a6e4cfafe723ad4d82fb07eb2eb0205dd13e0f179f5c89f24c38",
+    "seed-command.json": "88fe5a8229aa7e144ba47bca9e92e29757c5e2026d334b74483c93dc9f012c11",
+    "seed-memory.jsonl": "c5706285a15fdb52730b74b0a4e13d609660ef8eeb06699f8389ccae3f63693c",
+    "seed.log": "36836ba061a5ecc3a37e6ca6863f552ffaaa0c08d18be1b61915d860f3b42ba2"
+  },
+  "native": {
+    "import": {
+      "content_bytes": 3588,
+      "documents": 8,
+      "elapsed_seconds": 0.022913033,
+      "phase": "import_complete",
+      "prepared_sha256": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+      "resumed_documents": 0
+    },
+    "indexes": {
+      "elapsed_seconds": 1.585547255,
+      "phase": "indexes_built",
+      "text": {
+        "operation": {
+          "attempt": 43,
+          "family": "text",
+          "generation": "1",
+          "index_id": "1",
+          "operation_id": "f8c65161-30c8-41ff-bd22-bc9cd6c5e498",
+          "operation_kind": "build",
+          "progress": {
+            "entities": "16",
+            "input_bytes": "165328",
+            "output_bytes": "67691",
+            "output_operations": "469"
+          },
+          "stage": "activate",
+          "status": "succeeded"
+        }
+      },
+      "vector": {
+        "operation": {
+          "attempt": 3,
+          "family": "vector",
+          "generation": "1",
+          "index_id": "2",
+          "operation_id": "1f1d4549-c8a3-4e71-ab54-a2ecd778e3f6",
+          "operation_kind": "build",
+          "progress": {
+            "entities": "24",
+            "input_bytes": "55864",
+            "output_bytes": "53136",
+            "output_operations": "88"
+          },
+          "stage": "activate",
+          "status": "succeeded"
+        }
+      }
+    },
+    "reopen": {
+      "changes": 4,
+      "checks": [
+        "stale_bm25",
+        "stale_ann",
+        "old_read_seq_new_validation",
+        "scope_move",
+        "retraction",
+        "restoration_does_not_revive_old_index_revision",
+        "historical_content_preserved",
+        "live_permission_revocation",
+        "principal_isolation",
+        "default_deny",
+        "minimum_commit_point",
+        "permission_idempotency",
+        "invalid_or_missing_head_explicit_error_on_reopen",
+        "orphaned_future_revision_error"
+      ],
+      "fixture_sha256": "365a3881c4deefc1f5a9b4194e98198e29a09c3128cf5b1e3f6621fffcfd07a6",
+      "memory": 1000000,
+      "not_tested": [
+        "full_size",
+        "indexed_receipts",
+        "generation_watermarks",
+        "power_loss"
+      ],
+      "phase": "separate_process_reopen",
+      "scope": 0,
+      "status": "passed"
+    },
+    "seed": {
+      "changes": 4,
+      "checks": [
+        "stale_bm25",
+        "stale_ann",
+        "old_read_seq_new_validation",
+        "scope_move",
+        "retraction",
+        "restoration_does_not_revive_old_index_revision",
+        "historical_content_preserved",
+        "live_permission_revocation",
+        "principal_isolation",
+        "default_deny",
+        "minimum_commit_point",
+        "permission_idempotency",
+        "invalid_or_missing_head_explicit_error_on_reopen",
+        "orphaned_future_revision_error"
+      ],
+      "fixture_sha256": "365a3881c4deefc1f5a9b4194e98198e29a09c3128cf5b1e3f6621fffcfd07a6",
+      "memory": 1000000,
+      "not_tested": [
+        "full_size",
+        "indexed_receipts",
+        "generation_watermarks",
+        "power_loss"
+      ],
+      "phase": "seed_and_invalidate",
+      "scope": 0,
+      "status": "passed"
+    }
+  },
+  "seconds": 6.664251112379134,
+  "status": "passed"
+}

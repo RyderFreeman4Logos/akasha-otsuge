@@ -1,0 +1,39 @@
+{
+  "active": 2,
+  "active_index_allocations_unchanged": true,
+  "after_witnesses": 42,
+  "allocation_note": "inode st_blocks is not exclusive Btrfs allocation; filesystem free includes concurrent host activity",
+  "archive_bytes": 838914,
+  "archive_files": 329,
+  "archive_sha256": "eeca8af42ab2abae02ffd31c4d0485aec3f21b4bb72bc888fc1a36e33e8b657c",
+  "artifacts_verified": true,
+  "authority_allocated_bytes_delta": -5509120,
+  "authority_history_witnesses_unchanged": true,
+  "before_witnesses": 42,
+  "binary_sha256": "a0edd192cb4a85efa74221cbc8def58a1fbb002523eecaf05da10981c9adfe7e",
+  "cgroup_peak_bytes": 68915200,
+  "committed": 260472,
+  "completed_controller_reuse": "verified before retiring disposable binary copy; no later controller reuse claimed",
+  "completed_reuse_verified": true,
+  "exact_json_matches": true,
+  "exact_processes_gone": true,
+  "failed_controls": [
+    "r1 service cwd omitted; import failed before opening database",
+    "r2 before native42witnesses passed; collector mistook string zero for integer; fixed collector reused same receipts"
+  ],
+  "free_bytes_after": 426862743552,
+  "free_bytes_before": 378895790080,
+  "free_bytes_delta": 47966953472,
+  "generation": 1,
+  "not_proven": [
+    "online retirement",
+    "expired retirement deadline extension",
+    "concurrent full rebuild physical peak"
+  ],
+  "retired_generation_allocated_bytes": 48655896576,
+  "rss_max_bytes": 50991104,
+  "scratch_removed": true,
+  "seconds": 4.333429771475494,
+  "source_head": "d0aa672e17045f98360725ddb0035a01e19f2e9c",
+  "status": "passed_full_offline_retirement"
+}

@@ -1,0 +1,52 @@
+{
+  "observed_utc": "2026-10-23T14:19:11.399297+00:00",
+  "result": {
+    "acceptance": "not_run",
+    "artifact_sha256": {
+      "66fad502824f47adadd68d76e3919405/consumer.log": "e9fb39e005df980a15ca03f688fa9fab212e68e2dedf06ce570925d137fb69a8",
+      "66fad502824f47adadd68d76e3919405/memory.jsonl": "cd1ac7f6693b17e28395d0e6033e9b92dec28ff484a16c4f783bd4656c8cb7a6",
+      "66fad502824f47adadd68d76e3919405/producer.log": "5548cd1b19a94425748b2a4e26ac0240573187192a5d23ce9563dd111fcb08c4",
+      "database/import-progress.json": "4957586fe81af39bba2d0cd2b0a0df3ea50b1b3ee4b5d4b487dab99110f0a271"
+    },
+    "attempt": "66fad502824f47adadd68d76e3919405",
+    "binary_sha256": "c694650e219fc4e20d1cd06e4933096cae421a1d9bac5668bd1b0b392b86318e",
+    "documents": 11428831,
+    "elapsed_seconds": 12557.003977064975,
+    "failure": null,
+    "indexes": "not_built",
+    "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+    "status": "passed"
+  },
+  "import_progress": {
+    "completed": 11428831,
+    "content_bytes": 50001002783,
+    "durable_documents": 11428831,
+    "elapsed_s": 12554.424472969,
+    "eta_s": 0.0,
+    "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+    "phase": "import_complete",
+    "pid": 3803354,
+    "rate_per_s": 534.1351182157499,
+    "start_ticks": "457029219",
+    "total": 11428831
+  },
+  "samples": 12474,
+  "rss_max_bytes": 886087680,
+  "rss_p99_bytes": 876859392,
+  "database_allocated_bytes": 48987971584,
+  "free_bytes": 163866767360,
+  "observer_limits": {
+    "memory.high": "max",
+    "memory.max": "2147483648",
+    "memory.swap.max": "0"
+  },
+  "exit": [
+    {
+      "event": "exit",
+      "code": 0,
+      "seconds": 12556.175578076392
+    }
+  ],
+  "full_indexes": "not_built",
+  "both30minuteprofiles": "not_run"
+}

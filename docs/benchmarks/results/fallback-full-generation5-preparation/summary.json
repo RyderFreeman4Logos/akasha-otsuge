@@ -1,0 +1,137 @@
+{
+  "active": 3,
+  "archive_bytes": 816791,
+  "archive_files": 517,
+  "archive_sha256": "06f2c2881c4200282bcfd5dff90f8a8620f85a754bb703662398cbf1b009d7ad",
+  "candidate_state_checks": {
+    "after": {
+      "exact_native_gone": true,
+      "reply": {
+        "backfill_deadline_ms": 1792835028058,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 3
+        },
+        "cursor": 11428831,
+        "documents": 11428831,
+        "generation": 4,
+        "index_deadline_ms": 1792836176755,
+        "pending": null,
+        "ready": false,
+        "retirement": {
+          "completed": 2,
+          "deadline_ms": 1792842851564
+        },
+        "source": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+        "text_layout": "scope_columns",
+        "text_version": 5014,
+        "vector_rows": 1000000,
+        "vector_version": 1973,
+        "vectors": 1000000
+      },
+      "rss_max_bytes": 24170496,
+      "scratch_removed": true,
+      "status": "passed",
+      "unit_inactive": true
+    },
+    "before": {
+      "exact_native_gone": true,
+      "reply": {
+        "backfill_deadline_ms": 1792835028058,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 3
+        },
+        "cursor": 11428831,
+        "documents": 11428831,
+        "generation": 4,
+        "index_deadline_ms": 1792836176755,
+        "pending": null,
+        "ready": false,
+        "source": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+        "text_layout": "scope_columns",
+        "text_version": 5014,
+        "vector_rows": 1000000,
+        "vector_version": 1973,
+        "vectors": 1000000
+      },
+      "rss_max_bytes": 24358912,
+      "scratch_removed": true,
+      "status": "passed",
+      "unit_inactive": true
+    }
+  },
+  "committed": 309711,
+  "comparisons": "66 before and66 after witnesses; non-query responses exact; query candidate sets and all other fields exact; raw ranking order retained",
+  "disk_note": "Inode allocation is not exclusive Btrfs allocation; filesystem free-space delta includes other host activity.",
+  "disposable_copies_removed": true,
+  "free_bytes": 426668142592,
+  "free_bytes_delta_after_cleanup": 40334372864,
+  "generation": 5,
+  "native_sha256": "8f0b2b2f1a6890a78b0efba421176e95e906a4d03607fd5efab8292c00942d00",
+  "not_proven": [
+    "fresh uninterrupted full index build",
+    "full concurrent rebuild performance and resource acceptance",
+    "sole-backend selection"
+  ],
+  "operations": [
+    "retire_generation",
+    "prune_versions",
+    "begin_corpus",
+    "backfill"
+  ],
+  "query_order_changes": [
+    52
+  ],
+  "retired_candidate_original_deadline_preserved": true,
+  "retired_generation4_allocated_bytes": 36299567104,
+  "source_commit": "ddcf1136ea3d2a6b13e104065642d161c2e58a64",
+  "status": "prepared_not_built",
+  "steps": {
+    "backfill": {
+      "artifacts_verified": true,
+      "elapsed_s": 801.7174699530005,
+      "exact_processes_gone": true,
+      "oom_events": 0,
+      "rss_max_bytes": 164487168,
+      "scratch_removed": true,
+      "unit_state": "inactive"
+    },
+    "begin_corpus": {
+      "artifacts_verified": true,
+      "elapsed_s": 2.031761223450303,
+      "exact_processes_gone": true,
+      "oom_events": 0,
+      "rss_max_bytes": 24104960,
+      "scratch_removed": true,
+      "unit_state": "inactive"
+    },
+    "prune_versions": {
+      "artifacts_verified": true,
+      "elapsed_s": 34.03450372070074,
+      "exact_processes_gone": true,
+      "oom_events": 0,
+      "rss_max_bytes": 96702464,
+      "scratch_removed": true,
+      "unit_state": "inactive"
+    },
+    "retire_generation": {
+      "artifacts_verified": true,
+      "elapsed_s": 2.003305164165795,
+      "exact_processes_gone": true,
+      "oom_events": 0,
+      "rss_max_bytes": 24150016,
+      "scratch_removed": true,
+      "unit_state": "inactive"
+    }
+  },
+  "witnesses_after": 66,
+  "witnesses_before": 66,
+  "witnesses_match_except_query_order": true
+}

@@ -1,0 +1,133 @@
+{
+  "binary_sha256": "c694650e219fc4e20d1cd06e4933096cae421a1d9bac5668bd1b0b392b86318e",
+  "history_after_workload": {
+    "binary_sha256": "75562b77915a79736afd74d9d22973aea8cc3e6f9c9ec54521fdf2ece126a7ba",
+    "case": "prior-workload-v2",
+    "changes": 4096,
+    "checks": 5163,
+    "not_tested": [
+      "50GB",
+      "100_clients",
+      "derived_watermark",
+      "live_permission_revocation"
+    ],
+    "phase": "oracle_verified",
+    "seconds": 125.708430965
+  },
+  "implementation": "one native read snapshot validates at most 20 heads plus their latest immutable revisions, including orphaned future revisions; no candidate bodies are materialized",
+  "not_tested": [
+    "full corpus",
+    "30-minute profiles",
+    "generation-specific indexed receipts/watermarks",
+    "physical authority-file corruption",
+    "power loss"
+  ],
+  "prior_binary_sha256": "75562b77915a79736afd74d9d22973aea8cc3e6f9c9ec54521fdf2ece126a7ba",
+  "prior_failures": [
+    "legacy diagnostic documents lack memory IDs: all 87 search errors retained",
+    "native index build reached succeeded in 157.98s but old observer failed on procfs exit race; successor verifies already_active, not a repeated build",
+    "serial candidate head/history validation: write P95 9316ms exceeded unchanged 5000ms threshold; bounded native batch read passes same load at 1932ms"
+  ],
+  "real_invalidation": {
+    "changes": 4,
+    "checks": [
+      "stale_bm25",
+      "stale_ann",
+      "old_read_seq_new_validation",
+      "scope_move",
+      "retraction",
+      "restoration_does_not_revive_old_index_revision",
+      "historical_content_preserved",
+      "live_permission_revocation",
+      "principal_isolation",
+      "default_deny",
+      "minimum_commit_point",
+      "permission_idempotency",
+      "invalid_or_missing_head_explicit_error_on_reopen",
+      "orphaned_future_revision_error"
+    ],
+    "fixture_sha256": "1ec12178668947ebdcc79e3cfa33668748825d6a7b93515134a73555fff2cb1c",
+    "memory": 1000000,
+    "not_tested": [
+      "full_size",
+      "indexed_receipts",
+      "generation_watermarks",
+      "power_loss"
+    ],
+    "phase": "separate_process_reopen",
+    "scope": 0,
+    "status": "passed"
+  },
+  "review": "implementing-agent source self-check, not independent review",
+  "source_documents": 38462,
+  "status": "diagnostic_passed",
+  "workload": {
+    "clients": 100,
+    "content_oracle": {
+      "current_checks": 144,
+      "distinct_commits": 789,
+      "requests": 1698
+    },
+    "drain_s": 0.027766462000002434,
+    "operations": {
+      "ann": {
+        "attempted": 15,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 2154,
+        "successful": 15,
+        "successful_per_s": 0.25,
+        "within_window": 15
+      },
+      "bm25": {
+        "attempted": 72,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 1980,
+        "successful": 72,
+        "successful_per_s": 1.2,
+        "within_window": 72
+      },
+      "correction": {
+        "attempted": 12,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 2112,
+        "successful": 12,
+        "successful_per_s": 0.2,
+        "within_window": 12
+      },
+      "current": {
+        "attempted": 144,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 1880,
+        "successful": 144,
+        "successful_per_s": 2.4,
+        "within_window": 144
+      },
+      "history": {
+        "attempted": 15,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 2049,
+        "successful": 15,
+        "successful_per_s": 0.25,
+        "within_window": 15
+      },
+      "write": {
+        "attempted": 1440,
+        "conflicts": 713,
+        "errors": 0,
+        "p95_upper_ms": 1932,
+        "successful": 727,
+        "successful_per_s": 12.116666666666667,
+        "within_window": 727
+      }
+    },
+    "requests": 1698,
+    "rss_max_bytes": 166715392,
+    "rss_p99_bytes": 166715392,
+    "window_seconds": 60
+  }
+}

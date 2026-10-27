@@ -1,0 +1,78 @@
+FFFFFFFFE
+======================================================================
+ERROR: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (test_workload_oracle.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 68, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    self.assertEqual(verify_requests(root)["derived_current_checks"], 50)
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'derived_current_checks'
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (test_workload_oracle.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (derived='body')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 65, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(derived=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (test_workload_oracle.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (derived='jobs')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 65, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(derived=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (test_workload_oracle.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (derived='generation')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 65, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(derived=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (test_workload_oracle.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (derived='watermark')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 65, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(derived=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (test_workload_oracle.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (derived='commit')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 65, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(derived=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (test_workload_oracle.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (derived='vectors')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 65, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(derived=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (test_workload_oracle.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (derived='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 65, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(derived=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_pinned_content_and_identity_cannot_be_replaced_by_self_report (test_workload_oracle.CorpusCurrentOracle.test_pinned_content_and_identity_cannot_be_replaced_by_self_report) (derived='duplicate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/test_workload_oracle.py", line 65, in test_pinned_content_and_identity_cannot_be_replaced_by_self_report
+    with self.subTest(derived=case), self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.009s
+
+FAILED (failures=8, errors=1)

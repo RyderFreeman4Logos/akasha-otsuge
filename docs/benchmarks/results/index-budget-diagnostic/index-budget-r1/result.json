@@ -1,0 +1,38 @@
+{
+  "not_tested": [
+    "large-index completion time"
+  ],
+  "records": [
+    {
+      "exit": 1,
+      "name": "zero",
+      "value": "0"
+    },
+    {
+      "exit": 1,
+      "name": "too-large",
+      "value": "604801"
+    },
+    {
+      "exit": 1,
+      "name": "negative",
+      "value": "-1"
+    },
+    {
+      "exit": 1,
+      "name": "invalid",
+      "value": "unbounded"
+    },
+    {
+      "exit": 0,
+      "name": "explicit",
+      "value": "172800"
+    },
+    {
+      "exit": 0,
+      "name": "default",
+      "value": null
+    }
+  ],
+  "status": "passed"
+}

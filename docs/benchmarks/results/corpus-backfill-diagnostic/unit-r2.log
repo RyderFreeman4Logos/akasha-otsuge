@@ -1,0 +1,14 @@
+   Compiling akasha-helix-probe v0.0.0 (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix)
+    Finished `release` profile [optimized] target(s) in 11.29s
+     Running unittests src/main.rs (target/storage-spike/release/deps/akasha_helix_probe-23e0d933abb571b5)
+
+running 6 tests
+test generations::corpus::tests::cursor_completion_requires_all_declared_bytes_and_vectors ... ok
+test indexes::tests::observation_budget_is_explicit_and_bounded ... ok
+test workload::tests::full_window_has_all_clients_and_the_frozen_offered_load ... ok
+test profile::tests::high_profile_build_cache_is_explicit_and_staging_remains_bounded ... ok
+test profile::tests::absent_profile_preserves_low_and_invalid_values_fail ... ok
+test generations::tests::completion_prefix_is_bounded_and_cannot_cross_a_gap_or_a_foreign_family ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,249 @@
+{
+  "acknowledgements": {
+    "batches": 156,
+    "commit_seq": 309703,
+    "incomplete_trailing_lines": 1,
+    "seed_acknowledgements": 50,
+    "total_verified": 39876,
+    "unlogged_committed_sequences": [
+      309703
+    ],
+    "workload_acknowledgements": 39826
+  },
+  "archive_bytes": 9859777,
+  "archive_files": 743,
+  "archive_sha256": "9c382c6bb20792eaae210e40484974512c43208b89d12e95d872c393fb857e6c",
+  "candidate": {
+    "generation": 4,
+    "original_index_deadline_ms": 1792836176755,
+    "ready": false
+  },
+  "case_phase": "abandoned",
+  "checks": {
+    "acknowledgements": {
+      "artifacts_verified": true,
+      "commands": 156,
+      "exact_processes_gone": true,
+      "memory_log_sha256": "f97b87d364c5824aa77d18acddb73f628b3e070fb5bac1aeac51dcb064d2ad1d",
+      "result_sha256": "f0c451583bc8f76a2e2ac12719c2c9c9f9646e222bb56e460a64516537a35f22",
+      "sampled_rss_max_bytes": 149041152,
+      "scratch_removed": true,
+      "seconds": 46.58953913860023,
+      "status": "passed",
+      "unit_inactive": true
+    },
+    "drain-3": {
+      "artifacts_verified": true,
+      "commands": 4,
+      "exact_processes_gone": true,
+      "memory_log_sha256": "dc531f37ec46c852419705189a481cf3cb976a905ee2a98941ed9eda9d03223c",
+      "result_sha256": "8bfe0ecc59e5ec1f4cf36a68fe7d8e94644802b982ae6dc5ce03637df6d739cc",
+      "sampled_rss_max_bytes": 42815488,
+      "scratch_removed": true,
+      "seconds": 1.1732644429430366,
+      "status": "passed",
+      "unit_inactive": true
+    },
+    "reconcile": {
+      "artifacts": {
+        "000.request.json": "907ef2784833b811312fa4431581675134a0f4d8fc52034130ede175ce23d531",
+        "000.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "000.stdout": "ca4eaa188029177e93285845c1b5b3ea2dd80c8a96656e6e298c77582c179c86",
+        "001.request.json": "607615e75e4dd5de16feb8d64985a977865bd6312b0ef1f9089e0151569c1614",
+        "001.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "001.stdout": "6e1681188f8adf2b83a756bc66028fd1a797d3690c24d6d8cdbb39b4ca7c76eb",
+        "002.request.json": "1e68c72b0dd225346fe2a7fbb5ee4f11ff90c9644880ddf7d01b8ff28e01fe8f",
+        "002.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "002.stdout": "a5648b48567f043b8ed570eff61c8b8875bc92a8b73fc36ad1d5a49946f1a849",
+        "003.request.json": "3b7de513ef986965aa7cd5e7e41f938fd226e6da166e1c1107c606663ddd70df",
+        "003.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "003.stdout": "767c4350acd9f04bf2815f57bacdfa778ac3f906485bb5b8c3fa3be67c3590da",
+        "004.request.json": "5e295e02549dac24bb379088303e52ee533cc422cdf49781fb5b7aa9e56b14ff",
+        "004.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "004.stdout": "f719f0b02b7879a04c72e97cda8ea9ebc72ddf8f2a0da19b09798395df5cfaf9",
+        "005.request.json": "71096a16309f369a98b778b224db06b393f12102dd94607571e2f15a80d512a0",
+        "005.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "005.stdout": "8b0a41498070c2ab57169d15d49e44bc7ee91f1c0f6001e1bf44aa86602085be",
+        "006.request.json": "1b13f30743bd08a89f90138af2dea80e16acd0aac9b28a90f7f5557fa8960df6",
+        "006.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "006.stdout": "12ec4df887999387c37363ba8026a8c06eeab03ef62154b41301ab6ae9552c07",
+        "007.request.json": "99c10810bd624fa2b310c290924b37d63109327358eb711cef5487c649e767ff",
+        "007.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "007.stdout": "172478458724135437b450a093592ad487b812c31c3e37d82fc0d8e836e0d0f6",
+        "008.request.json": "426aaa14a97859aa809d89f95390075313f3e17f21c4b2b3a9566929f415f1c4",
+        "008.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "008.stdout": "c20010a6b21fe7ae573a4454b00ecce14c046609497129883ba0fbf24342263f",
+        "009.request.json": "b35386cb9fd5134d7d8439fe5f05f186d8f53dd224433ab16bdd3b4aebd29797",
+        "009.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "009.stdout": "0623ff2970036b4df2ee96c00126e509d24bc5b8d868b3096d5544842f071dbe",
+        "010.request.json": "a4dacb75ef0f6cb529516692082c94956ea56a5160c09f1da794e7bce01b4d8d",
+        "010.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "010.stdout": "e3060cbdbdd180fc48993cfeb7d8152b7907ef8a31e6e0f86df84875101320ff",
+        "011.request.json": "dde06d89d4100bb4090e686db17ff4437b1acf75e1d2115a11d0eabe8b1cc2ee",
+        "011.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "011.stdout": "027042fc83ad1be14917f3a6a2a3e9ff47a4ca0eda17619bd41684e2492b5095",
+        "012.request.json": "6fc776dd5fbe316e1dd66f3499ee5a9e08d1d35197044802d6b6f65e41365f4d",
+        "012.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "012.stdout": "1ff87d8a0c516b60cb142e2549d705aae44ad74a77aa0f67b64f6d247276f770",
+        "013.request.json": "95cd5a2f824e1efc926de4991d118372b9efe338c32f73b69ecffc7a40c7cba8",
+        "013.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "013.stdout": "15427cf35c7f0ebd656cf6cc5258774b95220c31983d0e1b0d2f442db72edbd0",
+        "014.request.json": "9d0feeb5bd8670d431a66218c16a8b7ee2016ae7d863491fbab939a564815064",
+        "014.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "014.stdout": "2373ca5e47b4d5dc9d93a1482302ba5245310b9f8619fb0d6d195bbe51b0a656",
+        "015.request.json": "cec2722d47f49e58bc2f73f4b1633df2f9472640a513f7ff5f676af4d7dcf7a2",
+        "015.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "015.stdout": "1b928d057205827ecc7051da8db5d6f8c595238c35f6f045e31e18a0da11da59",
+        "016.request.json": "68fc5c7d4ee0a8f0e80b33b1cb48cb6de0e608c39cc4b6b1016e61c0472fb0c3",
+        "016.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "016.stdout": "d6708afc2da4be525801e46961ec485725fd363d6feef21680fc8b3688856500",
+        "017.request.json": "6b343c6eac2a2afa8baeadd3e61d65ce659c4484081580b5dd68c6f025908137",
+        "017.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "017.stdout": "d1fd90d769ce744dbe518c13eea7ba04847b57b4acff6d4b5cbdc8a95e381d37",
+        "018.request.json": "68e7fe93e1816abe586586960e3aeb6659d6162d19a2d09b60f314094cad13f8",
+        "018.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "018.stdout": "c47613f914786bdbc9dbc20e7296bed5087c91fabe1b8561f6eff25efae87b57",
+        "019.request.json": "422ec9f82a81de5ff92f6d7e8b522eba293231f2af09254cd5e6f20bdc890cc7",
+        "019.stderr": "d9a7f29346886e059be1da9a45dcd530ac01dea7c3f8c960d84c2290641ee905",
+        "019.stdout": "c9e1280520b2d3ee0a859d714e5c6acfaa100ece9ede49fbdf7f9bd2fd27ec71",
+        "OWNER": "4812196feea8be965fecbc8296bdd1093f725c233e6a52f01719b7dbaef85167",
+        "commands.json": "5a3832da5b00cfac406edfaf262d07ba9552059cefd40b40b267d09ce6962698",
+        "progress.json": "264aea5372b9f3f6ebbef80d6552be746ed03374eac4a7ce4915b6a80c5cb88c",
+        "result.json": "0615e8b3c805293f19054ca0c6fcf5dc8d261355bb12ea2ec3184fa66f7e7a86"
+      },
+      "commands": 20,
+      "exact_children_gone": true,
+      "memory_sha256": "b7b9c8f807145e09b12ba717a1c2c411184f68af73d2fb4a7e4e707a48d15d21",
+      "result_sha256": "0615e8b3c805293f19054ca0c6fcf5dc8d261355bb12ea2ec3184fa66f7e7a86",
+      "sampled_rss_max_bytes": 173228032,
+      "scratch_removed": true,
+      "seconds": 17.029702545143664,
+      "status": "passed",
+      "unit_inactive": true
+    },
+    "restoration": {
+      "artifacts_verified": true,
+      "commands": 36,
+      "exact_processes_gone": true,
+      "memory_log_sha256": "b31aff88a731e222b77813c940b701ddda1f7e85077aef241eb567e7754b9227",
+      "result_sha256": "4af99e255f68880d666805f13c66b1d415bf9c523e6134ce16bfa9e24c31b5a1",
+      "sampled_rss_max_bytes": 92360704,
+      "scratch_removed": true,
+      "seconds": 9.014842288568616,
+      "status": "passed",
+      "unit_inactive": true
+    }
+  },
+  "cleanup": {
+    "empty_owned_scratch_removed": true,
+    "exact_processes_gone": true,
+    "scratch_path": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-rebuild-r2/low/native-scratch-chiqqm3i",
+    "unit_inactive": true
+  },
+  "complete_logged_requests": 48627,
+  "disk": {
+    "cancellation": null,
+    "failure": null,
+    "free_bytes_min": 406743638016,
+    "observer_sampled_rss_max_bytes": 23220224,
+    "sampled_peaks": {
+      "active": 49428787200,
+      "authority": 38107262976,
+      "candidate": 36175781888,
+      "other": 241664,
+      "scratch": 0
+    },
+    "sampled_total_peak_bytes": 123707609088,
+    "samples": 159,
+    "status": "failed"
+  },
+  "native_sha256": "68e74e4ca3b31f96bb762fb5ce25ae7eaa145d3680c0f474adcfab37caeb832d",
+  "not_proven": [
+    "full concurrent correctness and performance",
+    "uninterrupted full low-budget build",
+    "complete rebuild disk peak",
+    "generation4 readiness or activation",
+    "unlogged outcome309703 and incomplete trailing request outcome",
+    "backend selection"
+  ],
+  "observer_terminal_missing": true,
+  "obsolete_copy_cleanup": {
+    "count": 50,
+    "filesystem_free_delta": 2648940544,
+    "inode_allocated_bytes": 7430930432,
+    "note": "Exact task-owned obsolete copies with published digest references; no readable executable/fd/map references. Inaccessible processes have non-probe comm names; do not claim complete host fd visibility. Current/recent recovery and unattributed copies retained. Filesystem delta includes other host activity."
+  },
+  "oom": true,
+  "planned_requests": 108672,
+  "planned_seconds": 3840,
+  "prefix_metrics": {
+    "operations": {
+      "ann": {
+        "count": 373,
+        "observed_prefix_max_seconds": 264.12386769,
+        "observed_prefix_p95_seconds": 251.770430825,
+        "statuses": {
+          "error": 4,
+          "success": 369
+        }
+      },
+      "bm25": {
+        "count": 1142,
+        "observed_prefix_max_seconds": 802.415998476,
+        "observed_prefix_p95_seconds": 762.398546086,
+        "statuses": {
+          "error": 12,
+          "success": 1130
+        }
+      },
+      "correction": {
+        "count": 351,
+        "observed_prefix_max_seconds": 27.492799298,
+        "observed_prefix_p95_seconds": 0.90816612,
+        "statuses": {
+          "success": 351
+        }
+      },
+      "current": {
+        "count": 4211,
+        "observed_prefix_max_seconds": 29.198221269,
+        "observed_prefix_p95_seconds": 1.017257736,
+        "statuses": {
+          "success": 4211
+        }
+      },
+      "history": {
+        "count": 439,
+        "observed_prefix_max_seconds": 26.546141674,
+        "observed_prefix_p95_seconds": 1.298183093,
+        "statuses": {
+          "success": 439
+        }
+      },
+      "write": {
+        "count": 42111,
+        "observed_prefix_max_seconds": 29.474541762,
+        "observed_prefix_p95_seconds": 1.27600976,
+        "statuses": {
+          "conflict": 2636,
+          "success": 39475
+        }
+      }
+    },
+    "scope": "Incomplete censored prefix only, not full workload acceptance. Latency includes schedule delay."
+  },
+  "raw_effects": "unknown; recorded acknowledgements and subsequent restorations verified separately",
+  "restoration": {
+    "active_generation": 3,
+    "first_commit": 309704,
+    "last_commit": 309711,
+    "sources": 8,
+    "watermarks": 309711
+  },
+  "retained_harness_failure": "Initial acknowledgement reader rejected the one incomplete trailing line before any native verification; complete-prefix reader controls passed, original bytes preserved, successful verification covers only complete receipts.",
+  "sampled_rss_max_bytes": 608862208,
+  "sampled_rss_p99_bytes": 579792896,
+  "service_seconds": 1762.242,
+  "source_commit": "78ceb796ad2174fd8ae5088fefe62bb41bf37c4e",
+  "status": "failed_full_concurrent_rebuild"
+}

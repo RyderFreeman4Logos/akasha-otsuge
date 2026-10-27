@@ -1,0 +1,56 @@
+{
+  "status": "passed_diagnostic_only",
+  "records": {
+    "corpus": {
+      "commands": 61,
+      "seconds": 54.961556097492576,
+      "binary_sha256": "7757d56061ed3198e011569f5ea9fac8143c901103a325977e6e0e87bcbaee29",
+      "result_sha256": "3312c01eea91ab001b75edccfc4911e5fccd534b777a3d0dd72eee9e56b532af",
+      "harness_sha256": "f5f57c8b69624fa0c3965425682b0c27920cd371ee8748827cdb816831c39154",
+      "temporary_root_removed": true
+    },
+    "revision-compatibility": {
+      "commands": 96,
+      "seconds": 82.12141275778413,
+      "binary_sha256": "7757d56061ed3198e011569f5ea9fac8143c901103a325977e6e0e87bcbaee29",
+      "result_sha256": "cca98823d7b43c65eebdc1f0b994d2165c21adbf127b9f01e9a46fef8ff15094",
+      "harness_sha256": "ed38dfa1893b20ebe7f03e9844ef9f1625382d1b146b0fc379411a2cea95b1d1",
+      "temporary_root_removed": true
+    }
+  },
+  "native_cgroup_memory_max": 671088640,
+  "native_profile": "low",
+  "rss_measured": false,
+  "fixture": {
+    "documents": 25,
+    "public_vectors": 8,
+    "synthetic_text_documents": 17,
+    "excluded_from_full_corpus_acceptance": true
+  },
+  "checks": [
+    "before/after atomic cursor commit SIGKILL",
+    "idempotent resume",
+    "complete source manifest and model provenance",
+    "source count and contiguous memory IDs",
+    "final body byte and vector count",
+    "all copied text bodies",
+    "native lexical and vector search",
+    "outbox catch-up before activation",
+    "retained old generation"
+  ],
+  "not_tested": [
+    "full corpus backfill/indexing",
+    "full profile performance",
+    "ordinary/reindex disk admission",
+    "sustained concurrent build",
+    "physical corruption",
+    "power loss"
+  ],
+  "source_sha256": {
+    "spikes/helix/src/generations.rs": "34efb8adc5a59f12873771a67f77e8c1ad1c3bc4313ecf4140bbb99c9d0b7324",
+    "spikes/helix/src/generations/corpus.rs": "6ddba2a4ba56535abe75b5a19bb37e94301e516388b25d6066d4a48315cc3775",
+    "spikes/helix/src/main.rs": "8446e941d7036b5f447d5b79e774c2b95852b1f6022c42bfc4e20b632131157e",
+    "spikes/helix/src/indexes.rs": "c63367f88cb7f6fc9549d21a8b7a01c3cfe969abb6034ff29a98896fca7374ea",
+    "spikes/helix/check_backfill.py": "f5f57c8b69624fa0c3965425682b0c27920cd371ee8748827cdb816831c39154"
+  }
+}

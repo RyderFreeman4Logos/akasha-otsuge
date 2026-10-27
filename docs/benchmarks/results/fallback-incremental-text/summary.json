@@ -1,0 +1,43 @@
+{
+  "archive_bytes": 928384,
+  "archive_files": 356,
+  "archive_sha256": "6b34c3b7bd3bd0764462fa3441d95227157067fb7343a1f34f9c6b3e493acbdd",
+  "artifacts_verified": true,
+  "binary_sha256": "d3dd3451a948277ecd20d3d2782bb8b3e79c3f4e58316aeb9179ea2180485106",
+  "child_fts_budget": {
+    "LANCE_FTS_NUM_SHARDS": "1",
+    "LANCE_FTS_PARTITION_SIZE": "32"
+  },
+  "controller_units": 6,
+  "exact_processes_gone": true,
+  "green": {
+    "budget_refusal_and_recovery": true,
+    "crash_barriers": 6,
+    "lifecycle_checks": 104,
+    "lifecycle_seconds": 3.0894055077806115,
+    "rebuild_search_overlap": {
+      "ann": 0,
+      "bm25": 1
+    },
+    "receipt_negative_controls": 8,
+    "requests": 1698,
+    "rss_max_bytes": 146321408,
+    "tokenized_documents": 1,
+    "workload_seconds": 70.06626769900322
+  },
+  "not_proven": [
+    "full sustained performance after incremental change",
+    "full uninterrupted bounded build",
+    "full concurrent rebuild"
+  ],
+  "owned_fixtures_removed": true,
+  "red": {
+    "exit": 1,
+    "new_documents": 1,
+    "old_tokenized_documents": 3
+  },
+  "release_all_targets_clippy": "PASS",
+  "release_units": 10,
+  "source_parent": "4490b369687076f069eacfdd8580a7c61c90176d",
+  "status": "passed_diagnostic_only"
+}

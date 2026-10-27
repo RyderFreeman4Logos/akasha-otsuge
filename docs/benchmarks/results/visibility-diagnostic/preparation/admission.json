@@ -1,0 +1,11 @@
+{
+  "binary_sha256": "75562b77915a79736afd74d9d22973aea8cc3e6f9c9ec54521fdf2ece126a7ba",
+  "index_observation_seconds": 7200,
+  "input": "/tmp/akasha-otsuge-storage-20261022/vectors-00000.jsonl",
+  "max_attempts": 1,
+  "measured_workload_profile": "low",
+  "not_scale_acceptance": true,
+  "setup_profile": "high",
+  "source_bytes": 1273224971,
+  "source_sha256": "83704596cac9a4e772e46bc65816981136585fc721a1ffba2c198566f36082ab"
+}

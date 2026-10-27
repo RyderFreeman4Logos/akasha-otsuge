@@ -1,0 +1,11 @@
+Running as unit: akasha-corpus-views-red-20261023T1159.service
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_backfill.py", line 199, in <module>
+    main()
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_backfill.py", line 129, in main
+    assert all(hit['memory'] != 1_000_099 for hit in invoke(source_query)['hits'])
+AssertionError
+Finished with result: exit-code
+Main processes terminated with: code=exited/status=1
+Service runtime: 40.541s
+CPU time consumed: 4.222s

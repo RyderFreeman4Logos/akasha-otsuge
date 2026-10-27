@@ -1,0 +1,18 @@
+{
+  "status": "passed_diagnostic_only",
+  "binary_sha256": "1e482e799e40d9e23d2a13d218b80f39c8b69f42a086353a95b2b1b80fb2a45f",
+  "native_commands": 141,
+  "seconds": 101.77853592298925,
+  "visibility_seconds": 6.664251112379134,
+  "red": "Old native candidate loses source_key after retraction/restoration; retained query result and traceback",
+  "source_sha256": {
+    "spikes/helix/src/authority.rs": "c8193a1d64adeb87f2a94e1072df6a77cdb003b29965723927342504c6154d35",
+    "spikes/helix/check_backfill.py": "043c855cdaa8f5eda9a86135c12a3e1c407a41041389d4c6322bb4ed8fa982a0"
+  },
+  "not_tested": [
+    "full corpus",
+    "concurrent corpus candidate corrections",
+    "independent review",
+    "power loss"
+  ]
+}

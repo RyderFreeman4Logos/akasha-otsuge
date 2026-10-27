@@ -1,0 +1,24 @@
+   Compiling akasha-helix-probe v0.0.0 (/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix)
+    Finished `release` profile [optimized] target(s) in 22.74s
+     Running unittests src/main.rs (target/storage-spike/release/deps/akasha_helix_probe-15204afa4e8840ca)
+
+running 1 test
+test profile::tests::low_profile_bounds_compaction_ranges_in_actual_writer_settings ... FAILED
+
+failures:
+
+---- profile::tests::low_profile_bounds_compaction_ranges_in_actual_writer_settings stdout ----
+
+thread 'profile::tests::low_profile_bounds_compaction_ranges_in_actual_writer_settings' (466395) panicked at src/profile.rs:196:13:
+assertion `left == right` failed: low
+  left: 2097152
+ right: 262144
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    profile::tests::low_profile_bounds_compaction_ranges_in_actual_writer_settings
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin akasha-helix-probe`

@@ -1,0 +1,19 @@
+{
+  "status": "passed_diagnostic_only",
+  "binary_sha256": "2e1a13c0eca59f25c4bb6b961d92edddfa3aa5238d53f3d5381337326afda597",
+  "native_checks": 6,
+  "controller_checks": 9,
+  "source_sha256": {
+    "spikes/helix/src/engine.rs": "7a47a818c2132c58c24e511941c29f33b58027d0dd892ce10f02539a6392e9a1",
+    "spikes/helix/src/indexes.rs": "0a17aa9ed91ae225a2acc8ae9f08bcf034cd6d6632646f47d57e8c1480480e4f",
+    "spikes/helix/src/generations/corpus.rs": "d160db3252e3747ec78c68e0c27ad5f442b8ae1ceccc36087d71e4c408fc5ebb",
+    "spikes/helix/run_generation.py": "3f2f292e09a640b5e9963d6917d920e4558ac90f6690e0bb58862302f08fba98",
+    "spikes/helix/check_generation_runner.py": "27eec37132a696d655a2ff2843e147090fb083dfaa2a07110bd5813da1cd0744",
+    "spikes/helix/check_index_budget.py": "7b4a85399d735bf20ad58ee4a893aaf544387f27da3e7e8043faa8910dc27452"
+  },
+  "unsupported_binary": "generation-runner-unsupported-r1: native exit0 rejected because required native configuration records are absent",
+  "not_tested": [
+    "large index completion duration",
+    "retroactive changes to running full-generation-begin-v1"
+  ]
+}

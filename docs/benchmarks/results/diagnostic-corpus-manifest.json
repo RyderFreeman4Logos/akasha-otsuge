@@ -1,0 +1,114 @@
+{
+  "acceptance": "not_run",
+  "chunk_bytes": 65536,
+  "code_sha256": {
+    "download.py": "e16de77ee3a17962c335ba4efc2df157b13e30cbf63d2ceaf17b8a572a1ea4e1",
+    "prepare_corpus.py": "2e15aa7f0ed1e6a6c4143a99d072ec0e8d421479b3fee3a51930964336026272",
+    "sources.json": "fcc8ed51c3691224f0bdf54d5fd86be0fff97104e77d52fc98efcf851ca509bf"
+  },
+  "cold_partitions": [
+    "p2",
+    "p3",
+    "p4",
+    "p5",
+    "p6",
+    "p7"
+  ],
+  "corpus": {
+    "added_separator_bytes": 38462,
+    "documents": 765714,
+    "duplicate_content_utf8_bytes": 5819537,
+    "indexed_body_utf8_bytes": 3486696908,
+    "inputs": [
+      {
+        "file": "vectors-00000.parquet",
+        "license": "MIT; source DBpedia text CC-BY-SA-4.0",
+        "repository": "Qdrant/dbpedia-entities-openai3-text-embedding-3-large-1536-1M",
+        "revision": "4a9731217921bc476a0f03544f11f22ae4903fa5",
+        "source": {
+          "path": "data/train-00000-of-00026.parquet",
+          "sha256": "27519d7104c8ac6d0f51ac18e8ac23b29d67cbab8465bc3302b458ca3dcbbb78",
+          "size": 367354366
+        }
+      },
+      {
+        "file": "text-00000.parquet",
+        "license": "ODC-BY; original content rights retained",
+        "repository": "HuggingFaceFW/fineweb-edu",
+        "revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+        "source": {
+          "path": "sample/100BT/000_00000.parquet",
+          "sha256": "955ff462f3db09a52a4750e7a69901f89d64e48dfc936de0847c9f234f32b695",
+          "size": 2153444469
+        }
+      }
+    ],
+    "partitions": {
+      "p0": {
+        "documents": 95867,
+        "unique_content_utf8_bytes": 439127083,
+        "vectors": 4733
+      },
+      "p1": {
+        "documents": 95438,
+        "unique_content_utf8_bytes": 434518272,
+        "vectors": 4892
+      },
+      "p2": {
+        "documents": 95609,
+        "unique_content_utf8_bytes": 436092498,
+        "vectors": 4800
+      },
+      "p3": {
+        "documents": 95640,
+        "unique_content_utf8_bytes": 434143058,
+        "vectors": 4877
+      },
+      "p4": {
+        "documents": 95781,
+        "unique_content_utf8_bytes": 435058566,
+        "vectors": 4818
+      },
+      "p5": {
+        "documents": 95948,
+        "unique_content_utf8_bytes": 435534390,
+        "vectors": 4814
+      },
+      "p6": {
+        "documents": 95672,
+        "unique_content_utf8_bytes": 438213448,
+        "vectors": 4788
+      },
+      "p7": {
+        "documents": 95759,
+        "unique_content_utf8_bytes": 433971131,
+        "vectors": 4740
+      }
+    },
+    "prepared_bytes": 4843558699,
+    "prepared_sha256": "244b012da93f2a5b2777ab88cfb2b65c2d40620d96a30f57ded4301127a3af76",
+    "source_rows": 764462,
+    "unique_content_utf8_bytes": 3486658446,
+    "unique_vectors": 38462,
+    "unvectorized_unique_utf8_bytes": 3473352561,
+    "vectors": 38462
+  },
+  "dimensions": 1536,
+  "embedding_model": "text-embedding-3-large",
+  "environment": {
+    "pyarrow": "26.0.0",
+    "python": "3.14.7"
+  },
+  "hot_partitions": [
+    "p0",
+    "p1"
+  ],
+  "indexed": false,
+  "precomputed_at": "2024-02 (publisher)",
+  "seed": 0,
+  "source_counts": [
+    1,
+    1
+  ],
+  "status": "diagnostic_corpus_prepared"
+}

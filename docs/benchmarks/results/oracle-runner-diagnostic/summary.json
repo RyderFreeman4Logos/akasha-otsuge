@@ -1,0 +1,43 @@
+{
+  "binary_sha256": "074301ed0f7d6a6be396b0049cdc8d382bc16c2998a029dcd84dc105a29b5dc0",
+  "cases": {
+    "generation-runner-oracle-r1": {
+      "checks": 9,
+      "seconds": 8.023914652876556,
+      "status": "passed"
+    },
+    "index-abort-oracle-r1": {
+      "checks": 10,
+      "seconds": 3.122428215108812,
+      "status": "passed"
+    },
+    "oracle-runner-r1": {
+      "checks": 10,
+      "seconds": 31.638759876601398,
+      "status": "passed"
+    }
+  },
+  "not_tested": [
+    "full database100000changes",
+    "full corpus historical latency",
+    "physical power loss"
+  ],
+  "source_sha256": {
+    "spikes/helix/check_oracle_runner.py": "1328ea97bb8f6e890d84fb9e2df6acf23744b9d64d32a9de13531abd7d603901",
+    "spikes/helix/run_generation.py": "6383d2c5cc8f7c2bfb7c9489174892a723060784cda02b9c191234187195e4e7",
+    "spikes/helix/src/authority.rs": "99afd01ad8dcc56f8bf60adc0872e7c82d92b89d6c14a1634b90dd41166265b9"
+  },
+  "status": "passed_diagnostic_only",
+  "verify_checkpoint": {
+    "completed": 5163,
+    "config_epoch": 1,
+    "elapsed_s": 6.692125689,
+    "eta_s": 0.0,
+    "oracle_version": 1,
+    "phase": "oracle_verified",
+    "pid": 410136,
+    "rate_per_s": 771.5037403566016,
+    "start_ticks": "459193290",
+    "total": 5163
+  }
+}

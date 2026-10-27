@@ -1,0 +1,44 @@
+{
+  "archive_bytes": 257694,
+  "archive_files": 112,
+  "archive_sha256": "80f8e5e0efe6dca11b002530d1ff57f758a862691c1a36e282ed0f00b605f3e1",
+  "change": "One reservation check before missing legacy manifest write; already-bound reuse/status remain readable",
+  "clippy": "passed_release_all_targets",
+  "full_case": "not_started",
+  "native": {
+    "artifacts_verified": true,
+    "commands": 15,
+    "exact_processes_gone": true,
+    "memory_log_sha256": "5979e7dfa2f91603e2462621acb1eca62f27da252d77b3a505b59ae7a4d21405",
+    "result_sha256": "58c85f7edf957eae54fcf7be1f1fdacee5b3b7c3cc3a093df1b102968e1167de",
+    "sampled_rss_max_bytes": 8220672,
+    "scratch_removed": true,
+    "seconds": 0.8590892218053341,
+    "status": "passed",
+    "unit_inactive": true
+  },
+  "native_sha256": "860c32fa49451574f4d1d81bfaae88d9593999e770e1e4966cdb94c35ac41d35",
+  "not_proven": [
+    "full original-manifest binding",
+    "full concurrent resource acceptance",
+    "sole backend decision"
+  ],
+  "not_repeated": [
+    "231-command lifecycle",
+    "85-command search",
+    "160s concurrent fixture"
+  ],
+  "oracle_custody": {
+    "behavioral_red": "r2 legacy existing-generation Begin succeeded under impossible reserve; command003 exit0 vs expected1",
+    "excluded_r1": "fixture OWNER marker rejected by original importer before behavior; incorrect preliminary collector consequently failed to find command003; no source change",
+    "head": "bf5e62ced38926e7ca2cfda543f724f8d251e2bb",
+    "legacy_native_sha256": "8f0b2b2f1a6890a78b0efba421176e95e906a4d03607fd5efab8292c00942d00",
+    "oracle_sha256": "74178144dad0d3a2a4470b0eb31b3dfc883bf6a2d620ee12ade6e4d465c65f1a",
+    "red_native_sha256": "4028cb8e9164218029f6396c88172ace7d7f356f148247794b14ce4c9d955125",
+    "scope": "only new missing-manifest transaction; coatomic initial import metadata and read-only reuse/status unchanged"
+  },
+  "review": "independent R2 closed original identity/EOF findings, found this reservation gap; successor re-review pending",
+  "source_parent": "bf5e62ced38926e7ca2cfda543f724f8d251e2bb",
+  "status": "passed_focused_native",
+  "unit_tests": 13
+}

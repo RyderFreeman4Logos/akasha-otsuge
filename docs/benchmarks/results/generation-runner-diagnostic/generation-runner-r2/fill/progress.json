@@ -1,0 +1,17 @@
+{
+  "completed": null,
+  "config_epoch": 1,
+  "controller": {
+    "pid": 4152875,
+    "start_ticks": "458295424",
+    "state": "R"
+  },
+  "elapsed_s": 0.005718708969652653,
+  "eta_s": null,
+  "free_bytes": 164031864832,
+  "native": null,
+  "phase": "backfill",
+  "rate_per_s": null,
+  "reserved_bytes": 36212254720,
+  "total": null
+}

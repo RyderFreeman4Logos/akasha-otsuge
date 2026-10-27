@@ -1,0 +1,5 @@
+[execution]
+queries = 512
+config_epoch = 1
+[reliability]
+max_attempts = 1

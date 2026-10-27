@@ -1,0 +1,11 @@
+{
+  "binary_sha256": "1ee2001a5f77fc03db30cf8e87a4f8181d35aa6091193a62a766d69966c5b249",
+  "controller": {
+    "pid": 4104723,
+    "start_ticks": "458185753",
+    "state": "R"
+  },
+  "harness_sha256": "d21d848e451ba480079ed566cf14ec5c432a60ff6e3579b7390e7f06d52ec60b",
+  "source_sha256": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+  "temporary_root": "/tmp/akasha-generation-workload-mjx3bqy5"
+}

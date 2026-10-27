@@ -1,0 +1,19 @@
+{
+  "status": "passed_diagnostic_import_only",
+  "documents": 38462,
+  "dimensions": 1536,
+  "content_utf8_bytes": 13344347,
+  "import_seconds": 29.1014,
+  "maximum_sampled_engine_rss_bytes": 255762432,
+  "cgroup_peak_bytes": 540155904,
+  "binary_sha256": "ae577f3d38dfba49b20f35f448729a8b1d3fecd9521a5b95382b04480fe20b6f",
+  "samples_sha256": "308fbbe08d60f14c4a88a04496384e4cd0dae24d7dc1429a659ced599dbf3f70",
+  "not_tested": [
+    "full_50GB",
+    "1M_vectors",
+    "100_clients",
+    "30_minute_mixed_load",
+    "historical_oracle",
+    "index_completion"
+  ]
+}

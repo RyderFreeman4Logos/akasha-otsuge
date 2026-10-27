@@ -1,0 +1,183 @@
+{
+  "full_import": {
+    "database_allocated_bytes": 37799542784,
+    "raw_first": {
+      "command": [
+        "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-compressed-r1/probe",
+        "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-compressed-r1/database",
+        "--load",
+        "/dev/stdin",
+        "/tmp/akasha-otsuge-storage-20261022/full-corpus-v2.json"
+      ],
+      "event": "start",
+      "limits": {
+        "memory.high": "max",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0"
+      }
+    },
+    "raw_last": {
+      "code": 0,
+      "event": "exit",
+      "seconds": 1855.7279934464023
+    },
+    "raw_rows": 1851,
+    "result": {
+      "acceptance": "not_run",
+      "artifact_sha256": {
+        "30fc7d17da4e4a738757f80dfd327365/consumer.log": "1a3f21e021aa1bb82eac54aec7420a56b0e4d4631863e07a256addbb15c20a52",
+        "30fc7d17da4e4a738757f80dfd327365/memory.jsonl": "2487685232892d0d55acaf8d406a2ae27dde0727a63a57b6052b4eb723860d26",
+        "30fc7d17da4e4a738757f80dfd327365/producer.log": "5548cd1b19a94425748b2a4e26ac0240573187192a5d23ce9563dd111fcb08c4",
+        "database/import-progress.json": "463c291b57e287a99160abf73fcb62435ad82471530db87370f093e27c619d06"
+      },
+      "attempt": "30fc7d17da4e4a738757f80dfd327365",
+      "binary_sha256": "4fff0520217d83177093aeb92ba79a5c5b9e7440f36210b9a449d52ba2d104a4",
+      "documents": 11428831,
+      "elapsed_seconds": 1856.4235214749351,
+      "failure": null,
+      "indexes": "not_built",
+      "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+      "status": "passed"
+    },
+    "sample_keys": [
+      "event",
+      "limits",
+      "command"
+    ],
+    "ssd_free": 513584988160,
+    "units": {
+      "akasha-import-30fc7d17da4e4a738757f80dfd327365": "inactive",
+      "akasha-stream-30fc7d17da4e4a738757f80dfd327365": "inactive"
+    }
+  },
+  "full_low_verification": {
+    "binary_sha256": "4fff0520217d83177093aeb92ba79a5c5b9e7440f36210b9a449d52ba2d104a4",
+    "cgroup_peak_bytes": 537690112,
+    "database_allocated_after_close_bytes": 37805289472,
+    "exact_native_absent": true,
+    "import_artifact_hashes_verified": true,
+    "limits": {
+      "memory.high": "536870912",
+      "memory.max": "671088640",
+      "memory.swap.max": "0"
+    },
+    "log_sha256": "1a3f21e021aa1bb82eac54aec7420a56b0e4d4631863e07a256addbb15c20a52",
+    "max_sample_gap_s": 1.0218609301373363,
+    "memory_events": {
+      "high": "1195323",
+      "low": "0",
+      "max": "0",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "native": {
+      "complete": true,
+      "content_bytes": 50001002783,
+      "documents": 11428831,
+      "input_bytes": 84147341473,
+      "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+      "prefix": "26fd0ec04e78123ee35c94bf9ca7b6cdf99fe12df186275c62e266c3fe534081",
+      "storage_format": 2,
+      "vectors": 1000000
+    },
+    "nofile_configured": 8192,
+    "nofile_observer_attestation": null,
+    "original_deadline_preserved": true,
+    "rss_max_bytes": 133865472,
+    "rss_p99_nearest_rank_bytes": 133861376,
+    "samples": 3565,
+    "samples_sha256": "15b9d291fa9173118da9536be3ce70cdf7de907bfe6c1428b31d396db35491dc",
+    "scope": "full low-profile original-byte and source/scope-mapping verification; not mixed workload",
+    "seconds": 3570.27837168891,
+    "status": "passed",
+    "unit_inactive": true,
+    "utc": "2026-10-23T20:42:41.780425+00:00"
+  },
+  "history_real_shard": {
+    "binary_sha256": "92339952d55c1aa0904ef333da159879cc7ca53bb17cdd9a40ba86c9f39363e4",
+    "changes": 100000,
+    "documents": 38462,
+    "exact_processes_exited": true,
+    "hashes_verified": true,
+    "results": [
+      {
+        "memory_events": {
+          "high": "0",
+          "low": "0",
+          "max": "35324",
+          "oom": "0",
+          "oom_group_kill": "0",
+          "oom_kill": "0"
+        },
+        "native": {
+          "changes": 100000,
+          "phase": "oracle_seeded",
+          "seconds": 311.52208706,
+          "text_only": true,
+          "version": 1
+        },
+        "native_identity": {
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-dfad32b581fe491dabfd20a0ecff5517.service",
+          "event": "executable",
+          "pid": 918616,
+          "sha256": "92339952d55c1aa0904ef333da159879cc7ca53bb17cdd9a40ba86c9f39363e4",
+          "start_ticks": "460518807"
+        },
+        "operation": "seed_text",
+        "rss_max": 183025664,
+        "samples": 312,
+        "seconds": 311.8382275663316
+      },
+      {
+        "memory_events": {
+          "high": "0",
+          "low": "0",
+          "max": "0",
+          "oom": "0",
+          "oom_group_kill": "0",
+          "oom_kill": "0"
+        },
+        "native": {
+          "changes": 100000,
+          "checks": 5163,
+          "memory_domain": [
+            0,
+            1024
+          ],
+          "not_tested": [
+            "concurrent clients",
+            "derived watermark",
+            "live permission revocation"
+          ],
+          "phase": "oracle_verified",
+          "seconds": 2.2659426910000002,
+          "text_only": true
+        },
+        "native_identity": {
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-043019b07cdf4c8ea40c237e7722e53f.service",
+          "event": "executable",
+          "pid": 928831,
+          "sha256": "92339952d55c1aa0904ef333da159879cc7ca53bb17cdd9a40ba86c9f39363e4",
+          "start_ticks": "460550033"
+        },
+        "operation": "verify_text",
+        "rss_max": 81698816,
+        "samples": 4,
+        "seconds": 4.0069855051115155
+      }
+    ],
+    "scope": "100k history on real-shard storage; not full corpus",
+    "status": "passed",
+    "units_inactive": true
+  },
+  "not_proven": [
+    "full-corpus100k history: separate ongoing run",
+    "full Lance backfill and native indexes",
+    "mixed100-client workload",
+    "full failure matrix",
+    "power loss"
+  ],
+  "retained_failure": "full low r1 EMFILE at service soft1024 for2202 eagerly opened VLogs; r2 uses explicit unit-local8192, unchanged binary/memory/swap/original deadline",
+  "status": "passed_scoped_acceptance"
+}

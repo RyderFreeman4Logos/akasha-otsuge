@@ -1,0 +1,5 @@
+[execution]
+queries_per_partition = 4
+config_epoch = 1
+[reliability]
+max_attempts = 1

@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generations.py", line 119, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generations.py", line 68, in main
+    begin();invoke({'op':'build','generation':1});commit(1,1,0)
+    ^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generations.py", line 58, in begin
+    def begin(g=1, **updates):return invoke({'op':'begin','generation':g,'bundle':{**bundle,**updates}})
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/spikes/helix/check_generations.py", line 47, in invoke
+    assert (child.returncode!=0)==failure,text
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Error: "invalid phase"
+

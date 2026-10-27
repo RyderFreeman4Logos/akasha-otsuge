@@ -1,0 +1,239 @@
+{
+  "status": "passed_diagnostic_only",
+  "records": {
+    "corpus": {
+      "status": "passed",
+      "binary_sha256": "329bec46bc4213fc0b922109e899aff60f250171e4d8ac48657f24259b960a55",
+      "result_sha256": "a15b12851a1b41712da996b968673a6663e45ad73328b79cae8788e500e331f5",
+      "seconds": 68.0696895904839,
+      "commands": 114
+    },
+    "visibility": {
+      "status": "passed",
+      "binary_sha256": "329bec46bc4213fc0b922109e899aff60f250171e4d8ac48657f24259b960a55",
+      "result_sha256": "62f83d45d5ce8f8672454188cf01930638299ef10fda431c79d2e04c249cf743",
+      "seconds": 6.707959417253733,
+      "commands": 4
+    },
+    "workload-before": {
+      "status": "failed",
+      "binary_sha256": "d255e8104a1ab6bd6379fe6a5a187072cf6f3b7a5461f1d6b9c983e833b633ab",
+      "result_sha256": "afbac1f0d0b23eb99466f8a07d1dd5613ba28a3c80da33a6708d00b5edbd5bfe",
+      "operations": {
+        "ann": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 7339,
+          "successful": 15,
+          "successful_per_s": 0.23333333333333334,
+          "within_window": 14
+        },
+        "bm25": {
+          "attempted": 72,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 7126,
+          "successful": 72,
+          "successful_per_s": 1.1166666666666667,
+          "within_window": 67
+        },
+        "correction": {
+          "attempted": 12,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 6949,
+          "successful": 12,
+          "successful_per_s": 0.2,
+          "within_window": 12
+        },
+        "current": {
+          "attempted": 140,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 7863,
+          "successful": 140,
+          "successful_per_s": 2.1333333333333333,
+          "within_window": 128
+        },
+        "history": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 7211,
+          "successful": 15,
+          "successful_per_s": 0.23333333333333334,
+          "within_window": 14
+        },
+        "write": {
+          "attempted": 826,
+          "conflicts": 400,
+          "errors": 0,
+          "p95_upper_ms": 28259,
+          "successful": 426,
+          "successful_per_s": 6.583333333333333,
+          "within_window": 395
+        }
+      },
+      "rss_max_bytes": 191709184,
+      "requests": 1080,
+      "drain_s": 4.472530875999993
+    },
+    "profile-only": {
+      "status": "failed",
+      "binary_sha256": "6bcf42f43b10477bf604a0b894874f724f430741f17b3834aa417c5898c424e4",
+      "result_sha256": "26d96c992c77935d07993076b66d67f3457d83c5de6b2d21322473fb5fa02687",
+      "operations": {
+        "ann": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 10658,
+          "successful": 15,
+          "successful_per_s": 0.21666666666666667,
+          "within_window": 13
+        },
+        "bm25": {
+          "attempted": 72,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 9704,
+          "successful": 72,
+          "successful_per_s": 1.0333333333333334,
+          "within_window": 62
+        },
+        "correction": {
+          "attempted": 12,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 9073,
+          "successful": 12,
+          "successful_per_s": 0.18333333333333332,
+          "within_window": 11
+        },
+        "current": {
+          "attempted": 107,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 23640,
+          "successful": 107,
+          "successful_per_s": 1.5833333333333333,
+          "within_window": 95
+        },
+        "history": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 10525,
+          "successful": 15,
+          "successful_per_s": 0.21666666666666667,
+          "within_window": 13
+        },
+        "write": {
+          "attempted": 568,
+          "conflicts": 282,
+          "errors": 0,
+          "p95_upper_ms": 40928,
+          "successful": 286,
+          "successful_per_s": 4.266666666666667,
+          "within_window": 256
+        }
+      },
+      "rss_max_bytes": 157319168,
+      "requests": 789,
+      "drain_s": 7.234298136000007
+    },
+    "workload-after": {
+      "status": "passed",
+      "binary_sha256": "329bec46bc4213fc0b922109e899aff60f250171e4d8ac48657f24259b960a55",
+      "result_sha256": "97dbf43454ac6d39f4c18ce6c5f6f91292ba8cbee0246ec4f00b83b4a2ee4b4b",
+      "operations": {
+        "ann": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 3159,
+          "successful": 15,
+          "successful_per_s": 0.25,
+          "within_window": 15
+        },
+        "bm25": {
+          "attempted": 72,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 2962,
+          "successful": 72,
+          "successful_per_s": 1.15,
+          "within_window": 69
+        },
+        "correction": {
+          "attempted": 12,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 2829,
+          "successful": 12,
+          "successful_per_s": 0.2,
+          "within_window": 12
+        },
+        "current": {
+          "attempted": 144,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 2888,
+          "successful": 144,
+          "successful_per_s": 2.3,
+          "within_window": 138
+        },
+        "history": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 6652,
+          "successful": 15,
+          "successful_per_s": 0.23333333333333334,
+          "within_window": 14
+        },
+        "write": {
+          "attempted": 1398,
+          "conflicts": 660,
+          "errors": 0,
+          "p95_upper_ms": 4303,
+          "successful": 738,
+          "successful_per_s": 11.8,
+          "within_window": 708
+        }
+      },
+      "rss_max_bytes": 162824192,
+      "requests": 1656,
+      "drain_s": 2.5621829860000034
+    }
+  },
+  "history_lock": "paused immutable scan allows permission revocation and ordinary write; final response rechecks live authorization; deterministic RED then GREEN",
+  "native_tests": 7,
+  "zero_test_selector_is_not_red": true,
+  "visibility_failed_invocation_is_not_product_failure": true,
+  "workload_comparison_limit": "same database, workload rules and thresholds; prior runs add synthetic revisions; no claim of isolated hardware speedup",
+  "fixture": {
+    "documents": 25,
+    "public_vectors": 8,
+    "synthetic_text_documents": 17,
+    "excluded_from_full_corpus_acceptance": true
+  },
+  "source_sha256": {
+    "spikes/helix/src/authority.rs": "5ffeb21feb910ba5dafbd8c31736d5de2678bc0b89164b992fbaed5fa0089441",
+    "spikes/helix/src/generations.rs": "ae043900369adbb2a1ab08cfca86675742995deffc6d77846aba02ec85872c3f",
+    "spikes/helix/src/generations/corpus.rs": "1f8ce40e271a1773ff6a798a9aa90ec48db01080c3daa0271cf63325a1479945",
+    "spikes/helix/check_backfill.py": "1fc4727a91db004d89967d9ac2ca4141e14d79d897f998719a9ad1ed458242a8",
+    "spikes/helix/src/main.rs": "8446e941d7036b5f447d5b79e774c2b95852b1f6022c42bfc4e20b632131157e",
+    "spikes/helix/src/workload.rs": "30fb650b7221ecd9bd02df01c6fa162e301a396de405de04382302fb49ee6825",
+    "spikes/helix/src/engine.rs": "3c7b3b151aad84f67434e6820bed8b82ab19b30199f4d0a05feae0f8d3273cb8"
+  },
+  "not_tested": [
+    "full corpus import/backfill/indexing",
+    "30 minute low/high profiles",
+    "full cold reads",
+    "ordinary/reindex disk admission",
+    "power loss",
+    "production daemon"
+  ]
+}

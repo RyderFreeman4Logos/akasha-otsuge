@@ -1,0 +1,12 @@
+{
+  "binary_sha256": "7757d56061ed3198e011569f5ea9fac8143c901103a325977e6e0e87bcbaee29",
+  "controller": {
+    "pid": 3923973,
+    "start_ticks": "457419629",
+    "state": "R"
+  },
+  "harness_sha256": "f5f57c8b69624fa0c3965425682b0c27920cd371ee8748827cdb816831c39154",
+  "planned_commands": 61,
+  "source_sha256": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+  "temporary_root": "/tmp/akasha-backfill-k546t6ao"
+}

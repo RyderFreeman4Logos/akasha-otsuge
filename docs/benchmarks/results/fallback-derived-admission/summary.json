@@ -1,0 +1,625 @@
+{
+  "archive_bytes": 13916880,
+  "archive_files": 820,
+  "archive_sha256": "3888ad5ed573c8a09358c12a920f8c95603ad4f7eeba9aaf341bd39f76cc8e59",
+  "baseline_pair": {
+    "artifacts_verified": true,
+    "collector_sha256": "872b0d7aba6e06bfa1b50874968948e4bc8dccc7921be7e7d7b7e84e53939e6f",
+    "content_oracle": {
+      "corpus_correction_checks": 32,
+      "corpus_correction_scopes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "corpus_current_checks": 384,
+      "corpus_current_distinct": 16,
+      "corpus_current_partitions": {
+        "p0": 48,
+        "p1": 48,
+        "p2": 48,
+        "p3": 48,
+        "p4": 48,
+        "p5": 48,
+        "p6": 48,
+        "p7": 48
+      },
+      "current_checks": 384,
+      "derived_current_checks": 58,
+      "distinct_commits": 2832,
+      "rebuild_search_overlap": {
+        "ann": 1,
+        "bm25": 3
+      },
+      "requests": 4528,
+      "search_checks": {
+        "ann": 40,
+        "bm25": 192
+      },
+      "text_only_bm25_checks": 96,
+      "text_only_bm25_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ],
+      "text_only_current_checks": 192,
+      "text_only_current_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ]
+    },
+    "derived": {
+      "committed": 6928,
+      "generation": 1,
+      "remaining": 0,
+      "text": 6928,
+      "vector": 6928
+    },
+    "drain_s": 0.7167682609999986,
+    "exact_processes_gone": true,
+    "failures": [],
+    "identities": {
+      "controller": {
+        "pid": 4100149,
+        "start_ticks": "465216544",
+        "state": "R"
+      },
+      "native": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-case-c9b0905e3bc94a74859899f1acebfcc0.service",
+        "event": "executable",
+        "pid": 4100174,
+        "sha256": "68e74e4ca3b31f96bb762fb5ce25ae7eaa145d3680c0f474adcfab37caeb832d",
+        "start_ticks": "465216566"
+      }
+    },
+    "operations": {
+      "ann": {
+        "attempted": 40,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 68,
+        "successful": 40,
+        "successful_per_s": 0.25,
+        "within_window": 40
+      },
+      "bm25": {
+        "attempted": 192,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 116,
+        "successful": 192,
+        "successful_per_s": 1.2,
+        "within_window": 192
+      },
+      "correction": {
+        "attempted": 32,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 83,
+        "successful": 32,
+        "successful_per_s": 0.2,
+        "within_window": 32
+      },
+      "current": {
+        "attempted": 384,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 64,
+        "successful": 384,
+        "successful_per_s": 2.4,
+        "within_window": 384
+      },
+      "history": {
+        "attempted": 40,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 59,
+        "successful": 40,
+        "successful_per_s": 0.25,
+        "within_window": 40
+      },
+      "write": {
+        "attempted": 3840,
+        "conflicts": 1090,
+        "errors": 0,
+        "p95_upper_ms": 61,
+        "successful": 2750,
+        "successful_per_s": 17.1875,
+        "within_window": 2750
+      }
+    },
+    "rss_max_bytes": 208904192,
+    "rss_p99_bytes": 203296768,
+    "scratch_removed": true,
+    "seconds": 162.53269034065306,
+    "status": "passed",
+    "unit": "akasha-case-c9b0905e3bc94a74859899f1acebfcc0",
+    "unit_state": "inactive",
+    "verified_utc": "2026-10-24T09:38:18.756939+00:00"
+  },
+  "behavioral_red": "baseline generation2 completes while real delta application holds derived admission",
+  "bounded_controls": {
+    "fallback-ann-chunk-pair-r1": {
+      "after": {
+        "artifacts_verified": true,
+        "cold": {
+          "files": 99553,
+          "resident_pages_after": 0,
+          "resident_pages_before": 105479,
+          "seconds": 15.373990059830248
+        },
+        "commands": 16,
+        "exact_processes_gone": true,
+        "matches_before": false,
+        "matches_before_ignoring_query_order": true,
+        "memory_log_sha256": "5a98417b7fd76e4295a18415c2f713a338df2e9ad0e5bc048601a85ff457d429",
+        "query_order_changes": [
+          2
+        ],
+        "result_sha256": "d2b63170b4f29dba44a71c9f3b323e41194a93db6029f2d2cc9dcea7652f0e06",
+        "sampled_rss_max_bytes": 279576576,
+        "scratch_removed": true,
+        "seconds": 14.69607025384903,
+        "status": "passed",
+        "unit_inactive": true
+      },
+      "before": {
+        "artifacts_verified": true,
+        "cold": {
+          "files": 99537,
+          "resident_pages_after": 0,
+          "resident_pages_before": 35737,
+          "seconds": 39.47159668803215
+        },
+        "commands": 16,
+        "exact_processes_gone": true,
+        "matches_before": false,
+        "matches_before_ignoring_query_order": false,
+        "memory_log_sha256": "746a0c392c419af1348c02d3196f4cfcfab4e3c911ea69d03428de5eb2d5af01",
+        "query_order_changes": [],
+        "result_sha256": "3240d1bea62b509165a741c570dd45d625f41523fbbdd5323fa0b02e1818e7ac",
+        "sampled_rss_max_bytes": 292286464,
+        "scratch_removed": true,
+        "seconds": 14.819146923720837,
+        "status": "passed",
+        "unit_inactive": true
+      }
+    },
+    "fallback-ann-chunk-replay-r1": {
+      "after": {
+        "artifact_hashes_verified": true,
+        "cold": {
+          "files": 99570,
+          "resident_pages_after": 0,
+          "resident_pages_before": 84462,
+          "seconds": 12.2204058021307
+        },
+        "exact_processes_gone": true,
+        "order_only_changes": [
+          2,
+          18,
+          34,
+          50
+        ],
+        "queries": 64,
+        "result_sha256": "37b4dc45a6ffdd31553b22e03b4cf03bc2b90b2454824d38901a6251e1bfdfda",
+        "sampled_rss_max_bytes": 405676032,
+        "sampled_rss_p99_bytes": 405676032,
+        "scratch_removed": true,
+        "seconds": 37.564551579765975,
+        "status": "passed",
+        "unit_inactive": true
+      },
+      "before": {
+        "artifact_hashes_verified": true,
+        "cold": {
+          "files": 99569,
+          "resident_pages_after": 0,
+          "resident_pages_before": 17461,
+          "seconds": 10.70865375827998
+        },
+        "exact_processes_gone": true,
+        "order_only_changes": [],
+        "queries": 64,
+        "result_sha256": "568ba4431b5c1b20b52fd9fd0895ecebc1cfd57a08bfe90856230a1277d62c64",
+        "sampled_rss_max_bytes": 424198144,
+        "sampled_rss_p99_bytes": 424198144,
+        "scratch_removed": true,
+        "seconds": 41.937675945460796,
+        "status": "passed",
+        "unit_inactive": true
+      }
+    },
+    "fallback-ann-malloc-r1": {
+      "exact_processes_gone": true,
+      "hashes_verified": true,
+      "last": {
+        "arenas": 30,
+        "free_bytes": 68808977,
+        "mmap_bytes": 0,
+        "monotonic_s": 4650370.231483592,
+        "system_bytes": 69550080,
+        "used_estimate": 741103
+      },
+      "malloc_samples": 39,
+      "max_system": {
+        "arenas": 30,
+        "free_bytes": 22139914,
+        "mmap_bytes": 178712576,
+        "monotonic_s": 4650362.159519434,
+        "system_bytes": 74604544,
+        "used_estimate": 231177206
+      },
+      "max_used": {
+        "arenas": 29,
+        "free_bytes": 36413072,
+        "mmap_bytes": 215003136,
+        "monotonic_s": 4650342.010933081,
+        "system_bytes": 60555264,
+        "used_estimate": 239145328
+      },
+      "note": "Child-only malloc_info adds a thread and one-second fsync observations. Allocator estimates and sampled cgroup RSS are not simultaneous or identical accounting; RSS includes Python driver. No production change or concurrent-build inference.",
+      "queries": 64,
+      "rss_max_bytes": 423858176,
+      "scratch_removed": true,
+      "seconds": 38.30714993085712,
+      "status": "passed_diagnostic_observation",
+      "unit_inactive": true
+    },
+    "fallback-rebuild-memory-observe-r1": {
+      "build_outcome": {
+        "cancelled": true,
+        "error": "task 6 was cancelled"
+      },
+      "candidate_ready": false,
+      "candidate_sets_match": true,
+      "committed": 309711,
+      "exact_processes_gone": true,
+      "hashes_verified": true,
+      "last": {
+        "arenas": 26,
+        "free_bytes": 85699585,
+        "mmap_bytes": 0,
+        "monotonic_s": 4650891.143451651,
+        "system_bytes": 86519808,
+        "used_estimate": 820223
+      },
+      "malloc_samples": 43,
+      "max_system": {
+        "arenas": 26,
+        "free_bytes": 26463327,
+        "mmap_bytes": 215470080,
+        "monotonic_s": 4650882.110357671,
+        "system_bytes": 91930624,
+        "used_estimate": 280937377
+      },
+      "max_used": {
+        "arenas": 26,
+        "free_bytes": 25064241,
+        "mmap_bytes": 232779776,
+        "monotonic_s": 4650873.078795318,
+        "system_bytes": 90705920,
+        "used_estimate": 298421455
+      },
+      "note": "Diagnostic2GiB group, low engine, one CPU worker, same shared Authority. Allocator sampling adds one thread. Partial generation4 build cancelled without changing active3, authority commit or original deadline. This is not completed build or low-memory acceptance.",
+      "original_deadline_ms": 1792836176755,
+      "queries": 64,
+      "query_error": null,
+      "query_order_changes": [
+        18
+      ],
+      "rss_max_bytes": 462958592,
+      "scratch_removed": true,
+      "seconds": 42.210038209334016,
+      "status": "observed_partial_rebuild",
+      "unit_inactive": true
+    }
+  },
+  "concurrent": {
+    "artifacts_verified": true,
+    "case_seconds": 166.56031750608236,
+    "controls": 10,
+    "exact_processes_gone": true,
+    "fixture_removed": true,
+    "native_sha256": "d5b97f674d803f49bfaf02a6be835f86604694f983acd91543ecce8d57344a05",
+    "operations": {
+      "ann": {
+        "attempted": 40,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 759,
+        "successful": 40,
+        "successful_per_s": 0.25,
+        "within_window": 40
+      },
+      "bm25": {
+        "attempted": 192,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 198,
+        "successful": 192,
+        "successful_per_s": 1.2,
+        "within_window": 192
+      },
+      "correction": {
+        "attempted": 32,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 759,
+        "successful": 32,
+        "successful_per_s": 0.2,
+        "within_window": 32
+      },
+      "current": {
+        "attempted": 384,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 118,
+        "successful": 384,
+        "successful_per_s": 2.4,
+        "within_window": 384
+      },
+      "history": {
+        "attempted": 40,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 623,
+        "successful": 40,
+        "successful_per_s": 0.25,
+        "within_window": 40
+      },
+      "write": {
+        "attempted": 3840,
+        "conflicts": 1100,
+        "errors": 0,
+        "p95_upper_ms": 99,
+        "successful": 2740,
+        "successful_per_s": 17.125,
+        "within_window": 2740
+      }
+    },
+    "rebuild": {
+      "active_generation": 1,
+      "end_seq": 4283,
+      "generation": 2,
+      "ready": true,
+      "seconds": 10.168769316,
+      "start_seq": 4146,
+      "state": {
+        "backfill_deadline_ms": 1792841698004,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+          "schema": 2
+        },
+        "cursor": 24,
+        "documents": 24,
+        "generation": 2,
+        "index_deadline_ms": 1792841707444,
+        "pending": null,
+        "ready": true,
+        "source": "03e76bbf49929a2bf387f2d2fbbe1349522d87b45a60d3147e387ed8b64353b8",
+        "text_layout": "scope_columns",
+        "text_version": 1,
+        "vector_rows": 8,
+        "vector_version": 1,
+        "vectors": 8
+      },
+      "status": "passed"
+    },
+    "requests": 4528,
+    "rss_max_bytes": 201494528,
+    "rss_p99_bytes": 201355264,
+    "scratch_removed": true,
+    "seconds": 237.40491009317338,
+    "status": "passed",
+    "units_inactive": true
+  },
+  "fix": "reuse derived lock for baseline build; persist one deadline before waiting; release authority writer before wait; refresh generation state on admission",
+  "initial_concurrent_failure": {
+    "artifacts_verified": true,
+    "collector_sha256": "872b0d7aba6e06bfa1b50874968948e4bc8dccc7921be7e7d7b7e84e53939e6f",
+    "content_oracle": {
+      "corpus_correction_checks": 32,
+      "corpus_correction_scopes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "corpus_current_checks": 384,
+      "corpus_current_distinct": 16,
+      "corpus_current_partitions": {
+        "p0": 48,
+        "p1": 48,
+        "p2": 48,
+        "p3": 48,
+        "p4": 48,
+        "p5": 48,
+        "p6": 48,
+        "p7": 48
+      },
+      "current_checks": 384,
+      "derived_current_checks": 58,
+      "distinct_commits": 2665,
+      "rebuild_search_overlap": {
+        "ann": 1,
+        "bm25": 2
+      },
+      "requests": 4528,
+      "search_checks": {
+        "ann": 40,
+        "bm25": 192
+      },
+      "text_only_bm25_checks": 96,
+      "text_only_bm25_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ],
+      "text_only_current_checks": 192,
+      "text_only_current_partitions": [
+        "p0",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ]
+    },
+    "derived": {
+      "committed": 6761,
+      "generation": 1,
+      "remaining": 0,
+      "text": 6761,
+      "vector": 6761
+    },
+    "drain_s": 0.6347255569999959,
+    "exact_processes_gone": true,
+    "failures": [
+      "write P95 exceeded"
+    ],
+    "identities": {
+      "controller": {
+        "pid": 4069061,
+        "start_ticks": "465180045",
+        "state": "R"
+      },
+      "native": {
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-case-58ea32f3ecda4f0b85ece2f0fbddf00f.service",
+        "event": "executable",
+        "pid": 4069090,
+        "sha256": "d5b97f674d803f49bfaf02a6be835f86604694f983acd91543ecce8d57344a05",
+        "start_ticks": "465180070"
+      }
+    },
+    "operations": {
+      "ann": {
+        "attempted": 40,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 16493,
+        "successful": 40,
+        "successful_per_s": 0.25,
+        "within_window": 40
+      },
+      "bm25": {
+        "attempted": 192,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 17687,
+        "successful": 192,
+        "successful_per_s": 1.2,
+        "within_window": 192
+      },
+      "correction": {
+        "attempted": 32,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 3698,
+        "successful": 32,
+        "successful_per_s": 0.2,
+        "within_window": 32
+      },
+      "current": {
+        "attempted": 384,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 4803,
+        "successful": 384,
+        "successful_per_s": 2.4,
+        "within_window": 384
+      },
+      "history": {
+        "attempted": 40,
+        "conflicts": 0,
+        "errors": 0,
+        "p95_upper_ms": 4381,
+        "successful": 40,
+        "successful_per_s": 0.25,
+        "within_window": 40
+      },
+      "write": {
+        "attempted": 3840,
+        "conflicts": 1257,
+        "errors": 0,
+        "p95_upper_ms": 7904,
+        "successful": 2583,
+        "successful_per_s": 16.14375,
+        "within_window": 2583
+      }
+    },
+    "rss_max_bytes": 196808704,
+    "rss_p99_bytes": 196804608,
+    "scratch_removed": true,
+    "seconds": 163.52328654564917,
+    "status": "failed",
+    "unit": "akasha-case-58ea32f3ecda4f0b85ece2f0fbddf00f",
+    "unit_state": "inactive",
+    "verified_utc": "2026-10-24T09:31:05.073581+00:00"
+  },
+  "initial_harness_failure": "short exact selector collected zero tests; retained r1, corrected fully qualified selector r2 without changing test",
+  "lifecycle": {
+    "artifacts_verified": true,
+    "commands": 179,
+    "contenders": 2,
+    "exact_processes_gone": true,
+    "fixture_removed": true,
+    "native_sha256": "d5b97f674d803f49bfaf02a6be835f86604694f983acd91543ecce8d57344a05",
+    "rss_max_bytes": 125517824,
+    "scratch_removed": true,
+    "seconds": 22.920759873464704,
+    "sigkill_barriers": 12,
+    "status": "passed",
+    "unit_inactive": true
+  },
+  "native_sha256": "d5b97f674d803f49bfaf02a6be835f86604694f983acd91543ecce8d57344a05",
+  "not_proven": [
+    "full concurrent build memory/performance",
+    "exclusive causal attribution of prior OOM",
+    "sole backend decision"
+  ],
+  "red_oracle_sha256": "abe6b0c56e9b002a32069567902cd2ac1676fedb5b11c92a970f045cd815516b",
+  "release_all_targets_clippy": "passed",
+  "release_units": 12,
+  "review": "implementing-agent self-review only",
+  "source_parent": "e4de7fdc8051b474bd090c0de9ef9ba6620633db",
+  "status": "passed_diagnostic_only",
+  "unchanged": [
+    "native cache/spill/FTS/IVF settings",
+    "default64MiB ANN scoring chunk",
+    "fixed allocator mmap threshold",
+    "original deadlines",
+    "resource/performance thresholds",
+    "dependency pins"
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "active_generation": 2,
+  "binary_sha256": "5c2316a8101609ee64a0ac450f2a686042e293cd787adf6a5e7ffd8f8b1b57e6",
+  "build_failure_kind": "injected application validation failure after real text-index activation; not a native engine rejection",
+  "checks": [
+    "per-generation per-family indexed receipts",
+    "out-of-order gap-free watermarks",
+    "at most 256 completions per writer-held wave",
+    "real BM25 and ANN after reopen",
+    "exact body/model/provenance/dimension binding",
+    "wrong encoder rejected",
+    "source supersession and retraction",
+    "idempotent derived application after process kill",
+    "ordinary authority commit between candidate native build phases",
+    "old active bundle readable after injected application build failure",
+    "atomic activation before and after process kill",
+    "retained old bundle query",
+    "bounded generation identity count",
+    "malformed generation pointer/status/completion rejected",
+    "imported corpus refused without backfill"
+  ],
+  "commands": 96,
+  "expected_error_commands": 16,
+  "forced_process_crash_boundaries": [
+    "after-index-application",
+    "before-watermark",
+    "before-activation",
+    "after-activation"
+  ],
+  "generation_state": [
+    {
+      "bundle": {
+        "chunker": "source-document-v1",
+        "dimension": 1536,
+        "model": "text-embedding-3-large",
+        "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+        "schema": 1
+      },
+      "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+      "id": 1,
+      "ready": true,
+      "status": "retired",
+      "text": 6,
+      "vector": 6
+    },
+    {
+      "bundle": {
+        "chunker": "source-document-v1",
+        "dimension": 1536,
+        "model": "text-embedding-3-large",
+        "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+        "schema": 2
+      },
+      "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+      "id": 2,
+      "ready": true,
+      "status": "active",
+      "text": 7,
+      "vector": 7
+    }
+  ],
+  "model_fingerprint_algorithm": "sha256 of Python json.dumps(identity, sort_keys=True) encoded as UTF-8",
+  "model_provenance": {
+    "model": "text-embedding-3-large",
+    "precision": "float32",
+    "precomputed_at": "2024-02",
+    "repository": "Qdrant/dbpedia-entities-openai3-text-embedding-3-large-1536-1M",
+    "revision": "4a9731217921bc476a0f03544f11f22ae4903fa5"
+  },
+  "not_tested": [
+    "full corpus backfill",
+    "30-minute profiles",
+    "physical derived corruption",
+    "power loss",
+    "disk budget for full reindex"
+  ],
+  "prior_harness_failures": [
+    "r1 systemd default cwd made relative script unavailable",
+    "r2 missing owned database directory; corrected fixture initialization"
+  ],
+  "resource_request": {
+    "MemoryMax": 671088640,
+    "MemorySwapMax": 0,
+    "RuntimeMaxSec": 1200,
+    "native_rss": "not separately sampled",
+    "profile": "low",
+    "unit": "akasha-generations-r5-20261023T1122"
+  },
+  "review": "implementing-agent source self-check; not independent review",
+  "seconds": 78.36735875811428,
+  "source_sha256": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+  "status": "diagnostic_passed"
+}

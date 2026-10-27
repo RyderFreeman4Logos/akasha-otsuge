@@ -1,0 +1,14 @@
+[run]
+id = "fill"
+profile = "low"
+seconds = 180
+[paths]
+binary = "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/generation-workload-r3/probe"
+database = "/tmp/akasha-generation-runner-athzppo8/database"
+request = "/tmp/akasha-otsuge-storage-20261022/generation-runner-r5/fill.json"
+output = "/tmp/akasha-otsuge-storage-20261022/generation-runner-r5/fill"
+[disk]
+start_bytes = 81212254720
+reserve_bytes = 36212254720
+[reliability]
+max_attempts = 1

@@ -1,0 +1,22 @@
+{
+  "active_attempt": "66fad502824f47adadd68d76e3919405",
+  "completed": 11428831,
+  "content_bytes": 50001002783,
+  "controller": {
+    "pid": 3803343,
+    "start_ticks": "457029183",
+    "state": "R"
+  },
+  "durable_documents": 11428831,
+  "elapsed_controller_s": 12556.982003978454,
+  "elapsed_s": 12554.424472969,
+  "eta_s": 0.0,
+  "free_bytes": 163991388160,
+  "manifest_sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+  "phase": "import_complete",
+  "pid": 3803354,
+  "rate_per_s": 534.1351182157499,
+  "reserved_bytes": 126212254720,
+  "start_ticks": "457029219",
+  "total": 11428831
+}

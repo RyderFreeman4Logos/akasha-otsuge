@@ -1,0 +1,22 @@
+{
+  "status": "passed_diagnostic_only",
+  "checks": 9,
+  "seconds": 8.007779561914504,
+  "binary_sha256": "1ee2001a5f77fc03db30cf8e87a4f8181d35aa6091193a62a766d69966c5b249",
+  "harness_sha256": "2ce1f20ca8aeeaa4ae23b7a2f12b5e3889a315f5441436646169d56b54c7d709",
+  "controller_sha256": "a0c38a04db0109cd904c729c2c1e8ded98275fdabeceda9024685224d10213f6",
+  "not_tested": [
+    "native ordinary-write disk admission",
+    "full-size operation",
+    "power loss"
+  ],
+  "prelaunch_failure": "r1 fixture created an empty database before exclusive native --load; no native import began",
+  "source_sha256": {
+    "spikes/helix/run_generation.py": "a0c38a04db0109cd904c729c2c1e8ded98275fdabeceda9024685224d10213f6",
+    "spikes/helix/check_generation_runner.py": "2ce1f20ca8aeeaa4ae23b7a2f12b5e3889a315f5441436646169d56b54c7d709",
+    "spikes/helix/run_case.py": "c647b72392641f7626c718f479e7da4b001a2aca5bbf802465e0e6bfed95ca21",
+    "spikes/measure.py": "1280388c33caa835249b1f7d58491f428086b7d79edcc3d2f946384adbd87029"
+  },
+  "final_run": "generation-runner-r5",
+  "full_begin_controller": "Full generation initialization was launched with the retained executing-v1 controller before immutable manifest/config snapshot refinement; its running process and native binary were not restarted."
+}

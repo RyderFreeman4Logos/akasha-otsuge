@@ -1,0 +1,10 @@
+[run]
+id = "visibility-diagnostic-v1"
+max_attempts = 1
+setup_profile = "high"
+index_observation_seconds = 7200
+[paths]
+binary = "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/probe"
+database = "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/database"
+input = "/tmp/akasha-otsuge-storage-20261022/vectors-00000.jsonl"
+manifest = "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/visibility-diagnostic-v1/corpus.json"

@@ -1,18 +1,72 @@
-# Development checkpoint — 2026-10-22
+# Development checkpoint — 2026-10-26
 
-Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge (public, Apache-2.0).
-All 41 source pages and all 28 real Issues/dependency mappings are preserved.
+Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
-- MVP-001 / #1: complete. PR #29 merged as `9c60f50022a4d5b29338e8603e08153037926856`; [clean Linux CI](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/39879774711) passed. Local gate: 4 Rust CLI tests, 6 Python plan tests, formatting, Clippy and release smoke.
-- MVP-002 / #2: implementation candidate on `feat/mvp-002-config`. Configuration resolution, resource preparation, whole-snapshot reload, pending restart, live delivery checks and deadline contracts implemented; 17 configuration tests pass. Exact-commit gate, PR/CI and final closure are recorded on #2.
-- Next: MVP-003 / #3, after #2 acceptance. Read `docs/spec/05.md`, `08.md` and `issues/MVP-003.md`; freeze the storage benchmark/criteria before experimenting. Helix embedded first, specified fallback only after hard failure. No production backend has been chosen.
+The public Apache-2.0 repository contains all41 original specification pages and
+28 linked Issues. The specification snapshots remain immutable. #1/#2 are merged
+and completed; #3–#28 remain open at this checkpoint. The full acceptance queue
+is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-The remaining MVP Issues are open. Library configuration tests are not provider,
-daemon, four-host, 1600–1690s or 50GB/100-client acceptance. Persistent configuration
-audit, daemon commands and file watcher integration remain assigned to MVP-008;
-actual notifier dispatch is MVP-023. Installed user tools and running sessions have
-not been changed.
+## Current issue: MVP-003
 
-Use `bash scripts/check.sh` (or `just check`) on the current candidate. Issue closure
-requires its specific evidence, source review and clean Linux CI. Continue one main
-Issue at a time and preserve the original requirement coverage.
+The tested Helix candidate failed three full-data low-memory recovery runs.
+The selected sole backend is SurrealKV1.0.0 authority with LanceDB0.40.0/Lance13
+reconstructible indexes. The [ADR](../benchmarks/storage-decision.md) records its
+single compressed-authority content layout, measured settings, elimination
+reason and limits. No production Storage module is claimed by the spike.
+
+Source3b3994a/native860c32fa has passed its exact-HEAD root gate, independent R3
+source review and Linux CI40088656119. Original-model binding passes139 commands
+and67 identical before/after witnesses, with original deadlines and no reimport.
+The final fixed3,840-second/100-client full concurrent measurement passes:
+
+- 11,428,831 texts and1,000,000 real1536-dimensional vectors;50,000,002,783 unique
+  UTF-8 source bytes. Reuse42 compressed shards; do not retain the84GB expansion.
+- 108,641 completed requests,82,587 distinct seed/workload commits,10,391 expected
+  write conflicts and zero operation errors. Both search types overlap the build;
+  all workload latency, throughput, content and scope checks pass.
+- RSS P99/max509,325,312/553,222,144B, no OOM. Build2,632.432s; total3,852.107s.
+- 371 disk samples, total allocated peak137,661,698,048B and minimum free
+  397,265,436,672B. All category caps pass. These are sampled allocation bounds.
+- Completed reuse, exact process/unit exit and scratch cleanup pass. At measurement end, active3
+  watermarks equal committed392298 and candidate5 is built. Build-end370032 is not
+  the final workload commit.
+
+The previous user-requested restart pause occurred after measurement completion.
+No follow-up was launched during that pause, no new commit was made and no handoff
+file was written. The six prepared follow-up phases now pass with514 native
+commands:323 acknowledgement batches verify82,587 receipts; before/after witnesses
+pass78/79 commands;26 vector-replay, three catch-up and five activation commands
+pass. Catch-up takes552.448s; active5 and both watermarks equal392298. All exact
+process/unit/scratch checks pass. The nohup pipeline terminates normally and its
+WD relay is cancelled after collection.
+
+[The verified archive](../benchmarks/results/fallback-full-rebuild-r3/summary.json)
+contains2,116 files/22,486,670B, SHA256
+`ae38a323030c3b5058550945a7b1368f270ae975147f75457b0337c18272539a`.
+The final evidence/ADR exact-HEAD gate, independent review, CI and PR#31 merge
+remain required before closing#3. Full measurement was reused without rerunning.
+
+The [matrix](../benchmarks/storage-evidence-matrix.md) connects every storage
+criterion to evidence. Historical low/high1,800-second cases, burst/overload,
+full serial lifecycle, direct-low interrupted recovery, reclamation and native
+crash/corruption/ENOSPC fixtures retain their measured executable identities.
+Both full concurrent OOM failures and unlogged unknown outcomes remain retained.
+Product daemon, external workers, long model calls and four-host acceptance are
+separate dependent requirements; no installed binary or user service was changed.
+
+## Execution discipline
+
+Load WD after every restart/compaction; use exactly one dynamic provider-TTL relay
+while native work is live. Long executable tasks use `nohup`, detached stdin and
+exact PID/start-time plus durable admission/progress/terminal receipts. Preserve
+the original campaign start; intentional restart pauses are elapsed campaign time,
+not active computation. Reconcile an exact terminal result before any replay.
+
+After the current acceptance leaf is archived, run the canonical
+`bash scripts/check.sh` on the exact committed candidate, obtain independent
+review, push and read back the matching Linux CI, then merge and close#3.
+Continue#4–#28 one Issue at a time in dependency order. Avoid repeated full-corpus
+runs on unrelated intermediate changes; #24 repeats the same manifest/oracle
+through the actual product protocol. All required product work remains on the
+complete TODO list; no scaffold or diagnostic result counts as its completion.

@@ -1,0 +1,3312 @@
+{
+  "artifact_sha256": {
+    "000-begin.json": "e846c54aa0e3bfef3f378cc41f7faed73f931ac1512c87f63da825321bc065bc",
+    "000-begin.log": "d04765a7400608d24d3f333aecaf13712e5e40d3bb25e01d01e79d89a9b89644",
+    "000-begin.stderr": "68c1504c1e6393975fa0917e4e314c18a542b548738295dc6b77e1e40d34cfb9",
+    "001-grant.json": "7a856eba5b9b51a84893923140afaa48ee292aea9c69b5fe71e50a699fe20a75",
+    "001-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "001-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "002-grant.json": "675c5eeb2b1e820aa2ca4870625f05cf3cf81aed0ccb30ca8be25f6561a827bd",
+    "002-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "002-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "003-grant.json": "91d665c1f36cd7bc69002f3858c37c4e82161bf7b49f56add7c73c2266c9ff86",
+    "003-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "003-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "004-grant.json": "af44c70f78564297243baa2827d44bd37b47da663fae6128cabfe58959850679",
+    "004-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "004-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "005-grant.json": "65fdd4999dc29fbe31955e4b94649b2d0ff8c1ffb4270e2e359997a04481863b",
+    "005-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "005-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "006-grant.json": "c0e90ccecc506f5c42fe45d2cc38ff37f742232c8b9e87334b0eed982cb6fc51",
+    "006-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "006-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "007-grant.json": "0545361561764ad4b8a6e3eebbd158ffec4ab48abcc1423918b27f693811789e",
+    "007-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "007-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "008-grant.json": "70462ac77f009e330c475abe0088a56a87ceb5eded3dbf58f84c7ff7ed3b2b23",
+    "008-grant.log": "62a92cd956a686a92c788388dd8078640c027860b121f9a6d591a6f392bfb2ac",
+    "008-grant.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "009-build.json": "f5d79732918a640924d57cb1003b64df74594146b555b657dc0b5f8b2f411937",
+    "009-build.log": "74d485632b7afc4af4492c57495ec9efcd26ebab6da81bc2fc4f1e0ebea05413",
+    "009-build.stderr": "6e2b53c20342303764b104145f715996668c2660741c47945bb2e44bd1b3f08a",
+    "010-commit.json": "916dc00ddc22224b219c86340e1a53754bc0c1b5af09d21c4e7681e7196c09e3",
+    "010-commit.log": "c5b9b0f2260d1510f7c369f1dfb041393f21e9ef434819da65bcfba8d459b5ad",
+    "010-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "011-receipt.json": "0edc5f9bd330ad4deb737fe27072ddf2f534452d2022af757e0befa9e8ef61d9",
+    "011-receipt.log": "99e177b07854c9a492eae1ed56d8e2b797a98e58fd62e6a55f00b603b1d20eb2",
+    "011-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "012-apply.json": "7e99778b8f4694869646143b02a6dbf8f2baf3b8d72830f6185bf02ccb5867a0",
+    "012-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "012-apply.stderr": "fb3efd5a4a64b4502a547e8b1bdd12ec5722bbd9fac89a63e7b784b1da3960b7",
+    "013-apply.json": "d9dae4c14463251be6d4b3f8f9aa63843d17a1013f6c95b3b2dee10d25f8cfaa",
+    "013-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "013-apply.stderr": "fb3efd5a4a64b4502a547e8b1bdd12ec5722bbd9fac89a63e7b784b1da3960b7",
+    "014-apply.json": "32491c57051e5ff3756fe06114a2e0f230c6d63b6c585cc50cf7e126395d04f6",
+    "014-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "014-apply.stderr": "fb3efd5a4a64b4502a547e8b1bdd12ec5722bbd9fac89a63e7b784b1da3960b7",
+    "015-apply.json": "dc4c6a17a518b34d992455f654f075b6b7473e6153afeab67be358353c337a0b",
+    "015-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "015-apply.stderr": "fb3efd5a4a64b4502a547e8b1bdd12ec5722bbd9fac89a63e7b784b1da3960b7",
+    "016-apply.json": "519f8f2fcb92687e55e9d04b9d1c052c3b7f8a34d24a556dbcdf839790181bc0",
+    "016-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "016-apply.stderr": "9185f5c16f22ade19636f00e0200a806b859e303ae39cc92d100ee5d3e0502f1",
+    "017-apply.json": "d6af5c61a7fd8ec3cc6926aeb79afb94858306543d07b95eecd80a8436fc7368",
+    "017-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "017-apply.stderr": "9693b3a49f8ac1eaa9299ec3eb57f26d4493620d05263572ec3c97f4101acaf9",
+    "018-receipt.json": "0edc5f9bd330ad4deb737fe27072ddf2f534452d2022af757e0befa9e8ef61d9",
+    "018-receipt.log": "99e177b07854c9a492eae1ed56d8e2b797a98e58fd62e6a55f00b603b1d20eb2",
+    "018-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "019-apply.json": "34db3595885179459e01fc5d8338ba932ddbcf7ac8ce8b2c87f97c160a75f9fc",
+    "019-apply.log": "0667cc8f1477f031379e3bba0c0e95e5f12ad3736ab37e3f32ccd599e85d0c46",
+    "019-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "020-apply.json": "8c6e7926b2f5c876c3ca7646d7f361dcb01a2da6c9a7f31bd803de40f43aef32",
+    "020-apply.log": "725b0a94f32a56b2d6186b8b3b6e25e900c9f7e0d87262c1479420a27ae39002",
+    "020-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "021-receipt.json": "0edc5f9bd330ad4deb737fe27072ddf2f534452d2022af757e0befa9e8ef61d9",
+    "021-receipt.log": "46fee3a1e7b15a796b971c9ecc8741af093ce7bc0009b6d9a98b15ae1e2e9a7e",
+    "021-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "022-activate.json": "356b4ff63aaaa9cde4a733e3c37d2199c43510b3ef156605becddea5522336b9",
+    "022-activate.log": "e074de8b2c14610dd926cb56194847ee4d237e26a0295c785bafb5d4a0f7e0e7",
+    "022-activate.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "023-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "023-query.log": "7ec1af1a0662334706c9ea4e380a83a6d3ae7d03a05a3cce597e443d82fe04f0",
+    "023-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "024-query.json": "ced964bbd8de10072aaffb17e5c8e73ec21edd43cd19e3543f4b8a84300e8f34",
+    "024-query.log": "7ec1af1a0662334706c9ea4e380a83a6d3ae7d03a05a3cce597e443d82fe04f0",
+    "024-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "025-commit.json": "d45a43e22533f86d0da68a833f83fd43db5426956ebffb75a0e4226d3e0d3345",
+    "025-commit.log": "776b6023453495f4701c3cfe4dcd14993947f2ee30c468e07d40487a64b17640",
+    "025-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "026-commit.json": "492cf9485485cfe46300c0a624381785fa86b9e6a2eb0b7834587f83ee5e20cd",
+    "026-commit.log": "1cae9d2fa5b1fda317e0aedd4fe955f567347631f3bf671d887f67ae33dcf96e",
+    "026-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "027-apply.json": "de0c6eb1c8a3218c276798ac9808be3dad1a96dc80677a62001da6ef2d2743ea",
+    "027-apply.log": "afdf6ec506a5eca3d5ff00bea8fc6fa9a68657071b4ffb84f89af4aea1573459",
+    "027-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "028-apply.json": "24b04b00d58d524c31d8a6baa96d4b69d17e1c48f627d27a71f9432445fd3393",
+    "028-apply.log": "0ef72088a313dcd78bf159b03b059947bb2abbc8bb8c6ea0fa66a557a8d83990",
+    "028-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "029-receipt.json": "6c8e4273419ff2cf7f42f226aa3eeb97f9abee2e6775fcff13156662191cf3dd",
+    "029-receipt.log": "7700647c492ad4dd5dd1053efd89d6a7decb9be9179081d30166efa5f44d56cf",
+    "029-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "030-apply.json": "8270fcecb5a467394d5fc78590c34cb62490dd07fd95b65b41871b2d6fded4ee",
+    "030-apply.log": "ae739d7aefc2aea7735fc6bb213b607757606e2ee0a54de53cca22577b0d4bdc",
+    "030-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "031-apply.json": "a0e22e910470fd7a2ac03458c114e1e18f0f4a9a136845ddd639146d89d316ca",
+    "031-apply.log": "bbd02c23c0720e45a5a4b3dc17106cd58ef6ab4669117a79eddc666ffb510e33",
+    "031-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "032-receipt.json": "6c8e4273419ff2cf7f42f226aa3eeb97f9abee2e6775fcff13156662191cf3dd",
+    "032-receipt.log": "2b16d1ecac94fc564c105335612541b6f8febe21f0519093021c75c2794e2265",
+    "032-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "033-commit.json": "3ff1f9b8b66d5b45d1d515d030f25c3662dbc29cd605c9b63d3a6d15f6bea5a8",
+    "033-commit.log": "c3e52480420817f66c3709c2cc093461be4a5c96942963d80cdceeeaa4723839",
+    "033-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "034-commit.json": "c26d1dc05f9ca0effeb00d4190301b581ee3bda25d2bdbdb13cd104f93a52af3",
+    "034-commit.log": "bb4890b248edf365733d7b5ffdeca8ce023d6cc08c1c01d7bda01c9c2eb4b8d6",
+    "034-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "035-apply.json": "2e22ef80b08191d732c47535859aa7cbef48205ef282b39edd6b466c29c03907",
+    "035-apply.log": "71895139c137ec36c41a60ef401ce3b2e88bdf53c8fce1a6c10c942e191def14",
+    "035-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "036-apply.json": "e9f4d68933283026f9f24bd5a6ffb20c53abe95d45532812918424be06c9a541",
+    "036-apply.log": "3f2e661b23342ed1fe334ba4fd7b00d8c783eeb8ef91c284457e9cc38a2d8b58",
+    "036-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "037-apply.json": "d6d8316650bddbd50d139d2da25b9ded7f3f8efc911e8d07bcb920b4317dd3a1",
+    "037-apply.log": "2248cfd30aefea53eaa8e66016c0780f21e90e628dcef2f7b129362593b4badc",
+    "037-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "038-apply.json": "68eaefac69c2d5da19c518d9bd15a3a963f4d07176ea1d72395c3b6ea1292f6b",
+    "038-apply.log": "2ecd3cbad5fac9457eda9daee9b1bad4072a3e76cfdea6d14969a2d6a5e5d127",
+    "038-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "039-receipt.json": "a4be57e295af4e266792cb1fa539e5ad2e8d7fa329ef31cb38c3a69e85109a7e",
+    "039-receipt.log": "76553821c10488d86cbce07dcef3d1369c5b9c8e40969caa45536dbd26f6345c",
+    "039-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "040-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "040-query.log": "46338a83c99aae59c2b297be6d2c0cff6b201d807b8cad9af06fd9463c94ca9d",
+    "040-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "041-commit.json": "c9ce210a29bf444320d6b68ba4ae87cd67c5f84e5b2a6fbc4fcf17dcd266b6e2",
+    "041-commit.log": "1e6f66ba607153dfbeba85f70dafdd608aca87ba0448b815fb16a88313264138",
+    "041-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "042-apply.json": "6c51e32a4d77d374ee90efc197f1bbbb214c68590028a3cb826d96982994209e",
+    "042-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "042-apply.stderr": "b8bb2b9352ec23844e0680157e5cb2d55364d0f51352ffe2751cd39ba5fe620a",
+    "043-query.json": "ced964bbd8de10072aaffb17e5c8e73ec21edd43cd19e3543f4b8a84300e8f34",
+    "043-query.log": "3bdc73a9fd99bb91e2860d5758dc3985512f5d955c7ab8f1489a946c13c52422",
+    "043-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "044-receipt.json": "8aae17460c1edc56da71ca2f77cf421ae617aa0a9f6e986df23852af10e1200c",
+    "044-receipt.log": "44e425ce0b96dbc17d0e814f318214faea961035ddd15c62d2408e822fa465b3",
+    "044-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "045-apply.json": "9d8cd1348c97745410e713339250223949b57e6c0471b606ce65e2a902c03506",
+    "045-apply.log": "5427e0e736ba58e0cb46ae59aa6aae146c03c91626569c93ada58b0f8556f111",
+    "045-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "046-apply.json": "70f21ca01d7aacef3b74a1a7f88ae08405167211ca591adb02c696794428bbe7",
+    "046-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "046-apply.stderr": "61187df2e9e09e8186d246137c5f6931a1a3734430b34d500181850bc8e617f6",
+    "047-receipt.json": "8aae17460c1edc56da71ca2f77cf421ae617aa0a9f6e986df23852af10e1200c",
+    "047-receipt.log": "4627274702a6f1ac09e5c68634ae540b68d7b9e975d8b3de2512fcbc8ccd2c23",
+    "047-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "048-apply.json": "4582ea9caa44e58b049cd07712d758471685c98f09cd2d9db50b10392e7ab753",
+    "048-apply.log": "9bbaf56edb9a55d854fda9170fb506f543b61df6213e41e353840114f75584e8",
+    "048-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "049-receipt.json": "8aae17460c1edc56da71ca2f77cf421ae617aa0a9f6e986df23852af10e1200c",
+    "049-receipt.log": "15d5608a866de258b6845d9d14ba16ea8bda01e0a3b9c4a22a3b8fe62c8cc875",
+    "049-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "050-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "050-query.log": "015a28da44378410f61e9cbae3cb7579d476a63940629b9bb99825a996287478",
+    "050-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "051-begin.json": "68960d89e68fb28ad643d68c6e7bf15d2ce414f2d29f2b6f785596317d3ef83b",
+    "051-begin.log": "b76ae54b305cd5e4f5d32bbc1a81cb24810179de8a95b6732367a362e73df947",
+    "051-begin.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "052-build.json": "814bcbff7e96253e2d4523b724b3eb914bf999422bfef7933fd1e3492cd670e1",
+    "052-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "052-build.stderr": "fafaab42d2bdb432770319750e013c701381f3168f32a9bfdc644ad6b4ddd995",
+    "053-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "053-status.log": "34c8319cf023a2cc8a2f876b78398a92dd08ae970ad21a725580450c9e2e86ef",
+    "053-status.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "054-query.json": "ced964bbd8de10072aaffb17e5c8e73ec21edd43cd19e3543f4b8a84300e8f34",
+    "054-query.log": "015a28da44378410f61e9cbae3cb7579d476a63940629b9bb99825a996287478",
+    "054-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "055-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "055-query.log": "015a28da44378410f61e9cbae3cb7579d476a63940629b9bb99825a996287478",
+    "055-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "056-build.json": "afaf335472978af9cfac993900ddef23aca13e8322d6aba12a534dd12046e80b",
+    "056-build.log": "3a992555f256a63a505fc9090f627640d024789e7103664ba8a306579282854f",
+    "056-build.stderr": "0b43f3bc029ac93f9adc4d8eccaaaa5fd7a600786f2f5cf1ef8f9e71eee90e0a",
+    "057-activate.json": "2e6676bc50135e4c6bd29e556ba31d96451e823e665495aa53de50563efbd45b",
+    "057-activate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "057-activate.stderr": "4cd2950fd2231ac5744db23ca0ca0081f15a1a153428ec62c4f24b231ab34f1b",
+    "058-apply.json": "0f9368341772a067465f1788950541d237ae741c19984d4dc8c4962a45b5c4cf",
+    "058-apply.log": "f23e5965523a836b2d3bd3b65c0b4aec637004977658f981da00e62c57afdead",
+    "058-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "059-apply.json": "89ca7a1fcc3c66199d1caefc8f44f50cf4675089cadbe75578e0c81359a71ca0",
+    "059-apply.log": "98c903957cbb9ca65fdd53eb9b5d7b34ef2d4c751408819ae46499f0be9b6930",
+    "059-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "060-apply.json": "4c972cd0ffa4c6ff7ed9101b7b49fb9fa5194d8c4e94b70f5a3b062ea5bf6d23",
+    "060-apply.log": "2bdc9abf0b4e77707a2417c7f3074c0240f3069c9fb6b855c70d092f8db6bcc3",
+    "060-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "061-apply.json": "0849471ab6c4a8952bcfc1af5f1812f6332ff76520875210e290704bb1cd73ff",
+    "061-apply.log": "24d7d989c1dbc84d75d4d965b97b9b13fade972b9e8c768d4d4441f060d042ee",
+    "061-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "062-apply.json": "edf40ed19f4cf39b88ecfd78c1019d464dfac9293273758b9f3eadb43e963708",
+    "062-apply.log": "e7386fb5ba34313f0422277504611d631559d9d992e52abbcdf26fdf1a0fedb0",
+    "062-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "063-apply.json": "7cbb999bb7613e4dc203139ff48a72091ef344852d3c01f01ccdad66ab1ee79e",
+    "063-apply.log": "0c5e71e8d8bfb52c41670b2347251ac9892067911b40a632fd92b09248ed4805",
+    "063-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "064-apply.json": "af93b36ccb1a77cf1fcf778d8cc3cd8de7e562437be391362bdea72d2688ffbb",
+    "064-apply.log": "59237282e9d722d81d69a0bd8b00235526ebe5ff8318f37e2ff75084a1efb048",
+    "064-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "065-apply.json": "699584040fab1232b95ee6747bd19878dd1eefd19af55e03714814c5ee125116",
+    "065-apply.log": "828d68d29d3a27c8522f7c2b7b743201b7aeb04200a451b0fe2d8c9014979771",
+    "065-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "066-apply.json": "c0bba729394ea781bc5046e84449b0bd5c43fc16b8add96b217b0bbd71dc4798",
+    "066-apply.log": "52b75a35ad8230d9048556d7abc9a9f02042487e46c5cb3d9e58f0f79c684ae1",
+    "066-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "067-apply.json": "2cc79c1f7a56d8985dd1a1c15834de14758d117d2d27e1465221ee793d12d586",
+    "067-apply.log": "549440414a6a630ef61871572525010d17243527a0444b633259aa57849aa5b9",
+    "067-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "068-apply.json": "d5f556f47820ec5408bff5fd3b70994e3b9c6930c88b62d97eea38438135a8b9",
+    "068-apply.log": "25fc52644aba720657e0bad15a0945419f127b856b06ea79ea621b960e88e3ba",
+    "068-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "069-apply.json": "347bf4a74c75a1824b1f2c640db95e06af844e741e8472f690b22ba6abc878a6",
+    "069-apply.log": "e85adbfa67ccd4ab3fdb74a77339858e554d84b8d3ff35ac0d2c3a9f9e013635",
+    "069-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "070-apply.json": "39422df56b44017e89943e4788d9c0b57eb90cc944b3c4dd22153d69e953eeed",
+    "070-apply.log": "c3fda706542389676661106e48bd85fc03f72ed01e8be2c98a62be447e18a766",
+    "070-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "071-apply.json": "2c332fea60be7e68c3febf1ba66a614dd4942c0413a29b7bffb1106b964921c8",
+    "071-apply.log": "eec321836a149e1609bd7053caa121da258b87ae86bf6d7e12141a2c9748456a",
+    "071-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "072-activate.json": "a59174e8b7f652969e1db8a4acf87f880c1d370b48541d74ba350d2ef8a700eb",
+    "072-activate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "072-activate.stderr": "b5ecf73f14430cd78958c5eca71b6344010893dbe157fbb312f4ae8aff2836da",
+    "073-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "073-status.log": "94e66fad30edb9d3e03290aee2eda6ce2f1d9dd5fda170401fcc6a25cdf7e95d",
+    "073-status.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "074-activate.json": "aa554a1a50cf7bdc5ac14703e0fb0f15c8c4bf9cba3131149e20d386d004c02b",
+    "074-activate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "074-activate.stderr": "7be2eccf8222ece1af8ce7ab00615ea6035fb70c93b134a1b046f97b9e27f2cc",
+    "075-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "075-status.log": "1a915efef7c4ca5e6b5f8e9625ccf539c8a5345271325aabe67c1c377db347d3",
+    "075-status.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "076-query.json": "bcc914d7ca13633bc2785e788eebacaf273af556581fa875bb6ad0fe3721b163",
+    "076-query.log": "5781f96c54c57afb941fba966928530fc22680f6e6af89fc65a03822f9a69aec",
+    "076-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "077-query.json": "af123f00ca6825dea3852eae0039e47f20e81c8b10b4ff07e573a20c58b3d4df",
+    "077-query.log": "5781f96c54c57afb941fba966928530fc22680f6e6af89fc65a03822f9a69aec",
+    "077-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "078-query.json": "b3d5dfc22b9f1ce4f4ff0ad6c8b65bc70e6f0cace287e2cf65f7bb3eb7ca94c3",
+    "078-query.log": "160d188fbfd9ce5b3c8a3f94e298f71be2ab8880f838c10d4e2efa35c6f5248e",
+    "078-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "079-query.json": "5bf82f5ced844c2a2ba3408e216219c4a941ee54b2acf7ce9532e1ba3dda2562",
+    "079-query.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "079-query.stderr": "a3a165fcc633cfd9d8cf6696ff7592ec613b82b8461529b5730d1b81d1e99356",
+    "080-begin.json": "58763ab9cd7551cb91888b3c97bed2ada669ed549e00d5e4c9d698357ea33d3f",
+    "080-begin.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "080-begin.stderr": "7dd2f278e5a617dc248b1bdb1004b99c93a28095a0e4be2fc9c4fc8478110afc",
+    "081-apply.json": "6c985a7eacebea4d6cd07a6127413bf38786a6ba581e894452715aaf6f2c4bfe",
+    "081-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "081-apply.stderr": "7b91c1d00df9a051d2ae0ab32676c7207808ed9136638ffe7fc29d213c9b9cbc",
+    "082-query.json": "682435ad39cdf37c22cdc0b816268819a6c753803b1d521adc4311f6262569a7",
+    "082-query.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "082-query.stderr": "a3a165fcc633cfd9d8cf6696ff7592ec613b82b8461529b5730d1b81d1e99356",
+    "083-commit.json": "9432a5db5e74bd798a36ea9878df0d897b2eaad41426f7098501f2aa890a6cb1",
+    "083-commit.log": "9643a68e232ffa8073d0a8859f5ea971bdbbc7be0509a21fb31259080cb65a63",
+    "083-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "084-apply.json": "e3d7b2995421c54a772081f8f5417677e9f430f4ba5e2e87a275f1ef0c340691",
+    "084-apply.log": "63a216585ee84058870b118edbf8a0b7af63a663b91855601ba52b29f0f86ef2",
+    "084-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "085-apply.json": "4d66168155e1bfd90c2396d5766661d9dc1e2689f702ef1588fd5a29ddc7912d",
+    "085-apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "085-apply.stderr": "adeff07903ef8ee3cf153f8122a22561242e163c90bc04dbeef338bf4f6beb69",
+    "086-apply.json": "fa4e48832a50c4fe4e99aab3ba504745da25120fc4013441a1c21b6c5bb92641",
+    "086-apply.log": "dbc97b3931678304ccc695d0f7bd3f071a5bd83f370706cfc727de9164c05bc4",
+    "086-apply.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "087-receipt.json": "271d5ad80c8e503e0dd0610e4af4c702f0753dd07c912c7964122e22a746239f",
+    "087-receipt.log": "c721045e4d5c440cbcb82c2a38024d86528c41f6be5f3035c6e2361662b4e414",
+    "087-receipt.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "088-query.json": "bcc914d7ca13633bc2785e788eebacaf273af556581fa875bb6ad0fe3721b163",
+    "088-query.log": "1a006dd1a1856f08afdb08edc6fb9cab23dbc79000eed3e2447a0a276d53b403",
+    "088-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "089-query.json": "af123f00ca6825dea3852eae0039e47f20e81c8b10b4ff07e573a20c58b3d4df",
+    "089-query.log": "d4abf5a3afbad528ae9905302dcb3efb8181fd92b1b74399ff4b291d08f6f88a",
+    "089-query.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "090-raw.json": "352fc82849e91b0c03c015d802ce3392d97befba3b0056590c8887baa7b4cf6f",
+    "090-raw.log": "20820b500ff2c86334994b6e8979e24fedd266a665400c25b20438f957067a9d",
+    "090-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "091-commit.json": "a271debd66e844d27bd82afa5966cb1eacb46a5930ea2bd52216bdf0ea05c633",
+    "091-commit.log": "05644b6b209b8769921bc00f88d6ee5ae9c8ab9efba4aa34c381d6823a76ef09",
+    "091-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "092-commit.json": "9432a5db5e74bd798a36ea9878df0d897b2eaad41426f7098501f2aa890a6cb1",
+    "092-commit.log": "9643a68e232ffa8073d0a8859f5ea971bdbbc7be0509a21fb31259080cb65a63",
+    "092-commit.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "093-raw.json": "f5dab387f4b00a7f1904e3b2a59d2d72a39621caad63df98d35447ce90c12e58",
+    "093-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "093-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "094-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "094-status.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "094-status.stderr": "f2ba0ee7a4dd030894d3fdf7c1f19f87bf403f9ac2f4d3c9e2f477ee86481725",
+    "095-raw.json": "43da5f3f033fe1692f44c12abe8e1601b0a60c6633b7a8ca803013dba242be8b",
+    "095-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "095-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "096-raw.json": "4f7a1aa2b618eea6368e4ae483c2a9fadf4619b0b3cf5643042d98f16da53f24",
+    "096-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "096-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "097-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "097-status.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "097-status.stderr": "113fedd1f2e5cf0c68b6a7ea23a543c5152c85d50b5fec3dff6bc20744a651d9",
+    "098-raw.json": "4afe1011a7efd1fcff64bef673b61c0212008bd503081a0df3e336ae3d78979d",
+    "098-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "098-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "099-raw.json": "3c524c06220890999787d28a6d335667fa01ded79c00807792d3bdbeaa84a7db",
+    "099-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "099-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "100-advance.json": "1dfd169e05cb6d2882a0635f4b956c2bfc62a85b981f25085e8773029642e0e2",
+    "100-advance.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "100-advance.stderr": "76dcc05d2915cbfff1625f385581a323a93cdde9813bc40bec4dd1af9dc4f675",
+    "101-raw.json": "deaa628a980a04127212e18553cabd47f3451e61c8db0da5897ffc4ca44eb6a7",
+    "101-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "101-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "102-advance.json": "796b75584268a44abbfd32e4c6a24bf1e6536d41f15bd7528484c36c9b8686c4",
+    "102-advance.log": "d83be004ed37b3787e57bed17c7b13ee0fcd20a0f0f6b18a7a95697d0a58747e",
+    "102-advance.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "103-status.json": "135ea780af616eabffe68150638c369067ea271c58c1f1be5ac79661429610f4",
+    "103-status.log": "9d76051d3a410d4c717607097a567a28da0301ec173d86337843a3d10c0444e8",
+    "103-status.stderr": "85ede37657e71e559ec12cbe29dad560242e7d24df5c3c930def6d5d0c7418fd",
+    "104-raw.json": "f187d63ebaf7040962e4890930ccdb780cf531d4be5fe0094c2f37fad537c5b6",
+    "104-raw.log": "4ec08dbb74f4e03496ab445b1d4f200c12cb6f6a8d2194c9bb049bcc19ff1b8a",
+    "104-raw.stderr": "4fe99be4c0175535de1309e1dc5189ccc96b73b2b9e40c89e1f3ae1edb8bd55d",
+    "105-begin.json": "e846c54aa0e3bfef3f378cc41f7faed73f931ac1512c87f63da825321bc065bc",
+    "105-begin.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "105-begin.stderr": "0de5fb628919b880b77239d2011200489e8b2591f41278ae8f9ab7e199c257fc",
+    "OWNER": "a3424ade0ef56357a88c25487d8cbc2e62e15fe7dc3c9ec1ad2fe55bfbe31573",
+    "admission.json": "d2a5b246acfd5dabe03621a792f2090f6b1e3fbde92c3c3db631a35ae2fcaf7a",
+    "progress.json": "3caab3b2f0d6cf23aa3cdea7d261a4dd4678230ba82de002f83db88b78f6153b"
+  },
+  "binary_sha256": "a41b4d3d27054fe88521f396df23e06f32aafe4fb452a5591806459dbb01c3bf",
+  "final": {
+    "active": 2,
+    "generations": [
+      {
+        "base": null,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+        "id": 1,
+        "ready": true,
+        "status": "retired",
+        "text": 6,
+        "vector": 6
+      },
+      {
+        "base": null,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+        "id": 2,
+        "ready": true,
+        "status": "active",
+        "text": 8,
+        "vector": 8
+      }
+    ],
+    "retention": "two builds lifetime bound; no native text blob GC"
+  },
+  "not_tested": [
+    "full corpus backfill",
+    "30-minute profiles",
+    "physical derived corruption",
+    "power loss",
+    "disk budget for full reindex"
+  ],
+  "records": [
+    {
+      "child": {
+        "pid": 4072425,
+        "start_ticks": "458076829",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/000-begin.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "000-begin.json",
+      "result": {
+        "base": null,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+        "id": 1,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 4072456,
+        "start_ticks": "458076980",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/001-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "001-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 4072464,
+        "start_ticks": "458076993",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/002-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "002-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 4072475,
+        "start_ticks": "458076999",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/003-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "003-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 4072490,
+        "start_ticks": "458077007",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/004-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "004-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 4072502,
+        "start_ticks": "458077014",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/005-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "005-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 4072510,
+        "start_ticks": "458077022",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/006-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "006-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 4072521,
+        "start_ticks": "458077029",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/007-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "007-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 4072529,
+        "start_ticks": "458077036",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/008-grant.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "008-grant.json",
+      "result": {
+        "revision": 1
+      }
+    },
+    {
+      "child": {
+        "pid": 4072604,
+        "start_ticks": "458077542",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/009-build.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "009-build.json",
+      "result": {
+        "concurrent_commit": null,
+        "generation": 1,
+        "text": {
+          "operation": {
+            "attempt": 8,
+            "family": "text",
+            "generation": "1",
+            "index_id": "16",
+            "operation_id": "54c55407-faa4-49e5-bf69-c4333719b285",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "11",
+              "input_bytes": "1747",
+              "output_bytes": "0",
+              "output_operations": "0"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        },
+        "vector": {
+          "operation": {
+            "attempt": 3,
+            "family": "vector",
+            "generation": "1",
+            "index_id": "17",
+            "operation_id": "40867622-e359-4e73-8436-9ff111db2733",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "11",
+              "input_bytes": "1747",
+              "output_bytes": "0",
+              "output_operations": "0"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4072615,
+        "start_ticks": "458077596",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/010-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "010-commit.json",
+      "result": {
+        "commit_seq": 1,
+        "config_generation": 1,
+        "request_id": "g-1",
+        "revision": "00000000000000000001:00000000000000000001",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 4072627,
+        "start_ticks": "458077605",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/011-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "011-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 1,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {},
+        "stage": "committed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 0,
+          "vector": 0
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4072639,
+        "start_ticks": "458077613",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/012-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "012-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4072649,
+        "start_ticks": "458077621",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/013-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "013-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4072660,
+        "start_ticks": "458077630",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/014-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "014-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4072673,
+        "start_ticks": "458077637",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/015-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "015-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4072680,
+        "start_ticks": "458077645",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/016-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "016-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4072689,
+        "start_ticks": "458077652",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/017-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "017-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4072697,
+        "start_ticks": "458077659",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/018-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "018-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 1,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {},
+        "stage": "committed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 0,
+          "vector": 0
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4072707,
+        "start_ticks": "458077668",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/019-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "019-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4072726,
+        "start_ticks": "458077678",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/020-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "020-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4072751,
+        "start_ticks": "458077691",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/021-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "021-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 1,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4072775,
+        "start_ticks": "458077699",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/022-activate.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "022-activate.json",
+      "result": {
+        "active": 1,
+        "at": 1,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "reused": false
+      }
+    },
+    {
+      "child": {
+        "pid": 4072798,
+        "start_ticks": "458077709",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/023-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "023-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 1
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4072810,
+        "start_ticks": "458077717",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/024-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "024-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 1
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 1,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 1,
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4072818,
+        "start_ticks": "458077725",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/025-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "025-commit.json",
+      "result": {
+        "commit_seq": 2,
+        "config_generation": 1,
+        "request_id": "g-2",
+        "revision": "00000000000000000002:00000000000000000002",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 4072829,
+        "start_ticks": "458077736",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/026-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "026-commit.json",
+      "result": {
+        "commit_seq": 3,
+        "config_generation": 1,
+        "request_id": "g-3",
+        "revision": "00000000000000000003:00000000000000000003",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 4072840,
+        "start_ticks": "458077745",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/027-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "027-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 3,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4072924,
+        "start_ticks": "458078253",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/028-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "028-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 3,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4072935,
+        "start_ticks": "458078263",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/029-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "029-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 3,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 1,
+          "vector": 1
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4072946,
+        "start_ticks": "458078272",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/030-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "030-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 2,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4072968,
+        "start_ticks": "458078283",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/031-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "031-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 2,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4072982,
+        "start_ticks": "458078296",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/032-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "032-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 3,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 3,
+          "vector": 3
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4072996,
+        "start_ticks": "458078306",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/033-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "033-commit.json",
+      "result": {
+        "commit_seq": 4,
+        "config_generation": 1,
+        "request_id": "g-4",
+        "revision": "00000000000000000001:00000000000000000004",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073058,
+        "start_ticks": "458078713",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/034-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "034-commit.json",
+      "result": {
+        "commit_seq": 5,
+        "config_generation": 1,
+        "request_id": "g-5",
+        "revision": "00000000000000000001:00000000000000000005",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073075,
+        "start_ticks": "458078723",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/035-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "035-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 4,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073093,
+        "start_ticks": "458078738",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/036-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "036-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 4,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073108,
+        "start_ticks": "458078750",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/037-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "037-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "retracted",
+        "reused": false,
+        "seq": 5,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073216,
+        "start_ticks": "458079562",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/038-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "038-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "retracted",
+        "reused": false,
+        "seq": 5,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073229,
+        "start_ticks": "458079575",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/039-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "039-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 4,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "superseded",
+          "vector": "superseded"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 5,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073239,
+        "start_ticks": "458079585",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/040-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "040-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [],
+        "permission_revision": 1,
+        "read_seq": 5,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 5,
+        "watermarks": {
+          "text": 5,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073250,
+        "start_ticks": "458079595",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/041-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "041-commit.json",
+      "result": {
+        "commit_seq": 6,
+        "config_generation": 1,
+        "request_id": "g-6",
+        "revision": "00000000000000000001:00000000000000000006",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073271,
+        "start_ticks": "458079608",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/042-apply.json"
+      ],
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "after-index-application",
+      "request": "042-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4073284,
+        "start_ticks": "458079620",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/043-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "043-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 6,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 6,
+        "watermarks": {
+          "text": 5,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073303,
+        "start_ticks": "458079631",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/044-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "044-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 6,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {},
+        "stage": "committed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 5,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073314,
+        "start_ticks": "458079642",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/045-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "045-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 1,
+        "reason": "applied",
+        "reused": false,
+        "seq": 6,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073330,
+        "start_ticks": "458079657",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/046-apply.json"
+      ],
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "before-watermark",
+      "request": "046-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4073341,
+        "start_ticks": "458079672",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/047-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "047-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 6,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 6,
+          "vector": 5
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073426,
+        "start_ticks": "458080179",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/048-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "048-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 1,
+        "reason": "applied",
+        "reused": true,
+        "seq": 6
+      }
+    },
+    {
+      "child": {
+        "pid": 4073436,
+        "start_ticks": "458080189",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/049-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "049-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "commit_seq": 6,
+        "corpus": null,
+        "generation": 1,
+        "reasons": {
+          "text": "applied",
+          "vector": "applied"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073449,
+        "start_ticks": "458080199",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/050-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "050-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 6,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 6,
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073465,
+        "start_ticks": "458080209",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/051-begin.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "051-begin.json",
+      "result": {
+        "base": null,
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+        "id": 2,
+        "ready": false,
+        "status": "building",
+        "text": 0,
+        "vector": 0
+      }
+    },
+    {
+      "child": {
+        "pid": 4073476,
+        "start_ticks": "458080219",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/052-build.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "052-build.json"
+    },
+    {
+      "child": {
+        "pid": 4073490,
+        "start_ticks": "458080264",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/053-status.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "053-status.json",
+      "result": {
+        "active": 1,
+        "generations": [
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 1
+            },
+            "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+            "id": 1,
+            "ready": true,
+            "status": "active",
+            "text": 6,
+            "vector": 6
+          },
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 2
+            },
+            "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+            "id": 2,
+            "ready": false,
+            "status": "failed",
+            "text": 0,
+            "vector": 0
+          }
+        ],
+        "retention": "two builds lifetime bound; no native text blob GC"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073503,
+        "start_ticks": "458080274",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/054-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "054-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 6,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 6,
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073516,
+        "start_ticks": "458080285",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/055-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "055-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 6,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 6,
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073534,
+        "start_ticks": "458080296",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/056-build.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "056-build.json",
+      "result": {
+        "concurrent_commit": {
+          "commit_seq": 7,
+          "config_generation": 1,
+          "request_id": "g-7",
+          "revision": "00000000000000000004:00000000000000000007",
+          "stage": "committed"
+        },
+        "generation": 2,
+        "text": {
+          "index": {
+            "generation": "1",
+            "index_id": "20",
+            "kind": "already_active"
+          }
+        },
+        "vector": {
+          "operation": {
+            "attempt": 3,
+            "family": "vector",
+            "generation": "1",
+            "index_id": "21",
+            "operation_id": "9d42862e-69eb-4b12-98ef-0bd8680a0e43",
+            "operation_kind": "build",
+            "progress": {
+              "entities": "60",
+              "input_bytes": "55932",
+              "output_bytes": "0",
+              "output_operations": "0"
+            },
+            "stage": "activate",
+            "status": "succeeded"
+          }
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4073643,
+        "start_ticks": "458081003",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/057-activate.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "057-activate.json"
+    },
+    {
+      "child": {
+        "pid": 4073657,
+        "start_ticks": "458081013",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/058-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "058-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073667,
+        "start_ticks": "458081024",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/059-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "059-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 1,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073678,
+        "start_ticks": "458081037",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/060-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "060-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 2,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073704,
+        "start_ticks": "458081050",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/061-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "061-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 2,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073797,
+        "start_ticks": "458081759",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/062-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "062-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 3,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073816,
+        "start_ticks": "458081774",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/063-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "063-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 3,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073837,
+        "start_ticks": "458081791",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/064-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "064-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 4,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073857,
+        "start_ticks": "458081806",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/065-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "065-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 4,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073874,
+        "start_ticks": "458081823",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/066-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "066-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 5,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073947,
+        "start_ticks": "458082329",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/067-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "067-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "superseded",
+        "reused": false,
+        "seq": 5,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073959,
+        "start_ticks": "458082345",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/068-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "068-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 6,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073980,
+        "start_ticks": "458082361",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/069-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "069-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 6,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4073997,
+        "start_ticks": "458082379",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/070-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "070-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 7,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074071,
+        "start_ticks": "458082887",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/071-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "071-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 7,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074082,
+        "start_ticks": "458082899",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/072-activate.json"
+      ],
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "before-activation",
+      "request": "072-activate.json"
+    },
+    {
+      "child": {
+        "pid": 4074102,
+        "start_ticks": "458082911",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/073-status.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "073-status.json",
+      "result": {
+        "active": 1,
+        "generations": [
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 1
+            },
+            "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+            "id": 1,
+            "ready": true,
+            "status": "active",
+            "text": 6,
+            "vector": 6
+          },
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 2
+            },
+            "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+            "id": 2,
+            "ready": true,
+            "status": "building",
+            "text": 7,
+            "vector": 7
+          }
+        ],
+        "retention": "two builds lifetime bound; no native text blob GC"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074118,
+        "start_ticks": "458082923",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/074-activate.json"
+      ],
+      "exit": -9,
+      "expected_failure": false,
+      "hold": "after-activation",
+      "request": "074-activate.json"
+    },
+    {
+      "child": {
+        "pid": 4074132,
+        "start_ticks": "458082936",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/075-status.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "075-status.json",
+      "result": {
+        "active": 2,
+        "generations": [
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 1
+            },
+            "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+            "id": 1,
+            "ready": true,
+            "status": "retired",
+            "text": 6,
+            "vector": 6
+          },
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 2
+            },
+            "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+            "id": 2,
+            "ready": true,
+            "status": "active",
+            "text": 7,
+            "vector": 7
+          }
+        ],
+        "retention": "two builds lifetime bound; no native text blob GC"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074154,
+        "start_ticks": "458082948",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/076-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "076-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 2,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 7,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 7,
+        "watermarks": {
+          "text": 7,
+          "vector": 7
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4074170,
+        "start_ticks": "458082962",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/077-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "077-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 2,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 7,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 7,
+        "watermarks": {
+          "text": 7,
+          "vector": 7
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4074186,
+        "start_ticks": "458082975",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/078-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "078-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 1
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 1,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 6
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 7,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 7,
+        "watermarks": {
+          "text": 6,
+          "vector": 6
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4074204,
+        "start_ticks": "458082988",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/079-query.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "079-query.json"
+    },
+    {
+      "child": {
+        "pid": 4074219,
+        "start_ticks": "458082998",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/080-begin.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "080-begin.json"
+    },
+    {
+      "child": {
+        "pid": 4074234,
+        "start_ticks": "458083009",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/081-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "081-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4074254,
+        "start_ticks": "458083021",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/082-query.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "082-query.json"
+    },
+    {
+      "child": {
+        "pid": 4074273,
+        "start_ticks": "458083033",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/083-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "083-commit.json",
+      "result": {
+        "commit_seq": 8,
+        "config_generation": 1,
+        "request_id": "g-8",
+        "revision": "00000000000000000001:00000000000000000008",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074284,
+        "start_ticks": "458083046",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/084-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "084-apply.json",
+      "result": {
+        "family": "text",
+        "generation": 2,
+        "reason": "applied",
+        "reused": false,
+        "seq": 8,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074384,
+        "start_ticks": "458083653",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/085-apply.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "085-apply.json"
+    },
+    {
+      "child": {
+        "pid": 4074396,
+        "start_ticks": "458083661",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/086-apply.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "086-apply.json",
+      "result": {
+        "family": "vector",
+        "generation": 2,
+        "reason": "not_required",
+        "reused": false,
+        "seq": 8,
+        "visibility": "strong_with_bounded_pending_overlay"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074406,
+        "start_ticks": "458083674",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/087-receipt.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "087-receipt.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "commit_seq": 8,
+        "corpus": null,
+        "generation": 2,
+        "reasons": {
+          "text": "applied",
+          "vector": "not_required"
+        },
+        "stage": "indexed",
+        "visibility": "strong_with_bounded_pending_overlay",
+        "watermarks": {
+          "text": 8,
+          "vector": 8
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4074417,
+        "start_ticks": "458083682",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/088-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "088-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 2,
+        "hits": [],
+        "permission_revision": 1,
+        "read_seq": 8,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 8,
+        "watermarks": {
+          "text": 8,
+          "vector": 8
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4074427,
+        "start_ticks": "458083692",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/089-query.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "089-query.json",
+      "result": {
+        "bundle": {
+          "chunker": "source-document-v1",
+          "dimension": 1536,
+          "model": "text-embedding-3-large",
+          "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+          "schema": 2
+        },
+        "coverage": "candidate_set_only",
+        "filtered": 0,
+        "generation": 2,
+        "hits": [
+          {
+            "memory": 1,
+            "partition": "p0",
+            "seq": 8
+          }
+        ],
+        "permission_revision": 1,
+        "read_seq": 8,
+        "retrieval_mode": "current_candidates",
+        "validated_at_seq": 8,
+        "watermarks": {
+          "text": 8,
+          "vector": 8
+        }
+      }
+    },
+    {
+      "child": {
+        "pid": 4074453,
+        "start_ticks": "458083705",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "MATCH (r:Revision {seq:8}) RETURN r.text_only"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "090-raw.json",
+      "result": {
+        "columns": [
+          "r.text_only"
+        ],
+        "rows": [
+          [
+            true
+          ]
+        ]
+      }
+    },
+    {
+      "child": {
+        "pid": 4074465,
+        "start_ticks": "458083710",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/091-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "091-commit.json",
+      "result": {
+        "conflict": "idempotency"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074477,
+        "start_ticks": "458083719",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/092-commit.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "092-commit.json",
+      "result": {
+        "commit_seq": 8,
+        "config_generation": 1,
+        "request_id": "g-8",
+        "revision": "00000000000000000001:00000000000000000008",
+        "stage": "committed"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074488,
+        "start_ticks": "458083727",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "MATCH (p:IndexState {key:'active'}) SET p.generation=0"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "093-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 4074499,
+        "start_ticks": "458083734",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/094-status.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "094-status.json"
+    },
+    {
+      "child": {
+        "pid": 4074510,
+        "start_ticks": "458083744",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "MATCH (p:IndexState {key:'active'}) SET p.generation=2"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "095-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 4074526,
+        "start_ticks": "458083750",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "MATCH (g:Generation {key:1}) SET g.status='invalid'"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "096-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 4074593,
+        "start_ticks": "458084257",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/097-status.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "097-status.json"
+    },
+    {
+      "child": {
+        "pid": 4074603,
+        "start_ticks": "458084266",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "MATCH (g:Generation {key:1}) SET g.status='retired'"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "098-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 4074614,
+        "start_ticks": "458084271",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "CREATE (:IndexedJob {key:'00000000000000000001:text:00000000000000000007',generation:1,family:'text',seq:8,reason:'applied',hash:'corrupt fixture'})"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "099-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 4074623,
+        "start_ticks": "458084277",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/100-advance.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "100-advance.json"
+    },
+    {
+      "child": {
+        "pid": 4074634,
+        "start_ticks": "458084285",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "MATCH (j:IndexedJob {key:'00000000000000000001:text:00000000000000000007'}) DELETE j"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "101-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 4074644,
+        "start_ticks": "458084291",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/102-advance.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "102-advance.json",
+      "result": {
+        "advanced": 0,
+        "next_wave_may_be_needed": false
+      }
+    },
+    {
+      "child": {
+        "pid": 4074655,
+        "start_ticks": "458084299",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/103-status.json"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "103-status.json",
+      "result": {
+        "active": 2,
+        "generations": [
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 1
+            },
+            "fingerprint": "de5085fbbe2970e6411873920e330ab81c8d16b81cfc9db262e59d2a1ff9471b",
+            "id": 1,
+            "ready": true,
+            "status": "retired",
+            "text": 6,
+            "vector": 6
+          },
+          {
+            "base": null,
+            "bundle": {
+              "chunker": "source-document-v1",
+              "dimension": 1536,
+              "model": "text-embedding-3-large",
+              "model_fingerprint": "176dc46360b6689592cdc1cda7be58309e51d0d48861261234d2599fe65f31af",
+              "schema": 2
+            },
+            "fingerprint": "9ba10f9ca84080bfb4b0522ccc0ce525ee4403df68172890f93ca3e66c7e57ed",
+            "id": 2,
+            "ready": true,
+            "status": "active",
+            "text": 8,
+            "vector": 8
+          }
+        ],
+        "retention": "two builds lifetime bound; no native text blob GC"
+      }
+    },
+    {
+      "child": {
+        "pid": 4074668,
+        "start_ticks": "458084310",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "CREATE (:Document {key:'baseline-requires-backfill'})"
+      ],
+      "exit": 0,
+      "expected_failure": false,
+      "hold": null,
+      "request": "104-raw.json",
+      "result": {
+        "columns": [],
+        "rows": []
+      }
+    },
+    {
+      "child": {
+        "pid": 4074681,
+        "start_ticks": "458084316",
+        "state": "R"
+      },
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/text-policy-r1/probe",
+        "/tmp/akasha-generations-li4j2e1r/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/text-policy-r1/105-begin.json"
+      ],
+      "exit": 1,
+      "expected_failure": true,
+      "hold": null,
+      "request": "105-begin.json"
+    }
+  ],
+  "seconds": 75.08980301581323,
+  "source_sha256": "66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d",
+  "status": "passed"
+}

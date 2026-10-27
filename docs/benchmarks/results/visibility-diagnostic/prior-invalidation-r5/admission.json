@@ -1,0 +1,12 @@
+{
+  "binary_sha256": "75562b77915a79736afd74d9d22973aea8cc3e6f9c9ec54521fdf2ece126a7ba",
+  "controller": {
+    "pid": 3758643,
+    "start_ticks": "456799131",
+    "state": "R"
+  },
+  "data_kind": "public source subset; not scale acceptance",
+  "fixture_sha256": "1ec12178668947ebdcc79e3cfa33668748825d6a7b93515134a73555fff2cb1c",
+  "selected_documents": 8,
+  "source_sha256": "83704596cac9a4e772e46bc65816981136585fc721a1ffba2c198566f36082ab"
+}

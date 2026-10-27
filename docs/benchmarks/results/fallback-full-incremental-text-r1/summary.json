@@ -1,0 +1,146 @@
+{
+  "archive_bytes": 1385243,
+  "archive_files": 27,
+  "archive_sha256": "61174ed71ec311bc851bd9f122c2fe1385a7f567398d8494b76c77f0f9d925db",
+  "artifacts_verified": true,
+  "binary_sha256": "d3dd3451a948277ecd20d3d2782bb8b3e79c3f4e58316aeb9179ea2180485106",
+  "cold_cache": {
+    "database": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-compressed-r1/database",
+    "files": 56261,
+    "finished_unix_s": 1792807257.7303314,
+    "method": "fsync and POSIX_FADV_DONTNEED on owned files; mincore without reading mapped pages",
+    "resident_pages_after": 0,
+    "resident_pages_before": 17626,
+    "scope": "per-file residency immediately after eviction under exclusive database lock",
+    "seconds": 7.145441394299269,
+    "status": "passed"
+  },
+  "content_oracle": {
+    "corpus_current_checks": 144,
+    "corpus_current_distinct": 144,
+    "corpus_current_partitions": {
+      "p0": 19,
+      "p1": 19,
+      "p2": 25,
+      "p3": 17,
+      "p4": 15,
+      "p5": 19,
+      "p6": 13,
+      "p7": 17
+    },
+    "current_checks": 144,
+    "derived_current_checks": 50,
+    "distinct_commits": 1100,
+    "rebuild_search_overlap": null,
+    "requests": 1698,
+    "search_checks": {
+      "ann": 15,
+      "bm25": 72
+    },
+    "text_only_bm25_checks": 10,
+    "text_only_bm25_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p4",
+      "p5",
+      "p7"
+    ],
+    "text_only_current_checks": 50,
+    "text_only_current_partitions": [
+      "p0",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ]
+  },
+  "delta_index_work": {
+    "events": {
+      "copy_partitions": 2368,
+      "tokenize_docs": 1776,
+      "write_metadata": 1776
+    },
+    "limitation": "one short diagnostic; not sustained acceptance",
+    "tokenization_builds": 592,
+    "tokenization_seconds": 4.775815053999998,
+    "tokenized_documents": 775
+  },
+  "derived": {
+    "committed": 148183,
+    "generation": 2,
+    "remaining": 0,
+    "text": 148183,
+    "vector": 148183
+  },
+  "drain_s": 0.0443842029999999,
+  "exact_processes_gone": true,
+  "not_proven": [
+    "1800s sustained profiles",
+    "full concurrent/uninterrupted build"
+  ],
+  "operations": {
+    "ann": {
+      "attempted": 15,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 1603,
+      "successful": 15,
+      "successful_per_s": 0.25,
+      "within_window": 15
+    },
+    "bm25": {
+      "attempted": 72,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 1474,
+      "successful": 72,
+      "successful_per_s": 1.2,
+      "within_window": 72
+    },
+    "correction": {
+      "attempted": 12,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 69,
+      "successful": 12,
+      "successful_per_s": 0.2,
+      "within_window": 12
+    },
+    "current": {
+      "attempted": 144,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 62,
+      "successful": 144,
+      "successful_per_s": 2.4,
+      "within_window": 144
+    },
+    "history": {
+      "attempted": 15,
+      "conflicts": 0,
+      "errors": 0,
+      "p95_upper_ms": 369,
+      "successful": 15,
+      "successful_per_s": 0.25,
+      "within_window": 15
+    },
+    "write": {
+      "attempted": 1440,
+      "conflicts": 402,
+      "errors": 0,
+      "p95_upper_ms": 38,
+      "successful": 1038,
+      "successful_per_s": 17.3,
+      "within_window": 1038
+    }
+  },
+  "rss_max_bytes": 367230976,
+  "rss_p99_bytes": 367230976,
+  "scratch_removed": true,
+  "seconds": 62.35989346448332,
+  "status": "passed_diagnostic_only"
+}

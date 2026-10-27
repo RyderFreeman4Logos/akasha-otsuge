@@ -1,0 +1,44 @@
+{
+  "archive_bytes": 2551319,
+  "archive_files": 3023,
+  "archive_sha256": "bcdccf4e36e71dc07d426ec7aab23f75f2b8102939dc3ca53a280298282159f3",
+  "artifacts_verified": true,
+  "binary_sha256": "3ef94b16debfff6309d103d87e0197ef190370b942c467db7589ce511b7d8401",
+  "cases": 16,
+  "commits": 64,
+  "corpus_documents": 11428831,
+  "exact_processes_gone": true,
+  "final": {
+    "active": 2,
+    "committed": 183256,
+    "text": {
+      "pending": null,
+      "rows": 45232,
+      "version": 22896,
+      "watermark": 183256
+    },
+    "vector": {
+      "pending": null,
+      "rows": 8,
+      "version": 24,
+      "watermark": 183256
+    }
+  },
+  "fixture_scope": "8 real precomputed vectors, broad BM25 history term; candidates selected from full50GB authority, outside3840 protected performance IDs",
+  "native_commands": 755,
+  "not_proven": [
+    "simultaneous query/build scheduling",
+    "sustained throughput"
+  ],
+  "observer_seconds": 307.66216263361275,
+  "protected_workload_ids": 3840,
+  "real_vectors": 1000000,
+  "rss_max_bytes": 255275008,
+  "scratch_removed": true,
+  "seconds": 306.90174931753427,
+  "source_bytes": 50000002783,
+  "source_head": "7fba9f0a5c4b69f20cf2c26cdd0826ef5857322c",
+  "status": "passed_full_data_serial_lifecycle",
+  "unique_candidates": 16,
+  "unit_inactive": true
+}

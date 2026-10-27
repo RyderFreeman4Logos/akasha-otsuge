@@ -1,0 +1,121 @@
+{
+  "archive_files": 27,
+  "archive_sha256": "01586d0455c9e66e0bd599bbf6a237c00256793d5c4e8e549d2a837bfcf7c0c9",
+  "new_scope_layout": "full native coverage verified; functional recovery succeeds",
+  "r2": {
+    "artifacts_verified": true,
+    "controller": {
+      "pid": 1238576,
+      "start_ticks": "461523202",
+      "state": "R"
+    },
+    "exact_processes_gone": true,
+    "free_bytes_after": 412297342976,
+    "free_bytes_before": 412297342976,
+    "hypothesis": "FTS build allocation retained until process exit raises following IVF merge peak; one fresh-process resume will isolate this from completed-index loading",
+    "last_memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "415123",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "native": {
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-c393c4676d1045e6958f46e48956283b.service",
+      "event": "executable",
+      "pid": 1238583,
+      "sha256": "5b1ced503e8fd8dce80812569ca6e55c2766515fc9fd9b65791175966b149ec5",
+      "start_ticks": "461523244"
+    },
+    "native_exit_receipt": false,
+    "original_deadline_ms": 1792804198404,
+    "rss_max_bytes": 700190720,
+    "scratch_allocated_removed": 6150127616,
+    "scratch_files": 4,
+    "scratch_removed": true,
+    "seconds": 2374.0225562462583,
+    "status": "failed_unit_oom",
+    "systemd_run_exit": 1,
+    "unit": "inactive"
+  },
+  "r3": {
+    "artifacts_verified": true,
+    "controller": {
+      "pid": 1293513,
+      "start_ticks": "461782702",
+      "state": "R"
+    },
+    "exact_processes_gone": true,
+    "last_memory_events": {
+      "high": "0",
+      "low": "0",
+      "max": "285165",
+      "oom": "0",
+      "oom_group_kill": "0",
+      "oom_kill": "0"
+    },
+    "limits": {
+      "memory.high": "max",
+      "memory.max": "671088640",
+      "memory.swap.max": "0"
+    },
+    "native": {
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-generation-7e36a7dc13cd48cca44557f0957a249d.service",
+      "event": "executable",
+      "pid": 1293539,
+      "sha256": "5b1ced503e8fd8dce80812569ca6e55c2766515fc9fd9b65791175966b149ec5",
+      "start_ticks": "461782774"
+    },
+    "native_environment": {
+      "LANCE_CPU_THREADS": "1",
+      "LANCE_DEFAULT_IO_BUFFER_SIZE": "16777216",
+      "LANCE_SHUFFLE_BATCH_BYTES": "16777216",
+      "LANCE_SHUFFLE_MAX_PRELOADED_OFFSETS_BYTES": "0",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/akasha-otsuge-storage-20261023/fallback-full-scoped-index-r3/build/7e36a7dc13cd48cca44557f0957a249d/native-scratch-ccuzcrji"
+    },
+    "native_index_coverage": "passed",
+    "native_state": {
+      "backfill_deadline_ms": 1792803126036,
+      "bundle": {
+        "chunker": "source-document-v1",
+        "dimension": 1536,
+        "model": "text-embedding-3-large",
+        "model_fingerprint": "c87f6e6c52567e56980cb3281f8a7b893276b665b3dd95bf00cabe024657fea5",
+        "schema": 1
+      },
+      "cursor": 11428831,
+      "documents": 11428831,
+      "generation": 2,
+      "index_deadline_ms": 1792804198404,
+      "pending": null,
+      "ready": true,
+      "source": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66",
+      "text_layout": "scope_columns",
+      "text_version": 5014,
+      "vector_rows": 1000000,
+      "vector_version": 1973,
+      "vectors": 1000000
+    },
+    "not_proven": [
+      "uninterrupted combined text and vector build within low memory",
+      "sustained 512 MiB P99",
+      "full queries",
+      "build peak RSS <= 640 MiB"
+    ],
+    "operation": "full generation2 index recovery after r2 OOM",
+    "original_deadline_ms": 1792804198404,
+    "peak_excess_bytes": 20234240,
+    "peak_rss_gate": "failed",
+    "peak_rss_limit_bytes": 671088640,
+    "rss_max_bytes": 691322880,
+    "rss_p99_bytes": 679751680,
+    "sample_count": 192,
+    "scratch_removed": true,
+    "seconds": 193.7980360854417,
+    "status": "functional_pass_resource_failed",
+    "unit": "inactive"
+  },
+  "required_next": "resolve peak RSS and uninterrupted build; full query and sustained workload acceptance remain separate",
+  "status": "resource_gate_failed"
+}

@@ -1,0 +1,15 @@
+{
+  "OWNER": "ef13471ca531bf518b3a758069ac6497c157fcf4c4bb9f5729b15c2ba9145988",
+  "build.json": "bde01cd55b7fecf100add812a7d6fec62eb67600cd2870eb9352fbd7642038bc",
+  "build.toml": "5645ca5e7fde110b4881c7dfb42f98e4b82a4935b489f9b7ed502ec0c6f566b9",
+  "build/946f6742034f45a6a841441dfe737d03/engine.log": "3f6f7b44414370addb9c8f7a2959ff90dcd3591757778afd9e61b73e22d8586c",
+  "build/946f6742034f45a6a841441dfe737d03/memory.jsonl": "62e5dbc07fe8a597b835de364fabe5b6c51ccbd9550a99e5d48d318b54a1fcdb",
+  "build/OWNER": "3c1ddc376da4636c58be9a77299c36cfd72cc2f3a736daa09003635495e52ccb",
+  "build/config.toml": "5645ca5e7fde110b4881c7dfb42f98e4b82a4935b489f9b7ed502ec0c6f566b9",
+  "build/progress.json": "5e2b93492d08f54bf7356cb309d4556996fcecf787f0dd108b5c0bce10a53c87",
+  "build/request.json": "17caee67564e0f59ac60aec1f41b4dc9ee81a98f9cbbb0be77932acb8b10d0d7",
+  "build/state.json": "b68a9693b9bbf8e9dabf0bc54e95cb8cde82444d6e14a61cd9499e17b8d071a5",
+  "evidence/fallback-full-index-r5-verified.json": "d3cbe717c933aaeef392492178365c2044eb8a249754c04b25c44ec92f28745b",
+  "evidence/fallback-streaming-ivf-r1-source.json": "bc18abdc0a8154a976c0c8774a09647efea87624e94e6f9369fd8b295e566249",
+  "successor-admission.json": "7fd850562c191503c4201cf8489a0c0e8898af0fea56d5e83fb2cf243167ebf2"
+}

@@ -1,0 +1,229 @@
+{
+  "status": "passed_diagnostic_only",
+  "records": {
+    "policy-r1": {
+      "status": "passed",
+      "binary_sha256": "a41b4d3d27054fe88521f396df23e06f32aafe4fb452a5591806459dbb01c3bf",
+      "seconds": 75.08980301581323,
+      "result_sha256": "798ade5947f6f527ce0455ec76d7e1301d6443e5d460f4acde4645016ff53358",
+      "commands": 106
+    },
+    "policy-r3": {
+      "status": "passed",
+      "binary_sha256": "1ee2001a5f77fc03db30cf8e87a4f8181d35aa6091193a62a766d69966c5b249",
+      "seconds": 87.46468564588577,
+      "result_sha256": "f1bff7bbb88838736332730ac8f45f0c1ae00647226bad583d48a3e908dc05b9",
+      "commands": 106
+    },
+    "workload-r1": {
+      "status": "passed_diagnostic_only",
+      "binary_sha256": "b464e159b4dcd7e362e0263ec32a808882fe70673860d24b273c752f11132e14",
+      "seconds": 266.98353985417634,
+      "result_sha256": "05256578b8f1c0328901d5eba4463c2384213dc1b71447cc0d376855dd9e0376",
+      "oracle": {
+        "corpus_current_checks": 144,
+        "corpus_current_distinct": 8,
+        "corpus_current_partitions": {
+          "p0": 18,
+          "p1": 17,
+          "p2": 18,
+          "p3": 17,
+          "p4": 18,
+          "p5": 19,
+          "p6": 18,
+          "p7": 19
+        },
+        "current_checks": 144,
+        "distinct_commits": 790,
+        "requests": 1698
+      },
+      "operations": {
+        "ann": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 73,
+          "successful": 15,
+          "successful_per_s": 0.25,
+          "within_window": 15
+        },
+        "bm25": {
+          "attempted": 72,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 42,
+          "successful": 72,
+          "successful_per_s": 1.2,
+          "within_window": 72
+        },
+        "correction": {
+          "attempted": 12,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 46,
+          "successful": 12,
+          "successful_per_s": 0.2,
+          "within_window": 12
+        },
+        "current": {
+          "attempted": 144,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 39,
+          "successful": 144,
+          "successful_per_s": 2.4,
+          "within_window": 144
+        },
+        "history": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 220,
+          "successful": 15,
+          "successful_per_s": 0.25,
+          "within_window": 15
+        },
+        "write": {
+          "attempted": 1440,
+          "conflicts": 712,
+          "errors": 0,
+          "p95_upper_ms": 21,
+          "successful": 728,
+          "successful_per_s": 12.133333333333333,
+          "within_window": 728
+        }
+      },
+      "derived": {
+        "committed": 4886,
+        "generation": 1,
+        "remaining": 0,
+        "text": 4886,
+        "vector": 4886
+      },
+      "rss_p99_bytes": 335257600,
+      "rss_max_bytes": 335257600,
+      "drain_s": 0.049239919000001464
+    },
+    "workload-r3": {
+      "status": "passed_diagnostic_only",
+      "binary_sha256": "1ee2001a5f77fc03db30cf8e87a4f8181d35aa6091193a62a766d69966c5b249",
+      "seconds": 268.80409456510097,
+      "result_sha256": "bb408b012a3e55575a5fb71a79391a07a9c9fca30e05d2953a444bab16ce37d2",
+      "oracle": {
+        "corpus_current_checks": 144,
+        "corpus_current_distinct": 8,
+        "corpus_current_partitions": {
+          "p0": 18,
+          "p1": 17,
+          "p2": 18,
+          "p3": 17,
+          "p4": 18,
+          "p5": 19,
+          "p6": 18,
+          "p7": 19
+        },
+        "current_checks": 144,
+        "derived_current_checks": 50,
+        "distinct_commits": 793,
+        "requests": 1698
+      },
+      "operations": {
+        "ann": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 65,
+          "successful": 15,
+          "successful_per_s": 0.25,
+          "within_window": 15
+        },
+        "bm25": {
+          "attempted": 72,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 48,
+          "successful": 72,
+          "successful_per_s": 1.2,
+          "within_window": 72
+        },
+        "correction": {
+          "attempted": 12,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 60,
+          "successful": 12,
+          "successful_per_s": 0.2,
+          "within_window": 12
+        },
+        "current": {
+          "attempted": 144,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 42,
+          "successful": 144,
+          "successful_per_s": 2.4,
+          "within_window": 144
+        },
+        "history": {
+          "attempted": 15,
+          "conflicts": 0,
+          "errors": 0,
+          "p95_upper_ms": 241,
+          "successful": 15,
+          "successful_per_s": 0.25,
+          "within_window": 15
+        },
+        "write": {
+          "attempted": 1440,
+          "conflicts": 709,
+          "errors": 0,
+          "p95_upper_ms": 21,
+          "successful": 731,
+          "successful_per_s": 12.183333333333334,
+          "within_window": 731
+        }
+      },
+      "derived": {
+        "committed": 4889,
+        "generation": 1,
+        "remaining": 0,
+        "text": 4889,
+        "vector": 4889
+      },
+      "rss_p99_bytes": 306741248,
+      "rss_max_bytes": 306741248,
+      "drain_s": 0.04389720000000352
+    }
+  },
+  "source_sha256": {
+    "spikes/helix/check_generations.py": "26015d53b19d3982511e403c1aeb6cbe107e010e836cd2c3766489777b27e2a3",
+    "spikes/helix/run_case.py": "e9f8ea3f4d87d43c472abdf09b2cfe3d177479861a531afeb08c2878d6cf9553",
+    "spikes/helix/src/authority.rs": "a5f5cd623ab1a61149fb270516ff76e9cd31c74538ac264cbfecd8ebc98b48fc",
+    "spikes/helix/src/generations.rs": "480fcc2f8fdf57a00500dc1f0d9ab986046fab6aac33595929df4fc2e1fe117f",
+    "spikes/helix/src/main.rs": "10790682bd4551b15062718a0ec0e618bb8987fa29b91357c6fc0adb3c8d325d",
+    "spikes/helix/src/visibility.rs": "32d5b151b79bc9d0d412c3a726990a7402959e60aa56945ee287a5ff37e96d79",
+    "spikes/helix/src/workload.rs": "8f200838bad213fbba60ef44842d666ac8e52d45f733ac0468a23369cd4074e2",
+    "spikes/helix/test_workload_oracle.py": "d5f058ef4ae838e7e129235de86d6067a7b74d85ee7f03c7218e7c9ff6236525",
+    "spikes/helix/check_generation_workload.py": "d21d848e451ba480079ed566cf14ec5c432a60ff6e3579b7390e7f06d52ec60b"
+  },
+  "independent_negative_controls": {
+    "corpus_current": 7,
+    "derived_state": 8
+  },
+  "scope": "eight public documents with real embeddings;4096 text-only historical changes;100 clients for60seconds; no new model output",
+  "not_tested": [
+    "full-size backfill/indexes",
+    "30-minute profiles",
+    "corpus-candidate corrections during workload",
+    "concurrent full rebuild",
+    "disk admission",
+    "file-cache cold reads",
+    "power loss"
+  ],
+  "notes": [
+    "False/absent text_only keeps previous request serialization/hash; explicit true persists with authority revision.",
+    "Vector completion uses not_required and removes old vector; no fabricated embedding.",
+    "Standalone generation fixtures have no independent RSS attestation; workload preparation and cases retain dedicated cgroup/observer evidence.",
+    "r1 predates the independent derived-state oracle; final r3 validates native derived content and exact completion count against raw requests."
+  ]
+}

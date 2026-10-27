@@ -1,0 +1,1 @@
+{"op": "raw", "cypher": "MATCH (d:Derived1Vector {memory:1000001}) SET d.partition='p1'"}

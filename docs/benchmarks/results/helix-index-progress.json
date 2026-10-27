@@ -1,0 +1,54 @@
+{
+  "status": "passed",
+  "checks": [
+    "native text/vector completion checkpoints",
+    "already-active reuse",
+    "invalid deadline before database open"
+  ],
+  "input_vectors": 8,
+  "build": {
+    "elapsed_seconds": 1.491337826,
+    "phase": "indexes_built",
+    "text": {
+      "operation": {
+        "attempt": 43,
+        "family": "text",
+        "generation": "1",
+        "index_id": "1",
+        "operation_id": "459078f9-ca1c-4eb8-8a6c-b4362895856f",
+        "operation_kind": "build",
+        "progress": {
+          "entities": "16",
+          "input_bytes": "118830",
+          "output_bytes": "9966",
+          "output_operations": "80"
+        },
+        "stage": "activate",
+        "status": "succeeded"
+      }
+    },
+    "vector": {
+      "operation": {
+        "attempt": 3,
+        "family": "vector",
+        "generation": "1",
+        "index_id": "2",
+        "operation_id": "83febf5d-a2c0-4f17-ac69-eab6b018aebf",
+        "operation_kind": "build",
+        "progress": {
+          "entities": "24",
+          "input_bytes": "52336",
+          "output_bytes": "53136",
+          "output_operations": "88"
+        },
+        "stage": "activate",
+        "status": "succeeded"
+      }
+    }
+  },
+  "binary_sha256": "9e5e6fc86df9b03f7d5844ee2006fc00b82fe52a06ac9a5a203594bd11be7b2b",
+  "limits": [
+    "eight real vectors with synthetic diagnostic text",
+    "full corpus build not run"
+  ]
+}

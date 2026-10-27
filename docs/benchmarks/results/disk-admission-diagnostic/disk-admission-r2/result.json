@@ -1,0 +1,295 @@
+{
+  "not_tested": [
+    "physical disk-full",
+    "power loss",
+    "full-size allocation bound"
+  ],
+  "records": [
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/initialize.json"
+      ],
+      "exit": 0,
+      "name": "initialize",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/blocked-commit.json"
+      ],
+      "exit": 1,
+      "name": "blocked-commit",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "MATCH (r:Revision) RETURN count(r)"
+      ],
+      "exit": 0,
+      "name": "no-revision",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/commit.json"
+      ],
+      "exit": 0,
+      "name": "commit",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/reused-commit.json"
+      ],
+      "exit": 0,
+      "name": "reused-commit",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/conflict.json"
+      ],
+      "exit": 0,
+      "name": "conflict",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/blocked-permission.json"
+      ],
+      "exit": 1,
+      "name": "blocked-permission",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/permission.json"
+      ],
+      "exit": 0,
+      "name": "permission",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/current.json"
+      ],
+      "exit": 0,
+      "name": "current",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--workload",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/full-budget-refused.json"
+      ],
+      "exit": 1,
+      "name": "full-budget-refused",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/blocked-generation.json"
+      ],
+      "exit": 1,
+      "name": "blocked-generation",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/generation.json"
+      ],
+      "exit": 0,
+      "name": "generation",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/blocked-build.json"
+      ],
+      "exit": 1,
+      "name": "blocked-build",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/build.json"
+      ],
+      "exit": 0,
+      "name": "build",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/blocked-application.json"
+      ],
+      "exit": 1,
+      "name": "blocked-application",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/application.json"
+      ],
+      "exit": 0,
+      "name": "application",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/reused-application.json"
+      ],
+      "exit": 0,
+      "name": "reused-application",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/vector-unneeded.json"
+      ],
+      "exit": 0,
+      "name": "vector-unneeded",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/blocked-activation.json"
+      ],
+      "exit": 1,
+      "name": "blocked-activation",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/database",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/activation.json"
+      ],
+      "exit": 0,
+      "name": "activation",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/corpus",
+        "--load",
+        "/tmp/akasha-otsuge-storage-20261022/generation-workload-r3/input.jsonl",
+        "/tmp/akasha-otsuge-storage-20261022/generation-workload-r3/manifest.json"
+      ],
+      "exit": 0,
+      "name": "corpus-load",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/corpus",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/corpus-begin.json"
+      ],
+      "exit": 0,
+      "name": "corpus-begin",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/corpus",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/blocked-backfill.json"
+      ],
+      "exit": 1,
+      "name": "blocked-backfill",
+      "reserve_bytes": "9223372036854775808"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/corpus",
+        "MATCH (d:Derived1Text) RETURN count(d)"
+      ],
+      "exit": 0,
+      "name": "no-derived",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/corpus",
+        "--generation",
+        "/tmp/akasha-otsuge-storage-20261022/disk-admission-r2/backfill.json"
+      ],
+      "exit": 0,
+      "name": "backfill",
+      "reserve_bytes": "36212254720"
+    },
+    {
+      "command": [
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.spike-work/disk-admission-r2/probe",
+        "/tmp/akasha-disk-admission-9bdpmzki/corpus",
+        "MATCH (d:Derived1Text) RETURN count(d)"
+      ],
+      "exit": 0,
+      "name": "corpus-coverage",
+      "reserve_bytes": "36212254720"
+    }
+  ],
+  "seconds": 6.503100709058344,
+  "status": "passed"
+}

@@ -1,0 +1,25 @@
+# Copy outside Git and use one fresh run ID/output per measured atomic case.
+# Re-read configuration only between cases; never combine different snapshots.
+[run]
+id = "full-low-steady-1"
+profile = "low"
+phase = "steady"
+seconds = 1800
+diagnostic = false
+generation = 2
+cold_cache = true
+
+[paths]
+binary = "/absolute/path/to/akasha-helix-probe"
+database = "/absolute/path/to/owned/full-database"
+fixture = "/absolute/path/to/search-eight-partitions.json"
+corpus_manifest = "/absolute/path/to/full-corpus.json"
+output = "/absolute/path/to/new-case-output"
+
+[reliability]
+# There are no network calls in a measured case. Never replay ambiguous effects.
+max_attempts = 1
+
+[disk]
+start_bytes = 81212254720
+reserve_bytes = 81212254720

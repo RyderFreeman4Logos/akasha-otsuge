@@ -1,0 +1,45 @@
+{
+  "archive_bytes": 902087,
+  "archive_files": 19,
+  "archive_sha256": "00153e9b450e2aa005337ac4f7dda0b5c088079fbc7dd2b9f0c02e60be37e028",
+  "case_state": "abandoned",
+  "effects": "unknown; durable writes require successor catch-up; prior case is not replayed",
+  "exact_processes_gone": true,
+  "full_cold": {
+    "allocated_bytes": 138284851200,
+    "bytes": 138161783270,
+    "files": 47108,
+    "resident_pages_after": 0,
+    "resident_pages_before": 23116,
+    "seconds": 14.133662435226142,
+    "status": "passed"
+  },
+  "hypothesis": "multiple general slots admitted concurrent heavy searches; single-query RSS proof does not cover combined working sets",
+  "last_committed_seq": 100070,
+  "last_completed_requests": 29,
+  "last_derived": {
+    "committed": 100070,
+    "generation": 2,
+    "remaining": 4,
+    "text": 100066,
+    "vector": 100066
+  },
+  "native_duration_s": 2.749,
+  "native_exit_receipt": false,
+  "native_sha256": "52b84ba6bd3b28d2171f0a28e73424407863b49a21435a7732e89d41abd64595",
+  "not_proven": [
+    "sole causal attribution",
+    "full workload acceptance",
+    "uninterrupted bounded index build"
+  ],
+  "planned_requests": 1698,
+  "resource_limits": {
+    "memory.high": "max",
+    "memory.max": 671088640,
+    "memory.swap.max": 0
+  },
+  "rss_samples_incomplete": true,
+  "sample_count": 3,
+  "scratch_removed": true,
+  "status": "failed_unit_oom"
+}

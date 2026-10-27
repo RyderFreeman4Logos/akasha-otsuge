@@ -1,0 +1,29 @@
+{
+  "baseline_binary_sha256": "4e50aeb7e399b1c0115f4ada10c2d84c953b38605ff971026b2725cb7bac10e0",
+  "baseline_engine_rss_max_bytes": 595562496,
+  "baseline_memory_max_bytes": 671088640,
+  "baseline_result": "systemd OOM-kill after175.399s; observer has no terminal exit event; failure preserved",
+  "candidate_binary_sha256": "2dea2798e273ddea48925f29a7df4d01c778feb3e05082ac0529dd4168390289",
+  "candidate_result": "systemd OOM-kill after44.399392s;44positiveRSSsamples,max674660352B;observerexitabsent;exactprocessesgone/unitinactive;allartifacthashesverified",
+  "changed_setting": {
+    "low.compactor.worker.max_subcompactions": [
+      4,
+      1
+    ]
+  },
+  "conclusion": "Lowering subcompaction ranges4to1 alone did not resolve the failure. Next bounded hypothesis is compressed-byte read-ahead; no acceptance threshold changes.",
+  "hypothesis": "One active compaction was recorded near OOM. Reducing subcompaction ranges skips planner index sampling and reduces per-range buffers. This is a bounded hypothesis, not established OOM causality.",
+  "original_absolute_deadline_unix_s": 1792816045.7572067,
+  "source_sha256": "a8fc4399917924a78c1705349734b91d6445ea1dbd5316ecf18cc02e8b6eb11d",
+  "status": "failed_full_low_profile_recovery",
+  "unchanged": [
+    "high profile",
+    "memory limits",
+    "original deadline",
+    "max concurrent jobs",
+    "read-ahead",
+    "WAL replay",
+    "index lifecycle budgets"
+  ],
+  "validation": "Behavioral baseline OOM; actual writer-settings unit RED4!=1 then11releaseunits+Clippy+build pass; full recovery not yet measured."
+}

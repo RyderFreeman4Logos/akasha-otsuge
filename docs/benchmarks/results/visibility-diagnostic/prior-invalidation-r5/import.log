@@ -1,0 +1,2 @@
+ENGINE_PROFILE:{"profile":"low","sst_compression":"zstd","vector_cache_mib":32,"slate_block_cache_mib":32,"slate_metadata_cache_mib":8,"fts_cache_mib":8,"vector_build_cache_mib":32,"unflushed_mib":32}
+{"content_bytes":3588,"documents":8,"elapsed_seconds":0.053200701,"phase":"import_complete","prepared_sha256":"66e66b4785adee9befef958737210b8646c4388985b8ee8c8ecfed828baeaa8d","resumed_documents":0}
