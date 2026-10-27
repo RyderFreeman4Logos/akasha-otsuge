@@ -547,7 +547,11 @@ impl Service {
                         &RecallDraft {
                             request_id: receipt_id.clone(),
                             output,
-                            scope,
+                            scope: if index_metadata.is_some() {
+                                owner_scope()
+                            } else {
+                                scope
+                            },
                             read_seq,
                             retrieval_mode: RetrievalMode::CurrentState,
                             selected,

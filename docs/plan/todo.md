@@ -268,7 +268,8 @@ retain exact commands, identities, original failures and scope limits.
 ## MVP-010 acceptance and remaining work
 
 The SSD worktree shares the existing build cache. Thirteen public retrieval fixtures and four native index controls pass. Final
-committed-HEAD gate, independent review and publication remain.
+committed-HEAD gate passed at `987d369`; independent R1 found five regressions.
+Repair validation, fresh review, CI and publication remain.
 
 - [x] Implement real on-disk ICU keyword search and exact receipt replay/reopen.
 - [x] Implement actual vector/embedding and reranker paths, model/dimension
@@ -291,6 +292,16 @@ committed-HEAD gate, independent review and publication remain.
   immutable sync targets; expose ongoing progress and coverage limits honestly.
 - [x] Cover progressive reads of retained capture originals as required, without
   widening grants or pretending Memory-only indexes cover all capture content.
+- [ ] R1: Recheck live sync authority at every record read, provider admission,
+  progress publication and activation; test a held embedding across grant shrink.
+- [x] R2: Preserve the owner-wide permission required by archived index metadata
+  across receipt show/replay and job show; retain narrow receipt access.
+- [ ] R3: Install both protoc and its standard definitions in CI and document them;
+  require repaired-candidate hosted CI success.
+- [ ] R4: Persist zero/overflow cosine-vector failure diagnostics and the original
+  prefix; verify identical diagnostic readback after restart.
+- [ ] R5: Admit a legal maximum-size wrapped Memory in the internal rule scan;
+  retain public byte limits and bounded, honest search output.
 - [ ] Publish search/show documentation, quality and withdrawal fixtures, focused
   results, final exact-HEAD gate/review, CI, merge and Issue closure. Then #11–#28.
 - [ ] Freeze at least 60 sourced reference intent tasks in #11 before any #16

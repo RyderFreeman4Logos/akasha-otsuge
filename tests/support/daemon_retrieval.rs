@@ -3,6 +3,9 @@ use akasha_otsuge::config::{Paths, ReviewMode, resolve};
 use akasha_otsuge::domain::*;
 use akasha_otsuge::storage::Storage;
 
+#[path = "retrieval_regressions.rs"]
+mod regressions;
+
 fn scope(project: &str) -> Scope {
     Scope {
         user: format!("uid:{}", rustix::process::geteuid().as_raw()),

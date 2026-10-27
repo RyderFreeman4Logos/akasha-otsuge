@@ -71,7 +71,8 @@ Search output contains the actual items/rules, query/scope, ranking mode, provid
 identities/traces and coverage. The RecallReceipt binds those exact output bytes
 and hash to selected revisions, source spans, read/validation sequences, accepted
 configuration and **actual lexical/vector generation**. Global index diagnostics
-are returned only with an owner-wide read grant; a scoped search otherwise emits
+are returned only with an owner-wide read grant. Such receipts retain that owner-wide
+requirement for every later show/replay, even if their query scope is narrower. A scoped search otherwise emits
 `index: null`. The standalone `index status` requires that owner-wide grant.
 
 ## Coverage and durable progress
