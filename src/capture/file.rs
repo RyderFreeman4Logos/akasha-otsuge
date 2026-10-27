@@ -20,17 +20,40 @@ struct FileCursor {
     tail_sha256: String,
 }
 
-fn anchor(file: &mut File, offset: u64) -> Result<(String, String)> {
+fn anchor_bytes(file: &mut File, offset: u64) -> Result<(Vec<u8>, Vec<u8>)> {
     let size = offset.min(ANCHOR) as usize;
-    let mut bytes = vec![0; size];
+    let mut first = vec![0; size];
     file.seek(SeekFrom::Start(0))?;
-    file.read_exact(&mut bytes)?;
-    let first = hash(&bytes);
+    file.read_exact(&mut first)?;
+    let mut last = vec![0; size];
     file.seek(SeekFrom::Start(offset - size as u64))?;
-    file.read_exact(&mut bytes)?;
-    let last = hash(&bytes);
+    file.read_exact(&mut last)?;
     file.seek(SeekFrom::Start(offset))?;
     Ok((first, last))
+}
+
+fn anchor(file: &mut File, offset: u64) -> Result<(String, String)> {
+    let (first, last) = anchor_bytes(file, offset)?;
+    Ok((hash(&first), hash(&last)))
+}
+
+fn next_anchor(file: &mut File, cursor: &FileCursor, line: &[u8]) -> Result<(String, String)> {
+    let (mut first, mut last) = anchor_bytes(file, cursor.offset)?;
+    if hash(&first) != cursor.prefix_sha256 || hash(&last) != cursor.tail_sha256 {
+        return Err(error("CAPTURE_SOURCE_CHANGED"));
+    }
+    // The new boundary must describe the accepted frame, not a later file generation.
+    first.extend_from_slice(&line[..line.len().min(ANCHOR as usize - first.len())]);
+    if line.len() >= ANCHOR as usize {
+        last.clear();
+        last.extend_from_slice(&line[line.len() - ANCHOR as usize..]);
+    } else {
+        last.extend_from_slice(line);
+    }
+    Ok((
+        hash(&first),
+        hash(&last[last.len().saturating_sub(ANCHOR as usize)..]),
+    ))
 }
 
 impl Capture<'_> {
@@ -202,7 +225,7 @@ impl Capture<'_> {
                 .offset
                 .checked_add(line.len() as u64)
                 .ok_or_else(|| error("CAPTURE_LIMIT"))?;
-            let (first, last) = anchor(&mut file, next.offset)?;
+            let (first, last) = next_anchor(&mut file, &cursor, &line)?;
             next.prefix_sha256 = first;
             next.tail_sha256 = last;
             let mut next_checkpoint = checkpoint.clone();
@@ -266,5 +289,72 @@ impl Capture<'_> {
             )
             .await?;
         Ok(report)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+    use std::path::PathBuf;
+
+    struct Fixture(PathBuf);
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            std::fs::remove_dir_all(&self.0).unwrap();
+        }
+    }
+
+    #[test]
+    fn checkpoint_anchors_use_the_accepted_frame_after_a_concurrent_rewrite() {
+        let root = std::env::temp_dir().join(format!("akasha-anchor-{}", std::process::id()));
+        std::fs::create_dir(&root).unwrap();
+        let fixture = Fixture(root);
+        let mut file = OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create_new(true)
+            .open(fixture.0.join("source"))
+            .unwrap();
+        for (before, size) in [
+            (0, 1),
+            (0, 4096),
+            (1, 1),
+            (1, 9000),
+            (4095, 200),
+            (4096, 1),
+            (7000, 9000),
+        ] {
+            let prefix = vec![b'p'; before];
+            let line = vec![b'a'; size];
+            file.set_len(0).unwrap();
+            file.rewind().unwrap();
+            file.write_all(&prefix).unwrap();
+            // The line was validated as A; a same-inode writer now replaces it with B.
+            file.write_all(&vec![b'b'; size]).unwrap();
+            let cursor = FileCursor {
+                schema_version: 1,
+                device: 0,
+                inode: 0,
+                generation: 0,
+                offset: before as u64,
+                prefix_sha256: hash(&prefix[..before.min(ANCHOR as usize)]),
+                tail_sha256: hash(&prefix[before.saturating_sub(ANCHOR as usize)..]),
+            };
+            let accepted = [prefix, line.clone()].concat();
+            let expected = (
+                hash(&accepted[..accepted.len().min(ANCHOR as usize)]),
+                hash(&accepted[accepted.len().saturating_sub(ANCHOR as usize)..]),
+            );
+            assert_eq!(next_anchor(&mut file, &cursor, &line).unwrap(), expected);
+            if before > 0 {
+                file.rewind().unwrap();
+                file.write_all(b"changed prefix").unwrap();
+                assert_eq!(
+                    next_anchor(&mut file, &cursor, &line).unwrap_err().code,
+                    "CAPTURE_SOURCE_CHANGED"
+                );
+            }
+        }
     }
 }

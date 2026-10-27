@@ -18,6 +18,14 @@ rotation/truncation/FIFO checks; the FIFO probe first reproduced a blocking open
 checkpoints, branch cutoffs and explicit gaps. Full frozen-candidate gate,
 independent review, CI, merge and closure remain on [todo.md](todo.md).
 
+The initial frozen candidate `9573f6a` passed the complete gate (33.177 seconds),
+but independent R1 review found a same-inode rewrite could combine an old event
+with replacement-file anchors and silently skip that replacement. The repair
+derives anchors from accepted bytes and checks the prior boundary; its causal
+regression fails before the repair and passes after it. The retained release
+probe now detects truncation, accepts the replacement and deduplicates backfill.
+The amended candidate still requires its own full gate and independent review.
+
 ## Completed history and receipts: MVP-006
 
 Candidate `e98d4cb` passed 17 Domain and 17 Storage fixtures, the complete canonical

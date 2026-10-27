@@ -177,6 +177,8 @@ retain exact commands, identities, original failures and scope limits.
   document its production CLI/IPC seam in #8 and actual host parsers in #12–#15.
 - [x] Pass focused capture/domain/storage and four capture SIGKILL points;
   verify the actual command's JSON, exits, reopen, backfill and FIFO refusal.
+- [x] Fix independent R1's accepted-frame/checkpoint-anchor rewrite race; retain
+  causal RED/GREEN, bounded boundary regressions and release-command readback.
 - [ ] Complete the exact-HEAD gate, independent review, CI, merge and closure.
   [The protocol](../capture.md) records coverage and known uncollectable items.
 

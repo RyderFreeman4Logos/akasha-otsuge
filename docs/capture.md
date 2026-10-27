@@ -109,7 +109,9 @@ opaque cursor records device/inode, offset, generation and first/last 4 KiB
 anchors at the consumed boundary. Inode changes identify rotation; shortening
 or changed anchors identify truncation. Before publishing, the reader rechecks
 those anchors and the current line. It does not hash the full prefix on every
-frame or claim detection of arbitrary middle-file rewrites outside the anchors.
+frame. The next anchors are assembled from verified prior boundary bytes and
+the accepted frame, so a later rewrite cannot silently replace their identity.
+It does not claim detection of arbitrary middle-file rewrites outside the anchors.
 Writers should append and retain rotated originals for backfill. A concurrently
 changing source can fail with `CAPTURE_SOURCE_CHANGED`; retry remains explicit.
 
@@ -141,3 +143,10 @@ IPC and model/index integration remain their dependent Issues. Hidden reasoning,
 inaccessible payloads, missing pre-install history and all terminal pixels are
 not claimed as captured. No actual host or full-corpus acceptance is replaced by
 these component fixtures.
+
+Independent R1 review reproduced a same-inode rewrite after frame verification:
+the old implementation adopted new-file anchors for an old accepted event, then
+silently skipped the replacement on restart. The retained probe is a real
+release-command failure. A deterministic regression now covers short/long frames
+and consumed boundaries around 4 KiB, plus changed-prefix refusal; the fix derives
+anchors from accepted bytes instead of rereading the new frame from the file.
