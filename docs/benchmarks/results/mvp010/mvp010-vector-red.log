@@ -1,0 +1,24 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp010)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.14s
+     Running tests/daemon.rs (target/debug/deps/daemon-7ddf8a6c18df7d4f)
+
+running 1 test
+
+thread 'retrieval_tests::real_vector_and_rerank_paths_are_scoped_versioned_and_degrade_when_offline' (3741234) panicked at tests/support/daemon_retrieval.rs:458:5:
+{"accepted_at_ms":1793125521888,"attempt":1,"cancel_requested":false,"config_digest":"56cc286fdba9c00065f36ca95be84b90507491101cfc6ecade7aad5d65e4ae88","config_generation":1,"error":null,"execution_budget_ms":120000,"execution_deadline_ms":1793125641901,"id":"vector-build","lease_owner":null,"lease_until_ms":null,"queue_deadline_ms":1793125821888,"request_sha256":"baafb54e6158d1f1a64899bf500747346c49f08675b1d1f098a7530248ce201d","result":{"generation":"lexical-icu-v1","indexed_rows":3,"lexical_watermark":11},"retrieval_plan":{"kind":"sync"},"retry_at_ms":1793125521888,"schema_version":1,"started_at_ms":1793125521901,"state":"succeeded"}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test retrieval_tests::real_vector_and_rerank_paths_are_scoped_versioned_and_degrade_when_offline ... FAILED
+
+failures:
+
+failures:
+    retrieval_tests::real_vector_and_rerank_paths_are_scoped_versioned_and_degrade_when_offline
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.41s
+
+error: test failed, to rerun pass `--test daemon`

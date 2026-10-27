@@ -1,0 +1,14 @@
+{
+  "command": [
+    "bash",
+    "-c",
+    "cargo fmt --all && cargo test --locked --test daemon retrieval_tests::empty_library_returns_no_hit_with_an_explicit_memory_only_boundary -- --exact --nocapture && cargo clippy --locked --all-targets -- -D warnings"
+  ],
+  "head": "a09d9d691840278e2905aa39808dabd01126c663",
+  "process": {
+    "pid": 3893377,
+    "start_ticks": "494717201",
+    "state": "R"
+  },
+  "utc": "2026-10-27T19:27:55.015554+00:00"
+}

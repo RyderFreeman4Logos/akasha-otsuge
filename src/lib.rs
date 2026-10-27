@@ -5,3 +5,5 @@ pub mod domain;
 pub mod ipc;
 pub mod provider;
 pub mod storage;
+
+pub mod retrieval;

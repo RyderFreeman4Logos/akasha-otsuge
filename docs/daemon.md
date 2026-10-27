@@ -1,9 +1,9 @@
 # Local daemon and management protocol
 
-This document describes the MVP-008 implementation under development. Final gate,
-independent review and installed acceptance are tracked in [the TODO](plan/todo.md).
-No provider, host adapter, research workflow or full-scale product acceptance is
-claimed by these local management commands.
+The MVP-008 daemon is merged and validated; exact gate, independent review and
+installed acceptance are tracked in [the TODO](plan/todo.md). Provider jobs and
+[retrieval jobs](retrieval.md) reuse this management protocol. Host adapters,
+research workflows and full-scale product acceptance remain separately tracked.
 
 The Linux daemon owns the single Storage writer and immutable configuration
 manager. It listens only on a filesystem Unix socket. The runtime and data

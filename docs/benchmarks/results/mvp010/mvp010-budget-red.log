@@ -1,0 +1,26 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp010)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.48s
+     Running tests/daemon.rs (target/debug/deps/daemon-7ddf8a6c18df7d4f)
+
+running 1 test
+
+thread 'retrieval_tests::search_character_budget_returns_a_truthful_partial_receipt' (3756255) panicked at tests/support/daemon_retrieval.rs:545:5:
+assertion `left == right` failed: {"accepted_at_ms":1793126009416,"attempt":1,"cancel_requested":false,"config_digest":"fcb4d0e03db60622e268c4861940528c7e319559c97ebdb04ba823f966fddfee","config_generation":1,"error":"RESULT_TOO_LARGE","execution_budget_ms":120000,"execution_deadline_ms":1793126129429,"id":"bounded-search","lease_owner":null,"lease_until_ms":null,"queue_deadline_ms":1793126309416,"request_sha256":"b21866ccaa4f7dec8a667509df30da28c832dff1969080d9475932e1b9bc359f","result":null,"retrieval_plan":{"kind":"search","query":"离线","scope":{"branch_or_version":null,"project":"alpha","session":null,"user":"uid:1001"}},"retry_at_ms":1793126009416,"schema_version":1,"started_at_ms":1793126009429,"state":"failed"}
+  left: String("failed")
+ right: "succeeded"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test retrieval_tests::search_character_budget_returns_a_truthful_partial_receipt ... FAILED
+
+failures:
+
+failures:
+    retrieval_tests::search_character_budget_returns_a_truthful_partial_receipt
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.49s
+
+error: test failed, to rerun pass `--test daemon`

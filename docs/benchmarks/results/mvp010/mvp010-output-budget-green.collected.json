@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T19:10:20.362301+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "a09d9d691840278e2905aa39808dabd01126c663",
+    "log_sha256": "8305fc2b6c5fde7b5e646e30c47997f61b4f3da3a76f8c9ea260e20aa64531a1",
+    "seconds": 19.15996544715017,
+    "utc": "2026-10-27T19:09:17.062176+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASS: 9 public retrieval fixtures,17 config,19 Domain,1 provider test and all-targets Clippy; all five new behavioral regressions now green"
+}

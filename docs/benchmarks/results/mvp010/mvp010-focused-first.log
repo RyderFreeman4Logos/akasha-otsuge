@@ -1,0 +1,125 @@
+    Checking tokio v1.54.1
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+    Checking object_store v0.13.2
+    Checking tokio-util v0.7.20
+    Checking datafusion-common-runtime v54.1.0
+    Checking tokio-rustls v0.26.6
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+    Checking object_store v0.14.2
+    Checking async-compression v0.4.51
+    Checking surrealkv v1.0.0 (https://github.com/surrealdb/surrealkv?rev=4338a790c8edc56ef5ea1e46157427af4815be3c#4338a790)
+    Checking h2 v0.4.20
+    Checking datafusion-common v54.1.0
+    Checking tower v0.5.3
+    Checking tower-http v0.6.11
+    Checking hyper v1.12.0
+    Checking tokio-stream v0.1.19
+    Checking axum v0.8.9
+    Checking datafusion-expr-common v54.1.0
+    Checking datafusion-physical-expr-common v54.1.0
+    Checking hyper-util v0.1.21
+    Checking datafusion-functions-aggregate-common v54.1.0
+    Checking datafusion-functions-window-common v54.1.0
+    Checking hyper-rustls v0.27.10
+    Checking hyper-timeout v0.5.2
+    Checking datafusion-expr v54.1.0
+    Checking reqwest v0.12.28
+    Checking tonic v0.14.8
+    Checking lance-namespace-reqwest-client v0.13.0
+    Checking tonic-prost v0.14.8
+    Checking arrow-flight v58.4.1
+    Checking datafusion-physical-expr v54.1.0
+    Checking datafusion-execution v54.1.0
+    Checking datafusion-functions v54.1.0
+    Checking datafusion-functions-aggregate v54.1.0
+    Checking datafusion-functions-window v54.1.0
+    Checking datafusion-optimizer v54.1.0
+    Checking datafusion-physical-plan v54.1.0
+    Checking datafusion-functions-nested v54.1.0
+    Checking datafusion-physical-expr-adapter v54.1.0
+    Checking datafusion-sql v54.1.0
+    Checking lance-core v13.0.0
+    Checking datafusion-session v54.1.0
+    Checking datafusion-datasource v54.1.0
+    Checking lance-namespace v13.0.0
+    Checking lance-encoding v13.0.0
+    Checking lance-select v13.0.0
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+    Checking datafusion-catalog v54.1.0
+    Checking datafusion-pruning v54.1.0
+    Checking lance-io v13.0.0
+    Checking datafusion-physical-optimizer v54.1.0
+    Checking datafusion-datasource-arrow v54.1.0
+    Checking datafusion-datasource-csv v54.1.0
+    Checking datafusion-datasource-json v54.1.0
+    Checking lance-linalg v13.0.0
+    Checking lance-file v13.0.0
+    Checking lance-table v13.0.0
+    Checking datafusion-functions-table v54.1.0
+    Checking datafusion-catalog-listing v54.1.0
+    Checking datafusion v54.1.0
+    Checking lance-datafusion v13.0.0
+    Checking lance-index-core v13.0.0
+    Checking lance-index v13.0.0
+    Checking lance v13.0.0
+    Checking lance-namespace-impls v13.0.0
+    Checking lancedb v0.40.0 (https://github.com/lancedb/lancedb?rev=b1b080b97c3edd2fd9f2aae8a3b71ff19487b1f8#b1b080b9)
+    Checking akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp010)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 26s
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp010)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.34s
+     Running tests/daemon.rs (target/debug/deps/daemon-7ddf8a6c18df7d4f)
+
+running 19 tests
+test model_tests::gb10_guard_actual_services ... ignored, bounded synthetic inference against explicitly selected GB10 guard
+test model_tests::real_wall_clock_provider_deadlines ... ignored, 1700-second real production daemon/provider acceptance; explicit receipt directory required
+test configuration_fifo_is_rejected_before_any_blocking_read ... ok
+test production_signals_drain_and_release_the_socket_for_restart ... ok
+test private_daemon_lifecycle_and_bounded_versioned_protocol ... ok
+test retrieval_tests::original_ranges_preserve_utf8_budget_receipt_and_live_permission ... ok
+test model_tests::independent_model_endpoints_run_as_durable_jobs ... ok
+test production_history_diff_and_receipt_reads_use_the_domain_and_live_grant ... ok
+test retrieval_tests::keyword_search_is_scoped_persistent_and_archives_exact_output ... ok
+test model_tests::queued_models_keep_endpoint_and_budget_across_reload ... ok
+test model_tests::three_bounded_responses_fit_the_durable_archive_and_ipc ... ok
+test selected_profile_large_config_and_pending_paths_survive_restart ... ok
+test model_tests::model_cancel_shutdown_and_crash_never_replay_ambiguous_calls ... ok
+test configuration_reload_and_watcher_share_durable_generations ... ok
+test explicit_restart_activates_pending_socket_and_preserves_old_job_plan ... ok
+test queue_expiry_and_running_cancellation_do_not_wait_for_a_free_slot ... ok
+test model_tests::all_model_kinds_classify_bad_output_disconnect_timeout_and_rate_limit ... ok
+test model_tests::wall_clock_harness_short_control ... ok
+test accepted_reconciliation_survives_process_death_and_pins_configuration ... ok
+
+test result: ok. 17 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 17.03s
+
+     Running tests/domain.rs (target/debug/deps/domain-867d80089de86a46)
+
+running 18 tests
+test untrusted_payloads_cannot_supply_authority_or_actor_fields ... ok
+test automatic_statement_adoption_cannot_cut_context_or_invent_semantic_fields ... ok
+test scope_widening_and_invalid_source_spans_have_no_effect ... ok
+test a_review_channel_grant_cannot_approve_a_different_recomputed_hash ... ok
+test a_project_version_exception_keeps_global_taste_and_cannot_rescope_it ... ok
+test trusted_explicit_decisions_and_worker_role_labels_take_different_routes ... ok
+test selective_policy_accepts_technical_evidence_without_granting_human_authority ... ok
+test history::queued_reads_and_receipt_preparation_observe_permission_shrink ... ok
+test automatic_conclusions_stay_agent_origin_and_tentative_taste_stays_candidate ... ok
+test history::receipt_phase_updates_cannot_rewrite_the_original_retrieval_metadata ... ok
+test history::incomplete_outputs_and_empty_pages_cannot_claim_complete_coverage ... ok
+test history::diff_pages_keep_retirements_and_bind_cursors_to_both_points ... ok
+test rejecting_a_candidate_preserves_the_existing_adopted_version ... ok
+test edited_review_binds_its_hash_and_later_proposals_do_not_inherit_it ... ok
+test history::retired_and_rejected_history_is_bounded_and_keeps_approval_sources ... ok
+test history::scope_pages_bind_the_point_and_permission_revocation_remains_live ... ok
+test history::as_of_separates_known_state_from_reality_time_and_pending_proposals ... ok
+test history::receipt_replays_exact_bytes_after_replacement_index_switch_and_reopen ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.94s
+

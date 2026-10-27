@@ -1,0 +1,14 @@
+{
+  "command": [
+    "bash",
+    "-c",
+    "cargo fmt --all && { rc=0; cargo test --locked --test daemon retrieval_tests -- --nocapture || rc=1; cargo test --locked --test domain current_receipt_rechecks -- --nocapture || rc=1; exit \"$rc\"; }"
+  ],
+  "head": "a09d9d691840278e2905aa39808dabd01126c663",
+  "process": {
+    "pid": 3782862,
+    "start_ticks": "494482551",
+    "state": "R"
+  },
+  "utc": "2026-10-27T18:48:48.508257+00:00"
+}

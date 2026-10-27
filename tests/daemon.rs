@@ -14,6 +14,9 @@ const BIN: &str = env!("CARGO_BIN_EXE_akasha-otsuge");
 #[path = "support/daemon_models.rs"]
 mod model_tests;
 
+#[path = "support/daemon_retrieval.rs"]
+mod retrieval_tests;
+
 struct Daemon {
     root: PathBuf,
     socket_name: String,

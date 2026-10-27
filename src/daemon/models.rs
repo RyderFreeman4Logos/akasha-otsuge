@@ -91,7 +91,7 @@ pub(super) fn load_result(storage: &Storage, pointer: &Value, point: u64) -> Res
 }
 
 impl Service {
-    async fn model_cancelled(&self, id: &str) -> &'static str {
+    pub(super) async fn model_cancelled(&self, id: &str) -> &'static str {
         loop {
             let changed = self.work.notified();
             tokio::pin!(changed);

@@ -413,6 +413,74 @@ impl Domain<'_> {
             .await
     }
 
+    /// Read applicable confirmed rules independently of semantic or keyword scores.
+    pub async fn applicable_rules(
+        &self,
+        context: &ReadContext,
+        scope: &Scope,
+        at: u64,
+        now_ms: i64,
+        limit: usize,
+    ) -> Result<(Vec<TimedMemory>, bool)> {
+        self.permission(context, Some(scope))?;
+        let mut scopes = Vec::new();
+        for mask in 0..8 {
+            let ancestor = Scope {
+                user: scope.user.clone(),
+                project: if mask & 1 == 0 {
+                    scope.project.clone()
+                } else {
+                    None
+                },
+                branch_or_version: if mask & 2 == 0 {
+                    scope.branch_or_version.clone()
+                } else {
+                    None
+                },
+                session: if mask & 4 == 0 {
+                    scope.session.clone()
+                } else {
+                    None
+                },
+            };
+            if ancestor.contains(scope) && !scopes.contains(&ancestor) {
+                match self.permission(context, Some(&ancestor)) {
+                    Ok(_) => scopes.push(ancestor),
+                    Err(e) if e.code == "READ_DENIED" => (),
+                    Err(e) => return Err(e),
+                }
+            }
+        }
+        let mut items = Vec::new();
+        let mut examined = 0;
+        let mut complete = true;
+        for scope in scopes {
+            if examined == limit {
+                complete = false;
+                break;
+            }
+            let page = self
+                .state(
+                    context,
+                    &scope,
+                    at,
+                    None,
+                    PageBudget {
+                        limit: (limit - examined).min(64),
+                        max_bytes: 128 * 1024,
+                    },
+                )
+                .await?
+                .data;
+            examined += page.examined;
+            complete &= page.next.is_none();
+            items.extend(page.items.into_iter().filter(|item| {
+                item.memory.record.is_rule() && item.memory.record.draft.valid_at(now_ms)
+            }));
+        }
+        Ok((items, complete))
+    }
+
     pub async fn diff(
         &self,
         context: &ReadContext,

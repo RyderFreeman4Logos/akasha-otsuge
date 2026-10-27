@@ -1,0 +1,13 @@
+{
+  "baseline_binary_sha256": "6b6cc71fd9dbb1d8ce904b6ad95ed4227b99a78507e0a05f493ffe387a160c3e",
+  "classification": "Corrected frozen oracle behavioral RED on exact existing release: index sync unsupported",
+  "oracle_sha256": "2225f1edd03fe64c0696aa6ab47d3da634d76952fafc630c99cb236156d683b4",
+  "process_absent": true,
+  "terminal": {
+    "exit_code": 101,
+    "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+    "log_sha256": "b9fd5f305587269135adc202012e5c1bbe4cbe67d2360c926fc4289eba88556a",
+    "seconds": 1.525199055671692,
+    "utc": "2026-10-27T18:02:27.642160+00:00"
+  }
+}

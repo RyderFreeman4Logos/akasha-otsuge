@@ -83,6 +83,14 @@ pub enum Command {
         plan: crate::provider::Plan,
         idempotency_key: String,
     },
+    RetrievalRun {
+        plan: crate::retrieval::Request,
+        idempotency_key: String,
+    },
+    IndexStatus,
+    OriginalShow {
+        range: crate::domain::OriginalRange,
+    },
     JobShow {
         id: String,
     },
@@ -156,7 +164,7 @@ pub(crate) fn identifier(value: &str) -> bool {
 }
 
 pub(crate) fn hello() -> Value {
-    json!({"protocol_version":VERSION,"capabilities":["daemon", "config", "capture_jobs", "model_jobs"],"max_message_bytes":MAX_MESSAGE})
+    json!({"protocol_version":VERSION,"capabilities":["daemon", "config", "capture_jobs", "model_jobs", "retrieval_jobs", "index_status", "original_range"],"max_message_bytes":MAX_MESSAGE})
 }
 
 pub(crate) fn response(request: Option<&str>, result: Result<Value>) -> Value {

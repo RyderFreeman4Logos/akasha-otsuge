@@ -1,0 +1,212 @@
+[
+  {
+    "name": "mvp010-bounds-green",
+    "exit_code": 101,
+    "seconds": 43.391286401078105,
+    "log_sha256": "d9443a8304f1092aea5431018afc2e37b8adc05843b4642fdaffd3eb829f5e20"
+  },
+  {
+    "name": "mvp010-budget-green",
+    "exit_code": 0,
+    "seconds": 40.0381286367774,
+    "log_sha256": "85274f86c38647510e3946a4208e549ebd9c6f323cb4fbfbadc3ff4fca0fe65f"
+  },
+  {
+    "name": "mvp010-budget-red",
+    "exit_code": 101,
+    "seconds": 2.0507831713184714,
+    "log_sha256": "284a7751bc5470a34f435b0355b3cd1e0a2b7f5a378deb6a5b8020d180a4aa9b"
+  },
+  {
+    "name": "mvp010-concurrency-green",
+    "exit_code": 101,
+    "seconds": 8.5186133896932,
+    "log_sha256": "f681e7154baae0f537319cb32529e1e467d94447020300650e25c830849061f3"
+  },
+  {
+    "name": "mvp010-concurrency-green2",
+    "exit_code": 101,
+    "seconds": 51.89532062225044,
+    "log_sha256": "d63139c8eb570180710a3f53361e3135a678145e3b9ce908577513849c4031fe"
+  },
+  {
+    "name": "mvp010-concurrency-red2",
+    "exit_code": 101,
+    "seconds": 11.902038995176554,
+    "log_sha256": "1efb37b24839e9640ce06d331fcdaabc37761b06b24c12af2566976a52905663"
+  },
+  {
+    "name": "mvp010-concurrency-validity-red",
+    "exit_code": 1,
+    "seconds": 12.587799152359366,
+    "log_sha256": "159ac68ce4e2f374ee7e943924786a1027e537e9e0bce557708a7783dd1e1372"
+  },
+  {
+    "name": "mvp010-config-budget-red",
+    "exit_code": 101,
+    "seconds": 1.70784065220505,
+    "log_sha256": "37374276db5ee2b15b3ac31ef7ad77593e7fb8d635ed3187dd8219ad1321a29b"
+  },
+  {
+    "name": "mvp010-crash-coverage-first",
+    "exit_code": 101,
+    "seconds": 21.36790785752237,
+    "log_sha256": "e87304aaaf02c98fd26e45c1e2e4ade2798d1eb2b5a95d92b403fda9e7f81aa9"
+  },
+  {
+    "name": "mvp010-crash-coverage-green",
+    "exit_code": 0,
+    "seconds": 52.81801693420857,
+    "log_sha256": "67f48a882390efe6f6c49703c6969bd54db819b7cb240da214b3e529a425f712"
+  },
+  {
+    "name": "mvp010-dependency-check",
+    "exit_code": 101,
+    "seconds": 166.0893070269376,
+    "log_sha256": "4a79ad4f2fef0346af6221fc465bd3b03f26a5345094b571605668c2e5f494be"
+  },
+  {
+    "name": "mvp010-empty-library-control",
+    "exit_code": 0,
+    "seconds": 3.326647011563182,
+    "log_sha256": "1981623d3f7b9f7205132d40f61830a6fc521bb8d53d49583a3c2159824fa13d"
+  },
+  {
+    "name": "mvp010-final-focused",
+    "exit_code": 0,
+    "seconds": 26.458793753758073,
+    "log_sha256": "c4fd9406cb33b9dae11ef3aeef28536345cee3c3ff1f54f2768b643245c4b8e4"
+  },
+  {
+    "name": "mvp010-focused-first",
+    "exit_code": 0,
+    "seconds": 169.3911724826321,
+    "log_sha256": "9eac07932cf991dec102c4adc0a2e99ebcc8efc487e37f43093e352a798fe084"
+  },
+  {
+    "name": "mvp010-keyword-green1",
+    "exit_code": 101,
+    "seconds": 281.1643468262628,
+    "log_sha256": "011d59074442d99761c0e82aac82b72a8f375465751eb68a32748c35177dae0d"
+  },
+  {
+    "name": "mvp010-keyword-green2",
+    "exit_code": 101,
+    "seconds": 8.363252273760736,
+    "log_sha256": "501d34ec9ca48ae7f8af6f61693ca4c688891b781211b01b01948e68137b7b62"
+  },
+  {
+    "name": "mvp010-keyword-green3",
+    "exit_code": 0,
+    "seconds": 1.010513350367546,
+    "log_sha256": "1a2171f92a40fe72259b148dd37131a10e0ff9786c8631dbda7f2b959a433c51"
+  },
+  {
+    "name": "mvp010-keyword-red",
+    "exit_code": 101,
+    "seconds": 8.326434298418462,
+    "log_sha256": "d475adba17c69cdf2e5287061149e2e93bff01b6e35ccc4cd0250bf7ca855ada"
+  },
+  {
+    "name": "mvp010-keyword-red2",
+    "exit_code": 101,
+    "seconds": 1.525199055671692,
+    "log_sha256": "b9fd5f305587269135adc202012e5c1bbe4cbe67d2360c926fc4289eba88556a"
+  },
+  {
+    "name": "mvp010-live-coverage-green",
+    "exit_code": 0,
+    "seconds": 29.32817513216287,
+    "log_sha256": "1623f1a9149ff8a9e1325f924118f6c2ff7b2bee55da24aa35caa373cddfcd40"
+  },
+  {
+    "name": "mvp010-live-coverage-red",
+    "exit_code": 101,
+    "seconds": 0.8866058811545372,
+    "log_sha256": "1c5229cfe6ae8362715247407bbb17353614041f2b4b5592c172eb974ad0b771"
+  },
+  {
+    "name": "mvp010-live-coverage-red2",
+    "exit_code": 101,
+    "seconds": 0.8172219395637512,
+    "log_sha256": "f8c856fe8a2acd661a297552b3f4ac7cfd8acedd98015d6650cb92531bffa85f"
+  },
+  {
+    "name": "mvp010-live-coverage-red3",
+    "exit_code": 101,
+    "seconds": 4.423743508756161,
+    "log_sha256": "2e7e301a4cf9004c2b3537ed0100e4bfc967aa2c7df21d5a3360ba0c347b7e4d"
+  },
+  {
+    "name": "mvp010-original-range-green1",
+    "exit_code": 0,
+    "seconds": 10.509127724915743,
+    "log_sha256": "67d376bcbe9ab1dc7f8a119678df59d2d74b220a75ca165ee123834e28c23228"
+  },
+  {
+    "name": "mvp010-original-range-red",
+    "exit_code": 101,
+    "seconds": 1.7154604578390718,
+    "log_sha256": "0b7f7e931c482e943c160a7ce5c2ab79e13dad7c27ebeb35c9774a082a36dbbd"
+  },
+  {
+    "name": "mvp010-output-budget-green",
+    "exit_code": 0,
+    "seconds": 19.15996544715017,
+    "log_sha256": "8305fc2b6c5fde7b5e646e30c47997f61b4f3da3a76f8c9ea260e20aa64531a1"
+  },
+  {
+    "name": "mvp010-output-budget-red",
+    "exit_code": 101,
+    "seconds": 4.713137372396886,
+    "log_sha256": "bed061af5ed1795f8d6accc6a469f04e0d25fa69193b2ac47537b3c4dce22025"
+  },
+  {
+    "name": "mvp010-prefix-green",
+    "exit_code": 0,
+    "seconds": 27.140723244287074,
+    "log_sha256": "3954ab565b6a8ae4fdfac023454217fc62dd72356fea4375dc50ddc3d735105b"
+  },
+  {
+    "name": "mvp010-prefix-red",
+    "exit_code": 101,
+    "seconds": 12.659842326305807,
+    "log_sha256": "745a22b5252e226622b4c522917d5d004bfee2aeeb225f3f7799671725c84760"
+  },
+  {
+    "name": "mvp010-rules-green",
+    "exit_code": 101,
+    "seconds": 7.882800963707268,
+    "log_sha256": "d1db5d3e02639eb8a15218e8d2b8db5ef911400c0c8dd9f1b01a8032cb4906f8"
+  },
+  {
+    "name": "mvp010-rules-green2",
+    "exit_code": 0,
+    "seconds": 10.466567723080516,
+    "log_sha256": "2908ab1dafa04f844a8cb6459ece1523c16f152a008ea0e243ad85562a410888"
+  },
+  {
+    "name": "mvp010-rules-red",
+    "exit_code": 101,
+    "seconds": 5.44678346440196,
+    "log_sha256": "a84069442691fe9a88b2079731a708d3dd6a691098c503ae473f82401bbbfda5"
+  },
+  {
+    "name": "mvp010-status-red",
+    "exit_code": 101,
+    "seconds": 26.31907578650862,
+    "log_sha256": "152d5bc05be68062f06bd0b10d54bfe016b34227636ed0a4f271dbbe20a32ac2"
+  },
+  {
+    "name": "mvp010-vector-green1",
+    "exit_code": 0,
+    "seconds": 8.218957879580557,
+    "log_sha256": "87784c1df3471a11ac0380d977d147960c6cc681ae73fad9d019403a6d04dacb"
+  },
+  {
+    "name": "mvp010-vector-red",
+    "exit_code": 101,
+    "seconds": 2.649738854728639,
+    "log_sha256": "8219ae6ae55c0664e7da069ddcee459ee956f7dd27787b7bd7f0f60923302038"
+  }
+]

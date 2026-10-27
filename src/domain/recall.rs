@@ -159,12 +159,28 @@ impl Domain<'_> {
     ) -> Result<Vec<SourceSpan>> {
         self.storage.check_point(draft.read_seq)?;
         let mut sources = Vec::new();
+        let now = i64::try_from(
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_err(|_| error("CLOCK_INVALID"))?
+                .as_millis(),
+        )
+        .map_err(|_| error("CLOCK_INVALID"))?;
         for reference in &draft.selected {
             let memory = self
                 .revision(&reference.key.id, reference.commit_seq)?
                 .ok_or_else(|| error("REVISION_NOT_FOUND"))?;
-            if !draft.scope.contains(&memory.record.draft.scope) {
+            let applicable_rule = draft.retrieval_mode == RetrievalMode::CurrentState
+                && memory.record.is_rule()
+                && memory.record.draft.scope.contains(&draft.scope);
+            if !draft.scope.contains(&memory.record.draft.scope) && !applicable_rule {
                 return Err(error("SCOPE_DENIED"));
+            }
+            self.permission(context, Some(&memory.record.draft.scope))?;
+            if draft.retrieval_mode == RetrievalMode::CurrentState
+                && !memory.record.draft.valid_at(now)
+            {
+                return Err(error("STALE_RECALL"));
             }
             let at = if draft.retrieval_mode == RetrievalMode::CurrentState {
                 validated
@@ -189,7 +205,8 @@ impl Domain<'_> {
                 .iter()
                 .chain(memory.record.approval.iter().map(|a| &a.source))
             {
-                self.span(span)?;
+                let source = self.span(span)?;
+                self.permission(context, Some(&source.payload.scope))?;
                 if !sources.contains(span) {
                     sources.push(span.clone());
                 }
@@ -387,6 +404,15 @@ impl Domain<'_> {
                 self.permission(context, None)?;
                 let data = self.read_recall(context, receipt)?;
                 self.permission(context, Some(&data.record.scope))?;
+                for reference in &data.record.selected {
+                    let memory = self
+                        .revision(&reference.key.id, reference.commit_seq)?
+                        .ok_or_else(|| error("REVISION_NOT_FOUND"))?;
+                    self.permission(context, Some(&memory.record.draft.scope))?;
+                }
+                for span in &data.record.sources {
+                    self.permission(context, Some(&self.span(span)?.payload.scope))?;
+                }
                 Ok(ReadResult {
                     read_seq: data.record.read_seq,
                     validated_at_seq: self.storage.sequence()?,
@@ -434,5 +460,106 @@ impl Domain<'_> {
                 })
             })
             .await
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct OriginalRange {
+    pub event_id: String,
+    pub revision: u64,
+    pub start: usize,
+    pub end: usize,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct OriginalRead {
+    pub receipt_id: String,
+    pub output: String,
+    pub output_sha256: String,
+    pub reference: SourceSpan,
+    pub scope: Scope,
+    pub provenance: Provenance,
+    pub start: usize,
+    pub end: usize,
+    pub requested_end: usize,
+    pub total_bytes: usize,
+    pub truncated: bool,
+}
+
+impl Domain<'_> {
+    pub async fn original_range(
+        &self,
+        context: &ReadContext,
+        range: &OriginalRange,
+        request_id: &str,
+        max_chars: usize,
+        config_generation: u64,
+    ) -> Result<OriginalRead> {
+        self.permission(context, None)?;
+        let source = self.source(&range.event_id, range.revision)?;
+        self.permission(context, Some(&source.payload.scope))?;
+        let text = &source.payload.text;
+        if max_chars == 0 || range.start >= range.end {
+            return Err(error("INVALID_RANGE"));
+        }
+        let requested = text
+            .get(range.start..range.end)
+            .ok_or_else(|| error("INVALID_RANGE"))?;
+        let length = requested
+            .char_indices()
+            .nth(max_chars)
+            .map_or(requested.len(), |(offset, _)| offset);
+        let output = requested[..length].to_owned();
+        let end = range.start + length;
+        let truncated = end != range.end;
+        let reference = SourceSpan {
+            event_id: range.event_id.clone(),
+            revision: range.revision,
+            content_sha256: source.content_sha256,
+            start: range.start,
+            end,
+        };
+        self.prepare_recall(
+            context,
+            &RecallDraft {
+                request_id: request_id.into(),
+                output: output.clone(),
+                scope: source.payload.scope.clone(),
+                read_seq: self.storage.sequence()?,
+                retrieval_mode: RetrievalMode::CurrentState,
+                selected: vec![],
+                sources: vec![reference.clone()],
+                status: if truncated {
+                    RecallStatus::Incomplete
+                } else {
+                    RecallStatus::Found
+                },
+                coverage: Coverage {
+                    complete: !truncated,
+                    gaps: vec![],
+                },
+                truncation: truncated.then(|| Truncation {
+                    original_bytes: requested.len() as u64,
+                    reason: "character_budget".into(),
+                }),
+                config_generation,
+                index_generation: None,
+            },
+        )
+        .await?;
+        Ok(OriginalRead {
+            receipt_id: request_id.into(),
+            output_sha256: hash(output.as_bytes()),
+            output,
+            reference,
+            scope: source.payload.scope,
+            provenance: source.provenance,
+            start: range.start,
+            end,
+            requested_end: range.end,
+            total_bytes: text.len(),
+            truncated,
+        })
     }
 }

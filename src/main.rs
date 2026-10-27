@@ -19,6 +19,10 @@ Commands:
   config show --effective
   capture reconcile BINDING_JSON INPUT_JSONL --idempotency-key ID
   model run PLAN_JSON --idempotency-key ID
+  index sync --idempotency-key ID
+  index status
+  search QUERY --scope JSON_FILE --idempotency-key ID
+  show SOURCE_ID --revision COMMIT --range START_BYTE END_BYTE
   job show|cancel ID
   job list [--after KEY]
   memory show ID [--at COMMIT]
@@ -134,6 +138,35 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             }
             Some(Command::ModelRun {
                 plan: serde_json::from_str(&input)?,
+                idempotency_key: (*id).into(),
+            })
+        }
+        ["show", id, "--revision", revision, "--range", start, end] => {
+            Some(Command::OriginalShow {
+                range: akasha_otsuge::domain::OriginalRange {
+                    event_id: (*id).into(),
+                    revision: number(revision)?,
+                    start: usize::try_from(number(start)?)
+                        .map_err(|_| Error("INVALID_ARGUMENT"))?,
+                    end: usize::try_from(number(end)?).map_err(|_| Error("INVALID_ARGUMENT"))?,
+                },
+            })
+        }
+        ["index", "status"] => Some(Command::IndexStatus),
+        ["index", "sync", "--idempotency-key", id] => Some(Command::RetrievalRun {
+            plan: akasha_otsuge::retrieval::Request::Sync,
+            idempotency_key: (*id).into(),
+        }),
+        ["search", query, "--scope", scope, "--idempotency-key", id] => {
+            let input = config::read_file(std::path::Path::new(scope))?;
+            if input.len() > 4096 {
+                return Err(Error("MESSAGE_TOO_LARGE"));
+            }
+            Some(Command::RetrievalRun {
+                plan: akasha_otsuge::retrieval::Request::Search {
+                    query: (*query).into(),
+                    scope: serde_json::from_str(&input)?,
+                },
                 idempotency_key: (*id).into(),
             })
         }

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T18:25:29.278404+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+    "log_sha256": "8219ae6ae55c0664e7da069ddcee459ee956f7dd27787b7bd7f0f60923302038",
+    "seconds": 2.649738854728639,
+    "utc": "2026-10-27T18:25:22.035273+00:00"
+  },
+  "process_absent": true,
+  "classification": "Behavioral RED: configured embedding/reranker ignored by lexical-only sync; vector watermark absent."
+}

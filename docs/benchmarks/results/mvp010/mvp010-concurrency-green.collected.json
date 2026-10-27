@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T18:52:37.428185+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "a09d9d691840278e2905aa39808dabd01126c663",
+    "log_sha256": "f681e7154baae0f537319cb32529e1e467d94447020300650e25c830849061f3",
+    "seconds": 8.5186133896932,
+    "utc": "2026-10-27T18:52:11.537284+00:00"
+  },
+  "process_absent": true,
+  "classification": "5 retrieval fixtures PASS; concurrency now runs but INDEX_IO: query-vector uses old model while table selector still uses requested new config; fix exact selector before rerun"
+}

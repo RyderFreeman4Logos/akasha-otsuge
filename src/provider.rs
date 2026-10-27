@@ -83,7 +83,7 @@ impl Plan {
 }
 
 impl Call {
-    fn request(&self, config: &ResolvedConfig) -> Result<(&'static str, Value)> {
+    pub(crate) fn request(&self, config: &ResolvedConfig) -> Result<(&'static str, Value)> {
         let model = config
             .config()
             .models
@@ -93,7 +93,7 @@ impl Call {
         let valid_batch = |batch: &[String]| {
             !batch.is_empty() && batch.len() <= MAX_BATCH && batch.iter().all(|s| valid_text(s))
         };
-        match &self.input {
+        let request = match &self.input {
             Input::Text {
                 prompt,
                 max_output_tokens,
@@ -125,7 +125,15 @@ impl Call {
                 ))
             }
             _ => Err(Error("INVALID_REQUEST")),
+        }?;
+        if serde_json::to_vec(&request.1)
+            .map_err(|_| Error("INVALID_REQUEST"))?
+            .len()
+            > MAX_PLAN_BYTES * 2
+        {
+            return Err(Error("INVALID_REQUEST"));
         }
+        Ok(request)
     }
 
     fn output(&self, config: &ResolvedConfig, response: Value) -> Result<Value> {
@@ -216,6 +224,18 @@ pub struct Outcome {
     pub trace: Value,
 }
 
+pub fn model_identity(config: &ResolvedConfig, profile: &str) -> Result<String> {
+    let model = config
+        .config()
+        .models
+        .get(profile)
+        .ok_or(Error("MODEL_NOT_CONFIGURED"))?;
+    Ok(crate::storage::hash(
+        &serde_json::to_vec(&(model.kind, &model.endpoint, &model.model, model.dimension))
+            .expect("JSON configuration"),
+    ))
+}
+
 pub struct Client {
     http: reqwest::Client,
     slots: Semaphore,
@@ -249,26 +269,9 @@ impl Client {
         let mut queue = None;
         let mut queue_clock = None;
         let mut idle_triggered = false;
-        let identity = config
-            .config()
-            .models
-            .get(&call.profile)
-            .map(|m| {
-                crate::storage::hash(
-                    &serde_json::to_vec(&(m.kind, &m.endpoint, &m.model, m.dimension))
-                        .expect("JSON configuration"),
-                )
-            })
-            .unwrap_or_default();
+        let identity = model_identity(config, &call.profile).unwrap_or_default();
         let request = async {
             let (route, body) = call.request(config)?;
-            if serde_json::to_vec(&body)
-                .map_err(|_| Error("INVALID_REQUEST"))?
-                .len()
-                > MAX_PLAN_BYTES * 2
-            {
-                return Err(Error("INVALID_REQUEST"));
-            }
             let q = Deadline::start(Layer::Queue, config.timeouts().queue, None)?;
             let wait = q.remaining().min(workflow.remaining());
             queue_clock = Some(q.clone());

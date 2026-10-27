@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--jobs",
+    "4",
+    "--test",
+    "daemon",
+    "retrieval_tests::search_character_budget_returns_a_truthful_partial_receipt",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "process": {
+    "pid": 3756103,
+    "start_ticks": "494390444",
+    "state": "R"
+  },
+  "utc": "2026-10-27T18:33:27.445165+00:00"
+}

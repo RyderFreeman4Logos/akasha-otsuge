@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--jobs",
+    "4",
+    "--test",
+    "daemon",
+    "retrieval_tests::real_vector_and_rerank_paths_are_scoped_versioned_and_degrade_when_offline",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "process": {
+    "pid": 3741126,
+    "start_ticks": "494341637",
+    "state": "R"
+  },
+  "utc": "2026-10-27T18:25:19.390953+00:00"
+}

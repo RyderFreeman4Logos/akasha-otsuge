@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-27T19:27:48.278449+00:00",
+  "corrected_run": "mvp010-final-focused",
+  "daemon": {
+    "passed": 27,
+    "ignored": 2
+  },
+  "other_passed": {
+    "domain": 19,
+    "config": 17,
+    "native_index": 4
+  },
+  "basis": "raw Cargo test result counts; collector classification mistakenly said28 daemon"
+}

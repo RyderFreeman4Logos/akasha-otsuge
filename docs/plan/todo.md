@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-27 after PR #36 merged at `a3d278d`. Live GitHub audit: **20 open
-Issues, 8 completed Issues**. #9 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-27 after PR #37 merged at `a09d9d6`. Live GitHub audit: **19 open
+Issues, 9 completed Issues**. #10 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -43,8 +43,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-27 audit finds 20 open Issues (#9–#28). #4–#8 are closed with
-merged PRs #32–#36; no completed implementation is waiting for closure. #7's
+The 2026-10-27 audit finds 19 open Issues (#10–#28). #4–#9 are closed with
+merged PRs #32–#37; no completed implementation is waiting for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -228,7 +228,7 @@ retain exact commands, identities, original failures and scope limits.
 - [x] Independent whole-candidate R2 PASS,0 findings; CI40537161260 passed.
   PR #36 merged as `a3d278d`, same candidate tree, and #8 closed completed.
 
-## MVP-009 acceptance and remaining work
+## MVP-009 completed acceptance
 
 - [x] Reuse configured independent text/embedding/reranker routes; validate all
   outputs, bounded request/batch/response sizes, rate limits and explicit errors.
@@ -260,9 +260,41 @@ retain exact commands, identities, original failures and scope limits.
 - [x] Archive148 original receipts/logs/reports (228200B), verify every hash,
   and document examples, exact identities and limits in
   [the acceptance report](../providers-acceptance.md).
-- [ ] Complete final documentation-candidate gate/review, CI, merge and closure;
-  then continue #10 through #28. #10's isolated preparation has two passing
-  retrieval/range fixtures; vector/hybrid/rerank and remaining criteria are open.
+- [x] Final candidate `6c23e1a` passes its 63.238-second canonical gate and
+  independent R3 review with 0 findings. CI40560732248 passed; PR #37 merged
+  as `a09d9d6`, and #9 closed completed. Exact gate and review are published in
+  [the final PR receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/37#issuecomment-6450384881).
+
+## MVP-010 acceptance and remaining work
+
+The SSD worktree shares the existing build cache. Thirteen public retrieval fixtures and four native index controls pass. Final
+committed-HEAD gate, independent review and publication remain.
+
+- [x] Implement real on-disk ICU keyword search and exact receipt replay/reopen.
+- [x] Implement actual vector/embedding and reranker paths, model/dimension
+  generation identity and explicit keyword fallback when models are offline.
+- [x] Return applicable ancestor rules separately, preserve live scope grants,
+  and test UTF-8 original ranges and truthful character-budget truncation.
+- [x] Bound configuration, status permissions, source-span/output budgets and
+  reranker documents; verify public IPC capability declarations.
+- [x] Validate retired/corrected/current-validity and permission races at final
+  output publication, including stale physical indexes and daemon restart.
+- [x] Verify mixed Chinese/English, code identifiers, versions and conflicting
+  global/local rules against a fixed retrieval quality baseline.
+- [x] Persist separate contiguous lexical/vector prefixes, explicit skipped or
+  superseded coverage, failed model-call diagnostics and crash-safe replay.
+- [x] Use incremental native index updates and one bounded shared cache owner;
+  prove queries continue while indexing waits and budget changes drain owners.
+- [x] Preserve old-generation reads until safe new-generation activation and
+  bind receipts to the actual model/index identity; reject incompatible state.
+- [x] Keep the original workflow budget across every model stage and validate
+  immutable sync targets; expose ongoing progress and coverage limits honestly.
+- [x] Cover progressive reads of retained capture originals as required, without
+  widening grants or pretending Memory-only indexes cover all capture content.
+- [ ] Publish search/show documentation, quality and withdrawal fixtures, focused
+  results, final exact-HEAD gate/review, CI, merge and Issue closure. Then #11–#28.
+- [ ] Freeze at least 60 sourced reference intent tasks in #11 before any #16
+  research-prompt tuning; preserve the full later host and product acceptance.
 
 Host preparation: Codex0.164.0, Hermes0.22.5+1914 and Pi0.78.0 are executable.
 The existing Claude entry points to a missing2.1.170 installation; #12 must repair
@@ -279,7 +311,7 @@ host protocol capabilities or an authenticated Runner.
 - [x] [#6 [MVP-006] 持久历史视图、as-of 查询与实际 recall receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/6) — dependencies: #4, #5.
 - [x] [#7 [MVP-007] 采集归一化、原文归档及分支/压缩恢复协议](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/7) — dependencies: #4, #6.
 - [x] [#8 [MVP-008] CLI、私有 IPC daemon 与持久后台作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8) — dependencies: #2, #4, #7.
-- [ ] [#9 [MVP-009] 可配置本地模型客户端与 1700 秒全链长测](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9) — dependencies: #2, #8.
+- [x] [#9 [MVP-009] 可配置本地模型客户端与 1700 秒全链长测](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9) — dependencies: #2, #8.
 - [ ] [#10 [MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10) — dependencies: #5, #6, #9.
 - [ ] [#11 [MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11) — dependencies: #7, #8, #10.
 - [ ] [#12 [MVP-012] Claude Code CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) — dependencies: #11.

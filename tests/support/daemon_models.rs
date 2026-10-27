@@ -2,10 +2,11 @@ use super::*;
 use std::net::TcpListener;
 use std::sync::{Arc, Mutex, atomic::AtomicBool};
 
-struct Endpoint {
-    address: String,
-    requests: Arc<Mutex<Vec<(String, Value)>>>,
+pub(super) struct Endpoint {
+    pub(super) address: String,
+    pub(super) requests: Arc<Mutex<Vec<(String, Value)>>>,
     stop: Arc<AtomicBool>,
+    paused: Arc<AtomicBool>,
     worker: Option<std::thread::JoinHandle<()>>,
 }
 #[derive(Clone, Copy)]
@@ -17,8 +18,18 @@ enum Mode {
     RateLimited,
     NearLimit,
     Delay(u64),
+    Retrieval,
 }
 impl Endpoint {
+    pub(super) fn pause(&self) {
+        self.paused.store(true, Ordering::Release);
+    }
+    pub(super) fn resume(&self) {
+        self.paused.store(false, Ordering::Release);
+    }
+    pub(super) fn retrieval() -> Self {
+        Self::with_mode(Mode::Retrieval)
+    }
     fn new() -> Self {
         Self::with_mode(Mode::Normal)
     }
@@ -30,6 +41,8 @@ impl Endpoint {
         let saved = requests.clone();
         let stop = Arc::new(AtomicBool::new(false));
         let stopping = stop.clone();
+        let paused = Arc::new(AtomicBool::new(false));
+        let held = paused.clone();
         let worker = std::thread::spawn(move || {
             while !stopping.load(Ordering::Acquire) {
                 let (mut stream, _) = match listener.accept() {
@@ -73,7 +86,13 @@ impl Endpoint {
                     .nth(1)
                     .unwrap();
                 let body: Value = serde_json::from_slice(&bytes).unwrap();
-                saved.lock().unwrap().push((path.into(), body));
+                saved.lock().unwrap().push((path.into(), body.clone()));
+                while held.load(Ordering::Acquire) {
+                    if stopping.load(Ordering::Acquire) {
+                        return;
+                    }
+                    std::thread::sleep(Duration::from_millis(5));
+                }
                 if matches!(mode, Mode::Disconnect) {
                     continue;
                 }
@@ -93,7 +112,28 @@ impl Endpoint {
                             .min(Duration::from_millis(100)),
                     );
                 }
-                let response = if matches!(mode, Mode::NearLimit) {
+                let response = if matches!(mode, Mode::Retrieval) {
+                    match path {
+                        "/v1/embeddings" => {
+                            let dimension = if body["model"] == "vectors-3" { 3 } else { 2 };
+                            let data: Vec<_> = body["input"].as_array().unwrap().iter().enumerate().map(|(index,text)| {
+                                let text = text.as_str().unwrap();
+                                let offline = text.contains("offline") || text.contains("network") || text.contains("离线");
+                                let mut embedding = vec![if offline { 1.0 } else { 0.0 }, if offline { 0.0 } else { 1.0 }];
+                                if dimension == 3 { embedding.push(0.0); }
+                                json!({"index":index,"embedding":embedding})
+                            }).collect();
+                            json!({"data":data})
+                        }
+                        "/v1/rerank" => {
+                            let results: Vec<_> = body["documents"].as_array().unwrap().iter().enumerate().map(|(index,text)| {
+                                json!({"index":index,"relevance_score":if text.as_str().unwrap().contains("offline") { 0.9 } else { 0.2 }})
+                            }).collect();
+                            json!({"results":results})
+                        }
+                        _ => panic!("unexpected retrieval path"),
+                    }
+                } else if matches!(mode, Mode::NearLimit) {
                     json!({"choices":[{"index":0,"message":{"role":"assistant","content":"x".repeat(512*1024-128)},"finish_reason":"stop"}]})
                 } else if matches!(mode, Mode::Malformed) {
                     json!({"choices":[],"data":[],"results":[]})
@@ -123,6 +163,7 @@ impl Endpoint {
             address,
             requests,
             stop,
+            paused,
             worker: Some(worker),
         }
     }

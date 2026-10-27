@@ -24,8 +24,8 @@ Installing into the user's PATH remains a separate action.
 There is one Cargo package in one workspace. `src/main.rs` parses CLI input and
 calls versioned private IPC. The daemon invokes the shared Storage, ConfigManager,
 Capture and Domain components; it does not provide placeholder domain results.
-`tests/daemon.rs` exercises real executable and restart boundaries. Model, retrieval
-and host integration retain their own later acceptance criteria.
+`tests/daemon.rs` exercises real executable and restart boundaries. [Model](providers.md) and [retrieval](retrieval.md) jobs share that daemon.
+Host integration and full-scale product acceptance retain their own criteria.
 
 `src/config/` contains the shared configuration schema, atomic generation manager
 and monotonic deadline contracts. Its controlled consumers are tested in

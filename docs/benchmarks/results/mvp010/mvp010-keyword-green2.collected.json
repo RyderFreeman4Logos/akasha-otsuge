@@ -1,0 +1,12 @@
+{
+  "classification": "HARNESS: existing receipt replay CLI emits exact raw archived bytes, not a JSON envelope. Test expected an envelope. Product reached one scoped result; restart assertions not yet reached. Corrected to raw stdout byte equality.",
+  "process_absent": true,
+  "scratch_absent": true,
+  "terminal": {
+    "exit_code": 101,
+    "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+    "log_sha256": "501d34ec9ca48ae7f8af6f61693ca4c688891b781211b01b01948e68137b7b62",
+    "seconds": 8.363252273760736,
+    "utc": "2026-10-27T18:01:11.418570+00:00"
+  }
+}
