@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-27 after PR #34 merged at `42035bd`. Live GitHub audit: **22 open
-Issues, 6 completed Issues**. #7 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-27 after PR #35 merged at `960320a`. Live GitHub audit: **21 open
+Issues, 7 completed Issues**. #8 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -18,6 +18,11 @@ does not narrow them. Close an Issue only after evidence, review, gates and merg
   never reset an existing operation deadline or replay ambiguous effects.
 - Keep one database writer. Reuse the 42 verified compressed source shards and
   existing writable SSD; stream the 84 GB expansion without retaining it.
+- Keep `target` and `.spike-work` at the corresponding
+  `/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/`
+  paths, reached through checkout symlinks. Do not recreate large artifact roots
+  on the home filesystem. Remove owned obsolete build/probe/diagnostic outputs
+  after their consumers finish; preserve compact receipts and reusable corpus.
 - At a requested restart barrier, let native agents and non-durable jobs end
   naturally. Do not launch commits, long gates or new native agents; no handoff
   file unless requested. Resume only after the user confirms the restart.
@@ -38,11 +43,12 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-27 restart audit still finds 22 open Issues (#7–#28). #4–#6 have
-since been closed with merged PRs #32–#34; there is no completed implementation
-waiting for closure. #7's remaining work is command/documentation acceptance,
-the frozen-candidate gate/review and publication. Finish that leaf before adding
-features; retain the same one-Issue pipeline for #8 onward.
+The 2026-10-27 audit finds 21 open Issues (#8–#28). #4–#7 are closed with
+merged PRs #32–#35; no completed implementation is waiting for closure. #7's
+review found an anchor race and its sibling; both have causal regressions, and
+the final candidate passed its own gate, independent R3 review and CI. Finish
+one dependency leaf through publication before starting the next. Keep already
+passing unchanged full-data receipts, rather than rerunning them for each leaf.
 
 ## MVP-003 completed acceptance
 
@@ -161,7 +167,7 @@ retain exact commands, identities, original failures and scope limits.
   PR #34 merged as `42035bd` and #6 closed completed. Actual transport is #8;
   real indexes and host binding remain their dependent Issues.
 
-## MVP-007 remaining work
+## MVP-007 completed acceptance
 
 - [x] Define source identity, raw payload, normalized events and derived-summary
   references with session/entry/parent/branch/fork cutoff and visibility.
@@ -182,8 +188,41 @@ retain exact commands, identities, original failures and scope limits.
 - [x] Sweep the saved-cursor sibling: preserve validated anchors on resume and
   verify both real reconcile boundaries and append-only control with ordinary
   temporary-file fixtures. R2 interruption remains no final review verdict.
-- [ ] Complete the exact-HEAD gate, independent review, CI, merge and closure.
+- [x] Candidate `41a984d` passes its complete 23.181-second gate and independent
+  R3 source review (0 findings). CI40506461591 passed; PR #35 merged as
+  `960320a`, and #7 closed completed.
   [The protocol](../capture.md) records coverage and known uncollectable items.
+
+## MVP-008 acceptance and remaining work
+
+- [x] Implement private Linux Unix socket ownership/modes, peer UID validation,
+  version/capability/size handshake and bounded requests with stable errors.
+- [x] Provide thin CLI daemon start/status/stop/doctor and bounded explicit
+  DAEMON_UNAVAILABLE behavior, with no TCP or MCP listener.
+- [x] Persist accepted jobs, immutable configuration plans, leases, bounded retry
+  and cancellation state. Real SIGKILL/restart preserves all256 original/event
+  receipts and no-op replay; queue/cancel/pause/overload and graceful restart pass.
+  Durable recovery fixtures retain exhausted attempts and the original deadline.
+- [x] Wire validate/reload/status/effective config and watcher to one transactional
+  generation pipeline. Invalid-repeat/FIFO/rename/profile/large snapshot/pending
+  restore pass; failed durable publication keeps active/pending/history unchanged.
+  Validate/reload/startup share the original base paths when an override is removed.
+- [x] Expose real memory/history/state/diff/RecallReceipt via IPC/CLI with current
+  read permissions. Cursor/range parity, retirement/byte limits, revocation across
+  restart and stdout delivery ACK pass; `/dev/full` does not mark delivery.
+- [x] Verify another kernel UID denial with a working accessible control, no
+  daemon-owned TCP listener, oversized/version-incompatible/busy refusal.
+- [x] Audit disk use with dua; remove owned obsolete outputs, checksum-migrate
+  target/.spike-work to the SSD mirror and verify all42 original shard hashes.
+- [x] Complete installed release executable/API parity through the first canonical
+  gate at `71090cf`; repeat for the repaired final candidate below.
+- [x] Repair the four R1 review classes: collect mutation/scheduler owners on every
+  shutdown path, activate requested paths on explicit restart, check live capacity
+  at claim, and reject success after the last physical batch crosses its deadline.
+  Causal RED/GREEN receipts and bounded lifecycle/restart regressions are retained.
+- [ ] Run the repaired candidate's installed gate, including actual SIGTERM/SIGINT.
+- [ ] Freeze the candidate, run its complete exact-HEAD gate, obtain independent
+  review, then CI/merge/completed Issue closure; continue the full queue below.
 
 ## Complete Issue queue
 
@@ -193,7 +232,7 @@ retain exact commands, identities, original failures and scope limits.
 - [x] [#4 [MVP-004] 实现唯一正式 Storage、原子提交与恢复基础](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/4) — dependencies: #3.
 - [x] [#5 [MVP-005] 定义并执行来源、authority、scope 与 taste 数据语义](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5) — dependencies: #4.
 - [x] [#6 [MVP-006] 持久历史视图、as-of 查询与实际 recall receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/6) — dependencies: #4, #5.
-- [ ] [#7 [MVP-007] 采集归一化、原文归档及分支/压缩恢复协议](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/7) — dependencies: #4, #6.
+- [x] [#7 [MVP-007] 采集归一化、原文归档及分支/压缩恢复协议](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/7) — dependencies: #4, #6.
 - [ ] [#8 [MVP-008] CLI、私有 IPC daemon 与持久后台作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8) — dependencies: #2, #4, #7.
 - [ ] [#9 [MVP-009] 可配置本地模型客户端与 1700 秒全链长测](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9) — dependencies: #2, #8.
 - [ ] [#10 [MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10) — dependencies: #5, #6, #9.

@@ -75,3 +75,21 @@ fn stdout_write_failure_is_not_reported_as_success() {
             .contains("IO_ERROR")
     );
 }
+
+#[cfg(target_os = "linux")]
+#[test]
+fn daemon_unavailable_is_explicit_and_bounded() {
+    let socket = std::env::temp_dir().join(format!("akasha-absent-{}.sock", std::process::id()));
+    let start = std::time::Instant::now();
+    let output = Command::new(BIN)
+        .arg("--socket")
+        .arg(socket)
+        .args(["daemon", "status"])
+        .output()
+        .unwrap();
+    assert!(start.elapsed() < std::time::Duration::from_secs(3));
+    assert_eq!(output.status.code(), Some(3));
+    assert!(output.stdout.is_empty());
+    let error: serde_json::Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(error["error"]["code"], "DAEMON_UNAVAILABLE");
+}

@@ -12,7 +12,7 @@ use std::fmt;
 use std::io::Read;
 use std::path::Path;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
@@ -57,7 +57,43 @@ pub struct ResolvedConfig {
     retrieval_fingerprint: String,
 }
 
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct ArchivedConfig {
+    base_paths: Paths,
+    selected_profile: Option<String>,
+    config: Config,
+    sources: BTreeMap<String, String>,
+}
+
 impl ResolvedConfig {
+    pub(crate) fn base_paths(&self) -> &Paths {
+        &self.base_paths
+    }
+    pub(crate) fn archive(&self) -> ArchivedConfig {
+        ArchivedConfig {
+            base_paths: self.base_paths.clone(),
+            selected_profile: self.selected_profile.clone(),
+            config: self.config.clone(),
+            sources: self.sources.clone(),
+        }
+    }
+    pub(crate) fn restore(saved: ArchivedConfig) -> Result<Self, ConfigError> {
+        let timeouts = saved.config.validate()?;
+        Ok(Self {
+            digest: digest(&saved.config),
+            retrieval_fingerprint: digest(&(
+                &saved.config.retrieval,
+                &saved.config.models,
+                &saved.config.access,
+            )),
+            config: saved.config,
+            base_paths: saved.base_paths,
+            selected_profile: saved.selected_profile,
+            sources: saved.sources,
+            timeouts,
+        })
+    }
     pub fn config(&self) -> &Config {
         &self.config
     }
@@ -349,8 +385,18 @@ pub fn resolve(
 }
 
 pub fn read_file(path: &Path) -> Result<String, ConfigError> {
-    let file = std::fs::File::open(path)
+    use std::os::unix::fs::OpenOptionsExt;
+    let file = std::fs::OpenOptions::new()
+        .read(true)
+        .custom_flags(rustix::fs::OFlags::NONBLOCK.bits() as i32)
+        .open(path)
         .map_err(|_| ConfigError::invalid("document", "cannot open configuration file"))?;
+    if !file.metadata().is_ok_and(|m| m.is_file()) {
+        return Err(ConfigError::invalid(
+            "document",
+            "expected a regular configuration file",
+        ));
+    }
     let mut bytes = Vec::new();
     file.take((MAX_CONFIG_BYTES + 1) as u64)
         .read_to_end(&mut bytes)
