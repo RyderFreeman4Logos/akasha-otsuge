@@ -14,9 +14,11 @@ serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 serde_path_to_error = "0.1.20"
 sha2 = "0.11.1"
-tokio = { version = "1.54.1", features = ["sync", "time"] }
+surrealkv = { git = "https://github.com/surrealdb/surrealkv", rev = "4338a790c8edc56ef5ea1e46157427af4815be3c" }
+tokio = { version = "1.54.1", features = ["rt", "sync", "time"] }
 toml = "1.1.8"
 url = { version = "2.5.8", features = ["serde"] }
+zstd = "=0.13.3"
 
 [dev-dependencies]
 tokio = { version = "1.54.1", features = ["macros", "rt", "test-util"] }
