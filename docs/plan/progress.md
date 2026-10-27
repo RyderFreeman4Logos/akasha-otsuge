@@ -10,15 +10,15 @@ is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 ## Current issue: MVP-009
 
 Independent provider clients and durable model jobs are implemented on
-`feat/mvp-009-providers`, based on merge `a3d278d`. The complete remaining
-acceptance queue is in [todo.md](todo.md). Candidate phase `a57d515` passed45 focused
-Rust tests and Clippy. Three provider kinds, cancellation, crash ambiguity,
-generation pinning and virtual1699/1700-second serial calls pass. Follow-up tests
-repair aggregate archive accounting and prove three near512KiB outputs survive
-IPC/restart. A synthetic GB10 embedding probe returned4096 finite dimensions;
-the production three-service path and real long duration remain unverified.
-Production daemon/provider long tests and later CLI Runner tests
-retain their separate acceptance boundaries.
+`feat/mvp-009-providers`, based on merge `a3d278d`. Candidate `69853f1` passed
+its complete105.27s gate:96 Rust tests,8 Python tests and15 installed daemon
+cases. The actual GB10 production path passed text/4096-dimensional embedding/
+reranking compatibility. Its real-duration release run passed1605.029s success and1700s timeout,
+retaining that original release identity. R1 source review found one workflow-clock renewal across an admission
+wait. The fix carries the original clock and refuses expired admission; causal
+executor/provider regressions and49 focused Rust tests plus Clippy pass. Final
+candidate gate, review and release acceptance remain required before closing #9.
+Production daemon/provider and later CLI Runner acceptance stay distinct.
 
 ## Completed daemon: MVP-008
 
@@ -33,8 +33,8 @@ receipts. [The protocol](../daemon.md) records the actual trust/coverage limits.
 
 The user-requested dua audit found55.39GiB in the home checkout. Removing10.95GiB
 of obsolete owned outputs and checksum-migrating retained artifacts leaves about
-376MiB locally. After the gate the SSD mirror holds44.73GiB, including41.49GiB in
-.spike-work and3.24GiB in target. All42 compressed corpus shards match the original
+376MiB locally. The 2026-10-27 dua recheck reports41.49GiB in .spike-work and4.63GiB in target
+on the SSD mirror; active HTTP/test build outputs explain the target increase. All42 compressed corpus shards match the original
 manifest; preserve them for #24 without retaining the84GB expanded copy. Both
 large artifact roots remain lexical symlinks into `/ssd/mirror-rootfs/home/obj/`.
 The existing full SSD database was not opened or modified.

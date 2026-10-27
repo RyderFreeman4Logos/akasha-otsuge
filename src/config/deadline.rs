@@ -70,6 +70,26 @@ pub struct DeadlineTrace {
 }
 
 impl Deadline {
+    /// Restore one durable execution clock before waiting for any later admission.
+    pub fn resume(
+        layer: Layer,
+        configured: Duration,
+        started_at_unix_ms: u64,
+    ) -> Result<Self, ConfigError> {
+        let mut clock = Self::start(layer, configured, None)?;
+        let invalid = || ConfigError::invalid("deadline", "invalid stored execution start");
+        let elapsed = clock
+            .started_at_unix_ms
+            .and_then(|now| now.checked_sub(u128::from(started_at_unix_ms)))
+            .and_then(|millis| u64::try_from(millis).ok())
+            .map(Duration::from_millis)
+            .ok_or_else(invalid)?;
+        clock.started = clock.started.checked_sub(elapsed).ok_or_else(invalid)?;
+        clock.end = clock.end.checked_sub(elapsed).ok_or_else(invalid)?;
+        clock.started_at_unix_ms = Some(u128::from(started_at_unix_ms));
+        Ok(clock)
+    }
+
     /// Start execution after admission; a queue deadline is never its parent.
     pub fn start(
         layer: Layer,

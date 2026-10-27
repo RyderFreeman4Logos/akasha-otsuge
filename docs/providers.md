@@ -70,7 +70,10 @@ An enabled idle restriction is reported separately and does not renew the total
 provider deadline. The automatic model-workflow budget sums all stage request
 budgets, bounded admission waits and cleanup. An explicit workflow budget is
 reported and can be the limiting layer. Queue time does not reduce an individual
-provider's configured execution budget.
+provider's configured execution budget. The workflow resumes its original durable
+start and configured budget before configuration restoration. Lock waits and
+result archival consume that same clock; expired workflow/queue admission cannot
+start another provider attempt.
 
 Results include route/model identity, configured/effective/elapsed/remaining
 provider and workflow clocks, queue time and the limiting/triggered layer. A
@@ -82,15 +85,17 @@ returns the existing job; a changed plan conflicts. Running external requests ar
 never automatically replayed after an ambiguous interruption. Partial completed
 stages remain archived. Results are chunked into immutable Storage records with
 hash/revision checks, so embedding arrays do not overflow one authority record.
-The aggregate bound includes64KiB for profile names and diagnostic traces in
+The aggregate bound includes 64 KiB for profile names and diagnostic traces in
 addition to the three response budgets, and stays below the IPC message ceiling.
 
 Current fixtures cover independent endpoints, bad output, disconnects, slow
 responses, throttling, cancellation, shutdown/crash recovery, endpoint reload and
-virtual 1699/1700-second boundaries with three serial stages. Actual GB10 inference
-and the production daemon's near 1700-second wall-clock acceptance remain pending
-in #9. `local_long_timeout_verified` therefore remains false; a fixture receipt
-must never certify a different provider or a future host Runner.
+virtual 1699/1700-second boundaries with three serial stages. Explicit actual
+GB10 inference and near-1700-second production daemon acceptance have separate
+receipts in [#9](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9).
+`local_long_timeout_verified` remains false in ordinary runtime diagnostics:
+a controlled fixture receipt cannot certify another provider or a future host
+Runner, and this client does not attest a deployment's previous acceptance runs.
 
 The long acceptance uses the actual release executable with a controlled local
 endpoint. Its two overlapping requests return at1605 seconds and exceed1700

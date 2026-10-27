@@ -237,13 +237,27 @@ retain exact commands, identities, original failures and scope limits.
   Queue-clock and cancellation-trace defects have causal RED/GREEN receipts.
   Three near512KiB responses expose and repair aggregate archive overhead;
   the same requests now survive job reads and daemon restart.
-- [ ] Verify the actual available GB10 service contract with bounded inference;
-  retain exact model/client identities and output dimension/score semantics.
-- [ ] Run a nohup real-wall-clock1600..1690s success and over-budget failure
-  through production daemon/jobs/client; preserve every effective deadline and
-  begin/end identity. Fixture success must not certify an unrelated provider.
+- [x] Actual GB10 production-daemon compatibility passed at candidate `69853f1`:
+  text returned OK, embedding4096 dimensions, reranker2 finite raw scores.
+  The exact release0596d114 and routes are retained; this is not model quality.
+- [x] R1 review exposed workflow renewal during config-restore admission. Causal
+  executor RED/GREEN covers before/after expiry and already-expired execution;
+  the original durable start/budget survives, and expired work sends no request.
+  Provider admission also rechecks expired queue/workflow clocks before dispatch.
+- [ ] Recheck the repaired exact candidate, independent review and release
+  acceptances; prior release receipts retain their own immutable identities.
+- [x] Historical release0596d114 passed the nohup production-daemon1605.029s
+  success and1700s provider timeout, one physical send each; all owned processes
+  ended and scratch was removed. This predates the R1 workflow repair.
+- [ ] Run the repaired release's own real-wall acceptance after source review;
+  preserve all start/end/deadline identities without transferring historical proof.
 - [ ] Document examples/limits, exact-HEAD canonical gate, independent review,
   CI, merge and completed closure; then continue #10 through #28.
+
+Host preparation: Codex0.164.0, Hermes0.22.5+1914 and Pi0.78.0 are executable.
+The existing Claude entry points to a missing2.1.170 installation; #12 must repair
+installation and verify actual authentication. PATH/version checks do not prove
+host protocol capabilities or an authenticated Runner.
 
 ## Complete Issue queue
 

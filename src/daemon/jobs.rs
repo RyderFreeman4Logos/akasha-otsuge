@@ -427,6 +427,124 @@ mod tests {
         }
         service.storage.close().await.unwrap();
     }
+    #[tokio::test]
+    async fn model_workflow_keeps_its_original_clock_through_restore_wait() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt};
+        let mut observed = Vec::new();
+        for (name, advance_s, already_expired) in [
+            ("before", 1, false),
+            ("after", 11, false),
+            ("expired", 0, true),
+        ] {
+            let endpoint = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let address = endpoint.local_addr().unwrap();
+            let sends = Arc::new(AtomicUsize::new(0));
+            let counted = sends.clone();
+            let server = tokio::spawn(async move {
+                let (stream, _) = endpoint.accept().await.unwrap();
+                let mut stream = tokio::io::BufReader::new(stream);
+                let mut length = None;
+                for _ in 0..32 {
+                    let mut line = String::new();
+                    assert!(stream.read_line(&mut line).await.unwrap() > 0);
+                    if line == "\r\n" {
+                        break;
+                    }
+                    if let Some((name, value)) = line.split_once(':')
+                        && name.eq_ignore_ascii_case("content-length")
+                    {
+                        length = Some(value.trim().parse::<usize>().unwrap());
+                    }
+                }
+                let length = length.unwrap();
+                assert!(length < 4096);
+                stream.read_exact(&mut vec![0; length]).await.unwrap();
+                counted.fetch_add(1, Ordering::SeqCst);
+                let body = r#"{"choices":[{"index":0,"message":{"role":"assistant","content":"ok"},"finish_reason":"stop"}]}"#;
+                let response = format!(
+                    "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                    body.len()
+                );
+                let _ = stream.get_mut().write_all(response.as_bytes()).await;
+            });
+            let extra = format!(
+                "[timeouts]\nworkflow='10s'\nrunner='1s'\nstartup='1ms'\ncleanup='1ms'\ntools='1ms'\nsummary='1ms'\n[models.text]\nkind='text'\nendpoint='http://{address}/v1'\nmodel='fixture'\nlocal=true\n"
+            );
+            let (_fixture, service, _) = fixture(&format!("model-clock-{name}"), &extra).await;
+            let plan = serde_json::from_value(json!({"calls":[{"profile":"text","input":{"kind":"text","prompt":"hello","max_output_tokens":32}}]})).unwrap();
+            service.submit_model(name.into(), plan).await.unwrap();
+            assert!(service.claim(name, 0).await.unwrap());
+            if already_expired {
+                let (revision, mut job) = service.job(name).unwrap();
+                let started = ipc::now_ms().unwrap() - 20_000;
+                job.started_at_ms = Some(started);
+                job.execution_deadline_ms = Some(started + job.execution_budget_ms);
+                service
+                    .save_job(&job, Some(revision), vec![])
+                    .await
+                    .unwrap();
+            }
+            let original = service.job(name).unwrap().1;
+            let first = service.admission.lock().await;
+            let mut execution = Box::pin(service.clone().execute_job(name.into()));
+            std::future::poll_fn(|cx| {
+                assert!(std::future::Future::poll(execution.as_mut(), cx).is_pending());
+                std::task::Poll::Ready(())
+            })
+            .await;
+            let mut blocker = Box::pin(service.admission.lock());
+            std::future::poll_fn(|cx| {
+                assert!(std::future::Future::poll(blocker.as_mut(), cx).is_pending());
+                std::task::Poll::Ready(())
+            })
+            .await;
+            drop(first);
+            std::future::poll_fn(|cx| {
+                assert!(std::future::Future::poll(execution.as_mut(), cx).is_pending());
+                std::task::Poll::Ready(())
+            })
+            .await;
+            let second = blocker.await;
+            tokio::time::pause();
+            tokio::time::advance(Duration::from_secs(advance_s)).await;
+            tokio::time::resume();
+            drop(second);
+            let outcome = tokio::time::timeout(Duration::from_secs(5), execution).await;
+            server.abort();
+            let _ = server.await;
+            let terminal = service.show_job(name).await.unwrap();
+            let physical_sends = sends.load(Ordering::SeqCst);
+            service.storage.close().await.unwrap();
+            outcome.unwrap().unwrap();
+            observed.push((name, original, terminal, physical_sends));
+        }
+        for (name, _, terminal, sends) in &observed {
+            eprintln!(
+                "clock-case {name}: state={} error={} sends={sends}",
+                terminal["state"], terminal["error"]
+            );
+        }
+        observed.sort_by_key(|(name, _, _, _)| *name);
+        for (name, original, terminal, sends) in observed {
+            assert_eq!(terminal["started_at_ms"], original.started_at_ms.unwrap());
+            assert_eq!(
+                terminal["execution_deadline_ms"],
+                original.execution_deadline_ms.unwrap()
+            );
+            if name == "before" {
+                assert_eq!(terminal["state"], "succeeded");
+                assert_eq!(sends, 1);
+                let trace = &terminal["result"]["calls"][0]["trace"]["workflow"];
+                assert_eq!(trace["configured_ms"], original.execution_budget_ms);
+                assert_eq!(trace["started_at_unix_ms"], original.started_at_ms.unwrap());
+            } else {
+                assert_eq!(terminal["state"], "failed", "{name}: {terminal}");
+                assert_eq!(terminal["error"], "WORKFLOW_TIMEOUT", "{name}: {terminal}");
+                assert_eq!(sends, 0, "{name}: an exhausted workflow sent a request");
+            }
+        }
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -863,18 +981,25 @@ impl Service {
         Ok(true)
     }
     async fn execute_job(self: Arc<Self>, id: String) -> Result<()> {
-        let deadline = {
+        let job = {
             let _guard = self.admission.lock().await;
-            self.job(&id)?
-                .1
-                .execution_deadline_ms
-                .ok_or(Error("JOB_CORRUPT"))?
+            self.job(&id)?.1
         };
+        let deadline = job.execution_deadline_ms.ok_or(Error("JOB_CORRUPT"))?;
+        if job.model_plan.is_some() {
+            let started = job.started_at_ms.ok_or(Error("JOB_CORRUPT"))?;
+            if started.checked_add(job.execution_budget_ms) != Some(deadline) {
+                return Err(Error("JOB_CORRUPT"));
+            }
+            let workflow = crate::config::deadline::Deadline::resume(
+                crate::config::deadline::Layer::Workflow,
+                Duration::from_millis(job.execution_budget_ms),
+                started,
+            )?;
+            return self.execute_model(id, workflow).await;
+        }
         let remaining = Duration::from_millis(deadline.saturating_sub(ipc::now_ms()?));
         let end = tokio::time::Instant::now() + remaining;
-        if self.job(&id)?.1.model_plan.is_some() {
-            return self.execute_model(id, remaining).await;
-        }
         loop {
             let _guard = self.admission.lock().await;
             let (revision, mut job) = self.job(&id)?;

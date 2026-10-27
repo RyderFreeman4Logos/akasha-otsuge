@@ -292,6 +292,12 @@ impl Client {
                     "QUEUE_TIMEOUT"
                 })
             })??;
+            if workflow.expired().is_some() {
+                return Err(Error("WORKFLOW_TIMEOUT"));
+            }
+            if q.expired().is_some() {
+                return Err(Error("QUEUE_TIMEOUT"));
+            }
             let model = &config.config().models[&call.profile];
             let url = format!("{}/{route}", model.endpoint.as_str().trim_end_matches('/'));
             let mut request = self.http.post(url).json(&body);
@@ -403,6 +409,69 @@ async fn idle<T>(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn exhausted_workflow_cannot_start_provider_after_ready_admission() {
+        let endpoint = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let config = crate::config::resolve(
+            &format!(
+                "[timeouts]\nqueue='1s'\n[models.text]\nkind='text'\ntimeout='100ms'\nendpoint='http://{}/v1'\nmodel='fixture'\nlocal=true",
+                endpoint.local_addr().unwrap()
+            ),
+            None,
+            "",
+            &crate::config::Paths {
+                data_dir: "/unused".into(),
+                socket_path: "/unused/socket".into(),
+            },
+        )
+        .unwrap();
+        let call = Call {
+            profile: "text".into(),
+            input: Input::Text {
+                prompt: "hello".into(),
+                max_output_tokens: 32,
+            },
+        };
+        let mut outcomes = Vec::new();
+        for (waiting, workflow_s, expected) in [
+            (false, 1, "WORKFLOW_TIMEOUT"),
+            (true, 1, "WORKFLOW_TIMEOUT"),
+            (true, 10, "QUEUE_TIMEOUT"),
+        ] {
+            let client = Client::new().unwrap();
+            let workflow =
+                Deadline::start(Layer::Workflow, Duration::from_secs(workflow_s), None).unwrap();
+            let held = if waiting {
+                Some(client.slots.acquire_many(4).await.unwrap())
+            } else {
+                None
+            };
+            let mut request =
+                Box::pin(client.call(&config, &call, &workflow, std::future::pending()));
+            if waiting {
+                std::future::poll_fn(|cx| {
+                    assert!(std::future::Future::poll(request.as_mut(), cx).is_pending());
+                    std::task::Poll::Ready(())
+                })
+                .await;
+            }
+            tokio::time::pause();
+            tokio::time::advance(Duration::from_secs(2)).await;
+            tokio::time::resume();
+            drop(held);
+            let result = request.await;
+            outcomes.push((expected, result));
+        }
+        for (expected, result) in outcomes {
+            assert_eq!(result.error.as_deref(), Some(expected));
+            assert!(
+                result.trace["provider"].is_null(),
+                "expired workflow began a provider attempt: {}",
+                result.trace
+            );
+        }
+    }
 
     #[tokio::test]
     async fn cancelled_admission_keeps_its_queue_trace_without_sending() {

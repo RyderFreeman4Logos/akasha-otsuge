@@ -1,5 +1,5 @@
 use super::*;
-use crate::config::deadline::{Deadline, Layer};
+use crate::config::deadline::Deadline;
 use crate::storage::RevisionRef;
 
 // Include bounded profile names and per-stage traces alongside the response bytes.
@@ -114,7 +114,7 @@ impl Service {
     pub(super) async fn execute_model(
         self: &Arc<Self>,
         id: String,
-        remaining: Duration,
+        workflow: Deadline,
     ) -> Result<()> {
         let (plan, config) = {
             let _guard = self.admission.lock().await;
@@ -131,15 +131,15 @@ impl Service {
             (job.model_plan.ok_or(Error("JOB_CORRUPT"))?, restored.pin())
         };
         let mut calls = Vec::new();
-        let workflow = Deadline::start(
-            Layer::Workflow,
-            remaining.max(Duration::from_millis(1)),
-            None,
-        )?;
         for call in &plan.calls {
             {
                 let _guard = self.admission.lock().await;
                 let (revision, job) = self.job(&id)?;
+                if workflow.expired().is_some() {
+                    return self
+                        .finish_job(job, revision, "failed", Some("WORKFLOW_TIMEOUT"))
+                        .await;
+                }
                 if let Err(error) = self.authorize_job(&job) {
                     return self
                         .finish_job(job, revision, "failed", Some(error.0))
