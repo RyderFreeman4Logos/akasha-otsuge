@@ -2,9 +2,20 @@
 
 MVP-003 only, outside the product Cargo workspace. This is the sole fallback
 allowed by the source specification after the tested Helix candidate failed
-full-data low-memory recovery. No production backend is selected.
+full-data low-memory recovery. The final ADR selects this combination as the sole
+backend after full concurrent acceptance and activation. The root product still
+contains no storage implementation; MVP-004 begins after MVP-003 review/merge.
 See the [decision](../../docs/benchmarks/storage-decision.md) and unchanged
 [acceptance contract](../../docs/benchmarks/storage-contract.md).
+
+The [final full-run archive](../../docs/benchmarks/results/fallback-full-rebuild-r3/summary.json)
+records source3b3994a/native860c32fa, 3,840-second/100-client acceptance,
+82,587 verified acknowledgements and active5/text/vector watermark392298.
+The [current matrix](../../docs/benchmarks/storage-evidence-matrix.md) supersedes
+pending-state wording in the historical milestone notes below; each older result
+retains its own source, scope and failures.
+
+## Historical implementation and invocation notes
 
 `prune_versions` is an offline generation request with `generation` and a fixed
 absolute `deadline_ms`. It requires the active ready generation and a fully

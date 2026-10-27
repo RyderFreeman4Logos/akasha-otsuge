@@ -1,290 +1,107 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-24 after the session restart. GitHub audit: **26 open Issues,
-2 completed Issues**; #3 is the first unresolved dependency. PR #31 remains draft.
-This checklist supplements each linked Issue's full acceptance criteria; it does
-not narrow them. Check an Issue only after its evidence, review, gate and merge.
-
-Current decision: the tested Helix candidate failed full-data low-memory recovery
-in three retained OOM runs. Stop Helix tuning and validate the specification's
-SurrealKV 1.0.0/LanceDB 0.40 fallback against the unchanged contract. Diagnostic
-leaves below identify their candidate; no acceptance transfers between backends.
-See [decision record](../benchmarks/storage-decision.md).
+Updated 2026-10-26 after the session restart. Live GitHub audit: **26 open
+Issues, 2 completed Issues**. #3 is the first unresolved dependency; PR #31
+remains draft. The complete queue below preserves every Issue and dependency.
+Each linked Issue's full acceptance criteria remain authoritative; this checklist
+does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
 ## Session operating rules
 
-- Use `/home/obj/.hermes/skills/software-development/wd/SKILL.md` before every
-  non-CSA command expected to exceed 90 seconds, including after compaction.
-- Resolve the active provider from this session's metadata, then run that skill's
-  `scripts/resolve-checkin.sh` immediately before arming one shared parent relay.
-  Never reuse a previously resolved TTL or claim cache hits without telemetry.
-- At each check-in record exact PID/start time, durable progress, campaign age,
-  elapsed time since progress and a bounded next action. Reconcile terminal work
-  before resuming it. Do not rerun a full gate for unchanged source.
-- Preserve verified corpus shards and partial downloads. A previous running
-  snapshot is not proof a process survived restart. Maintain one database writer.
+- Load `/home/obj/.hermes/skills/software-development/wd/SKILL.md` before every
+  non-CSA task expected to exceed 90 seconds, including after compaction.
+- Resolve this session's active provider TTL afresh for each arm; keep one shared
+  parent relay. No cache-hit claim without telemetry.
+- Launch long executable tasks with `nohup`, detached stdin and durable logs,
+  PID/start-time, admission and terminal receipts. Keep one completion listener.
+- At check-ins verify exact process identity, durable progress, original campaign
+  age and a bounded next action. Reconcile terminal work before any resume;
+  never reset an existing operation deadline or replay ambiguous effects.
+- Keep one database writer. Reuse the 42 verified compressed source shards and
+  existing writable SSD; stream the 84 GB expansion without retaining it.
+- At a requested restart barrier, let native agents and non-durable jobs end
+  naturally. Do not launch commits, long gates or new native agents; no handoff
+  file unless requested. Resume only after the user confirms the restart.
 
 ## Restart review and process improvement
 
-#1 and #2 are merged and closed with acceptance evidence. All later work depends
-on #3's real storage decision, so issue-count reduction is currently constrained
-by that decision. Closing it on diagnostic data would conceal the dependency.
+#1/#2 are merged and closed. #3's repeated full-scale failures held up all later
+Issues. The final fixed 3,840-second concurrent case has now passed; its final
+commit is 392298, distinct from the build interval's ending commit 370032.
+The prior pause was intentional: measured work and reviewers ended naturally,
+while follow-up validation, archive, final ADR/review and merge remained undone.
 
-The previous history verifier timed out after 900 seconds without per-wave
-checkpoints; the vector builder reached 34,477/38,462 entities before its 7,200s
-harness limit, with no OOM. Neither is a pass or, alone, a backend rejection.
-The downloader encountered curl HTTP/2 error 92; completed files and partials
-remain available. No previous task-owned processes remained at the restart audit.
-
-Improvements: instrument the precise slow query before enlarging its workload;
-classify retryable transport failures and preserve individual file outcomes;
-separate preparation from measured engine work; publish verified, cohesive leaves
-without repeatedly rebuilding unchanged product code. Continue one main Issue.
-For the fallback, test direct low-budget reopen after the first real source shard
-before admitting the full corpus, so memory-layout failures surface earlier.
+The six prepared phases now pass and the archive verifies; finish the publication
+tail before any new tuning or full measurement. Reuse unchanged passing receipts, preserve each
+historical binary's identity and retain all failures. Consolidate the remaining
+checklist instead of appending stale running snapshots. Then implement one Issue
+at a time in the specification's dependency order, with focused regressions and
+one final exact-HEAD gate/review per candidate. No speculative parallel writers
+or repeated full-corpus acceptance on unrelated intermediate changes.
 
 ## MVP-003 acceptance and remaining work
 
-The unchanged [storage contract](../benchmarks/storage-contract.md), linked Issue
-and original specifications remain authoritative. The [decision record](../benchmarks/storage-decision.md)
-and its immutable result archives retain all failed attempts, source identities,
-commands and scope limits; historical diagnostics are not repeated in this queue.
+The unchanged [storage contract](../benchmarks/storage-contract.md),
+[specification](../spec/issues/MVP-003.md) and
+[evidence matrix](../benchmarks/storage-evidence-matrix.md) define acceptance.
+The [decision record](../benchmarks/storage-decision.md) and immutable archives
+retain exact commands, identities, original failures and scope limits.
 
-Completed, with the limits shown:
-
-- [x] Freeze candidate order, licenses, exact source pins, oracle and thresholds.
-      Helix failed three full-data low-recovery OOM runs; only the specified
-      SurrealKV1.0.0/LanceDB0.40.0 fallback is under evaluation. No backend selected.
-- [x] Freeze and verify42 public compressed source shards,50,000,002,783 unique
-      UTF-8 content bytes,11,428,831 documents and1,000,000 real1536-dimensional
-      vectors. Import and verify every original record at low budget;84GB of
-      expanded input is streamed, not retained.
-- [x] Seed100,000 deterministic changes and verify5,163 historical assertions on
-      full storage. Fresh verification identities preserve their original
-      deadlines; expired prior operations remain expired.
-- [x] Backfill both full generations and verify complete native text/vector index
-      coverage. Generation2 uses scope columns. This is functional coverage;
-      interrupted/recovered build peak memory failed and remains below.
-- [x] Verify64 full scoped BM25/ANN queries and1,195 authority-checked candidates.
-      The32 ANN references cover all million vectors; mean recall@20 is0.9125.
-- [x] Freeze3,840 distributed mixed queries, including512 unvectorized queries
-      across eight scopes. Source preparation SIGKILL/resume preserves exact
-      canonical output, and native/controller admission rejects malformed input.
-- [x] Prove owned-file cold-cache preparation with fsync/fadvise/mincore and a
-      warm-file eviction control. The first full1800s low workload verifies
-      50,536 recorded requests,4,320 synthetic and4,320 corpus current reads,
-      581 unvectorized current reads and198 unvectorized BM25 queries across all
-      eight scopes. Correctness/cold coverage passes; search performance fails.
-- [x] Implement bounded100-client admission, explicit interrupted-case
-      reconciliation and independent current/derived-state oracles. Single-search
-      admission leaves ordinary read/write permits available. Fixed GNU allocator
-      startup settings prevent the observed freed-arena retention.
-- [x] Verify full100k backlog drain, restricted admission while draining, controlled
-      high-to-low reopen with original deadlines, and generation2 activation.
-      These are experiment-controller results; production hot reload belongs to
-      the dependent daemon implementation.
-- [x] Retain diagnostic atomic commit/conflict/idempotency/history and live
-      visibility checks;103 lifecycle commands with six SIGKILL barriers;
-      85 physical derived-corruption/quarantine/rebuild checks; authority/WAL/VLog
-      corruption and real kernel ENOSPC recovery. Their small-fixture scope does
-      not replace the full scenarios below or production automatic quarantine.
-- [x] Pass the full low1800s/100-client cold case after the delta scope-index
-      fix:50,931 requests,34,460 distinct commits, BM251.188333/s/P9516.712s,
-      ANN0.248889/s/P9511.424s, RSS P99/max458,305,536/493,187,072B.
-      All content/scoped oracles pass; both watermarks reach217716 with6.570s
-      drain. Raw hashes, exact process/unit exit and scratch cleanup verify.
-      This is the required low-profile pass; high and build gates remain below.
-- [x] Pass the full high1800s/100-client cold case:50,940 requests,36,049 distinct
-      commits, BM251.195/s/P958.489s, ANN0.248889/s/P958.805s, RSS P99/max
-      709,939,200/763,740,160B and5.078s drain. Low-profile write burst passes
-      100/100 writes; overload records7,300 writes with6,507 successes,793
-      expected revision conflicts, zero operation errors and1.434s drain.
-      All raw oracles/hashes and exact process/unit/scratch cleanup verify.
-      Both watermarks reach260472. Burst/overload are write cases and are not cold.
-- [x] Retire the rejected Helix experiment database with exact ownership, process,
-      lock and artifact checks;38,603,812,864 allocated bytes removed. Preserve
-      source shards and receipts. Do not claim later reuse of that database.
-- [x] Prune obsolete native versions of full active generation2 under the low
-      group:349.791s, RSS max200,458,240B,41,326 versions and40,540,456,938
-      native-reported bytes removed. All42 before/after current/history/query/
-      receipt witnesses match. Actual filesystem free-space delta is
-      40,473,866,240B; retain Btrfs/concurrent-activity limits. Completed controller
-      reuse verifies before retiring its disposable binary. Authority and old
-      generation1 remain intact in that historical run.
-- [x] Retire full inactive generation1 through the public native operation in
-      4.333s, RSS max50,991,104B, no OOM. All42 before/after witnesses match;
-      authority history, active2 and committed/text/vector260472 are unchanged.
-      Retired tables account for48,655,896,576 allocated bytes; filesystem free
-      space increases47,966,953,472B. Preserve the Btrfs/host-activity distinction.
-      Completed reuse, exact process/unit exits and scratch cleanup verify;
-      the disposable controller copy is retired after reuse verification.
-
-- [x] Add opt-in real unvectorized corpus candidates to the existing eight
-      correction clients. The160s native fixture passes32 corrections across
-      eight scopes, original-body restoration,58 derived checks and ten evidence
-      tamper controls. Both search types overlap its rebuild. Preserve the
-      initial one-based-ordinal failure and the ordinary60s throughput failure;
-      this diagnostic does not establish full-size overlap or vectorized changes.
-- [x] Prepare full generation3 after pruning obsolete active2 versions. Its
-      backfill covers11,428,831 documents and1,000,000 vectors. Its first full
-      concurrent build failed below. Select and verify eight actual unvectorized search candidates,
-      excluding all3,840 fixed query IDs. No backend is selected.
-
-Remaining acceptance, in execution order:
-
-- [x] Repair per-connection Lance cache-budget multiplication with one Session
-      owned by each authority. The native two-connection assertion fails before
-      the change, then passes with fresh rows/indexes visible after writes. All12
-      release units, release Clippy,179 lifecycle commands/12 SIGKILL barriers and
-      the160s/100-client corpus-concurrent fixture pass (4,528 requests; RSS
-      P99/max210,034,688/210,227,200B). Capacities and acceptance thresholds are
-      unchanged. Full-size resource/performance acceptance remains below.
-- [x] Prepare full generation4 with the shared-session candidate after public
-      retirement of inactive2 and pruning of active3. All66 before/after witnesses
-      preserve authority/history/receipts and query candidate sets; one BM25
-      result changes order only, with the initial exact-order failure retained.
-      Filesystem free space increases48,113,942,528B across cleanup. Backfill
-      covers11,428,831 texts/1,000,000 vectors in870.210s, RSS max158,670,848B,
-      no OOM. All four disposable native copies are retired after completed reuse
-      and exact process/unit/scratch checks. Generation4 is unbuilt; active3 and
-      committed269826 remain unchanged. No concurrent-build pass is inferred.
-- [x] Preserve and reconcile the second full concurrent failure: systemd OOM at
-      1762.242s; sampled RSS P99/max579,792,896/608,862,208B. The incomplete prefix
-      has48,627 complete logged requests and16 search errors. All39,876 complete
-      seed/workload acknowledgements match authority; one truncated trailing
-      line and unlogged committed309703 remain unknown. Eight guarded originals
-      are restored at309704..309711; active3 drains both watermarks to309711.
-      Generation4 stays partial/inactive under its original deadline. Failed-run
-      disk samples stay within caps; no completed rebuild peak is inferred.
-- [x] Restore spec08's single index-builder admission by sharing the existing
-      derived mutex between baseline and delta construction. The held-delta
-      regression reproduces the bypass, then proves original-deadline expiry,
-      ordinary-write progress and successful construction after release. All12
-      release units, release Clippy and179 lifecycle commands/12 SIGKILL barriers
-      pass. First160s concurrent run fails write P95 at7.904s; retain it. One later
-      same-harness baseline/candidate pair passes, candidate write P95=99ms and
-      RSS P99/max201,355,264/201,494,528B. This bounded source repair is not a
-      full-scale resource pass or a causal explanation of every earlier failure.
-- [ ] Validate the repaired admission at full scale with unchanged limits. Four
-      bounded query/allocation controls are archived. The64MiB/8MiB ANN chunk
-      comparison preserves candidate sets but gives only a limited reduction;
-      retain the default64MiB chunk and fixed allocator configuration.
-- [x] Permit safe retirement of incomplete inactive candidates through the
-      existing tombstone/public-delete path. Native223-command regression covers
-      empty, interrupted-backfill and failed-build states,19 SIGKILL barriers,
-      two competing owners, idempotent resume and unchanged active queries/receipts.
-      Twelve release units and Clippy pass; RSS max128,020,480B. Behavioral RED and
-      the initial obsolete-fixture expectation failure are retained. Only that
-      contradictory old refusal is removed; new regression assertions are unchanged.
-- [x] Retire actual failed inactive generation4 in2.003s without completing its
-      indexes, preserving its original index deadline1792836176755. Prune active3
-      in34.035s; all66 before/after witnesses agree except one BM25 ordering change
-      with identical candidates. Filesystem free space increases40,334,372,864B.
-      Generation5 backfill covers11,428,831 texts/1,000,000 vectors in801.717s,
-      RSS max164,487,168B and no OOM. It remains unbuilt with no index deadline;
-      active3/committed309711 are unchanged. Completed reuse, exact process/unit
-      exit, scratch cleanup and four disposable-copy removals verify.
-- [x] Bind generation model/fingerprint/dimension/chunker to the original import
-      manifest at creation and shared reads. Behavioral native/unit RED reproduces
-      relabeling; GREEN covers rejection, explicit synthetic provenance, legacy
-      binding with unchanged state/deadlines, and awaited close after refusal.
-      All13 release units, Clippy,231 lifecycle commands/19 SIGKILL barriers,
-      21 import and85 search commands pass. The160s/100-client diagnostic passes
-      4,528 requests, RSS P99/max202,850,304/202,907,648B. Prior failed attempts
-      remain archived. The independent review's trailing-blank finding is fixed.
-- [ ] Complete exact-HEAD gates and independent re-review of the identity repair,
-      then bind the existing full database to its original manifest and verify
-      active3/candidate5 state, deadlines and witnesses. Do this before full r3;
-      no corpus reimport or threshold change is needed. The optional old text-layout
-      binary fixture was not rerun; legacy metadata binding has native unit coverage.
-- [x] Close the second review's legacy-binding reservation gap with one check
-      before its metadata write. The genuine old-native import regression first
-      reproduces the write under an impossible reserve, then passes15 commands:
-      both existing/fresh generation refusals leave metadata absent; normal binding
-      preserves state/deadlines; already-bound reuse/status remain allowed. All13
-      release units and Clippy pass. The initial fixture OWNER setup failure is
-      retained separately. Fresh independent successor review is still required.
-- [x] Remove50 obsolete native copies whose hashes appear in published receipts;
-      retain current/recent recovery and unattributed files. Inode allocation
-      falls7,430,930,432B; filesystem free space increases2,648,940,544B. No build
-      cache, corpus, authority database or installed program is removed.
-- [ ] Complete an uninterrupted full scoped build within the640MiB low peak and
-      reopen interrupted builds directly at low budget. The prior vector merge
-      OOMs at812/1000; recovery completes but RSS691,322,880B exceeds the limit.
-      The fixed allocator setting has not yet passed a fresh full build.
-      The first full concurrent attempt also fails at403.420s with systemd
-      oom-kill and sampled RSS686,899,200B. Preserve its10,942 logged requests
-      and9,286 logged successful commits; the missing terminal observer receipt
-      prevents a complete correctness/performance verdict. A same-native,
-      build-only direct-low recovery passes within the original generation3
-      deadline:2342.712s, full11,428,831 text/1,000,000 vector coverage,
-      RSS P99/max215,441,408/250,179,584B and no OOM. Exact processes/unit,
-      scratch cleanup and completed reuse verify. This establishes direct-low
-      recovery; fresh uninterrupted/concurrent build acceptance remains open.
-- [x] Reconcile every recorded acknowledgement after the full concurrent OOM:
-      9,286 workload and50 seed receipts match durable receipts, immutable bodies,
-      outbox revisions and original request hashes in37 bounded batches. Ten
-      committed sequences lack persisted request outcomes and remain unknown.
-      Guarded restoration of all eight original bodies/scopes/keys passes at
-      commits269819..269826; historical revisions remain unchanged. Active2
-      drains to269826 and78 before-activation witnesses pass, including16
-      indexed receipts,32 historical bodies, eight BM25 and eight ANN queries.
-      The drain collector initially compared extra target/done fields; its
-      failure and corrected collection of the unchanged native receipts remain.
-- [x] Finish recovered generation3 catch-up and activation without changing its
-      original deadline. Replay eight pinned original vector outputs for prior
-      vectorized restorations after the first catch-up explicitly refuses their
-      missing embeddings. Both watermarks reach269826;79 after-activation
-      witnesses pass with exact history/current bodies, generation-specific
-      receipts, eight BM25/eight ANN queries and four bundle-mismatch refusals.
-      All low-budget process/unit/scratch checks pass. This is recovery and
-      activation coverage; the failed concurrent attempt stays failed.
-- [ ] Measure a full rebuild while the100-client steady workload continues in the
-      same authority/process group. Prove ordinary commits and completed BM25/ANN
-      queries overlap the build, keep the old generation active/readable, verify
-      failed-build rollback and model/dimension separation. The new optional
-      rebuild entrypoint passes the small native fixture:1,698 requests, nine
-      commits and both old-generation search types overlap the build. Eight
-      receipt mutations are rejected;103 lifecycle commands also pass. Full-size
-      overlap has now been attempted with actual corpus mutations but failed
-      resource acceptance. Keep the3,840 fixed performance IDs protected in
-      the repaired full check. Do not replay the unchanged failing full case.
-- [x] Full-size corpus-candidate corrections/rescopes/retractions/restores and
-      live permissions now pass16 distinct candidates,64 revisions and755 native
-      commands in306.902s, with RSS max255,275,008B. Exact original/current/history
-      bodies and vectors agree; watermarks reach183256. All3,840 fixed performance
-      IDs are excluded from mutation. Earlier small-fixture SIGKILL/resume,
-      completed reuse and tamper controls pass separately. These serial full-data
-      checks do not replace the concurrent build/query requirement above.
-- [ ] Verify full generation-specific indexed receipts and gap-free watermarks
-      across concurrent rebuild, activation and failure. Existing full backlog
-      and mixed-workload watermarks pass; reindex overlap remains distinct.
-- [ ] Measure physical authority/current/next-generation/scratch categories and
-      enforce the actual rebuild bound. The81,212,254,720B admission floor is
-      shared by all generations, but45GB projected rebuild plus4GB scratch is
-      not physical proof; a failed build retained6.15GB scratch before cleanup.
-      Preserve30GiB headroom and read/idempotent-receipt availability at refusal.
-      Public offline derived-version pruning passes133 native commands, one
-      competing-owner refusal and eight total crash barriers; current/history/
-      receipts remain unchanged. Full-size obsolete-version reclamation now
-      and inactive-generation retirement pass above; concurrent peak disk
-      accounting still needs completed-run acceptance. The failed concurrent
-      run sampled118,985,441,280B total inode allocation and at least
-      401,853,628,416B filesystem free space, without a category-cap violation;
-      this is sampled failure evidence, not a complete rebuild peak. Public retirement also passes
-      179 commands, two competing-owner checks and twelve SIGKILL barriers on
-      nine documents/eight real vectors, covering all four native table families.
-      Retired IDs cannot be reused; historical receipts remain readable.
-- [ ] Reconcile the complete required crash/resource/config matrix against
-      immutable receipts: commit/reply/index/watermark/activation barriers,
-      authority and derived corruption, child failure/exhaustion, isolated disk
-      exhaustion, invalid config and competing reloads. Retain the distinction
-      between experiment recovery and future product automatic recovery. Do not
-      rerun a proven small-fixture check unless changed code or a gap justifies it.
-- [ ] Finish the specified fallback evaluation, publish the sole-backend ADR,
-      exact-source gates/review and raw evidence, merge PR#31 and only then close
-      #3. Both candidates failing is a real blocker; no third backend or reduced
-      thresholds are authorized. The complete dependent queue remains below.
+- [x] Freeze both allowed candidates, licenses, exact source pins, manifest,
+  oracle and thresholds. Helix fails three retained full-data low-memory recovery
+  OOM runs; only the specified SurrealKV 1.0.0/LanceDB 0.40.0 fallback is evaluated.
+- [x] Import and verify 50,000,002,783 unique UTF-8 bytes, 11,428,831 originals,
+  1,000,000 real 1536-dimensional vectors and 100,000 deterministic changes.
+  Historical verification has 5,163 assertions at its frozen commit point.
+- [x] Verify complete lexical/vector coverage, 64 full scoped queries and 1,195
+  authority-checked candidates; 32 ANN references cover all million vectors,
+  with mean recall@20 0.9125. Freeze 3,840 distributed mixed queries and exclude
+  their IDs from mutation.
+- [x] Pass both 1,800-second/100-client file-cache-cold profiles, write burst and
+  overload. Low RSS P99/max 458,305,536/493,187,072 B; high
+  709,939,200/763,740,160 B. Their original native identities remain explicit.
+- [x] Verify full backlog drain, high-to-low reopen and direct-low interrupted
+  build recovery within the original deadlines. Production reload remains #8/#24.
+- [x] Verify immutable history, permissions, real corrections/rescopes/retractions
+  and restored bodies/vectors: 16 full-corpus candidates, 64 revisions, 755 native
+  commands. Retain native crash, atomicity, derived-corruption, authority/WAL/VLog
+  corruption, real kernel ENOSPC and configuration fixtures separately.
+- [x] Reclaim full obsolete versions and inactive/partial generations through
+  public operations; before/after witnesses preserve history, receipts and query
+  candidate sets. Preserve filesystem versus inode-allocation distinctions.
+- [x] Repair shared cache ownership and single baseline/delta builder admission;
+  keep their causal regressions and failed diagnostics. Bind generation identity
+  to the original import manifest and check reserve before legacy binding writes.
+  Source 3b3994a passes the exact-HEAD root gate and independent R3 review.
+- [x] Bind the existing full database with 139 native commands and 67 identical
+  before/after witnesses, preserving state/deadlines without reimport.
+- [x] Pass the complete 3,840-second/100-client concurrent rebuild on source
+  3b3994a/native 860c32fa: 108,641 completed requests, zero operation errors,
+  82,587 distinct seed/workload commits and768 corpus corrections. Both search
+  types overlap the full11,428,831-text/1,000,000-vector build. RSS P99/max
+  509,325,312/553,222,144 B; no OOM. All latency/throughput/content gates pass.
+  108,672 is the planned count, not the executed count.
+- [x] Verify completed-run sampled disk bounds: 371 samples, total peak
+  137,661,698,048 B and minimum free 397,265,436,672 B; no category cap violation.
+  Ten-second inode-allocation samples are not an instantaneous quota or exclusive
+  Btrfs extent measurement. Completed reuse, exact process/unit exits and scratch
+  removal pass. Retain both earlier full concurrent OOM failures and unknown
+  outcomes unchanged.
+- [x] Finish six already-prepared phases: all acknowledgements, pre-switch
+  witnesses, eight original-vector replays, generation5 catch-up, activation and
+  post-switch witnesses. 323 acknowledgement batches verify82,587 receipts; all
+  514 follow-up commands pass. Active5 and both watermarks equal392298; immutable
+  history/current bodies, indexed receipts and incompatible-bundle refusals pass.
+- [x] Archive the full run, manifest binding, follow-ups, frozen source, commands,
+  hashes, resource samples and prior gate/review receipts. All2,116 archive
+  members pass hash/readback verification; compressed archive size22,486,670B.
+- [x] Reconcile the complete crash/resource/config matrix against immutable
+  receipts. Distinguish experiment recovery from product daemon/worker behavior;
+  do not rerun unchanged checks without a concrete missing acceptance case.
+- [x] Publish the sole-backend ADR and unchanged measured operating envelope.
+- [ ] Complete the final exact-HEAD gate and independent review, push/read back
+  CI, merge PR #31 and close #3. No third backend or relaxed
+  threshold is authorized. Product Storage and all later requirements stay below.
 
 ## Complete Issue queue
 

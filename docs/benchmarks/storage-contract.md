@@ -1,7 +1,8 @@
 # Storage experiment contract — MVP-003
 
-Status: criteria frozen before candidate measurement on 2026-10-22. No backend
-has passed or been selected. [Issue #3](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/3).
+Status: criteria frozen before candidate measurement on 2026-10-22 and unchanged.
+The [ADR](storage-decision.md) selects SurrealKV/LanceDB after the measured passes;
+final review and merge close [Issue #3](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/3).
 Authoritative requirements: [storage](../spec/05.md), [resources](../spec/08.md).
 This contract applies unchanged to both permitted candidates and to MVP-024.
 

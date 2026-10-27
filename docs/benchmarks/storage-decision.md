@@ -1,8 +1,123 @@
-# Storage candidate decision record
+# ADR-001 — Storage candidate decision
 
-Updated2026-10-24. MVP-003 remains open; no production backend is selected.
-The [evidence matrix](storage-evidence-matrix.md) distinguishes completed scope
-from the remaining full concurrent acceptance.
+Updated 2026-10-26. **Select SurrealKV 1.0.0 authority with LanceDB 0.40.0
+and Lance 13.0.0 derived indexes as the sole backend.** Full concurrent rebuild,
+acknowledgement, catch-up and activation acceptance passes on source3b3994a /
+native860c32fa. MVP-003 stays open until final review and merge.
+The [current evidence matrix](storage-evidence-matrix.md) is the acceptance map.
+The dated records below retain historical states and failures, rather than
+relabeling them as measurements of the latest executable.
+
+## Selected backend and layout
+
+The specified fallback is SurrealKV 1.0.0 authority at
+`4338a790c8edc56ef5ea1e46157427af4815be3c`, with LanceDB 0.40.0 at
+`b1b080b97c3edd2fd9f2aae8a3b71ff19487b1f8` and Lance 13.0.0 for derived
+lexical/vector retrieval. All three use Apache-2.0; exact transitive identities
+and licenses are retained in the isolated spike's Cargo.lock and
+[dependency inventory](results/fallback-primitives/dependency-licenses.json).
+Helix is excluded from the intended production path for the failures below.
+
+Choose one original-content layout: compressed immutable content in the
+SurrealKV authority, with native value-log separation. There is no separate
+external blob backend and no SQLite metadata store. The experiment's format2
+uses Zstd level1 and a 512 KiB decoded-record bound, VLog threshold256 bytes,
+16 MiB VLog segments and full checksum verification. Production format/version
+and migration APIs are implemented by #4; the experiment directory is not a
+production data-directory format.
+
+One Immediate authority transaction validates the expected revision and commits
+immutable revision, head/scope membership, request hash/receipt, durable derived
+job and commit sequence. Immutable sequence-keyed revisions plus versioned
+head/scope keys support historical reads without replaying the entire event log.
+No model, network or external process runs inside that transaction. Failed or
+ambiguous calls are reconciled by durable idempotency identity.
+
+LanceDB is reconstructible derived storage. Bounded outbox waves apply before
+text/vector watermarks advance through a gap-free prefix; there is no cross-store
+transaction claim. Queries combine bounded baseline/delta candidates and validate
+current authority/head/scope/permission before returning. Candidate coverage does
+not promise global ranking. Model/fingerprint/dimension/chunker identity binds
+to the exact original import manifest; incompatible bundles are refused.
+Activation requires complete native coverage and current watermarks, then commits
+the active pointer under the ordinary writer lock. Public offline prune/retire
+operations preserve authority history and receipts; this is not online GC.
+
+## Measured operating envelope
+
+| Parameter | Required low profile | Required high profile |
+| --- | --- | --- |
+| Steady RSS P99 / peak | 512 / 640 MiB | 2048 / 2048 MiB |
+| KV memtable / block cache / target SST | 8 / 32 / 8 MiB | 64 / 128 / 64 MiB |
+| Memtable stall threshold | 2 | 2 |
+| Mixed workload clients | 100 | 100 |
+| Operation / heavy-search admission | 4 / 1 | 4 / 1 |
+| Baseline and delta build admission | one shared slot | one shared slot |
+
+Native settings include retained version history, strict WAL recovery, one
+shared Lance Session per authority, FTS shard1/partition32, bounded scan/shuffle
+buffers and streaming IVF training. The measured GNU libc startup setting is
+`MALLOC_MMAP_THRESHOLD_=131072`. Controllers record these values; production
+consumers must preserve and validate the resource contract rather than assume
+cache limits alone bound RSS. No upstream engine source was patched.
+
+Both full 1,800-second mixed profiles pass, with original native identities in
+the matrix. The final 3,840-second low-profile concurrent case executes 108,641
+requests out of 108,672 planned, with zero operation errors and 10,391 expected
+write conflicts. Throughput/P95: durable writes21.294/s/45ms, current2.4/s/55ms,
+BM251.188802/s/28.447s, ANN0.249479/s/11.174s, history0.25/s/186ms and
+correction0.2/s/47ms. Current/history/corpus/scope oracles pass. During construction,
+3,123 BM25 and655 ANN requests complete; the workload includes768 actual corpus
+corrections. The complete11,428,831-text/1,000,000-vector build takes2,632.432s;
+whole measurement3,852.107s. RSS P99/max509,325,312/553,222,144B, no OOM.
+
+There are371 ten-second disk samples. Total observed allocation peaks at
+137,661,698,048B; minimum filesystem free space is397,265,436,672B. Native write
+reservation and category caps remain unchanged. These samples do not prove an
+instantaneous quota or exclusive Btrfs extent ownership. The42 compressed shards
+occupy43,986,181,099B; the84,147,341,473B expanded stream is never retained.
+Existing writable storage is sufficient; no extra250GB directory is required.
+
+The full original-manifest binding separately passes139 commands/67 identical
+before-and-after witnesses without reimport, state changes or extended deadlines.
+[The final archive](results/fallback-full-rebuild-r3/summary.json) contains2,116
+files/22,486,670B, SHA256
+`ae38a323030c3b5058550945a7b1368f270ae975147f75457b0337c18272539a`.
+All82,587 seed/workload acknowledgements match in323 native batches, with no
+unlogged committed sequence. Eight original vector outputs replay in26 commands;
+candidate5 catches up in552.448s and activates. Both watermarks equal392298.
+The78 before/79 after witnesses preserve32 historical versions, eight original
+current bodies,16 generation-specific receipts, eight BM25/eight ANN queries,
+and reject four incompatible bundles after activation. Each follow-up satisfies
+the low640MiB bound, exact process/unit exit and scratch cleanup. No model call
+or regenerated vector was needed. Build-end370032 remains a separate checkpoint.
+
+The archive includes frozen source/helpers, original commands/configuration,
+manifest-binding results, workload/content oracles, raw process/disk samples and
+all six follow-up receipts. Its files.json binds each member; archive readback
+verifies every member and the complete set. The measured source3b3994a passed
+its exact-HEAD gate, independent R3 source review and Linux CI40088656119 before
+full admission. Final evidence/ADR review is a separate merge prerequisite.
+
+## Acceptance limits and next dependency
+
+Process-crash recovery is verified; arbitrary hardware power-loss safety is not.
+The two earlier full concurrent OOMs, failed diagnostics and unlogged unknown
+outcomes remain in their immutable archives. Production daemon hot reload,
+automatic quarantine, worker containment, model timeouts, four-host integration,
+backup/migration and protocol-level50GB acceptance are separate required Issues.
+No spike receipt is attributed to an installed binary or a live user service.
+
+The probes remain outside the root Cargo workspace. After #3 review/merge,
+#4 adds the selected authority and persistence contract; #10 adds its derived
+retrieval path. The rejected prototype does not enter either production path.
+Do not retain multiple selectable storage backends or add an alternative store.
+
+## Historical candidate and repair records
+
+The following records describe their own checkpoints. Pending-state wording in
+these historical entries is superseded only by the current matrix and final
+receipts above; their metrics and failed outcomes remain unchanged.
 
 ## Helix candidate: failed full-data low-memory recovery
 
