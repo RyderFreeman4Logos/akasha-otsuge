@@ -87,7 +87,7 @@ pub struct Review {
     pub mode: ReviewMode,
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ReviewMode {
     Manual,
