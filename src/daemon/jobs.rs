@@ -1,11 +1,15 @@
 use super::*;
-use crate::capture::{Capture, PendingReason, ReconcileReport};
+#[cfg(test)]
+use crate::capture::ReconcileReport;
+use crate::capture::{Capture, PendingReason};
 use crate::domain::{Domain, ReadContext, Scope};
 use crate::ipc::CaptureInput;
 use crate::storage::{Change, CommitRequest, RecordKey, RecordKind, hash};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeSet;
+#[path = "models.rs"]
+mod models;
 
 const MAX_ACTIVE: usize = 256;
 const MAX_RUNNING: usize = 16;
@@ -51,6 +55,7 @@ mod tests {
             work: Notify::new(),
             stopping: std::sync::atomic::AtomicBool::new(false),
             instance: "new-daemon".into(),
+            providers: crate::provider::Client::new().unwrap(),
             batch_gate: Mutex::new(None),
         });
         let scope = owner_scope();
@@ -91,7 +96,7 @@ mod tests {
         service
             .stopping
             .store(true, std::sync::atomic::Ordering::Release);
-        service.work.notify_one();
+        service.wake_jobs();
         tokio::time::timeout(Duration::from_secs(2), async {
             while Arc::strong_count(&service) > 1 {
                 tokio::task::yield_now().await;
@@ -405,7 +410,7 @@ mod tests {
                 original.execution_deadline_ms
             );
             assert_eq!(terminal.started_at_ms, original.started_at_ms);
-            let report = terminal.result.unwrap();
+            let report: ReconcileReport = serde_json::from_value(terminal.result.unwrap()).unwrap();
             assert_ne!(
                 report.checkpoint.checkpoint.pending,
                 Some(PendingReason::Backlog)
@@ -426,12 +431,16 @@ mod tests {
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct Job {
+pub(super) struct Job {
     schema_version: u32,
     id: String,
     request_sha256: String,
-    binding: CaptureInput,
-    path: PathBuf,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    binding: Option<CaptureInput>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    path: Option<PathBuf>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    model_plan: Option<crate::provider::Plan>,
     config_generation: u64,
     config_digest: String,
     accepted_at_ms: u64,
@@ -446,7 +455,7 @@ struct Job {
     state: String,
     cancel_requested: bool,
     error: Option<String>,
-    result: Option<ReconcileReport>,
+    result: Option<Value>,
 }
 impl Job {
     fn terminal(&self) -> bool {
@@ -497,6 +506,10 @@ impl Service {
         if job.schema_version != 1
             || job.id != id
             || job.attempt > MAX_ATTEMPTS
+            || !matches!(
+                (&job.binding, &job.path, &job.model_plan),
+                (Some(_), Some(_), None) | (None, None, Some(_))
+            )
             || !["queued", "running", "succeeded", "failed", "cancelled"]
                 .contains(&job.state.as_str())
         {
@@ -539,7 +552,12 @@ impl Service {
         Ok(())
     }
     fn authorize_job(&self, job: &Job) -> Result<()> {
-        Domain::new(&self.storage).permission(&context()?, Some(&job.binding.scope))?;
+        let scope = job
+            .binding
+            .as_ref()
+            .map(|b| b.scope.clone())
+            .unwrap_or_else(owner_scope);
+        Domain::new(&self.storage).permission(&context()?, Some(&scope))?;
         Ok(())
     }
     fn allowed_path(&self, path: &Path) -> Result<PathBuf> {
@@ -575,16 +593,45 @@ impl Service {
         binding: CaptureInput,
         path: PathBuf,
     ) -> Result<Value> {
+        self.submit_job(id, Some(binding), Some(path), None).await
+    }
+    pub(super) async fn submit_model(
+        self: &Arc<Self>,
+        id: String,
+        plan: crate::provider::Plan,
+    ) -> Result<Value> {
+        self.submit_job(id, None, None, Some(plan)).await
+    }
+    async fn submit_job(
+        self: &Arc<Self>,
+        id: String,
+        binding: Option<CaptureInput>,
+        path: Option<PathBuf>,
+        model_plan: Option<crate::provider::Plan>,
+    ) -> Result<Value> {
         let service = self.clone();
         self.operation(async move {
             let _guard = service.admission.lock().await;
             if !ipc::identifier(&id) {
                 return Err(Error("INVALID_REQUEST"));
             }
-            binding.binding()?;
-            Domain::new(&service.storage).permission(&context()?, Some(&binding.scope))?;
-            let path = service.allowed_path(&path)?;
-            let fingerprint = hash(&serde_json::to_vec(&(&binding, &path))?);
+            let path = path
+                .as_deref()
+                .map(|p| service.allowed_path(p))
+                .transpose()?;
+            if let Some(binding) = &binding {
+                binding.binding()?;
+            }
+            let scope = binding
+                .as_ref()
+                .map(|b| b.scope.clone())
+                .unwrap_or_else(owner_scope);
+            Domain::new(&service.storage).permission(&context()?, Some(&scope))?;
+            let fingerprint = if let Some(plan) = &model_plan {
+                hash(&serde_json::to_vec(&("model", plan))?)
+            } else {
+                hash(&serde_json::to_vec(&(&binding, &path))?)
+            };
             if service.storage.current(&job_key(&id))?.is_some() {
                 let (_, job) = service.job(&id)?;
                 if job.request_sha256 != fingerprint {
@@ -611,15 +658,19 @@ impl Service {
             let now = ipc::now_ms()?;
             let queue_ms = u64::try_from(snapshot.resolved().timeouts().queue.as_millis())
                 .map_err(|_| Error("CONFIG_INVALID"))?;
+            let budget = match &model_plan {
+                Some(plan) => plan.validate(snapshot.resolved()).map_err(|e| Error(e.0))?,
+                None => snapshot.resolved().timeouts().tools,
+            };
             let execution_budget_ms =
-                u64::try_from(snapshot.resolved().timeouts().tools.as_millis())
-                    .map_err(|_| Error("CONFIG_INVALID"))?;
+                u64::try_from(budget.as_millis()).map_err(|_| Error("CONFIG_INVALID"))?;
             let job = Job {
                 schema_version: 1,
                 id: id.clone(),
                 request_sha256: fingerprint,
                 binding,
                 path,
+                model_plan,
                 config_generation: snapshot.generation(),
                 config_digest: snapshot.resolved().digest().into(),
                 accepted_at_ms: now,
@@ -648,16 +699,22 @@ impl Service {
                     }],
                 )
                 .await?;
-            service.work.notify_one();
+            service.wake_jobs();
             Ok(serde_json::to_value(job)?)
         })
         .await
     }
     pub(super) async fn show_job(&self, id: &str) -> Result<Value> {
         let _guard = self.admission.lock().await;
-        let (_, job) = self.job(id)?;
+        let (revision, job) = self.job(id)?;
         self.authorize_job(&job)?;
-        Ok(serde_json::to_value(job)?)
+        let mut value = serde_json::to_value(&job)?;
+        if job.model_plan.is_some()
+            && let Some(result) = &job.result
+        {
+            value["result"] = models::load_result(&self.storage, result, revision)?;
+        }
+        Ok(value)
     }
     pub(super) async fn list_jobs(&self, after: Option<&str>) -> Result<Value> {
         let _guard = self.admission.lock().await;
@@ -698,7 +755,7 @@ impl Service {
                 } else {
                     service.save_job(&job, Some(revision), vec![]).await?;
                 }
-                service.work.notify_one();
+                service.wake_jobs();
             }
             Ok(serde_json::to_value(job)?)
         })
@@ -727,7 +784,7 @@ impl Service {
             }],
         )
         .await?;
-        self.work.notify_one();
+        self.wake_jobs();
         Ok(())
     }
     pub(super) async fn recover(&self) -> Result<()> {
@@ -747,6 +804,11 @@ impl Service {
                 return Err(Error("CONFIG_CORRUPT"));
             }
             if job.state == "running" {
+                if job.model_plan.is_some() {
+                    self.finish_job(job, revision, "failed", Some("PROVIDER_INTERRUPTED"))
+                        .await?;
+                    continue;
+                }
                 job.state = "queued".into();
                 job.lease_owner = None;
                 job.lease_until_ms = None;
@@ -810,6 +872,9 @@ impl Service {
         };
         let remaining = Duration::from_millis(deadline.saturating_sub(ipc::now_ms()?));
         let end = tokio::time::Instant::now() + remaining;
+        if self.job(&id)?.1.model_plan.is_some() {
+            return self.execute_model(id, remaining).await;
+        }
         loop {
             let _guard = self.admission.lock().await;
             let (revision, mut job) = self.job(&id)?;
@@ -834,15 +899,19 @@ impl Service {
             }
             let checked = self
                 .authorize_job(&job)
-                .and_then(|_| self.allowed_path(&job.path));
+                .and_then(|_| self.allowed_path(job.path.as_deref().ok_or(Error("JOB_CORRUPT"))?));
             if let Err(error) = checked {
                 return self
                     .finish_job(job, revision, "failed", Some(error.0))
                     .await;
             }
             let storage = self.storage.clone();
-            let binding = job.binding.binding()?;
-            let path = job.path.clone();
+            let binding = job
+                .binding
+                .as_ref()
+                .ok_or(Error("JOB_CORRUPT"))?
+                .binding()?;
+            let path = job.path.clone().ok_or(Error("JOB_CORRUPT"))?;
             let generation = job.config_generation;
             let runtime = tokio::runtime::Handle::current();
             #[cfg(test)]
@@ -863,7 +932,7 @@ impl Service {
             match result {
                 Ok(report) => {
                     let more = report.checkpoint.checkpoint.pending == Some(PendingReason::Backlog);
-                    job.result = Some(report);
+                    job.result = Some(serde_json::to_value(report)?);
                     if tokio::time::Instant::now() >= end {
                         return self
                             .finish_job(job, revision, "failed", Some("JOB_TIMEOUT"))
@@ -884,7 +953,7 @@ impl Service {
                     job.lease_owner = None;
                     job.lease_until_ms = None;
                     self.save_job(&job, Some(revision), vec![]).await?;
-                    self.work.notify_one();
+                    self.wake_jobs();
                     return Ok(());
                 }
                 Err(error) => {
@@ -939,7 +1008,7 @@ impl Service {
             self.stopping
                 .store(true, std::sync::atomic::Ordering::Release);
             self.stop.notify_one();
-            self.work.notify_one();
+            self.wake_jobs();
         }
         while let Some(result) = running.join_next().await {
             let result = result

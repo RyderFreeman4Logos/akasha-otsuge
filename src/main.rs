@@ -18,6 +18,7 @@ Commands:
   config validate|reload|status
   config show --effective
   capture reconcile BINDING_JSON INPUT_JSONL --idempotency-key ID
+  model run PLAN_JSON --idempotency-key ID
   job show|cancel ID
   job list [--after KEY]
   memory show ID [--at COMMIT]
@@ -123,6 +124,16 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             Some(Command::Reconcile {
                 binding: serde_json::from_str(&input)?,
                 path: PathBuf::from(path),
+                idempotency_key: (*id).into(),
+            })
+        }
+        ["model", "run", path, "--idempotency-key", id] => {
+            let input = config::read_file(std::path::Path::new(path))?;
+            if input.len() > akasha_otsuge::provider::MAX_PLAN_BYTES {
+                return Err(Error("MESSAGE_TOO_LARGE"));
+            }
+            Some(Command::ModelRun {
+                plan: serde_json::from_str(&input)?,
                 idempotency_key: (*id).into(),
             })
         }

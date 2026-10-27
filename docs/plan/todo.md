@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-27 after PR #35 merged at `960320a`. Live GitHub audit: **21 open
-Issues, 7 completed Issues**. #8 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-27 after PR #36 merged at `a3d278d`. Live GitHub audit: **20 open
+Issues, 8 completed Issues**. #9 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -43,8 +43,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-27 audit finds 21 open Issues (#8–#28). #4–#7 are closed with
-merged PRs #32–#35; no completed implementation is waiting for closure. #7's
+The 2026-10-27 audit finds 20 open Issues (#9–#28). #4–#8 are closed with
+merged PRs #32–#36; no completed implementation is waiting for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before starting the next. Keep already
@@ -193,7 +193,7 @@ retain exact commands, identities, original failures and scope limits.
   `960320a`, and #7 closed completed.
   [The protocol](../capture.md) records coverage and known uncollectable items.
 
-## MVP-008 acceptance and remaining work
+## MVP-008 completed acceptance
 
 - [x] Implement private Linux Unix socket ownership/modes, peer UID validation,
   version/capability/size handshake and bounded requests with stable errors.
@@ -220,9 +220,27 @@ retain exact commands, identities, original failures and scope limits.
   shutdown path, activate requested paths on explicit restart, check live capacity
   at claim, and reject success after the last physical batch crosses its deadline.
   Causal RED/GREEN receipts and bounded lifecycle/restart regressions are retained.
-- [ ] Run the repaired candidate's installed gate, including actual SIGTERM/SIGINT.
-- [ ] Freeze the candidate, run its complete exact-HEAD gate, obtain independent
-  review, then CI/merge/completed Issue closure; continue the full queue below.
+- [x] Candidate `7552d97` passes its complete installed gate in78.23s:88 Rust
+  tests,8 Python tests and9 installed daemon cases, including SIGTERM/SIGINT.
+- [x] Independent whole-candidate R2 PASS,0 findings; CI40537161260 passed.
+  PR #36 merged as `a3d278d`, same candidate tree, and #8 closed completed.
+
+## MVP-009 acceptance and remaining work
+
+- [ ] Reuse configured independent text/embedding/reranker routes; validate all
+  outputs, bounded request/batch/response sizes, rate limits and explicit errors.
+- [ ] Add production CLI/IPC model jobs to the existing durable scheduler, pin
+  accepted generations, keep provider clocks separate from queue/CLI clocks,
+  support cancellation and never replay ambiguous interrupted external calls.
+- [ ] Cover success/malformed/slow/disconnect for all three endpoint contracts;
+  virtual1699/1700 boundaries, sequential stages, cancellation and endpoint reload.
+- [ ] Verify the actual available GB10 service contract with bounded inference;
+  retain exact model/client identities and output dimension/score semantics.
+- [ ] Run a nohup real-wall-clock1600..1690s success and over-budget failure
+  through production daemon/jobs/client; preserve every effective deadline and
+  begin/end identity. Fixture success must not certify an unrelated provider.
+- [ ] Document examples/limits, exact-HEAD canonical gate, independent review,
+  CI, merge and completed closure; then continue #10 through #28.
 
 ## Complete Issue queue
 
@@ -233,7 +251,7 @@ retain exact commands, identities, original failures and scope limits.
 - [x] [#5 [MVP-005] 定义并执行来源、authority、scope 与 taste 数据语义](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/5) — dependencies: #4.
 - [x] [#6 [MVP-006] 持久历史视图、as-of 查询与实际 recall receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/6) — dependencies: #4, #5.
 - [x] [#7 [MVP-007] 采集归一化、原文归档及分支/压缩恢复协议](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/7) — dependencies: #4, #6.
-- [ ] [#8 [MVP-008] CLI、私有 IPC daemon 与持久后台作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8) — dependencies: #2, #4, #7.
+- [x] [#8 [MVP-008] CLI、私有 IPC daemon 与持久后台作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8) — dependencies: #2, #4, #7.
 - [ ] [#9 [MVP-009] 可配置本地模型客户端与 1700 秒全链长测](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9) — dependencies: #2, #8.
 - [ ] [#10 [MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10) — dependencies: #5, #6, #9.
 - [ ] [#11 [MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11) — dependencies: #7, #8, #10.

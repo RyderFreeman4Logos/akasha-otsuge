@@ -79,6 +79,10 @@ pub enum Command {
         path: std::path::PathBuf,
         idempotency_key: String,
     },
+    ModelRun {
+        plan: crate::provider::Plan,
+        idempotency_key: String,
+    },
     JobShow {
         id: String,
     },
@@ -152,7 +156,7 @@ pub(crate) fn identifier(value: &str) -> bool {
 }
 
 pub(crate) fn hello() -> Value {
-    json!({"protocol_version":VERSION,"capabilities":["daemon", "config", "capture_jobs"],"max_message_bytes":MAX_MESSAGE})
+    json!({"protocol_version":VERSION,"capabilities":["daemon", "config", "capture_jobs", "model_jobs"],"max_message_bytes":MAX_MESSAGE})
 }
 
 pub(crate) fn response(request: Option<&str>, result: Result<Value>) -> Value {

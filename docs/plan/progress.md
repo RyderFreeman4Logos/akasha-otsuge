@@ -3,33 +3,37 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#7 are merged
-and completed; #8–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#8 are merged
+and completed; #9–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-008
+## Current issue: MVP-009
 
-Private IPC, daemon lifecycle and durable jobs are being implemented on
-`feat/mvp-008-daemon`, based on merge `960320a`. The complete remaining acceptance
-checklist is in [todo.md](todo.md). Existing Storage, ConfigManager, Domain and
-Capture remain the shared authority; CLI calls must reach those real components.
-Focused acceptance now covers real daemon/job crash and graceful recovery,
-configuration/profile/chunked snapshots, CLI history/diff pagination and delivery
-ACK. A different kernel UID control verifies private-path and peer denial.
-Candidate `71090cf` passed the complete installed gate; independent R1 found four
-untested lifecycle boundaries. Their repairs cover all mutation owners during
-shutdown, explicit socket-path activation, live capacity under the claim lock,
-and final-batch deadline arbitration. Each class has a causal RED/GREEN receipt.
-Nine real daemon cases now include SIGTERM/SIGINT and pending-path restart;
-focused library/configuration checks and Clippy pass. The repaired candidate
-still requires its own complete installed gate, independent review and publication.
+Independent provider clients and durable model jobs are next on
+`feat/mvp-009-providers`, based on merge `a3d278d`. The complete remaining
+acceptance queue is in [todo.md](todo.md). Read-only contract preparation found
+GB10 guard models metadata reachable; actual inference and long duration remain
+unverified. Production daemon/provider long tests and later CLI Runner tests
+retain their separate acceptance boundaries.
 
-The user-requested dua audit found55.39GiB on the home filesystem. Removing
-obsolete owned caches/probes/diagnostic data and checksum-migrating retained
-artifacts leaves374.74MiB locally and44.06GiB in the SSD mirror; all42 corpus
-shards match their original SHA-256 manifest. Original paths are symlinks, and
-future large artifacts must use this layout. The existing full SSD database was
-not opened or modified.
+## Completed daemon: MVP-008
+
+Candidate `7552d97` passed `bash scripts/check.sh` in78.23s:88 Rust tests,
+8 Python tests, formatting, Clippy, release and capture acceptance. The installed
+release reran all9 daemon cases, including SIGTERM/SIGINT, pending socket restart,
+SIGKILL recovery and CLI/API parity. Kernel UID165536 controls and no-owned-TCP
+checks passed. Independent R2 review passed with0 findings; CI40537161260 passed.
+PR #36 merged as `a3d278d` with the same tree, and #8 closed completed. The four
+R1 lifecycle repairs and the harness procfs-exit race retain causal RED/GREEN
+receipts. [The protocol](../daemon.md) records the actual trust/coverage limits.
+
+The user-requested dua audit found55.39GiB in the home checkout. Removing10.95GiB
+of obsolete owned outputs and checksum-migrating retained artifacts leaves about
+376MiB locally. After the gate the SSD mirror holds44.73GiB, including41.49GiB in
+.spike-work and3.24GiB in target. All42 compressed corpus shards match the original
+manifest; preserve them for #24 without retaining the84GB expanded copy. Both
+large artifact roots remain lexical symlinks into `/ssd/mirror-rootfs/home/obj/`.
+The existing full SSD database was not opened or modified.
 
 ## Completed capture: MVP-007
 
