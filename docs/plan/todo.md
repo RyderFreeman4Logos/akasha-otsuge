@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-27 after PR #37 merged at `a09d9d6`. Live GitHub audit: **19 open
-Issues, 9 completed Issues**. #10 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-28 UTC after PR #38 merged at `d566101`. Live GitHub audit: **18 open
+Issues, 10 completed Issues**. #11 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -43,8 +43,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-27 audit finds 19 open Issues (#10–#28). #4–#9 are closed with
-merged PRs #32–#37; no completed implementation is waiting for closure. #7's
+The 2026-10-28 audit finds 18 open Issues (#11–#28). #4–#10 are closed with
+merged PRs #32–#38; no completed implementation is waiting for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -52,6 +52,14 @@ long acceptance, independent preparation may use one isolated SSD checkout and
 the shared build cache, without changing the frozen source or release executable.
 Keep one build writer and remove the temporary checkout after publication. Keep
 passing unchanged full-data receipts, rather than rerunning them for each leaf.
+
+#10's final exact-HEAD gate and hosted CI passed before the intentional restart.
+After resume, the unchanged receipts were collected, independent R2 review
+passed with zero actionable findings, and the PR/Issue were closed promptly.
+The cold hosted build took about38 minutes; a separate small CI-cache leaf
+reuses Cargo inputs/artifacts without skipping checks. Then implement #11's
+binding/protocol, restricted context, shared Runner budget and frozen evaluation
+reference set. Real host adapters remain #12–#15, not mock completion claims.
 
 ## MVP-003 completed acceptance
 
@@ -265,12 +273,13 @@ retain exact commands, identities, original failures and scope limits.
   as `a09d9d6`, and #9 closed completed. Exact gate and review are published in
   [the final PR receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/37#issuecomment-6450384881).
 
-## MVP-010 acceptance and remaining work
+## MVP-010 completed acceptance
 
-The SSD worktree shares the existing build cache. All five independent R1 findings
-are repaired with causal regressions. There are now 21 public retrieval fixtures
-and five native index controls. Final repaired-candidate gate, fresh review, CI
-and publication remain; the historical gate at `987d369` does not attest repairs.
+All five independent R1 findings are repaired with causal regressions. The final
+candidate `e27dc53` passes its exact-HEAD gate, fresh R2 review and CI. Its21 public
+retrieval fixtures and five native index controls support the published acceptance;
+PR #38 merged as `d566101` and #10 is completed. The historical gate at `987d369`
+does not attest those repairs.
 
 - [x] Implement real on-disk ICU keyword search and exact receipt replay/reopen.
 - [x] Implement actual vector/embedding and reranker paths, model/dimension
@@ -298,15 +307,33 @@ and publication remain; the historical gate at `987d369` does not attest repairs
 - [x] R2: Preserve the owner-wide permission required by archived index metadata
   across receipt show/replay and job show; retain narrow receipt access.
 - [x] R3: Install both protoc and its standard definitions in CI and document them.
-  Repaired-candidate hosted CI remains part of the final publication gate.
+  Repaired-candidate hosted CI40581193846 passed.
 - [x] R4: Persist zero/overflow cosine-vector failure diagnostics and the original
   prefix; verify identical diagnostic readback after restart.
 - [x] R5: Admit a legal maximum-size wrapped Memory in the internal rule scan;
   retain public byte limits and bounded, honest search output.
-- [ ] Publish search/show documentation, quality and withdrawal fixtures, focused
+- [x] Publish search/show documentation, quality and withdrawal fixtures, focused
   results, final exact-HEAD gate/review, CI, merge and Issue closure. Then #11–#28.
+
+## MVP-011 remaining work
+
+- [ ] Versioned bounded JSONL envelopes, request/sequence correlation, capabilities,
+  structured externally constructible errors, cancellation and terminal results.
+- [ ] Immutable runtime invocation binding before work; concurrent identities and
+  missing/ambiguous/session-only/turn-specific capability refusal tests.
+- [ ] ContextSource with captured lineage/fork cutoffs, explicit gaps, authorized
+  handles and current live read permissions; bounded workspace reads and hashes.
+- [ ] AgentRunner input/events/result and read-only tool policy; pinned generation,
+  deadlines and shared start/depth/read/output budgets; immediate child refusal
+  when no execution slot is available, including simultaneous parent delegates.
+- [ ] Out-of-crate adapter contract tests across all16 Caller/Runner combinations,
+  including source failures, protocol errors and permission boundary failures.
 - [ ] Freeze at least 60 sourced reference intent tasks in #11 before any #16
-  research-prompt tuning; preserve the full later host and product acceptance.
+  research-prompt tuning, with oracles, critical cases, at least10 confusing intent
+  pairs, counting rules, fixed reference profile and commit/hash verification.
+- [ ] Publish protocol/trait/binding/permission documentation and evidence, pass
+  exact-HEAD gate and independent review, then merge and close #11. The four real
+  host integrations remain #12–#15; full quality/combination acceptance remains #27.
 
 Host preparation: Codex0.164.0, Hermes0.22.5+1914 and Pi0.78.0 are executable.
 The existing Claude entry points to a missing2.1.170 installation; #12 must repair
@@ -324,7 +351,7 @@ host protocol capabilities or an authenticated Runner.
 - [x] [#7 [MVP-007] 采集归一化、原文归档及分支/压缩恢复协议](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/7) — dependencies: #4, #6.
 - [x] [#8 [MVP-008] CLI、私有 IPC daemon 与持久后台作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8) — dependencies: #2, #4, #7.
 - [x] [#9 [MVP-009] 可配置本地模型客户端与 1700 秒全链长测](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9) — dependencies: #2, #8.
-- [ ] [#10 [MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10) — dependencies: #5, #6, #9.
+- [x] [#10 [MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10) — dependencies: #5, #6, #9.
 - [ ] [#11 [MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11) — dependencies: #7, #8, #10.
 - [ ] [#12 [MVP-012] Claude Code CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) — dependencies: #11.
 - [ ] [#13 [MVP-013] Codex CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/13) — dependencies: #11.

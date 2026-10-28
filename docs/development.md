@@ -1,5 +1,11 @@
 # Development
 
+GitHub CI caches Cargo registry/git sources and `target` by OS, architecture,
+toolchain and manifest/lock hashes. It always runs the full check command,
+including on a cache hit. Cache misses remain ordinary clean builds; credentials
+and user configuration are excluded. The pinned official [cache action](https://github.com/actions/cache/tree/55cc8345863c7cc4c66a329aec7e433d2d1c52a9)
+saves only successful runs. No paid cache-capacity setting is changed.
+
 Linux is the MVP platform. Install Rust using rustup, Python 3.11 or newer,
 a C/C++ toolchain, the Protocol Buffers compiler (`protoc`) and its standard
 `.proto` definitions. Lance's build scripts require both; neither is a runtime
