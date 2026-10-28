@@ -6,7 +6,7 @@ export function register(on) {
     const fields = {
       describe: {},
       list: { cursor: { type: ['string', 'null'] }, limit: { type: 'integer', minimum: 1, maximum: 16 } },
-      read: { handle: { type: 'string' }, start: { type: 'integer', minimum: 0 }, max_bytes: { type: 'integer', minimum: 1, maximum: 65536 } },
+      read: { handle: { type: 'string' }, start: { type: 'integer', minimum: 0 }, max_bytes: { type: 'integer', minimum: 1, maximum: 16384 } },
       search: { cursor: { type: ['string', 'null'] }, query: { type: 'string' }, limit: { type: 'integer', minimum: 1, maximum: 16 } },
     };
     for (const operation of operations) {

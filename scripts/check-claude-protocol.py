@@ -43,6 +43,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 assert '/help literal $(touch forbidden) 字' in text
                 assert 'PRIVATE_ORIGINAL_STAYS_OUT_OF_PROMPT' not in text
                 assert 'mcp__akasha-runner__context_list' in [t['name'] for t in request['tools']]
+                read_tool = next(t for t in request['tools'] if t['name'] == 'mcp__akasha-runner__context_read')
+                assert read_tool['input_schema']['properties']['max_bytes']['maximum'] == 16384, 'native read schema exceeds the shared reader limit'
                 block = dict(type='tool_use', id='toolu_list', name='mcp__akasha-runner__context_list', input={})
                 delta = dict(type='input_json_delta', partial_json='{"limit":16}')
             elif number == 2:
@@ -54,7 +56,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 handle = data['value']['events'][0]['handle']
                 assert 'PRIVATE_ORIGINAL_STAYS_OUT_OF_PROMPT' not in text
                 block = dict(type='tool_use', id='toolu_read', name='mcp__akasha-runner__context_read', input={})
-                delta = dict(type='input_json_delta', partial_json=json.dumps(dict(handle=handle, start=0, max_bytes=500)))
+                delta = dict(type='input_json_delta', partial_json=json.dumps(dict(handle=handle, start=0, max_bytes=16384)))
             else:
                 results = [b for m in request['messages'] if isinstance(m['content'], list) for b in m['content'] if b['type'] == 'tool_result']
                 result = next(b for b in results if b['tool_use_id'] == 'toolu_read')

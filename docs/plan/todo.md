@@ -431,6 +431,14 @@ does not attest those repairs.
 - [ ] Retain sanitized native fixtures and failures, official API/version evidence,
   reproduction commands and limitations; pass exact-candidate gate, independent
   review and CI, then merge and close #12. Continue every queue entry below.
+  Candidate `0aede7c` passed the full local gate and exact-candidate native Caller
+  and Runner protocol checks; draft PR #41 is published. Independent review found
+  three defects that must pass new regressions, a fresh gate and re-review:
+  - [x] Match the native read-tool schema to the shared 16 KiB reader limit.
+    The actual native schema assertion fails before the fix and passes after;
+    bridge tests accept 16,384 bytes and reject 16,385 bytes.
+  - [ ] Make uninstall recoverable after partial failure and preserve replacements.
+  - [ ] Bound Runner/probe reap waits while retaining cleanup ownership.
 
 The four original TUI onboarding probes remain setup failures. A distinct probe
 used a controlling PTY and task-only trusted workspace configuration, ran the

@@ -393,7 +393,8 @@ assert call(dict(operation='describe'),'wrong')['error']['code']=='READ_DENIED'
 assert call(dict(operation='read',handle='invented',start=0,max_bytes=500))['error']['code']=='READ_DENIED'
 assert call(dict(operation='describe',session='forged'))['error']['code']=='PROTOCOL_INVALID'
 page=call(dict(operation='list',cursor=None,limit=16))['data']['value']
-result=call(dict(operation='read',handle=page['events'][0]['handle'],start=0,max_bytes=500))['data']['value']['text']
+assert call(dict(operation='read',handle=page['events'][0]['handle'],start=0,max_bytes=16385))['error']['code']=='INVALID_ARGUMENT'
+result=call(dict(operation='read',handle=page['events'][0]['handle'],start=0,max_bytes=16384))['data']['value']['text']
 assert result=='PRIVATE_ORIGINAL_STAYS_OUT_OF_PROMPT'
 print(json.dumps(dict(type='result',subtype='success',is_error=False,session_id='runner-session',result='read-authorized-original')),flush=True)
 PY
