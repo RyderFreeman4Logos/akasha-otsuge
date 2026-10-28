@@ -339,6 +339,7 @@ does not attest those repairs.
 - [x] R1 finding 2: preserve v1 and freeze a separate S04 permission-denial erratum,
   retaining the real revocation barrier, all60 cases and critical scoring.
   Erratum manifest `09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16`.
+  Erratum freeze commit `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
 - [ ] Publish protocol/trait/binding/permission documentation and evidence, pass
   exact-HEAD gate and independent review, then merge and close #11. The four real
   host integrations remain #12–#15; full quality/combination acceptance remains #27.

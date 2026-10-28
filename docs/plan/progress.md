@@ -27,6 +27,7 @@ separate [erratum](../evaluation/reference-v1-errata-1/README.md) changes S04 to
 typed `READ_DENIED`, without protected content or a successful RecallReceipt;
 v1 remains unchanged. Erratum manifest SHA-256 is
 `09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16`.
+Erratum freeze commit: `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
 Reference profile Codex0.164.0 / gpt-6.1-sol / high was selected before research
 instructions, with actual installed executable provenance. Model evaluation has
 not run. The pre-repair exact-HEAD full gate passed; the amended candidate still

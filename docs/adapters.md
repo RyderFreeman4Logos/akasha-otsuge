@@ -166,5 +166,6 @@ oracle to `error` / `READ_DENIED`, without protected content or a successful
 RecallReceipt. A04's individual-memory rescope still expects `no_hit`. Its
 independently pinned manifest is
 `09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16`.
+Its freeze commit is `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
 Evaluation consumers use `scripts/check_reference.py::read_reference()` to load
 the effective set; reading the uncorrected v1 task file alone is not sufficient.
