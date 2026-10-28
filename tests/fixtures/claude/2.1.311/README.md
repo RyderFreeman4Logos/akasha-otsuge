@@ -112,3 +112,11 @@ python3 scripts/check-claude-caller.py /absolute/path/to/claude \
   /absolute/path/to/akasha-otsuge \
   /absolute/path/to/new-ssd-scratch-directory
 ```
+
+The same check also overlaps two native sessions in one working directory and
+verifies their transcript identities and inputs stay separate. It resumes the
+TUI session, runs `/compact`, then submits another prompt. All three turns retain
+native input/output UUIDs and a captured compaction boundary. The daemon
+regression separately restarts during an unfinished native backfill, supplies
+the delayed original, and verifies completion under the original deadline;
+cancellation is checked with a separate missing-target job.

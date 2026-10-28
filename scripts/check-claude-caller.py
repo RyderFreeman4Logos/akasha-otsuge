@@ -59,9 +59,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 assert 'PRIVATE_CALLER_INPUT parent_later' not in history
             if stage=='parent_later':
                 assert 'PRIVATE_CALLER_INPUT fork' not in json.dumps(request['messages'])
+            if stage=='tui_resume' and not title:
+                assert 'PRIVATE_TUI_INPUT' in json.dumps(request['messages']) and 'Observed caller tui' in json.dumps(request['messages'])
+            parallel=None
+            if stage=='parallel':
+                parallel=[name for name in ['A','B'] if 'PRIVATE_PARALLEL_'+name in json.dumps(request['messages'])]
+                assert len(parallel)==1,'concurrent native inputs mixed'
             is_child=stage=='child' and any(m.get('role')=='user' and (m.get('content')=='PRIVATE_CHILD_INPUT' or isinstance(m.get('content'),list) and any(b.get('text')=='PRIVATE_CHILD_INPUT' for b in m['content'])) for m in request['messages'])
             spawn=stage=='child' and count==1
-            tool=stage not in ['installed','tui'] and (count==1 or is_child and not child_called)
+            tool=stage not in ['installed','parallel'] and not stage.startswith('tui') and (count==1 or is_child and not child_called)
             if is_child:
                 if child_called:
                     assert 'native caller probe' in json.dumps(request['messages']), 'child consult body did not execute'
@@ -69,6 +75,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 child_called=True
             block=dict(type='tool_use',id='toolu_'+stage+'_'+str(count),name='Agent' if spawn else 'mcp__akasha-otsuge__consult',input={}) if tool else dict(type='text',text='')
             delta=dict(type='input_json_delta',partial_json=json.dumps({'prompt':'PRIVATE_CHILD_INPUT','description':'child binding check','subagent_type':'general-purpose'} if spawn else {'hint':'probe'})) if tool else dict(type='text_delta',text='Fixture session title' if title else 'Observed caller '+stage)
+            if parallel:delta['text']+=' '+parallel[0]
             message=dict(id='msg_'+stage+'_'+str(count),type='message',role='assistant',model=request['model'],content=[],stop_reason=None,stop_sequence=None,usage=dict(input_tokens=20,output_tokens=1))
             events=[dict(type='message_start',message=message),dict(type='content_block_start',index=0,content_block=block),dict(type='content_block_delta',index=0,delta=delta),dict(type='content_block_stop',index=0),dict(type='message_delta',delta=dict(stop_reason='tool_use' if tool else 'end_turn',stop_sequence=None),usage=dict(output_tokens=20)),dict(type='message_stop')]
             payload=''.join('event: '+e['type']+'\ndata: '+json.dumps(e)+'\n\n' for e in events).encode()
@@ -79,7 +86,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 server=http.server.HTTPServer(('127.0.0.1',0),Handler);thread=threading.Thread(target=server.serve_forever);thread.start()
 env=dict(HOME=str(ROOT/'home'),USER='obj',LOGNAME='obj',PATH='/usr/bin:/bin',LANG='C.UTF-8',CLAUDE_CONFIG_DIR=str(ROOT/'config'),DISABLE_AUTOUPDATER='1',CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1',CLAUDE_CODE_DISABLE_CLAUDE_MDS='1',ANTHROPIC_API_KEY=KEY,ANTHROPIC_BASE_URL='http://127.0.0.1:'+str(server.server_port))
-def tui(args, expected):
+def tui(args, expected, followups=()):
+ global stage,count
+ initial=stage;steps=[];remaining=iter(followups);need_idle=True;offset=0
  pid,master=pty.fork()
  if pid==0:
   os.chdir(workspace)
@@ -95,10 +104,15 @@ def tui(args, expected):
     if not chunk:break
     raw.extend(chunk);assert len(raw)<=2*1024*1024
     if tty is None:tty=pathlib.Path(f'/proc/{pid}/stat').read_text().rsplit(') ',1)[1].split()[4]
-    clean=re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]','',raw.decode(errors='replace'))
+    clean=re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]','',raw[offset:].decode(errors='replace'))
     compact=re.sub(r'\s+','',clean)
-    if not observed and expected.replace(' ','') in compact and re.search(r'done\d{1,2}:\d{2}',compact):
-     observed=True;os.write(master,b'/exit\r')
+    if not observed and count and expected.replace(' ','') in compact and (not need_idle or re.search(r'done\d{1,2}:\d{2}',compact)):
+     steps.append({'stage':stage,'requests':count})
+     following=next(remaining,None)
+     if following:
+      stage,command,expected,need_idle=following;count=0;offset=len(raw);end=time.monotonic()+30
+      os.write(master,command.encode()+b'\r')
+     else:observed=True;os.write(master,b'/exit\r')
    ended,candidate=os.waitpid(pid,os.WNOHANG)
    if ended:status=candidate;break
  finally:
@@ -114,7 +128,7 @@ def tui(args, expected):
     if status is None:os.killpg(pid,signal.SIGKILL);_,status=os.waitpid(pid,0)
   os.close(master)
  assert observed and os.waitstatus_to_exitcode(status)==0 and int(tty or 0)!=0,raw[-4000:].decode(errors='replace')
- return {'stage':'tui','pid':pid,'tty_nr':tty,'requests':count,'stdout_sha256':hashlib.sha256(raw).hexdigest()}
+ return {'stage':initial,'pid':pid,'tty_nr':tty,'requests':sum(s['requests'] for s in steps),'steps':steps,'stdout_sha256':hashlib.sha256(raw).hexdigest()}
 daemon_log=(ROOT/'daemon.log').open('wb')
 daemon=None
 checks=[]
@@ -176,16 +190,35 @@ try:
   if child.poll() is None:
    os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=5)
  assert child.returncode==0 and count==1 and b'Observed caller installed' in stdout,(child.returncode,count,stderr)
+ parallel_sessions=['66666666-6666-4666-8666-666666666666','77777777-7777-4777-8777-777777777777']
+ stage='parallel';count=0;parallel=[]
+ try:
+  for name,identity in zip(['A','B'],parallel_sessions,strict=True):
+   child=subprocess.Popen(launch+['-p','PRIVATE_PARALLEL_'+name,'--session-id',identity,'--tools','','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources',''],cwd=workspace,env=env,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+   parallel.append(child)
+  assert all(child.poll() is None for child in parallel),'native sessions did not overlap'
+  for name,child in zip(['A','B'],parallel,strict=True):
+   output,error=child.communicate(timeout=30)
+   assert child.returncode==0 and ('Observed caller parallel '+name).encode() in output,(child.returncode,error)
+   checks.append({'stage':'parallel_'+name,'pid':child.pid,'stdout_sha256':hashlib.sha256(output).hexdigest()})
+  assert count==2
+ finally:
+  for child in parallel:
+   if child.poll() is None:os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=5)
  stage='tui';count=0;tui_session='55555555-5555-4555-8555-555555555555'
  tui_check=tui(launch+['PRIVATE_TUI_INPUT','--session-id',tui_session,'--tools','','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources',''],'Observed caller tui')
  tui_requests=[r for r in requests if r['stage']=='tui']
  assert sum(r['kind']=='conversation' for r in tui_requests)==1 and sum(r['kind']=='title' for r in tui_requests)<=1
+ stage='tui_resume';count=0
+ tui_resume=tui(launch+['PRIVATE_TUI_RESUME','--resume',tui_session,'--tools','','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources',''],'Observed caller tui_resume',[
+  ('tui_compact','/compact','Compacted',False),
+  ('tui_after_compact','PRIVATE_TUI_AFTER_COMPACT','Observed caller tui_after_compact',True)])
  end=time.monotonic()+15
  while True:
   result=subprocess.run(argv+['job','list'],env=env,capture_output=True,timeout=5);assert result.returncode==0
   page=json.loads(result.stdout)['data'];assert page['next'] is None,'fixture exceeds one job page'
-  jobs=[j for j in page['items'] if j.get('binding',{}).get('source',{}).get('session') in [installed_session,tui_session]]
-  if {j['binding']['source']['session'] for j in jobs}=={installed_session,tui_session} and all(j['state'] not in ['queued','running'] for j in jobs):break
+  jobs=[j for j in page['items'] if j.get('binding',{}).get('source',{}).get('session') in [installed_session,tui_session,*parallel_sessions]]
+  if {j['binding']['source']['session'] for j in jobs}=={installed_session,tui_session,*parallel_sessions} and all(j['state'] not in ['queued','running'] for j in jobs):break
   if time.monotonic()>=end:
    diagnostic=[]
    for job in jobs:
@@ -204,16 +237,20 @@ try:
    failures.append({'state':job['state'],'error':job['error'],'next_frame':pathlib.Path(job['path']).read_bytes()[offset:].splitlines()[0][:2048].decode(errors='replace'),'native_types':sorted({json.loads(row).get('type','') for row in native_rows})})
  assert not failures,failures
  traces=[]
- for identity,prompt,answer in [(installed_session,'PRIVATE_INSTALLED_PLUGIN_INPUT','Observed caller installed'),(tui_session,'PRIVATE_TUI_INPUT','Observed caller tui')]:
+ for identity,prompt,answer in [(installed_session,'PRIVATE_INSTALLED_PLUGIN_INPUT','Observed caller installed'),(tui_session,'PRIVATE_TUI_INPUT','Observed caller tui'),(tui_session,'PRIVATE_TUI_RESUME','Observed caller tui_resume'),(tui_session,'PRIVATE_TUI_AFTER_COMPACT','Observed caller tui_after_compact'),*[(identity,'PRIVATE_PARALLEL_'+name,'Observed caller parallel '+name) for name,identity in zip(['A','B'],parallel_sessions,strict=True)]]:
   job=max((j for j in jobs if j['binding']['source']['session']==identity),key=lambda j:json.loads(j['result']['checkpoint']['checkpoint']['cursor'])['offset'])
   cursor=json.loads(job['result']['checkpoint']['checkpoint']['cursor'])
   captured=pathlib.Path(job['path']).read_bytes()[:cursor['offset']]
   assert hashlib.sha256(captured[:4096]).hexdigest()==cursor['prefix_sha256']
   assert hashlib.sha256(captured[-4096:]).hexdigest()==cursor['tail_sha256']
   rows=[json.loads(row) for row in captured.splitlines()]
+  assert all(r.get('sessionId',identity)==identity for r in rows),'captured session mismatch'
+  if prompt.startswith('PRIVATE_PARALLEL_'):
+   assert ('PRIVATE_PARALLEL_'+('B' if prompt.endswith('A') else 'A')).encode() not in captured
   inputs=[r['uuid'] for r in rows if r['type']=='user' and prompt in json.dumps(r.get('message'))]
-  outputs=[r['uuid'] for r in rows if r['type']=='assistant' and answer in json.dumps(r.get('message'))]
+  outputs=[r['uuid'] for r in rows if r['type']=='assistant' and any(b.get('type')=='text' and b.get('text')==answer for b in r.get('message',{}).get('content',[]))]
   assert len(inputs)==len(outputs)==1,(identity,inputs,outputs)
+  if prompt=='PRIVATE_TUI_AFTER_COMPACT':assert any(r.get('subtype')=='compact_boundary' for r in rows),'native compaction boundary missing'
   traces.append({'session':identity,'input_uuid':inputs[0],'output_uuid':outputs[0],'captured_bytes':len(captured),'captured_sha256':hashlib.sha256(captured).hexdigest(),'checkpoint_revision':job['result']['checkpoint']['revision']})
  doctor=subprocess.run(argv+['doctor','--host','claude','--binary',str(NATIVE),'--directory',str(installed)],env=env,capture_output=True,timeout=10)
  assert doctor.returncode==0 and json.loads(doctor.stdout)['installation']['state']=='verified',{'doctor_error':doctor.stderr.decode(),'plugin_files':sorted(str(p.relative_to(installed)) for p in installed.rglob('*'))}
@@ -224,6 +261,7 @@ try:
  assert not (installed/'hooks').exists() and not (installed/'.claude-plugin/plugin.json').exists() and not (installed/'akasha-install.json').exists()
  checks.append({'stage':'installed','requests':1,'capture_jobs':sum(j['binding']['source']['session']==installed_session for j in jobs),'stdout_sha256':hashlib.sha256(stdout).hexdigest(),'uninstalled':True})
  tui_check['capture_jobs']=sum(j['binding']['source']['session']==tui_session for j in jobs);checks.append(tui_check)
+ checks.append(tui_resume)
  assert not errors,errors
  print(json.dumps({'native_sha256':hashlib.sha256(NATIVE.read_bytes()).hexdigest(),'akasha_sha256':hashlib.sha256(AKASHA.read_bytes()).hexdigest(),'native_bindings':len(bindings),'native_backfill_jobs':len(syncs),'checks':checks,'traces':traces,'authenticated_model_acceptance':False}),flush=True)
 finally:

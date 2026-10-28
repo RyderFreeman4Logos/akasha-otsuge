@@ -364,7 +364,7 @@ does not attest those repairs.
   private thinking is excluded and a user role remains unverified authority.
   Focused regression:77 passed/5 existing ignored; all-target Clippy passed.
   Native child/fork/compaction coverage and live caller registration remain below.
-- [ ] Implement the smallest native plugin and Rust bridge for actual caller
+- [x] Implement the smallest native plugin and Rust bridge for actual caller
   identity, parent/child registration, per-call turn/fence and immutable binding.
   Re-read identity after resume/clear; unknown child identity must refuse.
   The private root registration/binding bridge now passes durable retry/restart,
@@ -378,7 +378,7 @@ does not attest those repairs.
   within the original job deadline. Native lifecycle reasons are retained;
   fork-parent session IDs are not exposed by the supported hook and remain
   unknown. Root tokens cannot claim child identity.
-- [ ] Capture original prompts, visible outputs and tool results; normalize native
+- [x] Capture original prompts, visible outputs and tool results; normalize native
   transcripts with bounded resume/backfill, partial-tail/gap handling, exact
   parent/fork/compaction lineage and no private-thinking extraction or false approval.
   Capture and binding now pass7 regressions and all-target Clippy,
@@ -422,6 +422,12 @@ does not attest those repairs.
   Permission metadata, duration events and nonpersistent local-command UUIDs
   have causal native evidence and regressions. A fixture-tool execution failure
   remains unclassified; richer diagnostics were added before the next passing run.
+  Subsequent native checks pass concurrent sessions, TUI resume, manual compact
+  and a turn after compact, retaining input/output UUIDs and original ancestry.
+  A real daemon restart during an unfinished backfill preserves its deadline;
+  the same job succeeds once the original arrives. Cancellation remains terminal.
+  Authenticated model acceptance still needs an available lawful Claude login or
+  provider configuration; the existing request for that input remains pending.
 - [ ] Retain sanitized native fixtures and failures, official API/version evidence,
   reproduction commands and limitations; pass exact-candidate gate, independent
   review and CI, then merge and close #12. Continue every queue entry below.

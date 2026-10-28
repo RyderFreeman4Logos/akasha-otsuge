@@ -599,8 +599,22 @@ fn native_sync_waits_for_the_pinned_event_after_async_transcript_flush() {
         daemon.cli(&["job", "show", id])["data"]["execution_deadline_ms"],
         deadline
     );
-    daemon.cli(&["job", "cancel", id]);
-    assert_eq!(terminal(&daemon, id)["state"], "cancelled");
+    writeln!(
+        std::fs::OpenOptions::new().append(true).open(daemon.root.join("not-flushed.jsonl")).unwrap(),
+        "{}", json!({"type":"user","uuid":"not-emitted","parentUuid":"a7c3b44a-26cd-4a68-9aff-3e98cce20493",
+        "sessionId":"11111111-1111-4111-8111-111111111111","version":"2.1.311","message":{"role":"user","content":"original flushed after daemon restart"}})
+    ).unwrap();
+    let recovered = terminal(&daemon, id);
+    assert_eq!(recovered["state"], "succeeded", "{recovered}");
+    assert_eq!(recovered["execution_deadline_ms"], deadline);
+    assert!(recovered["result"]["checkpoint"]["checkpoint"]["pending"].is_null());
+    let cancelled = native_bridge(
+        &daemon,
+        &json!({"op":"sync","registration":registered["data"]["registration"],"tip":"cancel-pending"}),
+    );
+    let cancelled_id = cancelled["data"]["id"].as_str().unwrap();
+    daemon.cli(&["job", "cancel", cancelled_id]);
+    assert_eq!(terminal(&daemon, cancelled_id)["state"], "cancelled");
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
 }
