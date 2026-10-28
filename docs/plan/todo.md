@@ -496,6 +496,11 @@ checks do not prove host protocol capabilities or an authenticated Runner.
 - [ ] Implement version-pinned bounded native capture with original visible
   prompts, commentary, tool calls/results, resume/fork/compaction relationships,
   duplicate suppression, interrupted backfill and explicit coverage gaps.
+  The shared component now captures Codex0.164.0 native ordinal chains and
+  visible response items, preserves compaction originals and explicit fork
+  cutoffs, resumes partial files and deduplicates rotation replay. Native
+  controlled-endpoint fixtures include a separate-process root resume after
+  forking. Caller/daemon scheduling and real TUI hook acceptance remain below.
 - [ ] Bind actual root/child invocation identity, turn, call, cursor and workspace
   before tools execute. Do not infer a child identity from the hook's parent
   session ID; fail clearly when runtime proof is absent. Test concurrent TUIs,

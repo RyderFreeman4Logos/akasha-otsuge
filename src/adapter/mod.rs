@@ -9,6 +9,7 @@ mod context;
 pub use context::*;
 mod code;
 pub use code::*;
+pub mod codex;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::io::{BufRead, Read};
 

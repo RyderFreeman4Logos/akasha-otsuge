@@ -169,3 +169,35 @@ independently pinned manifest is
 Its freeze commit is `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
 Evaluation consumers use `scripts/check_reference.py::read_reference()` to load
 the effective set; reading the uncorrected v1 task file alone is not sufficient.
+
+## Codex native capture component
+
+`adapter::codex::reconcile_transcript` accepts an explicitly authenticated source
+identity and an explicit file, using the existing durable bounded file cursor.
+It supports the captured **Codex 0.164.0** rollout format. Each native ordinal
+has one event identity; native message/call IDs remain in retained visible raw
+payloads. Display text comes from response items, so duplicate `item_completed`
+notifications do not repeat user messages or tool results. Unknown records,
+missing ordinals and incomplete tails remain pending. Unknown native versions
+and mismatched session headers are rejected. This parser does not authenticate
+a caller or discover the latest session.
+
+The native fork metadata identifies the parent thread and exclusive ordinal
+cutoff. A later root resume cannot expand that inherited history. Compaction
+records link the already retained ancestor range and its summary, without
+replacing originals. An unavailable ancestor stays observable; traversal is
+bounded to 65,536 events per compaction. The native rollout does not identify
+process resumes as a distinct event, so capture preserves the continuing chain
+without inventing a resume marker.
+
+Coverage is `visible_text`, not every native payload. Native system/developer
+instructions, environment configuration, private reasoning and binary attachment
+bodies are omitted explicitly. Public reasoning summaries and tool inputs/results
+are retained; attachments have visible unavailable markers. Retained raw JSON is
+a filtered native record, not a byte-identical copy of private configuration.
+All captured content is unverified input and conveys no human authority.
+
+[Native fixtures](../tests/fixtures/codex/0.164.0/README.md) bind sanitized examples
+to their native versions and source hashes. Controlled local SSE runs prove
+protocol and lifecycle behavior. Authenticated Caller/Runner, installation,
+actual tool restriction and concurrent TUI acceptance remain MVP-013 work.
