@@ -10,6 +10,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "support/codex_caller.rs"]
+mod caller;
+
 const ROOT: &str = include_str!("fixtures/codex/0.164.0/root.jsonl");
 const FORK: &str = include_str!("fixtures/codex/0.164.0/fork.jsonl");
 

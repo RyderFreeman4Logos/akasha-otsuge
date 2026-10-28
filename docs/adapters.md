@@ -201,3 +201,19 @@ All captured content is unverified input and conveys no human authority.
 to their native versions and source hashes. Controlled local SSE runs prove
 protocol and lifecycle behavior. Authenticated Caller/Runner, installation,
 actual tool restriction and concurrent TUI acceptance remain MVP-013 work.
+
+`CodexCaller` accepts a server-owned registration and native hook identity outside
+the model's arguments. It verifies the registered session, workspace and root
+source, then matches the exact native function-call ID and turn ID in an 8 MiB
+tail snapshot. Missing or ambiguous identity is refused. Missing `agent_id` is
+insufficient proof: unknown/subagent native sources and explicit child hooks are
+currently unsupported. No caller is selected by cwd or by the latest file.
+
+The immutable fence ends at the function-call ordinal, excluding subsequent
+usage records, tool results and final output. Catch-up uses the shared capture
+cursor, with a 256-frame budget and a two-second checked deadline. A missing
+ancestor returns `HISTORY_GAP`; a retry preserves its stored fence even if the
+native file is gone. Permission revocation applies to new calls and retries.
+Focused tests cover native hook data, concurrent registrations in one workspace,
+identity conflicts, unknown versions, duplicate calls, missing ancestors and
+revocation. These tests do not yet prove live TUI hook delivery or installation.

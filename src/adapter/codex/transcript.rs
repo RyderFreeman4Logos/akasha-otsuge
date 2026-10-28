@@ -46,6 +46,20 @@ pub async fn reconcile_transcript(
         CoverageLevel::VisibleText,
     )?;
     // Verify the pinned native header even when resuming beyond it.
+    header(path, source)?;
+    Capture::new(store)
+        .reconcile_decoded(
+            &binding,
+            path,
+            limit,
+            config,
+            |line| decode(store, &binding, source, line).map(Some),
+            |_| {},
+        )
+        .await
+}
+
+pub(super) fn header(path: &Path, source: &SourceIdentity) -> Result<Option<Value>> {
     match OpenOptions::new()
         .read(true)
         .custom_flags(0o4000)
@@ -66,21 +80,13 @@ pub async fn reconcile_transcript(
                     return Err(invalid());
                 }
                 validate_meta(&header, source)?;
+                return Ok(Some(header));
             }
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
         Err(e) => return Err(e.into()),
     }
-    Capture::new(store)
-        .reconcile_decoded(
-            &binding,
-            path,
-            limit,
-            config,
-            |line| decode(store, &binding, source, line).map(Some),
-            |_| {},
-        )
-        .await
+    Ok(None)
 }
 
 fn validate_meta(row: &Value, source: &SourceIdentity) -> Result<()> {

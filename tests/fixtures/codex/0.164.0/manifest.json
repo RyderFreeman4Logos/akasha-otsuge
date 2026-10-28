@@ -18,5 +18,14 @@
     "sha256": "105fba2e0766b49142d837595633a7c20b726d257a2c5168fc6f3f716e6bc7ca",
     "source_sha256": "6bb1630b48bf1464e3bf110b50135c1aa74f9d1e7c9392f419b94750cc0d82d5",
     "rows": 13
+  },
+  "exec-root.jsonl": {
+    "sha256": "72f441921c14435d6a136aba6fa1bcdba553ad5e3aab03ffe5f336aecb18dd4e",
+    "source_sha256": "3bbb6d5b33c49492fdda484d773f1a79d21a0dd1c4fa8ab5c690dbd9dbe3004d",
+    "rows": 19
+  },
+  "exec-pre-tool-use.json": {
+    "sha256": "e89c8bc7938f2cc9d8dcb58af11e5523807fd52826884ad2ffe04cb8e7b544c9",
+    "source_receipt": "mvp013-native-exec-history1"
   }
 }

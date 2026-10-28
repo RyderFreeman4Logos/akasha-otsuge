@@ -505,6 +505,10 @@ checks do not prove host protocol capabilities or an authenticated Runner.
   before tools execute. Do not infer a child identity from the hook's parent
   session ID; fail clearly when runtime proof is absent. Test concurrent TUIs,
   siblings/grandchildren, permission changes and immutable replay fences.
+  The library now binds registered roots to the native call's exact ordinal;
+  four Caller tests (including eight identity refusal cases), five capture tests
+  and all-target Clippy pass. Missing/explicit child proof is refused. Live
+  hook registration, daemon transport and concurrent TUI acceptance remain open.
 - [ ] Implement the standalone Codex Runner through native app-server stdio and
   scoped dynamic read tools. Verify native sandbox/tool restrictions, original
   deadlines, bounded output, structured final/exit status and retained cleanup
