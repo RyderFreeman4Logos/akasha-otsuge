@@ -715,7 +715,7 @@ impl Service {
         Domain::new(&self.storage).permission(&context()?, Some(&scope))?;
         Ok(())
     }
-    fn allowed_path(&self, path: &Path) -> Result<PathBuf> {
+    pub(super) fn allowed_path(&self, path: &Path) -> Result<PathBuf> {
         if !path.is_absolute() {
             return Err(Error("PATH_DENIED"));
         }

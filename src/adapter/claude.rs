@@ -1,6 +1,8 @@
 //! Claude Code's native process and event boundary.
 mod bridge;
 pub use bridge::read_bridge;
+pub(crate) mod caller;
+pub use caller::{ClaudeCaller, NativeCall, NativeEvent};
 mod runner;
 mod transcript;
 use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};

@@ -34,6 +34,37 @@ impl From<crate::config::ConfigError> for Error {
         Self(error.code)
     }
 }
+impl From<crate::adapter::AdapterError> for Error {
+    fn from(error: crate::adapter::AdapterError) -> Self {
+        use crate::adapter::ErrorCode::*;
+        Self(match error.code {
+            InvalidArgument => "INVALID_ARGUMENT",
+            ProtocolInvalid => "PROTOCOL_INVALID",
+            OutputLimit => "OUTPUT_LIMIT",
+            BudgetExhausted => "BUDGET_EXHAUSTED",
+            DelegationUnavailable => "DELEGATION_UNAVAILABLE",
+            Cancelled => "CANCELLED",
+            WorkflowTimeout => "WORKFLOW_TIMEOUT",
+            QueueTimeout => "QUEUE_TIMEOUT",
+            ProviderTimeout => "PROVIDER_TIMEOUT",
+            RunnerTimeout => "RUNNER_TIMEOUT",
+            ConfigInvalid => "CONFIG_INVALID",
+            BindingUnavailable => "BINDING_UNAVAILABLE",
+            CallerAmbiguous => "CALLER_AMBIGUOUS",
+            AdapterUnsupported => "ADAPTER_UNSUPPORTED",
+            HistoryGap => "HISTORY_GAP",
+            ExecutorUnavailable => "EXECUTOR_UNAVAILABLE",
+            AuthRequired => "AUTH_REQUIRED",
+            RunnerIncomplete => "RUNNER_INCOMPLETE",
+            RunnerFailed => "RUNNER_FAILED",
+            ToolDenied => "TOOL_DENIED",
+            ReadDenied => "READ_DENIED",
+            SourceUnavailable => "SOURCE_UNAVAILABLE",
+            BindingConflict => "BINDING_CONFLICT",
+            SourceChanged => "SOURCE_CHANGED",
+        })
+    }
+}
 impl Error {
     pub fn exit_code(self) -> u8 {
         match self.0 {
@@ -74,6 +105,9 @@ pub enum Command {
     ConfigReload,
     ConfigStatus,
     ConfigShow,
+    Claude {
+        event: crate::adapter::claude::NativeEvent,
+    },
     Reconcile {
         binding: CaptureInput,
         path: std::path::PathBuf,

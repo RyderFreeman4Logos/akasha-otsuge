@@ -129,6 +129,17 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         return Ok(u8::from(failed));
     }
     let operation = match command.as_slice() {
+        ["adapter", "claude-call"] => {
+            use std::io::Read;
+            let mut bytes = Vec::new();
+            io::stdin().take(16 * 1024 + 1).read_to_end(&mut bytes)?;
+            if bytes.len() > 16 * 1024 {
+                return Err(Error("MESSAGE_TOO_LARGE"));
+            }
+            Some(Command::Claude {
+                event: serde_json::from_slice(&bytes)?,
+            })
+        }
         ["daemon", "run" | "start"] => None,
         ["daemon", "status"] => Some(Command::Status),
         ["daemon", "stop"] => Some(Command::Stop),

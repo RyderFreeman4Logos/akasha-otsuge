@@ -357,3 +357,117 @@ fn recorded_native_compaction(missing_ancestor: bool) {
             store.close().await.unwrap();
         });
 }
+
+fn native_bridge(daemon: &Daemon, event: &Value) -> Value {
+    let mut child = daemon
+        .command()
+        .args(["adapter", "claude-call"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(event.to_string().as_bytes())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    let mut response: Value = serde_json::from_slice(if output.status.success() {
+        &output.stdout
+    } else {
+        &output.stderr
+    })
+    .unwrap();
+    response.as_object_mut().unwrap().remove("request_id");
+    response
+}
+
+#[test]
+fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() {
+    use std::os::unix::fs::PermissionsExt;
+    let mut daemon = Daemon::new();
+    daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
+    let binary = daemon.root.join("claude");
+    std::fs::write(&binary, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n").unwrap();
+    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let transcript = daemon.root.join("native.jsonl");
+    std::fs::write(
+        &transcript,
+        include_str!("../fixtures/claude/2.1.311/native-root-resume-compact.jsonl"),
+    )
+    .unwrap();
+    daemon.start();
+    let registration = native_bridge(
+        &daemon,
+        &json!({"op":"register","binary":binary,
+        "session_id":"11111111-1111-4111-8111-111111111111","transcript_path":transcript,"cwd":daemon.root}),
+    );
+    let token = registration["data"]["registration"]
+        .as_str()
+        .expect("native registration accepted");
+    let call = json!({"op":"bind","registration":token,"session_id":"11111111-1111-4111-8111-111111111111",
+        "agent_id":null,"turn_id":"turn-a","tool_call_id":"call-a","cursor":1,"tip":"a7c3b44a-26cd-4a68-9aff-3e98cce20493"});
+    let first = native_bridge(&daemon, &call);
+    assert!(first["error"].is_null(), "{first}");
+    let binding = &first["data"];
+    assert_eq!(binding["caller"]["agent"], "main");
+    assert_eq!(binding["turn_id"], "turn-a");
+    assert_eq!(binding["tool_call_id"], "call-a");
+    assert_eq!(binding["requested_cursor"], 1);
+    assert_eq!(binding["available_cursor"], 1);
+    assert_eq!(binding["tip"]["event_id"], call["tip"]);
+    assert_eq!(binding["capability"]["binding"], "exact_turn");
+    assert!(!first.to_string().contains(token));
+    assert_eq!(native_bridge(&daemon, &call), first);
+    for (key, value) in [
+        ("session_id", json!("other-session")),
+        ("agent_id", json!("unknown-child")),
+        ("turn_id", json!("other-turn")),
+        ("tip", json!("other-tip")),
+        ("cursor", json!(2)),
+        ("registration", json!("forged")),
+    ] {
+        let mut changed = call.clone();
+        changed[key] = value;
+        let result = native_bridge(&daemon, &changed);
+        assert!(
+            result["error"]["code"].is_string(),
+            "accepted replacement {key}: {result}"
+        );
+    }
+    let mut next = call.clone();
+    next["tool_call_id"] = "call-b".into();
+    let second = native_bridge(&daemon, &next);
+    assert!(second["error"].is_null(), "{second}");
+    assert_ne!(second["data"]["invocation_id"], binding["invocation_id"]);
+    let mut missing = next.clone();
+    missing["tool_call_id"] = "call-missing".into();
+    missing["tip"] = "not-yet-captured".into();
+    assert_eq!(
+        native_bridge(&daemon, &missing)["error"]["code"],
+        "HISTORY_GAP"
+    );
+    let mut injected = call.clone();
+    injected["scope"] = json!({"user":"other"});
+    assert_eq!(
+        native_bridge(&daemon, &injected)["error"]["code"],
+        "INVALID_REQUEST"
+    );
+    daemon.configure("[access]\nread_roots=[]\n");
+    daemon.cli(&["config", "reload"]);
+    assert_eq!(
+        native_bridge(&daemon, &call)["error"]["code"],
+        "PATH_DENIED"
+    );
+    daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
+    daemon.cli(&["config", "reload"]);
+    assert_eq!(native_bridge(&daemon, &call), first);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    assert_eq!(native_bridge(&daemon, &call), first);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}

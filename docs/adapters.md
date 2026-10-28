@@ -169,3 +169,24 @@ independently pinned manifest is
 Its freeze commit is `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
 Evaluation consumers use `scripts/check_reference.py::read_reference()` to load
 the effective set; reading the uncorrected v1 task file alone is not sufficient.
+
+## Claude native bridge under development
+
+`adapter claude-call` accepts a bounded host-only JSON envelope on stdin and uses
+the existing private daemon IPC. It is not a model tool schema. Registration
+checks the installed2.1.311 executable and configured read roots, then retains
+only a hash of its random bearer token with the session, source and workspace.
+The token response is for the native bridge; it must never become a tool result.
+The same-UID local management boundary remains the declared trust boundary.
+
+Root binding fixes the native turn, tool call, event UUID and observed event
+cursor before research. It reuses the existing incremental file cursor and checks
+for the requested tip between at most256 single-frame batches, stopping new
+batches after two seconds. This bounds catch-up work, not an individual storage
+operation's latency. A missing tip returns `HISTORY_GAP`; it never selects the
+latest session or substitutes another caller. Long backlogs can be imported with
+the existing capture command before retrying. The saved invocation and capture
+sequence are immutable across retries and daemon restarts; live permissions and
+read roots are checked again. Changed identity or fence data conflicts, and an
+unregistered child is refused. Native hook installation, child/fork registration
+and the consult workflow are not supplied by this bridge phase.

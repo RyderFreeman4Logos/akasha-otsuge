@@ -367,6 +367,10 @@ does not attest those repairs.
 - [ ] Implement the smallest native plugin and Rust bridge for actual caller
   identity, parent/child registration, per-call turn/fence and immutable binding.
   Re-read identity after resume/clear; unknown child identity must refuse.
+  The private root registration/binding bridge now passes durable retry/restart,
+  identity replacement, missing-tip, unknown-field and live read-root withdrawal
+  regressions; all-target Clippy passed. Actual native hooks, child/fork registration
+  and installation remain unfinished. Root tokens cannot claim child identity.
 - [ ] Capture original prompts, visible outputs and tool results; normalize native
   transcripts with bounded resume/backfill, partial-tail/gap handling, exact
   parent/fork/compaction lineage and no private-thinking extraction or false approval.
