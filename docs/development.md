@@ -6,17 +6,18 @@ including on a cache hit. Cache misses remain ordinary clean builds; credentials
 and user configuration are excluded. The pinned official [cache action](https://github.com/actions/cache/tree/55cc8345863c7cc4c66a329aec7e433d2d1c52a9)
 saves only successful runs. No paid cache-capacity setting is changed.
 
-Linux is the MVP platform. Install Rust using rustup, Python 3.11 or newer,
+Linux is the MVP platform. Install Rust using rustup, Python 3.11 or newer, Node.js 18 or newer,
 a C/C++ toolchain, the Protocol Buffers compiler (`protoc`) and its standard
 `.proto` definitions. Lance's build scripts require both; neither is a runtime
 dependency. On Debian/Ubuntu:
 
 ```sh
-sudo apt-get install build-essential pkg-config protobuf-compiler libprotobuf-dev
+sudo apt-get install build-essential pkg-config protobuf-compiler libprotobuf-dev nodejs
 ```
 
 The local acceptance environment uses `protoc` 3.21.12. CI installs the distribution
 package and records its version before building.
+Node runs the native hook's isolated JavaScript regressions; it is not a product runtime dependency.
 The checked-in toolchain pins Rust 1.99.1, verified against the official stable
 channel manifest on 2026-10-22. No model credentials are required for this bootstrap.
 

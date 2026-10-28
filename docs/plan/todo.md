@@ -450,6 +450,13 @@ does not attest those repairs.
     occurs in an isolated writer process. A distinct procfs `ESRCH` observation
     is treated as an exited process. All33 focused cases, Clippy and20 parallel
     rounds pass; both earlier failures remain retained.
+  - [x] R2: Reject changed native workspaces before binding root or child calls.
+    The production JavaScript hook's child and grandchild regression fails on the
+    old implementation. The repaired hook keeps the immutable session workspace;
+    a cwd change requires a new native session. Root/child/grandchild and fresh
+    session controls run in the shared gate with Node.js. Candidate `62ef371`
+    passed its full gate, native checks and CI40776089474, but R2 found this
+    binding defect; those passing checks do not approve the repair candidate.
 
 The four original TUI onboarding probes remain setup failures. A distinct probe
 used a controlling PTY and task-only trusted workspace configuration, ran the

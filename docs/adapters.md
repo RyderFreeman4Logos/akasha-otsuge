@@ -213,6 +213,12 @@ transcript layout and each frame's session/agent/sidechain identity are checked;
 an unknown or mismatched child cannot fall back to the root. Parent identity is
 immutable across registration retries. Ordinary child transcripts have their
 own ancestry; registering the parent does not invent inherited originals.
+The hook checks the live cwd against the session's registered workspace before
+binding either a root or descendant call. A changed cwd returns
+`BINDING_UNAVAILABLE` before the tool body executes; start a new native session in
+the new directory. It does not rewrite cached parent/child registrations.
+The canonical gate exercises the production hook with root, child and grandchild
+workspace transitions, including a root call before a descendant call.
 
 Native sync jobs persist `until_event` with their capture input and wait for
 that event within the original job deadline, including delayed file creation

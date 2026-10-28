@@ -89,9 +89,8 @@ export function register(on) {
     if (!caller || !caller.turn || !caller.tip || await $.session.id() !== caller.session)
       return {deny: 'BINDING_UNAVAILABLE'};
     const cwd = await $.session.cwd();
-    if (cwd !== caller.cwd) {
-      caller.cwd = cwd; caller.registration = undefined;
-    }
+    // Descendants inherit the registered workspace; changing it needs a new session.
+    if (cwd !== caller.cwd) return {deny: 'BINDING_UNAVAILABLE'};
     await ensureRegistration($, caller);
     if (root !== generation) return {deny: 'BINDING_UNAVAILABLE'};
     await send($, {op: 'bind', registration: caller.registration, session_id: caller.session,
