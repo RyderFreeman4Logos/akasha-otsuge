@@ -1130,20 +1130,27 @@ impl Service {
                     .await;
             }
             let storage = self.storage.clone();
-            let binding = job
-                .binding
-                .as_ref()
-                .ok_or(Error("JOB_CORRUPT"))?
-                .binding()?;
+            let input = job.binding.as_ref().ok_or(Error("JOB_CORRUPT"))?.clone();
+            let binding = input.binding()?;
             let path = job.path.clone().ok_or(Error("JOB_CORRUPT"))?;
             let generation = job.config_generation;
             let runtime = tokio::runtime::Handle::current();
             #[cfg(test)]
             let gate = self.batch_gate.lock().await.take();
             let result = tokio::task::spawn_blocking(move || {
-                let result = runtime.block_on(
-                    Capture::new(&storage).reconcile_jsonl(&binding, &path, 1, generation),
-                );
+                let capture = Capture::new(&storage);
+                let result = if input.host == Some(crate::config::Host::ClaudeCode) {
+                    runtime.block_on(capture.reconcile_decoded(
+                        &binding,
+                        &path,
+                        1,
+                        generation,
+                        |line| crate::adapter::claude::transcript_frame(&input.source, line),
+                        |_| {},
+                    ))
+                } else {
+                    runtime.block_on(capture.reconcile_jsonl(&binding, &path, 1, generation))
+                };
                 #[cfg(test)]
                 if let Some(gate) = gate {
                     gate.reached.send(end).unwrap();

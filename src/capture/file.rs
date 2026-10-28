@@ -76,6 +76,30 @@ impl Capture<'_> {
         path: &Path,
         limit: usize,
         config: u64,
+        boundary: impl FnMut(&'static str),
+    ) -> Result<ReconcileReport> {
+        self.reconcile_decoded(
+            binding,
+            path,
+            limit,
+            config,
+            |line| {
+                serde_json::from_slice::<CaptureFrame>(line)
+                    .map(Some)
+                    .map_err(|_| error("INVALID_CAPTURE_FRAME"))
+            },
+            boundary,
+        )
+        .await
+    }
+
+    pub(crate) async fn reconcile_decoded(
+        &self,
+        binding: &CaptureBinding,
+        path: &Path,
+        limit: usize,
+        config: u64,
+        mut decode: impl FnMut(&[u8]) -> Result<Option<CaptureFrame>>,
         mut boundary: impl FnMut(&'static str),
     ) -> Result<ReconcileReport> {
         if limit == 0 || limit > 64 || config == 0 {
@@ -198,23 +222,30 @@ impl Capture<'_> {
                 checkpoint.pending = Some(PendingReason::PartialTail);
                 break;
             }
-            let parsed = serde_json::from_slice::<CaptureFrame>(&line)
-                .map_err(|_| error("INVALID_CAPTURE_FRAME"));
-            let frame = match parsed {
-                Ok(v) if v.schema_version == 1 => v,
+            let frame = match decode(&line) {
+                Ok(Some(v)) if v.schema_version == 1 => Some(v),
+                Ok(None) => None,
                 _ => {
                     checkpoint.pending = Some(PendingReason::InvalidFrame);
                     break;
                 }
             };
-            let raw = match decode_hex(&frame.raw_hex, MAX_RAW) {
+            let raw = match frame
+                .as_ref()
+                .map(|f| decode_hex(&f.raw_hex, MAX_RAW))
+                .transpose()
+            {
                 Ok(v) => v,
                 Err(_) => {
                     checkpoint.pending = Some(PendingReason::InvalidFrame);
                     break;
                 }
             };
-            if validate(&frame.event, &raw, config).is_err() {
+            if frame
+                .as_ref()
+                .zip(raw.as_ref())
+                .is_some_and(|(f, raw)| validate(&f.event, raw, config).is_err())
+            {
                 checkpoint.pending = Some(PendingReason::InvalidFrame);
                 break;
             }
@@ -243,8 +274,8 @@ impl Capture<'_> {
             next.tail_sha256 = last;
             let mut next_checkpoint = checkpoint.clone();
             next_checkpoint.cursor = serde_json::to_string(&next)?;
-            let duplicate = self
-                .event(
+            let duplicate = if let Some(frame) = &frame {
+                self.event(
                     binding,
                     &EventRef {
                         source: binding.source.clone(),
@@ -252,20 +283,30 @@ impl Capture<'_> {
                     },
                     self.storage.sequence()?,
                 )?
-                .is_some();
-            let result = self
-                .ingest(
+                .is_some()
+            } else {
+                false
+            };
+            let advance = Advance {
+                expected_revision: saved.as_ref().map(|v| v.revision),
+                checkpoint: next_checkpoint.clone(),
+            };
+            let result = if let Some(frame) = frame {
+                self.ingest(
                     binding,
                     &frame.event,
-                    &raw,
+                    &raw.unwrap_or_default(),
                     &ingress,
-                    Some(&Advance {
-                        expected_revision: saved.as_ref().map(|v| v.revision),
-                        checkpoint: next_checkpoint.clone(),
-                    }),
+                    Some(&advance),
                     config,
                 )
-                .await;
+                .await
+                .map(|_| ())
+            } else {
+                self.advance_checkpoint(binding, &advance, config)
+                    .await
+                    .map(|_| ())
+            };
             match result {
                 Ok(_) => {}
                 Err(e)

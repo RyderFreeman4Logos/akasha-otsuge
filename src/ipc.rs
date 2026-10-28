@@ -139,9 +139,23 @@ pub struct CaptureInput {
     pub scope: crate::domain::Scope,
     pub stream: String,
     pub coverage: crate::capture::CoverageLevel,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub host: Option<crate::config::Host>,
 }
 impl CaptureInput {
     pub(crate) fn binding(&self) -> Result<crate::capture::CaptureBinding> {
+        if let Some(host) = self.host {
+            if host != crate::config::Host::ClaudeCode {
+                return Err(Error("ADAPTER_UNSUPPORTED"));
+            }
+            if self.source.adapter != "claude_code"
+                || self.coverage != crate::capture::CoverageLevel::VisibleText
+                || self.source.agent != "main"
+                || self.source.thread != self.source.session
+            {
+                return Err(Error("INVALID_CAPTURE_BINDING"));
+            }
+        }
         Ok(crate::capture::CaptureBinding::from_source(
             self.source.clone(),
             self.scope.clone(),

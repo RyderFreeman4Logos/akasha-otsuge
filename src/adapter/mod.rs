@@ -1,5 +1,6 @@
 //! Shared host contracts; host integrations authenticate runtime identity.
 mod budget;
+pub mod claude;
 pub use budget::*;
 mod runner;
 pub use runner::*;

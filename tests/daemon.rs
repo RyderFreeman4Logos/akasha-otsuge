@@ -17,6 +17,9 @@ mod model_tests;
 #[path = "support/daemon_retrieval.rs"]
 mod retrieval_tests;
 
+#[path = "support/daemon_claude.rs"]
+mod claude_tests;
+
 struct Daemon {
     root: PathBuf,
     socket_name: String,

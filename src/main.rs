@@ -15,9 +15,11 @@ Commands:
   daemon status              Show daemon and storage status
   daemon stop                Stop intake and drain the daemon
   doctor --json              Inspect the local daemon
+  doctor --host claude [--binary PATH]
+                             Inspect the installed Claude CLI
   config validate|reload|status
   config show --effective
-  capture reconcile BINDING_JSON INPUT_JSONL --idempotency-key ID
+  capture reconcile|claude BINDING_JSON INPUT_JSONL --idempotency-key ID
   model run PLAN_JSON --idempotency-key ID
   index sync --idempotency-key ID
   index status
@@ -104,6 +106,18 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         .iter()
         .map(|s| s.to_str().ok_or(Error("INVALID_ARGUMENT")))
         .collect::<Result<_>>()?;
+    if let ["doctor", "--host", "claude", flags @ ..] = command.as_slice() {
+        let flags = options(flags, &["--binary"])?;
+        let binary = std::path::Path::new(flags.get("--binary").copied().unwrap_or("claude"));
+        let (response, failed) = match akasha_otsuge::adapter::claude::probe(binary).await {
+            Ok(report) => (serde_json::json!({"schema_version":1,"data":report}), false),
+            Err(error) => (serde_json::json!({"schema_version":1,"error":error}), true),
+        };
+        let mut bytes = serde_json::to_vec(&response)?;
+        bytes.push(b'\n');
+        output(&bytes, failed)?;
+        return Ok(u8::from(failed));
+    }
     let operation = match command.as_slice() {
         ["daemon", "run" | "start"] => None,
         ["daemon", "status"] => Some(Command::Status),
@@ -115,7 +129,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         ["config", "show", "--effective"] => Some(Command::ConfigShow),
         [
             "capture",
-            "reconcile",
+            format @ ("reconcile" | "claude"),
             binding,
             path,
             "--idempotency-key",
@@ -125,8 +139,12 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             if input.len() > 16 * 1024 {
                 return Err(Error("MESSAGE_TOO_LARGE"));
             }
+            let mut binding: ipc::CaptureInput = serde_json::from_str(&input)?;
+            if *format == "claude" {
+                binding.host = Some(config::Host::ClaudeCode);
+            }
             Some(Command::Reconcile {
-                binding: serde_json::from_str(&input)?,
+                binding,
                 path: PathBuf::from(path),
                 idempotency_key: (*id).into(),
             })

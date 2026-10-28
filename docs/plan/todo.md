@@ -356,7 +356,14 @@ does not attest those repairs.
 - [x] Verify the installed Claude2.1.311 executable against its official manifest;
   validate a native plugin and execute a non-model native metadata command with
   isolated config, unchanged user files, no other host CLI and no MCP server.
-  This is interface preparation; it does not establish TUI/model acceptance.
+  The native TUI also executed that local command in a controlling PTY and exited
+  normally, without model requests. This does not establish model acceptance.
+- [x] Add the daemon-independent bounded CLI version probe and native transcript
+  import through the existing durable capture cursor. The first slice preserves
+  root-message parent links, visible text/tool results and partial-tail recovery;
+  private thinking is excluded and a user role remains unverified authority.
+  Focused regression:77 passed/5 existing ignored; all-target Clippy passed.
+  Native child/fork/compaction coverage and live caller registration remain below.
 - [ ] Implement the smallest native plugin and Rust bridge for actual caller
   identity, parent/child registration, per-call turn/fence and immutable binding.
   Re-read identity after resume/clear; unknown child identity must refuse.
@@ -377,9 +384,10 @@ does not attest those repairs.
   reproduction commands and limitations; pass exact-candidate gate, independent
   review and CI, then merge and close #12. Continue every queue entry below.
 
-The TUI controller's onboarding probes are retained as setup failures, not product
-regressions or acceptance. Stop retrying the same input method; use the captured
-native screen evidence to repair terminal driving before a complete TUI run.
+The four original TUI onboarding probes remain setup failures. A distinct probe
+used a controlling PTY and task-only trusted workspace configuration, ran the
+local native command through the actual TUI, and exited successfully. User files
+were unchanged. Real model/compact/cancellation acceptance is still required.
 
 Host preparation: Claude Code2.1.311, Codex0.164.0, Hermes0.22.5+1914 and Pi0.78.0
 are executable. Claude's broken link was repaired through mise onto SSD; the
