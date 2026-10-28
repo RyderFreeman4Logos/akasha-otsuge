@@ -34,6 +34,37 @@ impl From<crate::config::ConfigError> for Error {
         Self(error.code)
     }
 }
+impl From<crate::adapter::AdapterError> for Error {
+    fn from(error: crate::adapter::AdapterError) -> Self {
+        use crate::adapter::ErrorCode::*;
+        Self(match error.code {
+            InvalidArgument => "INVALID_ARGUMENT",
+            ProtocolInvalid => "PROTOCOL_INVALID",
+            OutputLimit => "OUTPUT_LIMIT",
+            BudgetExhausted => "BUDGET_EXHAUSTED",
+            DelegationUnavailable => "DELEGATION_UNAVAILABLE",
+            Cancelled => "CANCELLED",
+            WorkflowTimeout => "WORKFLOW_TIMEOUT",
+            QueueTimeout => "QUEUE_TIMEOUT",
+            ProviderTimeout => "PROVIDER_TIMEOUT",
+            RunnerTimeout => "RUNNER_TIMEOUT",
+            ConfigInvalid => "CONFIG_INVALID",
+            BindingUnavailable => "BINDING_UNAVAILABLE",
+            CallerAmbiguous => "CALLER_AMBIGUOUS",
+            AdapterUnsupported => "ADAPTER_UNSUPPORTED",
+            HistoryGap => "HISTORY_GAP",
+            ExecutorUnavailable => "EXECUTOR_UNAVAILABLE",
+            AuthRequired => "AUTH_REQUIRED",
+            RunnerIncomplete => "RUNNER_INCOMPLETE",
+            RunnerFailed => "RUNNER_FAILED",
+            ToolDenied => "TOOL_DENIED",
+            ReadDenied => "READ_DENIED",
+            SourceUnavailable => "SOURCE_UNAVAILABLE",
+            BindingConflict => "BINDING_CONFLICT",
+            SourceChanged => "SOURCE_CHANGED",
+        })
+    }
+}
 impl Error {
     pub fn exit_code(self) -> u8 {
         match self.0 {
@@ -67,6 +98,9 @@ pub struct Request {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    Codex {
+        event: crate::adapter::codex::NativeEvent,
+    },
     Status,
     Doctor,
     Stop,
@@ -139,9 +173,33 @@ pub struct CaptureInput {
     pub scope: crate::domain::Scope,
     pub stream: String,
     pub coverage: crate::capture::CoverageLevel,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub host: Option<crate::config::Host>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub until_event: Option<String>,
 }
 impl CaptureInput {
     pub(crate) fn binding(&self) -> Result<crate::capture::CaptureBinding> {
+        if self
+            .until_event
+            .as_ref()
+            .is_some_and(|id| !identifier(id) || self.host.is_none())
+        {
+            return Err(Error("INVALID_CAPTURE_BINDING"));
+        }
+        if let Some(host) = self.host {
+            if host != crate::config::Host::Codex {
+                return Err(Error("ADAPTER_UNSUPPORTED"));
+            }
+            if self.source.adapter != "codex"
+                || self.source.session != self.source.thread
+                || self.source.agent != "main"
+                || self.coverage != crate::capture::CoverageLevel::VisibleText
+                || self.stream != crate::adapter::codex::TRANSCRIPT_STREAM
+            {
+                return Err(Error("INVALID_CAPTURE_BINDING"));
+            }
+        }
         Ok(crate::capture::CaptureBinding::from_source(
             self.source.clone(),
             self.scope.clone(),

@@ -15,9 +15,11 @@ Commands:
   daemon status              Show daemon and storage status
   daemon stop                Stop intake and drain the daemon
   doctor --json              Inspect the local daemon
+  doctor --host codex [--binary PATH]
+                             Inspect the installed Codex CLI
   config validate|reload|status
   config show --effective
-  capture reconcile BINDING_JSON INPUT_JSONL --idempotency-key ID
+  capture reconcile|codex BINDING_JSON INPUT_JSONL --idempotency-key ID
   model run PLAN_JSON --idempotency-key ID
   index sync --idempotency-key ID
   index status
@@ -104,7 +106,28 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         .iter()
         .map(|s| s.to_str().ok_or(Error("INVALID_ARGUMENT")))
         .collect::<Result<_>>()?;
+    if let ["doctor", "--host", "codex", flags @ ..] = command.as_slice() {
+        let flags = options(flags, &["--binary"])?;
+        let binary = std::path::Path::new(flags.get("--binary").copied().unwrap_or("codex"));
+        let report = akasha_otsuge::adapter::codex::probe(binary).await?;
+        let mut bytes = serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":report,
+            "coverage":{"version_supported":report.version.as_deref()==Some("0.164.0"),"supported_versions":["0.164.0"],"native_children":false,"model_auth":"not_checked","hook_trust":"not_checked"}}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
     let operation = match command.as_slice() {
+        ["adapter", "codex-call"] => {
+            use std::io::Read;
+            let mut bytes = Vec::new();
+            io::stdin().take(16 * 1024 + 1).read_to_end(&mut bytes)?;
+            if bytes.len() > 16 * 1024 {
+                return Err(Error("MESSAGE_TOO_LARGE"));
+            }
+            Some(Command::Codex {
+                event: serde_json::from_slice(&bytes)?,
+            })
+        }
         ["daemon", "run" | "start"] => None,
         ["daemon", "status"] => Some(Command::Status),
         ["daemon", "stop"] => Some(Command::Stop),
@@ -115,7 +138,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         ["config", "show", "--effective"] => Some(Command::ConfigShow),
         [
             "capture",
-            "reconcile",
+            format @ ("reconcile" | "codex"),
             binding,
             path,
             "--idempotency-key",
@@ -125,8 +148,12 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             if input.len() > 16 * 1024 {
                 return Err(Error("MESSAGE_TOO_LARGE"));
             }
+            let mut binding: ipc::CaptureInput = serde_json::from_str(&input)?;
+            if *format == "codex" {
+                binding.host = Some(config::Host::Codex);
+            }
             Some(Command::Reconcile {
-                binding: serde_json::from_str(&input)?,
+                binding,
                 path: PathBuf::from(path),
                 idempotency_key: (*id).into(),
             })

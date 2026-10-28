@@ -16,7 +16,8 @@ use std::{
 };
 
 /// Server-owned registration, not a model tool argument.
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CodexRegistration {
     pub capability: CapabilityReport,
     pub source: SourceIdentity,
@@ -27,13 +28,34 @@ pub struct CodexRegistration {
 }
 
 /// Actual native hook fields transported outside the model's short hint.
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CodexCall {
     pub session_id: String,
     pub agent_id: Option<String>,
     pub turn_id: String,
     pub tool_call_id: String,
     pub cwd: PathBuf,
+}
+
+/// Private local transport; these fields are never a model tool schema.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
+pub enum NativeEvent {
+    Register {
+        binary: PathBuf,
+        session_id: String,
+        transcript_path: PathBuf,
+        cwd: PathBuf,
+    },
+    Bind {
+        registration: String,
+        call: CodexCall,
+    },
+    Sync {
+        registration: String,
+        until_ordinal: u64,
+    },
 }
 
 pub struct CodexCaller {

@@ -508,7 +508,11 @@ checks do not prove host protocol capabilities or an authenticated Runner.
   The library now binds registered roots to the native call's exact ordinal;
   four Caller tests (including eight identity refusal cases), five capture tests
   and all-target Clippy pass. Missing/explicit child proof is refused. Live
-  hook registration, daemon transport and concurrent TUI acceptance remain open.
+  hook delivery and concurrent TUI acceptance remain open. The daemon now persists
+  registration, replays bindings across restart and schedules native backfill;
+  75 relevant library/CLI/daemon/Codex tests and all-target Clippy pass (five
+  preexisting ignored cases). An observed empty crash-readiness marker race was
+  fixed at the shared test-only publisher in `8aec4ac`; no product timeout changed.
 - [ ] Implement the standalone Codex Runner through native app-server stdio and
   scoped dynamic read tools. Verify native sandbox/tool restrictions, original
   deadlines, bounded output, structured final/exit status and retained cleanup

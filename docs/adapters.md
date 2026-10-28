@@ -217,3 +217,20 @@ native file is gone. Permission revocation applies to new calls and retries.
 Focused tests cover native hook data, concurrent registrations in one workspace,
 identity conflicts, unknown versions, duplicate calls, missing ancestors and
 revocation. These tests do not yet prove live TUI hook delivery or installation.
+
+The daemon's private `codex` transport persists root registrations with opaque
+credentials, binds native calls and queues native capture through the existing
+durable scheduler. Registration credentials travel over the owner-only local
+socket and stdin bridge; binding responses contain no credential. Access roots
+and current read grants are rechecked for subsequent calls and capture batches.
+The `adapter codex-call` stdin bridge is internal host transport, not a model
+tool. `capture codex` selects the pinned format for explicit backfill input;
+the binding must use stream `codex-native-v1` and `visible_text` coverage.
+
+`doctor --host codex [--binary PATH]` observes the executable/version with bounded
+output and a five-second probe deadline. It reports authentication and hook trust
+as unchecked. The process owner signals its group before releasing the leader
+PID, and deferred reaping retains ownership after the one-second cleanup grace.
+The daemon, CLI, Codex and library regression suites pass 75 tests (five existing
+ignored helpers/acceptance cases), including registration/replay across daemon
+restart and native background backfill. Full acceptance and review remain open.
