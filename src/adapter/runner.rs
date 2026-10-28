@@ -383,15 +383,6 @@ impl RunSpec {
         self.config_generation
     }
     pub fn check(&self) -> Result<()> {
-        self.lease.check()?;
-        if let Some(layer) = self.deadline.expired() {
-            return Err(if layer == Layer::Workflow {
-                ErrorCode::WorkflowTimeout
-            } else {
-                ErrorCode::RunnerTimeout
-            }
-            .into());
-        }
-        Ok(())
+        self.lease.check_deadline(&self.deadline)
     }
 }

@@ -284,3 +284,50 @@ async fn external_sources_can_construct_distinct_refusals_and_capabilities_bind_
     drop(handle);
     store.close().await.unwrap();
 }
+
+#[tokio::test]
+async fn runspec_preserves_earliest_timeout_after_both_clocks_expire() {
+    use akasha_otsuge::config::deadline::{Deadline, Layer};
+    let f = Fixture::new();
+    let store = f.open().await;
+    Domain::new(&store)
+        .set_read_grant("grant", "reader", Some(&scope()), None, 1)
+        .await
+        .unwrap();
+    let tip = event(&store, "root", "tip", "source", None, false).await;
+    let inv = Invocation::bind(&store, runtime(&f, &store, "root", tip, "call"))
+        .await
+        .unwrap();
+    tokio::time::pause();
+    for (workflow_seconds, runner_seconds, layer, code) in [
+        (30, 20, Layer::Runner, ErrorCode::RunnerTimeout),
+        (10, 20, Layer::Workflow, ErrorCode::WorkflowTimeout),
+        (20, 20, Layer::Workflow, ErrorCode::WorkflowTimeout),
+    ] {
+        let budget = RunBudget::new(
+            inv.id(),
+            &inv.fence_hash(),
+            std::sync::Arc::new(tokio::sync::Semaphore::new(1)),
+            BudgetLimits::default(),
+            Deadline::start(Layer::Workflow, Duration::from_secs(workflow_seconds), None).unwrap(),
+        )
+        .unwrap();
+        let mut opts = options();
+        opts.runner_timeout = Duration::from_secs(runner_seconds);
+        let spec = RunSpec::new(
+            &inv,
+            opts,
+            ReadCapability::issue(&inv).unwrap(),
+            budget.start().unwrap(),
+        )
+        .unwrap();
+        spec.check().unwrap();
+        tokio::time::advance(Duration::from_secs(40)).await;
+        assert_eq!(spec.deadline().expired(), Some(layer));
+        assert_eq!(spec.check().unwrap_err().code, code);
+        budget.cancel();
+        assert_eq!(spec.check().unwrap_err().code, ErrorCode::Cancelled);
+    }
+    tokio::time::resume();
+    store.close().await.unwrap();
+}

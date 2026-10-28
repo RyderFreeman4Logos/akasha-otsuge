@@ -7,6 +7,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1] / "docs/evaluation/reference-v1"
 # First freeze commit 7356d17f0a373ade3520e6e1a1249fc52e17ba8d. Add errata in a new set; never reseal v1.
 FROZEN_MANIFEST_SHA256 = "6b6dffd7882dc703e393686d327f8aaae6becad1f5566e761b8cae8f4fad6ac7"
+ERRATA_ROOT = ROOT.parent / "reference-v1-errata-1"
+ERRATA_MANIFEST_SHA256 = "09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16"
 
 
 def validate_tasks(tasks):
@@ -47,7 +49,13 @@ def validate_tasks(tasks):
         for memory in memories.values():
             require(memory["source_ids"] and set(memory["source_ids"]) <= sources.keys(), label + ": unsourced memory")
         oracle = task["oracle"]
-        require(oracle["status"] in {"found", "no_hit", "incomplete"}, label + ": result status")
+        revoked = any(c["operation"] == "revoke_read_grant" for c in task.get("changes_during_run", []))
+        if revoked:
+            require(oracle["status"] == "error" and oracle.get("error_code") == "READ_DENIED" and
+                    oracle.get("successful_receipt") is False, label + ": grant revocation requires a permission error without a successful receipt")
+        else:
+            require(oracle["status"] in {"found", "no_hit", "incomplete"} and
+                    "error_code" not in oracle and "successful_receipt" not in oracle, label + ": result status")
         require(bool(oracle["required_items"]) == (oracle["status"] == "found"), label + ": result count")
         require(bool(oracle["gaps"]) == (oracle["status"] == "incomplete"), label + ": history gap")
         require(task["retrieval_mode"] in {"current_state", "historical_state"}, label + ": retrieval mode")
@@ -105,7 +113,7 @@ def covers(scope, target):
                for key in ("user", "project", "branch_or_version", "session"))
 
 
-def validate_snapshot(root=ROOT):
+def read_reference(root=ROOT):
     raw = (root / "manifest.json").read_bytes()
     require(digest(raw) == FROZEN_MANIFEST_SHA256, "reference-v1 differs from its committed freeze; use a separate regression/errata set")
     manifest = json.loads(raw)
@@ -113,12 +121,31 @@ def validate_snapshot(root=ROOT):
     for name, expected in manifest["files"].items():
         require(digest((root / name).read_bytes()) == expected, "frozen hash mismatch: " + name)
     tasks = [json.loads(line) for line in (root / "tasks.jsonl").read_text().splitlines()]
+    raw = (ERRATA_ROOT / "manifest.json").read_bytes()
+    require(digest(raw) == ERRATA_MANIFEST_SHA256, "erratum differs from its committed freeze")
+    erratum = json.loads(raw)
+    require(erratum["schema_version"] == 1 and erratum["base_manifest_sha256"] == FROZEN_MANIFEST_SHA256 and
+            set(erratum["files"]) == {"corrections.json", "README.md"}, "erratum manifest schema")
+    for name, expected in erratum["files"].items():
+        require(digest((ERRATA_ROOT / name).read_bytes()) == expected, "erratum frozen hash mismatch: " + name)
+    corrections = json.loads((ERRATA_ROOT / "corrections.json").read_text())
+    require(len(corrections) == 1 and corrections[0]["task_id"] == "S04" and
+            set(corrections[0]["set_oracle_fields"]) == {"status", "error_code", "successful_receipt"}, "erratum scope")
+    task = next(t for t in tasks if t["id"] == "S04")
+    require(task["oracle"]["status"] == "no_hit", "erratum original status")
+    task["oracle"].update(corrections[0]["set_oracle_fields"])
     validate_tasks(tasks)
+    return manifest, tasks
+
+
+def validate_snapshot(root=ROOT):
+    manifest, tasks = read_reference(root)
     require(manifest["task_ids"] == [t["id"] for t in tasks], "frozen task membership")
     require(manifest["critical_ids"] == [t["id"] for t in tasks if t["critical"]], "frozen critical membership")
     require(manifest["categories"] == dict(Counter(t["category"] for t in tasks)), "category counts")
     return {"tasks": len(tasks), "critical_tasks": len(manifest["critical_ids"]), "intent_pairs": 10,
-            "manifest_sha256": digest((root / "manifest.json").read_bytes()), "model_evaluation": "not_run"}
+            "manifest_sha256": FROZEN_MANIFEST_SHA256, "errata_manifest_sha256": ERRATA_MANIFEST_SHA256,
+            "reference_version": "reference-v1+errata-1", "model_evaluation": "not_run"}
 
 
 if __name__ == "__main__":

@@ -38,3 +38,23 @@ version-bumped empty replacement. The original reference directory is unchanged.
 `mvp011-focused-green3` passes 19 Rust tests (including the new grandchild path),
 seven Python reference controls and all-target Clippy; log SHA-256 is
 `b410885d8b98db0ca3965f62db5c06f6dabb8229f28f985a87dc80b9fc000a84`.
+
+`r1-repair-receipts.tar.gz` and `r1-repair-manifest.json` preserve the complete
+independent R1 FAIL report, original passing pre-repair full gate, and original
+repair runs. The controlled-clock RED returned WorkflowTimeout where the earlier
+deadline required RunnerTimeout. The oracle RED admitted S04's successful no-hit
+after whole-grant revocation; the erratum control admitted coordinated resealing.
+The repaired shared guard retains the effective deadline's trigger and cancellation
+precedence. The [separate pinned erratum](../../../evaluation/reference-v1-errata-1/README.md)
+corrects S04 while preserving the original v1 bytes and scoring population.
+
+The first deadline GREEN attempt was blocked before tests by an sccache0.17.0
+client talking to the existing0.19.0 daemon. The next run pinned the already
+installed0.19.0 client, verified against that daemon's executable, and reused its
+cache without restart. An intermediate focused run failed only a Rustfmt line
+wrap; its original log remains. Neither failure is behavioral RED or a green gate.
+Final focused run `mvp011-r1-focused-green2` passes20 Rust contract tests,9 reference
+tests and all-target Clippy in9.404s; log SHA-256 is
+`45acecbcecb3c1bf83acd0bc61e956866a9ef67ed7a100db20340be09a23acb1`.
+These repair receipts identify dirty development based on617636a; they do not
+replace the subsequent exact-HEAD full gate and whole-candidate R2 review.

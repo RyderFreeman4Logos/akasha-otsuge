@@ -1,0 +1,10 @@
+[
+  {
+    "task_id": "S04",
+    "set_oracle_fields": {
+      "status": "error",
+      "error_code": "READ_DENIED",
+      "successful_receipt": false
+    }
+  }
+]

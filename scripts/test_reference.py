@@ -4,17 +4,48 @@ import unittest
 import tempfile
 import shutil
 from pathlib import Path
+from unittest.mock import patch
 
-from check_reference import ROOT, digest, validate_tasks, validate_snapshot
+import check_reference
+
+from check_reference import ROOT, digest, read_reference, validate_tasks, validate_snapshot
 
 
 class ReferenceTests(unittest.TestCase):
     def setUp(self):
-        self.tasks = [json.loads(line) for line in (ROOT / "tasks.jsonl").read_text().splitlines()]
+        self.tasks = read_reference()[1]
 
     def test_current_sources_and_oracles(self):
         validate_tasks(self.tasks)
         self.assertEqual(validate_snapshot()["tasks"], 60)
+
+    def test_whole_grant_revocation_requires_a_permission_error(self):
+        tasks = [json.loads(line) for line in (ROOT / "tasks.jsonl").read_text().splitlines()]
+        with self.assertRaisesRegex(ValueError, "grant revocation"):
+            validate_tasks(tasks)
+        task = next(t for t in tasks if t["id"] == "S04")
+        task["oracle"].update(status="error", error_code="READ_DENIED", successful_receipt=False)
+        validate_tasks(tasks)
+        for field, value in (("error_code", "RUNNER_FAILED"), ("successful_receipt", True)):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(tasks)
+                next(t for t in changed if t["id"] == "S04")["oracle"][field] = value
+                with self.assertRaisesRegex(ValueError, "grant revocation"):
+                    validate_tasks(changed)
+
+    def test_erratum_cannot_be_coordinately_resealed(self):
+        for name in ("corrections.json", "README.md"):
+            with self.subTest(input=name), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp) / "erratum"
+                shutil.copytree(ROOT.parent / "reference-v1-errata-1", root)
+                with (root / name).open("a") as output:
+                    output.write("\n")
+                manifest = json.loads((root / "manifest.json").read_text())
+                manifest["files"][name] = digest((root / name).read_bytes())
+                (root / "manifest.json").write_text(json.dumps(manifest))
+                with patch.object(check_reference, "ERRATA_ROOT", root, create=True):
+                    with self.assertRaisesRegex(ValueError, "erratum.*freeze"):
+                        validate_snapshot()
 
     def test_frozen_bytes_cannot_be_silently_changed(self):
         with tempfile.TemporaryDirectory() as temp:

@@ -125,10 +125,13 @@ impl RunBudget {
         }
     }
     fn check(&self, state: &Counters) -> Result<()> {
+        Self::check_deadline(state, &self.0.deadline)
+    }
+    fn check_deadline(state: &Counters, deadline: &Deadline) -> Result<()> {
         if state.cancelled {
             return Err(ErrorCode::Cancelled.into());
         }
-        if let Some(layer) = self.0.deadline.expired() {
+        if let Some(layer) = deadline.expired() {
             return Err(match layer {
                 Layer::Workflow => ErrorCode::WorkflowTimeout,
                 Layer::Provider => ErrorCode::ProviderTimeout,
@@ -202,13 +205,16 @@ impl RunLease {
         Ok(())
     }
     pub fn check(&self) -> Result<()> {
+        self.check_deadline(self.deadline())
+    }
+    pub(super) fn check_deadline(&self, deadline: &Deadline) -> Result<()> {
         let state = self
             .budget
             .0
             .state
             .lock()
             .map_err(|_| ErrorCode::BudgetExhausted)?;
-        self.budget.check(&state)
+        RunBudget::check_deadline(&state, deadline)
     }
     pub fn deadline(&self) -> &Deadline {
         self.budget.deadline()

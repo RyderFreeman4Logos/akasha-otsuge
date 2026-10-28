@@ -151,7 +151,7 @@ roles from outside the library and tests all 16 combinations through the real
 `CapturedContext`, with unique private caller markers. These contract fakes are
 not evidence that real installed host protocols work.
 
-The [reference set](evaluation/reference-v1/README.md) freezes 60 sourced tasks,
+The [reference set with erratum 1](evaluation/reference-v1-errata-1/README.md) freezes 60 sourced tasks,
 31 critical tasks and ten paired intents, plus oracles, counting rules, thresholds
 and the reference profile. The integrity checker and negative controls run in the
 canonical gate. Model quality, cost, four real isolated hosts, the real cross-host
@@ -161,3 +161,10 @@ The immutable freeze commit is `7356d17f0a373ade3520e6e1a1249fc52e17ba8d`;
 manifest SHA-256 is `6b6dffd7882dc703e393686d327f8aaae6becad1f5566e761b8cae8f4fad6ac7`.
 The gate pins this independent baseline, so rewriting both a reference input and
 its manifest still fails. Errata/regressions use a separate addressable set.
+Erratum 1 preserves that original set and corrects S04's whole-grant revocation
+oracle to `error` / `READ_DENIED`, without protected content or a successful
+RecallReceipt. A04's individual-memory rescope still expects `no_hit`. Its
+independently pinned manifest is
+`09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16`.
+Evaluation consumers use `scripts/check_reference.py::read_reference()` to load
+the effective set; reading the uncorrected v1 task file alone is not sufficient.
