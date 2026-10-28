@@ -1,5 +1,6 @@
 //! Claude Code's native process and event boundary.
 mod bridge;
+pub mod installation;
 pub use bridge::read_bridge;
 pub(crate) mod caller;
 pub use caller::{ClaudeCaller, NativeCall, NativeEvent};

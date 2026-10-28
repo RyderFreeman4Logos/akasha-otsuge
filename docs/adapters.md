@@ -214,5 +214,45 @@ Native startup/resume/clear/compact/fork reasons are retained in registration
 evidence. A CLI fork copies its retained UUID chain into the new session; those
 originals remain readable within that branch. The2.1.311 SessionStart contract
 does not expose a fork's parent session ID, so that relationship stays unknown.
-No later parent or sibling events are imported into the branch. Installation
-remains unfinished.
+No later parent or sibling events are imported into the branch.
+
+### Claude session plugin installation
+
+The supported native version is2.1.311. Install into a new directory whose parent
+already exists, using the same executable/configuration as the running daemon:
+
+```sh
+akasha-otsuge --config /absolute/path/akasha.toml adapter install claude \
+  --binary /absolute/path/claude --directory /absolute/path/akasha-claude-v1
+akasha-otsuge doctor --host claude --binary /absolute/path/claude \
+  --directory /absolute/path/akasha-claude-v1
+claude --plugin-dir /absolute/path/akasha-claude-v1
+```
+
+The returned `launch_args` identify the exact native executable and plugin.
+This uses the native [session plugin option](https://code.claude.com/docs/en/plugins);
+loading is explicit on each launch. Start the daemon first and include the
+native transcript directory in its configured read roots. Explicit `--config`,
+`--profile` and `--socket` options are retained in the bridge arguments; omitted
+configuration uses normal defaults. Installation does not start a daemon or add
+a consult model tool; that workflow is tracked in #16.
+
+The installer publishes a verified private directory atomically and never edits
+native user/project settings or other hooks. An identical reinstall succeeds;
+changed files, symlinks and unowned content are refused. Upgrade into a new
+directory, validate it with `claude plugin validate DIR`, then switch the launch
+path. Keep the old directory to roll back by selecting its launch path again.
+The executable paths in the old plugin must remain available for rollback.
+
+```sh
+akasha-otsuge adapter uninstall claude --directory /absolute/path/akasha-claude-v1
+```
+
+Uninstall removes only the receipt's verified files and empty owned directories;
+user additions or edits prevent removal. `doctor` reports the observed CLI
+version, supported-version match, optional installation integrity and explicit
+coverage limits. Its version probe does not execute a caller/model self-test,
+check authentication or claim that a running session loaded the plugin. Fork
+parent IDs remain unavailable. The local native protocol fixture exercises the
+unmodified generated plugin, durable capture, doctor and removal; authenticated
+model and full TUI acceptance remain separate.

@@ -60,7 +60,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 assert 'PRIVATE_CALLER_INPUT fork' not in json.dumps(request['messages'])
             is_child=stage=='child' and any(m.get('role')=='user' and (m.get('content')=='PRIVATE_CHILD_INPUT' or isinstance(m.get('content'),list) and any(b.get('text')=='PRIVATE_CHILD_INPUT' for b in m['content'])) for m in request['messages'])
             spawn=stage=='child' and count==1
-            tool=count==1 or is_child and not child_called
+            tool=stage!='installed' and (count==1 or is_child and not child_called)
             if is_child:
                 if child_called:
                     assert 'native caller probe' in json.dumps(request['messages']), 'child consult body did not execute'
@@ -125,6 +125,33 @@ try:
    if data['state'] not in ['running','queued']:break
    assert time.monotonic()<end;time.sleep(.02)
   assert data['state']=='succeeded' and data['result']['checkpoint']['checkpoint']['pending'] is None,data
+ installed=ROOT/'installed plugin';installed_session='44444444-4444-4444-8444-444444444444'
+ install=subprocess.run(argv+['adapter','install','claude','--binary',str(NATIVE),'--directory',str(installed)],env=env,capture_output=True,timeout=10)
+ assert install.returncode==0,install.stderr
+ launch=json.loads(install.stdout)['data']['launch_args']
+ validation=subprocess.run([str(NATIVE),'plugin','validate',str(installed)],env=env,capture_output=True,timeout=10)
+ assert validation.returncode==0,validation.stdout+validation.stderr
+ stage='installed';count=0
+ child=subprocess.Popen(launch+['-p','--output-format','stream-json','--verbose','--tools','','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources','','--session-id',installed_session],cwd=workspace,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+ try:stdout,stderr=child.communicate(b'PRIVATE_INSTALLED_PLUGIN_INPUT',timeout=30)
+ finally:
+  if child.poll() is None:
+   os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=5)
+ assert child.returncode==0 and count==1 and b'Observed caller installed' in stdout,(child.returncode,count,stderr)
+ end=time.monotonic()+15
+ while True:
+  result=subprocess.run(argv+['job','list'],env=env,capture_output=True,timeout=5);assert result.returncode==0
+  page=json.loads(result.stdout)['data'];assert page['next'] is None,'fixture exceeds one job page'
+  jobs=[j for j in page['items'] if j.get('binding',{}).get('source',{}).get('session')==installed_session]
+  if jobs and all(j['state'] not in ['queued','running'] for j in jobs):break
+  assert time.monotonic()<end,'installed plugin did not capture';time.sleep(.02)
+ assert all(j['state']=='succeeded' and j['result']['checkpoint']['checkpoint']['pending'] is None for j in jobs),jobs
+ doctor=subprocess.run(argv+['doctor','--host','claude','--binary',str(NATIVE),'--directory',str(installed)],env=env,capture_output=True,timeout=10)
+ assert doctor.returncode==0 and json.loads(doctor.stdout)['installation']['state']=='verified'
+ removal=subprocess.run(argv+['adapter','uninstall','claude','--directory',str(installed)],env=env,capture_output=True,timeout=10)
+ assert removal.returncode==0 and not installed.exists(),removal.stderr
+ checks.append({'stage':'installed','requests':count,'capture_jobs':len(jobs),'stdout_sha256':hashlib.sha256(stdout).hexdigest(),'uninstalled':True})
+ assert not errors,errors
  print(json.dumps({'native_sha256':hashlib.sha256(NATIVE.read_bytes()).hexdigest(),'akasha_sha256':hashlib.sha256(AKASHA.read_bytes()).hexdigest(),'native_bindings':len(bindings),'native_backfill_jobs':len(syncs),'checks':checks,'authenticated_model_acceptance':False}),flush=True)
 finally:
  server.shutdown();thread.join(timeout=2);server.server_close()

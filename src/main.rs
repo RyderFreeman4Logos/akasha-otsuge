@@ -15,8 +15,10 @@ Commands:
   daemon status              Show daemon and storage status
   daemon stop                Stop intake and drain the daemon
   doctor --json              Inspect the local daemon
-  doctor --host claude [--binary PATH]
+  doctor --host claude [--binary PATH] [--directory DIR]
                              Inspect the installed Claude CLI
+  adapter install claude --directory DIR [--binary PATH]
+  adapter uninstall claude --directory DIR
   config validate|reload|status
   config show --effective
   capture reconcile|claude BINDING_JSON INPUT_JSONL --idempotency-key ID
@@ -116,11 +118,83 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         output(&bytes, failed)?;
         return Ok(u8::from(failed));
     }
+    if let [
+        "adapter",
+        action @ ("install" | "uninstall"),
+        "claude",
+        flags @ ..,
+    ] = command.as_slice()
+    {
+        let names: &[&str] = if *action == "install" {
+            &["--directory", "--binary"]
+        } else {
+            &["--directory"]
+        };
+        let flags = options(flags, names)?;
+        let directory =
+            std::path::Path::new(flags.get("--directory").ok_or(Error("INVALID_ARGUMENT"))?);
+        let data = if *action == "install" {
+            let mut bridge_args = Vec::new();
+            if explicit_config {
+                bridge_args.extend([
+                    "--config".into(),
+                    std::path::absolute(&config_path)?
+                        .to_str()
+                        .ok_or(Error("INVALID_ARGUMENT"))?
+                        .into(),
+                ]);
+            }
+            if let Some(profile) = &profile {
+                bridge_args.extend(["--profile".into(), profile.clone()]);
+            }
+            if let Some(socket) = &socket {
+                bridge_args.extend([
+                    "--socket".into(),
+                    std::path::absolute(socket)?
+                        .to_str()
+                        .ok_or(Error("INVALID_ARGUMENT"))?
+                        .into(),
+                ]);
+            }
+            akasha_otsuge::adapter::claude::installation::install(
+                std::path::Path::new(flags.get("--binary").copied().unwrap_or("claude")),
+                directory,
+                bridge_args,
+            )
+            .await?
+        } else {
+            akasha_otsuge::adapter::claude::installation::uninstall(directory)?
+        };
+        let mut bytes = serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":data}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
     if let ["doctor", "--host", "claude", flags @ ..] = command.as_slice() {
-        let flags = options(flags, &["--binary"])?;
+        let flags = options(flags, &["--binary", "--directory"])?;
         let binary = std::path::Path::new(flags.get("--binary").copied().unwrap_or("claude"));
         let (response, failed) = match akasha_otsuge::adapter::claude::probe(binary).await {
-            Ok(report) => (serde_json::json!({"schema_version":1,"data":report}), false),
+            Ok(report) => {
+                let installation = flags
+                    .get("--directory")
+                    .map(|path| {
+                        akasha_otsuge::adapter::claude::installation::inspect(std::path::Path::new(
+                            path,
+                        ))
+                    })
+                    .transpose()?;
+                let coverage = serde_json::json!({
+                    "version_supported":report.version.as_deref()==Some("2.1.311"),
+                    "supported_versions":["2.1.311"],
+                    "session_loading":"explicit_plugin_dir",
+                    "fork_parent":"unavailable",
+                    "model_auth":"not_checked"
+                });
+                (
+                    serde_json::json!({"schema_version":1,"data":report,"installation":installation,"coverage":coverage}),
+                    false,
+                )
+            }
             Err(error) => (serde_json::json!({"schema_version":1,"error":error}), true),
         };
         let mut bytes = serde_json::to_vec(&response)?;

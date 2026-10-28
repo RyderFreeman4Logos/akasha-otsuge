@@ -377,7 +377,7 @@ does not attest those repairs.
   within the original bound. Native sync waits for its persisted target event
   within the original job deadline. Native lifecycle reasons are retained;
   fork-parent session IDs are not exposed by the supported hook and remain
-  unknown. Installation remains unfinished. Root tokens cannot claim child identity.
+  unknown. Root tokens cannot claim child identity.
 - [ ] Capture original prompts, visible outputs and tool results; normalize native
   transcripts with bounded resume/backfill, partial-tail/gap handling, exact
   parent/fork/compaction lineage and no private-thinking extraction or false approval.
@@ -403,8 +403,14 @@ does not attest those repairs.
   process-group cancellation have separate evidence. This phase does not prove
   authenticated model acceptance or live Caller identity. Fixture provenance and
   reproduction are in `tests/fixtures/claude/2.1.311/README.md`.
-- [ ] Provide install/uninstall/rollback that preserves unrelated hooks and
+- [x] Provide install/uninstall/rollback that preserves unrelated hooks and
   configuration; expose actual version, capability and coverage in doctor.
+  The owned session plugin uses explicit native `--plugin-dir` loading. A new
+  directory allows upgrade/rollback without overwriting the previous plugin.
+  Integrity/extra-file/symlink guards and preserved native settings pass the CLI
+  test; actual2.1.311 validates the generated plugin, captures a turn through its
+  unmodified bridge, verifies doctor and uninstalls successfully. Runtime model
+  authentication and loaded-session self-test are explicitly not asserted.
 - [ ] Prove real TUI and Runner behavior with the other three CLIs absent:
   concurrent sessions, resume, compact, interrupted backfill, tool results,
   cancellation and denied operations, with traceable inputs/final output.

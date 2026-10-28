@@ -90,7 +90,10 @@ Native API references: [CLI options](https://code.claude.com/docs/en/cli-referen
 The Caller check uses the production native hook and actual daemon/Storage,
 checking startup/resume/fork/child identity and completed durable backfill. Its
 fixture-only tool returns a marker after binding; it does not implement consult
-research or establish authenticated model acceptance. It removes its owned
+research or establish authenticated model acceptance. A final stage installs
+the production plugin without the fixture wrapper/tool, validates it with the
+native CLI, captures a turn into durable jobs, runs doctor and removes the plugin.
+It removes its owned
 scratch directory and processes on completion:
 
 ```sh
