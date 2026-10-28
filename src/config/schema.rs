@@ -138,7 +138,7 @@ pub struct Executor {
     pub fallback: Vec<String>,
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Host {
     ClaudeCode,

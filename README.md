@@ -18,4 +18,6 @@ A local, traceable memory system for coding agents, written in Rust.
 
 [磁盘检索与渐进原文读取](docs/retrieval.md)提供中英文关键词、向量混合召回、重排和实际回执，并明确索引进度、来源范围及降级状态。
 
+[宿主公共契约](docs/adapters.md)定义持久调用绑定、受限上下文读取、Runner 终态与共享预算；[固定参考集](docs/evaluation/reference-v1/README.md)保存 60 项任务与评测规则。真实四宿主接入和模型质量验收仍待后续 Issues 完成。
+
 公开仓库按用户要求采用 [Apache-2.0](LICENSE)。[来源与许可证核查](docs/provenance.md)记录迁移边界。
