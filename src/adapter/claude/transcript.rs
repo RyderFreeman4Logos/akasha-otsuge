@@ -101,7 +101,10 @@ pub(crate) fn transcript_frame(
             (json!(text), text, Visibility::Session, EventKind::Execution)
         }
         "attachment" => {
-            let rendered = row["rendered"].as_array().ok_or_else(invalid)?;
+            let rendered: &[Value] = match row.get("rendered") {
+                Some(value) => value.as_array().ok_or_else(invalid)?,
+                None => &[],
+            };
             let mut content = Vec::new();
             let mut texts = Vec::new();
             for block in rendered {
@@ -109,8 +112,13 @@ pub(crate) fn transcript_frame(
                 content.push(visible);
                 texts.push(text);
             }
+            let mut payload =
+                json!({"attachment_type":field(&row["attachment"],"type")?,"rendered":content});
+            if row.get("rendered").is_none() {
+                payload["omitted"] = "unrendered_attachment".into();
+            }
             (
-                json!({"attachment_type":field(&row["attachment"],"type")?,"rendered":content}),
+                payload,
                 texts.join("\n"),
                 Visibility::Session,
                 EventKind::Execution,

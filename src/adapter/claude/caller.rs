@@ -18,6 +18,10 @@ pub enum NativeEvent {
         cwd: PathBuf,
     },
     Bind(NativeCall),
+    Sync {
+        registration: String,
+        tip: String,
+    },
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -84,7 +88,7 @@ impl CallerAdapter for ClaudeCaller {
             let id = format!(
                 "claude/{}",
                 hash(
-                    &serde_json::to_vec(&(&call.registration, runtime_call))
+                    &serde_json::to_vec(&(&registered.source, runtime_call))
                         .map_err(|_| ErrorCode::ProtocolInvalid)?
                 )
             );
@@ -96,6 +100,7 @@ impl CallerAdapter for ClaudeCaller {
                 Ok(invocation) => {
                     let old = invocation.diagnostic();
                     if old.caller != registered.source
+                        || old.workspace != registered.workspace
                         || old.turn_id.as_deref() != Some(&call.turn_id)
                         || old.tool_call_id.as_deref() != Some(runtime_call)
                         || old.requested_cursor != call.cursor
@@ -153,7 +158,15 @@ impl CallerAdapter for ClaudeCaller {
                             if capture.event(&binding, &capture_tip, at)?.is_some() {
                                 return Ok(at);
                             }
-                            break;
+                            match report.checkpoint.checkpoint.pending {
+                                None
+                                | Some(PendingReason::PartialTail | PendingReason::SourceMissing) =>
+                                {
+                                    // Native transcript writes can trail the pinned hook event.
+                                    tokio::time::sleep(std::time::Duration::from_millis(25)).await;
+                                }
+                                _ => break,
+                            }
                         }
                     }
                     Err(crate::storage::StorageError::new("HISTORY_GAP"))

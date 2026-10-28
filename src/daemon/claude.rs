@@ -18,6 +18,23 @@ fn key(token: &str) -> RecordKey {
 }
 
 impl Service {
+    fn claude_registration(&self, token: &str) -> Result<Registration> {
+        if token.len() != 64 || !token.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(Error("BINDING_UNAVAILABLE"));
+        }
+        let record = self
+            .storage
+            .current(&key(token))?
+            .ok_or(Error("BINDING_UNAVAILABLE"))?;
+        let registration: Registration = serde_json::from_str(&record.content)?;
+        if registration.scope != jobs::owner_scope()
+            || self.allowed_path(&registration.transcript)? != registration.transcript
+            || self.allowed_path(&registration.workspace)? != registration.workspace
+        {
+            return Err(Error("READ_DENIED"));
+        }
+        Ok(registration)
+    }
     pub(super) async fn claude(self: &Arc<Self>, event: NativeEvent) -> Result<serde_json::Value> {
         let service = self.clone();
         self.operation(async move {
@@ -77,23 +94,7 @@ impl Service {
                     Ok(json!({"registration":token}))
                 }
                 NativeEvent::Bind(call) => {
-                    if call.registration.len() != 64
-                        || !call.registration.bytes().all(|b| b.is_ascii_hexdigit())
-                    {
-                        return Err(Error("BINDING_UNAVAILABLE"));
-                    }
-                    let record = service
-                        .storage
-                        .current(&key(&call.registration))?
-                        .ok_or(Error("BINDING_UNAVAILABLE"))?;
-                    let registration: Registration = serde_json::from_str(&record.content)?;
-                    if registration.scope != scope
-                        || service.allowed_path(&registration.transcript)?
-                            != registration.transcript
-                        || service.allowed_path(&registration.workspace)? != registration.workspace
-                    {
-                        return Err(Error("READ_DENIED"));
-                    }
+                    let registration = service.claude_registration(&call.registration)?;
                     let caller = ClaudeCaller {
                         store: service.storage.clone(),
                         registration,
@@ -102,6 +103,28 @@ impl Service {
                     };
                     let invocation = caller.bind(&caller.call.tool_call_id).await?;
                     Ok(serde_json::to_value(invocation.diagnostic())?)
+                }
+                NativeEvent::Sync {
+                    registration: token,
+                    tip,
+                } => {
+                    if !ipc::identifier(&tip) {
+                        return Err(Error("INVALID_REQUEST"));
+                    }
+                    let registration = service.claude_registration(&token)?;
+                    let id = format!(
+                        "claude-capture/{}",
+                        hash(&serde_json::to_vec(&(&registration.source, tip))?)
+                    );
+                    let binding = ipc::CaptureInput {
+                        source: registration.source,
+                        scope: registration.scope,
+                        stream: "native-file".into(),
+                        coverage: crate::capture::CoverageLevel::VisibleText,
+                        host: Some(crate::config::Host::ClaudeCode),
+                    };
+                    drop(_guard);
+                    service.submit(id, binding, registration.transcript).await
                 }
             }
         })

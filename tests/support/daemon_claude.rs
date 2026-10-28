@@ -468,6 +468,47 @@ fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() 
     daemon.wait();
     daemon.start();
     assert_eq!(native_bridge(&daemon, &call), first);
+    let refreshed = native_bridge(
+        &daemon,
+        &json!({"op":"register","binary":binary,
+        "session_id":"11111111-1111-4111-8111-111111111111","transcript_path":transcript,"cwd":daemon.root}),
+    );
+    let mut replay = call.clone();
+    replay["registration"] = refreshed["data"]["registration"].clone();
+    assert_ne!(replay["registration"], call["registration"]);
+    assert_eq!(native_bridge(&daemon, &replay), first);
+    let synced = native_bridge(
+        &daemon,
+        &json!({"op":"sync","registration":replay["registration"],"tip":"after-turn"}),
+    );
+    let job_id = synced["data"]["id"]
+        .as_str()
+        .expect("durable native capture job accepted");
+    let complete = terminal(&daemon, job_id);
+    assert_eq!(complete["state"], "succeeded", "{complete}");
+    assert!(complete["result"]["checkpoint"]["checkpoint"]["pending"].is_null());
+    let lagged = daemon.root.join("lagged.jsonl");
+    std::fs::write(&lagged, "").unwrap();
+    let registered = native_bridge(
+        &daemon,
+        &json!({"op":"register","binary":binary,
+        "session_id":"lagged-session","transcript_path":lagged,"cwd":daemon.root}),
+    );
+    let mut delayed_call = call.clone();
+    delayed_call["registration"] = registered["data"]["registration"].clone();
+    delayed_call["session_id"] = "lagged-session".into();
+    let writer = std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_millis(500));
+        std::fs::write(
+            lagged,
+            include_str!("../fixtures/claude/2.1.311/native-root-resume-compact.jsonl")
+                .replace("11111111-1111-4111-8111-111111111111", "lagged-session"),
+        )
+        .unwrap();
+    });
+    let delayed = native_bridge(&daemon, &delayed_call);
+    writer.join().unwrap();
+    assert!(delayed["error"].is_null(), "{delayed}");
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
 }

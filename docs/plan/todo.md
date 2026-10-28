@@ -369,14 +369,19 @@ does not attest those repairs.
   Re-read identity after resume/clear; unknown child identity must refuse.
   The private root registration/binding bridge now passes durable retry/restart,
   identity replacement, missing-tip, unknown-field and live read-root withdrawal
-  regressions; all-target Clippy passed. Actual native hooks, child/fork registration
-  and installation remain unfinished. Root tokens cannot claim child identity.
+  regressions; all-target Clippy passed. Actual native hooks now pass startup and
+  resume binding plus four durable backfill jobs against local synthetic SSE.
+  Re-registration preserves call identity; a delayed transcript flush is retried
+  within the original bound. Child/fork registration and installation remain
+  unfinished. Root tokens cannot claim child identity.
 - [ ] Capture original prompts, visible outputs and tool results; normalize native
   transcripts with bounded resume/backfill, partial-tail/gap handling, exact
   parent/fork/compaction lineage and no private-thinking extraction or false approval.
-  Root resume and compaction now pass3 capture regressions and all-target Clippy,
+  Root resume and compaction now pass4 capture regressions and all-target Clippy,
   replaying the actual2.1.311 transcript. Attachments retain rendered visible
-  text; summary flags remain recorded as session information. Missing original
+  text when present; native attachments without rendered bodies retain identity
+  and an explicit omission marker. The fixture preserves that native absence.
+  Summary flags remain recorded as session information. Missing original
   ancestry stays explicitly pending. Native child/fork linkage remains unfinished.
 - [ ] Implement a standalone Claude Runner using existing lawful CLI auth,
   structured terminal events plus exit status, bounded output, cancellation and

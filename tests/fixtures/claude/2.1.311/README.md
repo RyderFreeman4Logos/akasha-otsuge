@@ -30,18 +30,22 @@ identity and completion boundaries to verify refusal.
 `native-root-resume-compact.jsonl` records one native session started, resumed,
 then manually compacted against the same local SSE fixture. It preserves native
 event UUIDs, parent links and compaction metadata. Native attachments keep their
-type and rendered shape with synthetic text; API request metadata keeps only its
-type, session and version. Native summary text and owned paths were replaced.
+type and rendered shape with synthetic text; absent rendered bodies stay absent.
+API request metadata keeps only its type, session and version. Native summary
+text and owned paths were replaced.
 The complete source transcript has SHA-256
 `4d65441bf974ca19bb5054258f8dd81ca4be97a8b5079c3c7083df081607a65e`;
 the sanitized fixture has SHA-256
-`1ae00405b269248938acba4b8e734e41d4e65435d36d9c149eb97642a23a15b0`.
+`3a55296106f37c5d91146c17e6ab32c2056aa7c12daef850e0bd4c9353eb091e`.
 Capture follows the compaction boundary's native `logicalParentUuid` back to
 the first retained ancestor, preserving original references and marking summary
 messages as session information. This range describes captured ancestry, not
 the model's exact input window. Missing ancestors, cycles or more than 65,536
 ancestors leave the frame pending; no incomplete range is declared complete.
 The regression also checks missing-ancestor refusal and retained summary flags.
+Unrendered attachments retain their UUID and parent chain with no visible body.
+The fixture was corrected after a real native `session_context` attachment
+exposed that sanitization had supplied rendered text absent from the source.
 
 To repeat the local protocol check, compile the test executable and use the path
 Cargo prints. The last argument must be a new artifact directory on writable SSD
@@ -59,3 +63,16 @@ python3 scripts/check-claude-protocol.py /absolute/path/to/claude \
 Native API references: [CLI options](https://code.claude.com/docs/en/cli-reference),
 [plugin modules](https://code.claude.com/docs/en/plugins/mods/api), and
 [Anthropic SSE](https://platform.claude.com/docs/en/build-with-claude/streaming).
+
+The Caller check uses the production native hook and actual daemon/Storage,
+checking startup/resume call identity and completed durable backfill. Its
+fixture-only tool returns a marker after binding; it does not implement consult
+research or establish authenticated model acceptance. It removes its owned
+scratch directory and processes on completion:
+
+```sh
+cargo build --locked
+python3 scripts/check-claude-caller.py /absolute/path/to/claude \
+  /absolute/path/to/akasha-otsuge \
+  /absolute/path/to/new-ssd-scratch-directory
+```

@@ -188,5 +188,14 @@ latest session or substitutes another caller. Long backlogs can be imported with
 the existing capture command before retrying. The saved invocation and capture
 sequence are immutable across retries and daemon restarts; live permissions and
 read roots are checked again. Changed identity or fence data conflicts, and an
-unregistered child is refused. Native hook installation, child/fork registration
-and the consult workflow are not supplied by this bridge phase.
+unregistered child is refused. Re-registering the same source preserves call
+identity. Brief native transcript flush delays are retried within the same
+catch-up deadline; malformed records remain explicit gaps.
+
+The native `caller.js` module captures session, turn and append events, binds
+the consult call before its body executes, and queues durable backfill on turn
+completion and session end. It registers only after the native transcript
+directory exists. It declares no model tool; the consult workflow remains #16.
+`scripts/check-claude-caller.py` verifies startup/resume bindings and completed
+backfill with the actual CLI, production hook and daemon under local synthetic
+SSE. Installation and child/fork registration remain unfinished.
