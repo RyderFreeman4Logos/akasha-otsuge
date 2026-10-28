@@ -374,6 +374,15 @@ does not attest those repairs.
   structured terminal events plus exit status, bounded output, cancellation and
   original deadlines. Disable built-in/unrelated tools and enforce shared Rust
   read capabilities; verify denied writes, network and out-of-scope reads.
+  The native process/read-bridge phase is implemented:23 focused tests and
+  all-target Clippy pass. Native2.1.311 loads the actual plugin and completes
+  list/read/final-output through real CapturedContext under a local SSE fixture;
+  initial model input contains no original. Replayed native fixtures cover
+  authentication, retries, tool pairing and incomplete/unsafe output. Native
+  Bash/Read/WebFetch/ToolSearch denials, bounded output, original deadlines and
+  process-group cancellation have separate evidence. This phase does not prove
+  authenticated model acceptance or live Caller identity. Fixture provenance and
+  reproduction are in `tests/fixtures/claude/2.1.311/README.md`.
 - [ ] Provide install/uninstall/rollback that preserves unrelated hooks and
   configuration; expose actual version, capability and coverage in doctor.
 - [ ] Prove real TUI and Runner behavior with the other three CLIs absent:

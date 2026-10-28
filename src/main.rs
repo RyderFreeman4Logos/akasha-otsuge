@@ -106,6 +106,16 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         .iter()
         .map(|s| s.to_str().ok_or(Error("INVALID_ARGUMENT")))
         .collect::<Result<_>>()?;
+    if command == ["adapter", "claude-read"] {
+        let (response, failed) = match akasha_otsuge::adapter::claude::read_bridge().await {
+            Ok(response) => (response, false),
+            Err(error) => (serde_json::json!({"error":error}), true),
+        };
+        let mut bytes = serde_json::to_vec(&response)?;
+        bytes.push(b'\n');
+        output(&bytes, failed)?;
+        return Ok(u8::from(failed));
+    }
     if let ["doctor", "--host", "claude", flags @ ..] = command.as_slice() {
         let flags = options(flags, &["--binary"])?;
         let binary = std::path::Path::new(flags.get("--binary").copied().unwrap_or("claude"));

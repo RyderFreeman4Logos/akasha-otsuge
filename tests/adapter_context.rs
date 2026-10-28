@@ -14,6 +14,9 @@ use std::{
 #[path = "support/adapter_matrix.rs"]
 mod matrix;
 
+#[path = "support/claude_runner.rs"]
+mod claude_runner;
+
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
@@ -287,7 +290,7 @@ async fn description_reports_actual_binding_precision_even_on_capable_hosts() {
         let mut context = CapturedContext::new(&store, inv).unwrap();
         let value = serde_json::to_value(
             context
-                .execute(&permit, ContextRequest::Describe)
+                .execute(&permit, ContextRequest::Describe {})
                 .await
                 .unwrap(),
         )

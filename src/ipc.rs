@@ -191,8 +191,14 @@ pub(crate) fn response(request: Option<&str>, result: Result<Value>) -> Value {
 }
 
 pub(crate) async fn read<T: DeserializeOwned>(stream: &mut UnixStream) -> Result<T> {
+    read_bounded(stream, MAX_MESSAGE).await
+}
+pub(crate) async fn read_bounded<T: DeserializeOwned>(
+    stream: &mut UnixStream,
+    limit: usize,
+) -> Result<T> {
     let size = stream.read_u32().await? as usize;
-    if size == 0 || size > MAX_MESSAGE {
+    if size == 0 || size > limit {
         return Err(Error("MESSAGE_TOO_LARGE"));
     }
     let mut bytes = vec![0; size];

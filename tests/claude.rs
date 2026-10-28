@@ -167,3 +167,74 @@ fn doctor_deadline_terminates_the_owned_process_group() {
         std::thread::sleep(std::time::Duration::from_millis(10));
     }
 }
+
+#[test]
+fn native_read_bridge_keeps_capability_out_of_model_arguments() {
+    use std::{
+        io::{Read, Write},
+        os::unix::net::UnixListener,
+        process::Stdio,
+        time::{Duration, Instant},
+    };
+    let f = HostFixture::new("#!/bin/sh\nexit 0\n");
+    let socket = f.0.join("context.sock");
+    let listener = UnixListener::bind(&socket).unwrap();
+    listener.set_nonblocking(true).unwrap();
+    let server = std::thread::spawn(move || {
+        let end = Instant::now() + Duration::from_secs(3);
+        let mut stream = loop {
+            match listener.accept() {
+                Ok((stream, _)) => break stream,
+                Err(e) if e.kind() == std::io::ErrorKind::WouldBlock && Instant::now() < end => {
+                    std::thread::sleep(Duration::from_millis(10))
+                }
+                Err(e) => panic!("bridge did not connect: {e}"),
+            }
+        };
+        stream
+            .set_read_timeout(Some(Duration::from_secs(2)))
+            .unwrap();
+        let mut length = [0; 4];
+        stream.read_exact(&mut length).unwrap();
+        let mut body = vec![0; u32::from_be_bytes(length) as usize];
+        stream.read_exact(&mut body).unwrap();
+        let request: serde_json::Value = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            request,
+            serde_json::json!({"token":"opaque-transport-token","request":{"operation":"describe"}})
+        );
+        let response =
+            br#"{"data":{"kind":"description","value":{"invocation_id":"trusted-origin"}}}"#;
+        stream
+            .write_all(&(response.len() as u32).to_be_bytes())
+            .unwrap();
+        stream.write_all(response).unwrap();
+    });
+    let mut child = Command::new(BIN)
+        .env_clear()
+        .env("HOME", &f.0)
+        .env("AKASHA_RUN_SOCKET", &socket)
+        .env("AKASHA_RUN_TOKEN", "opaque-transport-token")
+        .args(["adapter", "claude-read"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(br#"{"operation":"describe"}"#)
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    server.join().unwrap();
+    let value: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(value["data"]["value"]["invocation_id"], "trusted-origin");
+    assert!(!String::from_utf8_lossy(&output.stdout).contains("opaque-transport-token"));
+}

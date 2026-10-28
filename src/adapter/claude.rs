@@ -1,7 +1,11 @@
 //! Claude Code's native process and event boundary.
+mod bridge;
+pub use bridge::read_bridge;
+mod runner;
 mod transcript;
 use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
 use crate::{capture::CoverageLevel, config::Host};
+pub use runner::ClaudeRunner;
 use rustix::process::{Pid, Signal, kill_process_group};
 use std::{
     os::unix::{fs::PermissionsExt, process::CommandExt},
