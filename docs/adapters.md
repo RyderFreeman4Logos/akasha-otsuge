@@ -156,3 +156,8 @@ The [reference set](evaluation/reference-v1/README.md) freezes 60 sourced tasks,
 and the reference profile. The integrity checker and negative controls run in the
 canonical gate. Model quality, cost, four real isolated hosts, the real cross-host
 cycle and the full local Runner duration are later acceptance, still unexecuted.
+
+The immutable freeze commit is `7356d17f0a373ade3520e6e1a1249fc52e17ba8d`;
+manifest SHA-256 is `6b6dffd7882dc703e393686d327f8aaae6becad1f5566e761b8cae8f4fad6ac7`.
+The gate pins this independent baseline, so rewriting both a reference input and
+its manifest still fails. Errata/regressions use a separate addressable set.

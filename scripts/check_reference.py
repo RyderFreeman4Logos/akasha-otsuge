@@ -5,6 +5,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "docs/evaluation/reference-v1"
+# First freeze commit 7356d17f0a373ade3520e6e1a1249fc52e17ba8d. Add errata in a new set; never reseal v1.
+FROZEN_MANIFEST_SHA256 = "6b6dffd7882dc703e393686d327f8aaae6becad1f5566e761b8cae8f4fad6ac7"
 
 
 def validate_tasks(tasks):
@@ -104,7 +106,9 @@ def covers(scope, target):
 
 
 def validate_snapshot(root=ROOT):
-    manifest = json.loads((root / "manifest.json").read_text())
+    raw = (root / "manifest.json").read_bytes()
+    require(digest(raw) == FROZEN_MANIFEST_SHA256, "reference-v1 differs from its committed freeze; use a separate regression/errata set")
+    manifest = json.loads(raw)
     require(manifest["schema_version"] == 1 and set(manifest["files"]) == {"tasks.jsonl", "profile.json", "README.md"}, "manifest schema")
     for name, expected in manifest["files"].items():
         require(digest((root / name).read_bytes()) == expected, "frozen hash mismatch: " + name)

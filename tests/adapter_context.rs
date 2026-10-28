@@ -357,6 +357,33 @@ async fn context_handles_follow_only_fenced_ancestry_and_recheck_live_grants() {
     let inv = Invocation::bind(&store, binding).await.unwrap();
     let permit = lease(&inv);
     let mut context = CapturedContext::new(&store, inv.clone()).unwrap();
+    let grand_tip = event(
+        &store,
+        "grandchild",
+        "g0",
+        "grandchild secret",
+        inv.diagnostic().tip.clone(),
+        true,
+    )
+    .await;
+    let mut grand_binding = runtime(&f, &store, "grandchild", grand_tip, "grandchild-call");
+    grand_binding.proof = CallerProof::RegisteredChild {
+        thread: "grandchild".into(),
+        parent: "child".into(),
+    };
+    let grand_inv = Invocation::bind(&store, grand_binding).await.unwrap();
+    let grand_lease = lease(&grand_inv);
+    let mut grand_context = CapturedContext::new(&store, grand_inv).unwrap();
+    let grand_page = list(&mut grand_context, &grand_lease, None, 16).await;
+    assert_eq!(
+        grand_page
+            .events
+            .iter()
+            .map(|e| e.reference.event_id.as_str())
+            .collect::<Vec<_>>(),
+        vec!["g0", "c0", "p0"],
+        "each ancestor keeps its own cutoff even when later parent records precede this call"
+    );
     let page = list(&mut context, &permit, None, 1).await;
     assert_eq!(page.events.len(), 1);
     assert_eq!(page.events[0].reference.event_id, "c0");

@@ -5,7 +5,7 @@ import tempfile
 import shutil
 from pathlib import Path
 
-from check_reference import ROOT, validate_tasks, validate_snapshot
+from check_reference import ROOT, digest, validate_tasks, validate_snapshot
 
 
 class ReferenceTests(unittest.TestCase):
@@ -24,6 +24,44 @@ class ReferenceTests(unittest.TestCase):
                 output.write("\n")
             with self.assertRaisesRegex(ValueError, "frozen hash mismatch"):
                 validate_snapshot(root)
+
+    def test_resealed_inputs_or_version_bumped_wipe_cannot_rewrite_original(self):
+        for name in ("tasks.jsonl", "profile.json", "README.md"):
+            with self.subTest(input=name), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp) / "reference"
+                shutil.copytree(ROOT, root)
+                manifest = json.loads((root / "manifest.json").read_text())
+                (root / name).write_text("{}\n")
+                manifest["files"][name] = digest((root / name).read_bytes())
+                manifest["schema_version"] = 2
+                (root / "ERRATA.md").write_text("Replace original with empty template.\n")
+                (root / "manifest.json").write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, "committed freeze"):
+                    validate_snapshot(root)
+
+    def test_coordinated_reseal_does_not_change_fixed_reference(self):
+        for name in ("tasks.jsonl", "profile.json", "README.md"):
+            with self.subTest(input=name), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp) / "reference"
+                shutil.copytree(ROOT, root)
+                if name == "tasks.jsonl":
+                    tasks = copy.deepcopy(self.tasks)
+                    source = tasks[0]["sources"][0]
+                    source["text"] += " Additional context."
+                    source["sha256"] = digest(source["text"].encode())
+                    (root / name).write_text("".join(json.dumps(t) + "\n" for t in tasks))
+                elif name == "profile.json":
+                    profile = json.loads((root / name).read_text())
+                    profile["model"] = "different-reference-model"
+                    (root / name).write_text(json.dumps(profile))
+                else:
+                    with (root / name).open("a") as output:
+                        output.write("Changed scoring policy.\n")
+                manifest = json.loads((root / "manifest.json").read_text())
+                manifest["files"][name] = digest((root / name).read_bytes())
+                (root / "manifest.json").write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, "committed freeze"):
+                    validate_snapshot(root)
 
     def test_source_change_and_invented_revision_are_rejected(self):
         for mutation in ("source", "revision", "conditions"):

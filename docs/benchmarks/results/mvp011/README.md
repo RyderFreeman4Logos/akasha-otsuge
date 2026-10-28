@@ -29,3 +29,12 @@ No host authentication, real model evaluation, production consult workflow,
 RecallReceipt publication or 1700-second real Runner run is claimed here.
 See [the contracts](../../../adapters.md) and
 [the frozen reference rubric](../../../evaluation/reference-v1/README.md).
+
+`freeze-pin-receipts.tar.gz` and `freeze-pin-manifest.json` retain the subsequent
+frozen-base negative control: the original verifier from commit `7356d17` accepted
+three coordinated input/manifest rewrites. The repaired verifier pins the original
+manifest and refuses source, model-profile and rubric resealing, including a
+version-bumped empty replacement. The original reference directory is unchanged.
+`mvp011-focused-green3` passes 19 Rust tests (including the new grandchild path),
+seven Python reference controls and all-target Clippy; log SHA-256 is
+`b410885d8b98db0ca3965f62db5c06f6dabb8229f28f985a87dc80b9fc000a84`.
