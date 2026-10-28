@@ -437,7 +437,9 @@ does not attest those repairs.
   - [x] Match the native read-tool schema to the shared 16 KiB reader limit.
     The actual native schema assertion fails before the fix and passes after;
     bridge tests accept 16,384 bytes and reject 16,385 bytes.
-  - [ ] Make uninstall recoverable after partial failure and preserve replacements.
+  - [x] Make uninstall recoverable after partial failure and preserve replacements.
+    Permission-failure retry, detached-tree edits/replacements, resumed cleanup
+    and preserved native configuration pass four unit and two real CLI tests.
   - [ ] Bound Runner/probe reap waits while retaining cleanup ownership.
 
 The four original TUI onboarding probes remain setup failures. A distinct probe

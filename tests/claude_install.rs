@@ -8,6 +8,74 @@ use std::{
 
 const BIN: &str = env!("CARGO_BIN_EXE_akasha-otsuge");
 
+#[test]
+fn uninstall_can_resume_after_an_owned_file_removal_fails() {
+    let root = Fixture(std::env::temp_dir().join(format!(
+        "akasha-claude-uninstall-retry-{}",
+        std::process::id()
+    )));
+    fs::create_dir(&root.0).unwrap();
+    let native = root.0.join("claude");
+    fs::write(&native, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n").unwrap();
+    fs::set_permissions(&native, fs::Permissions::from_mode(0o700)).unwrap();
+    let plugin = root.0.join("plugin");
+    let run = |operation: &str| {
+        let mut command = Command::new(BIN);
+        command
+            .args(["adapter", operation, "claude", "--directory"])
+            .arg(&plugin)
+            .env("HOME", &root.0)
+            .env("CLAUDE_CONFIG_DIR", &root.0);
+        if operation == "install" {
+            command.arg("--binary").arg(&native);
+        }
+        command.output().unwrap()
+    };
+    assert!(run("install").status.success());
+    let hooks = fs::File::open(plugin.join("hooks")).unwrap();
+    hooks
+        .set_permissions(fs::Permissions::from_mode(0o500))
+        .unwrap();
+    let failed = run("uninstall");
+    hooks
+        .set_permissions(fs::Permissions::from_mode(0o700))
+        .unwrap();
+    assert!(
+        !failed.status.success(),
+        "non-writable hooks must fail removal"
+    );
+    let blocked = run("install");
+    assert!(!blocked.status.success());
+    assert_eq!(
+        serde_json::from_slice::<Value>(&blocked.stderr).unwrap()["error"]["code"],
+        "ADAPTER_UNINSTALL_PENDING"
+    );
+    let diagnosis = Command::new(BIN)
+        .args(["doctor", "--host", "claude", "--binary"])
+        .arg(&native)
+        .arg("--directory")
+        .arg(&plugin)
+        .output()
+        .unwrap();
+    assert!(diagnosis.status.success());
+    assert_eq!(
+        serde_json::from_slice::<Value>(&diagnosis.stdout).unwrap()["installation"]["state"],
+        "uninstall_pending"
+    );
+    let retry = run("uninstall");
+    assert!(
+        retry.status.success(),
+        "retry must recover after partial removal: {}",
+        String::from_utf8_lossy(&retry.stderr)
+    );
+    assert!(!plugin.exists());
+    assert!(
+        run("install").status.success(),
+        "a recovered removal permits reinstall"
+    );
+    assert!(run("uninstall").status.success());
+}
+
 struct Fixture(PathBuf);
 impl Drop for Fixture {
     fn drop(&mut self) {

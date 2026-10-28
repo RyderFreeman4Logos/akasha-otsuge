@@ -254,6 +254,11 @@ The native TUI [generates type support](https://code.claude.com/docs/en/plugins/
 under `.claude-plugin/types/` and at `tsconfig.json`. These paths, including user
 edits, are preserved and listed in `preserved_paths`; their parent directories
 remain after uninstall. The installer neither validates nor deletes their contents.
+Removal first detaches the verified plugin directory and retains a recovery receipt.
+If removal fails, `doctor --directory <original-path>` reports
+`uninstall_pending` and `recovery_dir`. Resolve the reported filesystem problem
+and repeat the same uninstall command; reinstall is refused while removal is
+pending. Changed files and replacements at the original path are retained.
 `doctor` reports the observed CLI
 version, supported-version match, optional installation integrity and explicit
 coverage limits. Its version probe does not execute a caller/model self-test,

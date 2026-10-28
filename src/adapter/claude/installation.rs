@@ -13,6 +13,7 @@ use std::{
 };
 
 const RECEIPT: &str = "akasha-install.json";
+const REMOVING: &str = "akasha-uninstall.json";
 const FILES: [&str; 4] = [
     ".claude-plugin/plugin.json",
     "hooks/hooks.json",
@@ -20,7 +21,7 @@ const FILES: [&str; 4] = [
     "hooks/config.js",
 ];
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 struct Receipt {
     schema_version: u32,
@@ -73,18 +74,39 @@ fn read(path: &Path) -> Result<Vec<u8>> {
     Ok(bytes)
 }
 
-fn verified(root: &Path) -> Result<(Receipt, Vec<&'static str>)> {
-    directory(
-        root,
-        &[".claude-plugin", "hooks", RECEIPT],
-        &["tsconfig.json"],
-    )?;
-    directory(&root.join(".claude-plugin"), &["plugin.json"], &["types"])?;
-    directory(
-        &root.join("hooks"),
-        &["hooks.json", "caller.js", "config.js"],
-        &[],
-    )?;
+fn verified(root: &Path, removing: bool) -> Result<(Receipt, Vec<&'static str>)> {
+    let pending = removing && fs::symlink_metadata(root.join(REMOVING)).is_ok();
+    if pending {
+        directory(
+            root,
+            &[REMOVING],
+            &[".claude-plugin", "hooks", RECEIPT, "tsconfig.json"],
+        )?;
+    } else {
+        directory(
+            root,
+            &[".claude-plugin", "hooks", RECEIPT],
+            &["tsconfig.json"],
+        )?;
+    }
+    for (name, files, optional) in [
+        (".claude-plugin", &["plugin.json"][..], &["types"][..]),
+        (
+            "hooks",
+            &["hooks.json", "caller.js", "config.js"][..],
+            &[][..],
+        ),
+    ] {
+        if pending {
+            match fs::symlink_metadata(root.join(name)) {
+                Ok(_) => directory(&root.join(name), &[], &[files, optional].concat())?,
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(error) => return Err(error.into()),
+            }
+        } else {
+            directory(&root.join(name), files, optional)?;
+        }
+    }
     // Native TUI generates these paths; preserve them, including user edits.
     let mut preserved = Vec::new();
     for (name, is_dir) in [(".claude-plugin/types", true), ("tsconfig.json", false)] {
@@ -102,20 +124,56 @@ fn verified(root: &Path) -> Result<(Receipt, Vec<&'static str>)> {
             Err(error) => return Err(error.into()),
         }
     }
-    let receipt: Receipt = serde_json::from_slice(&read(&root.join(RECEIPT))?)?;
+    let receipt: Receipt =
+        serde_json::from_slice(&read(&root.join(if pending { REMOVING } else { RECEIPT }))?)?;
     if receipt.schema_version != 1
         || receipt.application != "akasha-otsuge-claude"
         || receipt.files.len() != FILES.len()
         || !receipt.binary.is_absolute()
+        || FILES.iter().any(|name| !receipt.files.contains_key(*name))
+    {
+        return Err(conflict());
+    }
+    if pending
+        && fs::symlink_metadata(root.join(RECEIPT)).is_ok()
+        && serde_json::from_slice::<Receipt>(&read(&root.join(RECEIPT))?)? != receipt
     {
         return Err(conflict());
     }
     for name in FILES {
+        if pending && !root.join(name).try_exists()? {
+            // A dangling symlink is a replacement, not a previously removed file.
+            if fs::symlink_metadata(root.join(name)).is_ok() {
+                return Err(conflict());
+            }
+            continue;
+        }
         if receipt.files.get(name) != Some(&hash(&read(&root.join(name))?)) {
             return Err(conflict());
         }
     }
     Ok((receipt, preserved))
+}
+
+fn quarantine(root: &Path) -> PathBuf {
+    use std::os::unix::ffi::OsStrExt;
+    root.with_file_name(format!(
+        ".akasha-uninstall-{}",
+        hash(root.as_os_str().as_bytes())
+    ))
+}
+
+fn rename(from: &Path, to: &Path) -> Result<()> {
+    rustix::fs::renameat_with(
+        rustix::fs::CWD,
+        from,
+        rustix::fs::CWD,
+        to,
+        rustix::fs::RenameFlags::NOREPLACE,
+    )
+    .map_err(std::io::Error::from)?;
+    File::open(to.parent().ok_or_else(conflict)?)?.sync_all()?;
+    Ok(())
 }
 
 fn destination(path: &Path) -> Result<PathBuf> {
@@ -130,7 +188,17 @@ fn destination(path: &Path) -> Result<PathBuf> {
 
 pub fn inspect(path: &Path) -> Result<Value> {
     let root = destination(path)?;
-    let (receipt, preserved) = verified(&root)?;
+    let pending = quarantine(&root);
+    let directory = if fs::symlink_metadata(&pending).is_ok() {
+        &pending
+    } else {
+        &root
+    };
+    if directory == &pending || fs::symlink_metadata(directory.join(REMOVING)).is_ok() {
+        verified(directory, true)?;
+        return Ok(json!({"plugin_dir":root,"state":"uninstall_pending","recovery_dir":directory}));
+    }
+    let (receipt, preserved) = verified(&root, false)?;
     Ok(
         json!({"plugin_dir":root,"state":"verified","launch_args":[receipt.binary,"--plugin-dir",root],"preserved_paths":preserved}),
     )
@@ -175,8 +243,13 @@ pub async fn install(binary: &Path, path: &Path, args: Vec<String>) -> Result<Va
             .map(|(name, content)| (name.to_string(), hash(content.as_bytes())))
             .collect(),
     };
+    if fs::symlink_metadata(quarantine(&root)).is_ok()
+        || fs::symlink_metadata(root.join(REMOVING)).is_ok()
+    {
+        return Err(Error("ADAPTER_UNINSTALL_PENDING"));
+    }
     if fs::symlink_metadata(&root).is_ok() {
-        if verified(&root)?.0.files != receipt.files {
+        if verified(&root, false)?.0.files != receipt.files {
             return Err(conflict());
         }
         return inspect(&root);
@@ -202,7 +275,7 @@ pub async fn install(binary: &Path, path: &Path, args: Vec<String>) -> Result<Va
         file.write_all(content.as_bytes())?;
         file.sync_all()?;
     }
-    verified(&stage)?;
+    verified(&stage, false)?;
     for name in [".claude-plugin", "hooks", ""] {
         File::open(stage.join(name))?.sync_all()?;
     }
@@ -220,19 +293,182 @@ pub async fn install(binary: &Path, path: &Path, args: Vec<String>) -> Result<Va
 }
 
 pub fn uninstall(path: &Path) -> Result<Value> {
+    uninstall_inner(path, || {})
+}
+
+fn uninstall_inner(path: &Path, before_detach: impl FnOnce()) -> Result<Value> {
     let root = destination(path)?;
-    let (_, preserved) = verified(&root)?;
-    for name in FILES {
-        fs::remove_file(root.join(name))?;
+    let pending = quarantine(&root);
+    if fs::symlink_metadata(&pending).is_err() {
+        let expected = verified(&root, true)?.0;
+        before_detach();
+        rename(&root, &pending)?;
+        // Verify the detached tree, so an edit/replacement after preflight is retained.
+        if !verified(&pending, true).is_ok_and(|(actual, _)| actual == expected) {
+            rename(&pending, &root)?;
+            return Err(conflict());
+        }
     }
-    fs::remove_dir(root.join("hooks"))?;
-    if !preserved.contains(&".claude-plugin/types") {
-        fs::remove_dir(root.join(".claude-plugin"))?;
+    // A crash after deleting the final journal can leave only this empty directory.
+    if fs::read_dir(&pending)?.next().is_none() {
+        fs::remove_dir(&pending)?;
+        File::open(root.parent().ok_or_else(conflict)?)?.sync_all()?;
+        return Ok(json!({"plugin_dir":root,"state":"removed","preserved_paths":[]}));
     }
-    fs::remove_file(root.join(RECEIPT))?;
+    let (_, preserved) = verified(&pending, true)?;
+    if fs::symlink_metadata(pending.join(REMOVING)).is_err() {
+        // Linking the immutable receipt publishes the recovery journal atomically.
+        fs::hard_link(pending.join(RECEIPT), pending.join(REMOVING))?;
+        File::open(&pending)?.sync_all()?;
+    }
+    for name in FILES.into_iter().chain([RECEIPT]) {
+        match fs::remove_file(pending.join(name)) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
+    }
+    for name in ["hooks", ".claude-plugin"] {
+        if name == ".claude-plugin" && preserved.contains(&".claude-plugin/types") {
+            continue;
+        }
+        match fs::remove_dir(pending.join(name)) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
+    }
+    File::open(&pending)?.sync_all()?;
+    let remaining = if preserved.is_empty() {
+        &pending
+    } else {
+        rename(&pending, &root)?;
+        &root
+    };
+    fs::remove_file(remaining.join(REMOVING))?;
+    File::open(remaining)?.sync_all()?;
     if preserved.is_empty() {
-        fs::remove_dir(&root)?;
+        fs::remove_dir(&pending)?;
     }
     File::open(root.parent().ok_or_else(conflict)?)?.sync_all()?;
     Ok(json!({"plugin_dir":root,"state":"removed","preserved_paths":preserved}))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    fn fixture() -> (Staging, PathBuf) {
+        static NEXT: AtomicUsize = AtomicUsize::new(0);
+        let base = std::env::temp_dir().join(format!(
+            "akasha-uninstall-race-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        let root = base.join("plugin");
+        fs::create_dir_all(root.join(".claude-plugin")).unwrap();
+        fs::create_dir(root.join("hooks")).unwrap();
+        let mut files = BTreeMap::new();
+        for name in FILES {
+            fs::write(root.join(name), name).unwrap();
+            files.insert(name.into(), hash(name.as_bytes()));
+        }
+        let receipt = Receipt {
+            schema_version: 1,
+            application: "akasha-otsuge-claude".into(),
+            binary: "/bin/true".into(),
+            files,
+        };
+        fs::write(root.join(RECEIPT), serde_json::to_vec(&receipt).unwrap()).unwrap();
+        (Staging(Some(base)), root)
+    }
+
+    #[test]
+    fn uninstall_retains_a_replacement_between_verification_and_detach() {
+        let (_guard, root) = fixture();
+        let original = root.with_file_name("original");
+        let result = uninstall_inner(&root, || {
+            fs::rename(&root, &original).unwrap();
+            fs::create_dir(&root).unwrap();
+            fs::write(root.join("user-file"), "replacement").unwrap();
+        });
+        assert!(result.is_err());
+        assert_eq!(
+            fs::read_to_string(root.join("user-file")).unwrap(),
+            "replacement"
+        );
+        verified(&original, false).unwrap();
+        assert!(!quarantine(&root).exists());
+    }
+
+    #[test]
+    fn uninstall_retains_an_edit_between_verification_and_detach() {
+        let (_guard, root) = fixture();
+        assert!(
+            uninstall_inner(&root, || fs::write(root.join(FILES[0]), "user edit")
+                .unwrap())
+            .is_err()
+        );
+        assert_eq!(
+            fs::read_to_string(root.join(FILES[0])).unwrap(),
+            "user edit"
+        );
+        assert!(root.join(FILES[1]).exists());
+        assert!(!quarantine(&root).exists());
+    }
+
+    #[test]
+    fn interrupted_uninstall_retains_recreated_original_and_edited_remaining_files() {
+        let (_guard, root) = fixture();
+        let pending = quarantine(&root);
+        rename(&root, &pending).unwrap();
+        fs::hard_link(pending.join(RECEIPT), pending.join(REMOVING)).unwrap();
+        fs::remove_file(pending.join(FILES[0])).unwrap();
+        fs::write(pending.join(FILES[1]), "user edit").unwrap();
+        fs::create_dir(&root).unwrap();
+        fs::write(root.join("user-file"), "replacement").unwrap();
+        assert!(uninstall(&root).is_err());
+        assert_eq!(
+            fs::read_to_string(pending.join(FILES[1])).unwrap(),
+            "user edit"
+        );
+        fs::write(pending.join(FILES[1]), FILES[1]).unwrap();
+        assert_eq!(inspect(&root).unwrap()["state"], "uninstall_pending");
+        assert!(uninstall(&root).is_ok());
+        assert_eq!(
+            fs::read_to_string(root.join("user-file")).unwrap(),
+            "replacement"
+        );
+        assert!(!pending.exists());
+    }
+
+    #[test]
+    fn interrupted_uninstall_restores_generated_files_after_destination_conflict() {
+        let (_guard, root) = fixture();
+        fs::write(root.join("tsconfig.json"), "user config").unwrap();
+        let pending = quarantine(&root);
+        rename(&root, &pending).unwrap();
+        fs::hard_link(pending.join(RECEIPT), pending.join(REMOVING)).unwrap();
+        fs::create_dir(&root).unwrap();
+        fs::write(root.join("new-file"), "replacement").unwrap();
+        assert!(uninstall(&root).is_err());
+        assert_eq!(
+            fs::read_to_string(root.join("new-file")).unwrap(),
+            "replacement"
+        );
+        assert_eq!(
+            fs::read_to_string(pending.join("tsconfig.json")).unwrap(),
+            "user config"
+        );
+        assert_eq!(inspect(&root).unwrap()["state"], "uninstall_pending");
+        fs::rename(&root, root.with_file_name("new-root")).unwrap();
+        assert!(uninstall(&root).is_ok());
+        assert_eq!(
+            fs::read_to_string(root.join("tsconfig.json")).unwrap(),
+            "user config"
+        );
+        assert!(!root.join(REMOVING).exists());
+        assert!(!pending.exists());
+    }
 }
