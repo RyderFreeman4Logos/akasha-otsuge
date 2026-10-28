@@ -33,18 +33,21 @@ fn conflict() -> Error {
     Error("ADAPTER_INSTALL_CONFLICT")
 }
 
-fn directory(path: &Path, names: &[&str]) -> Result<()> {
+fn directory(path: &Path, names: &[&str], optional: &[&str]) -> Result<()> {
     let metadata = fs::symlink_metadata(path)?;
     if !metadata.is_dir() || metadata.uid() != rustix::process::geteuid().as_raw() {
         return Err(conflict());
     }
-    let mut actual = fs::read_dir(path)?
+    let actual = fs::read_dir(path)?
         .map(|entry| entry.map(|entry| entry.file_name()))
         .collect::<std::io::Result<Vec<_>>>()?;
-    actual.sort();
-    let mut expected: Vec<_> = names.iter().map(std::ffi::OsString::from).collect();
-    expected.sort();
-    if actual != expected {
+    if names
+        .iter()
+        .any(|name| !actual.iter().any(|entry| entry == name))
+        || actual
+            .iter()
+            .any(|entry| !names.iter().chain(optional).any(|name| entry == name))
+    {
         return Err(conflict());
     }
     Ok(())
@@ -70,13 +73,35 @@ fn read(path: &Path) -> Result<Vec<u8>> {
     Ok(bytes)
 }
 
-fn verified(root: &Path) -> Result<Receipt> {
-    directory(root, &[".claude-plugin", "hooks", RECEIPT])?;
-    directory(&root.join(".claude-plugin"), &["plugin.json"])?;
+fn verified(root: &Path) -> Result<(Receipt, Vec<&'static str>)> {
+    directory(
+        root,
+        &[".claude-plugin", "hooks", RECEIPT],
+        &["tsconfig.json"],
+    )?;
+    directory(&root.join(".claude-plugin"), &["plugin.json"], &["types"])?;
     directory(
         &root.join("hooks"),
         &["hooks.json", "caller.js", "config.js"],
+        &[],
     )?;
+    // Native TUI generates these paths; preserve them, including user edits.
+    let mut preserved = Vec::new();
+    for (name, is_dir) in [(".claude-plugin/types", true), ("tsconfig.json", false)] {
+        match fs::symlink_metadata(root.join(name)) {
+            Ok(metadata) => {
+                if metadata.uid() != rustix::process::geteuid().as_raw()
+                    || (is_dir && !metadata.is_dir())
+                    || (!is_dir && !metadata.is_file())
+                {
+                    return Err(conflict());
+                }
+                preserved.push(name);
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
+    }
     let receipt: Receipt = serde_json::from_slice(&read(&root.join(RECEIPT))?)?;
     if receipt.schema_version != 1
         || receipt.application != "akasha-otsuge-claude"
@@ -90,7 +115,7 @@ fn verified(root: &Path) -> Result<Receipt> {
             return Err(conflict());
         }
     }
-    Ok(receipt)
+    Ok((receipt, preserved))
 }
 
 fn destination(path: &Path) -> Result<PathBuf> {
@@ -105,9 +130,9 @@ fn destination(path: &Path) -> Result<PathBuf> {
 
 pub fn inspect(path: &Path) -> Result<Value> {
     let root = destination(path)?;
-    let receipt = verified(&root)?;
+    let (receipt, preserved) = verified(&root)?;
     Ok(
-        json!({"plugin_dir":root,"state":"verified","launch_args":[receipt.binary,"--plugin-dir",root]}),
+        json!({"plugin_dir":root,"state":"verified","launch_args":[receipt.binary,"--plugin-dir",root],"preserved_paths":preserved}),
     )
 }
 
@@ -151,7 +176,7 @@ pub async fn install(binary: &Path, path: &Path, args: Vec<String>) -> Result<Va
             .collect(),
     };
     if fs::symlink_metadata(&root).is_ok() {
-        if verified(&root)?.files != receipt.files {
+        if verified(&root)?.0.files != receipt.files {
             return Err(conflict());
         }
         return inspect(&root);
@@ -196,14 +221,18 @@ pub async fn install(binary: &Path, path: &Path, args: Vec<String>) -> Result<Va
 
 pub fn uninstall(path: &Path) -> Result<Value> {
     let root = destination(path)?;
-    verified(&root)?;
+    let (_, preserved) = verified(&root)?;
     for name in FILES {
         fs::remove_file(root.join(name))?;
     }
     fs::remove_dir(root.join("hooks"))?;
-    fs::remove_dir(root.join(".claude-plugin"))?;
+    if !preserved.contains(&".claude-plugin/types") {
+        fs::remove_dir(root.join(".claude-plugin"))?;
+    }
     fs::remove_file(root.join(RECEIPT))?;
-    fs::remove_dir(&root)?;
+    if preserved.is_empty() {
+        fs::remove_dir(&root)?;
+    }
     File::open(root.parent().ok_or_else(conflict)?)?.sync_all()?;
-    Ok(json!({"plugin_dir":root,"state":"removed"}))
+    Ok(json!({"plugin_dir":root,"state":"removed","preserved_paths":preserved}))
 }

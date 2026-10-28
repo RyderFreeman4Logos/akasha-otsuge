@@ -92,9 +92,19 @@ checking startup/resume/fork/child identity and completed durable backfill. Its
 fixture-only tool returns a marker after binding; it does not implement consult
 research or establish authenticated model acceptance. A final stage installs
 the production plugin without the fixture wrapper/tool, validates it with the
-native CLI, captures a turn into durable jobs, runs doctor and removes the plugin.
-It removes its owned
-scratch directory and processes on completion:
+native CLI, captures headless and controlling-PTY turns into durable jobs, runs
+doctor and removes the owned plugin files. Native-generated type support remains
+intact. Input/output UUIDs and SHA-256 hashes bind capture checkpoints to the
+actual native transcript. The TUI uses its normal idle indicator before exit;
+title-generation requests are counted separately from conversation requests.
+The first TUI runs exposed native `permission-mode` metadata, UUID-bearing
+`system/turn_duration` events, and `/exit` notifications absent from the file.
+Regressions cover those shapes without treating ephemeral UUIDs as file fences.
+One subsequent run failed the fixture-tool execution assertion without enough
+diagnostics to classify the cause; the error was retained and the assertion now
+includes bounded native output. The next complete run passed; this is not proof
+that the intermittent failure is resolved.
+The script removes its owned scratch directory and processes on completion:
 
 ```sh
 cargo build --locked

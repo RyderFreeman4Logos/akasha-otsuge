@@ -411,10 +411,17 @@ does not attest those repairs.
   test; actual2.1.311 validates the generated plugin, captures a turn through its
   unmodified bridge, verifies doctor and uninstalls successfully. Runtime model
   authentication and loaded-session self-test are explicitly not asserted.
+  Actual TUI type generation is supported: owned files remain hash-verified,
+  generated type/config files and user edits within them are preserved on removal.
 - [ ] Prove real TUI and Runner behavior with the other three CLIs absent:
   concurrent sessions, resume, compact, interrupted backfill, tool results,
   cancellation and denied operations, with traceable inputs/final output.
   Controlled local fixtures do not substitute for authenticated model acceptance.
+  The unmodified installed plugin now captures a real controlling-PTY turn with
+  native input/output UUIDs and cursor hashes, then passes doctor/uninstall.
+  Permission metadata, duration events and nonpersistent local-command UUIDs
+  have causal native evidence and regressions. A fixture-tool execution failure
+  remains unclassified; richer diagnostics were added before the next passing run.
 - [ ] Retain sanitized native fixtures and failures, official API/version evidence,
   reproduction commands and limitations; pass exact-candidate gate, independent
   review and CI, then merge and close #12. Continue every queue entry below.

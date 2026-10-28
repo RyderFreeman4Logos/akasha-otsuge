@@ -67,8 +67,9 @@ export function register(on) {
     const state = stateFor(e.agentId);
     const generation = root;
     const result = await next(e);
-    if (state && await $.session.id() === state.session && root === generation) {
-      state.tip = e.uuid; state.cursor += 1;
+    // Queue and local-command notifications can be absent from the transcript file.
+    if (e.door !== 'queue' && e.door !== 'command' && result?.uuid && state && await $.session.id() === state.session && root === generation) {
+      state.tip = result.uuid; state.cursor += 1;
       await ensureRegistration($, state);
     }
     return result;

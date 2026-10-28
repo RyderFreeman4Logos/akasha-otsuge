@@ -117,6 +117,45 @@ fn claude_plugin_install_is_reversible_and_preserves_unrelated_configuration() {
     assert!(!directory.exists());
     assert_eq!(fs::read(&config).unwrap(), original);
     assert!(run(&install).status.success());
+    let types = directory.join(".claude-plugin/types");
+    fs::create_dir_all(types.join("claude-code")).unwrap();
+    let declaration = types.join("claude-code/index.d.ts");
+    fs::write(&declaration, "native generated types with user additions").unwrap();
+    let tsconfig = directory.join("tsconfig.json");
+    fs::write(&tsconfig, "user customized tsconfig").unwrap();
+    fs::remove_file(&tsconfig).unwrap();
+    symlink(&config, &tsconfig).unwrap();
+    assert!(!run(&doctor).status.success());
+    assert!(!run(&remove).status.success());
+    assert!(caller.exists());
+    assert_eq!(fs::read(&config).unwrap(), original);
+    fs::remove_file(&tsconfig).unwrap();
+    fs::write(&tsconfig, "user customized tsconfig").unwrap();
+    assert!(
+        run(&doctor).status.success(),
+        "native type generation must not invalidate the plugin"
+    );
+    assert!(run(&install).status.success());
+    let removed = run(&remove);
+    assert!(removed.status.success());
+    let removed: Value = serde_json::from_slice(&removed.stdout).unwrap();
+    assert_eq!(
+        removed["data"]["preserved_paths"],
+        serde_json::json!([".claude-plugin/types", "tsconfig.json"])
+    );
+    assert_eq!(
+        fs::read_to_string(&declaration).unwrap(),
+        "native generated types with user additions"
+    );
+    assert_eq!(
+        fs::read_to_string(&tsconfig).unwrap(),
+        "user customized tsconfig"
+    );
+    assert!(!directory.join("hooks").exists());
+    assert!(!directory.join(".claude-plugin/plugin.json").exists());
+    assert!(!directory.join("akasha-install.json").exists());
+    fs::remove_dir_all(&directory).unwrap();
+    assert!(run(&install).status.success());
     fs::remove_file(&caller).unwrap();
     symlink(&config, &caller).unwrap();
     assert!(!run(&remove).status.success());

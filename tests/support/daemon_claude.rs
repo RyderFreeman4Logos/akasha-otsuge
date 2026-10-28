@@ -46,6 +46,7 @@ fn native_claude_backfill_preserves_visible_payloads_links_and_partial_tail() {
     let mut bytes = Vec::new();
     for row in [
         json!({"type":"queue-operation","operation":"enqueue","timestamp":"2026-10-28T15:40:43.067Z","sessionId":"session-a"}),
+        json!({"type":"permission-mode","permissionMode":"auto","sessionId":"session-a"}),
         json!({"type":"user","uuid":"prompt-a","parentUuid":null,"sessionId":"session-a","version":"2.1.311","message":{"role":"user","content":"Keep the original 字 prompt"}}),
         json!({"type":"assistant","uuid":"response-a","parentUuid":"prompt-a","sessionId":"session-a","version":"2.1.311","message":{"role":"assistant","content":[{"type":"thinking","thinking":"PRIVATE_THINKING_SENTINEL","signature":"PRIVATE_SIGNATURE"},{"type":"text","text":"Visible answer"},{"type":"tool_use","id":"tool-a","name":"Read","input":{"file_path":"visible.txt"}}]}}),
         json!({"type":"user","uuid":"result-a","parentUuid":"response-a","sessionId":"session-a","version":"2.1.311","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"tool-a","content":"tool result 原文"}]}}),
@@ -78,6 +79,8 @@ fn native_claude_backfill_preserves_visible_payloads_links_and_partial_tail() {
         .unwrap();
     file.write_all(&final_row.as_bytes()[final_row.len() / 2..])
         .unwrap();
+    file.write_all(b"\n").unwrap();
+    serde_json::to_writer(&mut file, &json!({"type":"system","subtype":"turn_duration","durationMs":140,"messageCount":9,"uuid":"duration-a","parentUuid":"final-a","sessionId":"session-a","version":"2.1.311"})).unwrap();
     file.write_all(b"\n").unwrap();
     drop(file);
     args[5] = "claude-resume";
@@ -175,6 +178,26 @@ fn native_claude_backfill_preserves_visible_payloads_links_and_partial_tail() {
                     Actor::Unverified(_)
                 ));
             }
+            let duration = capture
+                .event(
+                    &bound,
+                    &EventRef {
+                        source: source.clone(),
+                        event_id: "duration-a".into(),
+                    },
+                    store.sequence().unwrap(),
+                )
+                .unwrap()
+                .unwrap();
+            assert_eq!(duration.event.metadata.visibility, Visibility::Session);
+            assert_eq!(
+                duration.event.metadata.parent.as_ref().unwrap().event_id,
+                "final-a"
+            );
+            assert!(capture.text(&duration).unwrap().is_empty());
+            let raw: Value = serde_json::from_slice(&capture.raw(&duration).unwrap()).unwrap();
+            assert_eq!(raw["message"]["subtype"], "turn_duration");
+            assert_eq!(raw["message"]["durationMs"], 140);
             store.close().await.unwrap();
         });
 }

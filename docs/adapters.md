@@ -239,7 +239,7 @@ a consult model tool; that workflow is tracked in #16.
 
 The installer publishes a verified private directory atomically and never edits
 native user/project settings or other hooks. An identical reinstall succeeds;
-changed files, symlinks and unowned content are refused. Upgrade into a new
+changed owned files, symlinks and unexpected content are refused. Upgrade into a new
 directory, validate it with `claude plugin validate DIR`, then switch the launch
 path. Keep the old directory to roll back by selecting its launch path again.
 The executable paths in the old plugin must remain available for rollback.
@@ -249,10 +249,19 @@ akasha-otsuge adapter uninstall claude --directory /absolute/path/akasha-claude-
 ```
 
 Uninstall removes only the receipt's verified files and empty owned directories;
-user additions or edits prevent removal. `doctor` reports the observed CLI
+user additions or edits outside the native-generated paths prevent removal.
+The native TUI [generates type support](https://code.claude.com/docs/en/plugins/mods/create#get-type-definitions-for-your-version)
+under `.claude-plugin/types/` and at `tsconfig.json`. These paths, including user
+edits, are preserved and listed in `preserved_paths`; their parent directories
+remain after uninstall. The installer neither validates nor deletes their contents.
+`doctor` reports the observed CLI
 version, supported-version match, optional installation integrity and explicit
 coverage limits. Its version probe does not execute a caller/model self-test,
 check authentication or claim that a running session loaded the plugin. Fork
 parent IDs remain unavailable. The local native protocol fixture exercises the
-unmodified generated plugin, durable capture, doctor and removal; authenticated
-model and full TUI acceptance remain separate.
+unmodified generated plugin in headless and controlling-PTY sessions, durable
+capture, doctor and removal. UUIDs and cursor-prefix hashes bind the captured
+input/output to native files. Local command/queue notifications that may not be
+persisted cannot advance the file fence. Native permission metadata is skipped;
+turn-duration events retain their identity and session visibility. Authenticated
+model and the remaining TUI lifecycle acceptance remain separate.

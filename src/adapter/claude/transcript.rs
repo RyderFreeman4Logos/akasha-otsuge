@@ -39,6 +39,7 @@ pub(crate) fn transcript_frame(
             | "api-request-shape"
             | "api-request-blob"
             | "mode"
+            | "permission-mode"
             | "atis-latch"
             | "tools-used"
     ) {
@@ -102,6 +103,13 @@ pub(crate) fn transcript_frame(
             let text = row["content"].as_str().ok_or_else(invalid)?.to_owned();
             (json!(text), text, Visibility::Session, EventKind::Execution)
         }
+        "system" if row["subtype"] == "turn_duration" => (
+            json!({"subtype":"turn_duration", "durationMs":row["durationMs"].as_u64().ok_or_else(invalid)?,
+                "messageCount":row["messageCount"].as_u64().ok_or_else(invalid)?}),
+            String::new(),
+            Visibility::Session,
+            EventKind::Execution,
+        ),
         "attachment" => {
             let rendered: &[Value] = match row.get("rendered") {
                 Some(value) => value.as_array().ok_or_else(invalid)?,
