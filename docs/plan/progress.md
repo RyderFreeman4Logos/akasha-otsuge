@@ -1,25 +1,39 @@
-# Development checkpoint — 2026-10-27
+# Development checkpoint — 2026-10-28 UTC
 
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#9 are merged
-and completed; #10–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#10 are merged
+and completed; #11–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-010
+## Next issue: MVP-011
 
-Retrieval is implemented in the SSD worktree, based on merge `a09d9d6`.
-Thirteen public retrieval fixtures and four native index controls cover actual
-keyword/vector/reranking paths, scoped/global rules, retirement/correction,
-publication permission races, UTF-8/captured original ranges, budgets, prefix
-SIGKILL recovery and generation switching. The queued query keeps its admitted
-old model after activation; cache-budget changes wait for old owners to drain.
-The aggregate focused run passes 27 daemon, 19 Domain, 17 configuration and four
-native index tests, plus all-targets Clippy. A subsequent exact-selector control
-adds a passing empty-library test (28 ordinary daemon tests now). The final committed-HEAD gate,
-independent review, CI and publication are still pending; #10 is not closed.
-See [the retrieval contract and fixed baseline](../retrieval.md).
+Implement the shared CallerAdapter/ContextSource/AgentRunner contract, immutable
+runtime binding, restricted reads and global delegation budgets. Freeze the
+60-task sourced reference set before #16 research prompts. The complete acceptance
+criteria remain in #11; read-only preparation is not implementation acceptance.
+The separate CI-cache improvement addresses repeated cold dependency compilation
+without changing the canonical gate or increasing paid storage capacity.
+
+## Completed retrieval: MVP-010
+
+Candidate `e27dc5391483e48dfcb268a9fc9a0daba828e7b4`, tree
+`629d2a2e6a22d01032cff96c13755a92358db648`, passes the117.311-second exact-HEAD
+canonical gate:126 ordinary Rust tests,8 Python tests and36 installed-release
+daemon cases. The21 public retrieval cases and five native index controls cover
+scope/current revisions, rules/conflicts, generation pinning, SIGKILL prefix
+recovery, live permission shrink, archived diagnostics, budgets and progressive
+original reads. Installed/release SHA-256 is
+`37d2b9ebab808e20eff7b3e9533011aacb1c66a6605e373f53d7f302ed37b4f2`.
+
+Independent R2 review passes with0 actionable findings and closes all five R1
+findings. CI40581193846 passes on GitHub's synthetic merge of this head and base;
+PR #38 merged as `d5661016c3bfb057f4b01799035ef84c45d8450c` with the same tree,
+and #10 closed completed. [Final gate and review originals](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/38#issuecomment-6461008510)
+retain raw logs, SHA-256 and environment. [The retrieval contract](../retrieval.md)
+links the frozen quality baseline and all development/failure receipts. Product
+scale and actual model quality remain #24/#27, not inferred from tiny fixtures.
 
 ## Completed providers: MVP-009
 
@@ -52,9 +66,9 @@ receipts. [The protocol](../daemon.md) records the actual trust/coverage limits.
 
 The user-requested dua audit found55.39GiB in the home checkout. Removing10.95GiB
 of obsolete owned outputs and checksum-migrating retained artifacts leaves about
-380MiB locally. The 2026-10-27 dua recheck reports41.49GiB in .spike-work and9.29GiB in target
+383MiB locally. The 2026-10-28 UTC dua recheck reports41.49GiB in .spike-work and13.65GiB in target
 on the SSD mirror; the shared cache includes #10's first Lance/Arrow compilation.
-Its temporary source checkout is198MiB and shares this target. All42 compressed corpus shards match the original
+Its temporary source checkout is200MiB and shares this target. All42 compressed corpus shards match the original
 manifest; preserve them for #24 without retaining the84GB expanded copy. Both
 large artifact roots remain lexical symlinks into `/ssd/mirror-rootfs/home/obj/`.
 The existing full SSD database was not opened or modified.
@@ -161,7 +175,7 @@ not active computation. Reconcile an exact terminal result before any replay.
 After the current acceptance leaf is archived, run the canonical
 `bash scripts/check.sh` on the exact committed candidate, obtain independent
 review, push and read back the matching Linux CI, then merge and close the corresponding Issue.
-Continue #9–#28 through publication in dependency order. Isolated preparation can
+Continue #11–#28 through publication in dependency order. Isolated preparation can
 overlap immutable long acceptance while preserving one build writer. Avoid repeated full-corpus
 runs on unrelated intermediate changes; #24 repeats the same manifest/oracle
 through the actual product protocol. All required product work remains on the
