@@ -10,7 +10,9 @@ pub(crate) fn checkpoint(phase: &str) {
         return;
     }
     let root = PathBuf::from(std::env::var_os("AKASHA_TEST_CRASH_ROOT").unwrap());
-    std::fs::write(root.join("reached"), phase).unwrap();
+    // Publish the phase and readiness together; create alone can expose an empty marker.
+    std::fs::write(root.join("reached.pending"), phase).unwrap();
+    std::fs::rename(root.join("reached.pending"), root.join("reached")).unwrap();
     loop {
         std::thread::park();
     }
