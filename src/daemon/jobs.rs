@@ -1145,7 +1145,14 @@ impl Service {
                         &path,
                         1,
                         generation,
-                        |line| crate::adapter::claude::transcript_frame(&input.source, line),
+                        |line| {
+                            crate::adapter::claude::transcript_frame(
+                                &storage,
+                                &binding,
+                                &input.source,
+                                line,
+                            )
+                        },
                         |_| {},
                     ))
                 } else {

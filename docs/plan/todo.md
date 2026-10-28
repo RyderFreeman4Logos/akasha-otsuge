@@ -370,6 +370,10 @@ does not attest those repairs.
 - [ ] Capture original prompts, visible outputs and tool results; normalize native
   transcripts with bounded resume/backfill, partial-tail/gap handling, exact
   parent/fork/compaction lineage and no private-thinking extraction or false approval.
+  Root resume and compaction now pass3 capture regressions and all-target Clippy,
+  replaying the actual2.1.311 transcript. Attachments retain rendered visible
+  text; summary flags remain recorded as session information. Missing original
+  ancestry stays explicitly pending. Native child/fork linkage remains unfinished.
 - [ ] Implement a standalone Claude Runner using existing lawful CLI auth,
   structured terminal events plus exit status, bounded output, cancellation and
   original deadlines. Disable built-in/unrelated tools and enforce shared Rust

@@ -178,3 +178,182 @@ fn native_claude_backfill_preserves_visible_payloads_links_and_partial_tail() {
             store.close().await.unwrap();
         });
 }
+
+#[test]
+fn recorded_native_resume_and_compact_keep_original_lineage_and_session_authority() {
+    recorded_native_compaction(false);
+}
+
+#[test]
+fn recorded_native_compaction_refuses_missing_original_ancestor() {
+    recorded_native_compaction(true);
+}
+
+fn recorded_native_compaction(missing_ancestor: bool) {
+    let mut daemon = Daemon::new();
+    daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
+    let source = SourceIdentity {
+        adapter: "claude_code".into(),
+        profile: "test".into(),
+        session: "11111111-1111-4111-8111-111111111111".into(),
+        thread: "11111111-1111-4111-8111-111111111111".into(),
+        agent: "main".into(),
+    };
+    let scope = Scope {
+        user: format!("uid:{}", rustix::process::geteuid().as_raw()),
+        project: None,
+        branch_or_version: None,
+        session: None,
+    };
+    let binding = daemon.root.join("binding.json");
+    std::fs::write(
+        &binding,
+        json!({"source":source,"scope":scope,"stream":"native-file","coverage":"visible_text"})
+            .to_string(),
+    )
+    .unwrap();
+    let input = daemon.root.join("native.jsonl");
+    let fixture = include_str!("../fixtures/claude/2.1.311/native-root-resume-compact.jsonl");
+    let mut rows: Vec<Value> = fixture
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    if missing_ancestor {
+        rows.iter_mut()
+            .find(|row| row["subtype"] == "compact_boundary")
+            .unwrap()["logicalParentUuid"] = "unknown-original".into();
+    }
+    std::fs::write(
+        &input,
+        rows.iter()
+            .map(|row| format!("{row}\n"))
+            .collect::<String>(),
+    )
+    .unwrap();
+    daemon.start();
+    daemon.cli(&[
+        "capture",
+        "claude",
+        binding.to_str().unwrap(),
+        input.to_str().unwrap(),
+        "--idempotency-key",
+        "native-recording",
+    ]);
+    let job = terminal(&daemon, "native-recording");
+    assert_eq!(job["state"], "succeeded", "{job}");
+    if missing_ancestor {
+        assert_eq!(
+            job["result"]["checkpoint"]["checkpoint"]["pending"],
+            "invalid_frame"
+        );
+    } else {
+        assert!(
+            job["result"]["checkpoint"]["checkpoint"]["pending"].is_null(),
+            "{job}"
+        );
+    }
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    if missing_ancestor {
+        return;
+    }
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            let store = Storage::open(
+                &resolve(
+                    "",
+                    None,
+                    "",
+                    &Paths {
+                        data_dir: daemon.root.join("data"),
+                        socket_path: daemon.socket(),
+                    },
+                )
+                .unwrap(),
+            )
+            .await
+            .unwrap();
+            let capture = Capture::new(&store);
+            let bound = CaptureBinding::from_source(
+                source.clone(),
+                scope,
+                "native-file",
+                CoverageLevel::VisibleText,
+            )
+            .unwrap();
+            let reference = |id: &str| EventRef {
+                source: source.clone(),
+                event_id: id.into(),
+            };
+            let compact = rows
+                .iter()
+                .find(|row| row["subtype"] == "compact_boundary")
+                .unwrap();
+            let event = capture
+                .event(
+                    &bound,
+                    &reference(compact["uuid"].as_str().unwrap()),
+                    store.sequence().unwrap(),
+                )
+                .unwrap()
+                .unwrap();
+            assert_eq!(
+                event.event.metadata.parent,
+                Some(reference(compact["logicalParentUuid"].as_str().unwrap()))
+            );
+            let akasha_otsuge::capture::EventKind::Compaction {
+                first,
+                last,
+                originals,
+            } = &event.event.metadata.kind
+            else {
+                panic!("compaction relation missing")
+            };
+            let first_prompt = rows
+                .iter()
+                .find(|row| row["message"]["content"] == "PRIVATE_CALLER_INPUT start")
+                .unwrap();
+            assert_eq!(
+                first.as_ref(),
+                &reference(first_prompt["uuid"].as_str().unwrap())
+            );
+            assert_eq!(last.as_ref(), event.event.metadata.parent.as_ref().unwrap());
+            assert!(originals.contains(first) && originals.contains(last));
+            let tip = rows
+                .iter()
+                .rev()
+                .find_map(|row| row["uuid"].as_str())
+                .unwrap();
+            let page = capture
+                .lineage(&bound, &reference(tip), store.sequence().unwrap(), 64)
+                .unwrap();
+            assert!(page.missing.is_none() && page.next.is_none());
+            let texts: Vec<_> = page
+                .events
+                .iter()
+                .map(|e| capture.text(e).unwrap())
+                .collect();
+            assert!(
+                texts
+                    .iter()
+                    .any(|text| text == "PRIVATE_CALLER_INPUT start")
+            );
+            assert!(
+                texts
+                    .iter()
+                    .any(|text| text == "PRIVATE_CALLER_INPUT resume")
+            );
+            let summary = page
+                .events
+                .iter()
+                .find(|e| capture.text(e).unwrap() == "Synthetic caller summary retained.")
+                .unwrap();
+            assert_eq!(summary.event.metadata.visibility, Visibility::Session);
+            let raw: Value = serde_json::from_slice(&capture.raw(summary).unwrap()).unwrap();
+            assert_eq!(raw["isCompactSummary"], true);
+            store.close().await.unwrap();
+        });
+}
