@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-28 UTC after PR #38 merged at `d566101`. Live GitHub audit: **18 open
-Issues, 10 completed Issues**. #11 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-28 UTC after PR #40 merged at `19efca1`. Live GitHub audit: **17 open
+Issues, 11 completed Issues**. #12 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -43,8 +43,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-28 audit finds 18 open Issues (#11–#28). #4–#10 are closed with
-merged PRs #32–#38; no completed implementation is waiting for closure. #7's
+The 2026-10-28 audit finds 17 open Issues (#12–#28). #4–#11 are closed with
+merged PRs #32–#38/#40; no completed implementation is waiting for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -56,10 +56,13 @@ passing unchanged full-data receipts, rather than rerunning them for each leaf.
 #10's final exact-HEAD gate and hosted CI passed before the intentional restart.
 After resume, the unchanged receipts were collected, independent R2 review
 passed with zero actionable findings, and the PR/Issue were closed promptly.
-The cold hosted build took about38 minutes; a separate small CI-cache leaf
-reuses Cargo inputs/artifacts without skipping checks. Then implement #11's
-binding/protocol, restricted context, shared Runner budget and frozen evaluation
-reference set. Real host adapters remain #12–#15, not mock completion claims.
+The cold hosted build took about38 minutes; the independent CI-cache PR #39
+merged before #11. CI40717707611 actually restored its1.94GB cache and ran the
+full gate in about144 seconds. This one run proves restoration, not a general
+benchmark. #11's exact gate and fresh whole-candidate R2 review passed; PR #40
+merged and #11 closed. Collect terminal review/CI results promptly instead of
+letting completed work wait through the next implementation phase.
+Real host adapters remain #12–#15, not mock completion claims.
 
 ## MVP-003 completed acceptance
 
@@ -315,7 +318,7 @@ does not attest those repairs.
 - [x] Publish search/show documentation, quality and withdrawal fixtures, focused
   results, final exact-HEAD gate/review, CI, merge and Issue closure. Then #11–#28.
 
-## MVP-011 acceptance and remaining work
+## MVP-011 completed acceptance
 
 - [x] Versioned bounded JSONL envelopes, request/sequence correlation, capabilities,
   structured externally constructible errors, cancellation and terminal results.
@@ -340,9 +343,43 @@ does not attest those repairs.
   retaining the real revocation barrier, all60 cases and critical scoring.
   Erratum manifest `09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16`.
   Erratum freeze commit `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
-- [ ] Publish protocol/trait/binding/permission documentation and evidence, pass
-  exact-HEAD gate and independent review, then merge and close #11. The four real
+- [x] Publish protocol/trait/binding/permission documentation and evidence, pass
+  exact-HEAD gate and independent review, then merge and close #11. Candidate
+  `639e991` passed146 Rust,17 Python and36 installed daemon cases in140.200s;
+  R2 whole-candidate review passed with0 actionable findings. CI40717707611
+  passed; PR #40 merged as `19efca1`. Full originals are published in the PR.
+  The four real
   host integrations remain #12–#15; full quality/combination acceptance remains #27.
+
+## MVP-012 acceptance and remaining work
+
+- [x] Verify the installed Claude2.1.311 executable against its official manifest;
+  validate a native plugin and execute a non-model native metadata command with
+  isolated config, unchanged user files, no other host CLI and no MCP server.
+  This is interface preparation; it does not establish TUI/model acceptance.
+- [ ] Implement the smallest native plugin and Rust bridge for actual caller
+  identity, parent/child registration, per-call turn/fence and immutable binding.
+  Re-read identity after resume/clear; unknown child identity must refuse.
+- [ ] Capture original prompts, visible outputs and tool results; normalize native
+  transcripts with bounded resume/backfill, partial-tail/gap handling, exact
+  parent/fork/compaction lineage and no private-thinking extraction or false approval.
+- [ ] Implement a standalone Claude Runner using existing lawful CLI auth,
+  structured terminal events plus exit status, bounded output, cancellation and
+  original deadlines. Disable built-in/unrelated tools and enforce shared Rust
+  read capabilities; verify denied writes, network and out-of-scope reads.
+- [ ] Provide install/uninstall/rollback that preserves unrelated hooks and
+  configuration; expose actual version, capability and coverage in doctor.
+- [ ] Prove real TUI and Runner behavior with the other three CLIs absent:
+  concurrent sessions, resume, compact, interrupted backfill, tool results,
+  cancellation and denied operations, with traceable inputs/final output.
+  Controlled local fixtures do not substitute for authenticated model acceptance.
+- [ ] Retain sanitized native fixtures and failures, official API/version evidence,
+  reproduction commands and limitations; pass exact-candidate gate, independent
+  review and CI, then merge and close #12. Continue every queue entry below.
+
+The TUI controller's onboarding probes are retained as setup failures, not product
+regressions or acceptance. Stop retrying the same input method; use the captured
+native screen evidence to repair terminal driving before a complete TUI run.
 
 Host preparation: Claude Code2.1.311, Codex0.164.0, Hermes0.22.5+1914 and Pi0.78.0
 are executable. Claude's broken link was repaired through mise onto SSD; the
@@ -363,7 +400,7 @@ checks do not prove host protocol capabilities or an authenticated Runner.
 - [x] [#8 [MVP-008] CLI、私有 IPC daemon 与持久后台作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8) — dependencies: #2, #4, #7.
 - [x] [#9 [MVP-009] 可配置本地模型客户端与 1700 秒全链长测](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9) — dependencies: #2, #8.
 - [x] [#10 [MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10) — dependencies: #5, #6, #9.
-- [ ] [#11 [MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11) — dependencies: #7, #8, #10.
+- [x] [#11 [MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11) — dependencies: #7, #8, #10.
 - [ ] [#12 [MVP-012] Claude Code CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) — dependencies: #11.
 - [ ] [#13 [MVP-013] Codex CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/13) — dependencies: #11.
 - [ ] [#14 [MVP-014] Hermes CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/14) — dependencies: #11.

@@ -3,11 +3,22 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#10 are merged
-and completed; #11–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#11 are merged
+and completed; #12–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-011
+## Current issue: MVP-012
+
+Claude2.1.311 is installed through mise on SSD with an official-manifest-matching
+binary. Its native plugin validator and a non-model metadata command pass in
+isolated config; the command returns the actual native session ID and version.
+User configuration remained unchanged. Native TUI onboarding probes exposed a
+terminal-driving setup problem and retain their failures; TUI and authenticated
+model acceptance remain open. The full remaining implementation/acceptance list
+is in [todo.md](todo.md). The finished CI checkout is reused for #12 on SSD,
+sharing the canonical build target rather than copying it.
+
+## Completed contracts: MVP-011
 
 The shared contracts, durable immutable binding, fenced context/workspace reads,
 terminal results and global delegation budgets are implemented. Focused checks
@@ -30,13 +41,18 @@ v1 remains unchanged. Erratum manifest SHA-256 is
 Erratum freeze commit: `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
 Reference profile Codex0.164.0 / gpt-6.1-sol / high was selected before research
 instructions, with actual installed executable provenance. Model evaluation has
-not run. The pre-repair exact-HEAD full gate passed; the amended candidate still
-needs its own full gate, independent R2 review, CI and Issue closure. #11 remains open.
+not run. Final candidate `639e991` passed its140.200-second canonical gate:
+146 Rust tests,17 Python tests and36 installed-release daemon cases. Fresh
+whole-candidate R2 review passed with0 findings, and CI40717707611 passed.
+[PR #40](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/40) publishes the
+complete original gate/review/CI logs, merged as `19efca1`, and closed #11.
 
 The separate [CI-cache PR #39](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/39)
 merged as `dc8e27cd4329dcbc41cdf37cf63a4eafcee548c2` after its exact local gate,
 independent PASS/0-finding review and hosted CI40636923468. First miss/save is
-confirmed; a future cache restore and speed benefit are still unverified.
+confirmed. PR #40 then restored the1.94GB cache successfully and still ran the
+whole gate, from15:37:49 to15:40:13 UTC. This verifies a real cross-run restore;
+it is a single observed run rather than a general performance benchmark.
 
 ## Completed retrieval: MVP-010
 
@@ -197,7 +213,7 @@ not active computation. Reconcile an exact terminal result before any replay.
 After the current acceptance leaf is archived, run the canonical
 `bash scripts/check.sh` on the exact committed candidate, obtain independent
 review, push and read back the matching Linux CI, then merge and close the corresponding Issue.
-Continue #11–#28 through publication in dependency order. Isolated preparation can
+Continue #12–#28 through publication in dependency order. Isolated preparation can
 overlap immutable long acceptance while preserving one build writer. Avoid repeated full-corpus
 runs on unrelated intermediate changes; #24 repeats the same manifest/oracle
 through the actual product protocol. All required product work remains on the
