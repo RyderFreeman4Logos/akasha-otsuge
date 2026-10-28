@@ -1,3 +1,6 @@
+#[path = "support/executable.rs"]
+mod executable;
+
 use serde_json::Value;
 use std::{
     fs,
@@ -16,8 +19,7 @@ fn uninstall_can_resume_after_an_owned_file_removal_fails() {
     )));
     fs::create_dir(&root.0).unwrap();
     let native = root.0.join("claude");
-    fs::write(&native, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n").unwrap();
-    fs::set_permissions(&native, fs::Permissions::from_mode(0o700)).unwrap();
+    executable::write(&native, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n");
     let plugin = root.0.join("plugin");
     let run = |operation: &str| {
         let mut command = Command::new(BIN);
@@ -89,8 +91,7 @@ fn claude_plugin_install_is_reversible_and_preserves_unrelated_configuration() {
         Fixture(std::env::temp_dir().join(format!("akasha-claude-install-{}", std::process::id())));
     fs::create_dir(&root.0).unwrap();
     let native = root.0.join("claude");
-    fs::write(&native, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n").unwrap();
-    fs::set_permissions(&native, fs::Permissions::from_mode(0o700)).unwrap();
+    executable::write(&native, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n");
     let config = root.0.join("user-settings.json");
     let original = br#"{"hooks":{"SessionStart":[{"hooks":[{"type":"command","command":"keep-me"}]}]},"custom":"untouched"}"#;
     fs::write(&config, original).unwrap();

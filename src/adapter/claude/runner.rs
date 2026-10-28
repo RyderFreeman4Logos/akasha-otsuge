@@ -1,4 +1,4 @@
-use super::{ProcessGroup, Reap, probe, reap, wait_for_exit};
+use super::{ProcessGroup, Reap, probe, reap, spawn_error, wait_for_exit};
 use crate::adapter::*;
 use futures::future::BoxFuture;
 use rustix::process::Pid;
@@ -150,7 +150,7 @@ impl AgentRunner for ClaudeRunner {
             let mut child = tokio::process::Command::from(command)
                 .kill_on_drop(true)
                 .spawn()
-                .map_err(|_| ErrorCode::ExecutorUnavailable)?;
+                .map_err(spawn_error)?;
             let group = ProcessGroup(
                 Pid::from_raw(child.id().ok_or(ErrorCode::RunnerFailed)? as i32)
                     .ok_or(ErrorCode::RunnerFailed)?,

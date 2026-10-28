@@ -1,11 +1,15 @@
 use super::*;
 use akasha_otsuge::adapter::claude::ClaudeRunner;
-use std::{os::unix::fs::PermissionsExt, time::Duration};
+use std::time::Duration;
 
 fn executable(f: &Fixture, body: &str) -> PathBuf {
     let path = f.0.join("fake-claude");
-    std::fs::write(&path, format!("#!/bin/sh\nif [ \"$1\" = --version ]; then printf '2.1.311 (Claude Code)\\n'; exit 0; fi\n{body}")).unwrap();
-    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+    super::executable::write(
+        &path,
+        &format!(
+            "#!/bin/sh\nif [ \"$1\" = --version ]; then printf '2.1.311 (Claude Code)\\n'; exit 0; fi\n{body}"
+        ),
+    );
     path
 }
 async fn origin(f: &Fixture, store: &Storage) -> Invocation {
@@ -119,7 +123,12 @@ fn no_live_process(pid: u32) -> bool {
             stat.rsplit_once(')').unwrap().1.split_whitespace().next(),
             Some("Z" | "X")
         ),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => true,
+        Err(e)
+            if e.kind() == std::io::ErrorKind::NotFound
+                || e.raw_os_error() == Some(rustix::io::Errno::SRCH.raw_os_error()) =>
+        {
+            true
+        }
         Err(e) => panic!("cannot inspect owned PID: {e}"),
     }
 }
@@ -437,12 +446,11 @@ async fn native_runner_removes_owned_setup_when_executor_disappears_after_probe(
     let f = Fixture::new();
     let store = f.open().await;
     let invocation = origin(&f, &store).await;
-    let binary = executable(&f, "exit 0\n");
-    std::fs::write(
+    let binary = f.0.join("fake-claude");
+    super::executable::write(
         &binary,
         "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n/bin/rm -- \"$0\"\n",
-    )
-    .unwrap();
+    );
     let mut runner = ClaudeRunner::new(
         &binary,
         std::path::Path::new(env!("CARGO_BIN_EXE_akasha-otsuge")),

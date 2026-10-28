@@ -541,12 +541,10 @@ fn native_bridge(daemon: &Daemon, event: &Value) -> Value {
 
 #[test]
 fn native_sync_waits_for_the_pinned_event_after_async_transcript_flush() {
-    use std::os::unix::fs::PermissionsExt;
     let mut daemon = Daemon::new();
     daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
     let binary = daemon.root.join("claude");
-    std::fs::write(&binary, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n").unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    super::executable::write(&binary, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n");
     let path = daemon.root.join("not-flushed.jsonl");
     daemon.start();
     let registered = native_bridge(
@@ -621,12 +619,10 @@ fn native_sync_waits_for_the_pinned_event_after_async_transcript_flush() {
 
 #[test]
 fn native_child_registration_keeps_parent_identity_and_separate_history() {
-    use std::os::unix::fs::PermissionsExt;
     let mut daemon = Daemon::new();
     daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
     let binary = daemon.root.join("claude");
-    std::fs::write(&binary, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n").unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    super::executable::write(&binary, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n");
     let session = "11111111-1111-4111-8111-111111111111";
     let agent = "a2d42a7b5cfaf7eb6";
     let transcript = daemon.root.join(format!("{session}.jsonl"));
@@ -791,12 +787,10 @@ fn native_child_registration_keeps_parent_identity_and_separate_history() {
 
 #[test]
 fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() {
-    use std::os::unix::fs::PermissionsExt;
     let mut daemon = Daemon::new();
     daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
     let binary = daemon.root.join("claude");
-    std::fs::write(&binary, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n").unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    super::executable::write(&binary, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n");
     let transcript = daemon.root.join("native.jsonl");
     std::fs::write(
         &transcript,

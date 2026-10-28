@@ -6,7 +6,7 @@ pub(crate) mod caller;
 pub use caller::{ClaudeCaller, NativeCall, NativeEvent};
 mod runner;
 mod transcript;
-use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
+use super::{AdapterError, BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
 use crate::{capture::CoverageLevel, config::Host};
 pub use runner::ClaudeRunner;
 use rustix::process::{Pid, Signal, WaitId, WaitIdOptions, kill_process_group, waitid};
@@ -32,7 +32,7 @@ pub async fn probe(binary: &Path) -> Result<CapabilityReport> {
     let mut child = tokio::process::Command::from(command)
         .kill_on_drop(true)
         .spawn()
-        .map_err(|_| ErrorCode::ExecutorUnavailable)?;
+        .map_err(spawn_error)?;
     let group = ProcessGroup(
         Pid::from_raw(child.id().ok_or(ErrorCode::RunnerFailed)? as i32)
             .ok_or(ErrorCode::RunnerFailed)?,
@@ -77,6 +77,13 @@ pub async fn probe(binary: &Path) -> Result<CapabilityReport> {
         capabilities: Default::default(),
         self_test: SelfTest::NotRun,
     })
+}
+
+fn spawn_error(error: std::io::Error) -> AdapterError {
+    AdapterError {
+        code: ErrorCode::ExecutorUnavailable,
+        source_code: error.raw_os_error().map(|code| format!("SPAWN_OS_{code}")),
+    }
 }
 
 fn resolve(binary: &Path) -> Result<PathBuf> {

@@ -72,7 +72,8 @@ the original timeout/error remains authoritative. A background cleanup owner
 retains the child, workspace and concurrency lease until exit is observed, even
 after the handle is dropped. The version probe uses the same bounded cleanup
 after its five-second query timeout. A successful native result still requires
-a successful process exit.
+a successful process exit. Spawn failures preserve the OS errno in
+`source_code` without exposing executable paths or arguments.
 
 `AgentRunner::start` receives that spec and a separate `ContextSource`; choosing
 a Runner does not change the caller's history source. `RunHandle` provides typed

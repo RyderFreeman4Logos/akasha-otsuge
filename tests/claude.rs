@@ -1,8 +1,11 @@
 #![cfg(unix)]
 
+#[path = "support/executable.rs"]
+mod executable;
+
 use std::{
     fs,
-    os::unix::fs::{PermissionsExt, symlink},
+    os::unix::fs::symlink,
     path::PathBuf,
     process::Command,
     sync::atomic::{AtomicU64, Ordering},
@@ -22,8 +25,7 @@ impl HostFixture {
         fs::create_dir(&root).unwrap();
         fs::create_dir(root.join("bin")).unwrap();
         let executable = root.join("native-claude");
-        fs::write(&executable, script).unwrap();
-        fs::set_permissions(&executable, fs::Permissions::from_mode(0o700)).unwrap();
+        executable::write(&executable, script);
         symlink(&executable, root.join("bin/claude")).unwrap();
         Self(root)
     }
@@ -103,6 +105,26 @@ fn doctor_uses_literal_binary_override_and_preserves_cli_validation() {
         assert_eq!(error["error"]["code"], "INVALID_ARGUMENT");
         assert!(!String::from_utf8_lossy(&output.stderr).contains("private"));
     }
+}
+
+#[test]
+fn doctor_preserves_spawn_errno_without_exposing_the_executable_path() {
+    let host = HostFixture::new("#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n");
+    let _writer = fs::OpenOptions::new()
+        .write(true)
+        .open(host.0.join("native-claude"))
+        .unwrap();
+    let output = host.command().output().unwrap();
+    assert!(!output.status.success());
+    let value: serde_json::Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(value["error"]["code"], "EXECUTOR_UNAVAILABLE");
+    assert_eq!(
+        value["error"]["source_code"],
+        format!("SPAWN_OS_{}", rustix::io::Errno::TXTBSY.raw_os_error())
+    );
+    assert!(!String::from_utf8_lossy(&output.stderr).contains(host.0.to_str().unwrap()));
+    drop(_writer);
+    assert!(host.command().output().unwrap().status.success());
 }
 
 #[test]

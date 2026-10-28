@@ -444,6 +444,12 @@ does not attest those repairs.
     The pending-reap regression fails with an unbounded wait and passes with
     a non-renewable one-second grace. Child/workspace/lease ownership survives
     caller drop; 17 focused tests and all-target Clippy pass.
+  - [x] Diagnose and repair fixture startup before the fresh candidate gate.
+    Gate2 at `bfc301b` failed before cancellation at executor startup. A later
+    native spawn diagnostic reproduced `ETXTBSY` (OS26); script creation now
+    occurs in an isolated writer process. A distinct procfs `ESRCH` observation
+    is treated as an exited process. All33 focused cases, Clippy and20 parallel
+    rounds pass; both earlier failures remain retained.
 
 The four original TUI onboarding probes remain setup failures. A distinct probe
 used a controlling PTY and task-only trusted workspace configuration, ran the

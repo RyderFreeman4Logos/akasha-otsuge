@@ -1,5 +1,8 @@
 #![cfg(target_os = "linux")]
 
+#[path = "support/executable.rs"]
+mod executable;
+
 use serde_json::{Value, json};
 use std::io::{Read, Write};
 use std::os::unix::fs::{DirBuilderExt, MetadataExt};

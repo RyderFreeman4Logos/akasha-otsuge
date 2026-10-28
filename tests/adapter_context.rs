@@ -1,3 +1,6 @@
+#[path = "support/executable.rs"]
+mod executable;
+
 use akasha_otsuge::{
     adapter::*,
     capture::*,
