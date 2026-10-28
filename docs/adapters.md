@@ -210,4 +210,9 @@ that event within the original job deadline, including delayed file creation
 or a partial final record. Restart preserves the deadline and cancellation
 remains available. Malformed frames before the target fail with `HISTORY_GAP`.
 Manual imports without a target retain their existing partial/gap reports.
-Installation and fork-parent discovery remain unfinished.
+Native startup/resume/clear/compact/fork reasons are retained in registration
+evidence. A CLI fork copies its retained UUID chain into the new session; those
+originals remain readable within that branch. The2.1.311 SessionStart contract
+does not expose a fork's parent session ID, so that relationship stays unknown.
+No later parent or sibling events are imported into the branch. Installation
+remains unfinished.

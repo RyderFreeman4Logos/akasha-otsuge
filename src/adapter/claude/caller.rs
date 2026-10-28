@@ -16,6 +16,7 @@ pub enum NativeEvent {
         session_id: String,
         transcript_path: PathBuf,
         cwd: PathBuf,
+        start_kind: Option<String>,
     },
     RegisterChild {
         parent_registration: String,
@@ -50,6 +51,8 @@ pub(crate) struct Registration {
     pub workspace: PathBuf,
     #[serde(default)]
     pub parent: Option<String>,
+    #[serde(default)]
+    pub start_kind: Option<String>,
 }
 
 pub struct ClaudeCaller {

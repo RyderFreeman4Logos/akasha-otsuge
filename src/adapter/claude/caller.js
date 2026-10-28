@@ -42,7 +42,7 @@ async function ensureRegistration($, state, seen = new Set()) {
       event = {op: 'register_child', parent_registration: parent.registration, agent_id: state.agent};
     } else {
       event = {op: 'register', binary, session_id: state.session,
-        transcript_path: state.transcript, cwd: state.cwd};
+        transcript_path: state.transcript, cwd: state.cwd, start_kind: state.start};
     }
     const registered = await send($, event);
     state.registration = registered.registration;
@@ -51,7 +51,7 @@ async function ensureRegistration($, state, seen = new Set()) {
 
 export function register(on) {
   on('classic.SessionStart', async ($, e, next) => {
-    const state = {session: e.session_id, transcript: e.transcript_path, cwd: e.cwd, cursor: 0};
+    const state = {session: e.session_id, transcript: e.transcript_path, cwd: e.cwd, cursor: 0, start: e.source};
     root = state;
     children.clear();
     if (e.session_id !== await $.session.id()) throw new Error('CALLER_AMBIGUOUS');

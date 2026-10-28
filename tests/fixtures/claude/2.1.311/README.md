@@ -58,6 +58,18 @@ fixture SHA-256:
 The ordinary child has13 captured events with no inherited parent originals.
 Its runtime parent registration remains distinct from transcript ancestry.
 
+`native-fork.jsonl` is the41-record native CLI fork of the recorded root before
+its later compaction. It retains25 native UUID-bearing records under the fork's
+new session ID. The same sanitization rules replace attachment text and tool
+result diagnostics; copied originals and parent links remain present. Source
+SHA-256 `86d82c82b7a257db0e4ff19f1e45de3cca082b08d9e87e7158939bdb62a3a34f`;
+fixture SHA-256
+`2cf9bc8a37a4331ff89d69af32e5beac13b136eaa1d5e8350ceddcc1536e649e`.
+Storage replay verifies retained startup/resume originals and isolation from
+the parent's later compaction. The native harness also verifies that later
+parent turns and fork inputs stay separate. SessionStart reports `fork` but
+does not provide its parent session ID; the adapter leaves that ID unknown.
+
 To repeat the local protocol check, compile the test executable and use the path
 Cargo prints. The last argument must be a new artifact directory on writable SSD
 storage. The script uses isolated HOME/config, a synthetic key, loopback HTTP and
@@ -76,7 +88,7 @@ Native API references: [CLI options](https://code.claude.com/docs/en/cli-referen
 [Anthropic SSE](https://platform.claude.com/docs/en/build-with-claude/streaming).
 
 The Caller check uses the production native hook and actual daemon/Storage,
-checking startup/resume/child call identity and completed durable backfill. Its
+checking startup/resume/fork/child identity and completed durable backfill. Its
 fixture-only tool returns a marker after binding; it does not implement consult
 research or establish authenticated model acceptance. It removes its owned
 scratch directory and processes on completion:

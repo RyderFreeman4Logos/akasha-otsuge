@@ -370,24 +370,26 @@ does not attest those repairs.
   The private root registration/binding bridge now passes durable retry/restart,
   identity replacement, missing-tip, unknown-field and live read-root withdrawal
   regressions; all-target Clippy passed. Actual native hooks now pass startup and
-  resume and native child binding plus nine durable backfill jobs against local
+  resume, fork and native child binding plus13 durable backfill jobs against local
   synthetic SSE. The child registry preserves parent identity and rejects
   unregistered identities, changed parents and mismatched native source frames.
   Re-registration preserves call identity; a delayed transcript flush is retried
   within the original bound. Native sync waits for its persisted target event
-  within the original job deadline. Fork-parent discovery and installation
-  remain unfinished. Root tokens cannot claim child identity.
+  within the original job deadline. Native lifecycle reasons are retained;
+  fork-parent session IDs are not exposed by the supported hook and remain
+  unknown. Installation remains unfinished. Root tokens cannot claim child identity.
 - [ ] Capture original prompts, visible outputs and tool results; normalize native
   transcripts with bounded resume/backfill, partial-tail/gap handling, exact
   parent/fork/compaction lineage and no private-thinking extraction or false approval.
-  Root resume and compaction now pass4 capture regressions and all-target Clippy,
+  Capture and binding now pass7 regressions and all-target Clippy,
   replaying the actual2.1.311 transcript. Attachments retain rendered visible
   text when present; native attachments without rendered bodies retain identity
   and an explicit omission marker. The fixture preserves that native absence.
   Summary flags remain recorded as session information. Missing original
   ancestry stays explicitly pending. Ordinary native children retain their own
-  transcript ancestry and their registered runtime parent separately; fork
-  linkage remains unfinished.
+  transcript ancestry and their registered runtime parent separately. Native
+  fork replay retains copied originals and excludes later parent/sibling events;
+  the unexposed fork-parent ID remains an explicit coverage limit.
 - [ ] Implement a standalone Claude Runner using existing lawful CLI auth,
   structured terminal events plus exit status, bounded output, cancellation and
   original deadlines. Disable built-in/unrelated tools and enforce shared Rust

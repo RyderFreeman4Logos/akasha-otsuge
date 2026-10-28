@@ -189,6 +189,138 @@ fn recorded_native_compaction_refuses_missing_original_ancestor() {
     recorded_native_compaction(true);
 }
 
+#[test]
+fn recorded_native_fork_keeps_copied_history_and_branch_isolation() {
+    let mut daemon = Daemon::new();
+    daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
+    let scope = Scope {
+        user: format!("uid:{}", rustix::process::geteuid().as_raw()),
+        project: None,
+        branch_or_version: None,
+        session: None,
+    };
+    let cases = [
+        (
+            "root",
+            "11111111-1111-4111-8111-111111111111",
+            include_str!("../fixtures/claude/2.1.311/native-root-resume-compact.jsonl"),
+        ),
+        (
+            "fork",
+            "22222222-2222-4222-8222-222222222222",
+            include_str!("../fixtures/claude/2.1.311/native-fork.jsonl"),
+        ),
+    ];
+    let mut captured = Vec::new();
+    daemon.start();
+    for (name, session, fixture) in cases {
+        let source = SourceIdentity {
+            adapter: "claude_code".into(),
+            profile: "test".into(),
+            session: session.into(),
+            thread: session.into(),
+            agent: "main".into(),
+        };
+        let path = daemon.root.join(format!("{name}.jsonl"));
+        let binding = daemon.root.join(format!("{name}.json"));
+        std::fs::write(&path, fixture).unwrap();
+        std::fs::write(
+            &binding,
+            json!({"source":source,"scope":scope,"stream":"native-file","coverage":"visible_text"})
+                .to_string(),
+        )
+        .unwrap();
+        daemon.cli(&[
+            "capture",
+            "claude",
+            binding.to_str().unwrap(),
+            path.to_str().unwrap(),
+            "--idempotency-key",
+            name,
+        ]);
+        let done = terminal(&daemon, name);
+        assert_eq!(done["state"], "succeeded", "{done}");
+        assert!(done["result"]["checkpoint"]["checkpoint"]["pending"].is_null());
+        let tip = fixture
+            .lines()
+            .rev()
+            .find_map(|line| {
+                serde_json::from_str::<Value>(line).unwrap()["uuid"]
+                    .as_str()
+                    .map(str::to_owned)
+            })
+            .unwrap();
+        captured.push((name, source, tip));
+    }
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            let resolved = resolve(
+                "",
+                None,
+                "",
+                &Paths {
+                    data_dir: daemon.root.join("data"),
+                    socket_path: daemon.socket(),
+                },
+            )
+            .unwrap();
+            let store = Storage::open(&resolved).await.unwrap();
+            let capture = Capture::new(&store);
+            for (name, source, tip) in captured {
+                let binding = CaptureBinding::from_source(
+                    source.clone(),
+                    scope.clone(),
+                    "native-file",
+                    CoverageLevel::VisibleText,
+                )
+                .unwrap();
+                let page = capture
+                    .lineage(
+                        &binding,
+                        &EventRef {
+                            source: source.clone(),
+                            event_id: tip,
+                        },
+                        store.sequence().unwrap(),
+                        64,
+                    )
+                    .unwrap();
+                assert!(page.missing.is_none() && page.next.is_none());
+                assert!(
+                    page.events
+                        .iter()
+                        .all(|e| e.event.reference.source == source)
+                );
+                let texts: Vec<_> = page
+                    .events
+                    .iter()
+                    .map(|e| capture.text(e).unwrap())
+                    .collect();
+                assert!(texts.iter().any(|t| t == "PRIVATE_CALLER_INPUT start"));
+                assert!(texts.iter().any(|t| t == "PRIVATE_CALLER_INPUT resume"));
+                assert_eq!(
+                    texts.iter().any(|t| t == "PRIVATE_CALLER_INPUT fork"),
+                    name == "fork"
+                );
+                assert_eq!(
+                    texts
+                        .iter()
+                        .any(|t| t == "Synthetic caller summary retained."),
+                    name == "root"
+                );
+                if name == "fork" {
+                    assert_eq!(page.events.len(), 25);
+                }
+            }
+            store.close().await.unwrap();
+        });
+}
+
 fn recorded_native_compaction(missing_ancestor: bool) {
     let mut daemon = Daemon::new();
     daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
@@ -638,11 +770,17 @@ fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() 
     let registration = native_bridge(
         &daemon,
         &json!({"op":"register","binary":binary,
-        "session_id":"11111111-1111-4111-8111-111111111111","transcript_path":transcript,"cwd":daemon.root}),
+        "session_id":"11111111-1111-4111-8111-111111111111","transcript_path":transcript,"cwd":daemon.root,"start_kind":"resume"}),
     );
     let token = registration["data"]["registration"]
         .as_str()
         .expect("native registration accepted");
+    let invalid_start = native_bridge(
+        &daemon,
+        &json!({"op":"register","binary":binary,
+        "session_id":"11111111-1111-4111-8111-111111111111","transcript_path":transcript,"cwd":daemon.root,"start_kind":"unknown-mode"}),
+    );
+    assert_eq!(invalid_start["error"]["code"], "INVALID_REQUEST");
     let call = json!({"op":"bind","registration":token,"session_id":"11111111-1111-4111-8111-111111111111",
         "agent_id":null,"turn_id":"turn-a","tool_call_id":"call-a","cursor":1,"tip":"a7c3b44a-26cd-4a68-9aff-3e98cce20493"});
     let first = native_bridge(&daemon, &call);
@@ -747,4 +885,35 @@ fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() 
     assert!(delayed["error"].is_null(), "{delayed}");
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            let resolved = resolve(
+                "",
+                None,
+                "",
+                &Paths {
+                    data_dir: daemon.root.join("data"),
+                    socket_path: daemon.socket(),
+                },
+            )
+            .unwrap();
+            let store = Storage::open(&resolved).await.unwrap();
+            let key = akasha_otsuge::storage::RecordKey {
+                kind: akasha_otsuge::storage::RecordKind::Evidence,
+                id: format!(
+                    "claude-registration/{}",
+                    <sha2::Sha256 as sha2::Digest>::digest(token.as_bytes())
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>()
+                ),
+            };
+            let saved: Value =
+                serde_json::from_str(&store.current(&key).unwrap().unwrap().content).unwrap();
+            assert_eq!(saved["start_kind"], "resume");
+            store.close().await.unwrap();
+        });
 }

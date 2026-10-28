@@ -52,6 +52,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
             count+=1;assert count<=8
             requests.append({'stage':stage,'body':request})
             (ROOT/'requests.json').write_text(json.dumps(requests))
+            if stage=='fork':
+                history=json.dumps(request['messages'])
+                assert 'PRIVATE_CALLER_INPUT start' in history and 'PRIVATE_CALLER_INPUT resume' in history
+                assert 'PRIVATE_CALLER_INPUT parent_later' not in history
+            if stage=='parent_later':
+                assert 'PRIVATE_CALLER_INPUT fork' not in json.dumps(request['messages'])
             is_child=stage=='child' and any(m.get('role')=='user' and (m.get('content')=='PRIVATE_CHILD_INPUT' or isinstance(m.get('content'),list) and any(b.get('text')=='PRIVATE_CHILD_INPUT' for b in m['content'])) for m in request['messages'])
             spawn=stage=='child' and count==1
             tool=count==1 or is_child and not child_called
@@ -85,8 +91,11 @@ try:
   assert daemon.poll() is None and time.monotonic()<end,'daemon readiness';time.sleep(.02)
  base=[str(NATIVE),'-p','--output-format','stream-json','--verbose','--tools','ToolSearch,Agent','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources','','--plugin-dir',str(ROOT/'plugin')]
  session='11111111-1111-4111-8111-111111111111'
+ fork_session='22222222-2222-4222-8222-222222222222'
  child_session='33333333-3333-4333-8333-333333333333'
- for stage,flags in [('start',['--session-id',session]),('resume',['--resume',session]),('child',['--session-id',child_session])]:
+ for stage,flags in [('start',['--session-id',session]),('resume',['--resume',session]),
+     ('fork',['--resume',session,'--fork-session','--session-id',fork_session]),
+     ('parent_later',['--resume',session]),('child',['--session-id',child_session])]:
   count=0;child=subprocess.Popen(base+flags,cwd=workspace,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
   try:stdout,stderr=child.communicate(('PRIVATE_CALLER_INPUT '+stage).encode(),timeout=30)
   finally:
@@ -99,12 +108,12 @@ try:
   checks.append({'stage':stage,'pid':child.pid,'requests':count,'stdout_sha256':hashlib.sha256(stdout).hexdigest()})
  assert not errors,errors
  records=[json.loads(l) for l in (ROOT/'bridge.jsonl').read_text().splitlines()] if (ROOT/'bridge.jsonl').exists() else []
- bindings=[r for r in records if r['event']['op']=='bind'];assert len(bindings)==3,'native hook did not create all immutable calls'
- for r in bindings[:2]:
+ bindings=[r for r in records if r['event']['op']=='bind'];assert len(bindings)==5,'native hook did not create all immutable calls'
+ for r,expected_session in zip(bindings[:4],[session,session,fork_session,session],strict=True):
   assert 'error' not in r['response'],r['response']
-  b=r['response']['data'];assert b['caller']['session']==session and b['caller']['agent']=='main' and b['turn_id'] and b['tool_call_id']
+  b=r['response']['data'];assert b['caller']['session']==expected_session and b['caller']['agent']=='main' and b['turn_id'] and b['tool_call_id']
  assert bindings[0]['response']['data']['turn_id']!=bindings[1]['response']['data']['turn_id']
- native_child=bindings[2]['response']['data']
+ native_child=bindings[4]['response']['data']
  assert native_child['caller']['session']==child_session and native_child['caller']['agent']!='main'
  assert native_child['proof']['kind']=='registered_child' and native_child['proof']['parent']==child_session
  syncs=[r['response']['data']['id'] for r in records if r['event']['op']=='sync'];assert syncs,'native turn did not submit backfill'

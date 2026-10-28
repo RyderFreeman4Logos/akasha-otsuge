@@ -95,8 +95,13 @@ impl Service {
                     session_id,
                     transcript_path,
                     cwd,
+                    start_kind,
                 } => {
-                    if !ipc::identifier(&session_id) {
+                    if !ipc::identifier(&session_id)
+                        || start_kind.as_deref().is_some_and(|kind| {
+                            !matches!(kind, "startup" | "resume" | "clear" | "compact" | "fork")
+                        })
+                    {
                         return Err(Error("INVALID_REQUEST"));
                     }
                     let transcript = service.allowed_path(&transcript_path)?;
@@ -121,6 +126,7 @@ impl Service {
                         transcript,
                         workspace,
                         parent: None,
+                        start_kind,
                     };
                     service
                         .save_claude_registration(registration, generation)
@@ -164,6 +170,7 @@ impl Service {
                         capability: parent.capability,
                         scope: parent.scope,
                         workspace: parent.workspace,
+                        start_kind: None,
                     };
                     service
                         .save_claude_registration(registration, generation)
