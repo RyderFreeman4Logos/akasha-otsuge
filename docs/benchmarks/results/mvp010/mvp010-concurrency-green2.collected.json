@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T18:56:10.937411+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "a09d9d691840278e2905aa39808dabd01126c663",
+    "log_sha256": "d63139c8eb570180710a3f53361e3135a678145e3b9ce908577513849c4031fe",
+    "seconds": 51.89532062225044,
+    "utc": "2026-10-27T18:53:29.462713+00:00"
+  },
+  "process_absent": true,
+  "classification": "6 retrieval and19 Domain fixtures PASS, including old generation while builder held and expired current receipt denial; Clippy requests collapsing nested generation selection ifs"
+}

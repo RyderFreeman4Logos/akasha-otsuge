@@ -1,0 +1,40 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp010)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.77s
+     Running tests/daemon.rs (target/debug/deps/daemon-7ddf8a6c18df7d4f)
+
+running 3 tests
+
+thread 'retrieval_tests::regressions::invalid_vector_overflow_retains_diagnostic' (4078105) panicked at tests/support/retrieval_regressions.rs:38:5:
+assertion `left == right` failed: {"dimension":2,"generation":"47a79042fcaf45821f55e1ff2a08edf78fff4d25458dd8bd5599fb6e3781f677","indexed_rows":0,"last_call":null,"model_identity":"9a0c70c15fff9737a1d9d6068da3bcbe015fc0ccbb01bb9d92669f24efc894f8","watermark":0}
+  left: Null
+ right: "PROVIDER_OUTPUT_INVALID"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test retrieval_tests::regressions::invalid_vector_overflow_retains_diagnostic ... FAILED
+
+thread 'retrieval_tests::regressions::invalid_vector_zero_retains_diagnostic' (4078106) panicked at tests/support/retrieval_regressions.rs:38:5:
+assertion `left == right` failed: {"dimension":2,"generation":"f1ad7873985b3e1b3d464c5cabf2b8719d5c3166f15ac5671cef6af0cfab5192","indexed_rows":0,"last_call":null,"model_identity":"4a7c4109e628254b9c213a3e8042146b52ebfae3bba978121242101fdde0e0e3","watermark":0}
+  left: Null
+ right: "PROVIDER_OUTPUT_INVALID"
+
+thread 'retrieval_tests::regressions::invalid_vector_cancelled_mean_retains_diagnostic' (4078104) panicked at tests/support/retrieval_regressions.rs:38:5:
+assertion `left == right` failed: {"dimension":2,"generation":"8ee6ed671d515e9378bd6ab6f81fd8ae19bc9b3564fc1e8d743a1b678b3730c5","indexed_rows":0,"last_call":null,"model_identity":"00f0d65177699347dae05b4e5dec074db64c366c5e899e0339daf634956ebd9a","watermark":0}
+  left: Null
+ right: "PROVIDER_OUTPUT_INVALID"
+test retrieval_tests::regressions::invalid_vector_zero_retains_diagnostic ... FAILED
+test retrieval_tests::regressions::invalid_vector_cancelled_mean_retains_diagnostic ... FAILED
+
+failures:
+
+failures:
+    retrieval_tests::regressions::invalid_vector_cancelled_mean_retains_diagnostic
+    retrieval_tests::regressions::invalid_vector_overflow_retains_diagnostic
+    retrieval_tests::regressions::invalid_vector_zero_retains_diagnostic
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 32 filtered out; finished in 0.85s
+
+error: test failed, to rerun pass `--test daemon`

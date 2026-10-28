@@ -1,0 +1,39 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp010)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.26s
+     Running tests/daemon.rs (target/debug/deps/daemon-7ddf8a6c18df7d4f)
+
+running 3 tests
+
+thread 'retrieval_tests::regressions::legal_large_ancestor_fact_does_not_block_scoped_search' (4086024) panicked at tests/support/retrieval_regressions.rs:172:5:
+assertion `left == right` failed: {"accepted_at_ms":1793133767067,"attempt":1,"cancel_requested":false,"config_digest":"934e751f32895662632f8534714ba956d99ad318e773fb35dda8db670cfa477a","config_generation":1,"error":"RESULT_TOO_LARGE","execution_budget_ms":120000,"execution_deadline_ms":1793133887090,"id":"large-search","lease_owner":null,"lease_until_ms":null,"queue_deadline_ms":1793134067067,"request_sha256":"765f39c018e298e6da911da308736865fb7085f031f0127c572f8f200851c1c5","result":null,"retrieval_plan":{"kind":"search","query":"absentword","scope":{"branch_or_version":"child","project":"alpha","session":null,"user":"uid:1001"}},"retrieval_vector_config_generation":1,"retry_at_ms":1793133767067,"schema_version":1,"started_at_ms":1793133767090,"state":"failed"}
+  left: String("failed")
+ right: "succeeded"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test retrieval_tests::regressions::legal_large_ancestor_fact_does_not_block_scoped_search ... FAILED
+
+thread 'retrieval_tests::regressions::legal_large_fact_does_not_block_scoped_search' (4086025) panicked at tests/support/retrieval_regressions.rs:172:5:
+assertion `left == right` failed: {"accepted_at_ms":1793133767107,"attempt":1,"cancel_requested":false,"config_digest":"729031d4385cea77e39bdb1113bc43dfb85ae88d0e65ece080bcde0f34bf3f3a","config_generation":1,"error":"RESULT_TOO_LARGE","execution_budget_ms":120000,"execution_deadline_ms":1793133887127,"id":"large-search","lease_owner":null,"lease_until_ms":null,"queue_deadline_ms":1793134067107,"request_sha256":"a18e70d14429f396c4431718ee51dac79eb37d9fe38c5b42071e2527fe10773c","result":null,"retrieval_plan":{"kind":"search","query":"absentword","scope":{"branch_or_version":null,"project":"alpha","session":null,"user":"uid:1001"}},"retrieval_vector_config_generation":1,"retry_at_ms":1793133767107,"schema_version":1,"started_at_ms":1793133767127,"state":"failed"}
+  left: String("failed")
+ right: "succeeded"
+test retrieval_tests::regressions::legal_large_fact_does_not_block_scoped_search ... FAILED
+
+thread 'retrieval_tests::regressions::legal_large_rule_is_dropped_whole_with_a_budget_gap' (4086026) panicked at tests/support/retrieval_regressions.rs:180:9:
+assertion failed: output["coverage"]["gaps"].as_array().unwrap().iter().any(|g|
+        g == "character_budget")
+test retrieval_tests::regressions::legal_large_rule_is_dropped_whole_with_a_budget_gap ... FAILED
+
+failures:
+
+failures:
+    retrieval_tests::regressions::legal_large_ancestor_fact_does_not_block_scoped_search
+    retrieval_tests::regressions::legal_large_fact_does_not_block_scoped_search
+    retrieval_tests::regressions::legal_large_rule_is_dropped_whole_with_a_budget_gap
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 35 filtered out; finished in 0.81s
+
+error: test failed, to rerun pass `--test daemon`

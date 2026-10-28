@@ -91,7 +91,24 @@ pub(super) fn load_result(storage: &Storage, pointer: &Value, point: u64) -> Res
 }
 
 impl Service {
-    async fn model_cancelled(&self, id: &str) -> &'static str {
+    pub(super) async fn authorize_model(
+        &self,
+        id: &str,
+    ) -> std::result::Result<(), crate::provider::Error> {
+        let _guard = self.admission.lock().await;
+        let (_, job) = self.job(id).map_err(|e| crate::provider::Error(e.0))?;
+        self.authorize_job(&job)
+            .map_err(|e| crate::provider::Error(e.0))?;
+        if job.cancel_requested {
+            return Err(crate::provider::Error("CANCELLED"));
+        }
+        if self.stopping.load(std::sync::atomic::Ordering::Acquire) {
+            return Err(crate::provider::Error("PROVIDER_INTERRUPTED"));
+        }
+        Ok(())
+    }
+
+    pub(super) async fn model_cancelled(&self, id: &str) -> &'static str {
         loop {
             let changed = self.work.notified();
             tokio::pin!(changed);
@@ -103,8 +120,12 @@ impl Service {
                 }
                 match self.job(id) {
                     Ok((_, job)) if job.cancel_requested => return "CANCELLED",
+                    Ok((_, job)) => {
+                        if let Err(error) = self.authorize_job(&job) {
+                            return error.0;
+                        }
+                    }
                     Err(_) => return "JOB_CORRUPT",
-                    _ => (),
                 }
             }
             changed.await;
@@ -148,11 +169,12 @@ impl Service {
             }
             let outcome = self
                 .providers
-                .call(
+                .call_guarded(
                     config.resolved(),
                     call,
                     &workflow,
                     self.model_cancelled(&id),
+                    self.authorize_model(&id),
                 )
                 .await;
             let failure = outcome.error.clone();

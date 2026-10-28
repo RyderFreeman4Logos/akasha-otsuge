@@ -1,0 +1,12 @@
+{
+  "classification": "Behavioral RED: production show/range CLI unsupported",
+  "process_absent": true,
+  "scratch_absent": true,
+  "terminal": {
+    "exit_code": 101,
+    "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+    "log_sha256": "0b7f7e931c482e943c160a7ce5c2ab79e13dad7c27ebeb35c9774a082a36dbbd",
+    "seconds": 1.7154604578390718,
+    "utc": "2026-10-27T18:04:10.766963+00:00"
+  }
+}

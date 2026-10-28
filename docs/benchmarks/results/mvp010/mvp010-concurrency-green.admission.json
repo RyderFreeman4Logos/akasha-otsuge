@@ -1,0 +1,14 @@
+{
+  "command": [
+    "bash",
+    "-c",
+    "cargo fmt --all && cargo test --locked --test daemon retrieval_tests -- --nocapture && cargo test --locked --test domain && cargo clippy --locked --all-targets -- -D warnings"
+  ],
+  "head": "a09d9d691840278e2905aa39808dabd01126c663",
+  "process": {
+    "pid": 3788967,
+    "start_ticks": "494502002",
+    "state": "R"
+  },
+  "utc": "2026-10-27T18:52:03.021512+00:00"
+}

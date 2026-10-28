@@ -55,6 +55,23 @@ impl Scope {
     }
 }
 
+impl MemoryRecord {
+    pub fn is_rule(&self) -> bool {
+        self.authority == Authority::HumanConfirmed
+            && matches!(
+                self.draft.kind,
+                MemoryKind::Decision | MemoryKind::Preference | MemoryKind::Procedure
+            )
+    }
+}
+
+impl MemoryDraft {
+    pub fn valid_at(&self, now_ms: i64) -> bool {
+        self.valid_from_ms.is_none_or(|start| now_ms >= start)
+            && self.valid_until_ms.is_none_or(|end| now_ms < end)
+    }
+}
+
 /// Trusted server policy for this operation; never deserialize it from a worker request.
 pub struct Policy {
     pub revision: String,

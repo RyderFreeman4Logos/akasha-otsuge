@@ -158,7 +158,7 @@ fn killed_transactions_recover_whole_batches_and_retry_exactly_once() {
     }
 }
 
-fn kill_at(root: &Path, phase: &str, test: &str) {
+pub(crate) fn kill_at(root: &Path, phase: &str, test: &str) {
     let log = std::fs::File::create(root.join("child.log")).unwrap();
     let mut child = OwnedChild(
         Command::new(std::env::current_exe().unwrap())

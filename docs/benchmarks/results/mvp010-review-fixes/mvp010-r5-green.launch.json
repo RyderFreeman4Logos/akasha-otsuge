@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "retrieval_tests::regressions::legal_large_",
+    "--",
+    "--nocapture"
+  ],
+  "name": "mvp010-r5-green",
+  "process": {
+    "pid": 4087018,
+    "start_ticks": "495170155",
+    "state": "R"
+  },
+  "utc": "2026-10-27T20:43:24.527888+00:00"
+}

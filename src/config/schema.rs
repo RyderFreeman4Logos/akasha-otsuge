@@ -302,9 +302,15 @@ impl Config {
             "must be between 1 and 2048 MiB",
         )?;
         require(
-            self.retrieval.top_k > 0 && self.retrieval.top_k <= self.retrieval.max_candidates,
+            (1..=32).contains(&self.retrieval.top_k)
+                && self.retrieval.top_k <= self.retrieval.max_candidates,
             "retrieval.top_k",
-            "must be positive and within the candidate budget",
+            "must be between 1 and 32 and within the candidate budget",
+        )?;
+        require(
+            (1..=100).contains(&self.retrieval.max_candidates),
+            "retrieval.max_candidates",
+            "must be between 1 and 100",
         )?;
         require(
             self.retrieval.max_original_chars > 0,
@@ -351,9 +357,9 @@ impl Config {
             )?;
             credential(&model.credential_ref, "models.*.credential_ref")?;
             require(
-                model.dimension.is_none_or(|d| d > 0),
+                model.dimension.is_none_or(|d| (1..=65_536).contains(&d)),
                 "models.*.dimension",
-                "dimension must be positive",
+                "dimension must be between 1 and 65536",
             )?;
             require(
                 model.kind != ModelKind::Embedding || model.dimension.is_some(),

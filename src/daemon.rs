@@ -116,6 +116,9 @@ struct Service {
     stopping: std::sync::atomic::AtomicBool,
     instance: String,
     providers: crate::provider::Client,
+    search_index: Mutex<Option<Arc<crate::retrieval::Index>>>,
+    index_builder: Mutex<()>,
+    index_epoch: std::sync::atomic::AtomicU64,
     #[cfg(test)]
     batch_gate: Mutex<Option<BatchGate>>,
 }
@@ -152,6 +155,7 @@ impl Service {
         while let Some(result) = owners.join_next().await {
             outcome = outcome.and(result.map_err(|_| Error("JOB_ERROR")));
         }
+        self.search_index.lock().await.take();
         let closed = self.storage.close().await.map_err(Error::from);
         outcome.and(closed)
     }
@@ -187,6 +191,44 @@ impl Service {
                 plan,
                 idempotency_key,
             } => self.submit_model(idempotency_key, plan).await,
+            Command::RetrievalRun {
+                plan,
+                idempotency_key,
+            } => self.submit_retrieval(idempotency_key, plan).await,
+            Command::OriginalShow { range } => {
+                let service = self.clone();
+                let request_id = request_id.to_owned();
+                self.operation(async move {
+                    let _guard = service.admission.lock().await;
+                    let config = service.config.pin();
+                    Ok(serde_json::to_value(
+                        crate::domain::Domain::new(&service.storage)
+                            .original_range(
+                                &jobs::context()?,
+                                &range,
+                                &request_id,
+                                config.resolved().config().retrieval.max_original_chars,
+                                config.generation(),
+                            )
+                            .await?,
+                    )?)
+                })
+                .await
+            }
+            Command::IndexStatus => {
+                crate::domain::Domain::new(&self.storage)
+                    .permission(&jobs::context()?, Some(&jobs::owner_scope()))?;
+                let mut value = serde_json::to_value(crate::retrieval::Index::status(
+                    &self.storage,
+                    self.config.pin().resolved(),
+                )?)?;
+                value["building"] =
+                    json!(self.index_epoch.load(std::sync::atomic::Ordering::Acquire) % 2 == 1);
+                value["active_vector"] =
+                    serde_json::to_value(crate::retrieval::active_vector(&self.storage)?)?;
+                value["searched_content"] = json!("active_memories");
+                Ok(value)
+            }
             Command::JobShow { id } => self.show_job(&id).await,
             Command::JobCancel { id } => self.cancel_job(id).await,
             Command::JobList { after } => self.list_jobs(after.as_deref()).await,
@@ -264,7 +306,7 @@ impl Service {
                     {
                         Err(Error("SCOPE_DENIED"))
                     } else {
-                        Ok(serde_json::to_value(
+                        let changed = serde_json::to_value(
                             crate::domain::Domain::new(&service.storage)
                                 .change_local_reader(
                                     &request_id,
@@ -273,7 +315,9 @@ impl Service {
                                     service.config.pin().generation(),
                                 )
                                 .await?,
-                        )?)
+                        )?;
+                        service.wake_jobs();
+                        Ok(changed)
                     }
                 })
                 .await
@@ -469,6 +513,9 @@ pub async fn run(
         stopping: std::sync::atomic::AtomicBool::new(false),
         instance,
         providers,
+        search_index: Mutex::new(None),
+        index_builder: Mutex::new(()),
+        index_epoch: std::sync::atomic::AtomicU64::new(0),
         #[cfg(test)]
         batch_gate: Mutex::new(None),
     });

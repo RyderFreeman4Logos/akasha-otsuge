@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "retrieval_tests::regressions::sync_stops_after_a_live_grant_shrinks",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+  "process": {
+    "pid": 4047839,
+    "start_ticks": "495069742",
+    "state": "R"
+  },
+  "utc": "2026-10-27T20:26:40.422485+00:00"
+}

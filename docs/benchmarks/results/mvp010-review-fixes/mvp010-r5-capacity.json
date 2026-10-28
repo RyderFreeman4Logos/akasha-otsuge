@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "file": "src/domain/history.rs",
+      "tokens": 7117
+    },
+    {
+      "file": "tests/support/retrieval_regressions.rs",
+      "tokens": 4701
+    }
+  ],
+  "model": "gpt-4o",
+  "tokenizer": "conservative",
+  "total": 11818
+}

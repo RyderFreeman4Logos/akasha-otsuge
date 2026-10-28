@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T19:25:32.092631+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "a09d9d691840278e2905aa39808dabd01126c663",
+    "log_sha256": "1623f1a9149ff8a9e1325f924118f6c2ff7b2bee55da24aa35caa373cddfcd40",
+    "seconds": 29.32817513216287,
+    "utc": "2026-10-27T19:23:52.157591+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASS:11 public retrieval fixtures including withdrawal/correction,99KB capture originals,conflicting rules and provider-held grant race;4 native index tests and all-targets Clippy"
+}

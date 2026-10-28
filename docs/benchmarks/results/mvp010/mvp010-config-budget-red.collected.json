@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T18:37:42.243705+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+    "log_sha256": "37374276db5ee2b15b3ac31ef7ad77593e7fb8d635ed3187dd8219ad1321a29b",
+    "seconds": 1.70784065220505,
+    "utc": "2026-10-27T18:36:46.938011+00:00"
+  },
+  "process_absent": true,
+  "classification": "Behavioral RED: top_k33 accepted although the durable receipt can select at most32 revisions; new max-candidate and vector-dimension controls included in same frozen oracle."
+}

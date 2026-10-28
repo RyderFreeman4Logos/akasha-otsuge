@@ -1,0 +1,14 @@
+{
+  "src/daemon/retrieval.rs": {
+    "sha256": "cb202b6f43d92486fdc7094f109356c221212c7aeddb92aff7337d04d91b5336",
+    "lines": 633
+  },
+  "tests/support/daemon_models.rs": {
+    "sha256": "822d71e2f7ca3ed6e553cf0ca738c8a114fa88943f28b8d037a7b2aef74fdb33",
+    "lines": 697
+  },
+  "tests/support/daemon_retrieval.rs": {
+    "sha256": "c70c32f01df6dd8a1063eec444840b14e671b82e2ebca25bf12f0cefa8013f3c",
+    "lines": 1258
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--jobs",
+    "4",
+    "--test",
+    "config",
+    "invalid_configs_fail_closed_and_errors_never_echo_values",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "process": {
+    "pid": 3762418,
+    "start_ticks": "494410223",
+    "state": "R"
+  },
+  "utc": "2026-10-27T18:36:45.232873+00:00"
+}

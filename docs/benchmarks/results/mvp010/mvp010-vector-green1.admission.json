@@ -1,0 +1,21 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--jobs",
+    "4",
+    "--test",
+    "daemon",
+    "retrieval_tests::",
+    "--",
+    "--nocapture"
+  ],
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "process": {
+    "pid": 3749054,
+    "start_ticks": "494369969",
+    "state": "R"
+  },
+  "utc": "2026-10-27T18:30:02.696592+00:00"
+}

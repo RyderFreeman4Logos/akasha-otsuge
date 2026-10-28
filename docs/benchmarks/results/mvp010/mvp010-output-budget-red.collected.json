@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T19:08:27.629154+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "a09d9d691840278e2905aa39808dabd01126c663",
+    "log_sha256": "bed061af5ed1795f8d6accc6a469f04e0d25fa69193b2ac47537b3c4dce22025",
+    "seconds": 4.713137372396886,
+    "utc": "2026-10-27T19:06:02.187639+00:00"
+  },
+  "process_absent": true,
+  "classification": "5 behavioral RED boundaries: missing failed vector trace, long rerank rejected before send, receipt missing vector identity, old active model clipped by new timeout, source union causes whole-job failure;4 controls PASS"
+}

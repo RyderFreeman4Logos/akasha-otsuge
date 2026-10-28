@@ -10,6 +10,8 @@ use serde_json::Value;
 use std::collections::BTreeSet;
 #[path = "models.rs"]
 mod models;
+#[path = "retrieval.rs"]
+mod retrieval;
 
 const MAX_ACTIVE: usize = 256;
 const MAX_RUNNING: usize = 16;
@@ -56,6 +58,9 @@ mod tests {
             stopping: std::sync::atomic::AtomicBool::new(false),
             instance: "new-daemon".into(),
             providers: crate::provider::Client::new().unwrap(),
+            search_index: Mutex::new(None),
+            index_builder: Mutex::new(()),
+            index_epoch: std::sync::atomic::AtomicU64::new(0),
             batch_gate: Mutex::new(None),
         });
         let scope = owner_scope();
@@ -559,6 +564,12 @@ pub(super) struct Job {
     path: Option<PathBuf>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     model_plan: Option<crate::provider::Plan>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    retrieval_plan: Option<crate::retrieval::Request>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    retrieval_target_seq: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    retrieval_vector_config_generation: Option<u64>,
     config_generation: u64,
     config_digest: String,
     accepted_at_ms: u64,
@@ -625,9 +636,31 @@ impl Service {
             || job.id != id
             || job.attempt > MAX_ATTEMPTS
             || !matches!(
-                (&job.binding, &job.path, &job.model_plan),
-                (Some(_), Some(_), None) | (None, None, Some(_))
+                (
+                    &job.binding,
+                    &job.path,
+                    &job.model_plan,
+                    &job.retrieval_plan
+                ),
+                (Some(_), Some(_), None, None)
+                    | (None, None, Some(_), None)
+                    | (None, None, None, Some(_))
             )
+            || (matches!(job.retrieval_plan, Some(crate::retrieval::Request::Sync))
+                != job.retrieval_target_seq.is_some())
+            || job
+                .retrieval_target_seq
+                .is_some_and(|seq| seq > revision.commit_seq)
+            || job
+                .retrieval_vector_config_generation
+                .is_some_and(|generation| {
+                    generation == 0
+                        || generation > job.config_generation
+                        || !matches!(
+                            job.retrieval_plan,
+                            Some(crate::retrieval::Request::Search { .. })
+                        )
+                })
             || !["queued", "running", "succeeded", "failed", "cancelled"]
                 .contains(&job.state.as_str())
         {
@@ -674,6 +707,10 @@ impl Service {
             .binding
             .as_ref()
             .map(|b| b.scope.clone())
+            .or_else(|| match &job.retrieval_plan {
+                Some(crate::retrieval::Request::Search { scope, .. }) => Some(scope.clone()),
+                _ => None,
+            })
             .unwrap_or_else(owner_scope);
         Domain::new(&self.storage).permission(&context()?, Some(&scope))?;
         Ok(())
@@ -711,14 +748,15 @@ impl Service {
         binding: CaptureInput,
         path: PathBuf,
     ) -> Result<Value> {
-        self.submit_job(id, Some(binding), Some(path), None).await
+        self.submit_job(id, Some(binding), Some(path), None, None)
+            .await
     }
     pub(super) async fn submit_model(
         self: &Arc<Self>,
         id: String,
         plan: crate::provider::Plan,
     ) -> Result<Value> {
-        self.submit_job(id, None, None, Some(plan)).await
+        self.submit_job(id, None, None, Some(plan), None).await
     }
     async fn submit_job(
         self: &Arc<Self>,
@@ -726,6 +764,7 @@ impl Service {
         binding: Option<CaptureInput>,
         path: Option<PathBuf>,
         model_plan: Option<crate::provider::Plan>,
+        retrieval_plan: Option<crate::retrieval::Request>,
     ) -> Result<Value> {
         let service = self.clone();
         self.operation(async move {
@@ -743,9 +782,15 @@ impl Service {
             let scope = binding
                 .as_ref()
                 .map(|b| b.scope.clone())
+                .or_else(|| match &retrieval_plan {
+                    Some(crate::retrieval::Request::Search { scope, .. }) => Some(scope.clone()),
+                    _ => None,
+                })
                 .unwrap_or_else(owner_scope);
             Domain::new(&service.storage).permission(&context()?, Some(&scope))?;
-            let fingerprint = if let Some(plan) = &model_plan {
+            let fingerprint = if let Some(plan) = &retrieval_plan {
+                hash(&serde_json::to_vec(&("retrieval", plan))?)
+            } else if let Some(plan) = &model_plan {
                 hash(&serde_json::to_vec(&("model", plan))?)
             } else {
                 hash(&serde_json::to_vec(&(&binding, &path))?)
@@ -776,9 +821,45 @@ impl Service {
             let now = ipc::now_ms()?;
             let queue_ms = u64::try_from(snapshot.resolved().timeouts().queue.as_millis())
                 .map_err(|_| Error("CONFIG_INVALID"))?;
-            let budget = match &model_plan {
-                Some(plan) => plan.validate(snapshot.resolved()).map_err(|e| Error(e.0))?,
-                None => snapshot.resolved().timeouts().tools,
+            let retrieval_target_seq =
+                if matches!(retrieval_plan, Some(crate::retrieval::Request::Sync)) {
+                    Some(service.storage.sequence()?)
+                } else {
+                    None
+                };
+            let vector_snapshot = if matches!(
+                retrieval_plan,
+                Some(crate::retrieval::Request::Search { .. })
+            ) {
+                service.query_vector_snapshot(&snapshot)?
+            } else {
+                snapshot.clone()
+            };
+            let retrieval_vector_config_generation = matches!(
+                retrieval_plan,
+                Some(crate::retrieval::Request::Search { .. })
+            )
+            .then_some(vector_snapshot.generation());
+            let pending = if let Some(target) = retrieval_target_seq {
+                let progress =
+                    crate::retrieval::Index::status(&service.storage, snapshot.resolved())?;
+                target.saturating_sub(
+                    progress
+                        .vector
+                        .as_ref()
+                        .map_or(progress.lexical_watermark, |v| {
+                            v.watermark.min(progress.lexical_watermark)
+                        }),
+                )
+            } else {
+                0
+            };
+            let budget = match (&model_plan, &retrieval_plan) {
+                (Some(plan), _) => plan.validate(snapshot.resolved()).map_err(|e| Error(e.0))?,
+                (_, Some(plan)) => {
+                    plan.workflow_budget(snapshot.resolved(), vector_snapshot.resolved(), pending)?
+                }
+                _ => snapshot.resolved().timeouts().tools,
             };
             let execution_budget_ms =
                 u64::try_from(budget.as_millis()).map_err(|_| Error("CONFIG_INVALID"))?;
@@ -789,6 +870,9 @@ impl Service {
                 binding,
                 path,
                 model_plan,
+                retrieval_plan,
+                retrieval_target_seq,
+                retrieval_vector_config_generation,
                 config_generation: snapshot.generation(),
                 config_digest: snapshot.resolved().digest().into(),
                 accepted_at_ms: now,
@@ -831,6 +915,17 @@ impl Service {
             && let Some(result) = &job.result
         {
             value["result"] = models::load_result(&self.storage, result, revision)?;
+        }
+        if matches!(
+            job.retrieval_plan,
+            Some(crate::retrieval::Request::Search { .. })
+        ) && let Some(receipt) = job.result.as_ref().and_then(|r| r["receipt_id"].as_str())
+        {
+            let archived = Domain::new(&self.storage)
+                .recall_receipt(&context()?, receipt)
+                .await?
+                .data;
+            value["result"] = json!({"receipt_id":receipt,"output":archived.output,"output_sha256":archived.record.output_sha256,"retrieval_mode":"receipt_replay"});
         }
         Ok(value)
     }
@@ -922,7 +1017,7 @@ impl Service {
                 return Err(Error("CONFIG_CORRUPT"));
             }
             if job.state == "running" {
-                if job.model_plan.is_some() {
+                if job.model_plan.is_some() || job.retrieval_plan.is_some() {
                     self.finish_job(job, revision, "failed", Some("PROVIDER_INTERRUPTED"))
                         .await?;
                     continue;
@@ -986,7 +1081,7 @@ impl Service {
             self.job(&id)?.1
         };
         let deadline = job.execution_deadline_ms.ok_or(Error("JOB_CORRUPT"))?;
-        if job.model_plan.is_some() {
+        if job.model_plan.is_some() || job.retrieval_plan.is_some() {
             let started = job.started_at_ms.ok_or(Error("JOB_CORRUPT"))?;
             if started.checked_add(job.execution_budget_ms) != Some(deadline) {
                 return Err(Error("JOB_CORRUPT"));
@@ -996,7 +1091,11 @@ impl Service {
                 Duration::from_millis(job.execution_budget_ms),
                 started,
             )?;
-            return self.execute_model(id, workflow).await;
+            return if job.retrieval_plan.is_some() {
+                self.execute_retrieval(id, workflow).await
+            } else {
+                self.execute_model(id, workflow).await
+            };
         }
         let remaining = Duration::from_millis(deadline.saturating_sub(ipc::now_ms()?));
         let end = tokio::time::Instant::now() + remaining;

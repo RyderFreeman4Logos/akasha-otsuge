@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--jobs",
+    "4",
+    "--test",
+    "daemon",
+    "retrieval_tests::applicable_rules_survive_query_mismatch_but_never_widen_a_read_grant",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "process": {
+    "pid": 3730227,
+    "start_ticks": "494309307",
+    "state": "R"
+  },
+  "utc": "2026-10-27T18:19:56.075225+00:00"
+}

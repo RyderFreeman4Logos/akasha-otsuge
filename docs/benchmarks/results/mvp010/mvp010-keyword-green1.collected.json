@@ -1,0 +1,11 @@
+{
+  "classification": "Product integration compile failure before behavior: retrieval submit method was visible to jobs module but not its daemon caller; narrowed visibility repaired to crate::daemon.",
+  "process_absent": true,
+  "terminal": {
+    "exit_code": 101,
+    "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+    "log_sha256": "011d59074442d99761c0e82aac82b72a8f375465751eb68a32748c35177dae0d",
+    "seconds": 281.1643468262628,
+    "utc": "2026-10-27T17:59:53.145328+00:00"
+  }
+}

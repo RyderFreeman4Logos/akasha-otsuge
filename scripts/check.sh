@@ -7,8 +7,8 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
 cargo build --workspace --release --locked
-cargo build --example reconcile --release --locked
-python3 scripts/check_capture_command.py target/release/examples/reconcile
+# cargo test already builds examples with the test-only dependency features.
+python3 scripts/check_capture_command.py target/debug/examples/reconcile
 python3 scripts/check_daemon_command.py target/release/akasha-otsuge --install
 target/release/akasha-otsuge --help > /dev/null
 target/release/akasha-otsuge --version

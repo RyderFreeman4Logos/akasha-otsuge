@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T19:22:09.714030+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "a09d9d691840278e2905aa39808dabd01126c663",
+    "log_sha256": "1c5229cfe6ae8362715247407bbb17353614041f2b4b5592c172eb974ad0b771",
+    "seconds": 0.8866058811545372,
+    "utc": "2026-10-27T19:20:58.256497+00:00"
+  },
+  "process_absent": true,
+  "classification": "HARNESS: inspect compiler diagnostic; no behavioral RED or test acceptance claimed"
+}

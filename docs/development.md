@@ -1,6 +1,16 @@
 # Development
 
-Linux is the MVP platform. Install Rust using rustup and Python 3.11 or newer.
+Linux is the MVP platform. Install Rust using rustup, Python 3.11 or newer,
+a C/C++ toolchain, the Protocol Buffers compiler (`protoc`) and its standard
+`.proto` definitions. Lance's build scripts require both; neither is a runtime
+dependency. On Debian/Ubuntu:
+
+```sh
+sudo apt-get install build-essential pkg-config protobuf-compiler libprotobuf-dev
+```
+
+The local acceptance environment uses `protoc` 3.21.12. CI installs the distribution
+package and records its version before building.
 The checked-in toolchain pins Rust 1.99.1, verified against the official stable
 channel manifest on 2026-10-22. No model credentials are required for this bootstrap.
 
@@ -21,11 +31,17 @@ installed executable's IPC, configuration, jobs, history and receipts. A separat
 kernel UID must pass an accessible control and be denied private paths/IPC.
 Installing into the user's PATH remains a separate action.
 
+The capture component smoke reuses the debug example already compiled by
+[`cargo test`](https://doc.rust-lang.org/cargo/commands/cargo-test.html#target-selection).
+The installed product and daemon acceptance still use the release artifact.
+This avoids compiling a second release dependency graph with test-only Tokio
+features merely to run the component smoke.
+
 There is one Cargo package in one workspace. `src/main.rs` parses CLI input and
 calls versioned private IPC. The daemon invokes the shared Storage, ConfigManager,
 Capture and Domain components; it does not provide placeholder domain results.
-`tests/daemon.rs` exercises real executable and restart boundaries. Model, retrieval
-and host integration retain their own later acceptance criteria.
+`tests/daemon.rs` exercises real executable and restart boundaries. [Model](providers.md) and [retrieval](retrieval.md) jobs share that daemon.
+Host integration and full-scale product acceptance retain their own criteria.
 
 `src/config/` contains the shared configuration schema, atomic generation manager
 and monotonic deadline contracts. Its controlled consumers are tested in

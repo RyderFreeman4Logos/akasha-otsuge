@@ -1,0 +1,327 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp010)
+error[E0271]: expected `impl Future<Output = Result<(), Error>>` to be a future that resolves to `Result<(), Error>`, but it resolves to `Result<(), Error>`
+   --> src/daemon/models.rs:173:21
+    |
+168 |                 .call_guarded(
+    |                  ------------ required by a bound introduced by this call
+...
+173 |                     self.authorize_model(&id),
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `provider::Error`, found `ipc::Error`
+    |
+    = note: `ipc::Error` and `provider::Error` have similar names, but are actually distinct types
+note: `ipc::Error` is defined in module `crate::ipc` of the current crate
+   --> src/ipc.rs:15:1
+    |
+ 15 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: `provider::Error` is defined in module `crate::provider` of the current crate
+   --> src/provider.rs:50:1
+    |
+ 50 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: the method call chain might not have had the expected associated types
+   --> src/daemon/models.rs:173:26
+    |
+132 |         self: &Arc<Self>,
+    |         ---- this expression has type `&Arc<Service>`
+...
+173 |                     self.authorize_model(&id),
+    |                          ^^^^^^^^^^^^^^^^^^^^ `Future::Output` is `Result<(), Error>` here
+note: required by a bound in `provider::Client::call_guarded`
+   --> src/provider.rs:278:36
+    |
+272 |     pub(crate) async fn call_guarded(
+    |                         ------------ required by a bound in this associated function
+...
+278 |         authorization: impl Future<Output = Result<()>>,
+    |                                    ^^^^^^^^^^^^^^^^^^^ required by this bound in `Client::call_guarded`
+
+error[E0271]: expected `impl Future<Output = Result<(), Error>>` to be a future that resolves to `Result<(), Error>`, but it resolves to `Result<(), Error>`
+   --> src/daemon/models.rs:166:27
+    |
+166 |               let outcome = self
+    |  ___________________________^
+167 | |                 .providers
+168 | |                 .call_guarded(
+169 | |                     config.resolved(),
+...   |
+173 | |                     self.authorize_model(&id),
+174 | |                 )
+    | |_________________^ expected `provider::Error`, found `ipc::Error`
+    |
+    = note: `ipc::Error` and `provider::Error` have similar names, but are actually distinct types
+note: `ipc::Error` is defined in module `crate::ipc` of the current crate
+   --> src/ipc.rs:15:1
+    |
+ 15 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: `provider::Error` is defined in module `crate::provider` of the current crate
+   --> src/provider.rs:50:1
+    |
+ 50 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: required by a bound in `provider::Client::call_guarded`
+   --> src/provider.rs:278:36
+    |
+272 |     pub(crate) async fn call_guarded(
+    |                         ------------ required by a bound in this associated function
+...
+278 |         authorization: impl Future<Output = Result<()>>,
+    |                                    ^^^^^^^^^^^^^^^^^^^ required by this bound in `Client::call_guarded`
+
+error[E0271]: expected `impl Future<Output = Result<(), Error>>` to be a future that resolves to `Result<(), Error>`, but it resolves to `Result<(), Error>`
+   --> src/daemon/models.rs:175:18
+    |
+175 |                 .await;
+    |                  ^^^^^ expected `provider::Error`, found `ipc::Error`
+    |
+    = note: `ipc::Error` and `provider::Error` have similar names, but are actually distinct types
+note: `ipc::Error` is defined in module `crate::ipc` of the current crate
+   --> src/ipc.rs:15:1
+    |
+ 15 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: `provider::Error` is defined in module `crate::provider` of the current crate
+   --> src/provider.rs:50:1
+    |
+ 50 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: required by a bound in `provider::Client::call_guarded`
+   --> src/provider.rs:278:36
+    |
+272 |     pub(crate) async fn call_guarded(
+    |                         ------------ required by a bound in this associated function
+...
+278 |         authorization: impl Future<Output = Result<()>>,
+    |                                    ^^^^^^^^^^^^^^^^^^^ required by this bound in `Client::call_guarded`
+
+error[E0271]: expected `impl Future<Output = Result<(), Error>>` to be a future that resolves to `Result<(), Error>`, but it resolves to `Result<(), Error>`
+   --> src/daemon/retrieval.rs:224:33
+    |
+208 | ...                   .call_guarded(
+    |                        ------------ required by a bound introduced by this call
+...
+224 | ...                       self.authorize_model(id),
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^ expected `provider::Error`, found `ipc::Error`
+    |
+    = note: `ipc::Error` and `provider::Error` have similar names, but are actually distinct types
+note: `ipc::Error` is defined in module `crate::ipc` of the current crate
+   --> src/ipc.rs:15:1
+    |
+ 15 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: `provider::Error` is defined in module `crate::provider` of the current crate
+   --> src/provider.rs:50:1
+    |
+ 50 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: the method call chain might not have had the expected associated types
+   --> src/daemon/retrieval.rs:224:38
+    |
+ 53 |     async fn retrieval_result(&self, id: &str, workflow: &Deadline) -> Result<Value> {
+    |                               ----- this expression has type `&Service`
+...
+224 |                                 self.authorize_model(id),
+    |                                      ^^^^^^^^^^^^^^^^^^^ `Future::Output` is `Result<(), Error>` here
+note: required by a bound in `provider::Client::call_guarded`
+   --> src/provider.rs:278:36
+    |
+272 |     pub(crate) async fn call_guarded(
+    |                         ------------ required by a bound in this associated function
+...
+278 |         authorization: impl Future<Output = Result<()>>,
+    |                                    ^^^^^^^^^^^^^^^^^^^ required by this bound in `Client::call_guarded`
+
+error[E0271]: expected `impl Future<Output = Result<(), Error>>` to be a future that resolves to `Result<(), Error>`, but it resolves to `Result<(), Error>`
+   --> src/daemon/retrieval.rs:206:39
+    |
+206 |                           let outcome = self
+    |  _______________________________________^
+207 | |                             .providers
+208 | |                             .call_guarded(
+209 | |                                 vector_config.resolved(),
+...   |
+224 | |                                 self.authorize_model(id),
+225 | |                             )
+    | |_____________________________^ expected `provider::Error`, found `ipc::Error`
+    |
+    = note: `ipc::Error` and `provider::Error` have similar names, but are actually distinct types
+note: `ipc::Error` is defined in module `crate::ipc` of the current crate
+   --> src/ipc.rs:15:1
+    |
+ 15 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: `provider::Error` is defined in module `crate::provider` of the current crate
+   --> src/provider.rs:50:1
+    |
+ 50 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: required by a bound in `provider::Client::call_guarded`
+   --> src/provider.rs:278:36
+    |
+272 |     pub(crate) async fn call_guarded(
+    |                         ------------ required by a bound in this associated function
+...
+278 |         authorization: impl Future<Output = Result<()>>,
+    |                                    ^^^^^^^^^^^^^^^^^^^ required by this bound in `Client::call_guarded`
+
+error[E0271]: expected `impl Future<Output = Result<(), Error>>` to be a future that resolves to `Result<(), Error>`, but it resolves to `Result<(), Error>`
+   --> src/daemon/retrieval.rs:226:30
+    |
+226 | ...                   .await;
+    |                        ^^^^^ expected `provider::Error`, found `ipc::Error`
+    |
+    = note: `ipc::Error` and `provider::Error` have similar names, but are actually distinct types
+note: `ipc::Error` is defined in module `crate::ipc` of the current crate
+   --> src/ipc.rs:15:1
+    |
+ 15 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: `provider::Error` is defined in module `crate::provider` of the current crate
+   --> src/provider.rs:50:1
+    |
+ 50 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: required by a bound in `provider::Client::call_guarded`
+   --> src/provider.rs:278:36
+    |
+272 |     pub(crate) async fn call_guarded(
+    |                         ------------ required by a bound in this associated function
+...
+278 |         authorization: impl Future<Output = Result<()>>,
+    |                                    ^^^^^^^^^^^^^^^^^^^ required by this bound in `Client::call_guarded`
+
+error[E0271]: expected `impl Future<Output = Result<(), Error>>` to be a future that resolves to `Result<(), Error>`, but it resolves to `Result<(), Error>`
+   --> src/daemon/retrieval.rs:368:33
+    |
+363 | ...                   .call_guarded(
+    |                        ------------ required by a bound introduced by this call
+...
+368 | ...                       self.authorize_model(id),
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^ expected `provider::Error`, found `ipc::Error`
+    |
+    = note: `ipc::Error` and `provider::Error` have similar names, but are actually distinct types
+note: `ipc::Error` is defined in module `crate::ipc` of the current crate
+   --> src/ipc.rs:15:1
+    |
+ 15 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: `provider::Error` is defined in module `crate::provider` of the current crate
+   --> src/provider.rs:50:1
+    |
+ 50 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: the method call chain might not have had the expected associated types
+   --> src/daemon/retrieval.rs:368:38
+    |
+ 53 |     async fn retrieval_result(&self, id: &str, workflow: &Deadline) -> Result<Value> {
+    |                               ----- this expression has type `&Service`
+...
+368 |                                 self.authorize_model(id),
+    |                                      ^^^^^^^^^^^^^^^^^^^ `Future::Output` is `Result<(), Error>` here
+note: required by a bound in `provider::Client::call_guarded`
+   --> src/provider.rs:278:36
+    |
+272 |     pub(crate) async fn call_guarded(
+    |                         ------------ required by a bound in this associated function
+...
+278 |         authorization: impl Future<Output = Result<()>>,
+    |                                    ^^^^^^^^^^^^^^^^^^^ required by this bound in `Client::call_guarded`
+
+error[E0271]: expected `impl Future<Output = Result<(), Error>>` to be a future that resolves to `Result<(), Error>`, but it resolves to `Result<(), Error>`
+   --> src/daemon/retrieval.rs:361:39
+    |
+361 |                           let outcome = self
+    |  _______________________________________^
+362 | |                             .providers
+363 | |                             .call_guarded(
+364 | |                                 config.resolved(),
+...   |
+368 | |                                 self.authorize_model(id),
+369 | |                             )
+    | |_____________________________^ expected `provider::Error`, found `ipc::Error`
+    |
+    = note: `ipc::Error` and `provider::Error` have similar names, but are actually distinct types
+note: `ipc::Error` is defined in module `crate::ipc` of the current crate
+   --> src/ipc.rs:15:1
+    |
+ 15 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: `provider::Error` is defined in module `crate::provider` of the current crate
+   --> src/provider.rs:50:1
+    |
+ 50 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: required by a bound in `provider::Client::call_guarded`
+   --> src/provider.rs:278:36
+    |
+272 |     pub(crate) async fn call_guarded(
+    |                         ------------ required by a bound in this associated function
+...
+278 |         authorization: impl Future<Output = Result<()>>,
+    |                                    ^^^^^^^^^^^^^^^^^^^ required by this bound in `Client::call_guarded`
+
+error[E0271]: expected `impl Future<Output = Result<(), Error>>` to be a future that resolves to `Result<(), Error>`, but it resolves to `Result<(), Error>`
+   --> src/daemon/retrieval.rs:370:30
+    |
+370 | ...                   .await;
+    |                        ^^^^^ expected `provider::Error`, found `ipc::Error`
+    |
+    = note: `ipc::Error` and `provider::Error` have similar names, but are actually distinct types
+note: `ipc::Error` is defined in module `crate::ipc` of the current crate
+   --> src/ipc.rs:15:1
+    |
+ 15 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: `provider::Error` is defined in module `crate::provider` of the current crate
+   --> src/provider.rs:50:1
+    |
+ 50 | pub struct Error(pub &'static str);
+    | ^^^^^^^^^^^^^^^^
+note: required by a bound in `provider::Client::call_guarded`
+   --> src/provider.rs:278:36
+    |
+272 |     pub(crate) async fn call_guarded(
+    |                         ------------ required by a bound in this associated function
+...
+278 |         authorization: impl Future<Output = Result<()>>,
+    |                                    ^^^^^^^^^^^^^^^^^^^ required by this bound in `Client::call_guarded`
+
+error[E0277]: the trait bound `provider::Error: std::convert::From<StorageError>` is not satisfied
+   --> src/retrieval/vector.rs:193:37
+    |
+193 | ...                   storage.serialized_read(authorize).await.map_err(Into::into)
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `From<StorageError>` is not implemented for `provider::Error`
+      but trait `From<ConfigError>` is implemented for it
+   --> src/provider.rs:51:1
+    |
+ 51 | impl From<crate::config::ConfigError> for Error {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: for that trait implementation, expected `ConfigError`, found `StorageError`
+    = note: required for `StorageError` to implement `Into<provider::Error>`
+
+error[E0277]: the trait bound `provider::Error: std::convert::From<StorageError>` is not satisfied
+   --> src/retrieval/vector.rs:193:86
+    |
+193 | ...                   storage.serialized_read(authorize).await.map_err(Into::into)
+    |                                                                        ^^^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `From<StorageError>` is not implemented for `provider::Error`
+      but trait `From<ConfigError>` is implemented for it
+   --> src/provider.rs:51:1
+    |
+ 51 | impl From<crate::config::ConfigError> for Error {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: for that trait implementation, expected `ConfigError`, found `StorageError`
+    = note: required for `StorageError` to implement `Into<provider::Error>`
+
+Some errors have detailed explanations: E0271, E0277.
+For more information about an error, try `rustc --explain E0271`.
+error: could not compile `akasha-otsuge` (lib) due to 11 previous errors

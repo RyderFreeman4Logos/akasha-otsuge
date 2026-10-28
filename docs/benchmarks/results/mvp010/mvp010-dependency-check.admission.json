@@ -1,0 +1,16 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--lib",
+    "--jobs",
+    "4"
+  ],
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "process": {
+    "pid": 3639342,
+    "start_ticks": "494127823",
+    "state": "R"
+  },
+  "utc": "2026-10-27T17:49:41.234621+00:00"
+}

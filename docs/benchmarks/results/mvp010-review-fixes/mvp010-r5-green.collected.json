@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T20:45:05.761853+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "6e6b28eda5c5d5711f8959d4693c24f07729c016",
+    "log_sha256": "21d86e8c75fb5eb3470f62ff912d57954c255a949cab2149bcf644800d8bb8f1",
+    "seconds": 26.511671231128275,
+    "utc": "2026-10-27T20:43:51.064877+00:00"
+  },
+  "process_absent": true,
+  "classification": "behavioral-green-three-large-record-boundaries"
+}

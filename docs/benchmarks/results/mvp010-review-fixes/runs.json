@@ -1,0 +1,110 @@
+[
+  {
+    "name": "mvp010-r2-red",
+    "classification": "behavioral RED: all three archived-output readers leak global diagnostics",
+    "exit_code": 101,
+    "head": "987d369635b1d40d172fbfbe97e81258c3b9e811",
+    "log_sha256": "d88c832e9118b9186de289821f60bdaad5ffea75a1b5f045aa8a228829e9b404",
+    "seconds": 9.102378358133137,
+    "utc": "2026-10-27T20:21:12.145246+00:00"
+  },
+  {
+    "name": "mvp010-r2-green",
+    "classification": "GREEN: all three readers deny old output; narrow receipt remains readable",
+    "exit_code": 0,
+    "head": "987d369635b1d40d172fbfbe97e81258c3b9e811",
+    "log_sha256": "4ff6429b388e2477d0b0561cc370b8fa28de7ff518ea189ebe57c6921daf27ad",
+    "seconds": 16.027322622016072,
+    "utc": "2026-10-27T20:22:03.947930+00:00"
+  },
+  {
+    "name": "mvp010-r1-red",
+    "classification": "behavioral RED: forbidden later Memory reaches provider",
+    "exit_code": 101,
+    "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+    "log_sha256": "f7a42f42bbfb9e707ca5ca1607a8174010135ba81fe9dee64a6320d4ab56f1b8",
+    "seconds": 5.228426843881607,
+    "utc": "2026-10-27T20:24:35.455261+00:00"
+  },
+  {
+    "name": "mvp010-r1-green",
+    "classification": "compile failure: distinct error types; not behavioral RED/GREEN",
+    "exit_code": 101,
+    "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+    "log_sha256": "c8eaccb4c1ce2866a81147b7519bc7a31b26d5cbf6af5dd77603a54637b210f1",
+    "seconds": 4.65991985052824,
+    "utc": "2026-10-27T20:26:45.079937+00:00"
+  },
+  {
+    "name": "mvp010-r1-green2",
+    "classification": "compile failure: private type alias; not behavioral RED/GREEN",
+    "exit_code": 101,
+    "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+    "log_sha256": "3fe18c4052c1d96c53ef6400e97708452b3586faf7531f8d9ff92e8cb25ffeaa",
+    "seconds": 0.5342435212805867,
+    "utc": "2026-10-27T20:27:22.153056+00:00"
+  },
+  {
+    "name": "mvp010-r1-green3",
+    "classification": "fixture cleanup failure: revoked call closes held HTTP response; 22 library/29 daemon passed, 1 daemon failed",
+    "exit_code": 101,
+    "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+    "log_sha256": "bee4e4fe5cbd1e79c8c566d227f508ffe4f125b955442e7df65cbf5730fdb70d",
+    "seconds": 157.95871662721038,
+    "utc": "2026-10-27T20:31:00.451174+00:00"
+  },
+  {
+    "name": "mvp010-r1-green4",
+    "classification": "GREEN: 22 library and 30 daemon cases",
+    "exit_code": 0,
+    "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+    "log_sha256": "cb87063556718f8418556c906957377ed015fa63bf91e34cb422a19abbf3378f",
+    "seconds": 79.25390249863267,
+    "utc": "2026-10-27T20:33:36.701804+00:00"
+  },
+  {
+    "name": "mvp010-r1-extraction",
+    "classification": "GREEN after extraction: 22 library and 30 daemon cases",
+    "exit_code": 0,
+    "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+    "log_sha256": "f4db728bc63d1f900c5e2c90b89bc8aa510a17df3bd4242548084ab22a33b169",
+    "seconds": 80.4793268237263,
+    "utc": "2026-10-27T20:37:35.965638+00:00"
+  },
+  {
+    "name": "mvp010-r4-red",
+    "classification": "behavioral RED: zero, overflow, pooled cancellation all lose last_call",
+    "exit_code": 101,
+    "head": "a5aa45a751d3593967e9c5d213b40daeaf3a3d6f",
+    "log_sha256": "d553cb317b78b1e746b79711315d7e0b35717ddb56b9715919f610fc38ca5551",
+    "seconds": 6.6961877923458815,
+    "utc": "2026-10-27T20:38:51.477692+00:00"
+  },
+  {
+    "name": "mvp010-r4-green",
+    "classification": "GREEN: 18 retrieval cases, including restart diagnostics",
+    "exit_code": 0,
+    "head": "a5aa45a751d3593967e9c5d213b40daeaf3a3d6f",
+    "log_sha256": "313ea85468c25eaad753dfc762c8c823cbdd5f1f63b07748b46ada2c432fefaf",
+    "seconds": 51.80552828963846,
+    "utc": "2026-10-27T20:40:43.436586+00:00"
+  },
+  {
+    "name": "mvp010-r5-red",
+    "classification": "behavioral RED: same/ancestor large Facts fail; large rule skipped by scan page budget",
+    "exit_code": 101,
+    "head": "6e6b28eda5c5d5711f8959d4693c24f07729c016",
+    "log_sha256": "9e9ddad23ceda66d30b13ff7bd42fa56c7fc03e66feb75e332b776d3b40abafd",
+    "seconds": 3.14200337510556,
+    "utc": "2026-10-27T20:42:47.260086+00:00"
+  },
+  {
+    "name": "mvp010-r5-green",
+    "classification": "GREEN: all three large-record boundaries",
+    "exit_code": 0,
+    "head": "6e6b28eda5c5d5711f8959d4693c24f07729c016",
+    "log_sha256": "21d86e8c75fb5eb3470f62ff912d57954c255a949cab2149bcf644800d8bb8f1",
+    "seconds": 26.511671231128275,
+    "utc": "2026-10-27T20:43:51.064877+00:00"
+  }
+]

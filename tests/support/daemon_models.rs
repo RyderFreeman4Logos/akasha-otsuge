@@ -1,132 +1,9 @@
 use super::*;
-use std::net::TcpListener;
-use std::sync::{Arc, Mutex, atomic::AtomicBool};
 
-struct Endpoint {
-    address: String,
-    requests: Arc<Mutex<Vec<(String, Value)>>>,
-    stop: Arc<AtomicBool>,
-    worker: Option<std::thread::JoinHandle<()>>,
-}
-#[derive(Clone, Copy)]
-enum Mode {
-    Normal,
-    Malformed,
-    Disconnect,
-    Slow,
-    RateLimited,
-    NearLimit,
-    Delay(u64),
-}
-impl Endpoint {
-    fn new() -> Self {
-        Self::with_mode(Mode::Normal)
-    }
-    fn with_mode(mode: Mode) -> Self {
-        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-        listener.set_nonblocking(true).unwrap();
-        let address = format!("http://{}/v1", listener.local_addr().unwrap());
-        let requests = Arc::new(Mutex::new(Vec::new()));
-        let saved = requests.clone();
-        let stop = Arc::new(AtomicBool::new(false));
-        let stopping = stop.clone();
-        let worker = std::thread::spawn(move || {
-            while !stopping.load(Ordering::Acquire) {
-                let (mut stream, _) = match listener.accept() {
-                    Ok(pair) => pair,
-                    Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
-                        std::thread::sleep(Duration::from_millis(5));
-                        continue;
-                    }
-                    Err(e) => panic!("{e}"),
-                };
-                stream
-                    .set_read_timeout(Some(Duration::from_secs(3)))
-                    .unwrap();
-                let mut bytes = Vec::new();
-                let (head, len) = loop {
-                    let mut byte = [0];
-                    stream.read_exact(&mut byte).unwrap();
-                    bytes.push(byte[0]);
-                    assert!(bytes.len() <= 16384);
-                    if bytes.ends_with(b"\r\n\r\n") {
-                        let head = String::from_utf8(bytes.clone()).unwrap();
-                        let len = head
-                            .lines()
-                            .find_map(|s| {
-                                let (k, v) = s.split_once(':')?;
-                                k.eq_ignore_ascii_case("content-length")
-                                    .then(|| v.trim().parse::<usize>().unwrap())
-                            })
-                            .unwrap();
-                        break (head, len);
-                    }
-                };
-                assert!(len <= 65536);
-                bytes.resize(len, 0);
-                stream.read_exact(&mut bytes).unwrap();
-                let path = head
-                    .lines()
-                    .next()
-                    .unwrap()
-                    .split_whitespace()
-                    .nth(1)
-                    .unwrap();
-                let body: Value = serde_json::from_slice(&bytes).unwrap();
-                saved.lock().unwrap().push((path.into(), body));
-                if matches!(mode, Mode::Disconnect) {
-                    continue;
-                }
-                let delay = match mode {
-                    Mode::Slow => Duration::from_millis(400),
-                    Mode::Delay(seconds) => Duration::from_secs(seconds),
-                    _ => Duration::ZERO,
-                };
-                let until = Instant::now() + delay;
-                while Instant::now() < until {
-                    if stopping.load(Ordering::Acquire) {
-                        return;
-                    }
-                    std::thread::sleep(
-                        until
-                            .saturating_duration_since(Instant::now())
-                            .min(Duration::from_millis(100)),
-                    );
-                }
-                let response = if matches!(mode, Mode::NearLimit) {
-                    json!({"choices":[{"index":0,"message":{"role":"assistant","content":"x".repeat(512*1024-128)},"finish_reason":"stop"}]})
-                } else if matches!(mode, Mode::Malformed) {
-                    json!({"choices":[],"data":[],"results":[]})
-                } else { match path {
-                    "/v1/chat/completions" => json!({"choices":[{"index":0,"message":{"role":"assistant","content":"hello"},"finish_reason":"stop"}]}),
-                    "/v1/embeddings" => json!({"data":[{"index":1,"embedding":[0.0,1.0]},{"index":0,"embedding":[1.0,0.0]}]}),
-                    "/v1/rerank" => json!({"results":[{"index":1,"relevance_score":0.75},{"index":0,"relevance_score":0.25}]}),
-                    _ => panic!("unexpected path {path}"),
-                }}.to_string();
-                let status = if matches!(mode, Mode::RateLimited) {
-                    "429 Too Many Requests"
-                } else {
-                    "200 OK"
-                };
-                let sent = write!(
-                    stream,
-                    "HTTP/1.1 {status}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
-                    response.len(),
-                    response
-                );
-                if !matches!(mode, Mode::Slow | Mode::Delay(_)) {
-                    sent.unwrap();
-                }
-            }
-        });
-        Self {
-            address,
-            requests,
-            stop,
-            worker: Some(worker),
-        }
-    }
-}
+#[path = "model_endpoint.rs"]
+mod endpoint;
+pub(super) use endpoint::Endpoint;
+use endpoint::Mode;
 
 fn publish(path: &std::path::Path, value: &Value) {
     let temporary = path.with_extension("tmp");
@@ -566,12 +443,6 @@ fn all_model_kinds_classify_bad_output_disconnect_timeout_and_rate_limit() {
                 200
             );
         }
-    }
-}
-impl Drop for Endpoint {
-    fn drop(&mut self) {
-        self.stop.store(true, Ordering::Release);
-        self.worker.take().unwrap().join().unwrap();
     }
 }
 

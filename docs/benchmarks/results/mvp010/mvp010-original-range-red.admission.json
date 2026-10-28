@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--jobs",
+    "4",
+    "--test",
+    "daemon",
+    "retrieval_tests::original_ranges_preserve_utf8_budget_receipt_and_live_permission",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+  "process": {
+    "pid": 3693901,
+    "start_ticks": "494214605",
+    "state": "R"
+  },
+  "utc": "2026-10-27T18:04:09.054205+00:00"
+}

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T20:31:45.946687+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+    "log_sha256": "bee4e4fe5cbd1e79c8c566d227f508ffe4f125b955442e7df65cbf5730fdb70d",
+    "seconds": 157.95871662721038,
+    "utc": "2026-10-27T20:31:00.451174+00:00"
+  },
+  "process_absent": true,
+  "classification": "failed-test-run"
+}

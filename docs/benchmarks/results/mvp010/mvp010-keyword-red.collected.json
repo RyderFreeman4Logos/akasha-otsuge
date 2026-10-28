@@ -1,0 +1,12 @@
+{
+  "classification": "behavioral RED: production CLI does not implement index sync",
+  "scratch_absent": true,
+  "terminal": {
+    "exit_code": 101,
+    "head": "986a0278d5873cb667aeb4ba82118efceb9a3666",
+    "log_sha256": "d475adba17c69cdf2e5287061149e2e93bff01b6e35ccc4cd0250bf7ca855ada",
+    "seconds": 8.326434298418462,
+    "utc": "2026-10-27T17:47:10.500192+00:00"
+  },
+  "test_sha256": "bcd3431b4fcd6e402309b26fb1b7f90448fcf98b776894d711c5db00a5149ece"
+}

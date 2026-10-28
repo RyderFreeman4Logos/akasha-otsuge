@@ -1,0 +1,881 @@
+    Updating crates.io index
+    Updating git repository `https://github.com/lancedb/lancedb`
+     Locking 356 packages to highest Rust 1.99 compatible versions
+      Adding adler2 v2.0.1
+      Adding allocator-api2 v0.2.21
+      Adding android_system_properties v0.1.6
+      Adding anyhow v1.0.104
+      Adding arrayref v0.3.9
+      Adding arrayvec v0.7.8
+      Adding arrow v58.4.1
+      Adding arrow-arith v58.4.1
+      Adding arrow-array v58.4.1 (available: v60.0.0)
+      Adding arrow-buffer v58.4.1
+      Adding arrow-cast v58.4.1
+      Adding arrow-csv v58.4.1
+      Adding arrow-data v58.4.1
+      Adding arrow-flight v58.4.1
+      Adding arrow-ipc v58.4.1
+      Adding arrow-json v58.4.1
+      Adding arrow-ord v58.4.1
+      Adding arrow-row v58.4.1
+      Adding arrow-schema v58.4.1 (available: v60.0.0)
+      Adding arrow-select v58.4.1
+      Adding arrow-string v58.4.1
+      Adding async-channel v2.5.0
+      Adding async-compression v0.4.51
+      Adding async-lock v3.4.2
+      Adding async-recursion v1.2.0
+      Adding async-trait v0.1.92
+      Adding async_cell v0.2.3
+      Adding atoi v2.0.0
+      Adding autocfg v1.5.1
+      Adding axum v0.8.9
+      Adding axum-core v0.5.6
+      Adding bigdecimal v0.4.11
+      Adding bitflags v1.3.2
+      Adding bitvec v1.1.1
+      Adding blake2 v0.10.6
+      Adding blake3 v1.8.7
+      Adding block-buffer v0.10.4
+      Adding bs58 v0.5.1
+      Adding bytecheck v0.8.3
+      Adding bytecheck_derive v0.8.3
+      Adding bytecount v0.6.9
+      Adding bytemuck v1.25.2
+      Adding bytemuck_derive v1.12.1
+      Adding byteorder v1.5.0
+      Adding cedarwood v0.5.0
+      Adding chrono v0.4.45
+      Adding chrono-tz v0.10.4
+      Adding combine v4.6.9
+      Adding comfy-table v7.2.2
+      Adding compression-codecs v0.4.46
+      Adding compression-core v0.4.34
+      Adding concurrent-queue v2.5.0
+      Adding const-random v0.1.18
+      Adding const-random-macro v0.1.16
+      Adding constant_time_eq v0.4.2
+      Adding core-foundation v0.9.4
+      Adding core-foundation v0.10.1
+      Adding core-foundation-sys v0.8.7
+      Adding core_detect v1.0.0
+      Adding cpufeatures v0.2.17
+      Adding crossbeam-channel v0.5.17
+      Adding crossbeam-queue v0.3.14
+      Adding crossbeam-skiplist v0.1.3
+      Adding crunchy v0.2.4
+      Adding crypto-common v0.1.7
+      Adding csv v1.4.0
+      Adding csv-core v0.1.13
+      Adding daachorse v2.1.1
+      Adding darling v0.20.11
+      Adding darling v0.24.1
+      Adding darling_core v0.20.11
+      Adding darling_core v0.24.1
+      Adding darling_macro v0.20.11
+      Adding darling_macro v0.24.1
+      Adding dashmap v6.2.1
+      Adding datafusion v54.1.0
+      Adding datafusion-catalog v54.1.0
+      Adding datafusion-catalog-listing v54.1.0
+      Adding datafusion-common v54.1.0
+      Adding datafusion-common-runtime v54.1.0
+      Adding datafusion-datasource v54.1.0
+      Adding datafusion-datasource-arrow v54.1.0
+      Adding datafusion-datasource-csv v54.1.0
+      Adding datafusion-datasource-json v54.1.0
+      Adding datafusion-doc v54.1.0
+      Adding datafusion-execution v54.1.0
+      Adding datafusion-expr v54.1.0
+      Adding datafusion-expr-common v54.1.0
+      Adding datafusion-functions v54.1.0
+      Adding datafusion-functions-aggregate v54.1.0
+      Adding datafusion-functions-aggregate-common v54.1.0
+      Adding datafusion-functions-nested v54.1.0
+      Adding datafusion-functions-table v54.1.0
+      Adding datafusion-functions-window v54.1.0
+      Adding datafusion-functions-window-common v54.1.0
+      Adding datafusion-macros v54.1.0
+      Adding datafusion-optimizer v54.1.0
+      Adding datafusion-physical-expr v54.1.0
+      Adding datafusion-physical-expr-adapter v54.1.0
+      Adding datafusion-physical-expr-common v54.1.0
+      Adding datafusion-physical-optimizer v54.1.0
+      Adding datafusion-physical-plan v54.1.0
+      Adding datafusion-pruning v54.1.0
+      Adding datafusion-session v54.1.0
+      Adding datafusion-sql v54.1.0
+      Adding defmt v1.2.0
+      Adding defmt-macros v1.2.0
+      Adding defmt-parser v1.1.0
+      Adding deranged v0.5.9
+      Adding derive_builder v0.20.2
+      Adding derive_builder_core v0.20.2
+      Adding derive_builder_macro v0.20.2
+      Adding digest v0.10.7
+      Adding dirs v6.0.0
+      Adding dirs-sys v0.5.0
+      Adding dispatch2 v0.3.1
+      Adding dyn-clone v1.0.20
+      Adding either v1.19.0
+      Adding encoding_rs v0.8.42
+      Adding encoding_rs_io v0.1.8
+      Adding ethnum v1.5.3
+      Adding event-listener v5.4.2
+      Adding event-listener-strategy v0.5.4
+      Adding fast-float2 v0.2.4
+      Adding fastrand v2.5.0
+      Adding fixedbitset v0.5.7
+      Adding flatbuffers v25.12.19
+      Adding flate2 v1.1.10
+      Adding fnv v1.0.7
+      Adding foldhash v0.1.5
+      Adding foldhash v0.2.0
+      Adding frostem v1.20260821.8
+      Adding fs4 v0.13.1
+      Adding fsst v13.0.0
+      Adding fst v0.4.7
+      Adding funty v2.0.0
+      Adding futures v0.3.34
+      Adding futures-executor v0.3.34
+      Adding futures-io v0.3.34
+      Adding futures-macro v0.3.34
+      Adding futures-sink v0.3.34
+      Adding generic-array v0.14.7 (available: v0.14.9)
+      Adding glob v0.3.4
+      Adding h2 v0.4.20
+      Adding half v2.7.1
+      Adding hashbrown v0.12.3
+      Adding hashbrown v0.14.5
+      Adding hashbrown v0.15.5
+      Adding heck v0.5.0
+      Adding hex v0.4.3
+      Adding httpdate v1.0.3
+      Adding humantime v2.4.0
+      Adding hyper-timeout v0.5.2
+      Adding hyperloglogplus v0.4.1
+      Adding iana-time-zone v0.1.65
+      Adding iana-time-zone-haiku v0.1.2
+      Adding icu_locale_fallback v2.4.0
+      Adding icu_locale_fallback_data v2.4.0
+      Adding icu_segmenter v2.4.0
+      Adding icu_segmenter_data v2.4.0
+      Adding ident_case v1.0.1
+      Adding indexmap v1.9.3
+      Adding io-uring v0.7.15
+      Adding itertools v0.14.0
+      Adding itertools v0.15.0
+      Adding jieba-macros v0.10.4
+      Adding jieba-rs v0.10.4
+      Adding jiff v0.2.38
+      Adding jiff-core v0.1.1
+      Adding jiff-static v0.2.38
+      Adding jiff-tzdb v0.1.9
+      Adding jiff-tzdb-platform v0.1.3
+      Adding jni v0.22.4
+      Adding jni-macros v0.22.4
+      Adding jni-sys v0.4.1
+      Adding jni-sys-macros v0.4.1
+      Adding jsonb v0.5.6
+      Adding kanaria v0.2.0
+      Adding lance v13.0.0
+      Adding lance-arrow v13.0.0
+      Adding lance-arrow-scalar v58.0.0
+      Adding lance-arrow-stats v58.0.0
+      Adding lance-bitpacking v13.0.0
+      Adding lance-core v13.0.0
+      Adding lance-datafusion v13.0.0
+      Adding lance-datagen v13.0.0
+      Adding lance-derive v13.0.0
+      Adding lance-encoding v13.0.0
+      Adding lance-file v13.0.0
+      Adding lance-index v13.0.0
+      Adding lance-index-core v13.0.0
+      Adding lance-io v13.0.0
+      Adding lance-linalg v13.0.0
+      Adding lance-namespace v13.0.0
+      Adding lance-namespace-impls v13.0.0
+      Adding lance-namespace-reqwest-client v0.13.0
+      Adding lance-select v13.0.0
+      Adding lance-table v13.0.0
+      Adding lance-tokenizer v13.0.0
+      Adding lancedb v0.40.0 (https://github.com/lancedb/lancedb?rev=b1b080b97c3edd2fd9f2aae8a3b71ff19487b1f8#b1b080b9)
+      Adding lexical-core v1.0.6
+      Adding lexical-parse-float v1.0.6
+      Adding lexical-parse-integer v1.0.6
+      Adding lexical-util v1.0.7
+      Adding lexical-write-float v1.0.6
+      Adding lexical-write-integer v1.0.6
+      Adding libm v0.2.16
+      Adding libredox v0.1.25
+      Adding libsais-rs v0.2.2
+      Adding lindera v3.0.7
+      Adding lindera-dictionary v3.0.7
+      Adding lz4 v1.28.1
+      Adding lz4-sys v1.11.1+lz4-1.10.0
+      Adding lz4_flex v0.13.1
+      Adding matchit v0.8.4 (available: v0.8.6)
+      Adding matrixmultiply v0.3.11
+      Adding md-5 v0.11.0
+      Adding memmap2 v0.9.12
+      Adding mime v0.3.17
+      Adding mime_guess v2.0.5
+      Adding miniz_oxide v0.9.1
+      Adding moka v0.12.16
+      Adding multimap v0.10.1
+      Adding multiversion_no_op v1.0.0
+      Adding munge v0.4.7
+      Adding munge_macro v0.4.7
+      Adding ndarray v0.16.1
+      Adding ndk-context v0.1.1
+      Adding nix v0.31.3
+      Adding nom v8.0.0
+      Adding num-bigint v0.4.8
+      Adding num-complex v0.4.6
+      Adding num-conv v0.2.2
+      Adding num-integer v0.1.47
+      Adding num-traits v0.2.19
+      Adding oauth2 v5.0.0
+      Adding objc2 v0.6.5
+      Adding objc2-app-kit v0.3.2
+      Adding objc2-core-foundation v0.3.2
+      Adding objc2-encode v4.1.0
+      Adding objc2-foundation v0.3.2
+      Adding object_store v0.13.2
+      Adding object_store v0.14.2
+      Adding openssl-probe v0.2.2
+      Adding option-ext v0.2.0
+      Adding ordered-float v5.5.1
+      Adding parking v2.2.1
+      Adding paste v1.0.15
+      Adding path_abs v0.5.1
+      Adding permutation v0.4.1
+      Adding petgraph v0.8.3
+      Adding phf v0.12.1
+      Adding phf v0.13.1
+      Adding phf_codegen v0.13.1
+      Adding phf_generator v0.13.1
+      Adding phf_shared v0.12.1
+      Adding phf_shared v0.13.1
+      Adding pin-project v1.1.13
+      Adding pin-project-internal v1.1.13
+      Adding portable-atomic v1.15.0
+      Adding portable-atomic-util v0.2.8
+      Adding powerfmt v0.2.1
+      Adding prettyplease v0.2.37
+      Adding prost v0.14.4
+      Adding prost-build v0.14.4
+      Adding prost-derive v0.14.4
+      Adding prost-types v0.14.4
+      Adding ptr_meta v0.3.2
+      Adding ptr_meta_derive v0.3.2
+      Adding radium v0.7.0
+      Adding rancor v0.1.3
+      Adding rand v0.8.8
+      Adding rand_chacha v0.3.1
+      Adding rand_core v0.6.4
+      Adding rand_distr v0.5.1
+      Adding rand_xoshiro v0.7.0
+      Adding rangemap v1.8.0
+      Adding rawpointer v0.2.1
+      Adding rayon v1.12.0
+      Adding rayon-core v1.13.0
+      Adding redox_users v0.5.3
+      Adding ref-cast v1.0.27
+      Adding ref-cast-impl v1.0.27
+      Adding regex v1.13.1
+      Adding rend v0.5.4
+      Adding rkyv v0.8.18
+      Adding rkyv_derive v0.8.18
+      Adding roaring v0.11.5
+      Adding rustc_version v0.4.1
+      Adding rustls-native-certs v0.8.5
+      Adding same-file v1.0.6
+      Adding schannel v0.1.30
+      Adding schemars v0.9.0
+      Adding schemars v1.2.3
+      Adding security-framework v3.7.0
+      Adding security-framework-sys v2.17.0
+      Adding semver v1.0.28
+      Adding seq-macro v0.3.6
+      Adding serde_repr v0.1.21
+      Adding serde_with v3.24.0
+      Adding serde_with_macros v3.24.0
+      Adding serde_yaml_ng v0.10.0
+      Adding sha1_smol v1.0.1
+      Adding sha2 v0.10.9
+      Adding simd-adler32 v0.3.10
+      Adding simd_cesu8 v1.2.0
+      Adding simdutf8 v0.1.5
+      Adding siphasher v1.0.4
+      Adding snafu v0.8.9
+      Adding snafu v0.9.2
+      Adding snafu-derive v0.8.9
+      Adding snafu-derive v0.9.2
+      Adding sqlparser v0.62.0
+      Adding sqlparser_derive v0.5.0
+      Adding std_prelude v0.2.12
+      Adding stfu8 v0.2.7
+      Adding stop-words v0.10.1
+      Adding strsim v0.11.1
+      Adding strum v0.28.0
+      Adding strum_macros v0.28.0
+      Adding system-configuration v0.7.0
+      Adding system-configuration-sys v0.6.0
+      Adding tagptr v0.2.0
+      Adding tap v1.0.1
+      Adding tempfile v3.27.0
+      Adding thiserror v1.0.69
+      Adding thiserror-impl v1.0.69
+      Adding thread-tree v0.3.3
+      Adding time v0.3.55
+      Adding time-core v0.1.9
+      Adding time-macros v0.2.32
+      Adding tiny-keccak v2.0.2
+      Adding tokio-stream v0.1.19
+      Adding tokio-util v0.7.20
+      Adding tonic v0.14.8
+      Adding tonic-prost v0.14.8
+      Adding unicase v2.10.0
+      Adding unicode-blocks v0.1.10
+      Adding unicode-normalization v0.1.26
+      Adding unicode-segmentation v1.13.3
+      Adding unicode-width v0.2.2
+      Adding unsafe-libyaml v0.2.11
+      Adding urlencoding v2.1.3
+      Adding utf8-ranges v1.0.5
+      Adding uuid v1.29.0
+      Adding walkdir v2.5.0
+      Adding wasm-streams v0.4.2
+      Adding webbrowser v1.2.5
+      Adding winapi-util v0.1.11
+      Adding windows-core v0.62.2
+      Adding windows-implement v0.60.2
+      Adding windows-interface v0.59.3
+      Adding windows-registry v0.6.1
+      Adding windows-strings v0.5.1
+      Adding wyz v0.5.1
+      Adding zlib-rs v0.6.8
+ Downloading crates ...
+  Downloaded arrow v58.4.1
+  Downloaded arrow-arith v58.4.1
+  Downloaded arrow-string v58.4.1
+  Downloaded arrow-csv v58.4.1
+  Downloaded arrow-data v58.4.1
+  Downloaded arrow-row v58.4.1
+  Downloaded arrow-ord v58.4.1
+  Downloaded arrow-buffer v58.4.1
+  Downloaded arrow-json v58.4.1
+  Downloaded arrow-schema v58.4.1
+  Downloaded arrow-cast v58.4.1
+  Downloaded arrow-select v58.4.1
+  Downloaded arrow-ipc v58.4.1
+  Downloaded arrow-flight v58.4.1
+  Downloaded arrow-array v58.4.1
+  Downloaded openssl-probe v0.2.2
+  Downloaded ordered-float v5.5.1
+  Downloaded tonic-prost v0.14.8
+  Downloaded tonic v0.14.8
+   Compiling libc v0.2.191
+   Compiling serde_core v1.0.229
+    Checking memchr v2.8.3
+   Compiling syn v3.0.9
+   Compiling syn v2.0.119
+   Compiling autocfg v1.5.1
+    Checking smallvec v1.16.3
+   Compiling libm v0.2.16
+    Checking foldhash v0.2.0
+    Checking allocator-api2 v0.2.21
+    Checking hashbrown v0.17.1
+   Compiling num-traits v0.2.19
+   Compiling serde_derive v1.0.229
+   Compiling zerocopy v0.8.63
+    Checking parking_lot_core v0.9.12
+   Compiling synstructure v0.14.0
+   Compiling zerocopy-derive v0.8.63
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking getrandom v0.3.4
+   Compiling zerofrom-derive v0.1.8
+    Checking parking_lot v0.12.5
+    Checking futures-sink v0.3.34
+   Compiling yoke-derive v0.8.4
+    Checking stable_deref_trait v1.2.1
+    Checking zerofrom v0.1.8
+    Checking siphasher v1.0.4
+    Checking errno v0.3.14
+    Checking num-integer v0.1.47
+    Checking signal-hook-registry v1.4.8
+    Checking yoke v0.8.4
+    Checking mio v1.2.4
+    Checking socket2 v0.6.5
+   Compiling zerovec-derive v0.11.7
+   Compiling bytemuck_derive v1.12.1
+   Compiling tokio-macros v2.7.2
+    Checking iana-time-zone v0.1.65
+    Checking slab v0.4.12
+    Checking chrono v0.4.45
+    Checking tokio v1.54.1
+    Checking zerovec v0.11.9
+    Checking bytemuck v1.25.2
+    Checking futures-channel v0.3.34
+   Compiling displaydoc v0.2.7
+    Checking num-bigint v0.4.8
+    Checking indexmap v2.14.2
+   Compiling futures-macro v0.3.34
+    Checking writeable v0.6.4
+    Checking futures-task v0.3.34
+    Checking futures-io v0.3.34
+    Checking ahash v0.8.12
+    Checking half v2.7.1
+    Checking futures-util v0.3.34
+    Checking phf_shared v0.12.1
+   Compiling chrono-tz v0.10.4
+    Checking phf v0.12.1
+    Checking arrow-buffer v58.4.1
+    Checking tinystr v0.8.5
+    Checking arrow-schema v58.4.1
+    Checking num-complex v0.4.6
+    Checking rand_core v0.10.1
+    Checking litemap v0.8.3
+    Checking arrow-data v58.4.1
+    Checking icu_locale_core v2.4.0
+    Checking potential_utf v0.1.6
+    Checking zerotrie v0.2.5
+   Compiling tracing-attributes v0.1.31
+   Compiling getrandom v0.4.3
+    Checking icu_collections v2.4.0
+    Checking icu_provider v2.4.0
+    Checking tracing v0.1.44
+    Checking chacha20 v0.10.2
+    Checking lexical-util v1.0.7
+    Checking simdutf8 v0.1.5
+    Checking icu_properties v2.4.0
+    Checking icu_normalizer v2.4.0
+    Checking rand v0.10.3
+    Checking arrow-array v58.4.1
+   Compiling thiserror-impl v2.0.21
+    Checking unicode-segmentation v1.13.3
+    Checking arrow-select v58.4.1
+    Checking twox-hash v2.1.5
+    Checking lexical-write-integer v1.0.6
+    Checking thiserror v2.0.21
+    Checking lexical-parse-integer v1.0.6
+    Checking aho-corasick v1.1.5
+    Checking regex-syntax v0.8.11
+    Checking lexical-write-float v1.0.6
+    Checking lexical-parse-float v1.0.6
+    Checking arrow-ord v58.4.1
+    Checking idna_adapter v1.2.2
+    Checking regex-automata v0.4.18
+    Checking unicode-width v0.2.2
+    Checking idna v1.1.0
+   Compiling semver v1.0.28
+    Checking comfy-table v7.2.2
+    Checking url v2.5.8
+   Compiling rustc_version v0.4.1
+    Checking lexical-core v1.0.6
+    Checking atoi v2.0.0
+    Checking csv-core v0.1.13
+   Compiling flatbuffers v25.12.19
+    Checking arrow-cast v58.4.1
+    Checking csv v1.4.0
+    Checking either v1.19.0
+    Checking regex v1.13.1
+    Checking lz4_flex v0.13.1
+    Checking arrow-row v58.4.1
+   Compiling async-trait v0.1.92
+    Checking arrow-ipc v58.4.1
+    Checking arrow-string v58.4.1
+    Checking arrow-arith v58.4.1
+    Checking same-file v1.0.6
+    Checking walkdir v2.5.0
+    Checking arrow-json v58.4.1
+    Checking arrow-csv v58.4.1
+    Checking ppv-lite86 v0.2.21
+   Compiling pin-project-internal v1.1.13
+    Checking humantime v2.4.0
+    Checking sha1_smol v1.0.1
+    Checking arrow v58.4.1
+    Checking uuid v1.29.0
+    Checking itertools v0.14.0
+   Compiling sqlparser_derive v0.5.0
+    Checking pin-project v1.1.13
+    Checking object_store v0.13.2
+    Checking rand_core v0.9.5
+   Compiling anyhow v1.0.104
+    Checking sqlparser v0.62.0
+    Checking rand_chacha v0.9.0
+    Checking rand v0.9.5
+   Compiling generic-array v0.14.7
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+    Checking futures-executor v0.3.34
+    Checking futures v0.3.34
+    Checking datafusion-doc v54.1.0
+   Compiling heck v0.5.0
+    Checking foldhash v0.1.5
+    Checking hashbrown v0.15.5
+    Checking crypto-common v0.1.7
+    Checking block-buffer v0.10.4
+    Checking fixedbitset v0.5.7
+    Checking digest v0.10.7
+    Checking petgraph v0.8.3
+    Checking fastrand v2.5.0
+   Compiling prost-derive v0.14.4
+    Checking hashbrown v0.14.5
+    Checking tempfile v3.27.0
+   Compiling datafusion-macros v54.1.0
+    Checking dashmap v6.2.1
+   Compiling blake3 v1.8.7
+    Checking arrayvec v0.7.8
+    Checking constant_time_eq v0.4.2
+    Checking hex v0.4.3
+    Checking blake2 v0.10.6
+    Checking md-5 v0.11.0
+    Checking tokio-util v0.7.20
+    Checking datafusion-common v54.1.0
+   Compiling strsim v0.11.1
+   Compiling ident_case v1.0.1
+    Checking getrandom v0.2.17
+   Compiling bitflags v2.13.2
+   Compiling bytes v1.12.1
+   Compiling linux-raw-sys v0.12.1
+   Compiling equivalent v1.0.3
+   Compiling prettyplease v0.2.37
+   Compiling rustix v1.1.6
+   Compiling prost v0.14.4
+    Checking datafusion-expr-common v54.1.0
+   Compiling once_cell v1.21.4
+    Checking datafusion-physical-expr-common v54.1.0
+   Compiling prost-types v0.14.4
+    Checking datafusion-functions-window-common v54.1.0
+    Checking datafusion-functions-aggregate-common v54.1.0
+    Checking num_cpus v1.17.0
+   Compiling multimap v0.10.1
+   Compiling log v0.4.34
+    Checking datafusion-expr v54.1.0
+    Checking byteorder v1.5.0
+    Checking parking v2.2.1
+    Checking glob v0.3.4
+   Compiling prost-build v0.14.4
+    Checking fnv v1.0.7
+    Checking h2 v0.4.20
+    Checking ring v0.17.14
+    Checking event-listener v5.4.2
+    Checking datafusion-common-runtime v54.1.0
+    Checking crossbeam-channel v0.5.17
+   Compiling bigdecimal v0.4.11
+   Compiling rustls v0.23.46
+    Checking httpdate v1.0.3
+   Compiling cfg_aliases v0.2.2
+   Compiling nix v0.31.3
+    Checking rustls-webpki v0.103.16
+    Checking hyper v1.12.0
+    Checking datafusion-physical-expr v54.1.0
+    Checking datafusion-execution v54.1.0
+    Checking event-listener-strategy v0.5.4
+    Checking datafusion-functions v54.1.0
+   Compiling encoding_rs v0.8.42
+    Checking mime v0.3.17
+    Checking jiff-core v0.1.1
+    Checking datafusion-functions-aggregate v54.1.0
+   Compiling portable-atomic v1.15.0
+    Checking jiff v0.2.38
+    Checking hyper-util v0.1.21
+    Checking tower v0.5.3
+    Checking ordered-float v5.5.1
+    Checking nom v8.0.0
+    Checking datafusion-physical-plan v54.1.0
+    Checking datafusion-physical-expr-adapter v54.1.0
+    Checking datafusion-functions-nested v54.1.0
+    Checking simd-adler32 v0.3.10
+    Checking fast-float2 v0.2.4
+    Checking core_detect v1.0.0
+    Checking adler2 v2.0.1
+    Checking ethnum v1.5.3
+   Compiling multiversion_no_op v1.0.0
+    Checking openssl-probe v0.2.2
+    Checking rustls-native-certs v0.8.5
+    Checking jsonb v0.5.6
+    Checking datafusion-sql v54.1.0
+    Checking miniz_oxide v0.9.1
+    Checking quick_cache v0.6.24
+    Checking tokio-rustls v0.26.6
+    Checking async-lock v3.4.2
+   Compiling snafu-derive v0.9.2
+    Checking itertools v0.15.0
+    Checking tagptr v0.2.0
+    Checking moka v0.12.16
+    Checking datafusion-session v54.1.0
+    Checking snafu v0.9.2
+    Checking datafusion-datasource v54.1.0
+    Checking lance-arrow v13.0.0
+    Checking object_store v0.14.2
+    Checking flate2 v1.1.10
+    Checking roaring v0.11.5
+   Compiling darling_core v0.24.1
+   Compiling lance-derive v13.0.0
+   Compiling unicase v2.10.0
+    Checking compression-core v0.4.34
+   Compiling mime_guess v2.0.5
+    Checking lance-core v13.0.0
+    Checking compression-codecs v0.4.46
+   Compiling darling_core v0.20.11
+    Checking async-compression v0.4.51
+   Compiling ptr_meta_derive v0.3.2
+   Compiling darling_macro v0.24.1
+   Compiling darling v0.24.1
+    Checking ptr_meta v0.3.2
+    Checking hyper-rustls v0.27.10
+   Compiling serde_with_macros v3.24.0
+    Checking tower-http v0.6.11
+    Checking tokio-stream v0.1.19
+   Compiling darling_macro v0.20.11
+    Checking serde_urlencoded v0.7.1
+   Compiling paste v1.0.15
+    Checking serde_with v3.24.0
+   Compiling darling v0.20.11
+    Checking reqwest v0.12.28
+    Checking rancor v0.1.3
+   Compiling lz4-sys v1.11.1+lz4-1.10.0
+   Compiling serde_repr v0.1.21
+   Compiling bytecheck_derive v0.8.3
+   Compiling crunchy v0.2.4
+   Compiling io-uring v0.7.15
+   Compiling phf_shared v0.13.1
+    Checking bytecheck v0.8.3
+   Compiling derive_builder_core v0.20.2
+    Checking lance-namespace-reqwest-client v0.13.0
+    Checking datafusion-catalog v54.1.0
+   Compiling munge_macro v0.4.7
+   Compiling zmij v1.0.23
+    Checking stfu8 v0.2.7
+    Checking std_prelude v0.2.12
+   Compiling icu_locale_fallback_data v2.4.0
+   Compiling rayon-core v1.13.0
+   Compiling itoa v1.0.18
+    Checking path_abs v0.5.1
+    Checking munge v0.4.7
+   Compiling derive_builder_macro v0.20.2
+    Checking lance-namespace v13.0.0
+    Checking rend v0.5.4
+   Compiling phf_generator v0.13.1
+    Checking datafusion-pruning v54.1.0
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling lance-encoding v13.0.0
+   Compiling strum_macros v0.28.0
+   Compiling rkyv_derive v0.8.18
+   Compiling seq-macro v0.3.6
+    Checking arrayref v0.3.9
+   Compiling icu_segmenter_data v2.4.0
+    Checking strum v0.28.0
+    Checking lance-bitpacking v13.0.0
+    Checking rkyv v0.8.18
+    Checking lance-io v13.0.0
+    Checking datafusion-physical-optimizer v54.1.0
+   Compiling phf_codegen v0.13.1
+    Checking lz4 v1.28.1
+    Checking derive_builder v0.20.2
+   Compiling stop-words v0.10.1
+    Checking datafusion-datasource-json v54.1.0
+    Checking datafusion-datasource-arrow v54.1.0
+    Checking datafusion-datasource-csv v54.1.0
+    Checking encoding_rs_io v0.1.8
+    Checking datafusion-functions-window v54.1.0
+    Checking datafusion-optimizer v54.1.0
+    Checking datafusion-functions-table v54.1.0
+    Checking datafusion-catalog-listing v54.1.0
+   Compiling lance-file v13.0.0
+    Checking fsst v13.0.0
+    Checking hyperloglogplus v0.4.1
+    Checking memmap2 v0.9.12
+   Compiling matrixmultiply v0.3.11
+    Checking tinyvec v1.13.3
+   Compiling radium v0.7.0
+    Checking daachorse v2.1.1
+    Checking unsafe-libyaml v0.2.11
+    Checking bitflags v1.3.2
+    Checking lindera-dictionary v3.0.7
+    Checking kanaria v0.2.0
+    Checking serde_yaml_ng v0.10.0
+    Checking unicode-normalization v0.1.26
+    Checking phf v0.13.1
+    Checking rayon v1.12.0
+    Checking icu_locale_fallback v2.4.0
+   Compiling jieba-macros v0.10.4
+    Checking lance-select v13.0.0
+    Checking thread-tree v0.3.3
+   Compiling lance-table v13.0.0
+   Compiling lance-datafusion v13.0.0
+    Checking arc-swap v1.9.3
+   Compiling lance-linalg v13.0.0
+    Checking cedarwood v0.5.0
+   Compiling async-recursion v1.2.0
+    Checking rawpointer v0.2.1
+    Checking option-ext v0.2.0
+   Compiling libsais-rs v0.2.2
+    Checking rustc-hash v2.1.3
+    Checking unicode-blocks v0.1.10
+    Checking bytecount v0.6.9
+    Checking tap v1.0.1
+   Compiling fst v0.4.7
+    Checking wyz v0.5.1
+    Checking jieba-rs v0.10.4
+    Checking lindera v3.0.7
+    Checking dirs-sys v0.5.0
+    Checking icu_segmenter v2.4.0
+    Checking axum-core v0.5.6
+   Compiling lance-index v13.0.0
+    Checking datafusion v54.1.0
+    Checking rand_distr v0.5.1
+    Checking lance-arrow-scalar v58.0.0
+    Checking concurrent-queue v2.5.0
+    Checking frostem v1.20260821.8
+    Checking utf8-ranges v1.0.5
+    Checking funty v2.0.0
+    Checking rangemap v1.8.0
+    Checking matchit v0.8.4
+    Checking axum v0.8.9
+    Checking bitvec v1.1.1
+    Checking lance-tokenizer v13.0.0
+    Checking async-channel v2.5.0
+    Checking lance-arrow-stats v58.0.0
+    Checking ndarray v0.16.1
+    Checking dirs v6.0.0
+    Checking hyper-timeout v0.5.2
+   Compiling lance v13.0.0
+    Checking rand_core v0.6.4
+    Checking crossbeam-queue v0.3.14
+   Compiling thiserror v1.0.69
+    Checking rand_chacha v0.3.1
+    Checking tonic v0.14.8
+    Checking crossbeam-skiplist v0.1.3
+    Checking lz4_flex v0.12.2
+   Compiling thiserror-impl v1.0.69
+    Checking cpufeatures v0.2.17
+    Checking async_cell v0.2.3
+    Checking permutation v0.4.1
+    Checking sha2 v0.10.9
+    Checking tonic-prost v0.14.8
+    Checking rand v0.8.8
+   Compiling snafu-derive v0.8.9
+    Checking rand_xoshiro v0.7.0
+    Checking serde_path_to_error v0.1.20
+    Checking affinitypool v0.8.0
+    Checking lance-datagen v13.0.0
+    Checking oauth2 v5.0.0
+    Checking snafu v0.8.9
+    Checking chacha20poly1305 v0.11.0
+    Checking arrow-flight v58.4.1
+    Checking surrealkv-compat-rocksdb v0.1.0 (https://github.com/surrealdb/surrealkv?rev=4338a790c8edc56ef5ea1e46157427af4815be3c#4338a790)
+    Checking surrealkv-compat-v1 v0.1.0 (https://github.com/surrealdb/surrealkv?rev=4338a790c8edc56ef5ea1e46157427af4815be3c#4338a790)
+    Checking fs4 v0.13.1
+    Checking webbrowser v1.2.5
+    Checking surrealkv-compat-indxdb v0.1.0 (https://github.com/surrealdb/surrealkv?rev=4338a790c8edc56ef5ea1e46157427af4815be3c#4338a790)
+    Checking serde_spanned v1.1.2
+    Checking toml_datetime v1.1.2+spec-1.1.0
+    Checking urlencoding v2.1.3
+    Checking surrealkv v1.0.0 (https://github.com/surrealdb/surrealkv?rev=4338a790c8edc56ef5ea1e46157427af4815be3c#4338a790)
+    Checking toml v1.1.8+spec-1.1.0
+    Checking lance-index-core v13.0.0
+    Checking lance-namespace-impls v13.0.0
+    Checking lancedb v0.40.0 (https://github.com/lancedb/lancedb?rev=b1b080b97c3edd2fd9f2aae8a3b71ff19487b1f8#b1b080b9)
+    Checking akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp010)
+error[E0277]: the trait bound `Box<RecordBatchIterator<Vec<Result<RecordBatch, _>>>>: Scannable` is not satisfied
+   --> src/retrieval.rs:72:44
+    |
+ 72 | ...      connection.create_table(TABLE, Box::new(RecordBatchIterator::new(vec![Ok(batch)], schema.clone()))).execute().await.map_er...
+    |                     ------------        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `Scannable` is not implemented for `Box<RecordBatchIterator<Vec<Result<RecordBatch, ArrowError>>>>`
+    |                     |
+    |                     required by a bound introduced by this call
+    |
+help: the trait `Scannable` is implemented for `Box<dyn arrow_array::RecordBatchReader + std::marker::Send>`
+   --> /home/obj/.cargo/git/checkouts/lancedb-1a2acba6991cbf94/b1b080b/rust/lancedb/src/data/scannable.rs:129:1
+    |
+129 | impl Scannable for Box<dyn RecordBatchReader + Send> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `lancedb::Connection::create_table`
+   --> /home/obj/.cargo/git/checkouts/lancedb-1a2acba6991cbf94/b1b080b/rust/lancedb/src/connection.rs:519:28
+    |
+519 |     pub fn create_table<T: Scannable + 'static>(
+    |                            ^^^^^^^^^ required by this bound in `Connection::create_table`
+    = note: the full name for the type has been written to '/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp010/target/debug/deps/akasha_otsuge-364cbe0c8e690d1f.long-type-7172417715219294496.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0277]: the trait bound `Predicate<'_>: std::convert::From<std::string::String>` is not satisfied
+    --> src/retrieval.rs:96:39
+     |
+  96 |                     self.table.delete(format!("key = '{key}'")).await.map_err(index_error)?;
+     |                                ------ ^^^^^^^^^^^^^^^^^^^^^^^^ the trait `std::convert::From<std::string::String>` is not implemented for `Predicate<'_>`
+     |                                |
+     |                                required by a bound introduced by this call
+     |
+help: `Predicate<'_>` implements trait `std::convert::From<T>`
+    --> /home/obj/.cargo/git/checkouts/lancedb-1a2acba6991cbf94/b1b080b/rust/lancedb/src/table.rs:286:1
+     |
+ 286 | impl<'a> From<&'a str> for Predicate<'a> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `std::convert::From<&str>`
+...
+ 292 | impl<'a> From<&'a String> for Predicate<'a> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `std::convert::From<&std::string::String>`
+...
+ 298 | impl<'a> From<&'a Expr> for Predicate<'a> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `std::convert::From<&DfExpr>`
+     = note: required for `std::string::String` to implement `Into<Predicate<'_>>`
+note: required by a bound in `lancedb::Table::delete`
+    --> /home/obj/.cargo/git/checkouts/lancedb-1a2acba6991cbf94/b1b080b/rust/lancedb/src/table.rs:1451:48
+     |
+1451 |     pub async fn delete(&self, predicate: impl Into<Predicate<'_>>) -> Result<DeleteResult> {
+     |                                                ^^^^^^^^^^^^^^^^^^^ required by this bound in `Table::delete`
+
+error[E0277]: the trait bound `Predicate<'_>: std::convert::From<std::string::String>` is not satisfied
+    --> src/retrieval.rs:96:21
+     |
+  96 |                     self.table.delete(format!("key = '{key}'")).await.map_err(index_error)?;
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `std::convert::From<std::string::String>` is not implemented for `Predicate<'_>`
+     |
+help: `Predicate<'_>` implements trait `std::convert::From<T>`
+    --> /home/obj/.cargo/git/checkouts/lancedb-1a2acba6991cbf94/b1b080b/rust/lancedb/src/table.rs:286:1
+     |
+ 286 | impl<'a> From<&'a str> for Predicate<'a> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `std::convert::From<&str>`
+...
+ 292 | impl<'a> From<&'a String> for Predicate<'a> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `std::convert::From<&std::string::String>`
+...
+ 298 | impl<'a> From<&'a Expr> for Predicate<'a> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `std::convert::From<&DfExpr>`
+     = note: required for `std::string::String` to implement `Into<Predicate<'_>>`
+note: required by a bound in `lancedb::Table::delete`
+    --> /home/obj/.cargo/git/checkouts/lancedb-1a2acba6991cbf94/b1b080b/rust/lancedb/src/table.rs:1451:48
+     |
+1451 |     pub async fn delete(&self, predicate: impl Into<Predicate<'_>>) -> Result<DeleteResult> {
+     |                                                ^^^^^^^^^^^^^^^^^^^ required by this bound in `Table::delete`
+
+error[E0277]: the trait bound `Predicate<'_>: std::convert::From<std::string::String>` is not satisfied
+    --> src/retrieval.rs:96:65
+     |
+  96 |                     self.table.delete(format!("key = '{key}'")).await.map_err(index_error)?;
+     |                                                                 ^^^^^ the trait `std::convert::From<std::string::String>` is not implemented for `Predicate<'_>`
+     |
+help: `Predicate<'_>` implements trait `std::convert::From<T>`
+    --> /home/obj/.cargo/git/checkouts/lancedb-1a2acba6991cbf94/b1b080b/rust/lancedb/src/table.rs:286:1
+     |
+ 286 | impl<'a> From<&'a str> for Predicate<'a> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `std::convert::From<&str>`
+...
+ 292 | impl<'a> From<&'a String> for Predicate<'a> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `std::convert::From<&std::string::String>`
+...
+ 298 | impl<'a> From<&'a Expr> for Predicate<'a> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `std::convert::From<&DfExpr>`
+     = note: required for `std::string::String` to implement `Into<Predicate<'_>>`
+note: required by a bound in `lancedb::Table::delete`
+    --> /home/obj/.cargo/git/checkouts/lancedb-1a2acba6991cbf94/b1b080b/rust/lancedb/src/table.rs:1451:48
+     |
+1451 |     pub async fn delete(&self, predicate: impl Into<Predicate<'_>>) -> Result<DeleteResult> {
+     |                                                ^^^^^^^^^^^^^^^^^^^ required by this bound in `Table::delete`
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `akasha-otsuge` (lib) due to 4 previous errors

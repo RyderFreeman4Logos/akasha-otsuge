@@ -4,16 +4,18 @@ A local, traceable memory system for coding agents, written in Rust.
 
 面向 Claude Code、Codex、Hermes Agent 和 pi 的跨 Agent 记忆系统：保留原始证据、版本历史、用户决策和实际召回记录。
 
-**状态：MVP 开发中。** 当前实现权威存储、来源与版本历史、原文采集，以及 [私有 daemon 和管理 CLI](docs/daemon.md)。模型、检索和四个宿主的实际接入按 [28 个 Issues](docs/plan/issues-index.md) 逐项实施；验收进度见 [TODO](docs/plan/todo.md)。完整范围和验收门槛保存在 [规格快照](docs/spec/README.md)。CLI 名称统一为 `akasha-otsuge`，替代规格中的 `mem` 占位名。
+**状态：MVP 开发中。** 当前实现权威存储、来源与版本历史、原文采集，以及 [私有 daemon 和管理 CLI](docs/daemon.md)。模型调用和磁盘检索已接入；四个宿主等后续工作按 [28 个 Issues](docs/plan/issues-index.md) 逐项实施；验收进度见 [TODO](docs/plan/todo.md)。完整范围和验收门槛保存在 [规格快照](docs/spec/README.md)。CLI 名称统一为 `akasha-otsuge`，替代规格中的 `mem` 占位名。
 
 构建与验证见 [开发说明](docs/development.md)。配置库的版本切换、资源准备与时间预算见 [配置契约](docs/configuration.md)。
 
-权威存储库提供原子修订、持久幂等回执和独立备份恢复，格式与验证边界见 [存储说明](docs/storage.md)。[来源与采纳规则](docs/domain.md)区分可信输入、机器候选和精确版本的人审；后续 Issues 接入真实宿主与检索。
+权威存储库提供原子修订、持久幂等回执和独立备份恢复，格式与验证边界见 [存储说明](docs/storage.md)。[来源与采纳规则](docs/domain.md)区分可信输入、机器候选和精确版本的人审；后续 Issues 接入真实宿主。
 
 [历史与召回回执](docs/history.md)提供跨重启的 as-of 状态、固定时点分页和实际输出字节归档，并在 CLI/IPC 读取时复核当前权限。
 
 [采集与恢复协议](docs/capture.md)保存原始字节、规范化事件和分支/压缩关系，提供有界离线 reconcile 组件命令及可查询的缺失状态。
 
 [模型调用](docs/providers.md)通过持久 job 调用独立的 text、embedding 和 reranker 配置，记录分层时间预算；具体兼容性和长测证据见 [#9](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9)。
+
+[磁盘检索与渐进原文读取](docs/retrieval.md)提供中英文关键词、向量混合召回、重排和实际回执，并明确索引进度、来源范围及降级状态。
 
 公开仓库按用户要求采用 [Apache-2.0](LICENSE)。[来源与许可证核查](docs/provenance.md)记录迁移边界。

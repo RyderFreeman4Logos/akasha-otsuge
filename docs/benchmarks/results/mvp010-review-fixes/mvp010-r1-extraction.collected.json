@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-27T20:38:20.352957+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "c8f65d0bd3f3cb890d4a0858c2902098b8d978ff",
+    "log_sha256": "f4db728bc63d1f900c5e2c90b89bc8aa510a17df3bd4242548084ab22a33b169",
+    "seconds": 80.4793268237263,
+    "utc": "2026-10-27T20:37:35.965638+00:00"
+  },
+  "process_absent": true,
+  "classification": "green-after-behavior-preserving-extraction"
+}

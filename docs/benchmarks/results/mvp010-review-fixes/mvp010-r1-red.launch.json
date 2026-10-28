@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "retrieval_tests::regressions::sync_stops_after_a_live_grant_shrinks",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "name": "mvp010-r1-red",
+  "process": {
+    "pid": 4044273,
+    "start_ticks": "495056722",
+    "state": "R"
+  },
+  "utc": "2026-10-27T20:24:30.199283+00:00"
+}

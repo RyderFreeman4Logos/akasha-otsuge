@@ -3,11 +3,25 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#8 are merged
-and completed; #9–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#9 are merged
+and completed; #10–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-009
+## Current issue: MVP-010
+
+Retrieval is implemented in the SSD worktree, based on merge `a09d9d6`.
+Thirteen public retrieval fixtures and four native index controls cover actual
+keyword/vector/reranking paths, scoped/global rules, retirement/correction,
+publication permission races, UTF-8/captured original ranges, budgets, prefix
+SIGKILL recovery and generation switching. The queued query keeps its admitted
+old model after activation; cache-budget changes wait for old owners to drain.
+The aggregate focused run passes 27 daemon, 19 Domain, 17 configuration and four
+native index tests, plus all-targets Clippy. A subsequent exact-selector control
+adds a passing empty-library test (28 ordinary daemon tests now). The final committed-HEAD gate,
+independent review, CI and publication are still pending; #10 is not closed.
+See [the retrieval contract and fixed baseline](../retrieval.md).
+
+## Completed providers: MVP-009
 
 Independent provider clients and durable model jobs are implemented on
 `feat/mvp-009-providers`, based on merge `a3d278d`. Repaired source `986a027`
@@ -19,8 +33,10 @@ compatibility and its own1702.594s real-duration run:1605.030s success and
 configured budget and durable deadline match. R1's clock-renewal defect and its
 causal regressions remain archived alongside historical release0596d114 results.
 The [acceptance report](../providers-acceptance.md) links148 hashed original
-receipts/logs/reports totaling228200B. Final documentation-candidate gate/review,
-CI and publication remain required before closing #9.
+receipts/logs/reports totaling228200B. Final candidate `6c23e1a` passed its 63.238s canonical gate and independent
+R3 review with 0 findings. CI40560732248 passed; PR #37 merged as `a09d9d6`,
+and #9 closed completed. The final gate/review originals are published in
+[PR #37](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/37#issuecomment-6450384881).
 Production daemon/provider and later CLI Runner acceptance stay distinct.
 
 ## Completed daemon: MVP-008
@@ -36,7 +52,7 @@ receipts. [The protocol](../daemon.md) records the actual trust/coverage limits.
 
 The user-requested dua audit found55.39GiB in the home checkout. Removing10.95GiB
 of obsolete owned outputs and checksum-migrating retained artifacts leaves about
-378MiB locally. The 2026-10-27 dua recheck reports41.49GiB in .spike-work and8.43GiB in target
+380MiB locally. The 2026-10-27 dua recheck reports41.49GiB in .spike-work and9.29GiB in target
 on the SSD mirror; the shared cache includes #10's first Lance/Arrow compilation.
 Its temporary source checkout is198MiB and shares this target. All42 compressed corpus shards match the original
 manifest; preserve them for #24 without retaining the84GB expanded copy. Both

@@ -83,7 +83,7 @@ impl Plan {
 }
 
 impl Call {
-    fn request(&self, config: &ResolvedConfig) -> Result<(&'static str, Value)> {
+    pub(crate) fn request(&self, config: &ResolvedConfig) -> Result<(&'static str, Value)> {
         let model = config
             .config()
             .models
@@ -93,7 +93,7 @@ impl Call {
         let valid_batch = |batch: &[String]| {
             !batch.is_empty() && batch.len() <= MAX_BATCH && batch.iter().all(|s| valid_text(s))
         };
-        match &self.input {
+        let request = match &self.input {
             Input::Text {
                 prompt,
                 max_output_tokens,
@@ -125,7 +125,15 @@ impl Call {
                 ))
             }
             _ => Err(Error("INVALID_REQUEST")),
+        }?;
+        if serde_json::to_vec(&request.1)
+            .map_err(|_| Error("INVALID_REQUEST"))?
+            .len()
+            > MAX_PLAN_BYTES * 2
+        {
+            return Err(Error("INVALID_REQUEST"));
         }
+        Ok(request)
     }
 
     fn output(&self, config: &ResolvedConfig, response: Value) -> Result<Value> {
@@ -216,6 +224,18 @@ pub struct Outcome {
     pub trace: Value,
 }
 
+pub fn model_identity(config: &ResolvedConfig, profile: &str) -> Result<String> {
+    let model = config
+        .config()
+        .models
+        .get(profile)
+        .ok_or(Error("MODEL_NOT_CONFIGURED"))?;
+    Ok(crate::storage::hash(
+        &serde_json::to_vec(&(model.kind, &model.endpoint, &model.model, model.dimension))
+            .expect("JSON configuration"),
+    ))
+}
+
 pub struct Client {
     http: reqwest::Client,
     slots: Semaphore,
@@ -245,30 +265,25 @@ impl Client {
         workflow: &Deadline,
         cancellation: impl Future<Output = &'static str>,
     ) -> Outcome {
+        self.call_guarded(config, call, workflow, cancellation, async { Ok(()) })
+            .await
+    }
+
+    pub(crate) async fn call_guarded(
+        &self,
+        config: &ResolvedConfig,
+        call: &Call,
+        workflow: &Deadline,
+        cancellation: impl Future<Output = &'static str>,
+        authorization: impl Future<Output = Result<()>>,
+    ) -> Outcome {
         let mut provider = None;
         let mut queue = None;
         let mut queue_clock = None;
         let mut idle_triggered = false;
-        let identity = config
-            .config()
-            .models
-            .get(&call.profile)
-            .map(|m| {
-                crate::storage::hash(
-                    &serde_json::to_vec(&(m.kind, &m.endpoint, &m.model, m.dimension))
-                        .expect("JSON configuration"),
-                )
-            })
-            .unwrap_or_default();
+        let identity = model_identity(config, &call.profile).unwrap_or_default();
         let request = async {
             let (route, body) = call.request(config)?;
-            if serde_json::to_vec(&body)
-                .map_err(|_| Error("INVALID_REQUEST"))?
-                .len()
-                > MAX_PLAN_BYTES * 2
-            {
-                return Err(Error("INVALID_REQUEST"));
-            }
             let q = Deadline::start(Layer::Queue, config.timeouts().queue, None)?;
             let wait = q.remaining().min(workflow.remaining());
             queue_clock = Some(q.clone());
@@ -281,6 +296,8 @@ impl Client {
                 let mut next = self.next_start.lock().await;
                 tokio::time::sleep_until(*next).await;
                 *next = Instant::now() + Duration::from_millis(100);
+                drop(next);
+                authorization.await?;
                 Ok::<_, Error>(permit)
             })
             .await;
@@ -409,6 +426,59 @@ async fn idle<T>(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn live_authority_is_checked_after_the_provider_queue() {
+        let endpoint = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        endpoint.set_nonblocking(true).unwrap();
+        let config = crate::config::resolve(
+            &format!(
+                "[models.text]\nkind='text'\nendpoint='http://{}/v1'\nmodel='fixture'\nlocal=true",
+                endpoint.local_addr().unwrap()
+            ),
+            None,
+            "",
+            &crate::config::Paths {
+                data_dir: "/unused".into(),
+                socket_path: "/unused/socket".into(),
+            },
+        )
+        .unwrap();
+        let client = Client::new().unwrap();
+        let held = client.slots.acquire_many(4).await.unwrap();
+        let workflow = Deadline::start(Layer::Workflow, Duration::from_secs(10), None).unwrap();
+        let call = Call {
+            profile: "text".into(),
+            input: Input::Text {
+                prompt: "protected".into(),
+                max_output_tokens: 32,
+            },
+        };
+        let allowed = std::sync::atomic::AtomicBool::new(true);
+        let checked = std::sync::atomic::AtomicBool::new(false);
+        let request =
+            client.call_guarded(&config, &call, &workflow, std::future::pending(), async {
+                checked.store(true, std::sync::atomic::Ordering::SeqCst);
+                if allowed.load(std::sync::atomic::Ordering::SeqCst) {
+                    Ok(())
+                } else {
+                    Err(Error("READ_DENIED"))
+                }
+            });
+        tokio::pin!(request);
+        std::future::poll_fn(|cx| {
+            assert!(request.as_mut().poll(cx).is_pending());
+            std::task::Poll::Ready(())
+        })
+        .await;
+        assert!(!checked.load(std::sync::atomic::Ordering::SeqCst));
+        allowed.store(false, std::sync::atomic::Ordering::SeqCst);
+        drop(held);
+        let outcome = request.await;
+        assert_eq!(outcome.error.as_deref(), Some("READ_DENIED"));
+        assert!(outcome.trace["provider"].is_null());
+        assert!(matches!(endpoint.accept(), Err(e) if e.kind() == std::io::ErrorKind::WouldBlock));
+    }
 
     #[tokio::test]
     async fn exhausted_workflow_cannot_start_provider_after_ready_admission() {

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "retrieval_tests::regressions::legal_large_",
+    "--",
+    "--nocapture"
+  ],
+  "head": "6e6b28eda5c5d5711f8959d4693c24f07729c016",
+  "process": {
+    "pid": 4085914,
+    "start_ticks": "495166112",
+    "state": "R"
+  },
+  "utc": "2026-10-27T20:42:44.120841+00:00"
+}

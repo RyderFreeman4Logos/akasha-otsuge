@@ -1017,3 +1017,37 @@ async fn scope_pages_bind_the_point_and_permission_revocation_remains_live() {
     );
     reopened.close().await.unwrap();
 }
+
+#[tokio::test]
+async fn current_receipt_rechecks_wall_clock_validity_but_history_remains_readable() {
+    let fixture = Fixture::new();
+    let store = fixture.open().await;
+    let domain = Domain::new(&store);
+    grant(&domain).await;
+    let mut request = fact(&domain, "expired", "time bounded decision").await;
+    request.draft.valid_until_ms = Some(1);
+    domain
+        .propose(
+            &request,
+            &agent(Origin::Extraction),
+            &policy(ReviewMode::Automatic),
+        )
+        .await
+        .unwrap();
+    let at = store.sequence().unwrap();
+    let view = domain.active("expired").unwrap().unwrap();
+    let draft = recall(&view, at);
+    assert_eq!(
+        domain
+            .prepare_recall(&reader(), &draft)
+            .await
+            .unwrap_err()
+            .code,
+        "STALE_RECALL"
+    );
+    let mut historical = draft;
+    historical.retrieval_mode = RetrievalMode::HistoricalState;
+    historical.request_id = "expired-history".into();
+    domain.prepare_recall(&reader(), &historical).await.unwrap();
+    store.close().await.unwrap();
+}
