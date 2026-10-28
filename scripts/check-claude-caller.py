@@ -16,8 +16,8 @@ wrapper=ROOT/'bridge';wrapper.write_text('#!/usr/bin/python3\n'+'''import json,s
 event=json.load(sys.stdin)
 result=subprocess.run(ARGV+['adapter','claude-call'],input=json.dumps(event).encode(),stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=12)
 response=json.loads(result.stdout if result.returncode==0 else result.stderr)
-record={'event':{k:v for k,v in event.items() if k!='registration'},'response':response}
-if event['op']=='register' and response.get('data'):record={'event':record['event'],'registered':True}
+record={'event':{k:v for k,v in event.items() if k not in ['registration','parent_registration']},'response':response}
+if event['op'] in ['register','register_child'] and response.get('data'):record={'event':record['event'],'registered':True}
 with LOG.open('a') as f:f.write(json.dumps(record)+'\\n')
 sys.stdout.buffer.write(result.stdout);sys.stderr.buffer.write(result.stderr);sys.exit(result.returncode)
 '''.replace('ARGV',repr(argv)).replace('LOG',"pathlib.Path("+repr(str(ROOT/'bridge.jsonl'))+")"));wrapper.chmod(0o700)
@@ -35,24 +35,33 @@ workspace=str((ROOT/'workspace').resolve())
 (ROOT/'config/.claude.json').write_text(json.dumps({'hasCompletedOnboarding':True,'lastOnboardingVersion':'2.1.311','customApiKeyResponses':{'approved':[KEY[-20:]],'rejected':[]},'projects':{workspace:{'hasTrustDialogAccepted':True}}}))
 stage = ''
 count = 0
+child_called = False
+child_result_seen = False
 requests = []
 errors = []
 class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, *args): pass
     def do_POST(self):
-        global count
+        global count, child_called, child_result_seen
         try:
             size=int(self.headers['Content-Length']);assert 0<size<1024*1024
             request=json.loads(self.rfile.read(size))
             if self.path.startswith('/v1/messages/count_tokens'):
                 payload=b'{"input_tokens":20}';self.send_response(200);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(payload)));self.end_headers();self.wfile.write(payload);return
             assert self.path.startswith('/v1/messages') and self.headers.get('x-api-key')==KEY
-            count+=1;assert count<=3
+            count+=1;assert count<=8
             requests.append({'stage':stage,'body':request})
             (ROOT/'requests.json').write_text(json.dumps(requests))
-            tool=count==1 and stage!='compact'
-            block=dict(type='tool_use',id='toolu_'+stage,name='mcp__akasha-otsuge__consult',input={}) if tool else dict(type='text',text='')
-            delta=dict(type='input_json_delta',partial_json='{"hint":"probe"}') if tool else dict(type='text_delta',text='Synthetic caller summary retained.' if stage=='compact' else 'Observed caller '+stage)
+            is_child=stage=='child' and any(m.get('role')=='user' and (m.get('content')=='PRIVATE_CHILD_INPUT' or isinstance(m.get('content'),list) and any(b.get('text')=='PRIVATE_CHILD_INPUT' for b in m['content'])) for m in request['messages'])
+            spawn=stage=='child' and count==1
+            tool=count==1 or is_child and not child_called
+            if is_child:
+                if child_called:
+                    assert 'native caller probe' in json.dumps(request['messages']), 'child consult body did not execute'
+                    child_result_seen=True
+                child_called=True
+            block=dict(type='tool_use',id='toolu_'+stage+'_'+str(count),name='Agent' if spawn else 'mcp__akasha-otsuge__consult',input={}) if tool else dict(type='text',text='')
+            delta=dict(type='input_json_delta',partial_json=json.dumps({'prompt':'PRIVATE_CHILD_INPUT','description':'child binding check','subagent_type':'general-purpose'} if spawn else {'hint':'probe'})) if tool else dict(type='text_delta',text='Observed caller '+stage)
             message=dict(id='msg_'+stage+'_'+str(count),type='message',role='assistant',model=request['model'],content=[],stop_reason=None,stop_sequence=None,usage=dict(input_tokens=20,output_tokens=1))
             events=[dict(type='message_start',message=message),dict(type='content_block_start',index=0,content_block=block),dict(type='content_block_delta',index=0,delta=delta),dict(type='content_block_stop',index=0),dict(type='message_delta',delta=dict(stop_reason='tool_use' if tool else 'end_turn',stop_sequence=None),usage=dict(output_tokens=20)),dict(type='message_stop')]
             payload=''.join('event: '+e['type']+'\ndata: '+json.dumps(e)+'\n\n' for e in events).encode()
@@ -74,25 +83,30 @@ try:
  end=time.monotonic()+10
  while not socket.exists():
   assert daemon.poll() is None and time.monotonic()<end,'daemon readiness';time.sleep(.02)
- base=[str(NATIVE),'-p','--output-format','stream-json','--verbose','--tools','ToolSearch','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources','','--plugin-dir',str(ROOT/'plugin')]
+ base=[str(NATIVE),'-p','--output-format','stream-json','--verbose','--tools','ToolSearch,Agent','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources','','--plugin-dir',str(ROOT/'plugin')]
  session='11111111-1111-4111-8111-111111111111'
- for stage,flags in [('start',['--session-id',session]),('resume',['--resume',session])]:
+ child_session='33333333-3333-4333-8333-333333333333'
+ for stage,flags in [('start',['--session-id',session]),('resume',['--resume',session]),('child',['--session-id',child_session])]:
   count=0;child=subprocess.Popen(base+flags,cwd=workspace,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
   try:stdout,stderr=child.communicate(('PRIVATE_CALLER_INPUT '+stage).encode(),timeout=30)
   finally:
    if child.poll() is None:
     os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=5)
   (ROOT/(stage+'.stdout')).write_bytes(stdout);(ROOT/(stage+'.stderr')).write_bytes(stderr)
-  assert child.returncode==0 and count==2,(stage,child.returncode,count)
-  assert b'native caller probe' in stdout,'native fixture tool did not execute'
+  assert child.returncode==0 and (4<=count<=8 if stage=='child' else count==2),(stage,child.returncode,count)
+  if stage=='child': assert child_result_seen,'native child fixture tool did not execute'
+  else: assert b'native caller probe' in stdout,'native fixture tool did not execute'
   checks.append({'stage':stage,'pid':child.pid,'requests':count,'stdout_sha256':hashlib.sha256(stdout).hexdigest()})
  assert not errors,errors
  records=[json.loads(l) for l in (ROOT/'bridge.jsonl').read_text().splitlines()] if (ROOT/'bridge.jsonl').exists() else []
- bindings=[r for r in records if r['event']['op']=='bind'];assert len(bindings)==2,'native hook did not create both immutable calls'
- for r in bindings:
+ bindings=[r for r in records if r['event']['op']=='bind'];assert len(bindings)==3,'native hook did not create all immutable calls'
+ for r in bindings[:2]:
   assert 'error' not in r['response'],r['response']
   b=r['response']['data'];assert b['caller']['session']==session and b['caller']['agent']=='main' and b['turn_id'] and b['tool_call_id']
  assert bindings[0]['response']['data']['turn_id']!=bindings[1]['response']['data']['turn_id']
+ native_child=bindings[2]['response']['data']
+ assert native_child['caller']['session']==child_session and native_child['caller']['agent']!='main'
+ assert native_child['proof']['kind']=='registered_child' and native_child['proof']['parent']==child_session
  syncs=[r['response']['data']['id'] for r in records if r['event']['op']=='sync'];assert syncs,'native turn did not submit backfill'
  for job in syncs:
   end=time.monotonic()+15

@@ -175,17 +175,28 @@ pub struct CaptureInput {
     pub coverage: crate::capture::CoverageLevel,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub host: Option<crate::config::Host>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub until_event: Option<String>,
 }
 impl CaptureInput {
     pub(crate) fn binding(&self) -> Result<crate::capture::CaptureBinding> {
+        if self.until_event.as_ref().is_some_and(|event| {
+            self.host != Some(crate::config::Host::ClaudeCode) || !identifier(event)
+        }) {
+            return Err(Error("INVALID_CAPTURE_BINDING"));
+        }
         if let Some(host) = self.host {
             if host != crate::config::Host::ClaudeCode {
                 return Err(Error("ADAPTER_UNSUPPORTED"));
             }
             if self.source.adapter != "claude_code"
                 || self.coverage != crate::capture::CoverageLevel::VisibleText
-                || self.source.agent != "main"
-                || self.source.thread != self.source.session
+                || self.source.thread
+                    != if self.source.agent == "main" {
+                        self.source.session.clone()
+                    } else {
+                        format!("{}/{}", self.source.session, self.source.agent)
+                    }
             {
                 return Err(Error("INVALID_CAPTURE_BINDING"));
             }

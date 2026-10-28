@@ -18,6 +18,53 @@ fn key(token: &str) -> RecordKey {
 }
 
 impl Service {
+    async fn save_claude_registration(
+        &self,
+        registration: Registration,
+        generation: u64,
+    ) -> Result<serde_json::Value> {
+        let content = serde_json::to_string(&registration)?;
+        let mut changes = Vec::new();
+        if registration.parent.is_some() {
+            let identity = RecordKey {
+                kind: RecordKind::Evidence,
+                id: format!(
+                    "claude-child/{}",
+                    hash(&serde_json::to_vec(&registration.source)?)
+                ),
+            };
+            if let Some(old) = self.storage.current(&identity)? {
+                if old.content != content {
+                    return Err(Error("BINDING_CONFLICT"));
+                }
+            } else {
+                changes.push(Change {
+                    key: identity,
+                    expected_revision: None,
+                    content: content.clone(),
+                });
+            }
+        }
+        let mut bytes = [0u8; 32];
+        File::open("/dev/urandom")?.read_exact(&mut bytes)?;
+        let token: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
+        let key = key(&token);
+        let request_id = key.id.clone();
+        changes.push(Change {
+            key,
+            expected_revision: None,
+            content,
+        });
+        self.storage
+            .commit(&CommitRequest {
+                request_id,
+                config_generation: generation,
+                policy_revision: None,
+                changes,
+            })
+            .await?;
+        Ok(json!({"registration":token}))
+    }
     fn claude_registration(&self, token: &str) -> Result<Registration> {
         if token.len() != 64 || !token.bytes().all(|b| b.is_ascii_hexdigit()) {
             return Err(Error("BINDING_UNAVAILABLE"));
@@ -61,9 +108,6 @@ impl Service {
                     if capability.version.as_deref() != Some("2.1.311") {
                         return Err(Error("ADAPTER_UNSUPPORTED"));
                     }
-                    let mut bytes = [0u8; 32];
-                    File::open("/dev/urandom")?.read_exact(&mut bytes)?;
-                    let token: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
                     let registration = Registration {
                         capability,
                         source: SourceIdentity {
@@ -76,22 +120,54 @@ impl Service {
                         scope,
                         transcript,
                         workspace,
+                        parent: None,
                     };
-                    let key = key(&token);
                     service
-                        .storage
-                        .commit(&CommitRequest {
-                            request_id: key.id.clone(),
-                            config_generation: generation,
-                            policy_revision: None,
-                            changes: vec![Change {
-                                key,
-                                expected_revision: None,
-                                content: serde_json::to_string(&registration)?,
-                            }],
-                        })
-                        .await?;
-                    Ok(json!({"registration":token}))
+                        .save_claude_registration(registration, generation)
+                        .await
+                }
+                NativeEvent::RegisterChild {
+                    parent_registration,
+                    agent_id,
+                } => {
+                    if agent_id.is_empty()
+                        || agent_id.len() > 128
+                        || agent_id == "main"
+                        || !agent_id
+                            .bytes()
+                            .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+                    {
+                        return Err(Error("INVALID_REQUEST"));
+                    }
+                    let parent = service.claude_registration(&parent_registration)?;
+                    if parent.source.agent == agent_id {
+                        return Err(Error("CALLER_AMBIGUOUS"));
+                    }
+                    // Pinned 2.1.311 native layout, verified by SubagentStop's actual path.
+                    let directory = parent.transcript.parent().ok_or(Error("PATH_DENIED"))?;
+                    let directory = if parent.parent.is_none() {
+                        directory.join(&parent.source.session).join("subagents")
+                    } else {
+                        directory.to_path_buf()
+                    };
+                    let transcript =
+                        service.allowed_path(&directory.join(format!("agent-{agent_id}.jsonl")))?;
+                    let source = SourceIdentity {
+                        thread: format!("{}/{}", parent.source.session, agent_id),
+                        agent: agent_id,
+                        ..parent.source.clone()
+                    };
+                    let registration = Registration {
+                        source,
+                        transcript,
+                        parent: Some(parent.source.thread),
+                        capability: parent.capability,
+                        scope: parent.scope,
+                        workspace: parent.workspace,
+                    };
+                    service
+                        .save_claude_registration(registration, generation)
+                        .await
                 }
                 NativeEvent::Bind(call) => {
                     let registration = service.claude_registration(&call.registration)?;
@@ -114,7 +190,7 @@ impl Service {
                     let registration = service.claude_registration(&token)?;
                     let id = format!(
                         "claude-capture/{}",
-                        hash(&serde_json::to_vec(&(&registration.source, tip))?)
+                        hash(&serde_json::to_vec(&(&registration.source, &tip))?)
                     );
                     let binding = ipc::CaptureInput {
                         source: registration.source,
@@ -122,6 +198,7 @@ impl Service {
                         stream: "native-file".into(),
                         coverage: crate::capture::CoverageLevel::VisibleText,
                         host: Some(crate::config::Host::ClaudeCode),
+                        until_event: Some(tip),
                     };
                     drop(_guard);
                     service.submit(id, binding, registration.transcript).await

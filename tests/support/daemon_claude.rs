@@ -385,6 +385,242 @@ fn native_bridge(daemon: &Daemon, event: &Value) -> Value {
 }
 
 #[test]
+fn native_sync_waits_for_the_pinned_event_after_async_transcript_flush() {
+    use std::os::unix::fs::PermissionsExt;
+    let mut daemon = Daemon::new();
+    daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
+    let binary = daemon.root.join("claude");
+    std::fs::write(&binary, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n").unwrap();
+    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let path = daemon.root.join("not-flushed.jsonl");
+    daemon.start();
+    let registered = native_bridge(
+        &daemon,
+        &json!({"op":"register","binary":binary,
+        "session_id":"11111111-1111-4111-8111-111111111111","transcript_path":path,"cwd":daemon.root}),
+    );
+    let writer = std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_millis(500));
+        std::fs::write(
+            path,
+            include_str!("../fixtures/claude/2.1.311/native-root-resume-compact.jsonl"),
+        )
+        .unwrap();
+    });
+    let sync = native_bridge(
+        &daemon,
+        &json!({"op":"sync","registration":registered["data"]["registration"],
+        "tip":"a7c3b44a-26cd-4a68-9aff-3e98cce20493"}),
+    );
+    let completed = terminal(&daemon, sync["data"]["id"].as_str().unwrap());
+    writer.join().unwrap();
+    assert_eq!(completed["state"], "succeeded", "{completed}");
+    assert!(
+        completed["result"]["checkpoint"]["checkpoint"]["pending"].is_null(),
+        "{completed}"
+    );
+    let missing = native_bridge(
+        &daemon,
+        &json!({"op":"sync","registration":registered["data"]["registration"],"tip":"not-emitted"}),
+    );
+    let id = missing["data"]["id"].as_str().unwrap();
+    let end = Instant::now() + Duration::from_secs(5);
+    let deadline = loop {
+        let job = daemon.cli(&["job", "show", id])["data"].clone();
+        if !job["result"].is_null() {
+            assert_eq!(
+                job["state"], "running",
+                "missing tip must not report success: {job}"
+            );
+            break job["execution_deadline_ms"].clone();
+        }
+        assert!(Instant::now() < end);
+        std::thread::sleep(Duration::from_millis(10));
+    };
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    assert_eq!(
+        daemon.cli(&["job", "show", id])["data"]["execution_deadline_ms"],
+        deadline
+    );
+    daemon.cli(&["job", "cancel", id]);
+    assert_eq!(terminal(&daemon, id)["state"], "cancelled");
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
+fn native_child_registration_keeps_parent_identity_and_separate_history() {
+    use std::os::unix::fs::PermissionsExt;
+    let mut daemon = Daemon::new();
+    daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
+    let binary = daemon.root.join("claude");
+    std::fs::write(&binary, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n").unwrap();
+    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let session = "11111111-1111-4111-8111-111111111111";
+    let agent = "a2d42a7b5cfaf7eb6";
+    let transcript = daemon.root.join(format!("{session}.jsonl"));
+    std::fs::write(
+        &transcript,
+        include_str!("../fixtures/claude/2.1.311/native-root-resume-compact.jsonl"),
+    )
+    .unwrap();
+    let children = daemon.root.join(session).join("subagents");
+    std::fs::create_dir_all(&children).unwrap();
+    let fixture = include_str!("../fixtures/claude/2.1.311/native-child.jsonl");
+    std::fs::write(children.join(format!("agent-{agent}.jsonl")), fixture).unwrap();
+    std::fs::write(children.join("agent-sibling.jsonl"), fixture).unwrap();
+    std::fs::write(
+        children.join("agent-grandchild.jsonl"),
+        fixture.replace(agent, "grandchild"),
+    )
+    .unwrap();
+    daemon.start();
+    let root = native_bridge(
+        &daemon,
+        &json!({"op":"register","binary":binary,
+        "session_id":session,"transcript_path":transcript,"cwd":daemon.root}),
+    );
+    let register = json!({"op":"register_child","parent_registration":root["data"]["registration"],"agent_id":agent});
+    let child = native_bridge(&daemon, &register);
+    assert!(
+        child["data"]["registration"].is_string(),
+        "native child registration required: {child}"
+    );
+    let call = json!({"op":"bind","registration":child["data"]["registration"],"session_id":session,
+        "agent_id":agent,"turn_id":"child-turn","tool_call_id":"child-call","cursor":1,
+        "tip":"6a101f82-6982-4ac8-b613-07085ed078ce"});
+    let first = native_bridge(&daemon, &call);
+    assert!(first["error"].is_null(), "{first}");
+    let binding = &first["data"];
+    assert_eq!(binding["caller"]["agent"], agent);
+    assert_eq!(binding["caller"]["thread"], format!("{session}/{agent}"));
+    assert_eq!(binding["proof"]["kind"], "registered_child");
+    assert_eq!(binding["proof"]["parent"], session);
+    assert_eq!(binding["capability"]["native_children"], true);
+    for (key, value) in [
+        ("agent_id", json!(null)),
+        ("agent_id", json!("sibling")),
+        ("session_id", json!("unrelated")),
+        ("registration", root["data"]["registration"].clone()),
+    ] {
+        let mut wrong = call.clone();
+        wrong[key] = value;
+        assert_eq!(
+            native_bridge(&daemon, &wrong)["error"]["code"],
+            "CALLER_AMBIGUOUS"
+        );
+    }
+    for invalid in ["main", "../escape", "a/b", ""] {
+        let mut wrong = register.clone();
+        wrong["agent_id"] = invalid.into();
+        assert!(native_bridge(&daemon, &wrong)["error"].is_object());
+    }
+    let grandchild = native_bridge(
+        &daemon,
+        &json!({"op":"register_child",
+        "parent_registration":child["data"]["registration"],"agent_id":"grandchild"}),
+    );
+    assert!(
+        grandchild["data"]["registration"].is_string(),
+        "{grandchild}"
+    );
+    let mut grandcall = call.clone();
+    grandcall["registration"] = grandchild["data"]["registration"].clone();
+    grandcall["agent_id"] = "grandchild".into();
+    assert_eq!(
+        native_bridge(&daemon, &grandcall)["data"]["proof"]["parent"],
+        format!("{session}/{agent}")
+    );
+    let mut replacement = register.clone();
+    replacement["parent_registration"] = grandchild["data"]["registration"].clone();
+    assert_eq!(
+        native_bridge(&daemon, &replacement)["error"]["code"],
+        "BINDING_CONFLICT"
+    );
+    let refreshed = native_bridge(&daemon, &register);
+    let mut replay = call.clone();
+    replay["registration"] = refreshed["data"]["registration"].clone();
+    assert_eq!(native_bridge(&daemon, &replay), first);
+    let sibling = native_bridge(
+        &daemon,
+        &json!({"op":"register_child",
+        "parent_registration":root["data"]["registration"],"agent_id":"sibling"}),
+    );
+    let mut wrong_source = call.clone();
+    wrong_source["registration"] = sibling["data"]["registration"].clone();
+    wrong_source["agent_id"] = "sibling".into();
+    assert_eq!(
+        native_bridge(&daemon, &wrong_source)["error"]["code"],
+        "HISTORY_GAP"
+    );
+    let sync = native_bridge(
+        &daemon,
+        &json!({"op":"sync","registration":child["data"]["registration"],"tip":"d051798f-beae-456b-bf67-9cdd56ab8985"}),
+    );
+    let completed = terminal(&daemon, sync["data"]["id"].as_str().unwrap());
+    assert_eq!(completed["state"], "succeeded", "{completed}");
+    assert!(
+        completed["result"]["checkpoint"]["checkpoint"]["pending"].is_null(),
+        "{completed}"
+    );
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    assert_eq!(native_bridge(&daemon, &replay), first);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            let resolved = resolve(
+                "",
+                None,
+                "",
+                &Paths {
+                    data_dir: daemon.root.join("data"),
+                    socket_path: daemon.socket(),
+                },
+            )
+            .unwrap();
+            let store = Storage::open(&resolved).await.unwrap();
+            let source: SourceIdentity =
+                serde_json::from_value(first["data"]["caller"].clone()).unwrap();
+            let scope: Scope = serde_json::from_value(first["data"]["scope"].clone()).unwrap();
+            let binding = CaptureBinding::from_source(
+                source.clone(),
+                scope,
+                "native-file",
+                CoverageLevel::VisibleText,
+            )
+            .unwrap();
+            let page = Capture::new(&store)
+                .lineage(
+                    &binding,
+                    &EventRef {
+                        source: source.clone(),
+                        event_id: "d051798f-beae-456b-bf67-9cdd56ab8985".into(),
+                    },
+                    store.sequence().unwrap(),
+                    64,
+                )
+                .unwrap();
+            assert!(page.missing.is_none() && page.next.is_none());
+            assert_eq!(page.events.len(), 13);
+            assert!(
+                page.events
+                    .iter()
+                    .all(|e| e.event.reference.source == source)
+            );
+            assert!(page.events.last().unwrap().event.metadata.parent.is_none());
+            store.close().await.unwrap();
+        });
+}
+
+#[test]
 fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() {
     use std::os::unix::fs::PermissionsExt;
     let mut daemon = Daemon::new();
@@ -479,7 +715,7 @@ fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() 
     assert_eq!(native_bridge(&daemon, &replay), first);
     let synced = native_bridge(
         &daemon,
-        &json!({"op":"sync","registration":replay["registration"],"tip":"after-turn"}),
+        &json!({"op":"sync","registration":replay["registration"],"tip":call["tip"]}),
     );
     let job_id = synced["data"]["id"]
         .as_str()

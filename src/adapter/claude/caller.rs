@@ -17,6 +17,10 @@ pub enum NativeEvent {
         transcript_path: PathBuf,
         cwd: PathBuf,
     },
+    RegisterChild {
+        parent_registration: String,
+        agent_id: String,
+    },
     Bind(NativeCall),
     Sync {
         registration: String,
@@ -44,6 +48,8 @@ pub(crate) struct Registration {
     pub scope: Scope,
     pub transcript: PathBuf,
     pub workspace: PathBuf,
+    #[serde(default)]
+    pub parent: Option<String>,
 }
 
 pub struct ClaudeCaller {
@@ -61,6 +67,7 @@ impl CallerAdapter for ClaudeCaller {
         }
         report.binding = BindingLevel::ExactTurn;
         report.history = CoverageLevel::VisibleText;
+        report.native_children = true;
         report
             .capabilities
             .extend(["binding.session", "binding.turn", "history.raw"].map(str::to_owned));
@@ -76,8 +83,11 @@ impl CallerAdapter for ClaudeCaller {
             let registered = &self.registration;
             if runtime_call != call.tool_call_id
                 || call.session_id != registered.source.session
-                || call.agent_id.is_some()
-                || registered.source.agent != "main"
+                || call.agent_id.as_deref()
+                    != registered
+                        .parent
+                        .as_ref()
+                        .map(|_| registered.source.agent.as_str())
                 || ![&call.turn_id, &call.tool_call_id, &call.tip]
                     .into_iter()
                     .all(|s| valid_id(s))
@@ -85,6 +95,15 @@ impl CallerAdapter for ClaudeCaller {
             {
                 return Err(ErrorCode::CallerAmbiguous.into());
             }
+            let proof = match &registered.parent {
+                Some(parent) => CallerProof::RegisteredChild {
+                    thread: registered.source.thread.clone(),
+                    parent: parent.clone(),
+                },
+                None => CallerProof::RegisteredRoot {
+                    thread: registered.source.thread.clone(),
+                },
+            };
             let id = format!(
                 "claude/{}",
                 hash(
@@ -100,6 +119,7 @@ impl CallerAdapter for ClaudeCaller {
                 Ok(invocation) => {
                     let old = invocation.diagnostic();
                     if old.caller != registered.source
+                        || old.proof != proof
                         || old.workspace != registered.workspace
                         || old.turn_id.as_deref() != Some(&call.turn_id)
                         || old.tool_call_id.as_deref() != Some(runtime_call)
@@ -183,9 +203,7 @@ impl CallerAdapter for ClaudeCaller {
                     caller: registered.source.clone(),
                     principal: registered.scope.user.clone(),
                     scope: registered.scope.clone(),
-                    proof: CallerProof::RegisteredRoot {
-                        thread: registered.source.thread.clone(),
-                    },
+                    proof,
                     branch: registered.source.thread.clone(),
                     turn_id: Some(call.turn_id.clone()),
                     tool_call_id: Some(call.tool_call_id.clone()),

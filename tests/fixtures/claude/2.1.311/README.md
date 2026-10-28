@@ -47,6 +47,17 @@ Unrendered attachments retain their UUID and parent chain with no visible body.
 The fixture was corrected after a real native `session_context` attachment
 exposed that sanitization had supplied rendered text absent from the source.
 
+`native-child.jsonl` records a native `Agent` child calling a fixture tool. It
+retains all18 source records, native UUID/parent links, agent identity and
+sidechain flags. Attachments keep their rendered shape with synthetic text;
+tool results replace diagnostic paths with a marker and API metadata keeps only
+identity/version fields. Source SHA-256:
+`e20f6bae42d38efdcfa6b630b93031de0436dc6b982c36473c7811873be8cd14`;
+fixture SHA-256:
+`688b49ca9ea70296c6b98a2db64153d7ea8153a9eccc8b5e8c16c0eed038d3bd`.
+The ordinary child has13 captured events with no inherited parent originals.
+Its runtime parent registration remains distinct from transcript ancestry.
+
 To repeat the local protocol check, compile the test executable and use the path
 Cargo prints. The last argument must be a new artifact directory on writable SSD
 storage. The script uses isolated HOME/config, a synthetic key, loopback HTTP and
@@ -65,7 +76,7 @@ Native API references: [CLI options](https://code.claude.com/docs/en/cli-referen
 [Anthropic SSE](https://platform.claude.com/docs/en/build-with-claude/streaming).
 
 The Caller check uses the production native hook and actual daemon/Storage,
-checking startup/resume call identity and completed durable backfill. Its
+checking startup/resume/child call identity and completed durable backfill. Its
 fixture-only tool returns a marker after binding; it does not implement consult
 research or establish authenticated model acceptance. It removes its owned
 scratch directory and processes on completion:

@@ -198,4 +198,16 @@ completion and session end. It registers only after the native transcript
 directory exists. It declares no model tool; the consult workflow remains #16.
 `scripts/check-claude-caller.py` verifies startup/resume bindings and completed
 backfill with the actual CLI, production hook and daemon under local synthetic
-SSE. Installation and child/fork registration remain unfinished.
+SSE. Native children are identified by append/turn events and the host's agent
+registry. Only a known registered parent can admit a child. The pinned2.1.311
+transcript layout and each frame's session/agent/sidechain identity are checked;
+an unknown or mismatched child cannot fall back to the root. Parent identity is
+immutable across registration retries. Ordinary child transcripts have their
+own ancestry; registering the parent does not invent inherited originals.
+
+Native sync jobs persist `until_event` with their capture input and wait for
+that event within the original job deadline, including delayed file creation
+or a partial final record. Restart preserves the deadline and cancellation
+remains available. Malformed frames before the target fail with `HISTORY_GAP`.
+Manual imports without a target retain their existing partial/gap reports.
+Installation and fork-parent discovery remain unfinished.

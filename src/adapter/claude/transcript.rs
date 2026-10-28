@@ -44,10 +44,12 @@ pub(crate) fn transcript_frame(
     ) {
         return Ok(None);
     }
-    if field(&row, "sessionId")? != source.session
-        || row["isSidechain"].as_bool() == Some(true)
-        || row.get("agentId").is_some_and(|v| !v.is_null())
-    {
+    let identity_matches = if source.agent == "main" {
+        row["isSidechain"].as_bool() != Some(true) && row.get("agentId").is_none_or(Value::is_null)
+    } else {
+        row["agentId"].as_str() == Some(&source.agent) && row["isSidechain"].as_bool() == Some(true)
+    };
+    if field(&row, "sessionId")? != source.session || !identity_matches {
         return Err(invalid());
     }
     let event_id = field(&row, "uuid")?;
@@ -149,7 +151,12 @@ pub(crate) fn transcript_frame(
     let mut raw = json!({"type":kind,"uuid":event_id,"parentUuid":row["parentUuid"],
         "sessionId":source.session,"version":version,"timestamp":row["timestamp"],
         "isMeta":row["isMeta"],"message":content});
-    for key in ["isCompactSummary", "isVisibleInTranscriptOnly"] {
+    for key in [
+        "isCompactSummary",
+        "isVisibleInTranscriptOnly",
+        "agentId",
+        "isSidechain",
+    ] {
         if let Some(value) = row.get(key) {
             raw[key] = value.clone();
         }
