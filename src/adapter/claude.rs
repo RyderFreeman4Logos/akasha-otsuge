@@ -9,11 +9,11 @@ mod transcript;
 use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
 use crate::{capture::CoverageLevel, config::Host};
 pub use runner::ClaudeRunner;
-use rustix::process::{Pid, Signal, kill_process_group};
+use rustix::process::{Pid, Signal, WaitId, WaitIdOptions, kill_process_group, waitid};
 use std::{
     os::unix::{fs::PermissionsExt, process::CommandExt},
     path::{Path, PathBuf},
-    process::Stdio,
+    process::{ExitStatus, Stdio},
     time::Duration,
 };
 use tokio::io::{AsyncRead, AsyncReadExt};
@@ -40,19 +40,14 @@ pub async fn probe(binary: &Path) -> Result<CapabilityReport> {
     let stdout = child.stdout.take().ok_or(ErrorCode::RunnerFailed)?;
     let stderr = child.stderr.take().ok_or(ErrorCode::RunnerFailed)?;
     let result = tokio::time::timeout(Duration::from_secs(5), async {
-        tokio::try_join!(bounded(stdout), bounded(stderr), async {
-            child
-                .wait()
-                .await
-                .map_err(|_| ErrorCode::RunnerFailed.into())
-        })
+        tokio::try_join!(bounded(stdout), bounded(stderr), wait_for_exit(&child))
     })
     .await
     .map_err(|_| ErrorCode::RunnerTimeout);
     drop(group);
-    let _ = child.start_kill();
-    let _ = child.wait().await;
-    let (stdout, _, status) = result??;
+    let status = reap(child, || {}).wait().await;
+    let (stdout, _, ()) = result??;
+    let status = status.ok_or(ErrorCode::RunnerTimeout)?;
     if !status.success() {
         return Err(ErrorCode::RunnerFailed.into());
     }
@@ -120,4 +115,165 @@ async fn bounded(input: impl AsyncRead + Unpin) -> Result<Vec<u8>> {
         return Err(ErrorCode::OutputLimit.into());
     }
     Ok(bytes)
+}
+
+// Observe exit without releasing the leader PID before signalling its process group.
+async fn wait_for_exit(child: &tokio::process::Child) -> Result<()> {
+    let pid = Pid::from_raw(child.id().ok_or(ErrorCode::RunnerFailed)? as i32)
+        .ok_or(ErrorCode::RunnerFailed)?;
+    loop {
+        match waitid(
+            WaitId::Pid(pid),
+            WaitIdOptions::EXITED | WaitIdOptions::NOHANG | WaitIdOptions::NOWAIT,
+        ) {
+            Ok(Some(_)) => return Ok(()),
+            Ok(None) | Err(rustix::io::Errno::INTR) => {
+                tokio::time::sleep(Duration::from_millis(10)).await
+            }
+            Err(_) => return Err(ErrorCode::RunnerFailed.into()),
+        }
+    }
+}
+
+const REAP_GRACE: Duration = Duration::from_secs(1);
+
+struct Reap {
+    receiver: Option<tokio::sync::oneshot::Receiver<ExitStatus>>,
+    status: Option<ExitStatus>,
+    deadline: tokio::time::Instant,
+}
+impl Reap {
+    fn status(&mut self) -> Option<ExitStatus> {
+        if let Some(receiver) = &mut self.receiver {
+            match receiver.try_recv() {
+                Ok(status) => {
+                    self.status = Some(status);
+                    self.receiver = None;
+                }
+                Err(tokio::sync::oneshot::error::TryRecvError::Closed) => self.receiver = None,
+                Err(tokio::sync::oneshot::error::TryRecvError::Empty) => {}
+            }
+        }
+        self.status
+    }
+    async fn wait(&mut self) -> Option<ExitStatus> {
+        if self.status().is_some() {
+            return self.status;
+        }
+        if let Some(receiver) = &mut self.receiver
+            && let Ok(Ok(status)) = tokio::time::timeout_at(self.deadline, receiver).await
+        {
+            self.status = Some(status);
+            self.receiver = None;
+        }
+        self.status
+    }
+}
+
+fn reap(mut child: tokio::process::Child, cleanup: impl FnOnce() + Send + 'static) -> Reap {
+    let _ = child.start_kill();
+    reap_with(move || child.try_wait(), cleanup)
+}
+
+fn reap_with(
+    mut observe: impl FnMut() -> std::io::Result<Option<ExitStatus>> + Send + 'static,
+    cleanup: impl FnOnce() + Send + 'static,
+) -> Reap {
+    let (sender, receiver) = tokio::sync::oneshot::channel();
+    // This owner outlives both the caller future and its Tokio runtime.
+    std::thread::spawn(move || {
+        loop {
+            if let Ok(Some(status)) = observe() {
+                cleanup();
+                let _ = sender.send(status);
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    });
+    Reap {
+        receiver: Some(receiver),
+        status: None,
+        deadline: tokio::time::Instant::now() + REAP_GRACE,
+    }
+}
+
+#[cfg(test)]
+mod cleanup_tests {
+    use super::*;
+    use crate::{
+        adapter::{BudgetLimits, RunBudget},
+        config::deadline::{Deadline, Layer},
+    };
+    use std::{os::unix::process::ExitStatusExt, sync::Arc};
+
+    struct Release(Option<std::sync::mpsc::Sender<()>>);
+    impl Drop for Release {
+        fn drop(&mut self) {
+            if let Some(sender) = self.0.take() {
+                let _ = sender.send(());
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn pending_reap_is_bounded_and_keeps_lease_until_settled_after_caller_drop() {
+        let slots = Arc::new(tokio::sync::Semaphore::new(1));
+        let budget = RunBudget::new(
+            "origin",
+            "fence",
+            slots.clone(),
+            BudgetLimits::default(),
+            Deadline::start(Layer::Workflow, Duration::from_secs(30), None).unwrap(),
+        )
+        .unwrap();
+        let lease = budget.start().unwrap();
+        let directory =
+            std::env::temp_dir().join(format!("akasha-reap-owner-{}", std::process::id()));
+        std::fs::create_dir(&directory).unwrap();
+        let cleanup_directory = directory.clone();
+        let (release, released) = std::sync::mpsc::channel();
+        let release = Release(Some(release));
+        let (entered, entry) = tokio::sync::oneshot::channel();
+        let mut entered = Some(entered);
+        let (settled, done) = tokio::sync::oneshot::channel();
+        let mut cleanup = reap_with(
+            move || {
+                if let Some(entered) = entered.take() {
+                    let _ = entered.send(());
+                }
+                Ok(released.try_recv().ok().map(|()| ExitStatus::from_raw(0)))
+            },
+            move || {
+                std::fs::remove_dir(cleanup_directory).unwrap();
+                drop(lease);
+                let _ = settled.send(());
+            },
+        );
+        entry.await.unwrap();
+        let result = tokio::time::timeout(Duration::from_secs(2), cleanup.wait()).await;
+        assert!(
+            result.is_ok(),
+            "cleanup wait must return before the child can be reaped"
+        );
+        assert!(result.unwrap().is_none());
+        assert!(
+            tokio::time::timeout(Duration::from_millis(100), cleanup.wait())
+                .await
+                .unwrap()
+                .is_none(),
+            "a second wait must not renew cleanup grace"
+        );
+        assert!(directory.exists());
+        assert_eq!(slots.available_permits(), 0);
+        drop(cleanup);
+        assert_eq!(slots.available_permits(), 0);
+        drop(release);
+        tokio::time::timeout(Duration::from_secs(2), done)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(slots.available_permits(), 1);
+        assert!(!directory.exists());
+    }
 }

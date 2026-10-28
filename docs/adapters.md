@@ -66,6 +66,14 @@ adapter must check it at admission and event/I/O waits and enforce cancellation
 of its owned process or session; an outer timeout does not prove a CLI's inner
 provider timeout supports 1700 seconds.
 
+Claude cleanup has a separate one-second grace period, which repeated waits do
+not renew. Cancellation reports `acknowledged: false` if exit is still unknown;
+the original timeout/error remains authoritative. A background cleanup owner
+retains the child, workspace and concurrency lease until exit is observed, even
+after the handle is dropped. The version probe uses the same bounded cleanup
+after its five-second query timeout. A successful native result still requires
+a successful process exit.
+
 `AgentRunner::start` receives that spec and a separate `ContextSource`; choosing
 a Runner does not change the caller's history source. `RunHandle` provides typed
 events, cancellation acknowledgment and exit status. `RunCollector` counts all

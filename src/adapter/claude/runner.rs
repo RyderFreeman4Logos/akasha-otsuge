@@ -1,4 +1,4 @@
-use super::{ProcessGroup, probe};
+use super::{ProcessGroup, Reap, probe, reap, wait_for_exit};
 use crate::adapter::*;
 use futures::future::BoxFuture;
 use rustix::process::Pid;
@@ -177,6 +177,7 @@ impl AgentRunner for ClaudeRunner {
                 result: None,
                 status: None,
                 finished: false,
+                cleanup: None,
                 error: None,
             };
             cleanup.0 = None;
@@ -217,6 +218,7 @@ struct Handle<'a> {
     result: Option<String>,
     status: Option<i32>,
     finished: bool,
+    cleanup: Option<Reap>,
     error: Option<AdapterError>,
 }
 impl Handle<'_> {
@@ -371,11 +373,8 @@ impl Handle<'_> {
                     return Err(ErrorCode::ProtocolInvalid.into());
                 }
                 let child = self.child.as_mut().ok_or(ErrorCode::RunnerFailed)?;
-                let status = match tokio::time::timeout(
-                    self.spec.deadline().remaining(),
-                    child.wait(),
-                )
-                .await
+                match tokio::time::timeout(self.spec.deadline().remaining(), wait_for_exit(child))
+                    .await
                 {
                     Ok(result) => result.map_err(|_| ErrorCode::RunnerFailed)?,
                     Err(_) => {
@@ -383,10 +382,15 @@ impl Handle<'_> {
                         return Err(ErrorCode::RunnerTimeout.into());
                     }
                 };
+                self.begin_cleanup();
+                let status = self
+                    .cleanup
+                    .as_mut()
+                    .ok_or(ErrorCode::RunnerFailed)?
+                    .wait()
+                    .await
+                    .ok_or(ErrorCode::RunnerTimeout)?;
                 self.status = status.code();
-                drop(self.group.take());
-                self.finished = true;
-                let _ = std::fs::remove_dir_all(&self.directory);
                 if !status.success() {
                     return Err(ErrorCode::RunnerFailed.into());
                 }
@@ -454,16 +458,29 @@ impl Handle<'_> {
             .await
             .map_err(|_| ErrorCode::SourceUnavailable.into())
     }
-    async fn stop(&mut self) {
+    fn begin_cleanup(&mut self) {
         drop(self.group.take());
-        if let Some(child) = &mut self.child {
-            let _ = child.start_kill();
-            if let Ok(status) = child.wait().await {
-                self.status = status.code();
-            }
-        }
         self.finished = true;
-        let _ = std::fs::remove_dir_all(&self.directory);
+        if let Some(child) = self.child.take() {
+            let directory = self.directory.clone();
+            let lease = self.spec.lease_handle();
+            self.cleanup = Some(reap(child, move || {
+                let _lease = lease;
+                let _ = std::fs::remove_dir_all(directory);
+            }));
+        }
+    }
+    async fn stop(&mut self) -> bool {
+        self.begin_cleanup();
+        if let Some(status) = match &mut self.cleanup {
+            Some(cleanup) => cleanup.wait().await,
+            None => None,
+        } {
+            self.status = status.code();
+            true
+        } else {
+            false
+        }
     }
 }
 impl RunHandle for Handle<'_> {
@@ -488,38 +505,21 @@ impl RunHandle for Handle<'_> {
                     .unwrap_or(ErrorCode::RunnerTimeout.into()),
                 _ => ErrorCode::Cancelled.into(),
             });
-            self.stop().await;
-            Ok(CancelAck { acknowledged: true })
+            let acknowledged = self.stop().await;
+            Ok(CancelAck { acknowledged })
         })
     }
     fn exit_status(&mut self) -> BoxFuture<'_, Result<Option<i32>>> {
-        Box::pin(async move { Ok(self.status) })
+        Box::pin(async move {
+            if let Some(status) = self.cleanup.as_mut().and_then(Reap::status) {
+                self.status = status.code();
+            }
+            Ok(self.status)
+        })
     }
 }
 impl Drop for Handle<'_> {
     fn drop(&mut self) {
-        drop(self.group.take());
-        if self.finished {
-            return;
-        }
-        if let Some(mut child) = self.child.take() {
-            let _ = child.start_kill();
-            let directory = self.directory.clone();
-            std::thread::spawn(move || {
-                let end = std::time::Instant::now() + std::time::Duration::from_secs(5);
-                loop {
-                    match child.try_wait() {
-                        Ok(Some(_)) => {
-                            let _ = std::fs::remove_dir_all(directory);
-                            return;
-                        }
-                        Ok(None) if std::time::Instant::now() < end => {
-                            std::thread::sleep(std::time::Duration::from_millis(10))
-                        }
-                        _ => return,
-                    }
-                }
-            });
-        }
+        self.begin_cleanup();
     }
 }

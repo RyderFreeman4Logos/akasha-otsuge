@@ -440,7 +440,10 @@ does not attest those repairs.
   - [x] Make uninstall recoverable after partial failure and preserve replacements.
     Permission-failure retry, detached-tree edits/replacements, resumed cleanup
     and preserved native configuration pass four unit and two real CLI tests.
-  - [ ] Bound Runner/probe reap waits while retaining cleanup ownership.
+  - [x] Bound Runner/probe reap waits while retaining cleanup ownership.
+    The pending-reap regression fails with an unbounded wait and passes with
+    a non-renewable one-second grace. Child/workspace/lease ownership survives
+    caller drop; 17 focused tests and all-target Clippy pass.
 
 The four original TUI onboarding probes remain setup failures. A distinct probe
 used a controlling PTY and task-only trusted workspace configuration, ran the
