@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "base_manifest_sha256": "6b6dffd7882dc703e393686d327f8aaae6becad1f5566e761b8cae8f4fad6ac7",
+  "files": {
+    "corrections.json": "f81ad87d41e0d8b9fc17dba09c2f3768550bc4c99ec5bf6071f7628b4ce7f5c3",
+    "README.md": "6d461230531e69d20b74e990414e422be269eabfe6d2a2419f57a13ab8e35715"
+  }
+}

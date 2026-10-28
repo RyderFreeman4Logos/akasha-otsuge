@@ -1,0 +1,50 @@
+{
+  "files": [
+    {
+      "path": "mvp011-freeze-base-control.py",
+      "bytes": 688,
+      "sha256": "ff5c7f80ad9856565d5fb7996c287ae2ce69e113e51f438aa4b162ac53e8e6d0"
+    },
+    {
+      "path": "mvp011-freeze-pin-red1.admission.json",
+      "bytes": 340,
+      "sha256": "344953a492f5858f0da18c8db987528a61578a07091d4281f8956a68cf7c0037"
+    },
+    {
+      "path": "mvp011-freeze-pin-red1.terminal.json",
+      "bytes": 237,
+      "sha256": "8652d380878d29e2dc12adef1f9baf8c0db0442decab12c6afc7265069d1c54f"
+    },
+    {
+      "path": "mvp011-freeze-pin-red1.collected.json",
+      "bytes": 409,
+      "sha256": "71d1aec9294092ebf3c43c24fd94359a3fa592a1ca58d0e3029e90dd879b6a1e"
+    },
+    {
+      "path": "mvp011-freeze-pin-red1.log",
+      "bytes": 2712,
+      "sha256": "e89a13ed57ad4ea2081f2bc47e316201ac921a4c0e27082827334f10088b3841"
+    },
+    {
+      "path": "mvp011-focused-green3.admission.json",
+      "bytes": 325,
+      "sha256": "2bef7d4b66b3077166299f1de9ccf7078ec625e96b013976762e3c7222a8e1d8"
+    },
+    {
+      "path": "mvp011-focused-green3.terminal.json",
+      "bytes": 236,
+      "sha256": "617c67670ac9504647460ae1adc0eab1fa078b45027739b7f1cc2459d281d527"
+    },
+    {
+      "path": "mvp011-focused-green3.collected.json",
+      "bytes": 366,
+      "sha256": "70b715a1a3764f4d7b7a119502f41257459a9697cb7aa393d2839c3b51da7cce"
+    },
+    {
+      "path": "mvp011-focused-green3.log",
+      "bytes": 6717,
+      "sha256": "b410885d8b98db0ca3965f62db5c06f6dabb8229f28f985a87dc80b9fc000a84"
+    }
+  ],
+  "archive_sha256": "5801bff0958a22406790249e27cc46ac6400098be22cbd206624c74499d28b48"
+}

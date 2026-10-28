@@ -315,30 +315,41 @@ does not attest those repairs.
 - [x] Publish search/show documentation, quality and withdrawal fixtures, focused
   results, final exact-HEAD gate/review, CI, merge and Issue closure. Then #11–#28.
 
-## MVP-011 remaining work
+## MVP-011 acceptance and remaining work
 
-- [ ] Versioned bounded JSONL envelopes, request/sequence correlation, capabilities,
+- [x] Versioned bounded JSONL envelopes, request/sequence correlation, capabilities,
   structured externally constructible errors, cancellation and terminal results.
-- [ ] Immutable runtime invocation binding before work; concurrent identities and
+- [x] Immutable runtime invocation binding before work; concurrent identities and
   missing/ambiguous/session-only/turn-specific capability refusal tests.
-- [ ] ContextSource with captured lineage/fork cutoffs, explicit gaps, authorized
+- [x] ContextSource with captured lineage/fork cutoffs, explicit gaps, authorized
   handles and current live read permissions; bounded workspace reads and hashes.
-- [ ] AgentRunner input/events/result and read-only tool policy; pinned generation,
+- [x] AgentRunner input/events/result and read-only tool policy; pinned generation,
   deadlines and shared start/depth/read/output budgets; immediate child refusal
   when no execution slot is available, including simultaneous parent delegates.
-- [ ] Out-of-crate adapter contract tests across all16 Caller/Runner combinations,
+- [x] Out-of-crate adapter contract tests across all16 Caller/Runner combinations,
   including source failures, protocol errors and permission boundary failures.
-- [ ] Freeze at least 60 sourced reference intent tasks in #11 before any #16
+- [x] Freeze at least 60 sourced reference intent tasks in #11 before any #16
   research-prompt tuning, with oracles, critical cases, at least10 confusing intent
   pairs, counting rules, fixed reference profile and commit/hash verification.
+  Freeze commit `7356d17f0a373ade3520e6e1a1249fc52e17ba8d`, manifest SHA-256
+  `6b6dffd7882dc703e393686d327f8aaae6becad1f5566e761b8cae8f4fad6ac7`.
+  The gate pins this original baseline and refuses coordinated resealing.
+- [x] R1 finding 1: retain the earlier Runner timeout after both Runner/Workflow
+  deadlines expire, preserving cancellation and poisoned-state rejection.
+- [x] R1 finding 2: preserve v1 and freeze a separate S04 permission-denial erratum,
+  retaining the real revocation barrier, all60 cases and critical scoring.
+  Erratum manifest `09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16`.
+  Erratum freeze commit `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
 - [ ] Publish protocol/trait/binding/permission documentation and evidence, pass
   exact-HEAD gate and independent review, then merge and close #11. The four real
   host integrations remain #12–#15; full quality/combination acceptance remains #27.
 
-Host preparation: Codex0.164.0, Hermes0.22.5+1914 and Pi0.78.0 are executable.
-The existing Claude entry points to a missing2.1.170 installation; #12 must repair
-installation and verify actual authentication. PATH/version checks do not prove
-host protocol capabilities or an authenticated Runner.
+Host preparation: Claude Code2.1.311, Codex0.164.0, Hermes0.22.5+1914 and Pi0.78.0
+are executable. Claude's broken link was repaired through mise onto SSD; the
+native digest matches the official manifest. Non-billable auth status reports
+unauthenticated. Its startup config migration was restored byte-for-byte; future
+startup may migrate again. #12 still needs real host/model acceptance. PATH/version
+checks do not prove host protocol capabilities or an authenticated Runner.
 
 ## Complete Issue queue
 

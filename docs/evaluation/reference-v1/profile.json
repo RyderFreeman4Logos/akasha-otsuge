@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "host": "codex",
+  "host_version": "0.164.0",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "high",
+  "selection": "First installed reference runner with the existing explicit model configuration recorded before research-prompt implementation; do not choose a winner after evaluating this set.",
+  "selection_observed_at": "2026-10-28T04:51:24.630935+00:00",
+  "authentication": "Existing host authentication; credentials omitted. No evaluation model calls have run.",
+  "instructions_version": "Not implemented: frozen before MVP-016",
+  "budget": {
+    "max_runner_starts": 3,
+    "max_delegation_depth": 1,
+    "max_result_chars": 4000,
+    "runner_seconds": 1700,
+    "provider_seconds": 1700,
+    "idle_timeout": null
+  },
+  "scope": "Thresholds apply only to the exact tested profile and installation recorded in each eventual run; no cross-model guarantee.",
+  "installation_observed": {
+    "path_winner": "/home/obj/.local/share/pnpm/bin/codex",
+    "native_executable": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/pnpm/global/v11/ba697-18e22299c2a5d619-0/node_modules/.pnpm/@openai+codex@0.164.0-linux-x64/node_modules/@openai/codex/vendor/x86_64-unknown-linux-musl/bin/codex",
+    "native_sha256": "b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306",
+    "native_version_output": "codex-cli 0.164.0",
+    "resolution": "Installed Node launcher platform-package resolution through its real path; no PATH replacement."
+  }
+}

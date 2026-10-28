@@ -7,14 +7,36 @@ The public Apache-2.0 repository contains all41 original specification pages and
 and completed; #11–#28 remain open at this checkpoint. The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Next issue: MVP-011
+## Current issue: MVP-011
 
-Implement the shared CallerAdapter/ContextSource/AgentRunner contract, immutable
-runtime binding, restricted reads and global delegation budgets. Freeze the
-60-task sourced reference set before #16 research prompts. The complete acceptance
-criteria remain in #11; read-only preparation is not implementation acceptance.
-The separate CI-cache improvement addresses repeated cold dependency compilation
-without changing the canonical gate or increasing paid storage capacity.
+The shared contracts, durable immutable binding, fenced context/workspace reads,
+terminal results and global delegation budgets are implemented. Focused checks
+pass20 Rust tests, including16 Caller/Runner role combinations through real
+CapturedContext, plus9 reference validation tests and all-target Clippy. The
+[protocol and permission boundaries](../adapters.md) and
+[original development receipts](../benchmarks/results/mvp011/README.md) distinguish
+these contracts from real host integration and final consult publication.
+
+The60-task reference (31 critical tasks,10 paired intents) is frozen at
+`7356d17f0a373ade3520e6e1a1249fc52e17ba8d`; manifest SHA-256 is
+`6b6dffd7882dc703e393686d327f8aaae6becad1f5566e761b8cae8f4fad6ac7`.
+The gate rejects coordinated resealing of the original inputs and manifest.
+Independent R1 review found an overwritten timeout cause and S04's unsound
+no-hit outcome after whole-grant revocation. Causal regressions now pass. The
+separate [erratum](../evaluation/reference-v1-errata-1/README.md) changes S04 to
+typed `READ_DENIED`, without protected content or a successful RecallReceipt;
+v1 remains unchanged. Erratum manifest SHA-256 is
+`09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16`.
+Erratum freeze commit: `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
+Reference profile Codex0.164.0 / gpt-6.1-sol / high was selected before research
+instructions, with actual installed executable provenance. Model evaluation has
+not run. The pre-repair exact-HEAD full gate passed; the amended candidate still
+needs its own full gate, independent R2 review, CI and Issue closure. #11 remains open.
+
+The separate [CI-cache PR #39](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/39)
+merged as `dc8e27cd4329dcbc41cdf37cf63a4eafcee548c2` after its exact local gate,
+independent PASS/0-finding review and hosted CI40636923468. First miss/save is
+confirmed; a future cache restore and speed benefit are still unverified.
 
 ## Completed retrieval: MVP-010
 
