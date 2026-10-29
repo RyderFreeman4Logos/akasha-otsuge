@@ -46,6 +46,7 @@ pub struct HermesCaller {
     registration: HermesRegistration,
     call: HermesCall,
     generation: u64,
+    native_export: Option<Vec<u8>>,
 }
 impl HermesCaller {
     pub fn new(
@@ -59,7 +60,13 @@ impl HermesCaller {
             registration,
             call,
             generation,
+            native_export: None,
         }
+    }
+
+    pub(crate) fn with_export(mut self, bytes: Vec<u8>) -> Self {
+        self.native_export = Some(bytes);
+        self
     }
 }
 impl CallerAdapter for HermesCaller {
@@ -159,9 +166,16 @@ impl CallerAdapter for HermesCaller {
             let registration = r.clone();
             let call = c.clone();
             let generation = self.generation;
+            let bytes = self.native_export.clone();
             let runtime = tokio::runtime::Handle::current();
             let (cursor, tip, capture_seq) = tokio::task::spawn_blocking(move || {
-                runtime.block_on(capture_fence(&store, &registration, &call, generation))
+                runtime.block_on(capture_fence(
+                    &store,
+                    &registration,
+                    &call,
+                    generation,
+                    bytes,
+                ))
             })
             .await
             .map_err(|_| ErrorCode::SourceUnavailable)??;
@@ -240,9 +254,13 @@ async fn capture_fence(
     r: &HermesRegistration,
     c: &HermesCall,
     generation: u64,
+    bytes: Option<Vec<u8>>,
 ) -> Result<(u64, EventRef, u64)> {
     let started = Instant::now();
-    let bytes = read_snapshot(&r.snapshot)?;
+    let bytes = match bytes {
+        Some(bytes) => bytes,
+        None => read_snapshot(&r.snapshot)?,
+    };
     let frames = super::export::decode_export(&r.source, &r.native_profile, &bytes)?;
     let native: serde_json::Value =
         serde_json::from_slice(&bytes).map_err(|_| ErrorCode::ProtocolInvalid)?;

@@ -85,7 +85,9 @@ pub(super) async fn reconcile_frames(
         return Err(StorageError::new("INVALID_CAPTURE_CHECKPOINT"));
     }
     let ingress = Ingress::unverified(
-        "hermes-canonical-export",
+        // Both the immediate fence and durable interchange backfill publish the
+        // same source event, so their unverified ingress identity must agree.
+        "capture-interchange",
         &hash(&serde_json::to_vec(source)?),
         scope,
     )?;

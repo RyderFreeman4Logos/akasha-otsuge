@@ -558,6 +558,22 @@ One source writer works in the SSD mirror and reuses the existing shared target.
 #12 is deferred only for its recorded external authentication prerequisite;
 #14–#15 have their prerequisite #11 complete. No second feature writer is active.
 
+Current #14 implementation evidence (overall acceptance remains pending):
+
+- `d0ceccb`: bounded, free native version doctor; `e4b949d`: canonical export
+  decoder and durable capture; `541c0e1`: immutable profile-scoped Caller fences.
+  Four decoder and six Hermes tests pass, including repeated compaction, retries,
+  concurrent homes and child provenance. Export fixtures use native SessionDB/CLI
+  with synthetic content; they do not claim authenticated model acceptance.
+- The private daemon bridge now obtains native exports, binds an immediate call,
+  and queues normalized background history through the existing capture scheduler.
+  Its end-to-end fixture, the preceding ten tests and all-target Clippy pass.
+  Immediate and background capture share the ingress identity to prevent false
+  event conflicts. One earlier IPC timeout remains unclassified; a diagnostic run
+  passed at 346/41/53 ms for first bind/retry/sync without changing deadlines.
+- Remaining: native plugin/install/undo, independent restricted Runner, actual
+  authenticated CLI/TUI and recovery acceptance, final gate/review/CI and closure.
+
 ## Complete Issue queue
 
 - [x] [#1 [MVP-001] 建立 Rust/Linux 项目骨架与可执行开发门槛](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/1) — dependencies: none.

@@ -3,9 +3,13 @@ use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
 mod caller;
 pub mod capture;
 pub mod export;
+mod native;
 pub use caller::{HermesCall, HermesCaller, HermesRegistration, profile_key};
+pub use native::NativeEvent;
+pub(crate) use native::export_session;
 
 pub const SUPPORTED_VERSION: &str = "0.22.5";
+pub const BACKGROUND_STREAM: &str = "hermes-native-background-v1";
 
 /// Only observes the native version. Authentication and interoperability need separate checks.
 pub async fn probe(binary: &std::path::Path) -> Result<CapabilityReport> {
