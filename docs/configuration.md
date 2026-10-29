@@ -55,9 +55,24 @@ Fallback follows only the configured ordered lists, depth first, without repeati
 a profile. Every attempt and descendant shares the original invocation, workflow
 clock and start budget. Authority, cancellation and budget failures stop fallback.
 A delegate starts from its parent's active executor. Profile-specific timeouts
-remain bounded by the original workflow. Explicit native model/argument overrides
-are still being connected in MVP-016; until qualified they return
-`ADAPTER_UNSUPPORTED` rather than silently ignoring the configuration.
+remain bounded by the original workflow. An explicitly selected model's `timeout`
+also caps the entire native attempt; it cannot extend the executor deadline.
+
+Native model overrides apply only to the isolated worker. Codex uses a Responses
+endpoint and requires the model in its native catalog. Hermes uses a Chat
+Completions endpoint. Pi retains the matching native model's capabilities and
+supports its OpenAI Completions/Responses or Anthropic Messages protocol; unknown,
+ambiguous or provider-specific OAuth models return `ADAPTER_UNSUPPORTED`. Claude
+uses an Anthropic endpoint (`/v1` is removed before passing its API base URL).
+An explicit override requires an available `credential_ref = "env:NAME"`, except
+Codex permits an anonymous endpoint when that field is omitted. No credential or
+fallback is borrowed from another provider. Default-self execution retains the
+native profile; overrides never write its defaults.
+
+`args` accepts up to eight flag/value pairs: Codex `-c`/`--config` for only
+`model_reasoning_effort` or `model_verbosity`; Claude `--effort`; Pi `--thinking`;
+Hermes `--max-iterations`. Values must be supported by the pinned host. Tool,
+profile, prompt, resume and extension options return `CONFIG_INVALID`.
 
 | Settings | Activation | Accepted/queued jobs |
 | --- | --- | --- |

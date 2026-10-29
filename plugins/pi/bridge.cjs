@@ -174,7 +174,19 @@ function registerRunner(pi, getAgentDir, defaults, version, schemas) {
       return {content:[{type:'text',text:JSON.stringify(result)}],details:{}};
     }});
   pi.on('tool_call', event => names.includes(event.toolName) ? undefined : {block:true,reason:'TOOL_DENIED'});
-  pi.on('session_start', async () => {
+  pi.on('session_start', async (_event, ctx) => {
+    if (process.env.AKASHA_EXECUTOR_MODEL) {
+      const route = JSON.parse(process.env.AKASHA_EXECUTOR_MODEL);
+      if (route.kind !== 'text' || !route.model || !route.endpoint) throw new Error('CONFIG_INVALID');
+      if (!process.env.AKASHA_EXECUTOR_KEY) throw new Error('AUTH_REQUIRED');
+      const matches = ctx.modelRegistry.getAll().filter(model => model.id === route.model);
+      const known = ctx.model?.id === route.model ? ctx.model : matches.length === 1 ? matches[0] : undefined;
+      if (!known || !['openai-completions','openai-responses','anthropic-messages'].includes(known.api)) throw new Error('ADAPTER_UNSUPPORTED');
+      pi.registerProvider('akasha_executor', {baseUrl:route.endpoint, api:known.api,
+        apiKey:'$AKASHA_EXECUTOR_KEY', models:[{...known,baseUrl:route.endpoint}]});
+      const model = ctx.modelRegistry.find('akasha_executor', route.model);
+      if (!model || !await pi.setModel(model)) throw new Error('AUTH_REQUIRED');
+    }
     const tools = pi.getAllTools().map(tool => tool.name).sort(), active = [...pi.getActiveTools()].sort();
     if (JSON.stringify(tools) !== JSON.stringify(names) || JSON.stringify(active) !== JSON.stringify(names)) throw new Error('TOOL_DENIED');
     const result = await exchange(defaults, {op:'ready',agent_dir:fs.realpathSync(getAgentDir()),version,tools,active_tools:active},undefined,true);

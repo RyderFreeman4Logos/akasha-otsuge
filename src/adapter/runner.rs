@@ -335,6 +335,7 @@ pub struct RunSpec {
     deadline: Deadline,
     guard: Option<std::path::PathBuf>,
     research_result: bool,
+    pub(crate) native_options: NativeOptions,
 }
 impl RunSpec {
     pub fn new(
@@ -373,6 +374,7 @@ impl RunSpec {
             deadline,
             guard: None,
             research_result: false,
+            native_options: NativeOptions::default(),
         })
     }
     pub(crate) fn with_guard(mut self, binary: std::path::PathBuf) -> Self {

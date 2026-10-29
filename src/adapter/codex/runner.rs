@@ -109,6 +109,16 @@ impl AgentRunner for CodexRunner {
                 .create(&directory)
                 .map_err(|_| ErrorCode::SourceUnavailable)?;
             let mut setup = SetupCleanup(Some(directory.clone()));
+            let mut catalog = self.catalog.clone();
+            if let Some(model) = &spec.native_options.model {
+                let models = catalog["models"]
+                    .as_array_mut()
+                    .ok_or(ErrorCode::AdapterUnsupported)?;
+                models.retain(|entry| entry["slug"] == model.model);
+                if models.is_empty() {
+                    return Err(ErrorCode::AdapterUnsupported.into());
+                }
+            }
             let catalog_path = directory.join("catalog.json");
             let mut file = std::fs::OpenOptions::new()
                 .write(true)
@@ -116,10 +126,8 @@ impl AgentRunner for CodexRunner {
                 .mode(0o600)
                 .open(&catalog_path)
                 .map_err(|_| ErrorCode::SourceUnavailable)?;
-            file.write_all(
-                &serde_json::to_vec(&self.catalog).map_err(|_| ErrorCode::ProtocolInvalid)?,
-            )
-            .map_err(|_| ErrorCode::SourceUnavailable)?;
+            file.write_all(&serde_json::to_vec(&catalog).map_err(|_| ErrorCode::ProtocolInvalid)?)
+                .map_err(|_| ErrorCode::SourceUnavailable)?;
             drop(file);
             let mut command = spec.command(
                 self.report
@@ -157,6 +165,8 @@ impl AgentRunner for CodexRunner {
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
                 .process_group(0);
+            spec.native_options
+                .apply(crate::config::Host::Codex, &mut command)?;
             let mut child = tokio::process::Command::from(command)
                 .kill_on_drop(!spec.guarded())
                 .spawn()
@@ -169,7 +179,7 @@ impl AgentRunner for CodexRunner {
             let stdin = child.stdin.take().ok_or(ErrorCode::RunnerFailed)?;
             let stdout = child.stdout.take().ok_or(ErrorCode::RunnerFailed)?;
             let stderr = child.stderr.take().ok_or(ErrorCode::RunnerFailed)?;
-            let models = self.catalog["models"]
+            let models = catalog["models"]
                 .as_array()
                 .ok_or(ErrorCode::AdapterUnsupported)?
                 .iter()

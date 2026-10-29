@@ -177,22 +177,37 @@ def _run_native(ctx, names, args):
             if not prompt.strip() or len(prompt.encode()) > 131072:
                 raise BridgeError('INVALID_ARGUMENT')
             cfg = load_config_readonly()
-            choice = cfg.get('model') or {}
-            raw = choice.get('default') or choice.get('model') if isinstance(choice, dict) else choice
-            model, provider = split_model_config_default(raw)
-            if not model:
-                raise BridgeError('CONFIG_INVALID')
-            provider = provider or (choice.get('provider') if isinstance(choice, dict) else None)
-            runtime, fallback = resolve_runtime_with_fallback(cfg, requested=provider, target_model=model)
-            if fallback is not None:
-                model = fallback['model']
+            selected = os.environ.get('AKASHA_EXECUTOR_MODEL')
+            if selected:
+                route = json.loads(selected)
+                if route.get('kind') != 'text' or not route.get('model') or not route.get('endpoint'):
+                    raise BridgeError('CONFIG_INVALID')
+                model = route['model']
+                key = os.environ.get('AKASHA_EXECUTOR_KEY')
+                if not key:
+                    raise BridgeError('AUTH_REQUIRED')
+                runtime = {'model':model, 'api_key':key, 'base_url':route['endpoint'],
+                           'provider':'custom', 'requested_provider':'custom', 'api_mode':'chat_completions'}
+                fallback_chain = None
+            else:
+                choice = cfg.get('model') or {}
+                raw = choice.get('default') or choice.get('model') if isinstance(choice, dict) else choice
+                model, provider = split_model_config_default(raw)
+                if not model:
+                    raise BridgeError('CONFIG_INVALID')
+                provider = provider or (choice.get('provider') if isinstance(choice, dict) else None)
+                runtime, fallback = resolve_runtime_with_fallback(cfg, requested=provider, target_model=model)
+                if fallback is not None:
+                    model = fallback['model']
+                fallback_chain = get_fallback_chain(cfg) or None
             remaining = args.budget - (time.monotonic() - started)
             if remaining <= 0:
                 raise BridgeError('RUNNER_TIMEOUT')
             agent = AIAgent(
                 **{key: runtime.get(key) for key in ('api_key', 'base_url', 'provider',
                     'requested_provider', 'api_mode', 'credential_pool', 'request_overrides')},
-                model=model, fallback_model=get_fallback_chain(cfg) or None,
+                model=model, fallback_model=fallback_chain,
+                **({'max_iterations':args.max_iterations} if getattr(args, 'max_iterations', None) is not None else {}),
                 reasoning_config=resolve_reasoning_config(cfg, model),
                 enabled_toolsets=['akasha_context'], quiet_mode=True, platform='cli',
                 skip_context_files=True, skip_memory=True, skip_background_review=True,
@@ -276,6 +291,7 @@ def _register_runner(ctx):
     def setup(parser):
         parser.add_argument('--request', required=True)
         parser.add_argument('--budget', required=True, type=float)
+        parser.add_argument('--max-iterations', type=int)
     ctx.register_cli_command(name='akasha-runner', help='Run a scoped Akasha worker.',
                              setup_fn=setup, handler_fn=lambda args: _run_native(ctx, names, args))
 

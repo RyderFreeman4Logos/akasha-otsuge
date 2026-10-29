@@ -143,8 +143,22 @@ impl Research<'_> {
         let config = self.config.clone();
         let settings = &config.resolved().config().consult;
         let executor = config.resolved().config().executors.get(profile);
-        if executor.is_some_and(|e| !e.args.is_empty() || e.model.is_some()) {
-            return Err(Error("ADAPTER_UNSUPPORTED"));
+        let model_name = executor.and_then(|e| e.model.as_ref());
+        let model = model_name.and_then(|name| config.resolved().config().models.get(name));
+        let native_options = crate::adapter::NativeOptions::new(
+            native.host,
+            executor.map_or(&[], |e| e.args.as_slice()),
+            model,
+        )?;
+        let mut runner_timeout = config
+            .resolved()
+            .timeouts()
+            .executors
+            .get(profile)
+            .copied()
+            .unwrap_or(config.resolved().timeouts().runner);
+        if let Some(name) = model_name.filter(|_| model.is_some_and(|m| m.timeout.is_some())) {
+            runner_timeout = runner_timeout.min(config.resolved().timeouts().providers[name]);
         }
         {
             let _guard = service.admission.lock().await;
@@ -197,19 +211,13 @@ impl Research<'_> {
                 .await?,
             ),
         };
-        let spec = RunSpec::new(
+        let mut spec = RunSpec::new(
             &self.invocation,
             RunOptions {
                 job_id: run_id.into(),
                 executor_profile: profile.into(),
                 instructions_version: settings.instructions_version.clone(),
-                runner_timeout: config
-                    .resolved()
-                    .timeouts()
-                    .executors
-                    .get(profile)
-                    .copied()
-                    .unwrap_or(config.resolved().timeouts().runner),
+                runner_timeout,
                 args,
             },
             ReadCapability::issue(&self.invocation)?,
@@ -217,6 +225,7 @@ impl Research<'_> {
         )?
         .with_guard(std::env::current_exe()?)
         .with_research_result();
+        spec.native_options = native_options;
         let lease = spec.lease_handle();
         let mut collector = RunCollector::new(&lease, MAX_FRAME_BYTES);
         let mut handle = {

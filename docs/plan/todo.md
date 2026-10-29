@@ -677,8 +677,13 @@ links exact identities and preserves the distinct controlled/native results.
   Four failing controls pass after the repair;17 consult cases, the focused
   workspace case and all-target Clippy pass. Named executors now pin the accepted
   route and native home, enforce live enable/read policy and follow only explicit
-  ordered fallback. Remaining configuration work: native model and safe argument
-  overrides, followed by real cross-host acceptance. The29 consult and17 config
+  ordered fallback. Native model and safe argument overrides now reach each
+  isolated worker with explicit credentials, native catalog checks and a small
+  argument allowlist. Node9/Python10, two option units and nine named-executor
+  cases pass across the focused runs; Clippy passes. One earlier IPC WouldBlock
+  failure remains unexplained: the observed nine-case diagnostic passed without
+  any timeout change, which does not establish the historical cause. Real
+  default-self and cross-host acceptance remain below. The29 consult and17 config
   regressions plus Clippy pass. An earlier capture-setup timeout remains recorded;
   its exact isolated case passed without extending the deadline.
 - [x] Extend all native tool inventories and strict request decoding to the nine

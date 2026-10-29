@@ -295,6 +295,52 @@ fn consult_named_home_is_independent_of_the_caller_profile() {
 }
 
 #[test]
+fn consult_named_model_absent_from_native_catalog_never_starts_a_worker() {
+    let (daemon, event, _) = consult_fixture_with("success", |root| {
+        format!(
+            "executor='primary'\n[executors.primary]\nkind='codex'\nbinary={:?}\nmodel='chosen'\n[models.chosen]\nkind='text'\nendpoint='http://127.0.0.1:9/v1'\nmodel='unknown-model'\nlocal=true\n",
+            root.join("codex")
+        )
+    });
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["error"], "ADAPTER_UNSUPPORTED", "{job}");
+    assert!(!daemon.root.join("starts").exists());
+}
+
+#[test]
+fn consult_named_model_and_safe_options_reach_the_native_process() {
+    let (daemon, event, _) = consult_fixture_with("success", |root| {
+        format!(
+            "executor='primary'\n[executors.primary]\nkind='codex'\nbinary={:?}\nmodel='chosen'\nargs=['-c', 'model_reasoning_effort=\"low\"']\n[models.chosen]\nkind='text'\nendpoint='http://127.0.0.1:9/v1'\nmodel='fixture'\nlocal=true\n",
+            root.join("codex")
+        )
+    });
+    let binary = daemon.root.join("codex");
+    let host = std::fs::read_to_string(&binary).unwrap().replace("root = pathlib.Path(__file__).parent", "root = pathlib.Path(__file__).parent\n(root / 'native-options.json').write_text(json.dumps({'args':sys.argv[1:]}))");
+    super::executable::write(&binary, &host);
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["state"], "succeeded", "{job}");
+    let options: Value =
+        serde_json::from_slice(&std::fs::read(daemon.root.join("native-options.json")).unwrap())
+            .unwrap();
+    let args = options["args"].as_array().unwrap();
+    for expected in [
+        "model_reasoning_effort=\"low\"",
+        "model=\"fixture\"",
+        "model_provider=\"akasha_executor\"",
+        "model_providers.akasha_executor.base_url=\"http://127.0.0.1:9/v1\"",
+        "model_providers.akasha_executor.wire_api=\"responses\"",
+        "model_providers.akasha_executor.requires_openai_auth=false",
+    ] {
+        assert!(
+            args.iter().any(|arg| arg == expected),
+            "missing {expected}: {options}"
+        );
+    }
+    assert_eq!(job["run_trace"]["runs"][0]["executor_profile"], "primary");
+}
+
+#[test]
 fn consult_delegate_two_parents_refuse_without_deadlock() {
     let (daemon, event, _) = consult_fixture("delegate_parents");
     let workspace = daemon.root.join("workspace");

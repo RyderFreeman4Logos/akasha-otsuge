@@ -170,6 +170,8 @@ impl AgentRunner for PiRunner {
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
                 .process_group(0);
+            spec.native_options
+                .apply(crate::config::Host::Pi, &mut command)?;
             let mut child = tokio::process::Command::from(command)
                 .kill_on_drop(!spec.guarded())
                 .spawn()

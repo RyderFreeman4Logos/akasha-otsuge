@@ -304,13 +304,17 @@ class HermesPlugin(unittest.TestCase):
         }
         native = __import__('sys').modules['hermes_constants']
         native.resolve_reasoning_config = lambda *a: None
-        for widened, completion in ((False, {}), (True, {}), (False, {'partial': True}),
-                                    (False, {'completed': False}), (False, {'interrupted': True})):
+        route = {'kind':'text', 'endpoint':'http://127.0.0.1:9/v1', 'model':'chosen-model', 'local':True}
+        cases = [(False, {}, None), (True, {}, None), (False, {'partial': True}, None),
+                 (False, {'completed': False}, None), (False, {'interrupted': True}, None),
+                 (False, {}, route)]
+        for widened, completion, selected in cases:
             failed = widened or bool(completion)
             calls.clear()
             Agent.valid_tool_names = names | ({'terminal'} if widened else set())
             output = io.StringIO()
             with patch.dict('sys.modules', modules), patch('sys.stdout', output), \
+                    patch.dict(os.environ, {'AKASHA_EXECUTOR_MODEL':json.dumps(selected) if selected else '', 'AKASHA_EXECUTOR_KEY':'test-only-fixture-token'}), \
                     patch.object(self.plugin, '_exchange', side_effect=lambda ctx, event, **kw: {'ready': True} if event['op'] == 'ready' else {'accepted': True}), \
                     self.assertRaises(SystemExit) as exited:
                 self.plugin._run_native(self.ctx, names, args)
@@ -328,6 +332,11 @@ class HermesPlugin(unittest.TestCase):
                 self.assertEqual(calls[0]['enabled_toolsets'], ['akasha_context'])
                 self.assertGreater(calls[0]['run_budget_seconds'], 0)
                 self.assertLessEqual(calls[0]['run_budget_seconds'], 30)
+                if selected:
+                    self.assertEqual(calls[0]['model'], 'chosen-model')
+                    self.assertEqual(calls[0]['base_url'], selected['endpoint'])
+                    self.assertEqual(calls[0]['api_key'], 'test-only-fixture-token')
+                    self.assertIsNone(calls[0]['fallback_model'])
 
     def test_omitted_null_and_blank_hints_follow_the_shared_consult_contract(self):
         for args in ({}, {'hint': None}, {'hint': '   '}):

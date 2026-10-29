@@ -216,3 +216,43 @@ test('runner research may exceed transport timeout but keeps the original deadli
   delete process.env.AKASHA_RUN_DEADLINE_MS;
   await assert.rejects(exchange(f.defaults, {op:'context'}, undefined, true), /CONFIG_INVALID/);
 });
+
+test('runner applies an explicit model route without changing native defaults', async t => {
+  const keys = ['AKASHA_EXECUTOR_MODEL', 'AKASHA_EXECUTOR_KEY', 'AKASHA_RUN_DEADLINE_MS'];
+  const previous = keys.map(key => process.env[key]);
+  t.after(() => keys.forEach((key, i) => { if (previous[i] === undefined) delete process.env[key]; else process.env[key] = previous[i]; }));
+  process.env.AKASHA_EXECUTOR_MODEL = JSON.stringify({kind:'text',endpoint:'http://127.0.0.1:9/v1',model:'chosen',local:true});
+  process.env.AKASHA_EXECUTOR_KEY = 'test-only-fixture-token';
+  process.env.AKASHA_RUN_DEADLINE_MS = String(Date.now()+30000);
+  const f = fixture(t, "console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:{ready:true}}));return;");
+  const names = ['code_read','code_search','context_describe','context_list','context_read','context_search','delegate','memory_get','memory_search'];
+  const model = {id:'chosen',name:'Chosen',provider:'configured',api:'openai-completions',reasoning:false,input:['text'],contextWindow:32768,maxTokens:8192,cost:{input:0,output:0,cacheRead:0,cacheWrite:0}};
+  let registered, selected;
+  f.pi.getAllTools = () => names.map(name => ({name})); f.pi.getActiveTools = () => names;
+  f.pi.registerProvider = (name, config) => { registered = {name,config}; };
+  f.pi.setModel = async value => { selected = value; return true; };
+  f.ctx.model = model;
+  f.ctx.modelRegistry = {getAll:() => [model], find:(provider,id) => ({...model,provider,id})};
+  registerRunner(f.pi, () => f.agent, f.defaults, '1.4.0', Object.fromEntries(names.map(name => [name,{type:'object'}])));
+  await f.hooks.session_start({},f.ctx);
+  assert.equal(registered.name,'akasha_executor');
+  assert.equal(registered.config.baseUrl,'http://127.0.0.1:9/v1');
+  assert.equal(registered.config.apiKey,'$AKASHA_EXECUTOR_KEY');
+  assert.equal(registered.config.models[0].id,'chosen');
+  assert.equal(registered.config.models[0].contextWindow,32768);
+  assert.equal(selected.provider,'akasha_executor');
+  assert.equal(f.ctx.model.provider,'configured');
+  const readyCount = f.requests().length;
+  for (const invalid of [{...model,api:'openai-codex-responses'}, {...model,id:'unknown'}]) {
+    f.ctx.model = invalid;
+    f.ctx.modelRegistry.getAll = () => [invalid];
+    registered = undefined;
+    await assert.rejects(f.hooks.session_start({},f.ctx), /ADAPTER_UNSUPPORTED/);
+    assert.equal(registered,undefined);
+    assert.equal(f.requests().length,readyCount);
+  }
+  f.ctx.model = model;
+  delete process.env.AKASHA_EXECUTOR_KEY;
+  await assert.rejects(f.hooks.session_start({},f.ctx), /AUTH_REQUIRED/);
+  assert.equal(f.requests().length,readyCount);
+});

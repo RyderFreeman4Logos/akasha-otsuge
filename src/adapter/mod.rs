@@ -4,6 +4,8 @@ pub mod claude;
 pub use budget::*;
 mod runner;
 pub use runner::*;
+mod executor;
+pub(crate) use executor::NativeOptions;
 mod conclusion;
 pub(crate) use conclusion::*;
 mod binding;
