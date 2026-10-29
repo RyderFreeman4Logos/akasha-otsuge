@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "native_version": "0.164.0",
+  "native_binary_sha256": "b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306",
+  "platform": "Debian 12 Linux x86_64",
+  "authenticated_provider": "existing Codex ChatGPT login",
+  "authenticated_model": "gpt-6.1-sol",
+  "other_agent_clis_on_path": false,
+  "tests": [
+    {
+      "name": "authenticated_runner",
+      "receipt_name": "mvp013-authenticated-runner8",
+      "exit_code": 0,
+      "seconds": 9.706063347868621,
+      "utc": "2026-10-29T01:11:11.209655+00:00",
+      "log_sha256": "fad98021f7b94c6c17776bef7da2c346ab828570d7b571cdade7a224d4fd036e",
+      "receipt_sha256": "8afde900448c27239104ddb44651c7ee36e5228082b46e4605448a32261021a1",
+      "scratch_removed": true,
+      "test_binary_sha256": "97b7c384f420cc4741aea8f9b7223117a819b0978e527383f55d712ee22deabc",
+      "source_base": "e9a2ce98d5fca9bec53a40a227204ab1d24dc1e3",
+      "source_worktree_diff_sha256": "e9951b99ecda5bb3bbc3996cbbdeae8c4ef27f3bb763355ba2eb2dd55577a347",
+      "admission_base_commit": "e9a2ce98d5fca9bec53a40a227204ab1d24dc1e3"
+    },
+    {
+      "name": "authenticated_concurrent_tuis",
+      "receipt_name": "mvp013-authenticated-tui3",
+      "exit_code": 0,
+      "seconds": 10.99892800860107,
+      "utc": "2026-10-29T00:59:11.582734+00:00",
+      "log_sha256": "92f0ed4d5d499547a2029a8a8ab6a457842efd4e42a6f1dafc25f241080e56d4",
+      "receipt_sha256": "d09c0d1f824adf2229e556b8011a70702d82cd7f767a1a88569b01cb1936261c",
+      "scratch_removed": true,
+      "product_binary_sha256": "5cfc6ad632c73aea4a1d0f5bc87662281e16e82d77f6c243ef809fb2f8f3b9df",
+      "allocated_fixture_bytes": 5115904,
+      "sessions": [
+        {
+          "native_exit": 0,
+          "controlling_terminal": true,
+          "session_sha256": "6ddcae2e202ba9ef1885d0fed8e28234266d9c206391d29f193dfd7603f1b51f",
+          "invocation_id": "codex/b7f702576150b535aed84a53bc4f261b80beff5fdc62fe7220c69fda46aeb6a6",
+          "call_cursor": 14,
+          "pty_log_sha256": "cab838354714040da9eff3304eab367169c2ea55f36ae769f2bbcaa9ce3f35ed",
+          "transcript_sha256": "3d55a5524cbdf07ee54dafee97871b57efce9d189222183413273243c14ce584"
+        },
+        {
+          "native_exit": 0,
+          "controlling_terminal": true,
+          "session_sha256": "09569985535c76a0646c48d98a8b64f13b356460a30c5517ca6372c9a6a9c195",
+          "invocation_id": "codex/feb2f09c73f51e08b8e650c4b85b3ed2af6c6df54f38356f801acf9b0e261422",
+          "call_cursor": 14,
+          "pty_log_sha256": "5a0944b8186d3d8fe4f83ed26c41988ba62734025fcd7784e5510c896acece97",
+          "transcript_sha256": "21f44f55c0b32cc3f59efd60f79bf922f41c0db71100a520180398732799e750"
+        }
+      ],
+      "admission_base_commit": "e9a2ce98d5fca9bec53a40a227204ab1d24dc1e3"
+    },
+    {
+      "name": "controlled_native_installed_caller",
+      "receipt_name": "mvp013-native-codemode5",
+      "exit_code": 0,
+      "seconds": 2.153465394861996,
+      "utc": "2026-10-29T00:45:17.968954+00:00",
+      "log_sha256": "3e03b2a4d318c3fe23cd124f08bdaa3fe87990140e323c5db9cd056086fa12e2",
+      "receipt_sha256": "375ac267e10ef2793463a9cc5f54f401370cba532764fd2992cb3eee1b01cc77",
+      "scratch_removed": true,
+      "admission_base_commit": "d490737d1db910b50afe51adbc875b21ceae9470"
+    },
+    {
+      "name": "controlled_native_denial_matrix",
+      "receipt_name": "mvp013-native-denials1",
+      "exit_code": 0,
+      "seconds": 8.019508004188538,
+      "utc": "2026-10-29T00:59:06.673805+00:00",
+      "log_sha256": "cfc679c2c09a5b690bf0dd5f5d06efded061adbee040cbb9f4207639be45d6b8",
+      "admission_base_commit": "e9a2ce98d5fca9bec53a40a227204ab1d24dc1e3"
+    },
+    {
+      "name": "controlled_native_lineage",
+      "receipt_name": "mvp013-native-lineage1",
+      "exit_code": 0,
+      "seconds": 0.9309486849233508,
+      "utc": "2026-10-28T22:43:15.570011+00:00",
+      "log_sha256": "a1d8a64c60b91cf68bdf261de862ff78abf776acec8760df6d7c35a6f6c545d6",
+      "receipt_sha256": "4ba379962f2fb261e704583651e80b806deded5b8210bf1ba298e89e2298a171",
+      "scratch_removed": true,
+      "admission_base_commit": "415b0af9d6e47335d06029c11af130aca6d1ed7b"
+    },
+    {
+      "name": "controlled_native_history",
+      "receipt_name": "mvp013-native-history1",
+      "exit_code": 0,
+      "seconds": 0.8428394868969917,
+      "utc": "2026-10-28T22:36:43.031252+00:00",
+      "log_sha256": "b3bef418879c88b5c8db1c63628f99e15d847347d9ff731debd0e8010d724c34",
+      "receipt_sha256": "f1e310c9e8820f6f87267306a9235283c40d0c183a96775f4657d3f1f25eac90",
+      "scratch_removed": true,
+      "admission_base_commit": "415b0af9d6e47335d06029c11af130aca6d1ed7b"
+    },
+    {
+      "name": "controlled_native_hook",
+      "receipt_name": "mvp013-native-exec-history1",
+      "exit_code": 0,
+      "seconds": 1.3436051309108734,
+      "utc": "2026-10-28T23:10:04.674603+00:00",
+      "log_sha256": "3e03b2a4d318c3fe23cd124f08bdaa3fe87990140e323c5db9cd056086fa12e2",
+      "receipt_sha256": "abbc6dc0d00095dbc8b608bd211b21c7939cb910873505ca2c1ae61035b0ca26",
+      "scratch_removed": true,
+      "admission_base_commit": "ba755626f02468c441f2613a3fc1855f6ef404e0"
+    },
+    {
+      "name": "controlled_native_separate_process_resume",
+      "receipt_name": "mvp013-native-restart1",
+      "exit_code": 0,
+      "seconds": 1.2466902323067188,
+      "utc": "2026-10-28T22:55:10.766188+00:00",
+      "log_sha256": "a1d8a64c60b91cf68bdf261de862ff78abf776acec8760df6d7c35a6f6c545d6",
+      "receipt_sha256": "c86d3195adc62b993e794aa6d34976ff4b1e3a896d4a3d948740635695ac7aaa",
+      "scratch_removed": true,
+      "first_process_exit_code": 0,
+      "native_exit_code": 0,
+      "distinct_processes": true,
+      "admission_base_commit": "415b0af9d6e47335d06029c11af130aca6d1ed7b"
+    }
+  ],
+  "limits": [
+    "native version pinned",
+    "native child identity unsupported and refused",
+    "nested Code Mode shell calls refused; opt-in launcher exposes functions directly",
+    "visible public text coverage; private reasoning and binary attachment contents excluded",
+    "native model cache required for Runner catalog",
+    "workflow memory/code tools are MVP-016",
+    "gate, independent review, CI and merge tracked separately"
+  ],
+  "denials": [
+    {
+      "case": "shell_write",
+      "status": "PASS",
+      "scratch_removed": true,
+      "receipt_sha256": "85a389e4c3e6d441f5ff42205e5f0e16e1b4b451ac91188b22b3650e7248c23e",
+      "registered_tools": [
+        "context_describe",
+        "context_list",
+        "context_read",
+        "context_search"
+      ]
+    },
+    {
+      "case": "shell_network",
+      "status": "PASS",
+      "scratch_removed": true,
+      "receipt_sha256": "ec610a1196bb9dc9416de42b9bd0535da1f8ae7c938ee122837b59354fd4ea8f",
+      "registered_tools": [
+        "context_describe",
+        "context_list",
+        "context_read",
+        "context_search"
+      ]
+    },
+    {
+      "case": "shell_read",
+      "status": "PASS",
+      "scratch_removed": true,
+      "receipt_sha256": "f086c17bfd0825bb7bb0d4a6fc9af0c76047ba969062ed48c51292cbb16ef317",
+      "registered_tools": [
+        "context_describe",
+        "context_list",
+        "context_read",
+        "context_search"
+      ]
+    },
+    {
+      "case": "patch",
+      "status": "PASS",
+      "scratch_removed": true,
+      "receipt_sha256": "a8a8fd078a2db3fdf8f449bbdaeaa62b8793541cd780e54ff8f1fc11ff099545",
+      "registered_tools": [
+        "context_describe",
+        "context_list",
+        "context_read",
+        "context_search"
+      ]
+    },
+    {
+      "case": "mcp",
+      "status": "PASS",
+      "scratch_removed": true,
+      "receipt_sha256": "fa1ca0f9e58069ca3ec8f0f2f9d7108be1cc07688f6030707f16bfb36ce5cd28",
+      "registered_tools": [
+        "context_describe",
+        "context_list",
+        "context_read",
+        "context_search"
+      ]
+    },
+    {
+      "case": "context_handle",
+      "status": "PASS",
+      "scratch_removed": true,
+      "receipt_sha256": "01c17296550e787904e59626b6e3de6ec45ac2aeb36a5f400a8ea85685ec2f0b",
+      "registered_tools": [
+        "context_describe",
+        "context_list",
+        "context_read",
+        "context_search"
+      ]
+    }
+  ],
+  "failed_attempts_preserved": [
+    "native Unix socket EPERM before offline result bridge",
+    "nested Code Mode CALLER_AMBIGUOUS before direct namespace selection",
+    "unrecognized additional_tools before bounded metadata decode",
+    "native legacy config strict-mode rejection and missing metadata notifications",
+    "TUI1 fresh-home SQLite migration race plus exit input timing",
+    "TUI2 concurrent context PASS but exit input timing failure"
+  ],
+  "implementation_commit": "e9a2ce98d5fca9bec53a40a227204ab1d24dc1e3",
+  "provenance": "Historical native contract fixtures precede the final implementation. Per-run base commits identify admission, not necessarily a clean build. Binary and patch hashes identify runtime evidence; the final clean source gate is recorded separately."
+}

@@ -64,9 +64,17 @@ impl CodexRunner {
         report.machine_protocol = Some("codex-app-server/0.164.0".into());
         report.cancellation = true;
         report.outer_timeout = true;
-        report
-            .capabilities
-            .extend(["runner.events".into(), "runner.cancel".into()]);
+        report.capabilities.extend(
+            [
+                "runner.events",
+                "runner.cancel",
+                "context.describe",
+                "context.list",
+                "context.read",
+                "context.search",
+            ]
+            .map(str::to_owned),
+        );
         Ok(Self {
             report,
             home,

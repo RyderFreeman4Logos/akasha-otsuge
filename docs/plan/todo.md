@@ -482,77 +482,49 @@ checks do not prove host protocol capabilities or an authenticated Runner.
 
 ## MVP-013 acceptance and remaining work
 
-- [x] Reconcile the actual installed Codex0.164.0 schemas with official app-server
-  and hook documentation. The older local reference checkout is not authoritative
-  for installed fields. Native app-server initialization, read-only thread creation
-  and an actual dynamic-tool/result/final round trip pass controlled SSE fixtures.
-  Runtime thread/turn/call IDs stay outside model arguments. The native executable
-  SHA-256 is `b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306`.
-- [x] Inventory the native fixture's actual tool list; disable shell, view_image,
-  goals and other unrelated feature tools. A model-attempted shell call returns
-  `unsupported call: shell_command` without creating its sentinel file. This used
-  fallback metadata for a synthetic model; actual configured-model permissions
-  and all denial classes still require acceptance below.
-- [ ] Implement version-pinned bounded native capture with original visible
-  prompts, commentary, tool calls/results, resume/fork/compaction relationships,
-  duplicate suppression, interrupted backfill and explicit coverage gaps.
-  The shared component now captures Codex0.164.0 native ordinal chains and
-  visible response items, preserves compaction originals and explicit fork
-  cutoffs, resumes partial files and deduplicates rotation replay. Native
-  controlled-endpoint fixtures include a separate-process root resume after
-  forking. Caller/daemon scheduling and real TUI hook acceptance remain below.
-- [ ] Bind actual root/child invocation identity, turn, call, cursor and workspace
-  before tools execute. Do not infer a child identity from the hook's parent
-  session ID; fail clearly when runtime proof is absent. Test concurrent TUIs,
-  siblings/grandchildren, permission changes and immutable replay fences.
-  The library now binds registered roots to the native call's exact ordinal;
-  four Caller tests (including eight identity refusal cases), five capture tests
-  and all-target Clippy pass. Missing/explicit child proof is refused. Live
-  hook delivery and concurrent TUI acceptance remain open. The daemon now persists
-  registration, replays bindings across restart and schedules native backfill;
-  75 relevant library/CLI/daemon/Codex tests and all-target Clippy pass (five
-  preexisting ignored cases). An observed empty crash-readiness marker race was
-  fixed at the shared test-only publisher in `8aec4ac`; no product timeout changed.
-- [ ] Implement the standalone Codex Runner through native app-server stdio and
-  scoped dynamic read tools. Verify native sandbox/tool restrictions, original
-  deadlines, bounded output, structured final/exit status and retained cleanup
-  ownership across cancellation, EOF, errors and drop.
-  Implementation now passes 14 focused Codex tests (one explicit native test is
-  ignored in ordinary runs), including 19 injected failure scenarios and native
-  cancellation. Codex0.164.0 with the existing ChatGPT login completed one scoped
-  tool call, structured answer and zero exit in 6.43 seconds, directly invoking
-  the pinned executable with other CLIs absent from PATH. Controlled native
-  acceptance separately proves the exact four-tool inventory and MCP/hook
-  exclusion. The final candidate gate/review and native denial matrix remain.
-- [ ] Provide opt-in install/undo, actual-version/capability doctor, official
-  interface rationale, sanitized native fixtures and reproduction commands.
-  The owned single-file launcher, conflict-preserving undo and native hook
-  transport now pass focused and actual Codex0.164.0 controlled-endpoint tests.
-  A Linux sandbox Unix-socket EPERM was reproduced; the hook now prepares a
-  per-call result for an offline sandbox reader, without registration tokens.
-  Four transport/install regressions pass, including concurrent sessions,
-  daemon-free result delivery and explicit native denial on binding failure.
-  Authenticated and concurrent TUI acceptance remain open below.
-  Current model metadata required two compatibility fixes: retain the ordinal of
-  native `additional_tools` metadata without exposing its tool descriptions, and
-  explicitly expose the `functions` namespace directly in the opt-in launcher.
-  Nested Code Mode tool IDs are random and lack a matching rollout entry; they
-  remain an explicit binding refusal. No user configuration file is edited.
-- [ ] With the other three CLIs absent, prove actual authenticated Caller/Runner,
-  two concurrent TUIs, resume/fork/compact, interrupted backfill, denied writes,
-  denied network/out-of-scope reads and structured output. Local SSE preflights
-  do not substitute for this acceptance.
-  The first authenticated TUI bound the correct root/call and returned its marker.
-  The simultaneous fresh-home startup exposed a native SQLite migration race in
-  the second TUI; a security-setup popup then blocked graceful exit. This failed
-  run is retained, its scratch is removed, and concurrent acceptance remains
-  pending a fixture with one-time database initialization and idle-aware exit.
-- [ ] Complete focused regressions, exact-candidate gate, independent review,
-  hosted CI, publication/merge and issue closure. Keep every later queue entry.
+- [x] Pin native Codex0.164.0 schemas, hook fields and tool policy to the installed
+  executable and official tagged sources. The native executable SHA-256 is
+  `b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306`.
+- [x] Capture bounded native ordinal chains and original public messages/tools,
+  preserve compaction originals and fork cutoffs, suppress duplicate replay and
+  resume interrupted backfill. Missing history stays observable. Controlled
+  native fixtures include a separate-process resume after fork; private reasoning
+  and binary bodies remain outside explicit `visible_text` coverage.
+- [x] Bind registered root session/turn/call/workspace to an immutable call-ordinal
+  fence before tool execution. Reject ambiguous, explicit child or unknown native
+  identity; never infer a child from a parent session. Cover concurrent roots,
+  permission changes, restart, bounded catch-up and replay. Daemon registration
+  and capture use the existing durable scheduler. The shared test-only empty
+  readiness-marker race was fixed in `8aec4ac` without changing product timeouts.
+- [x] Implement the standalone native app-server Runner with four scoped context
+  tools, bounded frames/output, original deadlines, structured final/exit checks
+  and retained process-group/lease cleanup. Fourteen ordinary Codex tests include
+  19 injected failure scenarios; two explicit native tests are ignored by default.
+  Capability negotiation advertises the actual four context operations.
+- [x] Provide opt-in single-file install/undo and free version/capability doctor.
+  Actual hooks bind outside the native sandbox and prepare a private per-call
+  result for its offline reader. No credentials enter that file. Concurrent
+  calls share no current-context file; installation conflicts preserve user data.
+  The launcher explicitly exposes `functions` directly because nested Code Mode
+  calls lack a provable rollout identity. No native configuration file is edited.
+- [x] Verify actual authenticated Runner and two simultaneous authenticated TUIs,
+  with other agent CLIs absent from PATH. Both TUIs have controlling terminals,
+  distinct session/call/fence identities, isolated synthetic context and zero exit.
+  Controlled native tests separately force denied writes, networking, outside
+  reads, patch/MCP tools and unissued context handles. They prove the actual native
+  tool boundary, while authenticated runs prove configured-model operation.
+  [Sanitized acceptance](../adapters/codex-0.164.0/README.md) records exact binary,
+  receipt and source-base hashes plus reproduction steps. Failed probes remain
+  preserved. The successful TUI fixture allocated about4.9MiB, measured without
+  following symlinks, and was removed after all consumers ended.
+- [ ] Run the canonical full gate on the final clean candidate, then obtain an
+  independent review of the full base-to-head range. Resolve every finding.
+- [ ] Pass hosted CI, publish/merge the reviewed candidate and close #13 with
+  linked evidence. Keep all later queue entries until their own acceptance passes.
 
 One source writer works in the SSD mirror and reuses the existing shared target.
-#12 is deferred only for its recorded external acceptance prerequisite; #13–#15
-no longer carry the stale dependency-blocked label after #11's completion.
+#12 is deferred only for its recorded external authentication prerequisite;
+#13–#15 no longer carry the stale dependency-blocked label after #11 completed.
 
 ## Complete Issue queue
 

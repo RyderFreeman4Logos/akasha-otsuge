@@ -199,8 +199,9 @@ All captured content is unverified input and conveys no human authority.
 
 [Native fixtures](../tests/fixtures/codex/0.164.0/README.md) bind sanitized examples
 to their native versions and source hashes. Controlled local SSE runs prove
-protocol and lifecycle behavior. Authenticated Caller/Runner, actual tool restriction and concurrent TUI
-acceptance remain MVP-013 work.
+protocol and lifecycle behavior. [Native acceptance](adapters/codex-0.164.0/README.md)
+records authenticated Caller/Runner, actual tool restrictions and concurrent TUI
+results separately from the final source gate and review.
 
 `CodexCaller` accepts a server-owned registration and native hook identity outside
 the model's arguments. It verifies the registered session, workspace and root
@@ -216,7 +217,7 @@ ancestor returns `HISTORY_GAP`; a retry preserves its stored fence even if the
 native file is gone. Permission revocation applies to new calls and retries.
 Focused tests cover native hook data, concurrent registrations in one workspace,
 identity conflicts, unknown versions, duplicate calls, missing ancestors and
-revocation. These tests do not yet prove live TUI acceptance.
+revocation. Separate native acceptance proves two simultaneous authenticated TUIs.
 
 The daemon's private `codex` transport persists root registrations with opaque
 credentials, binds native calls and queues native capture through the existing
@@ -312,7 +313,8 @@ The native0.164.0 controlled-endpoint fixture passed the installed launcher,
 real hook, actual read-only shell sandbox, exact call fence, result cleanup and
 uninstall round trip. A prior failed socket bridge and a native EPERM diagnostic
 are retained; no sandbox or network permission was relaxed. The result proves
-that transport only, not authenticated model quality or two concurrent TUIs.
+that transport. Separate authenticated Runner and concurrent-TUI receipts are
+linked above; they do not measure model quality.
 The interface follows the official [hook protocol](https://learn.chatgpt.com/docs/hooks)
 and [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference),
 checked against the installed native binary rather than the older source clone.

@@ -68,6 +68,19 @@ async fn standalone_runner_uses_scoped_native_tools_and_requires_structured_fina
     let mut runner = CodexRunner::new(&binary, &fixture.0, &fixture.0, "Read the bound context.")
         .await
         .unwrap();
+    runner
+        .probe()
+        .unwrap()
+        .negotiate(
+            &[
+                "context.describe",
+                "context.list",
+                "context.read",
+                "context.search",
+            ],
+            &[],
+        )
+        .unwrap();
     let spec = spec(&inv, 10);
     let lease = spec.lease_handle();
     let mut context = CapturedContext::new(&store, inv).unwrap();
@@ -173,6 +186,33 @@ async fn native_runner_cancel_kills_the_owned_group_and_waits_before_cleanup() {
             stat.rsplit_once(") ").unwrap().1.split_whitespace().next(),
             Some("Z")
         );
+    }
+    drop(handle);
+    drop(context);
+    Arc::try_unwrap(store).ok().unwrap().close().await.unwrap();
+}
+
+#[tokio::test]
+#[ignore = "requires explicit native Codex binary/home and isolated acceptance environment"]
+async fn installed_native_runner_denies_unissued_context_handles() {
+    let fixture = Fixture::new();
+    let binary = PathBuf::from(std::env::var_os("AKASHA_CODEX_BINARY").unwrap());
+    let home = PathBuf::from(std::env::var_os("AKASHA_CODEX_HOME").unwrap());
+    let (store, inv) = invocation(&fixture).await;
+    let mut runner = CodexRunner::new(&binary, &home, &fixture.0, "Read only authorized context.")
+        .await
+        .unwrap();
+    let mut context = CapturedContext::new(&store, inv.clone()).unwrap();
+    let mut handle = runner.start(spec(&inv, 25), &mut context).await.unwrap();
+    loop {
+        match handle.next().await {
+            Ok(Some(_)) => {}
+            Err(error) => {
+                assert_eq!(error.code, ErrorCode::ReadDenied);
+                break;
+            }
+            Ok(None) => panic!("unissued handle was accepted"),
+        }
     }
     drop(handle);
     drop(context);
