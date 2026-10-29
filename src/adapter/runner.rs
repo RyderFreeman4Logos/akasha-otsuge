@@ -103,6 +103,7 @@ pub enum RunnerEvent {
     Tool {
         name: String,
     },
+    /// Cumulative native usage for this lease, including cached input tokens.
     Usage {
         input_tokens: u64,
         output_tokens: u64,
@@ -172,6 +173,15 @@ impl<'a> RunCollector<'a> {
             }
             RunnerEvent::Accepted if self.started => return Err(ErrorCode::ProtocolInvalid.into()),
             RunnerEvent::Tool { name } => ToolPolicy::authorize(&name)?,
+            RunnerEvent::Usage {
+                input_tokens,
+                output_tokens,
+            } => {
+                if !self.started {
+                    return Err(ErrorCode::ProtocolInvalid.into());
+                }
+                self.lease.report_tokens(input_tokens, output_tokens)?;
+            }
             RunnerEvent::Completed { output } => {
                 if !self.started || output.trim().is_empty() {
                     return Err(ErrorCode::RunnerIncomplete.into());

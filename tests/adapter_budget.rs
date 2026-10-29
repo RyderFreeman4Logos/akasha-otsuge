@@ -60,7 +60,8 @@ async fn descendants_retry_and_output_share_one_budget_and_original_origin() {
             starts: 3,
             reads: 2,
             read_bytes: 8,
-            output_bytes: 8
+            output_bytes: 8,
+            tokens: 0,
         }
     );
 }
@@ -111,4 +112,96 @@ async fn cancel_and_original_deadline_apply_to_every_descendant() {
         ErrorCode::Cancelled
     );
     assert_eq!(root.charge_read(1).unwrap_err().code, ErrorCode::Cancelled);
+}
+
+#[test]
+fn reported_tokens_exhaust_one_shared_budget_and_stop_every_descendant() {
+    let b = budget(Arc::new(Semaphore::new(2)), BudgetLimits::default());
+    let root = b.start().unwrap();
+    let child = root.delegate().unwrap();
+    let mut parent_output = RunCollector::new(&root, 100);
+    let mut child_output = RunCollector::new(&child, 100);
+    parent_output.push(RunnerEvent::Started).unwrap();
+    child_output.push(RunnerEvent::Started).unwrap();
+    parent_output
+        .push(RunnerEvent::Usage {
+            input_tokens: 100_000,
+            output_tokens: 0,
+        })
+        .unwrap();
+    assert_eq!(
+        child_output
+            .push(RunnerEvent::Usage {
+                input_tokens: 100_000,
+                output_tokens: 0,
+            })
+            .unwrap_err()
+            .code,
+        ErrorCode::BudgetExhausted
+    );
+    assert_eq!(root.check().unwrap_err().code, ErrorCode::BudgetExhausted);
+    assert_eq!(child.check().unwrap_err().code, ErrorCode::BudgetExhausted);
+    assert_eq!(
+        root.delegate().unwrap_err().code,
+        ErrorCode::BudgetExhausted
+    );
+    assert!(
+        parent_output
+            .push(RunnerEvent::Completed {
+                output: "over budget".into()
+            })
+            .is_err()
+    );
+    assert_eq!(b.usage().unwrap().tokens, 200_000);
+    drop(parent_output);
+    drop(child_output);
+    drop(root);
+    drop(child);
+    assert_eq!(b.start().unwrap_err().code, ErrorCode::BudgetExhausted);
+}
+
+#[test]
+fn token_accounting_preserves_exact_limit_and_rejects_overflow() {
+    let b = budget(
+        Arc::new(Semaphore::new(1)),
+        BudgetLimits {
+            tokens: u64::MAX,
+            ..BudgetLimits::default()
+        },
+    );
+    let root = b.start().unwrap();
+    root.charge_tokens(u64::MAX - 3, 3).unwrap();
+    assert_eq!(b.usage().unwrap().tokens, u64::MAX);
+    assert_eq!(
+        root.charge_tokens(1, 0).unwrap_err().code,
+        ErrorCode::BudgetExhausted
+    );
+    assert_eq!(root.check().unwrap_err().code, ErrorCode::BudgetExhausted);
+}
+
+#[test]
+fn cumulative_usage_does_not_double_bill_native_and_collector_reports() {
+    let b = budget(Arc::new(Semaphore::new(1)), BudgetLimits::default());
+    let root = b.start().unwrap();
+    let mut collector = RunCollector::new(&root, 100);
+    collector.push(RunnerEvent::Started).unwrap();
+    for (input_tokens, output_tokens) in [(10, 2), (10, 2), (11, 3)] {
+        collector
+            .push(RunnerEvent::Usage {
+                input_tokens,
+                output_tokens,
+            })
+            .unwrap();
+    }
+    assert_eq!(b.usage().unwrap().tokens, 14);
+    assert_eq!(
+        collector
+            .push(RunnerEvent::Usage {
+                input_tokens: 9,
+                output_tokens: 3
+            })
+            .unwrap_err()
+            .code,
+        ErrorCode::ProtocolInvalid
+    );
 }
