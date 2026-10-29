@@ -51,7 +51,7 @@ if scenario == 'cancel':
     child = subprocess.Popen([sys.executable, '-c', 'import time;time.sleep(30)'])
     (home / 'child.pid').write_text(str(child.pid))
 ready = {'op': 'ready', 'home': str(home if scenario != 'wrong_home' else home / 'other'),
-         'tools': ['context_describe', 'context_list', 'context_read', 'context_search']}
+         'tools': ['code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search']}
 if scenario != 'no_ready':
     assert exchange(ready) == {'ready': True}
 if scenario == 'double_ready':

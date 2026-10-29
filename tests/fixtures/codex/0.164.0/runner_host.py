@@ -26,7 +26,7 @@ assert request['method'] == 'thread/start'
 assert request['params']['config']['mcp_servers']['other.server']['enabled'] is False
 assert request['params']['sandbox'] == 'read-only'
 assert request['params']['approvalPolicy'] == 'never'
-assert {t['name'] for t in request['params']['dynamicTools']} == {'context_describe', 'context_list', 'context_read', 'context_search'}
+assert {t['name'] for t in request['params']['dynamicTools']} == {'code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search'}
 assert 'token' not in json.dumps(request)
 catalog = next(sys.argv[i+1] for i, arg in enumerate(sys.argv[:-1]) if arg == '-c' and sys.argv[i+1].startswith('model_catalog_json='))
 model = json.loads(pathlib.Path(json.loads(catalog.split('=', 1)[1])).read_text())['models'][0]

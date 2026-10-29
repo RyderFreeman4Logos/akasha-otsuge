@@ -233,7 +233,7 @@ class HermesPlugin(unittest.TestCase):
                                       'AKASHA_HERMES_RUN_TOKEN': 'a' * 64}), \
                 patch.object(self.plugin, '_exchange', side_effect=exchange):
             self.plugin.register(runner)
-            names = {'context_describe', 'context_list', 'context_read', 'context_search'}
+            names = {'code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search'}
             self.assertEqual(set(runner.tools), names)
             self.assertEqual(set(runner.hooks), {'pre_tool_call'})
             self.assertEqual(events, [])
@@ -253,7 +253,7 @@ class HermesPlugin(unittest.TestCase):
         request.write_text('Read context.')
         request.chmod(0o600)
         args = types.SimpleNamespace(request=str(request), budget=30.0)
-        names = {'context_describe', 'context_list', 'context_read', 'context_search'}
+        names = {'code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search'}
         calls = []
         completion = {}
         class Agent:

@@ -315,10 +315,11 @@ retaining the model's remaining metadata. Before starting an ephemeral thread,
 the Runner disables every effective MCP server, native hooks, plugins, agent
 delegation and host skill discovery. It requests the native read-only sandbox,
 disabled tool networking and no approvals, and verifies the returned policy.
-Only `context_describe`, `context_list`, `context_read` and `context_search` are
-registered. Their requests pass the existing invocation, permission and shared
-budget checks; model arguments cannot supply the operation or caller identity.
-Memory/code tools and workflow composition are integrated in MVP-016.
+The registered inventory contains `context_describe/list/read/search`,
+`memory_search/get`, `code_search/read` and `delegate`. Strict shared request
+decoding rejects model-supplied caller identity. CapturedContext serves only the
+context operations; the consult workflow supplies the remaining research tools
+under the same invocation, permissions and budget.
 
 The Runner accepts one structured nonempty `answer`, then closes stdin and waits
 for the native process to exit successfully. EOF, an answer followed by a failing

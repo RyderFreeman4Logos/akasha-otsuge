@@ -169,7 +169,7 @@ test('runner registers only context tools and attests real inventories before wo
     if (process.argv.at(-1) !== 'pi-context') process.exit(2);
     console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:event.op === 'ready' ? {ready:true} : event.op === 'usage' ? {accepted:true} : {kind:'description'}})); return;
   }`);
-  const names = ['context_describe', 'context_list', 'context_read', 'context_search'];
+  const names = ['code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search'];
   f.pi.getAllTools = () => names.map(name => ({name}));
   f.pi.getActiveTools = () => names;
   registerRunner(f.pi, () => f.agent, f.defaults, '1.4.0', Object.fromEntries(names.map(name => [name, {type:'object'}])));

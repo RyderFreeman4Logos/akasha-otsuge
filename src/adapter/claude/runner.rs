@@ -13,11 +13,16 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{UnixListener, UnixStream};
 use tokio::process::{Child, ChildStderr, ChildStdout};
 
-const TOOLS: [&str; 4] = [
+const TOOLS: [&str; 9] = [
     "mcp__akasha-runner__context_describe",
     "mcp__akasha-runner__context_list",
     "mcp__akasha-runner__context_read",
     "mcp__akasha-runner__context_search",
+    "mcp__akasha-runner__memory_search",
+    "mcp__akasha-runner__memory_get",
+    "mcp__akasha-runner__code_search",
+    "mcp__akasha-runner__code_read",
+    "mcp__akasha-runner__delegate",
 ];
 
 #[derive(serde::Deserialize)]
@@ -65,9 +70,22 @@ impl ClaudeRunner {
         report.machine_protocol = Some("claude-stream-json/2.1.311".into());
         report.cancellation = true;
         report.outer_timeout = true;
-        report
-            .capabilities
-            .extend(["runner.events".into(), "runner.cancel".into()]);
+        report.capabilities.extend(
+            [
+                "runner.events",
+                "runner.cancel",
+                "context.describe",
+                "context.list",
+                "context.read",
+                "context.search",
+                "memory.search",
+                "memory.get",
+                "code.search",
+                "code.read",
+                "delegate",
+            ]
+            .map(str::to_owned),
+        );
         let bridge = super::resolve(bridge)?;
         Ok(Self {
             report,

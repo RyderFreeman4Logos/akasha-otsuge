@@ -16,7 +16,7 @@ for flag in ['--no-session', '--no-builtin-tools', '--no-extensions', '--no-mcp'
              '--no-prompt-templates', '--no-themes', '--no-context-files', '--no-approve']:
     assert flag in sys.argv
 assert sys.argv[sys.argv.index('--mode') + 1] == 'rpc'
-tools = ['context_describe', 'context_list', 'context_read', 'context_search']
+tools = ['code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search']
 assert sys.argv[sys.argv.index('--tools') + 1].split(',') == tools
 assert Path(sys.argv[sys.argv.index('-e') + 1]) == home / 'extensions/akasha-otsuge/index.ts'
 

@@ -218,16 +218,21 @@ def _run_native(ctx, names, args):
 
 def _register_runner(ctx):
     schemas = {
-        'describe': ({}, []),
-        'list': ({'cursor': {'type': ['string', 'null']},
+        'context_describe': ({}, []),
+        'context_list': ({'cursor': {'type': ['string', 'null']},
                   'limit': {'type': 'integer', 'minimum': 1, 'maximum': 16}}, ['limit']),
-        'read': ({'handle': {'type': 'string'}, 'start': {'type': 'integer', 'minimum': 0},
+        'context_read': ({'handle': {'type': 'string'}, 'start': {'type': 'integer', 'minimum': 0},
                   'max_bytes': {'type': 'integer', 'minimum': 1, 'maximum': 16384}},
                  ['handle', 'start', 'max_bytes']),
-        'search': ({'cursor': {'type': ['string', 'null']}, 'query': {'type': 'string'},
+        'context_search': ({'cursor': {'type': ['string', 'null']}, 'query': {'type': 'string'},
                     'limit': {'type': 'integer', 'minimum': 1, 'maximum': 16}}, ['query', 'limit']),
+        'memory_search': ({'query': {'type': 'string', 'maxLength': 512}}, ['query']),
+        'memory_get': ({'memory_id': {'type': 'string'}, 'revision': {'type': 'integer', 'minimum': 1}}, ['memory_id', 'revision']),
+        'code_search': ({'paths': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1, 'maxItems': 16}, 'query': {'type': 'string', 'maxLength': 512}}, ['paths', 'query']),
+        'code_read': ({'path': {'type': 'string'}, 'start': {'type': 'integer', 'minimum': 0}, 'max_bytes': {'type': 'integer', 'minimum': 1, 'maximum': 16384}}, ['path', 'start', 'max_bytes']),
+        'delegate': ({'hint': {'type': 'string', 'maxLength': 512}}, ['hint']),
     }
-    names = {'context_' + op for op in schemas}
+    names = set(schemas)
 
     def before(tool_name='', **_):
         if tool_name not in names:
@@ -245,8 +250,8 @@ def _register_runner(ctx):
                 return json.dumps({'error': {'code': str(error)}})
         return call
 
-    for op, (properties, required) in schemas.items():
-        name = 'context_' + op
+    for name, (properties, required) in schemas.items():
+        op = name.removeprefix('context_')
         if ctx.register_tool(name=name, toolset='akasha_context', handler=handler(op),
                 schema={'name': name, 'description': op + ' the authorized caller context',
                         'parameters': {'type': 'object', 'properties': properties,

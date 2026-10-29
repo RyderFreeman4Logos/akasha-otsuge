@@ -55,7 +55,7 @@ async fn native_runner_requires_init_terminal_and_exit_with_isolated_tool_flags(
         &f,
         r#"printf '%s\n' "$@" > "$0.argv"
 /bin/cat > "$0.stdin"
-printf '%s\n' '{"type":"system","subtype":"init","session_id":"runner-session","claude_code_version":"2.1.311","tools":["ToolSearch","mcp__akasha-runner__context_describe","mcp__akasha-runner__context_list","mcp__akasha-runner__context_read","mcp__akasha-runner__context_search"],"mcp_servers":[{"name":"akasha-runner","status":"connected","source":"plugin"}]}'
+printf '%s\n' '{"type":"system","subtype":"init","session_id":"runner-session","claude_code_version":"2.1.311","tools":["ToolSearch","mcp__akasha-runner__context_describe","mcp__akasha-runner__context_list","mcp__akasha-runner__context_read","mcp__akasha-runner__context_search","mcp__akasha-runner__memory_search","mcp__akasha-runner__memory_get","mcp__akasha-runner__code_search","mcp__akasha-runner__code_read","mcp__akasha-runner__delegate"],"mcp_servers":[{"name":"akasha-runner","status":"connected","source":"plugin"}]}'
 printf '%s\n' '{"type":"assistant","session_id":"runner-session","message":{"id":"msg-1","usage":{"input_tokens":10,"output_tokens":1},"content":[{"type":"text","text":"PROVISIONAL_NOT_FINAL"}]}}'
 printf '%s\n' '{"type":"result","subtype":"success","is_error":false,"session_id":"runner-session","result":"final referenced answer","usage":{"input_tokens":10,"output_tokens":2}}'
 "#,
@@ -113,7 +113,7 @@ printf '%s\n' '{"type":"result","subtype":"success","is_error":false,"session_id
     store.close().await.unwrap();
 }
 
-const INIT: &str = r#"{"type":"system","subtype":"init","session_id":"runner-session","claude_code_version":"2.1.311","tools":["ToolSearch","mcp__akasha-runner__context_describe","mcp__akasha-runner__context_list","mcp__akasha-runner__context_read","mcp__akasha-runner__context_search"],"mcp_servers":[{"name":"akasha-runner","status":"connected","source":"plugin"}]}"#;
+const INIT: &str = r#"{"type":"system","subtype":"init","session_id":"runner-session","claude_code_version":"2.1.311","tools":["ToolSearch","mcp__akasha-runner__context_describe","mcp__akasha-runner__context_list","mcp__akasha-runner__context_read","mcp__akasha-runner__context_search","mcp__akasha-runner__memory_search","mcp__akasha-runner__memory_get","mcp__akasha-runner__code_search","mcp__akasha-runner__code_read","mcp__akasha-runner__delegate"],"mcp_servers":[{"name":"akasha-runner","status":"connected","source":"plugin"}]}"#;
 const DONE: &str = r#"{"type":"result","subtype":"success","is_error":false,"session_id":"runner-session","result":"final answer","usage":{"input_tokens":10,"output_tokens":2}}"#;
 
 fn no_live_process(pid: u32) -> bool {
@@ -394,7 +394,7 @@ async fn native_runner_context_bridge_uses_bound_capability_and_rejects_forgery(
         r#"/bin/cat >/dev/null
 exec /usr/bin/python3 - 2>"$0.stderr" <<'PY'
 import json,os,socket,struct
-names=['ToolSearch']+['mcp__akasha-runner__context_'+x for x in ['describe','list','read','search']]
+names=['ToolSearch']+['mcp__akasha-runner__'+x for x in ['context_describe','context_list','context_read','context_search','memory_search','memory_get','code_search','code_read','delegate']]
 print(json.dumps(dict(type='system',subtype='init',session_id='runner-session',claude_code_version='2.1.311',tools=names,mcp_servers=[dict(name="akasha-runner",status="connected",source="plugin")])),flush=True)
 def call(request,token=None):
     with socket.socket(socket.AF_UNIX) as s:
@@ -537,6 +537,9 @@ async fn native_runner_pairs_recorded_native_tool_results() {
             .collect();
     for case in 0..6 {
         let mut frames = rows.clone();
+        // Retain the recorded frames; only the controlled process advertises the current inventory.
+        frames[0]["tools"] =
+            serde_json::from_str::<serde_json::Value>(INIT).unwrap()["tools"].clone();
         let expected = match case {
             0 => None,
             1 => {

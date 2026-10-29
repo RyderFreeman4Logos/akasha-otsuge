@@ -640,6 +640,9 @@ links exact identities and preserves the distinct controlled/native results.
   Caller binding and support no hint without caller-built context packages.
 - [ ] Provide progressive context/memory/code reads through shared Rust authority;
   keep current grants, source versions, workspace limits and untrusted content.
+- [x] Extend all native tool inventories and strict request decoding to the nine
+  shared research tools. Focused Rust58, Hermes9 and Pi7 regressions pass; daemon
+  research execution and real consult acceptance remain separate work below.
 - [ ] Enforce shared token/read/output/start/depth/time/concurrency budgets across
   retries and descendants; retain run lineage and never reset origin or fence.
 - [x] Add cumulative token accounting and real native-protocol usage checks for
