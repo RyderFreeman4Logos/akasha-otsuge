@@ -17,6 +17,106 @@ pub(in crate::daemon) struct NativeExecutor {
 }
 
 impl NativeExecutor {
+    pub(super) fn options(
+        &self,
+        config: &crate::config::ResolvedConfig,
+        profile: &str,
+    ) -> Result<(crate::adapter::NativeOptions, Duration)> {
+        let executor = config.config().executors.get(profile);
+        let model_name = executor.and_then(|e| e.model.as_ref());
+        let model = model_name.and_then(|name| config.config().models.get(name));
+        let native_options = crate::adapter::NativeOptions::new(
+            self.host,
+            executor.map_or(&[], |e| e.args.as_slice()),
+            model,
+        )?;
+        let mut runner_timeout = config
+            .timeouts()
+            .executors
+            .get(profile)
+            .copied()
+            .unwrap_or(config.timeouts().runner);
+        if let Some(name) = model_name.filter(|_| model.is_some_and(|m| m.timeout.is_some())) {
+            runner_timeout = runner_timeout.min(config.timeouts().providers[name]);
+        }
+        Ok((native_options, runner_timeout))
+    }
+    pub(super) async fn runner(
+        &self,
+        directory: &std::path::Path,
+        instructions: &str,
+    ) -> Result<Box<dyn crate::adapter::AgentRunner>> {
+        Ok(match self.host {
+            Host::Codex => Box::new(
+                crate::adapter::codex::CodexRunner::new(
+                    &self.binary,
+                    &self.home,
+                    directory,
+                    instructions,
+                )
+                .await?,
+            ),
+            Host::Hermes => Box::new(
+                crate::adapter::hermes::HermesRunner::new(
+                    &self.binary,
+                    &self.home,
+                    directory,
+                    instructions,
+                )
+                .await?,
+            ),
+            Host::Pi => Box::new(
+                crate::adapter::pi::PiRunner::new(
+                    &self.binary,
+                    &self.home,
+                    directory,
+                    instructions,
+                )
+                .await?,
+            ),
+            Host::ClaudeCode => Box::new(
+                crate::adapter::claude::ClaudeRunner::with_profile(
+                    &self.binary,
+                    &std::env::current_exe()?,
+                    &self.home,
+                    directory,
+                    instructions,
+                )
+                .await?,
+            ),
+        })
+    }
+    pub(super) fn from_profile(
+        executor: &crate::config::Executor,
+        inherited: Option<&Self>,
+    ) -> Result<Self> {
+        let home = if let Some(home) = &executor.native_home {
+            home.clone()
+        } else if inherited.is_some_and(|native| executor.kind == native.host) {
+            inherited.unwrap().home.clone()
+        } else {
+            let (variable, relative) = match executor.kind {
+                Host::Codex => ("CODEX_HOME", ".codex"),
+                Host::ClaudeCode => ("CLAUDE_CONFIG_DIR", ".claude"),
+                Host::Hermes => ("HERMES_HOME", ".hermes"),
+                Host::Pi => ("PI_CODING_AGENT_DIR", ".pi/agent"),
+            };
+            std::env::var_os(variable)
+                .map(PathBuf::from)
+                .or_else(|| std::env::var_os("HOME").map(|root| PathBuf::from(root).join(relative)))
+                .ok_or(Error("EXECUTOR_UNAVAILABLE"))?
+        };
+        if !home.is_absolute() {
+            return Err(Error("CONFIG_INVALID"));
+        }
+        // Pin an existing profile's canonical location before the job can queue.
+        let home = home.canonicalize().unwrap_or(home);
+        Ok(Self {
+            host: executor.kind,
+            binary: executor.binary.clone(),
+            home,
+        })
+    }
     fn named(&self, config: &crate::config::Config) -> Result<BTreeMap<String, Self>> {
         let mut routes = BTreeMap::new();
         let mut pending = vec![config.consult.executor.clone()];
@@ -25,37 +125,7 @@ impl NativeExecutor {
                 continue;
             }
             let executor = config.executors.get(&name).ok_or(Error("CONFIG_CORRUPT"))?;
-            let home = if let Some(home) = &executor.native_home {
-                home.clone()
-            } else if executor.kind == self.host {
-                self.home.clone()
-            } else {
-                let (variable, relative) = match executor.kind {
-                    Host::Codex => ("CODEX_HOME", ".codex"),
-                    Host::ClaudeCode => ("CLAUDE_CONFIG_DIR", ".claude"),
-                    Host::Hermes => ("HERMES_HOME", ".hermes"),
-                    Host::Pi => ("PI_CODING_AGENT_DIR", ".pi/agent"),
-                };
-                std::env::var_os(variable)
-                    .map(PathBuf::from)
-                    .or_else(|| {
-                        std::env::var_os("HOME").map(|root| PathBuf::from(root).join(relative))
-                    })
-                    .ok_or(Error("EXECUTOR_UNAVAILABLE"))?
-            };
-            if !home.is_absolute() {
-                return Err(Error("CONFIG_INVALID"));
-            }
-            // Pin an existing profile's canonical location before the job can queue.
-            let home = home.canonicalize().unwrap_or(home);
-            routes.insert(
-                name,
-                Self {
-                    host: executor.kind,
-                    binary: executor.binary.clone(),
-                    home,
-                },
-            );
+            routes.insert(name, Self::from_profile(executor, Some(self))?);
             pending.extend(executor.fallback.iter().cloned());
         }
         Ok(routes)
@@ -92,7 +162,7 @@ impl Service {
         }
         Ok(())
     }
-    fn authorize_executor(&self, profile: &str, native: &NativeExecutor) -> Result<()> {
+    pub(super) fn authorize_executor(&self, profile: &str, native: &NativeExecutor) -> Result<()> {
         if profile != "caller" && !self.config.executor_allowed(profile) {
             return Err(Error("EXECUTOR_UNAVAILABLE"));
         }

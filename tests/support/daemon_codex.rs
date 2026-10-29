@@ -89,9 +89,13 @@ fn consult_fixture_with(
 }
 
 fn sync_consult_fixture(daemon: &Daemon, token: &str) {
+    sync_fixture_until(daemon, token, 18);
+}
+
+fn sync_fixture_until(daemon: &Daemon, token: &str, ordinal: u64) {
     let sync = native(
         daemon,
-        json!({"op":"sync","registration":token,"until_ordinal":18}),
+        json!({"op":"sync","registration":token,"until_ordinal":ordinal}),
     );
     assert!(sync.get("error").is_none(), "{sync}");
     let end = Instant::now() + Duration::from_secs(20);
@@ -1300,6 +1304,16 @@ fn native_hook_uses_private_call_files_without_exposing_registration_credentials
     let state = daemon.root.join("hook-state");
     std::fs::create_dir(daemon.root.join(".codex")).unwrap();
     daemon.start();
+    // This privacy test does not require cold catch-up to fit the two-second bind budget.
+    let registered = native(
+        &daemon,
+        json!({"op":"register","binary":binary,"session_id":hook["session_id"],"transcript_path":transcript,"cwd":daemon.root}),
+    );
+    sync_fixture_until(
+        &daemon,
+        registered["data"]["registration"].as_str().unwrap(),
+        9,
+    );
     let mut child = daemon
         .command()
         .args([
@@ -1566,6 +1580,7 @@ fn native_registration_binding_and_backfill_survive_daemon_restart() {
     let token = registered["data"]["registration"]
         .as_str()
         .expect("native registration must succeed");
+    sync_fixture_until(&daemon, token, 9);
     let bind = json!({"op":"bind","registration":token,"call":{"session_id":hook["session_id"],"agent_id":null,"turn_id":hook["turn_id"],"tool_call_id":hook["tool_use_id"],"cwd":daemon.root}});
     let bound = native(&daemon, bind.clone());
     assert!(bound.get("error").is_none(), "{bound}");

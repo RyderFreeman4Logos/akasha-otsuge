@@ -43,6 +43,30 @@ local = true
 "#;
 
 #[test]
+fn extraction_executor_needs_no_model_and_contributes_its_original_timeout() {
+    let input = "[consult]\nexecutor='short'\n[retrieval]\nextraction='executor:patient'\n[executors.short]\nkind='codex'\nbinary='codex'\ntimeout='1s'\n[executors.patient]\nkind='pi'\nbinary='pi'\ntimeout='2000s'\n";
+    let resolved = config(input);
+    assert!(resolved.config().models.is_empty());
+    assert!(resolved.timeouts().workflow > Duration::from_secs(2000));
+    for invalid in [
+        input.replace("executor:patient", "executor:missing"),
+        format!("{input}enabled=false\n"),
+        input.replace("executor:patient", "patient"),
+    ] {
+        assert!(resolve(&invalid, None, "", &paths()).is_err());
+    }
+    assert!(
+        resolve(
+            &format!("{input}\n[timeouts]\nworkflow='1701s'\n"),
+            None,
+            "",
+            &paths()
+        )
+        .is_err()
+    );
+}
+
+#[test]
 fn defaults_cover_all_local_model_roles_without_an_endpoint_requirement() {
     let empty = config("");
     assert!(empty.config().models.is_empty());

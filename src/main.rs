@@ -31,6 +31,7 @@ Commands:
   config show --effective
   capture reconcile|codex|claude BINDING_JSON INPUT_JSONL --idempotency-key ID
   model run PLAN_JSON --idempotency-key ID
+  extract run PLAN_JSON --idempotency-key ID
   index sync --idempotency-key ID
   index status
   search QUERY --scope JSON_FILE --idempotency-key ID
@@ -389,6 +390,16 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
                 return Err(Error("MESSAGE_TOO_LARGE"));
             }
             Some(Command::ModelRun {
+                plan: serde_json::from_str(&input)?,
+                idempotency_key: (*id).into(),
+            })
+        }
+        ["extract", "run", path, "--idempotency-key", id] => {
+            let input = config::read_file(std::path::Path::new(path))?;
+            if input.len() > 16 * 1024 {
+                return Err(Error("MESSAGE_TOO_LARGE"));
+            }
+            Some(Command::ExtractionRun {
                 plan: serde_json::from_str(&input)?,
                 idempotency_key: (*id).into(),
             })

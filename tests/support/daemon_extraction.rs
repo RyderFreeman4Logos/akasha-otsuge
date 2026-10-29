@@ -159,3 +159,63 @@ fn text_extraction_is_durable_source_backed_candidate_only_and_idempotent() {
         store.close().await.unwrap();
     });
 }
+
+fn native_fixture(scenario: &str) -> (Daemon, Value) {
+    let mut daemon = Daemon::new();
+    let source = seed_source(
+        &daemon,
+        "native-conditional",
+        "Only if offline, use keyword search.",
+    );
+    let home = daemon.root.join("native-home");
+    std::fs::create_dir(&home).unwrap();
+    let binary = daemon.root.join("codex");
+    executable::write(
+        &binary,
+        include_str!("../fixtures/codex/0.164.0/runner_host.py"),
+    );
+    std::fs::write(daemon.root.join("scenario"), scenario).unwrap();
+    std::fs::write(home.join("models_cache.json"), r#"{"models":[{"slug":"fixture","shell_type":"unified_exec","apply_patch_tool_type":"freeform","experimental_supported_tools":[],"tool_mode":"code_mode"}]}"#).unwrap();
+    daemon.configure(&format!("[access]\nread_roots=[{home:?}]\n[retrieval]\nextraction='executor:existing'\n[executors.existing]\nkind='codex'\nbinary={binary:?}\nnative_home={home:?}\n"));
+    daemon.start();
+    let plan = json!({"scope":scope(),"sources":[source]});
+    (daemon, plan)
+}
+
+#[test]
+fn native_extraction_uses_an_existing_executor_without_extra_model_profiles() {
+    let (daemon, plan) = native_fixture("extraction");
+    let path = daemon.root.join("extraction.json");
+    std::fs::write(&path, serde_json::to_vec(&plan).unwrap()).unwrap();
+    let admitted = daemon.cli(&[
+        "extract",
+        "run",
+        path.to_str().unwrap(),
+        "--idempotency-key",
+        "native-extraction",
+    ]);
+    assert_eq!(admitted["data"]["id"], "native-extraction");
+    let job = finished(&daemon, "native-extraction");
+    assert_eq!(job["state"], "succeeded", "{job}");
+    assert_eq!(job["result"]["candidates"].as_array().unwrap().len(), 1);
+    assert_eq!(job["result"]["generator"]["runner"], "executor/existing");
+    assert_eq!(
+        job["result"]["generator"]["prompt_version"],
+        "extraction-v1"
+    );
+    assert_eq!(job["result"]["trace"]["usage"]["starts"], 1);
+}
+
+#[test]
+fn native_extraction_cannot_expand_its_evidence_with_research_tools() {
+    let (daemon, plan) = native_fixture("extraction_denied");
+    assert!(
+        submit(&daemon, "denied-extraction", &plan)
+            .get("error")
+            .is_none()
+    );
+    let job = finished(&daemon, "denied-extraction");
+    assert_eq!(job["state"], "failed", "{job}");
+    assert_eq!(job["error"], "TOOL_DENIED", "{job}");
+    assert!(job["result"]["candidates"].is_null());
+}

@@ -699,6 +699,13 @@ hashes actually cover. #12 alone retains deferred Claude authentication.
   input first; model failure must leave sources and recoverable work intact.
 - [ ] Support configured text profiles and existing authenticated CLI Runners,
   including the single-CLI path without extra text/embedding/reranker API keys.
+- [x] Add `extract run PLAN_JSON --idempotency-key ID` and the configured
+  `executor:NAME` route, sharing existing native-home admission, model options,
+  deadlines and cleanup. Controlled native extraction and forbidden-tool tests
+  pass without model profiles. Config, shared Runner and all four adapter suites
+  pass; actual authenticated extraction remains below. Two unrelated Codex
+  privacy/restart fixtures now await durable async prefix capture rather than
+  assuming cold storage work fits the two-second binding catch-up window.
 - [ ] Version the prompt/output schema. Resolve model source indices to exact
   immutable source spans; preserve scope, conditions, assumptions and generator
   identity. Extraction produces candidates, without claiming human confirmation.

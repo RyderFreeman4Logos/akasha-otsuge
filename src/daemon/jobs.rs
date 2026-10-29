@@ -580,6 +580,8 @@ pub(super) struct Job {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     extraction_plan: Option<crate::extraction::Plan>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    extraction_native: Option<consult::NativeExecutor>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     consult_plan: Option<consult::Plan>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     retrieval_plan: Option<crate::retrieval::Request>,
@@ -652,6 +654,7 @@ impl Service {
         if job.schema_version != 1
             || job.id != id
             || job.attempt > MAX_ATTEMPTS
+            || (job.extraction_native.is_some() && job.extraction_plan.is_none())
             || !matches!(
                 (
                     &job.binding,
@@ -726,6 +729,18 @@ impl Service {
     fn authorize_job(&self, job: &Job) -> Result<()> {
         if let Some(plan) = &job.extraction_plan {
             plan.sources(&self.storage, &context()?)?;
+            if let Some(native) = &job.extraction_native {
+                let snapshot = self.retrieval_snapshot(job.config_generation)?;
+                let profile = snapshot
+                    .resolved()
+                    .config()
+                    .retrieval
+                    .extraction
+                    .as_deref()
+                    .and_then(|s| s.strip_prefix("executor:"))
+                    .ok_or(Error("JOB_CORRUPT"))?;
+                self.authorize_executor(profile, native)?;
+            }
             return Ok(());
         }
         if let Some(plan) = &job.consult_plan {
@@ -900,11 +915,35 @@ impl Service {
             } else {
                 0
             };
+            let extraction_native = if extraction_plan.is_some() {
+                snapshot
+                    .resolved()
+                    .config()
+                    .retrieval
+                    .extraction
+                    .as_deref()
+                    .and_then(|s| s.strip_prefix("executor:"))
+                    .map(|profile| {
+                        let executor = snapshot
+                            .resolved()
+                            .config()
+                            .executors
+                            .get(profile)
+                            .ok_or(Error("CONFIG_CORRUPT"))?;
+                        let native = consult::NativeExecutor::from_profile(executor, None)?;
+                        service.authorize_executor(profile, &native)?;
+                        Ok::<_, Error>(native)
+                    })
+                    .transpose()?
+            } else {
+                None
+            };
             let budget = match (&model_plan, &retrieval_plan) {
                 (Some(plan), _) => plan.validate(snapshot.resolved()).map_err(|e| Error(e.0))?,
                 (_, Some(plan)) => {
                     plan.workflow_budget(snapshot.resolved(), vector_snapshot.resolved(), pending)?
                 }
+                _ if extraction_native.is_some() => snapshot.resolved().timeouts().workflow,
                 _ if extraction_plan.is_some() => {
                     let call = service
                         .extraction_call(extraction_plan.as_ref().unwrap(), snapshot.resolved())?;
@@ -925,6 +964,7 @@ impl Service {
                 path,
                 model_plan,
                 extraction_plan,
+                extraction_native,
                 consult_plan,
                 retrieval_plan,
                 retrieval_target_seq,

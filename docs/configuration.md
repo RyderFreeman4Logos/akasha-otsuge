@@ -34,9 +34,11 @@ only idle accepts `disabled`, and only workflow accepts `auto`.
 and explicit `local`. Embedding requires `dimension`. An optional `timeout`
 overrides the common request budget. Endpoints accept HTTP(S), with no userinfo,
 query or fragment; use `credential_ref` for authentication. Unconfigured model
-services are valid. `retrieval.embedding/reranker/extraction` reference profiles of
-the corresponding kind. These are configuration contracts; actual requests are
-implemented in MVP-009/010/017.
+services are valid. `retrieval.embedding/reranker` reference profiles of the
+corresponding kind. `retrieval.extraction` accepts a text profile or
+`executor:NAME` to use one enabled CLI executor with its existing authentication.
+The latter needs no extra text, embedding or reranker endpoint. Nothing is selected
+or invoked by default.
 
 `executors.NAME` requires `kind` (`claude_code`, `codex`, `hermes`, `pi`) and `binary`.
 Optional fields are `args`, `enabled`, a text `model`, `timeout`, an absolute
@@ -51,6 +53,10 @@ its daemon environment override (`CODEX_HOME`, `CLAUDE_CONFIG_DIR`, `HERMES_HOME
 `PI_CODING_AGENT_DIR`) or its standard directory under `HOME`. Configure
 `native_home` for a different profile, and include that directory in `read_roots`.
 Live path restrictions and executor disablement are checked before startup.
+Extraction has no bound caller: an omitted native home uses the daemon environment
+or standard host directory. It pins that location at job admission and uses the
+configured profile once, with no implicit fallback. The source plan supplies all
+evidence; extraction cannot use research tools to expand its access.
 Fallback follows only the configured ordered lists, depth first, without repeating
 a profile. Every attempt and descendant shares the original invocation, workflow
 clock and start budget. Authority, cancellation and budget failures stop fallback.
