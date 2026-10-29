@@ -130,6 +130,14 @@ pub enum Command {
         plan: crate::extraction::Plan,
         idempotency_key: String,
     },
+    GrillRun {
+        plan: crate::grill::Plan,
+        idempotency_key: String,
+    },
+    GrillResume {
+        job_id: String,
+        idempotency_key: String,
+    },
     RetrievalRun {
         plan: crate::retrieval::Request,
         idempotency_key: String,

@@ -333,6 +333,7 @@ enum ResultKind {
     Answer,
     Research,
     Extraction,
+    Grill,
 }
 #[derive(Debug)]
 pub struct RunSpec {
@@ -371,6 +372,12 @@ impl RunSpec {
         let capability = ReadCapability::issue_for(lease.origin(), lease.fence())?;
         let mut spec = Self::from_lease(options, capability, lease, generation)?;
         spec.result_kind = ResultKind::Extraction;
+        Ok(spec)
+    }
+    pub(crate) fn for_grill(options: RunOptions, lease: RunLease, generation: u64) -> Result<Self> {
+        let capability = ReadCapability::issue_for(lease.origin(), lease.fence())?;
+        let mut spec = Self::from_lease(options, capability, lease, generation)?;
+        spec.result_kind = ResultKind::Grill;
         Ok(spec)
     }
     fn from_lease(
@@ -424,15 +431,16 @@ impl RunSpec {
         match self.result_kind {
             ResultKind::Research => ResearchConclusion::schema(),
             ResultKind::Extraction => crate::extraction::schema(),
+            ResultKind::Grill => crate::grill::schema(),
             ResultKind::Answer => {
                 serde_json::json!({"type":"object","properties":{"answer":{"type":"string"}},"required":["answer"],"additionalProperties":false})
             }
         }
     }
     pub(crate) fn result_instructions(&self) -> String {
-        if matches!(self.result_kind, ResultKind::Extraction) {
+        if matches!(self.result_kind, ResultKind::Extraction | ResultKind::Grill) {
             return format!(
-                "Return only JSON matching {}. All evidence is supplied in the instructions; do not call tools. This is an internal memory-service extraction, not a human statement or approval.",
+                "Return only JSON matching {}. All evidence is supplied in the instructions; do not call tools. This is an internal memory-service task, not a human statement or approval.",
                 self.result_schema()
             );
         }
@@ -442,7 +450,7 @@ impl RunSpec {
         )
     }
     pub(crate) fn final_output(&self, text: &str, plain: bool) -> Result<String> {
-        if matches!(self.result_kind, ResultKind::Extraction) {
+        if matches!(self.result_kind, ResultKind::Extraction | ResultKind::Grill) {
             let value: serde_json::Value =
                 serde_json::from_str(text).map_err(|_| ErrorCode::ProtocolInvalid)?;
             return serde_json::to_string(&value).map_err(|_| ErrorCode::ProtocolInvalid.into());

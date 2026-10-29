@@ -69,6 +69,34 @@ def usage(incoming, outgoing):
 
 usage(200000 if scenario == 'token_budget' else 10, 2)
 usage(9 if scenario == 'usage_regression' else 10, 2)
+if scenario.startswith('grill'):
+    payload = json.loads(request['params']['baseInstructions'].split('\nInput: ', 1)[1])
+    stage = payload['stage']
+    if scenario == 'grill_denied':
+        send({'id':10,'method':'item/tool/call','params':{'threadId':'thread','turnId':'turn',
+            'callId':'forbidden-grill-read','tool':'code_read','arguments':{'path':'private.txt','start':0,'max_bytes':1024}}})
+        time.sleep(30)
+    if scenario == 'grill_wait' and stage['role'] == 'expert':
+        (root / 'grill-wait.pid').write_text(str(os.getpid()))
+        time.sleep(30)
+    with (root / 'grill-runs.jsonl').open('a') as log:
+        log.write(json.dumps(dict(payload, pid=os.getpid())) + '\n')
+    if stage['role'] == 'interviewer':
+        report = dict(schema_version=1, questions=[dict(id='q1', text='Is keyword-only sufficient?', depends_on=[]), dict(id='q2', text='Which deployment follows?', depends_on=['q1'])], answers=[])
+    else:
+        expert = stage['role'] == 'expert'
+        report = dict(schema_version=1, questions=[], answers=[dict(
+            question=q['id'], kind='decision', claim=('Use keyword-only.' if expert else 'Keep hybrid search.') + q['id'],
+            rationale='A conditional automated proposal.', strongest_opposition='The alternative may handle unseen queries better.',
+            conditions=['offline'], assumptions=[], unresolved=['No representative evaluation.'],
+            sources=[dict(source=0, start=0, end=len(payload['evidence'][0]['text'].encode()))] if q['id']=='q1' else [], resolved=False)
+            for q in payload['questions']])
+    output = json.dumps(report)
+    send({'method':'turn/completed','params':{'threadId':'thread','turn':{
+        'id':'turn','status':'completed','error':None,'items':[{
+        'type':'agentMessage','id':'answer','phase':'final_answer','text':output}]}}})
+    assert sys.stdin.read() == ''
+    raise SystemExit(0)
 if scenario.startswith('extraction'):
     instructions = request['params']['baseInstructions']
     assert 'extraction-v1' in instructions

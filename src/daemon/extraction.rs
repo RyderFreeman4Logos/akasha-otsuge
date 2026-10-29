@@ -7,7 +7,7 @@ use crate::config::{ResolvedConfig, deadline::Deadline};
 use crate::domain::Generator;
 use crate::extraction::{self, PROMPT_VERSION, Plan};
 
-struct SuppliedEvidence;
+pub(super) struct SuppliedEvidence;
 impl ContextSource for SuppliedEvidence {
     fn execute<'a>(
         &'a mut self,

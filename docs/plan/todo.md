@@ -753,14 +753,19 @@ hashes actually cover. #12 alone retains deferred Claude authentication.
 
 Original task start2026-10-29T22:50:15.286265+00:00; base `d64051e`.
 
-- [ ] Configure interviewer/expert/reviewer with one or mixed native executors;
+- [x] Configure interviewer/expert/reviewer with one or mixed native executors;
   pin role/model/thinking and finite rounds/questions/starts/token/time budgets.
-- [ ] Execute independent initial answers, bounded cross-questioning and evidence
+- [x] Execute independent initial answers, bounded cross-questioning and evidence
   checks using isolated contexts, with no new endpoint/subscription requirement.
-- [ ] Preserve source events, dependencies, assumptions, strongest opposition and
+- [x] Preserve source events, dependencies, assumptions, strongest opposition and
   unresolved disagreements; apply existing review policy without human relabeling.
-- [ ] Persist phase progress and usage; test round/budget/user stops and recovery
+- [x] Persist phase progress and usage; test round/budget/user stops and recovery
   without resetting an existing clock or replaying ambiguous native work.
+  Controlled native single-CLI discussions, round/start/token limits, forbidden
+  tools and real child cancellation pass. Saved-response/partial-publication
+  SIGKILL tests preserve original deadlines and usage; ambiguous native work
+  fails without replay. Manual/policy/automatic publication retains automated
+  provenance and never claims human approval. Clippy and formatting pass.
 - [ ] Execute actual single-CLI and mixed-Runner samples through authorized
   profiles; archive compact source/candidate mappings and cleanup receipts.
 - [ ] Finish focused checks, canonical gate, independent review, CI, publication,

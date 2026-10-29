@@ -89,6 +89,24 @@ impl RunBudget {
     pub fn start(&self) -> Result<RunLease> {
         self.reserve(0)
     }
+    pub(crate) fn restore_usage(self, usage: BudgetUsage) -> Result<Self> {
+        {
+            let mut state = self
+                .0
+                .state
+                .lock()
+                .map_err(|_| ErrorCode::BudgetExhausted)?;
+            if state.usage != BudgetUsage::default() {
+                return Err(ErrorCode::ProtocolInvalid.into());
+            }
+            state.usage = usage;
+            state.exhausted = usage.tokens > self.0.limits.tokens
+                || usage.output_bytes > self.0.limits.output_bytes
+                || usage.reads > self.0.limits.reads
+                || usage.read_bytes > self.0.limits.read_bytes;
+        }
+        Ok(self)
+    }
     pub(crate) fn reserve(&self, depth: u32) -> Result<RunLease> {
         let mut state = self
             .0
