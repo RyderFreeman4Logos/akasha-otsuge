@@ -923,6 +923,126 @@ fn consult_lifecycle(scenario: &str) {
     }
 }
 
+fn hook(daemon: &Daemon, payload: &Value) -> Value {
+    let mut child = daemon
+        .command()
+        .args([
+            "adapter",
+            "codex-hook",
+            "--binary",
+            daemon.root.join("codex").to_str().unwrap(),
+            "--state-dir",
+            daemon.root.join("hook-state").to_str().unwrap(),
+        ])
+        .env("CODEX_HOME", daemon.root.join("native-home"))
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(payload.to_string().as_bytes())
+        .unwrap();
+    let out = child.wait_with_output().unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    serde_json::from_slice(&out.stdout).unwrap()
+}
+
+#[test]
+fn consult_hook_submits_and_expands_durable_results_inside_the_read_only_sandbox() {
+    let (mut daemon, _, _) = consult_fixture("conclusion_found");
+    let mut payload: Value = serde_json::from_str(include_str!(
+        "../fixtures/codex/0.164.0/exec-pre-tool-use.json"
+    ))
+    .unwrap();
+    payload["cwd"] = json!(daemon.root.join("workspace"));
+    payload["transcript_path"] = json!(daemon.root.join("workspace/native.jsonl"));
+    payload["tool_input"]["command"] = json!("akasha-otsuge consult \"long-output\"");
+    let invoke = |daemon: &Daemon, payload: &Value| {
+        let response = hook(daemon, payload);
+        assert_eq!(
+            response["hookSpecificOutput"]["permissionDecision"], "allow",
+            "command={}; response={response}",
+            payload["tool_input"]["command"]
+        );
+        let command = response["hookSpecificOutput"]["updatedInput"]["command"]
+            .as_str()
+            .unwrap();
+        let result = Command::new("/bin/sh")
+            .args(["-c", command])
+            .output()
+            .unwrap();
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        serde_json::from_slice::<Value>(&result.stdout).unwrap()["data"].clone()
+    };
+    let submitted = invoke(&daemon, &payload);
+    let id = submitted["job_id"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{submitted}"));
+    assert!(submitted.get("consult_plan").is_none());
+    assert_eq!(invoke(&daemon, &payload)["job_id"], id);
+    let end = Instant::now() + Duration::from_secs(15);
+    while daemon.cli(&["consult", "show", id])["data"]["status"] == "pending" {
+        assert!(Instant::now() < end);
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    for (i, command) in [
+        format!("akasha-otsuge consult show {id}"),
+        format!("akasha-otsuge consult receipt {id}"),
+        format!("akasha-otsuge consult receipt {id} --full"),
+        format!("akasha-otsuge consult original {id} 0"),
+        format!("akasha-otsuge job cancel {id}"),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        payload["tool_use_id"] = json!(format!("followup-{i}"));
+        payload["tool_input"]["command"] = json!(command);
+        let value = invoke(&daemon, &payload);
+        assert!(value.get("run_trace").is_none());
+        if i == 2 {
+            let full: Value =
+                serde_json::from_str(value["data"]["output"].as_str().unwrap()).unwrap();
+            assert!(full["answer"].as_str().unwrap().chars().count() > 5000);
+        }
+        payload["hook_event_name"] = json!("PostToolUse");
+        hook(&daemon, &payload);
+        payload["hook_event_name"] = json!("PreToolUse");
+    }
+    daemon.cli(&["access", "revoke"]);
+    payload["tool_use_id"] = json!("revoked-query");
+    payload["tool_input"]["command"] = json!(format!("akasha-otsuge consult show {id}"));
+    assert_eq!(
+        hook(&daemon, &payload)["hookSpecificOutput"]["permissionDecisionReason"],
+        "READ_DENIED"
+    );
+    for command in [
+        format!("akasha-otsuge consult show {id}; echo unwanted"),
+        "akasha-otsuge job cancel foreign-job".into(),
+        format!("akasha-otsuge consult original {id} 0 --start -1"),
+    ] {
+        payload["tool_input"]["command"] = json!(command);
+        assert_eq!(
+            hook(&daemon, &payload)["hookSpecificOutput"]["permissionDecisionReason"],
+            "INVALID_ARGUMENT"
+        );
+    }
+}
+
 #[test]
 fn native_hook_uses_private_call_files_without_exposing_registration_credentials() {
     let mut daemon = Daemon::new();
@@ -941,6 +1061,7 @@ fn native_hook_uses_private_call_files_without_exposing_registration_credentials
     hook["transcript_path"] = json!(transcript);
     hook["tool_input"]["command"] = "akasha-otsuge consult \"find prior decision\"".into();
     let state = daemon.root.join("hook-state");
+    std::fs::create_dir(daemon.root.join(".codex")).unwrap();
     daemon.start();
     let mut child = daemon
         .command()
@@ -952,6 +1073,7 @@ fn native_hook_uses_private_call_files_without_exposing_registration_credentials
             "--state-dir",
             state.to_str().unwrap(),
         ])
+        .env("CODEX_HOME", daemon.root.join(".codex"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -1014,10 +1136,15 @@ fn native_hook_uses_private_call_files_without_exposing_registration_credentials
             .get("registration")
             .is_none()
     );
-    assert_eq!(
-        serde_json::from_slice::<Value>(&bound.stdout).unwrap()["data"]["requested_cursor"],
-        10
+    let result: Value = serde_json::from_slice(&bound.stdout).unwrap();
+    assert!(
+        result["data"]["job_id"]
+            .as_str()
+            .unwrap()
+            .starts_with("consult/")
     );
+    assert!(result["data"].get("consult_plan").is_none());
+    assert!(result["data"].get("run_trace").is_none());
     assert!(
         call_files[0].exists(),
         "the sandboxed reader must not need write access"
@@ -1033,6 +1160,7 @@ fn native_hook_uses_private_call_files_without_exposing_registration_credentials
             "--state-dir",
             state.to_str().unwrap(),
         ])
+        .env("CODEX_HOME", daemon.root.join(".codex"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -1060,6 +1188,7 @@ fn native_hook_uses_private_call_files_without_exposing_registration_credentials
             "--state-dir",
             state.to_str().unwrap(),
         ])
+        .env("CODEX_HOME", daemon.root.join(".codex"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -1095,6 +1224,7 @@ fn concurrent_native_hooks_share_state_without_cross_binding_or_global_lock_cont
         "#!/bin/sh\nsleep 0.2\nprintf 'codex-cli 0.164.0\\n'\n",
     );
     let state = daemon.root.join("hook-state");
+    std::fs::create_dir(daemon.root.join(".codex")).unwrap();
     daemon.start();
     let original: Value = serde_json::from_str(include_str!(
         "../fixtures/codex/0.164.0/exec-pre-tool-use.json"
@@ -1123,6 +1253,7 @@ fn concurrent_native_hooks_share_state_without_cross_binding_or_global_lock_cont
                 "--state-dir",
                 state.to_str().unwrap(),
             ])
+            .env("CODEX_HOME", daemon.root.join(".codex"))
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -1157,7 +1288,13 @@ fn concurrent_native_hooks_share_state_without_cross_binding_or_global_lock_cont
             String::from_utf8_lossy(&out.stderr)
         );
         let bound: Value = serde_json::from_slice(&out.stdout).unwrap();
-        assert_eq!(bound["data"]["caller"]["session"], session);
+        let id = bound["data"]["job_id"].as_str().unwrap();
+        let matching = std::fs::read_dir(&state).unwrap().any(|entry| {
+            let value: Value =
+                serde_json::from_slice(&std::fs::read(entry.unwrap().path()).unwrap()).unwrap();
+            value["call"]["session_id"] == session && value["response"]["job_id"] == id
+        });
+        assert!(matching, "the public job must belong to this native call");
     }
 }
 

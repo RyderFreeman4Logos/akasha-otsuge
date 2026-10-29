@@ -39,6 +39,7 @@ struct BoundCall {
     call: CodexCall,
     args: ConsultArgs,
     transcript: PathBuf,
+    request: String,
 }
 
 pub fn parse_hint(command: &str) -> Result<Option<ConsultArgs>> {
@@ -51,6 +52,66 @@ pub fn parse_hint(command: &str) -> Result<Option<ConsultArgs>> {
     };
     let hint: String = serde_json::from_str(hint.trim()).map_err(|_| Error("INVALID_ARGUMENT"))?;
     Ok(Some(ConsultArgs::new(Some(hint))?))
+}
+
+fn parse_query(command: &str) -> Result<Option<ipc::Command>> {
+    let words: Vec<_> = command.split_ascii_whitespace().collect();
+    let id = |text: &str| -> Result<String> {
+        let value = if text.starts_with('"') {
+            serde_json::from_str::<String>(text).map_err(|_| Error("INVALID_ARGUMENT"))?
+        } else {
+            text.strip_prefix('\'')
+                .and_then(|s| s.strip_suffix('\''))
+                .unwrap_or(text)
+                .into()
+        };
+        if !value
+            .strip_prefix("consult/")
+            .is_some_and(|s| s.len() == 64 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+        {
+            return Err(Error("INVALID_ARGUMENT"));
+        }
+        Ok(value)
+    };
+    let number = |s: &str| s.parse::<usize>().map_err(|_| Error("INVALID_ARGUMENT"));
+    Ok(Some(match words.as_slice() {
+        ["akasha-otsuge", "consult", "show", job] => ipc::Command::ConsultShow { id: id(job)? },
+        ["akasha-otsuge", "consult", "receipt", job] => ipc::Command::ConsultReceipt {
+            id: id(job)?,
+            full: false,
+        },
+        ["akasha-otsuge", "consult", "receipt", job, "--full"] => ipc::Command::ConsultReceipt {
+            id: id(job)?,
+            full: true,
+        },
+        ["akasha-otsuge", "consult", "original", job, source] => ipc::Command::ConsultOriginal {
+            id: id(job)?,
+            source: number(source)?,
+            start: 0,
+        },
+        [
+            "akasha-otsuge",
+            "consult",
+            "original",
+            job,
+            source,
+            "--start",
+            start,
+        ] => ipc::Command::ConsultOriginal {
+            id: id(job)?,
+            source: number(source)?,
+            start: number(start)?,
+        },
+        ["akasha-otsuge", "job", "cancel", job] => ipc::Command::JobCancel { id: id(job)? },
+        [
+            "akasha-otsuge",
+            "consult",
+            "show" | "receipt" | "original",
+            ..,
+        ]
+        | ["akasha-otsuge", "job", "cancel", ..] => return Err(Error("INVALID_ARGUMENT")),
+        _ => return Ok(None),
+    }))
 }
 
 pub fn quote(value: &str) -> String {
@@ -87,7 +148,7 @@ fn private_file(path: &Path) -> Result<File> {
         || meta.uid() != rustix::process::geteuid().as_raw()
         || meta.mode() & 0o777 != 0o600
         || meta.nlink() != 1
-        || meta.len() > 16384
+        || meta.len() > ipc::MAX_MESSAGE as u64
     {
         return Err(Error("UNSAFE_PATH"));
     }
@@ -96,14 +157,20 @@ fn private_file(path: &Path) -> Result<File> {
 
 fn read_call(path: &Path) -> Result<BoundCall> {
     let mut bytes = Vec::new();
-    private_file(path)?.take(16385).read_to_end(&mut bytes)?;
-    if bytes.len() > 16384 {
+    private_file(path)?
+        .take(ipc::MAX_MESSAGE as u64 + 1)
+        .read_to_end(&mut bytes)?;
+    if bytes.len() > ipc::MAX_MESSAGE {
         return Err(Error("MESSAGE_TOO_LARGE"));
     }
     Ok(serde_json::from_slice(&bytes)?)
 }
 
 fn publish_call(path: &Path, bound: &BoundCall) -> Result<()> {
+    let bytes = serde_json::to_vec(bound)?;
+    if bytes.len() > ipc::MAX_MESSAGE {
+        return Err(Error("MESSAGE_TOO_LARGE"));
+    }
     let temporary = path.with_extension(format!(
         "{}-{}.pending",
         std::process::id(),
@@ -115,7 +182,7 @@ fn publish_call(path: &Path, bound: &BoundCall) -> Result<()> {
         .mode(0o600)
         .open(&temporary)?;
     let result = (|| {
-        file.write_all(&serde_json::to_vec(bound)?)?;
+        file.write_all(&bytes)?;
         file.sync_all()?;
         match rustix::fs::renameat_with(
             rustix::fs::CWD,
@@ -130,7 +197,7 @@ fn publish_call(path: &Path, bound: &BoundCall) -> Result<()> {
                 if serde_json::to_value(&existing.call)? != serde_json::to_value(&bound.call)?
                     || existing.args != bound.args
                     || existing.transcript != bound.transcript
-                    || existing.response != bound.response
+                    || existing.request != bound.request
                 {
                     return Err(Error("BINDING_CONFLICT"));
                 }
@@ -164,6 +231,10 @@ fn call_path(state: &Path, hook: &Hook) -> Result<PathBuf> {
 }
 
 async fn send(socket: &Path, event: NativeEvent) -> Result<Value> {
+    send_command(socket, ipc::Command::Codex { event }).await
+}
+
+async fn send_command(socket: &Path, command: ipc::Command) -> Result<Value> {
     let now = ipc::now_ms()?;
     let response = ipc::call(
         socket,
@@ -171,7 +242,7 @@ async fn send(socket: &Path, event: NativeEvent) -> Result<Value> {
             protocol_version: ipc::VERSION,
             request_id: format!("codex-hook/{}/{now}", std::process::id()),
             deadline_ms: Some(now + ipc::TRANSPORT_TIMEOUT.as_millis() as u64),
-            command: ipc::Command::Codex { event },
+            command,
         },
     )
     .await?;
@@ -183,6 +254,14 @@ async fn send(socket: &Path, event: NativeEvent) -> Result<Value> {
             "ADAPTER_UNSUPPORTED" => "ADAPTER_UNSUPPORTED",
             "HISTORY_GAP" => "HISTORY_GAP",
             "BINDING_CONFLICT" => "BINDING_CONFLICT",
+            "IDEMPOTENCY_CONFLICT" => "IDEMPOTENCY_CONFLICT",
+            "STALE_RECALL" => "STALE_RECALL",
+            "RESULT_UNAVAILABLE" => "RESULT_UNAVAILABLE",
+            "INVALID_ARGUMENT" => "INVALID_ARGUMENT",
+            "INVALID_RANGE" => "INVALID_RANGE",
+            "JOB_NOT_FOUND" => "JOB_NOT_FOUND",
+            "JOB_CORRUPT" => "JOB_CORRUPT",
+            "OUTPUT_LIMIT" => "OUTPUT_LIMIT",
             _ => "BINDING_UNAVAILABLE",
         }));
     }
@@ -252,12 +331,16 @@ pub async fn handle(socket: &Path, binary: &Path, state: &Path, payload: &[u8]) 
     }
     let selected =
         hook.hook_event_name == "PreToolUse" && hook.tool_name.as_deref() == Some("Bash");
-    let args = if selected {
-        parse_hint(
-            hook.tool_input["command"]
-                .as_str()
-                .ok_or(Error("INVALID_ARGUMENT"))?,
-        )?
+    let command = if selected {
+        hook.tool_input["command"]
+            .as_str()
+            .ok_or(Error("INVALID_ARGUMENT"))?
+    } else {
+        ""
+    };
+    let query = parse_query(command)?;
+    let args = if selected && query.is_none() {
+        parse_hint(command)?
     } else {
         None
     };
@@ -269,7 +352,7 @@ pub async fn handle(socket: &Path, binary: &Path, state: &Path, payload: &[u8]) 
     {
         return Ok(json!({}));
     }
-    if selected && args.is_none() {
+    if selected && args.is_none() && query.is_none() {
         return Ok(json!({}));
     }
     if hook.agent_id.is_some() {
@@ -293,7 +376,7 @@ pub async fn handle(socket: &Path, binary: &Path, state: &Path, payload: &[u8]) 
         }
         return Ok(json!({}));
     }
-    let Some(args) = args else {
+    if args.is_none() && query.is_none() {
         let until_ordinal = latest_ordinal(&hook.transcript_path)?;
         let registration = register(socket, binary, &hook).await?;
         send(
@@ -305,7 +388,8 @@ pub async fn handle(socket: &Path, binary: &Path, state: &Path, payload: &[u8]) 
         )
         .await?;
         return Ok(json!({}));
-    };
+    }
+    let args = args.unwrap_or(ConsultArgs::new(None)?);
     let path = call_path(state, &hook)?;
     let call = CodexCall {
         session_id: hook.session_id.clone(),
@@ -319,21 +403,34 @@ pub async fn handle(socket: &Path, binary: &Path, state: &Path, payload: &[u8]) 
         if serde_json::to_value(&bound.call)? != serde_json::to_value(&call)?
             || bound.args != args
             || bound.transcript != hook.transcript_path
+            || bound.request != command
         {
             return Err(Error("BINDING_CONFLICT"));
         }
     } else if std::fs::read_dir(state)?.take(258).count() >= 258 {
         return Err(Error("RESOURCE_BUSY"));
     }
-    let registration = register(socket, binary, &hook).await?;
-    let response = send(
-        socket,
-        NativeEvent::Bind {
-            registration,
-            call: call.clone(),
-        },
-    )
-    .await?;
+    let response = if let Some(query) = query {
+        if let ipc::Command::JobCancel { id } = query {
+            send_command(socket, ipc::Command::JobCancel { id: id.clone() }).await?;
+            send_command(socket, ipc::Command::ConsultShow { id }).await?
+        } else {
+            send_command(socket, query).await?
+        }
+    } else {
+        let registration = register(socket, binary, &hook).await?;
+        let job = send(
+            socket,
+            NativeEvent::Consult {
+                registration,
+                call: call.clone(),
+                args: args.clone(),
+            },
+        )
+        .await?;
+        let id = job["id"].as_str().ok_or(Error("JOB_CORRUPT"))?.into();
+        send_command(socket, ipc::Command::ConsultShow { id }).await?
+    };
     publish_call(
         &path,
         &BoundCall {
@@ -341,6 +438,7 @@ pub async fn handle(socket: &Path, binary: &Path, state: &Path, payload: &[u8]) 
             call,
             args,
             transcript: hook.transcript_path,
+            request: command.into(),
         },
     )?;
     let bridge = std::env::current_exe()?;

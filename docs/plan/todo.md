@@ -654,7 +654,10 @@ links exact identities and preserves the distinct controlled/native results.
   when its verified tool handler executes. Both daemon entry tests, Node8/Python10
   plugin checks and Clippy pass, including deduplication and restart recovery.
   An earlier Hermes first-bind IPC timeout is retained; its isolated case passed.
-  Codex and Claude installed entries, and authenticated Consult acceptance, remain.
+  The Codex hook now submits Consult and safely transports show/receipt/original
+  and cancel through the read-only sandbox. Three hook cases and Clippy pass,
+  including concurrent calls, retries, restart, full Unicode output and revocation.
+  Claude's installed entry and authenticated Consult acceptance remain.
 - [ ] Provide progressive context/memory/code reads through shared Rust authority;
   keep current grants, source versions, workspace limits and untrusted content.
   Memory search/get and bound workspace search/read now reuse the existing

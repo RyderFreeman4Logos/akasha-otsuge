@@ -51,8 +51,9 @@ retained context; unavailable or missing originals must be reported as gaps.
 A trusted Consult submission creates a durable job handle. Pi and Hermes native
 tools now submit Consult using their automatically verified identity and optional
 hint. Pending results survive the short caller request; use the same daemon socket
-or CLI profile for the commands below. Codex trusted IPC also supports submission;
-its installed hook and the Claude caller entry remain part of MVP-016.
+or CLI profile for the commands below. The installed Codex hook submits Consult
+and transports its follow-up commands through the read-only sandbox. The Claude
+caller entry remains part of MVP-016.
 A binding diagnostic is not a completed Consult.
 
 ```sh
@@ -342,15 +343,19 @@ files untouched, and never infers a parent call from JavaScript text.
 
 The hook configuration uses the official CLI override
 mechanism. SessionStart/Stop schedule incremental native backfill. PreToolUse
-recognizes exactly `akasha-otsuge consult` or that command followed by one
-JSON-quoted hint; shell suffixes and identity arguments are rejected. At this
-stage the command returns a binding diagnostic; the consult workflow is MVP-016.
-The trusted callback binds the native identity and stores an atomic per-call
-result, then rewrites the command to an absolute read-only result reader. This
+recognizes `akasha-otsuge consult` with an optional JSON-quoted hint, and the
+`consult show/receipt/original` and `job cancel` commands above. Follow-up IDs
+must be Consult job IDs; shell suffixes and identity arguments are rejected.
+The trusted callback binds and submits the initial call, then returns public
+status/result through an atomic per-call file. Follow-ups recheck current
+permissions before publishing their response. The command is rewritten to an
+absolute read-only result reader. This
 is necessary because the native Linux read-only sandbox rejects Unix socket
 connections. Neither registration credentials nor a daemon connection enter the
 sandbox command. Concurrent sessions share no current-context file or global
-lock. Binding errors return the native explicit deny response.
+lock. Repeated native calls reuse the same job and per-call response; a new show
+call retrieves updated status. Result files remain bounded by the IPC size cap,
+including explicit full receipts. Binding errors return the native deny response.
 
 ## Codex standalone Runner
 
