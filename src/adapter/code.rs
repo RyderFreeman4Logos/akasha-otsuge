@@ -44,12 +44,48 @@ pub struct CodeSearch {
     pub matches: Vec<CodeMatch>,
     pub truncated: bool,
 }
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct WorkspaceProof {
+    path: PathBuf,
+    device: u64,
+    inode: u64,
+}
+impl WorkspaceProof {
+    pub(crate) fn authorize<R: Send + Sync + 'static>(
+        &self,
+        config: &ConfigManager<R>,
+    ) -> Result<()> {
+        let canonical = self
+            .path
+            .canonicalize()
+            .map_err(|_| ErrorCode::ReadDenied)?;
+        let named = std::fs::metadata(&self.path).map_err(|_| ErrorCode::ReadDenied)?;
+        if canonical != self.path
+            || !named.is_dir()
+            || named.dev() != self.device
+            || named.ino() != self.inode
+            || !config
+                .pin()
+                .resolved()
+                .config()
+                .access
+                .read_roots
+                .iter()
+                .filter_map(|p| p.canonicalize().ok())
+                .any(|root| self.path.starts_with(root))
+        {
+            return Err(ErrorCode::ReadDenied.into());
+        }
+        Ok(())
+    }
+}
 pub struct BoundWorkspace<'a, R> {
     store: &'a Storage,
     invocation: Invocation,
     config: &'a ConfigManager<R>,
     root: File,
-    path: PathBuf,
+    proof: WorkspaceProof,
     observations: BTreeMap<String, String>,
 }
 impl<'a, R: Send + Sync + 'static> BoundWorkspace<'a, R> {
@@ -71,36 +107,24 @@ impl<'a, R: Send + Sync + 'static> BoundWorkspace<'a, R> {
             )
             .map_err(|_| ErrorCode::ReadDenied)?,
         );
+        let pinned = root.metadata().map_err(|_| ErrorCode::ReadDenied)?;
         let result = Self {
             store,
             invocation,
             config,
             root,
-            path,
+            proof: WorkspaceProof {
+                path,
+                device: pinned.dev(),
+                inode: pinned.ino(),
+            },
             observations: BTreeMap::new(),
         };
-        result.allowed()?;
+        result.proof.authorize(config)?;
         Ok(result)
     }
-    fn allowed(&self) -> Result<()> {
-        let named = std::fs::metadata(&self.path).map_err(|_| ErrorCode::ReadDenied)?;
-        let pinned = self.root.metadata().map_err(|_| ErrorCode::ReadDenied)?;
-        if named.dev() != pinned.dev()
-            || named.ino() != pinned.ino()
-            || !self
-                .config
-                .pin()
-                .resolved()
-                .config()
-                .access
-                .read_roots
-                .iter()
-                .filter_map(|p| p.canonicalize().ok())
-                .any(|root| self.path.starts_with(root))
-        {
-            return Err(ErrorCode::ReadDenied.into());
-        }
-        Ok(())
+    pub(crate) fn proof(&self) -> &WorkspaceProof {
+        &self.proof
     }
     async fn observe(&mut self, lease: &RunLease, path: &str) -> Result<CodeRead> {
         if path.len() > 4096
@@ -124,7 +148,7 @@ impl<'a, R: Send + Sync + 'static> BoundWorkspace<'a, R> {
                         return Err(ErrorCode::ReadDenied.into());
                     }
                     lease.check()?;
-                    self.allowed()?;
+                    self.proof.authorize(self.config)?;
                     Domain::new(self.store).permission(
                         &self.invocation.read_context()?,
                         Some(&self.invocation.diagnostic().scope),
@@ -164,7 +188,7 @@ impl<'a, R: Send + Sync + 'static> BoundWorkspace<'a, R> {
                     let sha256 = hash(&bytes);
                     let text =
                         String::from_utf8(bytes).map_err(|_| ErrorCode::SourceUnavailable)?;
-                    self.allowed()?;
+                    self.proof.authorize(self.config)?;
                     lease.check()?;
                     Ok(CodeRead {
                         path: path.into(),

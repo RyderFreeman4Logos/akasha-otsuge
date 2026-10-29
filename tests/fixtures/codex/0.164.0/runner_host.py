@@ -80,7 +80,7 @@ send(call)
 result = read()
 assert result['id'] == 10 and result['result']['success'] is True
 assert 'invocation_id' in result['result']['contentItems'][0]['text']
-if scenario == 'research' or scenario.startswith('delegate_'):
+if scenario in ('research', 'code_policy') or scenario.startswith('delegate_'):
     call_number = 100
     def tool(name, arguments):
         global call_number
@@ -138,6 +138,13 @@ if scenario.startswith('delegate_'):
             assert result['kind'] == 'error' and result['value']['code'] == 'AUTH_REQUIRED'
             result = tool('delegate', {'hint':'succeed'})
             assert result['kind'] == 'research' and result['value']['answer'] == 'bounded-context'
+if scenario == 'code_policy':
+    assert tool('code_read', {'path':'notes.rs','start':0,'max_bytes':1024})['value']['text'] == 'memory needle\n'
+    (root / 'code-read-ready').touch()
+    end = time.monotonic() + 15
+    while not (root / 'code-read-release').exists():
+        assert time.monotonic() < end, 'code policy barrier timed out'
+        time.sleep(0.01)
 if scenario == 'research':
     found = tool('memory_search', {'query':'offline'})['value']
     item = next(item for item in found['items'] if item['memory']['revision']['key']['id'] == 'offline')

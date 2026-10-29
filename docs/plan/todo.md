@@ -657,8 +657,11 @@ links exact identities and preserves the distinct controlled/native results.
   source-version links in the archived result. The affected suites passed75
   tests; one existing wall-clock overlap control failed under concurrent load
   and passed separately. Clippy passes. This is not authenticated acceptance.
-  Remaining core work: structured branch results,
-  evidence selection, final current-state validation, configured executors and
+  Final return and replay now recheck live code-read policy and the observed
+  workspace's durable device/inode identity, including after daemon restart.
+  Four failing controls pass after the repair;17 consult cases, the focused
+  workspace case and all-target Clippy pass. Remaining core work: structured
+  branch results, evidence selection, configured executors and
   explicit fallback routing. The initial daemon path uses the caller executor.
 - [x] Extend all native tool inventories and strict request decoding to the nine
   shared research tools. Focused Rust58, Hermes9 and Pi7 regressions pass; daemon

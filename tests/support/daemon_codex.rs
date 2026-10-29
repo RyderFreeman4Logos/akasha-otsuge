@@ -54,6 +54,8 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
             ],
             1,
         );
+    }
+    if matches!(scenario, "research" | "code_policy") {
         std::fs::write(workspace.join("notes.rs"), "memory needle\n").unwrap();
     }
     daemon.start();
@@ -323,6 +325,82 @@ fn consult_progressive_research_keeps_source_versions_and_workspace_changes() {
                 .unwrap()
                 .contains(&observation["source"])
         );
+    }
+}
+
+#[test]
+fn consult_code_rechecks_read_policy_before_return() {
+    consult_code_policy(false, false);
+}
+
+#[test]
+fn consult_code_rechecks_workspace_identity_before_return() {
+    consult_code_policy(false, true);
+}
+
+#[test]
+fn consult_code_rechecks_read_policy_before_replay() {
+    consult_code_policy(true, false);
+}
+
+#[test]
+fn consult_code_rechecks_workspace_identity_before_replay() {
+    consult_code_policy(true, true);
+}
+
+fn consult_code_policy(delivered: bool, redirect: bool) {
+    let (mut daemon, event, _) = consult_fixture("code_policy");
+    let submitted = native(&daemon, event);
+    assert!(submitted.get("error").is_none(), "{submitted}");
+    let id = submitted["data"]["id"].as_str().unwrap();
+    let end = Instant::now() + Duration::from_secs(15);
+    while !daemon.root.join("code-read-ready").exists() {
+        assert!(Instant::now() < end, "code read did not reach barrier");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let release =
+        |daemon: &Daemon| std::fs::write(daemon.root.join("code-read-release"), "").unwrap();
+    let terminal = |daemon: &Daemon| loop {
+        let job = daemon.cli(&["job", "show", id])["data"].clone();
+        if !matches!(job["state"].as_str(), Some("queued" | "running")) {
+            break job;
+        }
+        assert!(Instant::now() < end, "consult did not finish: {job}");
+        std::thread::sleep(Duration::from_millis(10));
+    };
+    if delivered {
+        release(&daemon);
+        let job = terminal(&daemon);
+        assert_eq!(job["state"], "succeeded", "{job}");
+        assert!(job["result"]["output"].as_str().is_some());
+        daemon.cli(&["daemon", "stop"]);
+        daemon.wait();
+        daemon.start();
+        assert_eq!(
+            daemon.cli(&["job", "show", id])["data"]["result"],
+            job["result"]
+        );
+    }
+    let workspace = daemon.root.join("workspace");
+    if redirect {
+        std::fs::rename(&workspace, daemon.root.join("original-workspace")).unwrap();
+        std::fs::create_dir(&workspace).unwrap();
+    } else {
+        let home = daemon.root.join("native-home");
+        daemon.configure(&format!("[access]\nread_roots=[{home:?}]\n"));
+        daemon.cli(&["config", "reload"]);
+    }
+    if delivered {
+        let output = daemon.command().args(["job", "show", id]).output().unwrap();
+        assert!(!output.status.success());
+        let error: Value = serde_json::from_slice(&output.stderr).unwrap();
+        assert_eq!(error["error"]["code"], "READ_DENIED");
+    } else {
+        release(&daemon);
+        let job = terminal(&daemon);
+        assert_eq!(job["state"], "failed", "{job}");
+        assert_eq!(job["error"], "READ_DENIED");
+        assert!(job["result"].is_null());
     }
 }
 

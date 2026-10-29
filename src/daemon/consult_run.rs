@@ -5,7 +5,10 @@ use crate::adapter::{
 
 impl Research<'_> {
     pub fn trace(&self) -> Result<Value> {
-        Ok(json!({"usage":self.budget.usage()?,"deadline":self.workflow.trace(),"runs":self.runs}))
+        Ok(
+            json!({"usage":self.budget.usage()?,"deadline":self.workflow.trace(),"runs":self.runs,
+            "workspace":self.workspace.as_ref().map(BoundWorkspace::proof)}),
+        )
     }
 
     async fn save_trace(&self) -> Result<()> {

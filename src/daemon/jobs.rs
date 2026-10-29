@@ -942,6 +942,9 @@ impl Service {
         if job.consult_plan.is_some()
             && let Some(trace) = &job.result
         {
+            if job.state == "succeeded" {
+                self.authorize_consult_result(trace)?;
+            }
             value["run_trace"] =
                 json!({"usage":trace["usage"],"deadline":trace["deadline"],"runs":trace["runs"]});
             if job.state != "succeeded" {

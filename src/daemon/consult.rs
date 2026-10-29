@@ -26,6 +26,15 @@ pub(super) struct Plan {
 }
 
 impl Service {
+    pub(super) fn authorize_consult_result(&self, trace: &Value) -> Result<()> {
+        if !trace["workspace"].is_null() {
+            let proof: crate::adapter::WorkspaceProof =
+                serde_json::from_value(trace["workspace"].clone())
+                    .map_err(|_| Error("JOB_CORRUPT"))?;
+            proof.authorize(&self.config)?;
+        }
+        Ok(())
+    }
     fn authorize_native(&self, native: &NativeExecutor) -> Result<()> {
         if self.allowed_path(&native.home)? != native.home || !native.home.is_dir() {
             return Err(Error("READ_DENIED"));
@@ -166,6 +175,7 @@ impl Service {
         if workflow.expired().is_some() {
             return Err(Error("WORKFLOW_TIMEOUT"));
         }
+        self.authorize_consult_result(&trace)?;
         Domain::new(&self.storage)
             .prepare_recall(
                 &self.job_read_context(&job)?,
