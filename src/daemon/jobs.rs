@@ -12,6 +12,9 @@ use std::collections::BTreeSet;
 pub(super) mod consult;
 #[path = "extraction.rs"]
 mod extraction;
+#[cfg(test)]
+#[path = "extraction_tests.rs"]
+mod extraction_tests;
 #[path = "models.rs"]
 mod models;
 #[path = "retrieval.rs"]
@@ -33,25 +36,32 @@ const MAX_ATTEMPTS: u32 = 3;
 mod tests {
     use super::*;
 
-    struct Fixture(PathBuf);
+    pub(super) struct Fixture(pub(super) PathBuf);
     impl Drop for Fixture {
         fn drop(&mut self) {
             std::fs::remove_dir_all(&self.0).unwrap();
         }
     }
-    async fn fixture(name: &str, extra: &str) -> (Fixture, Arc<Service>, CaptureInput) {
+    pub(super) async fn fixture(name: &str, extra: &str) -> (Fixture, Arc<Service>, CaptureInput) {
         let fixture =
             Fixture(std::env::temp_dir().join(format!("akasha-job-{name}-{}", std::process::id())));
-        private_dir(&fixture.0).unwrap();
-        let input = format!("[access]\nread_roots=[{:?}]\n{extra}", fixture.0);
-        std::fs::write(fixture.0.join("config.toml"), &input).unwrap();
+        let (service, binding) = service_at(&fixture.0, extra).await;
+        (fixture, service, binding)
+    }
+    pub(super) async fn service_at(
+        root: &std::path::Path,
+        extra: &str,
+    ) -> (Arc<Service>, CaptureInput) {
+        private_dir(root).unwrap();
+        let input = format!("[access]\nread_roots=[{root:?}]\n{extra}");
+        std::fs::write(root.join("config.toml"), &input).unwrap();
         let initial = crate::config::resolve(
             &input,
             None,
             "",
             &crate::config::Paths {
-                data_dir: fixture.0.join("data"),
-                socket_path: fixture.0.join("run/socket"),
+                data_dir: root.join("data"),
+                socket_path: root.join("run/socket"),
             },
         )
         .unwrap();
@@ -60,7 +70,7 @@ mod tests {
         let service = Arc::new(Service {
             storage,
             config: manager,
-            config_path: fixture.0.join("config.toml"),
+            config_path: root.join("config.toml"),
             profile: None,
             admission: Mutex::new(()),
             operations: Mutex::new(JoinSet::new()),
@@ -85,7 +95,7 @@ mod tests {
             "source":{"adapter":"fixture","profile":"test","session":"session","thread":"thread","agent":"agent"},
             "scope":scope,"stream":"stream","coverage":"available_payloads"
         })).unwrap();
-        (fixture, service, binding)
+        (service, binding)
     }
 
     #[tokio::test]
@@ -1140,8 +1150,14 @@ impl Service {
                 if job.model_plan.is_some()
                     || job.retrieval_plan.is_some()
                     || job.consult_plan.is_some()
+                    || (job.extraction_plan.is_some()
+                        && job
+                            .result
+                            .as_ref()
+                            .and_then(|v| v.get("checkpoint"))
+                            .is_none())
                 {
-                    let code = if job.consult_plan.is_some() {
+                    let code = if job.consult_plan.is_some() || job.extraction_native.is_some() {
                         "RUNNER_INTERRUPTED"
                     } else {
                         "PROVIDER_INTERRUPTED"

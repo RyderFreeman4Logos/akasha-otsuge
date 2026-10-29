@@ -55,15 +55,15 @@ impl Service {
         id: String,
         workflow: Deadline,
     ) -> Result<()> {
-        let (original_job, config) = {
+        let (original_revision, original_job, config) = {
             let _guard = self.admission.lock().await;
-            let (_, job) = self.job(&id)?;
+            let (revision, job) = self.job(&id)?;
             self.authorize_job(&job)?;
             let config = self.retrieval_snapshot(job.config_generation)?;
             if config.resolved().digest() != job.config_digest {
                 return Err(Error("CONFIG_CORRUPT"));
             }
-            (job, config)
+            (revision, job, config)
         };
         let plan = original_job
             .extraction_plan
@@ -77,7 +77,28 @@ impl Service {
             .as_deref()
             .ok_or(Error("MODEL_NOT_CONFIGURED"))?;
         let mut trace = json!({"deadline":workflow.trace(),"origin":"extraction"});
-        let (text, error, generator) = if let Some(name) = profile.strip_prefix("executor:") {
+        let checkpoint = original_job
+            .result
+            .as_ref()
+            .and_then(|v| v.get("checkpoint"))
+            .cloned();
+        let (text, error, generator) = if let Some(pointer) = &checkpoint {
+            let saved = models::load_result(&self.storage, pointer, original_revision)?;
+            if saved["schema_version"] != 1
+                || saved["prompt_version"] != PROMPT_VERSION
+                || saved["origin"] != "extraction"
+            {
+                return Err(Error("JOB_CORRUPT"));
+            }
+            let text = saved["text"]
+                .as_str()
+                .ok_or(Error("JOB_CORRUPT"))?
+                .to_owned();
+            let generator = serde_json::from_value::<Generator>(saved["generator"].clone())
+                .map_err(|_| Error("JOB_CORRUPT"))?;
+            trace = saved["trace"].clone();
+            (Some(text), None, generator)
+        } else if let Some(name) = profile.strip_prefix("executor:") {
             let result = self
                 .native_extraction(&original_job, config.resolved(), &workflow, &mut trace)
                 .await;
@@ -129,12 +150,13 @@ impl Service {
             )
         };
         let _guard = self.admission.lock().await;
-        let (revision, mut job) = self.job(&id)?;
+        let (mut revision, mut job) = self.job(&id)?;
         if job.state != "running" || job.lease_owner.as_deref() != Some(&self.instance) {
             return Err(Error("LEASE_LOST"));
         }
-        job.result =
-            Some(json!({"prompt_version":PROMPT_VERSION,"trace":trace,"generator":generator}));
+        job.result = Some(
+            json!({"origin":"extraction","prompt_version":PROMPT_VERSION,"trace":trace,"generator":generator}),
+        );
         if job.cancel_requested {
             return self
                 .finish_job(job, revision, "cancelled", Some("CANCELLED"))
@@ -164,6 +186,17 @@ impl Service {
                     .await;
             }
         };
+        if let Some(pointer) = checkpoint {
+            job.result.as_mut().unwrap()["checkpoint"] = pointer;
+        } else {
+            let saved = json!({"schema_version":1,"origin":"extraction","prompt_version":PROMPT_VERSION,"text":text,"generator":generator,"trace":trace});
+            let pointer = models::save_result(&self.storage, &saved, job.config_generation).await?;
+            job.result.as_mut().unwrap()["checkpoint"] = pointer;
+            self.save_job(&job, Some(revision), vec![]).await?;
+            revision = self.job(&id)?.0;
+        }
+        #[cfg(test)]
+        crate::storage::crash_tests::checkpoint("extraction-response");
         let candidates = extraction::publish(
             &self.storage,
             plan,
@@ -171,10 +204,25 @@ impl Service {
             job.config_generation,
             generator.clone(),
             drafts,
+            &workflow,
         )
-        .await?;
+        .await;
+        let candidates = match candidates {
+            Ok(candidates) => candidates,
+            Err(error) if matches!(error.code, "EXTRACTION_SOURCE_LIMIT" | "WORKFLOW_TIMEOUT") => {
+                return self
+                    .finish_job(job, revision, "failed", Some(error.code))
+                    .await;
+            }
+            Err(error) => return Err(error.into()),
+        };
         job.result.as_mut().unwrap()["candidates"] = json!(candidates);
         job.result.as_mut().unwrap()["generator"] = json!(generator);
+        if workflow.expired().is_some() {
+            return self
+                .finish_job(job, revision, "failed", Some("WORKFLOW_TIMEOUT"))
+                .await;
+        }
         self.finish_job(job, revision, "succeeded", None).await
     }
 

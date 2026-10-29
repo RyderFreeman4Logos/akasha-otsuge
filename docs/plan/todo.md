@@ -695,7 +695,7 @@ hashes actually cover. #12 alone retains deferred Claude authentication.
   default-parallel run had 18 IPC timeouts; bounded-concurrency isolation and one
   observed unchanged default-parallel run passed. Preserve that failure: its
   historical cause is unknown, and no timeout or durability policy was changed.
-- [ ] Add asynchronous extraction to existing durable daemon jobs. Persist raw
+- [x] Add asynchronous extraction to existing durable daemon jobs. Persist raw
   input first; model failure must leave sources and recoverable work intact.
 - [ ] Support configured text profiles and existing authenticated CLI Runners,
   including the single-CLI path without extra text/embedding/reranker API keys.
@@ -706,12 +706,19 @@ hashes actually cover. #12 alone retains deferred Claude authentication.
   pass; actual authenticated extraction remains below. Two unrelated Codex
   privacy/restart fixtures now await durable async prefix capture rather than
   assuming cold storage work fits the two-second binding catch-up window.
-- [ ] Version the prompt/output schema. Resolve model source indices to exact
+- [x] Version the prompt/output schema. Resolve model source indices to exact
   immutable source spans; preserve scope, conditions, assumptions and generator
   identity. Extraction produces candidates, without claiming human confirmation.
-- [ ] Persist idempotent progress, merge duplicate candidates with all sources,
+- [x] Persist idempotent progress, merge duplicate candidates with all sources,
   keep contradictory candidates, and mark internal memory-service origins to
   prevent recursively extracting derived discussions.
+  Real SIGKILL at durable response and partial candidate publication resumes
+  without repeating the model or candidate revision. An interrupted call without
+  a saved response fails durably and requires an explicit new job. Preserve
+  revised candidate identities, bound source unions without discarding evidence,
+  and stop publication on the original workflow deadline. Eighteen job tests,
+  three extraction integration tests, Clippy and formatting pass; retained RED
+  receipts distinguish real failures from the corrected test harness/selector.
 - [ ] Cover conditional, negated, quoted and temporary statements, malformed or
   forged sources, duplicate delivery, partial publication/restart, unavailable
   models and later retry. Verify the existing index pause/resume/rebuild and

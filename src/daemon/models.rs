@@ -14,7 +14,11 @@ struct ResultArchive {
     parts: Vec<RevisionRef>,
 }
 
-async fn save_result(storage: &Storage, value: &Value, generation: u64) -> Result<Value> {
+pub(super) async fn save_result(
+    storage: &Storage,
+    value: &Value,
+    generation: u64,
+) -> Result<Value> {
     let content = serde_json::to_string(value)?;
     if content.len() > MAX_RESULT {
         return Err(Error("PROVIDER_OUTPUT_TOO_LARGE"));

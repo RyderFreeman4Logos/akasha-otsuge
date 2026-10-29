@@ -38,6 +38,12 @@ impl Plan {
             .map(|span| {
                 let record = domain.source(&span.event_id, span.revision)?;
                 domain.permission(context, Some(&record.payload.scope))?;
+                if matches!(
+                    record.provenance.origin,
+                    Origin::Extraction | Origin::AutoGrill
+                ) {
+                    return Err(StorageError::new("EXTRACTION_INTERNAL_SOURCE"));
+                }
                 if record.content_sha256 != span.content_sha256
                     || span.start >= span.end
                     || record.payload.text.get(span.start..span.end).is_none()
@@ -171,6 +177,7 @@ pub(crate) async fn publish(
     generation: u64,
     generator: Generator,
     drafts: Vec<MemoryDraft>,
+    workflow: &crate::config::deadline::Deadline,
 ) -> Result<Vec<Value>> {
     let domain = Domain::new(storage);
     let ingress = Ingress::agent(
@@ -189,20 +196,17 @@ pub(crate) async fn publish(
     };
     let mut published = vec![];
     for mut draft in drafts {
-        let semantic = hash(&serde_json::to_vec(&(
-            &draft.kind,
-            &draft.scope,
-            &draft.claim,
-            &draft.conditions,
-            &draft.assumptions,
-            draft.valid_from_ms,
-            draft.valid_until_ms,
-        ))?);
+        if workflow.expired().is_some() {
+            return Err(StorageError::new("WORKFLOW_TIMEOUT"));
+        }
+        let semantic = candidate_identity(&draft)?;
         let memory_id = format!("extracted/{semantic}");
         let previous = domain.memory(&memory_id)?;
         if let Some(old) = &previous {
             if old.record.authority != Authority::Candidate
                 || old.record.lifecycle != Lifecycle::Candidate
+                || old.record.provenance.origin != Origin::Extraction
+                || candidate_identity(&old.record.draft)? != semantic
             {
                 published.push(json!({"memory_id":memory_id,"revision":old.revision.commit_seq,"status":"preserved_existing_state"}));
                 continue;
@@ -213,6 +217,9 @@ pub(crate) async fn publish(
                     merged.source_spans.push(span);
                 }
             }
+            if merged.source_spans.len() > 32 {
+                return Err(StorageError::new("EXTRACTION_SOURCE_LIMIT"));
+            }
             if merged == old.record.draft {
                 published.push(json!({"memory_id":memory_id,"revision":old.revision.commit_seq,"status":"existing"}));
                 continue;
@@ -220,6 +227,9 @@ pub(crate) async fn publish(
             draft = merged;
         }
         let expected_revision = previous.map(|old| old.revision.commit_seq);
+        if workflow.expired().is_some() {
+            return Err(StorageError::new("WORKFLOW_TIMEOUT"));
+        }
         let receipt = domain
             .propose(
                 &MemoryWrite {
@@ -239,6 +249,20 @@ pub(crate) async fn publish(
         published.push(
             json!({"memory_id":memory_id,"revision":receipt.commit_seq,"status":"candidate"}),
         );
+        #[cfg(test)]
+        crate::storage::crash_tests::checkpoint("extraction-candidate");
     }
     Ok(published)
+}
+
+fn candidate_identity(draft: &MemoryDraft) -> Result<String> {
+    Ok(hash(&serde_json::to_vec(&(
+        &draft.kind,
+        &draft.scope,
+        &draft.claim,
+        &draft.conditions,
+        &draft.assumptions,
+        draft.valid_from_ms,
+        draft.valid_until_ms,
+    ))?))
 }
