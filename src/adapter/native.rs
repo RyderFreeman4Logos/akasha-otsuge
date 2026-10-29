@@ -9,7 +9,7 @@ use std::{
 };
 use tokio::io::{AsyncRead, AsyncReadExt};
 
-pub(crate) async fn version_output(binary: &Path) -> Result<(PathBuf, String)> {
+pub(crate) async fn version_output(binary: &Path, timeout: Duration) -> Result<(PathBuf, String)> {
     let executable = resolve(binary)?;
     let mut command = std::process::Command::new(&executable);
     command
@@ -28,7 +28,7 @@ pub(crate) async fn version_output(binary: &Path) -> Result<(PathBuf, String)> {
     );
     let stdout = child.stdout.take().ok_or(ErrorCode::RunnerFailed)?;
     let stderr = child.stderr.take().ok_or(ErrorCode::RunnerFailed)?;
-    let result = tokio::time::timeout(Duration::from_secs(5), async {
+    let result = tokio::time::timeout(timeout, async {
         tokio::try_join!(bounded(stdout), bounded(stderr), wait_for_exit(&child))
     })
     .await

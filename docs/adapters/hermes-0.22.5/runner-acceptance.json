@@ -1,0 +1,40 @@
+{
+  "utc": "2026-10-29T05:04:20.831728+00:00",
+  "kind": "actual_authenticated_native_Hermes_Runner_with_synthetic_captured_context",
+  "model": {
+    "default": "gpt-6.1-sol",
+    "provider": "openai-codex",
+    "context_length": 256000
+  },
+  "rows": [
+    {
+      "mode": "in_process_a",
+      "seconds": 27.516786568798125,
+      "test_log_sha256": "5f5befb755028715b0cb29a7e9cb1a0607e35f299fa0d57c1dd7367ce48ed4a8",
+      "four_tools": true,
+      "other_clis_absent": true
+    },
+    {
+      "mode": "in_process_b",
+      "seconds": 16.173740117810667,
+      "test_log_sha256": "baf4df59983119909207a86d6d0169b48b968a805ae9b1eed8472eaaa950daa2",
+      "four_tools": true,
+      "other_clis_absent": true
+    }
+  ],
+  "allocated_bytes": 229376,
+  "files": 27,
+  "test_binary_sha256": "fe179426e30236d9d618c9be2fda656bf4f8729db6d6fa93883def9726306044",
+  "product_binary_sha256": "1071d39a6552e171acaaed8a575f619c75cf60ddf42ce0b3fc502662637a70af",
+  "native_head": "4960e41cec01de499ab99c4251437bc8039e41db",
+  "source_patch_sha256": "22190c2142776f78560903d0865db42ac48b593918bf68b04b00fa37f3426b5f",
+  "scratch_removed": true,
+  "profiles_removed": true,
+  "terminal": {
+    "exit_code": 0,
+    "head": "786675f9baa4f2a586f0c8d6b961f7a914182545",
+    "log_sha256": "a6c035f296e6e340f54f9b23401a95f661e7b1c083b9d59695fd9578c5baa700",
+    "seconds": 93.59643982537091,
+    "utc": "2026-10-29T05:04:41.172111+00:00"
+  }
+}

@@ -15,10 +15,12 @@ Commands:
   daemon status              Show daemon and storage status
   daemon stop                Stop intake and drain the daemon
   doctor --json              Inspect the local daemon
-  doctor --host codex [--binary PATH]
-                             Inspect the installed Codex CLI
+  doctor --host codex|hermes [--binary PATH]
+                             Inspect the installed native CLI
   adapter install codex --binary PATH --launcher PATH --state-dir PATH
   adapter uninstall codex --launcher PATH
+  adapter install hermes --binary PATH --home PATH
+  adapter uninstall hermes --home PATH
   config validate|reload|status
   config show --effective
   capture reconcile|codex BINDING_JSON INPUT_JSONL --idempotency-key ID
@@ -118,6 +120,17 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         output(&bytes, false)?;
         return Ok(0);
     }
+    if let ["doctor", "--host", "hermes", flags @ ..] = command.as_slice() {
+        let flags = options(flags, &["--binary"])?;
+        let binary = std::path::Path::new(flags.get("--binary").copied().unwrap_or("hermes"));
+        let report = akasha_otsuge::adapter::hermes::probe(binary).await?;
+        let supported = akasha_otsuge::adapter::hermes::SUPPORTED_VERSION;
+        let mut bytes = serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":report,
+            "coverage":{"version_supported":akasha_otsuge::adapter::hermes::supported_version(report.version.as_deref()),"supported_versions":[supported],"qualified_builds":[akasha_otsuge::adapter::hermes::QUALIFIED_BUILD],"native_children":false,"model_auth":"not_checked","hook_trust":"not_checked"}}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
     if let ["adapter", "codex-bound", path] = command.as_slice() {
         let response =
             akasha_otsuge::adapter::codex::hooks::bound_response(std::path::Path::new(path))?;
@@ -126,19 +139,44 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         output(&bytes, false)?;
         return Ok(0);
     }
-    if let ["adapter", "uninstall", "codex", flags @ ..] = command.as_slice() {
-        let flags = options(flags, &["--launcher"])?;
-        let response = akasha_otsuge::adapter::codex::installation::uninstall(
-            std::path::Path::new(flags.get("--launcher").ok_or(Error("INVALID_ARGUMENT"))?),
-        )?;
+    if let [
+        "adapter",
+        "uninstall",
+        host @ ("codex" | "hermes"),
+        flags @ ..,
+    ] = command.as_slice()
+    {
+        let key = if *host == "hermes" {
+            "--home"
+        } else {
+            "--launcher"
+        };
+        let flags = options(flags, &[key])?;
+        let path = std::path::Path::new(flags.get(key).ok_or(Error("INVALID_ARGUMENT"))?);
+        let response = if *host == "hermes" {
+            akasha_otsuge::adapter::hermes::installation::uninstall(path)?
+        } else {
+            akasha_otsuge::adapter::codex::installation::uninstall(path)?
+        };
         let mut bytes =
             serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":response}))?;
         bytes.push(b'\n');
         output(&bytes, false)?;
         return Ok(0);
     }
-    let install_flags = if let ["adapter", "install", "codex", flags @ ..] = command.as_slice() {
-        Some(options(flags, &["--binary", "--launcher", "--state-dir"])?)
+    let install_flags = if let [
+        "adapter",
+        "install",
+        host @ ("codex" | "hermes"),
+        flags @ ..,
+    ] = command.as_slice()
+    {
+        let keys: &[&str] = if *host == "hermes" {
+            &["--binary", "--home"]
+        } else {
+            &["--binary", "--launcher", "--state-dir"]
+        };
+        Some((*host, options(flags, keys)?))
     } else {
         None
     };
@@ -149,16 +187,22 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     };
     let operation = match command.as_slice() {
         ["adapter", "codex-hook", ..] => None,
-        ["adapter", "install", "codex", ..] => None,
-        ["adapter", "codex-call"] => {
+        ["adapter", "install", "codex" | "hermes", ..] => None,
+        ["adapter", host @ ("codex-call" | "hermes-call")] => {
             use std::io::Read;
             let mut bytes = Vec::new();
             io::stdin().take(16 * 1024 + 1).read_to_end(&mut bytes)?;
             if bytes.len() > 16 * 1024 {
                 return Err(Error("MESSAGE_TOO_LARGE"));
             }
-            Some(Command::Codex {
-                event: serde_json::from_slice(&bytes)?,
+            Some(if *host == "hermes-call" {
+                Command::Hermes {
+                    event: serde_json::from_slice(&bytes)?,
+                }
+            } else {
+                Command::Codex {
+                    event: serde_json::from_slice(&bytes)?,
+                }
             })
         }
         ["daemon", "run" | "start"] => None,
@@ -299,22 +343,32 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         "",
         &defaults,
     )?;
-    if let Some(flags) = install_flags {
+    if let Some((host, flags)) = install_flags {
         let path = |key| {
             flags
                 .get(key)
                 .map(std::path::Path::new)
                 .ok_or(Error("INVALID_ARGUMENT"))
         };
-        let response = akasha_otsuge::adapter::codex::installation::install(
-            path("--binary")?,
-            path("--launcher")?,
-            path("--state-dir")?,
-            socket
-                .as_deref()
-                .unwrap_or(&resolved.config().paths.socket_path),
-        )
-        .await?;
+        let socket = socket
+            .as_deref()
+            .unwrap_or(&resolved.config().paths.socket_path);
+        let response = if host == "hermes" {
+            akasha_otsuge::adapter::hermes::installation::install(
+                path("--binary")?,
+                path("--home")?,
+                socket,
+            )
+            .await?
+        } else {
+            akasha_otsuge::adapter::codex::installation::install(
+                path("--binary")?,
+                path("--launcher")?,
+                path("--state-dir")?,
+                socket,
+            )
+            .await?
+        };
         let mut bytes =
             serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":response}))?;
         bytes.push(b'\n');

@@ -287,7 +287,7 @@ async fn description_reports_actual_binding_precision_even_on_capable_hosts() {
         let mut context = CapturedContext::new(&store, inv).unwrap();
         let value = serde_json::to_value(
             context
-                .execute(&permit, ContextRequest::Describe)
+                .execute(&permit, ContextRequest::Describe {})
                 .await
                 .unwrap(),
         )
@@ -645,4 +645,24 @@ async fn code_reads_pin_workspace_reject_escape_and_report_changed_content() {
         ErrorCode::ReadDenied
     );
     store.close().await.unwrap();
+}
+
+#[test]
+fn context_requests_reject_model_supplied_identity_fields() {
+    for request in [
+        serde_json::json!({"operation":"describe"}),
+        serde_json::json!({"operation":"list","limit":1}),
+        serde_json::json!({"operation":"read","handle":"issued","start":0,"max_bytes":32}),
+        serde_json::json!({"operation":"search","query":"q","limit":1}),
+    ] {
+        assert!(serde_json::from_value::<ContextRequest>(request.clone()).is_ok());
+        for field in ["session_id", "token", "principal", "home"] {
+            let mut forged = request.clone();
+            forged[field] = serde_json::json!("model-supplied");
+            assert!(
+                serde_json::from_value::<ContextRequest>(forged).is_err(),
+                "{field}"
+            );
+        }
+    }
 }

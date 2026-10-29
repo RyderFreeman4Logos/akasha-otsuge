@@ -14,7 +14,8 @@ pub const TRANSCRIPT_STREAM: &str = "codex-native-v1";
 /// Reports an observed CLI version; authentication and model capabilities are separate.
 pub async fn probe(binary: &std::path::Path) -> super::Result<super::CapabilityReport> {
     use super::{BindingLevel, CapabilityReport, ErrorCode, SelfTest};
-    let (executable, text) = super::native::version_output(binary).await?;
+    let (executable, text) =
+        super::native::version_output(binary, std::time::Duration::from_secs(5)).await?;
     let version = text
         .trim()
         .strip_prefix("codex-cli ")

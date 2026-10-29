@@ -98,6 +98,9 @@ pub struct Request {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    Hermes {
+        event: crate::adapter::hermes::NativeEvent,
+    },
     Codex {
         event: crate::adapter::codex::NativeEvent,
     },
@@ -188,14 +191,22 @@ impl CaptureInput {
             return Err(Error("INVALID_CAPTURE_BINDING"));
         }
         if let Some(host) = self.host {
-            if host != crate::config::Host::Codex {
-                return Err(Error("ADAPTER_UNSUPPORTED"));
-            }
-            if self.source.adapter != "codex"
+            let host_valid = match host {
+                crate::config::Host::Codex => {
+                    self.source.adapter == "codex"
+                        && self.source.agent == "main"
+                        && self.stream == crate::adapter::codex::TRANSCRIPT_STREAM
+                }
+                crate::config::Host::Hermes => {
+                    self.source.adapter == "hermes"
+                        && (self.source.agent == "main" || self.source.agent == self.source.session)
+                        && self.stream == crate::adapter::hermes::BACKGROUND_STREAM
+                }
+                _ => return Err(Error("ADAPTER_UNSUPPORTED")),
+            };
+            if !host_valid
                 || self.source.session != self.source.thread
-                || self.source.agent != "main"
                 || self.coverage != crate::capture::CoverageLevel::VisibleText
-                || self.stream != crate::adapter::codex::TRANSCRIPT_STREAM
             {
                 return Err(Error("INVALID_CAPTURE_BINDING"));
             }

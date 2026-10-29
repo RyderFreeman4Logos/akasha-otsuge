@@ -20,6 +20,9 @@ mod retrieval_tests;
 #[path = "support/daemon_codex.rs"]
 mod codex_tests;
 
+#[path = "support/daemon_hermes.rs"]
+mod hermes_tests;
+
 struct Daemon {
     root: PathBuf,
     socket_name: String,

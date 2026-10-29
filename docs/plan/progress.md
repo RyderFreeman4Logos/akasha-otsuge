@@ -1,13 +1,38 @@
-# Development checkpoint — 2026-10-28 UTC
+# Development checkpoint — 2026-10-29 UTC
 
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#10 are merged
-and completed; #11–#28 remain open at this checkpoint. The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#11 and #13
+are merged and completed; #12 and #14–#28 remain open (16 Issues). The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-011
+## Current issue: MVP-014
+
+Hermes Caller, canonical export, native plugin installation and independent
+Runner are implemented at `2786c7a`. Two authenticated Runner profiles and a real
+CLI Caller pass with the other three agent CLIs absent. Native tool-policy,
+unissued-context denial and cancellation after a real context-tool call also pass.
+Actual native fixtures cover compaction originals, child provenance and interrupted
+end-hook backfill. [The support matrix](../adapters/hermes-0.22.5/README.md) records
+which checks use synthetic persisted history and which use authenticated models.
+
+Two `host`-mode TUI startup-query probes timed out. The bounded follow-up
+observed an existing session and zero persisted messages.
+Two simultaneous interactive TUIs now pass in distinct `in_process` and `host`
+profiles, including correct bindings, final answers, zero exits and completed
+capture jobs. The successful71.103-second harness removed all23,113,728bytes of
+temporary fixture files. A separate scripted-exit failure remains preserved.
+Final gate, independent review, CI and closure remain pending. #12's draft PR #41
+is waiting only for lawful Claude authentication; #15 is the next independent leaf.
+The complete TODO retains every prerequisite and acceptance item.
+
+PR #42 merged Codex candidate `329bba1` as `d49be08`; #13 is closed. Its final
+gate, authenticated Runner and simultaneous TUIs, native denial fixtures,
+independent R1 review and CI40801384231 passed. The temporary source checkout and
+native fixtures were removed; the shared SSD build cache remains in use.
+
+## Completed shared contracts: MVP-011
 
 The shared contracts, durable immutable binding, fenced context/workspace reads,
 terminal results and global delegation budgets are implemented. Focused checks
@@ -30,13 +55,15 @@ v1 remains unchanged. Erratum manifest SHA-256 is
 Erratum freeze commit: `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
 Reference profile Codex0.164.0 / gpt-6.1-sol / high was selected before research
 instructions, with actual installed executable provenance. Model evaluation has
-not run. The pre-repair exact-HEAD full gate passed; the amended candidate still
-needs its own full gate, independent R2 review, CI and Issue closure. #11 remains open.
+not run. Candidate `639e991` passed its140.200-second exact-HEAD gate (146 Rust
+tests,17 Python tests and36 installed daemon cases), independent R2 review with
+zero actionable findings, and CI40717707611. PR #40 merged as `19efca1`; #11 is closed.
 
 The separate [CI-cache PR #39](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/39)
 merged as `dc8e27cd4329dcbc41cdf37cf63a4eafcee548c2` after its exact local gate,
 independent PASS/0-finding review and hosted CI40636923468. First miss/save is
-confirmed; a future cache restore and speed benefit are still unverified.
+confirmed; CI40717707611 subsequently restored its1.94GB cache and completed
+the full gate in about144 seconds. This is one observed restore, not a general benchmark.
 
 ## Completed retrieval: MVP-010
 

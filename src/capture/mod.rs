@@ -529,7 +529,7 @@ fn validate_advance(binding: &CaptureBinding, a: &Advance) -> Result<()> {
     }
     Ok(())
 }
-fn encode_hex(bytes: &[u8]) -> String {
+pub(crate) fn encode_hex(bytes: &[u8]) -> String {
     const HEX: &[u8] = b"0123456789abcdef";
     let mut out = String::with_capacity(bytes.len() * 2);
     for &b in bytes {
@@ -538,7 +538,7 @@ fn encode_hex(bytes: &[u8]) -> String {
     }
     out
 }
-fn decode_hex(text: &str, max: usize) -> Result<Vec<u8>> {
+pub(crate) fn decode_hex(text: &str, max: usize) -> Result<Vec<u8>> {
     if text.len() > max * 2 || !text.len().is_multiple_of(2) {
         return Err(error("INVALID_CAPTURE_FRAME"));
     }
