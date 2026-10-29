@@ -67,6 +67,45 @@ fn extraction_executor_needs_no_model_and_contributes_its_original_timeout() {
 }
 
 #[test]
+fn auto_grill_roles_share_existing_executors_and_keep_finite_pinned_budgets() {
+    let empty = config("");
+    assert!(empty.config().grill.interviewer.is_none());
+    let input = "[grill]\ninterviewer='one'\nexpert='one'\nreviewer='one'\nmax_rounds=2\nmax_runner_starts=8\nmax_questions=4\nmax_tokens=128000\n[executors.one]\nkind='pi'\nbinary='pi'\ntimeout='2000s'\n";
+    let resolved = config(input);
+    assert!(resolved.config().models.is_empty());
+    assert_eq!(resolved.config().grill.max_rounds, 2);
+    assert!(resolved.timeouts().workflow >= Duration::from_secs(8 * 2000));
+    for invalid in [
+        input.replace("reviewer='one'", "reviewer='missing'"),
+        input.replace("reviewer='one'\n", ""),
+        input.replace("max_rounds=2", "max_rounds=0"),
+        input.replace("max_rounds=2", "max_rounds=9"),
+        input.replace("max_questions=4", "max_questions=0"),
+        input.replace("max_runner_starts=8", "max_runner_starts=0"),
+        input.replace("max_tokens=128000", "max_tokens=0"),
+        format!("{input}enabled=false\n"),
+        format!("{input}\n[timeouts]\nworkflow='2001s'\n"),
+    ] {
+        assert!(resolve(&invalid, None, "", &paths()).is_err());
+    }
+    let manager = manager(input);
+    let pinned = manager.pin();
+    assert_eq!(
+        manager
+            .reload(
+                &input.replace("max_rounds=2", "max_rounds=1"),
+                None,
+                |_| Ok(())
+            )
+            .unwrap()
+            .status,
+        ReloadStatus::Applied
+    );
+    assert_eq!(pinned.resolved().config().grill.max_rounds, 2);
+    assert_eq!(manager.pin().resolved().config().grill.max_rounds, 1);
+}
+
+#[test]
 fn defaults_cover_all_local_model_roles_without_an_endpoint_requirement() {
     let empty = config("");
     assert!(empty.config().models.is_empty());

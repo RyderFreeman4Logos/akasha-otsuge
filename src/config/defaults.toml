@@ -7,6 +7,12 @@ max_delegation_depth = 1
 max_result_chars = 4000
 instructions_version = "v1"
 
+[grill]
+max_rounds = 2
+max_runner_starts = 8
+max_questions = 4
+max_tokens = 128000
+
 [timeouts]
 local_request = "1700s"
 runner = "1700s"

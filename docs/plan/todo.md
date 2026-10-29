@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-29 UTC after PR #45 merged at `bbce316`: **15 completed,
-13 open Issues (#12, #17–#28)**. #17 is the sole active implementation.
+Updated 2026-10-29 UTC after PR #46 merged at `d64051e`: **16 completed,
+12 open Issues (#12, #18–#28)**. #18 is the sole active implementation.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -47,8 +47,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-29 audit finds 13 open Issues (#12, #17–#28). #4–#11 and #13–#16 are closed
-with merged PRs #32–#38/#40/#42/#43/#44/#45; no verified implementation waits for closure. #7's
+The 2026-10-29 audit finds 12 open Issues (#12, #18–#28). #4–#11 and #13–#17 are closed
+with merged PRs #32–#38/#40/#42/#43/#44/#45/#46; no verified implementation waits for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -685,7 +685,7 @@ Keep native model schema violations as failures and preserve strict parsing.
 Reuse unchanged expensive transport receipts only for the behavior their source
 hashes actually cover. #12 alone retains deferred Claude authentication.
 
-## MVP-017 active acceptance and remaining work
+## MVP-017 completed acceptance
 
 - [x] Add the first text-profile extraction path through durable jobs, strict
   versioned output validation and source-backed candidate publication. The
@@ -740,8 +740,36 @@ hashes actually cover. #12 alone retains deferred Claude authentication.
   integration tests pass, including an active-reader refusal and repeated native
   table replacement. Clippy and formatting pass. Compact evidence and the actual
   source/candidate comparison are archived under `docs/benchmarks/results/mvp017`.
-- [ ] Finish focused checks, one final canonical gate and independent review,
-  CI, publication, merge and closure. Keep #18–#28 queued until their turn.
+- [x] Final canonical `just check` passed on `d55bd8f` / tree `e5e176d`
+  in198.68 seconds, including installed release execution. Independent Hermes
+  R2 review after the gate passed with zero blocking findings on the same tree.
+  CI40967915492 passed; PR #46 merged as `d64051e` and #17 closed completed.
+  [Final gate and full review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/46#issuecomment-6510231207)
+  and [CI receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/46#issuecomment-6510404684)
+  retain separate final and historical native source identities. The finished
+  SSD worktree was removed after all consumers exited; shared target retained.
+
+## MVP-018 active acceptance and remaining work
+
+Original task start2026-10-29T22:50:15.286265+00:00; base `d64051e`.
+
+- [ ] Configure interviewer/expert/reviewer with one or mixed native executors;
+  pin role/model/thinking and finite rounds/questions/starts/token/time budgets.
+- [ ] Execute independent initial answers, bounded cross-questioning and evidence
+  checks using isolated contexts, with no new endpoint/subscription requirement.
+- [ ] Preserve source events, dependencies, assumptions, strongest opposition and
+  unresolved disagreements; apply existing review policy without human relabeling.
+- [ ] Persist phase progress and usage; test round/budget/user stops and recovery
+  without resetting an existing clock or replaying ambiguous native work.
+- [ ] Execute actual single-CLI and mixed-Runner samples through authorized
+  profiles; archive compact source/candidate mappings and cleanup receipts.
+- [ ] Finish focused checks, canonical gate, independent review, CI, publication,
+  merge and verified closure before advancing #19.
+
+#17 process correction: the initial overlapping review was provisional only.
+Dispatch paid final review after the free canonical gate passes; collect terminal
+results promptly. New managed admissions bind dirty and untracked source hashes
+in addition to HEAD, preventing ambiguous historical source claims.
 
 #28 also owns final remote dependency-index validation: completed dependencies
 are historical links, not active blockers. Reconcile the legacy checker's literal
@@ -765,7 +793,7 @@ are historical links, not active blockers. Reconcile the legacy checker's litera
 - [x] [#14 [MVP-014] Hermes CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/14) — dependencies: #11.
 - [x] [#15 [MVP-015] pi CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/15) — dependencies: #11.
 - [x] [#16 [MVP-016] consult 可选短 hint、渐进调研与子孙共享预算](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/16) — dependencies: #12, #13, #14, #15.
-- [ ] [#17 [MVP-017] 异步提取候选、来源引用与可重建索引作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/17) — dependencies: #5, #7, #9, #10, #16.
+- [x] [#17 [MVP-017] 异步提取候选、来源引用与可重建索引作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/17) — dependencies: #5, #7, #9, #10, #16.
 - [ ] [#18 [MVP-018] 单一或组合 Runner 的 Auto-Grill 工作流](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/18) — dependencies: #16, #17.
 - [ ] [#19 [MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19) — dependencies: #5, #6, #18.
 - [ ] [#20 [MVP-020] 外部 Memory Editor、范围受限 patch 与并发修订](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/20) — dependencies: #16, #19.

@@ -40,6 +40,18 @@ corresponding kind. `retrieval.extraction` accepts a text profile or
 The latter needs no extra text, embedding or reranker endpoint. Nothing is selected
 or invoked by default.
 
+`grill.interviewer`, `grill.expert` and `grill.reviewer` select enabled executor
+profiles. Configure all three together; they may share a single CLI/profile.
+Auto-Grill is unconfigured by default. Its finite limits are `max_rounds`
+(1–8, default2), `max_runner_starts` (1–32, default8), `max_questions`
+(1–8, default4) and `max_tokens` (1–10,000,000, default128000).
+Each role uses its executor's model, thinking arguments and timeout. New jobs
+pin these settings; reload does not rewrite already accepted plans. An automatic
+workflow deadline includes the full start budget and the slowest selected role.
+An explicit workflow deadline must allow at least one selected role plus overhead.
+Token usage includes cached input and stops the workflow when native usage crosses
+the shared limit; it is not a provider-specific currency/cost estimate.
+
 `executors.NAME` requires `kind` (`claude_code`, `codex`, `hermes`, `pi`) and `binary`.
 Optional fields are `args`, `enabled`, a text `model`, `timeout`, an absolute
 `native_home` and an ordered `fallback` list. No other host, fallback or paid API
