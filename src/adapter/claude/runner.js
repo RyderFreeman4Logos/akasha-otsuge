@@ -37,7 +37,11 @@ export function register(on) {
     for (const key of keys[name]) if (e[key] !== undefined) request[key] = e[key];
     const binary = await $.env.get('AKASHA_RUN_BRIDGE');
     if (!binary) return { deny: 'BINDING_UNAVAILABLE' };
-    const response = await $.process.run([binary, 'adapter', 'claude-read'], { stdin: JSON.stringify(request), timeoutMs: 15000 });
+    const deadline = Number(await $.env.get('AKASHA_RUN_DEADLINE_MS'));
+    if (!Number.isSafeInteger(deadline) || deadline <= 0) return { deny: 'CONFIG_INVALID' };
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) return { deny: 'RUNNER_TIMEOUT' };
+    const response = await $.process.run([binary, 'adapter', 'claude-read'], { stdin: JSON.stringify(request), timeoutMs: remaining });
     if (response.exitCode !== 0 || response.isStdoutTruncated || response.isStderrTruncated) return { deny: 'AKASHA_READ_FAILED' };
     const value = JSON.parse(response.stdout);
     if (value.error) return { deny: JSON.stringify(value.error) };

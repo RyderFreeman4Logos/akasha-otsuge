@@ -165,6 +165,9 @@ test('bridge cancellation reaps its child and rejects bounded malformed replies'
 });
 
 test('runner registers only context tools and attests real inventories before work', async t => {
+  const previous = process.env.AKASHA_RUN_DEADLINE_MS;
+  process.env.AKASHA_RUN_DEADLINE_MS = String(Date.now() + 30000);
+  t.after(() => { if (previous === undefined) delete process.env.AKASHA_RUN_DEADLINE_MS; else process.env.AKASHA_RUN_DEADLINE_MS = previous; });
   const f = fixture(t, `if (event.op === 'ready' || event.op === 'context' || event.op === 'usage') {
     if (process.argv.at(-1) !== 'pi-context') process.exit(2);
     console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:event.op === 'ready' ? {ready:true} : event.op === 'usage' ? {accepted:true} : {kind:'description'}})); return;
@@ -199,4 +202,16 @@ test('runner registers only context tools and attests real inventories before wo
   f.pi.getActiveTools = () => [...names,'bash'];
   await assert.rejects(f.hooks.session_start({},f.ctx), /TOOL_DENIED/);
   assert.equal(f.requests().length, count);
+});
+
+test('runner research may exceed transport timeout but keeps the original deadline', async t => {
+  const f = fixture(t, `setTimeout(() => console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:{answer:'slow research'}})),11000); return;`);
+  const previous = process.env.AKASHA_RUN_DEADLINE_MS;
+  t.after(() => { if (previous === undefined) delete process.env.AKASHA_RUN_DEADLINE_MS; else process.env.AKASHA_RUN_DEADLINE_MS = previous; });
+  process.env.AKASHA_RUN_DEADLINE_MS = String(Date.now() + 30000);
+  assert.equal((await exchange(f.defaults, {op:'context',request:{operation:'delegate',hint:'child'}}, undefined, true)).answer, 'slow research');
+  process.env.AKASHA_RUN_DEADLINE_MS = String(Date.now() - 1);
+  await assert.rejects(exchange(f.defaults, {op:'context'}, undefined, true), /RUNNER_TIMEOUT/);
+  delete process.env.AKASHA_RUN_DEADLINE_MS;
+  await assert.rejects(exchange(f.defaults, {op:'context'}, undefined, true), /CONFIG_INVALID/);
 });

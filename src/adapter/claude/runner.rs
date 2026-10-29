@@ -180,6 +180,10 @@ impl AgentRunner for ClaudeRunner {
                 .env("AKASHA_RUN_SOCKET", &socket)
                 .env("AKASHA_RUN_TOKEN", spec.capability().transport_token())
                 .env("AKASHA_RUN_BRIDGE", &self.bridge)
+                .env(
+                    "AKASHA_RUN_DEADLINE_MS",
+                    spec.bridge_deadline_ms()?.to_string(),
+                )
                 .arg("--plugin-dir")
                 .arg(&plugin)
                 .current_dir(&directory)
@@ -501,8 +505,7 @@ impl Handle<'_> {
             tokio::select! {
                 accepted = self.listener.accept() => {
                     let (mut stream, _) = accepted.map_err(|_| ErrorCode::SourceUnavailable)?;
-                    let limit = self.spec.deadline().remaining().min(std::time::Duration::from_secs(10));
-                    let _ = tokio::time::timeout(limit, self.serve(&mut stream)).await;
+                    let _ = tokio::time::timeout(self.spec.deadline().remaining(), self.serve(&mut stream)).await;
                 }
                 result = self.stdout.read(&mut out), if !self.stdout_closed => {
                     let count = result.map_err(|_| ErrorCode::RunnerFailed)?;
@@ -531,9 +534,13 @@ impl Handle<'_> {
             return Err(ErrorCode::ReadDenied.into());
         }
         let result = async {
-            let request: ReadRequest = crate::ipc::read_bounded(stream, MAX_FRAME_BYTES)
-                .await
-                .map_err(|_| ErrorCode::ProtocolInvalid)?;
+            let request: ReadRequest = tokio::time::timeout(
+                crate::ipc::TRANSPORT_TIMEOUT.min(self.spec.deadline().remaining()),
+                crate::ipc::read_bounded(stream, MAX_FRAME_BYTES),
+            )
+            .await
+            .map_err(|_| ErrorCode::ProtocolInvalid)?
+            .map_err(|_| ErrorCode::ProtocolInvalid)?;
             self.spec.check()?;
             self.spec
                 .capability()

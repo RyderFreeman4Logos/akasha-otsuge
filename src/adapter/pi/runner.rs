@@ -160,6 +160,10 @@ impl AgentRunner for PiRunner {
                 .env("PI_CODING_AGENT_DIR", &self.home)
                 .env("AKASHA_PI_RUN_SOCKET", format!("akasha-{nonce}"))
                 .env("AKASHA_PI_RUN_TOKEN", spec.capability().transport_token())
+                .env(
+                    "AKASHA_RUN_DEADLINE_MS",
+                    spec.bridge_deadline_ms()?.to_string(),
+                )
                 .current_dir(&directory)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())

@@ -20,7 +20,9 @@ pub async fn read_bridge() -> Result<Value> {
     if token.is_empty() || token.len() > 256 {
         return Err(ErrorCode::BindingUnavailable.into());
     }
-    tokio::time::timeout(crate::ipc::TRANSPORT_TIMEOUT, async {
+    let deadline = crate::adapter::native::bridge_deadline()?;
+    let handshake = deadline.min(tokio::time::Instant::now() + crate::ipc::TRANSPORT_TIMEOUT);
+    let mut stream = tokio::time::timeout_at(handshake, async {
         let mut stream = UnixStream::connect(socket)
             .await
             .map_err(|_| ErrorCode::SourceUnavailable)?;
@@ -33,10 +35,15 @@ pub async fn read_bridge() -> Result<Value> {
         crate::ipc::write(&mut stream, &json!({"token":token,"request":request}))
             .await
             .map_err(|_| ErrorCode::SourceUnavailable)?;
-        crate::ipc::read_bounded(&mut stream, MAX_FRAME_BYTES)
-            .await
-            .map_err(|_| ErrorCode::ProtocolInvalid.into())
+        Ok::<_, crate::adapter::AdapterError>(stream)
     })
     .await
-    .map_err(|_| ErrorCode::SourceUnavailable)?
+    .map_err(|_| ErrorCode::SourceUnavailable)??;
+    tokio::time::timeout_at(
+        deadline,
+        crate::ipc::read_bounded(&mut stream, MAX_FRAME_BYTES),
+    )
+    .await
+    .map_err(|_| ErrorCode::RunnerTimeout)?
+    .map_err(|_| ErrorCode::ProtocolInvalid.into())
 }

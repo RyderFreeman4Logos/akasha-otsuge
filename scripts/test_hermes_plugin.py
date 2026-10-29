@@ -2,11 +2,13 @@ import contextvars
 import importlib.util
 import io
 import json
+import os
 import pathlib
 import socket
 import struct
 import tempfile
 import threading
+import time
 import types
 import unittest
 from unittest.mock import patch
@@ -116,6 +118,29 @@ class Context:
 
 
 class HermesPlugin(unittest.TestCase):
+    def test_runner_research_uses_original_deadline(self):
+        name = 'akasha-' + 'a' * 64
+        server = Server('\0' + name)
+        self.addCleanup(server.close)
+        def delayed(request):
+            time.sleep(11)
+            return {'schema_version': 1, 'sequence': 1,
+                    'request_id': request['request_id'], 'data': {'answer': 'slow research'}}
+        server.reply = delayed
+        with patch.dict(os.environ, {
+            'AKASHA_HERMES_RUN_SOCKET': name,
+            'AKASHA_HERMES_RUN_TOKEN': 'b' * 64,
+            'AKASHA_RUN_DEADLINE_MS': str(int(time.time() * 1000) + 30000),
+        }):
+            result = self.plugin._exchange(self.ctx, {'op': 'context', 'request': {'operation': 'delegate', 'hint': 'child'}}, runner=True)
+            self.assertEqual(result['answer'], 'slow research')
+            os.environ['AKASHA_RUN_DEADLINE_MS'] = '1'
+            with self.assertRaisesRegex(self.plugin.BridgeError, 'RUNNER_TIMEOUT'):
+                self.plugin._exchange(self.ctx, {'op': 'context'}, runner=True)
+            del os.environ['AKASHA_RUN_DEADLINE_MS']
+            with self.assertRaisesRegex(self.plugin.BridgeError, 'CONFIG_INVALID'):
+                self.plugin._exchange(self.ctx, {'op': 'context'}, runner=True)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='akasha-hermes-plugin-')
         self.addCleanup(self.temp.cleanup)

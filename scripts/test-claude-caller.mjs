@@ -10,6 +10,34 @@ const fixtureSource = source.replace(
 assert.notEqual(fixtureSource, source);
 let instance = 0;
 
+test('runner calls inherit the absolute deadline without restarting its budget', async t => {
+  const source = await readFile(new URL('../src/adapter/claude/runner.js', import.meta.url), 'utf8');
+  const { register } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
+  const hooks = new Map(), timeouts = [];
+  register((name, callback) => {
+    hooks.set(name, callback);
+    return {catch: handler => hooks.set(name, async (...args) => {
+      try { return await callback(...args); } catch (error) { return handler(error); }
+    })};
+  });
+  const start = Date.now(), deadline = start + 30000;
+  const $ = {env:{get:async key => key === 'AKASHA_RUN_BRIDGE' ? '/owned/bridge' : String(deadline)},
+    process:{run:async (_command, options) => {
+      timeouts.push(options.timeoutMs);
+      return {exitCode:0,stdout:JSON.stringify({data:{answer:'done'}})};
+    }}};
+  const event = {tool:'mcp__akasha-runner__delegate',hint:'child'};
+  t.mock.method(Date, 'now', () => start);
+  assert((await hooks.get('tool.call')($, event)).result);
+  t.mock.method(Date, 'now', () => start + 11000);
+  assert((await hooks.get('tool.call')($, event)).result);
+  assert.equal(timeouts[0] - timeouts[1], 11000);
+  assert(timeouts[0] > 15000);
+  t.mock.method(Date, 'now', () => deadline + 1);
+  assert((await hooks.get('tool.call')($, event)).deny);
+  assert.equal(timeouts.length, 2);
+});
+
 async function fixture(initialCwd = '/workspace/A') {
   const { register } = await import(`data:text/javascript;base64,${Buffer.from(fixtureSource).toString('base64')}#${instance++}`);
   const hooks = new Map(), registrations = new Map(), binds = [];

@@ -380,6 +380,14 @@ impl RunSpec {
     pub(crate) fn guarded(&self) -> bool {
         self.guard.is_some()
     }
+    pub(crate) fn bridge_deadline_ms(&self) -> Result<u64> {
+        let trace = self.deadline.trace();
+        trace
+            .started_at_unix_ms
+            .and_then(|start| start.checked_add(trace.effective_ms))
+            .and_then(|end| end.try_into().ok())
+            .ok_or_else(|| ErrorCode::SourceUnavailable.into())
+    }
     pub(crate) fn command(
         &self,
         binary: &std::path::Path,

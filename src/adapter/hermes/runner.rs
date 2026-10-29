@@ -158,6 +158,10 @@ impl AgentRunner for HermesRunner {
                 .env_remove("HERMES_KANBAN_TASK")
                 .env("AKASHA_HERMES_RUN_SOCKET", format!("akasha-{nonce}"))
                 .env(
+                    "AKASHA_RUN_DEADLINE_MS",
+                    spec.bridge_deadline_ms()?.to_string(),
+                )
+                .env(
                     "AKASHA_HERMES_RUN_TOKEN",
                     spec.capability().transport_token(),
                 )

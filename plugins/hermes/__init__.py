@@ -35,7 +35,19 @@ def _exchange(ctx, event, *, runner=False):
         path = '\0' + name
     if not runner and (not isinstance(path, str) or not Path(path).is_absolute()):
         raise BridgeError('CONFIG_INVALID')
-    deadline = time.monotonic() + 10
+    run_deadline = None
+    if runner:
+        raw = os.environ.get('AKASHA_RUN_DEADLINE_MS', '')
+        if not re.fullmatch(r'[0-9]{1,20}', raw):
+            raise BridgeError('CONFIG_INVALID')
+        seconds = int(raw) / 1000 - time.time()
+        if seconds <= 0:
+            raise BridgeError('RUNNER_TIMEOUT')
+        if seconds > threading.TIMEOUT_MAX:
+            raise BridgeError('CONFIG_INVALID')
+        run_deadline = time.monotonic() + seconds
+    deadline = min(time.monotonic() + 10, run_deadline) if runner else time.monotonic() + 10
+    processing = False
     request_id = uuid.uuid4().hex
     request = {'protocol_version': 1, 'request_id': request_id,
                'command': {'op': 'hermes', 'event': event}}
@@ -45,7 +57,7 @@ def _exchange(ctx, event, *, runner=False):
         def remaining():
             seconds = deadline - time.monotonic()
             if seconds <= 0:
-                raise BridgeError('IPC_TIMEOUT')
+                raise BridgeError('RUNNER_TIMEOUT' if runner and processing else 'IPC_TIMEOUT')
             client.settimeout(seconds)
 
         def exact(size):
@@ -83,6 +95,9 @@ def _exchange(ctx, event, *, runner=False):
                 raise BridgeError('MESSAGE_TOO_LARGE')
             remaining()
             client.sendall(struct.pack('!I', len(encoded)) + encoded)
+            if runner:
+                deadline = run_deadline
+                processing = True
             reply = read()
             if (reply.get('schema_version') != 1 or reply.get('sequence') != 1
                     or reply.get('request_id') != request_id):
@@ -96,7 +111,7 @@ def _exchange(ctx, event, *, runner=False):
                 raise BridgeError('PROTOCOL_ERROR')
             return reply['data']
         except TimeoutError:
-            raise BridgeError('IPC_TIMEOUT') from None
+            raise BridgeError('RUNNER_TIMEOUT' if runner and processing else 'IPC_TIMEOUT') from None
         except OSError:
             raise BridgeError('DAEMON_UNAVAILABLE') from None
         except (ValueError, UnicodeError):

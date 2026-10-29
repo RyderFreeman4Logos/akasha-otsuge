@@ -21,6 +21,9 @@ async function exchange(defaults, event, signal, runner = false) {
   const input = Buffer.from(JSON.stringify(event));
   if (input.length > 16384) throw new Error('OUTPUT_LIMIT');
   if (signal?.aborted) throw new Error('CANCELLED');
+  const deadline = runner ? Number(process.env.AKASHA_RUN_DEADLINE_MS) : null;
+  if (runner && (!Number.isSafeInteger(deadline) || deadline <= 0)) throw new Error('CONFIG_INVALID');
+  if (runner && deadline <= Date.now()) throw new Error('RUNNER_TIMEOUT');
   return new Promise((resolve, reject) => {
     const args = runner ? ['adapter', 'pi-context'] : ['--socket', defaults.socket, 'adapter', 'pi-call'];
     const child = spawn(defaults.akasha_binary, args,
@@ -34,7 +37,14 @@ async function exchange(defaults, event, signal, runner = false) {
       }
     };
     const abort = () => stop('CANCELLED');
-    const timer = setTimeout(() => stop('IPC_TIMEOUT'), 10000);
+    let timer;
+    const expire = () => {
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) stop('RUNNER_TIMEOUT');
+      else timer = setTimeout(expire, Math.min(remaining, 2147483647));
+    };
+    if (runner) expire();
+    else timer = setTimeout(() => stop('IPC_TIMEOUT'), 10000);
     signal?.addEventListener('abort', abort, {once:true});
     if (signal?.aborted) abort();
     child.on('error', () => { failure ??= 'EXECUTOR_UNAVAILABLE'; });

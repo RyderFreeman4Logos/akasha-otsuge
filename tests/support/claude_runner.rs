@@ -47,6 +47,66 @@ fn spec(invocation: &Invocation, timeout: Duration) -> RunSpec {
 }
 
 #[tokio::test]
+async fn native_research_callback_can_exceed_the_handshake_timeout() {
+    struct Delayed<'a>(CapturedContext<'a>);
+    impl ContextSource for Delayed<'_> {
+        fn execute<'a>(
+            &'a mut self,
+            lease: &'a RunLease,
+            request: ContextRequest,
+        ) -> futures::future::BoxFuture<'a, akasha_otsuge::adapter::Result<ContextResponse>>
+        {
+            Box::pin(async move {
+                tokio::time::sleep(Duration::from_secs(11)).await;
+                self.0.execute(lease, request).await
+            })
+        }
+    }
+    let f = Fixture::new();
+    let store = f.open().await;
+    let invocation = origin(&f, &store).await;
+    let binary = executable(
+        &f,
+        r#"/usr/bin/python3 - <<'PY'
+import json, os, subprocess
+def send(value): print(json.dumps(value), flush=True)
+names = ['context_describe','context_list','context_read','context_search','memory_search','memory_get','code_search','code_read','delegate']
+send({'type':'system','subtype':'init','session_id':'runner-session','claude_code_version':'2.1.311','tools':['ToolSearch']+['mcp__akasha-runner__'+name for name in names],'mcp_servers':[{'name':'akasha-runner','status':'connected','source':'plugin'}]})
+reply = subprocess.run([os.environ['AKASHA_RUN_BRIDGE'],'adapter','claude-read'],input=json.dumps({'operation':'describe'}),text=True,capture_output=True,timeout=35)
+assert reply.returncode == 0, reply.stderr
+assert json.loads(reply.stdout)['data']['kind'] == 'description'
+send({'type':'assistant','session_id':'runner-session','message':{'id':'msg-1','usage':{'input_tokens':10,'output_tokens':1},'content':[{'type':'text','text':'bounded original read'}]}})
+send({'type':'result','subtype':'success','is_error':False,'session_id':'runner-session','result':'slow callback completed','usage':{'input_tokens':10,'output_tokens':2}})
+PY
+"#,
+    );
+    let mut runner = ClaudeRunner::new(
+        &binary,
+        std::path::Path::new(env!("CARGO_BIN_EXE_akasha-otsuge")),
+        &f.0,
+        "controlled slow research",
+    )
+    .await
+    .unwrap();
+    let plan = spec(&invocation, Duration::from_secs(40));
+    let lease = plan.lease_handle();
+    let mut context = Delayed(CapturedContext::new(&store, invocation).unwrap());
+    let mut handle = runner.start(plan, &mut context).await.unwrap();
+    let mut collector = RunCollector::new(&lease, 1000);
+    while let Some(event) = handle.next().await.unwrap() {
+        collector.push(event).unwrap();
+    }
+    assert_eq!(
+        collector
+            .finish(handle.exit_status().await.unwrap())
+            .unwrap(),
+        "slow callback completed"
+    );
+    drop(handle);
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
 async fn native_runner_requires_init_terminal_and_exit_with_isolated_tool_flags() {
     let f = Fixture::new();
     let store = f.open().await;

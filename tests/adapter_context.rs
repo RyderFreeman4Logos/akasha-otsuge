@@ -20,6 +20,9 @@ mod matrix;
 #[path = "support/claude_runner.rs"]
 mod claude_runner;
 
+#[path = "support/runner_bridge_deadlines.rs"]
+mod bridge_deadlines;
+
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {

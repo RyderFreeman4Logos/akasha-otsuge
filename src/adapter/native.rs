@@ -11,6 +11,24 @@ use std::{
 };
 use tokio::io::{AsyncRead, AsyncReadExt};
 
+pub(crate) fn bridge_deadline() -> Result<tokio::time::Instant> {
+    let raw = std::env::var("AKASHA_RUN_DEADLINE_MS").map_err(|_| ErrorCode::ConfigInvalid)?;
+    let end = if raw.len() <= 20 && !raw.is_empty() && raw.bytes().all(|b| b.is_ascii_digit()) {
+        raw.parse::<u64>().ok()
+    } else {
+        None
+    }
+    .ok_or(ErrorCode::ConfigInvalid)?;
+    let now = crate::ipc::now_ms().map_err(|_| ErrorCode::SourceUnavailable)?;
+    let remaining = end
+        .checked_sub(now)
+        .filter(|ms| *ms > 0)
+        .ok_or(ErrorCode::RunnerTimeout)?;
+    tokio::time::Instant::now()
+        .checked_add(Duration::from_millis(remaining))
+        .ok_or_else(|| ErrorCode::ConfigInvalid.into())
+}
+
 pub(crate) async fn version_output(binary: &Path, timeout: Duration) -> Result<(PathBuf, String)> {
     let executable = resolve(binary)?;
     let mut command = std::process::Command::new(&executable);

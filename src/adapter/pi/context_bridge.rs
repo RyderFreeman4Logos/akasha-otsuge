@@ -14,7 +14,9 @@ pub async fn call(event: Value) -> Result<Value> {
     if serde_json::to_vec(&request)?.len() > 16384 {
         return Err(Error("MESSAGE_TOO_LARGE"));
     }
-    tokio::time::timeout(ipc::TRANSPORT_TIMEOUT, async {
+    let deadline = crate::adapter::native::bridge_deadline()?;
+    let handshake = deadline.min(tokio::time::Instant::now() + ipc::TRANSPORT_TIMEOUT);
+    let mut stream = tokio::time::timeout_at(handshake, async {
         // Nonblocking connect is completed by Tokio; no unbounded synchronous connect.
         let fd = rustix::net::socket_with(
             rustix::net::AddressFamily::UNIX,
@@ -44,12 +46,15 @@ pub async fn call(event: Value) -> Result<Value> {
             return Err(Error("PROTOCOL_VERSION"));
         }
         ipc::write(&mut stream, &request).await?;
-        let reply: Value = ipc::read(&mut stream).await?;
-        if reply["schema_version"] != 1 || reply["sequence"] != 1 || reply["request_id"] != id {
-            return Err(Error("PROTOCOL_INVALID"));
-        }
-        Ok(reply)
+        Ok::<_, Error>(stream)
     })
     .await
-    .map_err(|_| Error("IPC_TIMEOUT"))?
+    .map_err(|_| Error("IPC_TIMEOUT"))??;
+    let reply: Value = tokio::time::timeout_at(deadline, ipc::read(&mut stream))
+        .await
+        .map_err(|_| Error("RUNNER_TIMEOUT"))??;
+    if reply["schema_version"] != 1 || reply["sequence"] != 1 || reply["request_id"] != id {
+        return Err(Error("PROTOCOL_INVALID"));
+    }
+    Ok(reply)
 }

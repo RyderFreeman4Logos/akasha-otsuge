@@ -680,9 +680,15 @@ links exact identities and preserves the distinct controlled/native results.
   Broader serial regression passed118 cases and exposed one shutdown-directory
   race; its failing receipt and passing guardian repair are retained. Earlier
   parallel capture/IPC timing failures remain separate from this focused result.
-- [ ] Carry original runner deadlines through every native research bridge;
+- [x] Carry original runner deadlines through every native research bridge;
   remove the premature10–15-second processing limits without relaxing bounded
   framing, handshake checks, cancellation or the main caller's short IPC calls.
+  The original absolute deadline reaches Claude/Pi/Hermes private bridges;
+  Codex already uses the remaining RunSpec deadline. Real delayed private
+  subprocesses and native-protocol callbacks pass beyond10 seconds; missing,
+  malformed and expired deadlines fail closed. Node13/Python10 and Rust68 tests
+  pass, with10 authenticated/long cases explicitly ignored; all-target Clippy
+  passes. Authenticated long-call acceptance remains below.
 - [ ] Publish concise found/no_hit/incomplete/pending/error results with scope,
   evidence, conflicts/gaps and durable RecallReceipt after final live validation.
   Retain receipt/show expansion and keep private research traces out of main output.
