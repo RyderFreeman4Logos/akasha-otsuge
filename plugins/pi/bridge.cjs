@@ -108,7 +108,7 @@ function registerCaller(pi, getAgentDir, defaults, parameters) {
       let result;
       try {
         if (!args || typeof args !== 'object' || Array.isArray(args) || Object.keys(args).some(k => k !== 'hint')
-            || (args.hint != null && (typeof args.hint !== 'string' || args.hint.length > 512))) {
+            || (args.hint != null && (typeof args.hint !== 'string' || [...args.hint].length > 512))) {
           throw new Error('INVALID_ARGUMENT');
         }
         const native = identity(ctx), branch = ctx.sessionManager.getBranch();

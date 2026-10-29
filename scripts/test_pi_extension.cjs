@@ -96,6 +96,21 @@ test('tool execution binds the unique native call, rejecting nested and model au
   assert.equal(f.requests().length, count);
 });
 
+test('Caller accepts 512 Unicode characters and rejects 513 before binding', async t => {
+  const f = fixture(t); fs.writeFileSync(f.transcript, 'persisted');
+  registerCaller(f.pi, () => f.agent, f.defaults, {type:'object'});
+  const hint = '😀'.repeat(512);
+  f.branch[0].message.content[0].arguments = {hint};
+  const execute = args => f.tools.akasha_consult.execute('call-a', args, undefined, undefined, f.ctx);
+  const accepted = JSON.parse((await execute({hint})).content[0].text);
+  assert.equal(accepted.error, undefined);
+  assert.equal(accepted.data.invocation_id, 'session-a');
+  assert.deepEqual(f.requests().map(r => r.op), ['register', 'bind']);
+  const refused = JSON.parse((await execute({hint: hint + '😀'})).content[0].text);
+  assert.equal(refused.error.code, 'INVALID_ARGUMENT');
+  assert.equal(f.requests().length, 2);
+});
+
 test('lifecycle errors expose only codes and are retried against persisted history', async t => {
   const f = fixture(t, `if (event.op === 'sync') { console.error(JSON.stringify({error:{code:'READ_DENIED',message:'PRIVATE_SENTINEL'}})); process.exit(1); }`);
   fs.writeFileSync(f.transcript, 'persisted');

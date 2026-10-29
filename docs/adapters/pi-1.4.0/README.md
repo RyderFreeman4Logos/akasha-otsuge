@@ -5,6 +5,8 @@ The qualified native package is `@earendil-works/pi-coding-agent@1.4.0` from
 The existing 0.78.0 installation is outside this adapter's support window.
 Use the explicit 1.4.0 executable; installation does not change the default CLI,
 native model settings or authentication. Node 22.19 or later is required by Pi.
+Optional hints accept up to512 Unicode characters, including supplementary
+characters such as emoji, consistently with the shared Rust contract.
 
 ## Opt-in Caller extension
 
@@ -74,7 +76,7 @@ from another host. Provider error text is not returned to the model.
 
 ## Evidence limits
 
-Native SDK loading, native SessionManager tree fixtures, five Node bridge
+Native SDK loading, native SessionManager tree fixtures, six Node bridge
 behaviors, three controlled Runner regressions and daemon recovery/cancellation
 checks pass. The Runner cases include 23 negative scenarios and exercise the
 actual Rust context bridge, including recovered authentication retries.
@@ -86,7 +88,9 @@ overlapping sessions, reload, tree selection, fork and resume. Other-extension
 transforms, context edits, native compaction and interrupted settlement pass;
 all19 capture jobs finish. The three retained native files total42,065bytes.
 These fixtures use an isolated profile and synthetic loopback SSE, with the other
-three host CLIs absent. They do not prove authenticated model execution or a
+three host CLIs absent. Their manifests pin the source before the Unicode hint
+correction; its separate regression accepts512 emoji and refuses513, matching
+the actual1.4.0 SDK schema validator. They do not prove authenticated model execution or a
 controlling-terminal interactive UI. All owned processes and scratch are removed.
 The bridge's child cleanup and output bounds are tested with controlled executables.
 Two earlier Caller identity tests reported `HISTORY_GAP` during a full run.

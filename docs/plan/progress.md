@@ -29,8 +29,20 @@ SDK loads the extension without a model call. Two prior Caller `HISTORY_GAP`
 failures remain causally unproven; their identity tests now pre-capture histories,
 while cold capture and daemon binding remain separately covered. No timeout was
 changed. [Pi support and recovery](../adapters/pi-1.4.0/README.md) records the limits.
-Native extension Caller and Runner acceptance remain outstanding. The complete TODO lists every
-remaining criterion. #12 still waits for lawful Claude authentication in draft #41.
+The scoped RPC Runner and native recovery handling are now implemented. Actual
+Pi with synthetic local SSE passes five Runner cases and six Caller bindings,
+including concurrent sessions, tree/fork/reload/resume, context edits, compaction
+and interruption;19 capture jobs finish and all scratch is removed. These controls
+do not establish authenticated provider or interactive TUI acceptance. Pi's
+selected profile fails OAuth refresh with401/invalid_refresh_token; native login
+is pending. #12 also waits for lawful Claude authentication in draft #41.
+
+Candidate `c098a0c` passed the full gate (27Python,196Rust and42installed-daemon
+executions). Independent R1 review found one Unicode hint length defect. Its
+causal regression and native SDK schema checks now accept512 emoji and reject513;
+all six Node bridge tests pass. The corrected candidate still needs its own final
+gate, independent re-review and publication. The complete TODO retains all
+acceptance criteria and dependencies.
 
 ## Completed Hermes adapter: MVP-014
 
