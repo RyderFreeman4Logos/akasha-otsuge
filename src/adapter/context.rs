@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(tag = "operation", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ContextRequest {
-    Describe,
+    Describe {},
     List {
         cursor: Option<String>,
         limit: usize,
@@ -268,7 +268,7 @@ impl ContextSource for CapturedContext<'_> {
     ) -> BoxFuture<'a, Result<ContextResponse>> {
         Box::pin(async move {
             let response = match request {
-                ContextRequest::Describe => {
+                ContextRequest::Describe {} => {
                     lease.charge_read(2048)?;
                     self.guarded(lease, || {
                         let b = self.invocation.diagnostic();

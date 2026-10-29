@@ -1,8 +1,8 @@
 # Hermes 0.22.5 integration
 
 MVP-014 is in progress. The native Caller plugin, canonical export decoder and
-durable capture bridge are implemented. The independent Runner and authenticated
-CLI/TUI acceptance are still pending. `akasha_consult` currently returns its
+durable capture bridge and independent Runner are implemented. Authenticated
+CLI/TUI Caller acceptance is still pending. `akasha_consult` currently returns its
 binding diagnostic; the final consult workflow belongs to MVP-016.
 
 | Surface | Current evidence |
@@ -12,7 +12,8 @@ binding diagnostic; the final consult workflow belongs to MVP-016.
 | Caller | Immutable session/task/turn/call fence, explicit child provenance, current grants |
 | Native plugin | Actual loader, hooks, tool dispatcher and daemon; both `in_process` and `host` isolation |
 | Interrupted capture | Actual native end hook with `interrupted=true`; durable job completed in each profile |
-| Authenticated CLI/TUI and Runner | Pending; controlled native fixtures do not establish these |
+| Authenticated Runner | Two independent profiles, existing native auth, all four context tools, final result and zero exit |
+| Authenticated CLI/TUI Caller | Pending; controlled native fixtures do not establish these |
 
 The initially examined build was `0.22.5+1914.gfdb04a0`; native plugin integration
 ran on `0.22.5+1915.g4960e41` (source `4960e41cec01de499ab99c4251437bc8039e41db`).
@@ -20,7 +21,42 @@ The plugin/export interfaces were unchanged between those source commits.
 The public plugin interface was also checked against official source
 [`6f553435`](https://github.com/NousResearch/hermes-agent/blob/6f553435a827d6ee2542afde1402f129fee091ee/hermes_cli/plugins.py).
 Other core versions are refused. An observed version alone does not qualify a
-different build's behavior.
+different build's behavior. At the same qualified source commit, the native
+version resolver's three-second git-tag probes can fall back to
+`0.21.5+18146.g4960e41` or `git.4960e41`. These two observed labels are explicitly
+recognized; other0.21.5/git builds remain unsupported. Doctor preserves the
+observed label and lists the full qualified source commit. Its bounded probe
+allows30seconds for the native resolver's multiple git commands; it still makes
+no model call. A read-only diagnostic observed7.008s and3.795s version commands
+at the same clean source commit. Native update checks can add time and may be
+disabled through the owning profile's `updates.check` setting.
+
+## Runner execution boundary
+
+Hermes0.22.5 routes ordinary `chat --format stream-json` and `-z` through its
+Gateway. Killing that CLI detaches accepted work; it does not cancel the native
+executor. `--run-budget` is also rejected on that route. The Akasha Runner uses
+the public plugin CLI extension `hermes akasha-runner` and Hermes' native
+`AIAgent` in its owned process instead. Native configuration, runtime credential
+resolution, provider fallback and reasoning settings remain owned by Hermes.
+The Python bridge registers tools and translates native execution results;
+Rust owns read authorization, budgets and context retrieval.
+
+Runner requires the selected profile to enable the installed plugin with
+`plugins.isolation: in_process` and expose the four context tools directly
+(`tools.tool_search.enabled: off`). Hermes explicitly skips plugin CLI commands
+under `host` isolation; that mode is supported for Caller capture, not Runner.
+The installer never changes these settings. An unexpected actual native tool
+surface is refused before a model request. Context files, native memory,
+background review and checkpoints are disabled for the independent run.
+
+An authenticated private UDS supplies context progressively. Its per-run bearer
+is never placed in the prompt or tool schema. Native pre-tool guards and the
+Rust broker reject other tools. This is tool-policy enforcement, not an OS
+sandbox. The Runner retains its lease and private scratch until its process group
+has exited; a final answer also requires an explicit successful native result
+and exit status zero. Controlled tests cover partial output, malformed frames,
+forged identity, extra tools, cancelled descendants and live processes after EOF.
 
 ## Install and undo
 
@@ -95,3 +131,11 @@ dependencies or modify existing profiles.
 These receipts cover synthetic public messages and native interoperability. Final
 authenticated acceptance, exact-candidate gates and independent review remain
 required before closing MVP-014.
+
+The [authenticated Runner receipt](runner-acceptance.json) separately records two
+native `gpt-6.1-sol` / `openai-codex` runs. Each invoked all four scoped context
+tools exactly once, returned the expected structured final result and exited
+successfully. Claude, Codex and Pi executables were absent from the child PATH.
+This uses real model calls over synthetic captured context; it does not establish
+CLI/TUI Caller acceptance or1700-second execution. The fixture allocated229,376
+bytes across27 files, and both native profiles and all scratch were removed.

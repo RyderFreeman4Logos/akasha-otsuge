@@ -126,7 +126,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         let report = akasha_otsuge::adapter::hermes::probe(binary).await?;
         let supported = akasha_otsuge::adapter::hermes::SUPPORTED_VERSION;
         let mut bytes = serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":report,
-            "coverage":{"version_supported":report.version.as_deref().and_then(|v|v.split('+').next())==Some(supported),"supported_versions":[supported],"native_children":false,"model_auth":"not_checked","hook_trust":"not_checked"}}))?;
+            "coverage":{"version_supported":akasha_otsuge::adapter::hermes::supported_version(report.version.as_deref()),"supported_versions":[supported],"qualified_builds":[akasha_otsuge::adapter::hermes::QUALIFIED_BUILD],"native_children":false,"model_auth":"not_checked","hook_trust":"not_checked"}}))?;
         bytes.push(b'\n');
         output(&bytes, false)?;
         return Ok(0);

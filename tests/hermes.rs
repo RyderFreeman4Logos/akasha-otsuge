@@ -8,6 +8,9 @@ use std::{
 #[path = "support/hermes_caller.rs"]
 mod caller;
 
+#[path = "support/hermes_runner.rs"]
+mod runner;
+
 #[path = "support/hermes_install.rs"]
 mod installation;
 
@@ -74,6 +77,33 @@ fn doctor_observes_hermes_without_model_calls_or_a_daemon() {
     assert_eq!(report["coverage"]["model_auth"], "not_checked");
     assert_eq!(report["coverage"]["version_supported"], true);
     assert!(output.stderr.is_empty());
+}
+
+#[tokio::test]
+async fn qualified_git_build_labels_do_not_admit_other_older_versions() {
+    let fixture = Fixture::new();
+    let binary = fixture.0.join("hermes");
+    for (version, supported) in [
+        ("git.4960e41", true),
+        ("0.21.5+18146.g4960e41", true),
+        ("0.21.5+18146.g0000000", false),
+        ("0.21.5", false),
+    ] {
+        std::fs::write(
+            &binary,
+            format!("#!/bin/sh\nprintf 'Hermes Agent v{version}\\n'\n"),
+        )
+        .unwrap();
+        std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let report = akasha_otsuge::adapter::hermes::probe(&binary)
+            .await
+            .unwrap();
+        assert_eq!(report.version.as_deref(), Some(version));
+        assert_eq!(
+            akasha_otsuge::adapter::hermes::supported_version(report.version.as_deref()),
+            supported
+        );
+    }
 }
 
 #[tokio::test]

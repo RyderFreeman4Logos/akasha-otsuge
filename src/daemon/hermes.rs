@@ -98,12 +98,7 @@ impl Service {
                 return Err(Error("CALLER_AMBIGUOUS"));
             }
             let capability = hermes::probe(&binary).await?;
-            if capability
-                .version
-                .as_deref()
-                .and_then(|s| s.split('+').next())
-                != Some(hermes::SUPPORTED_VERSION)
-            {
+            if !hermes::supported_version(capability.version.as_deref()) {
                 return Err(Error("ADAPTER_UNSUPPORTED"));
             }
             let bytes = hermes::export_session(

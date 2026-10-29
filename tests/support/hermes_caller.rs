@@ -8,7 +8,7 @@ use akasha_otsuge::{
 };
 use std::{os::unix::fs::PermissionsExt, sync::Arc};
 
-fn scope() -> Scope {
+pub(super) fn scope() -> Scope {
     Scope {
         user: "user".into(),
         project: Some("project".into()),
@@ -16,7 +16,7 @@ fn scope() -> Scope {
         session: None,
     }
 }
-fn native(f: &Fixture) -> (HermesRegistration, HermesCall) {
+pub(super) fn native(f: &Fixture) -> (HermesRegistration, HermesCall) {
     let home = f.0.join("profile");
     std::fs::create_dir(&home).unwrap();
     let mut raw: serde_json::Value =
@@ -69,7 +69,7 @@ fn native(f: &Fixture) -> (HermesRegistration, HermesCall) {
     };
     (r, c)
 }
-async fn store(f: &Fixture) -> Arc<Storage> {
+pub(super) async fn store(f: &Fixture) -> Arc<Storage> {
     let s = Arc::new(f.open().await);
     Domain::new(&s)
         .set_read_grant("grant", "reader", Some(&scope()), None, 1)

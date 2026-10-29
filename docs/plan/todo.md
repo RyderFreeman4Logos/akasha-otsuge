@@ -531,18 +531,18 @@ checks do not prove host protocol capabilities or an authenticated Runner.
 - [ ] Qualify the installed Hermes version against official plugin hooks,
   canonical session/export and stream-json interfaces. Record mode/version limits
   and actual capabilities; keep doctor free of model calls.
-- [ ] Parse one session per native JSONL export, retaining stable message UIDs,
+- [x] Parse one session per native JSONL export, retaining stable message UIDs,
   visible text/tool records, inactive compaction originals, parent/child lineage
   and interrupted-round backfill. Never tail obsolete session JSONL or invent
   human-input answers absent from native telemetry. Size guards, unsupported
   records, source changes and export failures must remain observable.
-- [ ] Bind native session/task/turn/call identity and the owning profile before
+- [x] Bind native session/task/turn/call identity and the owning profile before
   tool execution; persist an immutable fence, preserve retry identity, enforce
   current grants and prove simultaneous sessions/profiles cannot cross contexts.
 - [ ] Ship the minimal native plugin and Rust bridge, opt-in install/undo and
   durable background capture. Verify hooks across real CLI/TUI and interruption,
   rather than assuming gateway-only or successful-turn callbacks cover all work.
-- [ ] Implement independent one-shot stream-json Runner with profile selection,
+- [ ] Implement independent native plugin CLI Runner with profile selection,
   four scoped context tools, final-result plus exit-status checks, bounded output,
   original deadlines and process-group cancellation/cleanup. Disable unrelated
   native/MCP tools and verify writes, network and outside reads are denied.
@@ -576,7 +576,14 @@ Current #14 implementation evidence (overall acceptance remains pending):
   including interrupted backfill; the synthetic fixture used962,560 bytes and
   was removed. [Support and recovery](../adapters/hermes-0.22.5/README.md) retain
   scope limits and the repaired native-launcher fixture failure.
-- Remaining: independent restricted Runner, actual
+- The independent native plugin CLI Runner passes11 focused Hermes tests and
+  two authenticated profiles using existing native auth. Each model run calls all
+  four scoped context tools;229,376bytes/27files of scratch were cleaned. Native
+  Gateway CLI detachment and version-label fallback required separate fixes;
+  retained failures are not relabelled as acceptance. One broader Codex concurrent
+  Caller test returned HistoryGap; its unchanged isolated selector passed0.168s,
+  leaving the original broad failure unclassified for final-gate follow-up.
+- Remaining: native denied-tool/cancellation cases, actual
   authenticated CLI/TUI and recovery acceptance, final gate/review/CI and closure.
 
 ## Complete Issue queue

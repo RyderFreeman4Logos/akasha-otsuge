@@ -1,5 +1,6 @@
 import contextvars
 import importlib.util
+import io
 import json
 import pathlib
 import socket
@@ -89,6 +90,7 @@ class Context:
         self.settings = {'socket': str(socket_path), 'hermes_binary': '/native/hermes'}
         self.hooks = {}
         self.tools = {}
+        self.commands = {}
         self.records = {}
         self.state = types.SimpleNamespace(set=self.set_state)
 
@@ -106,6 +108,10 @@ class Context:
 
     def register_tool(self, **kwargs):
         self.tools[kwargs['name']] = kwargs
+        return object()
+
+    def register_cli_command(self, **kwargs):
+        self.commands[kwargs['name']] = kwargs
         return object()
 
 
@@ -215,6 +221,82 @@ class HermesPlugin(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'TOOL_REGISTRATION_CONFLICT'):
             self.plugin.register(conflicting)
         self.assertEqual(conflicting.hooks, {})
+
+    def test_runner_registers_only_scoped_context_tools_and_blocks_other_tools(self):
+        runner = Context(self.root, self.server.path)
+        events = []
+        def exchange(ctx, event, *, runner=False):
+            self.assertTrue(runner)
+            events.append(event)
+            return {'ready': True} if event['op'] == 'ready' else {'kind': 'description'}
+        with patch.dict('os.environ', {'AKASHA_HERMES_RUN_SOCKET': 'akasha-fixture',
+                                      'AKASHA_HERMES_RUN_TOKEN': 'a' * 64}), \
+                patch.object(self.plugin, '_exchange', side_effect=exchange):
+            self.plugin.register(runner)
+            names = {'context_describe', 'context_list', 'context_read', 'context_search'}
+            self.assertEqual(set(runner.tools), names)
+            self.assertEqual(set(runner.hooks), {'pre_tool_call'})
+            self.assertEqual(events, [])
+            self.assertIn('akasha-runner', runner.commands)
+            for name in ('terminal', 'execute_code', 'delegate_task', 'tool_call',
+                         'write_file', 'akasha_consult'):
+                self.assertEqual(runner.hooks['pre_tool_call'](tool_name=name),
+                                 {'action': 'block', 'message': 'TOOL_DENIED'})
+            result = json.loads(runner.tools['context_describe']['handler']({}))
+            self.assertEqual(result, {'kind': 'description'})
+            self.assertEqual(events[-1], {'op': 'context', 'request': {'operation': 'describe'}})
+            result = json.loads(runner.tools['context_read']['handler']({'operation': 'describe'}))
+            self.assertEqual(result['error']['code'], 'INVALID_ARGUMENT')
+
+    def test_runner_native_entry_checks_actual_tools_and_closes_before_final(self):
+        request = self.root / 'request.txt'
+        request.write_text('Read context.')
+        request.chmod(0o600)
+        args = types.SimpleNamespace(request=str(request), budget=30.0)
+        names = {'context_describe', 'context_list', 'context_read', 'context_search'}
+        calls = []
+        completion = {}
+        class Agent:
+            valid_tool_names = names
+            session_id = 'native-session'
+            def __init__(self, **kwargs):
+                calls.append(kwargs)
+            def run_conversation(self, prompt):
+                calls.append(prompt)
+                return {'final_response': '{"answer":"done"}', **completion}
+            def close(self):
+                calls.append('closed')
+        modules = {
+            'hermes_cli.auth': types.SimpleNamespace(AuthError=type('AuthError', (Exception,), {})),
+            'hermes_cli.config': types.SimpleNamespace(load_config_readonly=lambda: {'model': {'default': 'native-model', 'provider': 'native-provider'}}, split_model_config_default=lambda s: (s, '')),
+            'hermes_cli.runtime_provider': types.SimpleNamespace(resolve_runtime_with_fallback=lambda *a, **k: ({'provider': 'native-provider'}, None)),
+            'hermes_cli.fallback_config': types.SimpleNamespace(get_fallback_chain=lambda cfg: []),
+            'run_agent': types.SimpleNamespace(AIAgent=Agent),
+        }
+        native = __import__('sys').modules['hermes_constants']
+        native.resolve_reasoning_config = lambda *a: None
+        for widened, completion in ((False, {}), (True, {}), (False, {'partial': True}),
+                                    (False, {'completed': False}), (False, {'interrupted': True})):
+            failed = widened or bool(completion)
+            calls.clear()
+            Agent.valid_tool_names = names | ({'terminal'} if widened else set())
+            output = io.StringIO()
+            with patch.dict('sys.modules', modules), patch('sys.stdout', output), \
+                    patch.object(self.plugin, '_exchange', return_value={'ready': True}), \
+                    self.assertRaises(SystemExit) as exited:
+                self.plugin._run_native(self.ctx, names, args)
+            self.assertEqual(exited.exception.code, 1 if failed else 0)
+            frames = [json.loads(s) for s in output.getvalue().splitlines()]
+            self.assertEqual(frames[-1]['exit_code'], 1 if failed else 0)
+            self.assertEqual(calls[-1], 'closed')
+            if widened:
+                self.assertNotIn('Read context.', calls)
+            else:
+                for key in ('skip_memory', 'skip_context_files', 'skip_background_review'):
+                    self.assertTrue(calls[0][key])
+                self.assertEqual(calls[0]['enabled_toolsets'], ['akasha_context'])
+                self.assertGreater(calls[0]['run_budget_seconds'], 0)
+                self.assertLessEqual(calls[0]['run_budget_seconds'], 30)
 
     def test_omitted_null_and_blank_hints_follow_the_shared_consult_contract(self):
         for args in ({}, {'hint': None}, {'hint': '   '}):

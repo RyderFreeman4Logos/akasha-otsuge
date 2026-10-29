@@ -72,10 +72,7 @@ impl HermesCaller {
 impl CallerAdapter for HermesCaller {
     fn probe(&self) -> Result<CapabilityReport> {
         let mut report = self.registration.capability.clone();
-        if report.host != Host::Hermes
-            || report.version.as_deref().and_then(|v| v.split('+').next())
-                != Some(super::SUPPORTED_VERSION)
-        {
+        if report.host != Host::Hermes || !super::supported_version(report.version.as_deref()) {
             return Err(ErrorCode::AdapterUnsupported.into());
         }
         report.binding = BindingLevel::ExactTurn;

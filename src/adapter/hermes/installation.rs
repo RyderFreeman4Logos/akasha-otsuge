@@ -84,10 +84,27 @@ fn verify(path: &Path) -> Result<()> {
     Ok(())
 }
 
+pub(super) fn runner_plugin(home: &Path) -> Result<()> {
+    let path = destination(home, false)?;
+    verify(&path)?;
+    let bytes = read(&path.join(FILES[0]))?;
+    let installed = std::str::from_utf8(&bytes).map_err(|_| Error("ADAPTER_INSTALL_CONFLICT"))?;
+    let defaults = installed
+        .lines()
+        .find(|s| s.starts_with("DEFAULTS = "))
+        .ok_or(Error("ADAPTER_INSTALL_CONFLICT"))?;
+    let _: Value = serde_json::from_str(&defaults[11..])?;
+    if SOURCE.replacen("DEFAULTS = {}", defaults, 1) != installed
+        || read(&path.join(FILES[1]))? != MANIFEST
+    {
+        return Err(Error("ADAPTER_INSTALL_CONFLICT"));
+    }
+    Ok(())
+}
+
 pub async fn install(binary: &Path, home: &Path, socket: &Path) -> Result<Value> {
     let report = super::probe(binary).await?;
-    if report.version.as_deref().and_then(|s| s.split('+').next()) != Some(super::SUPPORTED_VERSION)
-    {
+    if !super::supported_version(report.version.as_deref()) {
         return Err(Error("ADAPTER_UNSUPPORTED"));
     }
     if !socket.is_absolute() {
