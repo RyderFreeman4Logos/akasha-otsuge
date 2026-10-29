@@ -377,6 +377,9 @@ impl RunSpec {
         self.guard = Some(binary);
         self
     }
+    pub(crate) fn guarded(&self) -> bool {
+        self.guard.is_some()
+    }
     pub(crate) fn command(
         &self,
         binary: &std::path::Path,

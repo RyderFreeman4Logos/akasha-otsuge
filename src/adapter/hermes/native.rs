@@ -55,6 +55,7 @@ pub(crate) async fn export_session(binary: &Path, home: &Path, session: &str) ->
     let group = ProcessGroup(
         rustix::process::Pid::from_raw(child.id().ok_or(ErrorCode::RunnerFailed)? as i32)
             .ok_or(ErrorCode::RunnerFailed)?,
+        false,
     );
     let stdout = child.stdout.take().ok_or(ErrorCode::RunnerFailed)?;
     let stderr = child.stderr.take().ok_or(ErrorCode::RunnerFailed)?;
@@ -80,7 +81,7 @@ pub(crate) async fn export_session(binary: &Path, home: &Path, session: &str) ->
     .await
     .map_err(|_| ErrorCode::RunnerTimeout);
     drop(group);
-    let status = native::reap(child, || {}).wait().await;
+    let status = native::reap(child, false, || {}).wait().await;
     let (bytes, _, ()) = result??;
     if !status.ok_or(ErrorCode::RunnerTimeout)?.success() {
         return Err(ErrorCode::SourceUnavailable.into());

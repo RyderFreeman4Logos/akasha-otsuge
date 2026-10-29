@@ -27,6 +27,12 @@ pub(super) struct Plan {
 }
 
 impl Service {
+    fn authorize_native(&self, native: &NativeExecutor) -> Result<()> {
+        if self.allowed_path(&native.home)? != native.home || !native.home.is_dir() {
+            return Err(Error("READ_DENIED"));
+        }
+        Ok(())
+    }
     pub(in crate::daemon) async fn submit_consult(
         self: &Arc<Self>,
         invocation: Invocation,
@@ -83,6 +89,7 @@ impl Service {
                 return Err(Error("CONFIG_CORRUPT"));
             }
             let plan = job.consult_plan.ok_or(Error("JOB_CORRUPT"))?;
+            self.authorize_native(&plan.native)?;
             let invocation = self.consult_invocation(&plan)?;
             (plan, config, invocation)
         };
@@ -189,6 +196,7 @@ impl Service {
             if self.stopping.load(std::sync::atomic::Ordering::Acquire) {
                 return Err(Error("RUNNER_INTERRUPTED"));
             }
+            self.authorize_native(&plan.native)?;
             runner.start(spec, &mut context).await?
         };
         let run = async {

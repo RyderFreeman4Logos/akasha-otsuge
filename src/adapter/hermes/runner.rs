@@ -167,12 +167,13 @@ impl AgentRunner for HermesRunner {
                 .stderr(Stdio::piped())
                 .process_group(0);
             let mut child = tokio::process::Command::from(command)
-                .kill_on_drop(true)
+                .kill_on_drop(!spec.guarded())
                 .spawn()
                 .map_err(spawn_error)?;
             let group = ProcessGroup(
                 Pid::from_raw(child.id().ok_or(ErrorCode::RunnerFailed)? as i32)
                     .ok_or(ErrorCode::RunnerFailed)?,
+                spec.guarded(),
             );
             let stdout = child.stdout.take().ok_or(ErrorCode::RunnerFailed)?;
             let stderr = child.stderr.take().ok_or(ErrorCode::RunnerFailed)?;
@@ -508,7 +509,7 @@ impl Handle<'_> {
         if let Some(child) = self.child.take() {
             let directory = self.directory.clone();
             let lease = self.spec.lease_handle();
-            self.cleanup = Some(reap(child, move || {
+            self.cleanup = Some(reap(child, self.spec.guarded(), move || {
                 let _lease = lease;
                 let _ = std::fs::remove_dir_all(directory);
             }));

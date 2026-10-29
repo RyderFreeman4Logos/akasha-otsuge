@@ -34,6 +34,11 @@ impl Service {
         {
             return Err(Error("READ_DENIED"));
         }
+        if let Some(home) = &reg.native_home
+            && self.allowed_path(home)? != *home
+        {
+            return Err(Error("READ_DENIED"));
+        }
         Ok(reg)
     }
 

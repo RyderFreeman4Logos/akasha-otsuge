@@ -8,7 +8,7 @@ use std::{
     os::unix::{fs::MetadataExt, process::ExitStatusExt},
     path::Path,
     process::{Command, Stdio},
-    time::{Duration, Instant},
+    time::Duration,
 };
 
 struct Identity {
@@ -41,36 +41,31 @@ pub(super) fn command(guard: &Path, binary: &Path, directory: &Path) -> Result<C
     Ok(command)
 }
 
-fn cleanup() -> Result<()> {
+fn cleanup() {
     let self_pid = std::process::id();
-    let end = Instant::now() + Duration::from_secs(1);
     loop {
         // This single-threaded subreaper owns every PID in its children file.
-        let children = std::fs::read_to_string(format!("/proc/self/task/{self_pid}/children"))
-            .map_err(|_| ErrorCode::RunnerFailed)?;
-        for pid in children.split_whitespace() {
-            let pid = pid
-                .parse::<i32>()
-                .ok()
-                .and_then(Pid::from_raw)
-                .ok_or(ErrorCode::RunnerFailed)?;
-            if let Ok(fd) = pidfd_open(pid, PidfdFlags::empty())
-                && identity(pid.as_raw_nonzero().get() as u32).is_some_and(|p| p.parent == self_pid)
-            {
-                let _ = pidfd_send_signal(fd, Signal::KILL);
+        if let Ok(children) =
+            std::fs::read_to_string(format!("/proc/self/task/{self_pid}/children"))
+        {
+            for pid in children.split_whitespace() {
+                if let Some(pid) = pid.parse::<i32>().ok().and_then(Pid::from_raw)
+                    && let Ok(fd) = pidfd_open(pid, PidfdFlags::empty())
+                    && identity(pid.as_raw_nonzero().get() as u32)
+                        .is_some_and(|p| p.parent == self_pid)
+                {
+                    let _ = pidfd_send_signal(fd, Signal::KILL);
+                }
             }
         }
         loop {
             match waitid(WaitId::All, WaitIdOptions::EXITED | WaitIdOptions::NOHANG) {
                 Ok(Some(_)) => continue,
-                Err(rustix::io::Errno::CHILD) => return Ok(()),
-                Ok(None) | Err(rustix::io::Errno::INTR) => break,
-                Err(_) => return Err(ErrorCode::RunnerFailed.into()),
+                Err(rustix::io::Errno::CHILD) => return,
+                Ok(None) | Err(_) => break,
             }
         }
-        if Instant::now() >= end {
-            return Err(ErrorCode::RunnerFailed.into());
-        }
+        // A bounded caller wait never abandons this owner or releases its live-child lease.
         std::thread::sleep(Duration::from_millis(10));
     }
 }
@@ -78,6 +73,14 @@ fn cleanup() -> Result<()> {
 /// Internal stdio-transparent owner for daemon-launched native workers.
 #[doc(hidden)]
 pub fn run_guard(args: &[OsString]) -> Result<u8> {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .map_err(|_| ErrorCode::RunnerFailed)?
+        .block_on(run(args))
+}
+
+async fn run(args: &[OsString]) -> Result<u8> {
     if args.len() < 4 || getpgrp() != getpid() {
         return Err(ErrorCode::InvalidArgument.into());
     }
@@ -117,6 +120,8 @@ pub fn run_guard(args: &[OsString]) -> Result<u8> {
         return Err(ErrorCode::ReadDenied.into());
     }
     set_child_subreaper(Some(getpid())).map_err(|_| ErrorCode::RunnerFailed)?;
+    let mut cancelled = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+        .map_err(|_| ErrorCode::RunnerFailed)?;
     let mut child = Command::new(&args[3])
         .args(&args[4..])
         .stdin(Stdio::inherit())
@@ -132,14 +137,17 @@ pub fn run_guard(args: &[OsString]) -> Result<u8> {
             Ok(Some(status)) => {
                 break status.code().unwrap_or(128 + status.signal().unwrap_or(0)) as u8;
             }
-            Ok(None) => std::thread::sleep(Duration::from_millis(50)),
+            Ok(None) => tokio::select! {
+                _ = cancelled.recv() => break 125,
+                _ = tokio::time::sleep(Duration::from_millis(50)) => {},
+            },
             Err(_) => {
-                cleanup()?;
+                cleanup();
                 return Err(ErrorCode::RunnerFailed.into());
             }
         }
     };
-    cleanup()?;
+    cleanup();
     if !alive() {
         std::fs::remove_dir_all(directory).map_err(|_| ErrorCode::SourceUnavailable)?;
     }

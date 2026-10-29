@@ -7,6 +7,9 @@ if '--version' in sys.argv:
     raise SystemExit(0)
 root = pathlib.Path(__file__).parent
 scenario = (root / 'scenario').read_text()
+detached = scenario == 'cancel_detached'
+if detached:
+    scenario = 'cancel'
 
 def read():
     return json.loads(sys.stdin.readline())
@@ -34,7 +37,7 @@ assert model['apply_patch_tool_type'] is None and model['shell_type'] == 'disabl
 send({'id': 3, 'result': {'thread': {'id': 'thread'}, 'model': 'fixture', 'approvalPolicy': 'never', 'sandbox': {'type': 'readOnly', 'networkAccess': False}}})
 assert read()['method'] == 'turn/start'
 if scenario in ('timeout', 'cancel'):
-    child = subprocess.Popen(['/bin/sleep', '30'])
+    child = subprocess.Popen(['/bin/sleep', '30'], start_new_session=detached)
     (root / 'child.pid').write_text(str(child.pid))
 send({'id': 4, 'result': {'turn': {'id': 'turn'}}})
 send({'method': 'item/reasoning/summaryPartAdded', 'params': {'threadId': 'thread', 'turnId': 'turn', 'itemId': 'reason', 'summaryIndex': 0}})

@@ -640,6 +640,11 @@ links exact identities and preserves the distinct controlled/native results.
   idempotency/restart, cancel, shutdown and daemon-crash regressions pass. The
   affected152-test suite and all-target Clippy pass. Remaining validation
   includes queued configuration/deadline cases and all native user-facing tools.
+  Independent core review exposed detached-descendant cancellation and live
+  native-profile admission gaps. Both have failing controls and passing repairs:
+  seven consult lifecycle/path tests,158 affected regressions and Clippy pass.
+  Queued calls retain their original generation while profile revocation and
+  redirection deny execution. Final independent review remains required.
 - [ ] Expose optional short hint through CLI and native tools; retain automatic
   Caller binding and support no hint without caller-built context packages.
   Preserve diagnostic Bind requests; connect each actual native tool to the
