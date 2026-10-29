@@ -604,10 +604,12 @@ Completed #14 implementation evidence:
 
 ## MVP-015 acceptance and remaining work
 
-- [ ] Qualify canonical `earendil-works/pi`, npm
+- [x] Qualify canonical `earendil-works/pi`, npm
   `@earendil-works/pi-coding-agent` and native1.4.0 against official tagged sources.
   Install through normal mise on SSD without changing the existing0.78.0 default;
   expose a bounded, free version doctor with honest untested capabilities.
+  Native version/help and isolated free RPC pass; all installation-helper processes
+  and scratch ended. Two doctor regressions and the actual native version probe pass.
 - [ ] Parse bounded native version3 session trees with stable IDs, parent links,
   selected branches, fork provenance, context edits and compaction originals.
   Exclude private thinking; preserve absent ancestry and source gaps explicitly.

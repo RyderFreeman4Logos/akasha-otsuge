@@ -12,7 +12,8 @@ is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 The Pi adapter starts from merge `24eda5a` in one SSD source checkout, reusing
 the shared target. Official `earendil-works/pi` and npm
 `@earendil-works/pi-coding-agent` currently identify1.4.0. Independent installation
-and free RPC qualification are in progress, preserving the default0.78.0 install.
+and free RPC qualification pass, preserving the default0.78.0 install. Two doctor
+regressions and the actual native version probe pass; doctor makes no model claim.
 Native version3 tree semantics and `agent_settled` govern the implementation;
 no Caller or Runner acceptance is claimed yet. The complete TODO lists every
 remaining criterion. #12 still waits for lawful Claude authentication in draft #41.
