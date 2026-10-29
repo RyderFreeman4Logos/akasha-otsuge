@@ -1,0 +1,22 @@
+{
+  "head": "f7afd61f3a584466222c4efb31e262c0e7205146",
+  "tree": "1d5565d5cac2ac00eb625398af39710a1cefadf9",
+  "parent": "927dcad2816a6cc4e10aaf4510477bbdae80fdba",
+  "paths": [
+    "docs/plan/todo.md",
+    "docs/configuration.md",
+    "src/adapter/claude/runner.rs",
+    "src/adapter/runner.rs",
+    "src/config/schema.rs",
+    "src/daemon/consult.rs",
+    "src/daemon/consult_run.rs",
+    "src/daemon/extraction.rs",
+    "src/daemon/jobs.rs",
+    "src/main.rs",
+    "tests/config.rs",
+    "tests/fixtures/codex/0.164.0/runner_host.py",
+    "tests/support/daemon_codex.rs",
+    "tests/support/daemon_extraction.rs"
+  ],
+  "clean": true
+}

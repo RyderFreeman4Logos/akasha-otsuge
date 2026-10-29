@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp017-native-extraction.py", line 14, in <module>
+    assert u.hostname in ['localhost','127.0.0.1'] and u.port==48317
+                                                       ^^^^^^^^^^^^^
+AssertionError

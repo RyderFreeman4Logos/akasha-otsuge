@@ -1,0 +1,151 @@
+CHECK ['cargo', 'test', '--locked', '--test', 'daemon', '--test', 'hermes', '--test', 'pi']
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp017)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.52s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 86 tests
+test codex_tests::codex_launcher_install_is_opt_in_atomic_and_preserves_edited_files ... ok
+test claude_tests::native_claude_backfill_preserves_visible_payloads_links_and_partial_tail ... ok
+test claude_tests::native_claude_consult_returns_public_status_and_deduplicates ... ok
+test codex_tests::concurrent_native_hooks_share_state_without_cross_binding_or_global_lock_contention ... ok
+test codex_tests::consult_delegate_default_capacity_refuses_without_deadlock ... ok
+test codex_tests::consult_code_rechecks_workspace_identity_before_return ... ok
+test codex_tests::consult_code_rechecks_read_policy_before_return ... ok
+test codex_tests::consult_code_rechecks_workspace_identity_before_replay ... ok
+test codex_tests::consult_code_rechecks_read_policy_before_replay ... ok
+test claude_tests::native_child_registration_keeps_parent_identity_and_separate_history ... ok
+test claude_tests::recorded_native_compaction_refuses_missing_original_ancestor ... ok
+test claude_tests::recorded_native_resume_and_compact_keep_original_lineage_and_session_authority ... ok
+test codex_tests::consult_delegate_descendants_share_budget_and_origin ... ok
+test codex_tests::consult_delegate_failure_keeps_other_branch_evidence ... ok
+test codex_tests::consult_job_is_distinct_durable_and_deduplicates_native_execution ... ok
+test codex_tests::consult_named_executor_runs_the_pinned_profile ... ok
+test codex_tests::consult_named_fallback_never_bypasses_source_authority ... ok
+test codex_tests::consult_delegate_two_parents_refuse_without_deadlock ... ok
+test codex_tests::consult_named_fallback_stops_at_shared_start_limit ... ok
+test claude_tests::native_sync_waits_for_the_pinned_event_after_async_transcript_flush ... ok
+test codex_tests::consult_named_delegates_inherit_the_active_executor ... ok
+test codex_tests::consult_named_home_is_independent_of_the_caller_profile ... ok
+test codex_tests::consult_named_model_absent_from_native_catalog_never_starts_a_worker ... ok
+test codex_tests::consult_hook_submits_and_expands_durable_results_inside_the_read_only_sandbox ... ok
+test codex_tests::consult_named_model_and_safe_options_reach_the_native_process ... ok
+test claude_tests::recorded_native_fork_keeps_copied_history_and_branch_isolation ... ok
+test configuration_fifo_is_rejected_before_any_blocking_read ... ok
+test claude_tests::native_caller_registration_pins_each_call_and_rejects_identity_replacement ... ok
+test codex_tests::consult_cancel_shutdown_and_crash_end_native_processes_without_replaying ... ok
+test codex_tests::consult_public_failure_reports_error_without_a_receipt ... ok
+test codex_tests::consult_named_fallback_is_explicit_and_shares_origin_budget ... ok
+test codex_tests::consult_queued_profile_rejects_path_redirection ... ok
+test codex_tests::consult_reused_profile_rejects_path_redirection ... ok
+test codex_tests::consult_queued_profile_obeys_current_read_roots ... ok
+test model_tests::gb10_guard_actual_services ... ignored, bounded synthetic inference against explicitly selected GB10 guard
+test codex_tests::consult_reused_profile_obeys_current_read_roots ... ok
+test extraction_tests::text_extraction_is_durable_source_backed_candidate_only_and_idempotent ... ok
+test extraction_tests::native_extraction_uses_an_existing_executor_without_extra_model_profiles ... ok
+test model_tests::real_wall_clock_provider_deadlines ... ignored, 1700-second real production daemon/provider acceptance; explicit receipt directory required
+test extraction_tests::native_extraction_cannot_expand_its_evidence_with_research_tools ... ok
+test codex_tests::native_hook_uses_private_call_files_without_exposing_registration_credentials ... ok
+test codex_tests::consult_delegate_cancellation_and_crash_reap_the_whole_run_tree ... ok
+test codex_tests::consult_public_large_result_preserves_complete_answer_and_conditions ... ok
+test codex_tests::consult_public_result_expands_receipt_and_originals_without_private_trace ... ok
+test codex_tests::native_registration_binding_and_backfill_survive_daemon_restart ... ok
+test codex_tests::consult_progressive_research_keeps_source_versions_and_workspace_changes ... ok
+test model_tests::independent_model_endpoints_run_as_durable_jobs ... ok
+test production_signals_drain_and_release_the_socket_for_restart ... ok
+test private_daemon_lifecycle_and_bounded_versioned_protocol ... ok
+test explicit_restart_activates_pending_socket_and_preserves_old_job_plan ... ok
+test retrieval_tests::empty_library_returns_no_hit_with_an_explicit_memory_only_boundary ... ok
+test configuration_reload_and_watcher_share_durable_generations ... ok
+test codex_tests::consult_conclusions_validate_evidence_no_hit_conditions_and_conflicts ... ok
+test codex_tests::consult_named_profile_keeps_generation_but_obeys_live_disable ... ok
+test model_tests::model_cancel_shutdown_and_crash_never_replay_ambiguous_calls ... ok
+test production_history_diff_and_receipt_reads_use_the_domain_and_live_grant ... ok
+test codex_tests::consult_detached_descendants_settle_before_cancellation_releases_ownership ... ok
+test retrieval_tests::lifecycle::failed_vector_build_retains_trace_without_advancing_its_prefix ... ok
+test model_tests::queued_models_keep_endpoint_and_budget_across_reload ... ok
+test hermes_tests::hermes_bridge_exports_the_requested_native_home_and_persists_background_history ... ok
+test retrieval_tests::lifecycle::reranking_long_claims_respects_wire_budget_and_reports_truncation ... ok
+test retrieval_tests::original_ranges_preserve_utf8_budget_receipt_and_live_permission ... ok
+test retrieval_tests::lifecycle::capture_original_larger_than_a_source_record_is_read_progressively ... ok
+test model_tests::three_bounded_responses_fit_the_durable_archive_and_ipc ... ok
+test retrieval_tests::keyword_search_is_scoped_persistent_and_archives_exact_output ... ok
+test pi_tests::pi_registration_binding_and_backfill_survive_restart_with_current_grants ... ok
+test retrieval_tests::regressions::invalid_vector_overflow_retains_diagnostic ... ok
+test retrieval_tests::regressions::archived_global_metadata_keeps_its_required_grant ... ok
+test retrieval_tests::regressions::invalid_vector_cancelled_mean_retains_diagnostic ... ok
+test retrieval_tests::regressions::invalid_vector_zero_retains_diagnostic ... ok
+test retrieval_tests::lifecycle::queued_search_keeps_its_admitted_model_after_generation_switch ... ok
+test retrieval_tests::regressions::sync_stops_after_a_live_grant_shrinks ... ok
+test retrieval_tests::regressions::legal_large_ancestor_fact_does_not_block_scoped_search ... ok
+test retrieval_tests::regressions::legal_large_fact_does_not_block_scoped_search ... ok
+test retrieval_tests::lifecycle::retired_and_corrected_memories_are_filtered_before_index_catchup ... ok
+test retrieval_tests::regressions::legal_large_rule_is_dropped_whole_with_a_budget_gap ... ok
+test retrieval_tests::lifecycle::old_generation_serves_queries_while_new_embedding_is_held ... ok
+test retrieval_tests::lifecycle::source_union_budget_returns_partial_output_instead_of_failing_the_job ... ok
+test retrieval_tests::search_character_budget_returns_a_truthful_partial_receipt ... ok
+test retrieval_tests::real_vector_and_rerank_paths_are_scoped_versioned_and_degrade_when_offline ... ok
+test queue_expiry_and_running_cancellation_do_not_wait_for_a_free_slot ... ok
+test retrieval_tests::rules::applicable_rules_survive_query_mismatch_but_never_widen_a_read_grant ... ok
+test selected_profile_large_config_and_pending_paths_survive_restart ... ok
+test model_tests::all_model_kinds_classify_bad_output_disconnect_timeout_and_rate_limit ... ok
+test accepted_reconciliation_survives_process_death_and_pins_configuration ... ok
+test model_tests::wall_clock_harness_short_control ... ok
+
+test result: ok. 84 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 30.47s
+
+     Running tests/hermes.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/hermes-2f5e159cb0a7424c)
+
+running 14 tests
+test runner::installed_native_cancellation_ends_executor_after_context_tool ... ignored, requires explicit native Hermes binary/profile and authenticated isolated acceptance
+test runner::installed_native_rejects_unissued_context ... ignored, requires explicit native Hermes binary/profile and authenticated isolated acceptance
+test runner::installed_native_runner_roundtrip ... ignored, requires explicit native Hermes binary/profile and authenticated isolated acceptance
+test doctor_observes_hermes_without_model_calls_or_a_daemon ... ok
+test qualified_git_build_labels_do_not_admit_other_older_versions ... ok
+test installation::plugin_install_is_opt_in_idempotent_and_undo_preserves_edits ... ok
+test caller::child_proof_uses_its_native_parent_without_substituting_root_history ... ok
+test caller::exact_call_fence_omits_later_results_and_retry_survives_source_loss ... ok
+test runner::standalone_runner_uses_profile_plugin_scoped_context_and_structured_final ... ok
+test runner::runner_cancellation_reaps_owned_group_before_releasing_resources ... ok
+test caller::simultaneous_homes_with_identical_native_labels_and_ids_remain_isolated ... ok
+test caller::foreign_profile_session_task_or_missing_call_cannot_read_the_root ... ok
+test snapshot_backfill_resumes_and_preserves_old_fences_across_native_rewrites ... ok
+test runner::runner_rejects_forged_authority_protocol_errors_and_unfinished_native_processes ... ok
+
+test result: ok. 11 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 27.16s
+
+     Running tests/pi.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a)
+
+running 17 tests
+test runner::installed_native_cancellation_ends_executor_after_context_tool ... ignored, requires explicit native Pi binary/profile and isolated acceptance
+test runner::installed_native_rejects_unadvertised_tool ... ignored, requires explicit native Pi binary/profile and a controlled hostile-tool provider
+test runner::installed_native_rejects_unissued_context ... ignored, requires explicit native Pi binary/profile and isolated acceptance
+test runner::installed_native_runner_roundtrip ... ignored, requires explicit native Pi binary/profile and isolated acceptance
+test caller::native_context_cannot_borrow_another_branch_profile_workspace_or_nested_call ... ok
+test caller::actual_native_tool_name_unique_call_id_and_short_hint_schema_are_required ... ok
+test doctor_observes_pi_version_without_model_or_daemon_claims ... ok
+test doctor_rejects_malformed_failed_or_unbounded_pi_probes ... ok
+test installation::extension_install_is_opt_in_integrity_checked_and_uninstall_recovers ... ok
+test capture::foreign_headers_conflicting_ids_and_unsupported_records_never_advance_as_complete ... ok
+test caller::native_call_fence_survives_source_loss_and_rechecks_current_permission ... ok
+test runner::rpc_runner_cancel_reaps_native_group_before_resource_release ... ok
+test capture::native_capture_resumes_partial_tail_reopen_and_rotation_without_duplicate_finals ... ok
+test capture::native_tree_keeps_selected_branches_fork_cutoff_edits_and_compaction_originals ... ok
+test caller::two_native_sessions_share_a_workspace_without_sharing_context_fences ... ok
+test runner::rpc_runner_waits_for_settled_after_retries_and_preserves_line_separators ... ok
+test runner::rpc_runner_rejects_authority_protocol_inventory_and_incomplete_terminals ... ok
+
+test result: ok. 13 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 24.41s
+
+CHECK ['cargo', 'clippy', '--workspace', '--all-targets', '--locked', '--', '-D', 'warnings']
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+    Checking akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp017)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.93s
+CHECK ['cargo', 'fmt', '--all', '--', '--check']
+CHECK ['git', 'diff', '--check']

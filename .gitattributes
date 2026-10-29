@@ -1,2 +1,2 @@
-# Preserve native command output, including its final empty line.
-docs/benchmarks/results/**/*.log whitespace=-blank-at-eof
+# Preserve byte-exact native output, including trailing spaces and empty lines.
+docs/benchmarks/results/**/*.log whitespace=-blank-at-eof,-blank-at-eol

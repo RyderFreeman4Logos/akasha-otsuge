@@ -1,0 +1,23 @@
+{
+  "parent": "f7afd61f3a584466222c4efb31e262c0e7205146",
+  "tree": "7445c7987c3dbc0265d006fedd6aa7dcf7e0c08c",
+  "paths": [
+    "docs/plan/todo.md",
+    "src/extraction.rs",
+    "src/daemon/extraction.rs",
+    "src/daemon/extraction_tests.rs",
+    "src/daemon/jobs.rs",
+    "src/daemon/models.rs"
+  ],
+  "identity": {
+    "GIT_AUTHOR_NAME": "RyderFreeman",
+    "GIT_COMMITTER_NAME": "RyderFreeman",
+    "GIT_AUTHOR_EMAIL": "RyderFreeman4Logos@gmail.com",
+    "GIT_COMMITTER_EMAIL": "RyderFreeman4Logos@gmail.com"
+  },
+  "patch_sha256": "b419adc986d14f6b501a04a553eaf7e3f9380a6e9770a3a6df76cf34ed8347eb",
+  "messages": [
+    "fix(extraction): checkpoint model results and preserve publication boundaries",
+    "Resume saved responses without model replay; preserve original deadlines, source limits and candidate identity. Refs #17."
+  ]
+}

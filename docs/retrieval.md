@@ -16,6 +16,7 @@ scope file such as the following, replacing the user with the daemon's kernel UI
 
 ```sh
 akasha-otsuge index sync --idempotency-key build-1
+akasha-otsuge index rebuild --idempotency-key rebuild-1
 akasha-otsuge job show build-1
 akasha-otsuge index status
 akasha-otsuge search '离线 load_config v2.3.1' --scope /absolute/scope.json --idempotency-key query-1
@@ -31,6 +32,21 @@ idempotency key returns its original operation; use a new key for a new sync or
 query after content/configuration changes. `job show` returns the archived output
 with `retrieval_mode: receipt_replay`, not a fresh search. `receipt replay` writes
 the exact archived bytes without adding a newline and records transport delivery.
+
+To pause ongoing indexing, cancel its job; completed prefix checkpoints remain.
+Set `runtime.paused = true` and reload to stop new admissions/claims, including
+across daemon restart. Restore it to false and submit `index sync` with a new key
+to resume from the durable prefix. A running model call is not replayed implicitly.
+
+`index rebuild` starts a fresh lexical/vector generation from authoritative
+records, including when completed native index files are missing. It requires no
+active reader of the index cache (`RESOURCE_BUSY` otherwise). The generation
+change is durable before native tables change. Old owned native index tables are
+retired, while source/memory revisions, receipts and progress history remain.
+Queries report not-ready/partial coverage until the new generation catches up.
+After interrupted rebuilding, a new sync resumes its saved prefix; another
+explicit rebuild also reclaims any tables left by an interrupted retirement.
+This maintenance operation does not promise uninterrupted old-generation service.
 
 `show` accepts UTF-8 **byte** boundaries and a half-open range. It returns actual
 `start`, `end`, `requested_end`, `total_bytes`, `truncated`, output and receipt ID.
@@ -145,9 +161,9 @@ after those requests drain. There is one index builder. Existing native FTS/ANN
 indexes are incrementally optimized rather than rebuilt for every appended batch.
 
 Native files live under `data_dir/search`. Authority revisions and receipts are
-never removed by index updates. Old vector generations are currently retained;
-bounded generation retirement and repeated full-scale product rebuild acceptance
-remain #17/#24. Per-record native merge/version overhead and whole-process memory
+never removed by index updates. Model-change generations remain available until
+an explicit quiescent rebuild retires old native tables. Repeated full-scale and
+concurrent product rebuild acceptance remains #24. Per-record native merge/version overhead and whole-process memory
 at 50 GB are not established by the small fixtures. The prior storage spike's
 full-corpus results do not establish these production-daemon limits.
 

@@ -1,0 +1,30 @@
+{
+  "parent": "bbce3165c6a0aed91bd1ff4d5810724d0afae968",
+  "tree": "71016732e426c39d31afdf9a848cad7da74f617c",
+  "paths": [
+    "docs/plan/todo.md",
+    "src/lib.rs",
+    "src/domain/mod.rs",
+    "src/ipc.rs",
+    "src/daemon.rs",
+    "src/daemon/jobs.rs",
+    "src/daemon/consult.rs",
+    "src/daemon/retrieval.rs",
+    "src/extraction.rs",
+    "src/daemon/extraction.rs",
+    "tests/daemon.rs",
+    "tests/support/model_endpoint.rs",
+    "tests/support/daemon_extraction.rs"
+  ],
+  "identity": {
+    "GIT_AUTHOR_NAME": "RyderFreeman",
+    "GIT_AUTHOR_EMAIL": "RyderFreeman4Logos@gmail.com",
+    "GIT_COMMITTER_NAME": "RyderFreeman",
+    "GIT_COMMITTER_EMAIL": "RyderFreeman4Logos@gmail.com"
+  },
+  "patch_sha256": "788b29f5457c937d87a159024e1fd0b1518f2fcc67cc4b2cc68611c6a50118ba",
+  "messages": [
+    "feat(extraction): derive source-backed candidates through durable text jobs",
+    "Validate versioned output against immutable source spans and retain candidate authority even under automatic review. Reuse existing job admission, provider deadlines and idempotency. Refs #17."
+  ]
+}

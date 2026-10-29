@@ -389,11 +389,6 @@ impl Config {
                 ModelKind::Reranker,
                 "retrieval.reranker",
             ),
-            (
-                &self.retrieval.extraction,
-                ModelKind::Text,
-                "retrieval.extraction",
-            ),
         ] {
             if let Some(name) = reference {
                 require(
@@ -402,6 +397,20 @@ impl Config {
                     "missing model profile or wrong model kind",
                 )?;
             }
+        }
+        if let Some(name) = &self.retrieval.extraction {
+            let configured = match name.strip_prefix("executor:") {
+                Some(name) => self.executors.get(name).is_some_and(|e| e.enabled),
+                None => self
+                    .models
+                    .get(name)
+                    .is_some_and(|m| m.kind == ModelKind::Text),
+            };
+            require(
+                configured,
+                "retrieval.extraction",
+                "expected a text model or enabled executor:<name>",
+            )?;
         }
         let mut visiting = BTreeSet::new();
         let mut visited = BTreeSet::new();
@@ -444,7 +453,7 @@ impl Config {
                     .unwrap_or(effective.runner),
             );
         }
-        let selected: Vec<&str> = if self.consult.executor == "caller" {
+        let mut selected: Vec<&str> = if self.consult.executor == "caller" {
             self.executors
                 .iter()
                 .filter(|(_, e)| e.enabled)
@@ -463,6 +472,14 @@ impl Config {
             self.collect_fallback(&self.consult.executor, &mut selected);
             selected.into_iter().collect()
         };
+        if let Some(name) = self
+            .retrieval
+            .extraction
+            .as_deref()
+            .and_then(|s| s.strip_prefix("executor:"))
+        {
+            selected.push(name);
+        }
         let runner_max = selected
             .iter()
             .map(|name| effective.executors[*name])

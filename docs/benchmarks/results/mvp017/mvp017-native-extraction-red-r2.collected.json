@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T21:36:40.786444+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "927dcad2816a6cc4e10aaf4510477bbdae80fdba",
+    "log_sha256": "cb6d9511d6280e17742d93f2ac1a7439b18dd163fb98695cb15206d5e1dc1843",
+    "seconds": 2.1330554708838463,
+    "utc": "2026-10-29T21:36:25.226630+00:00"
+  },
+  "process_absent": true,
+  "classification": "causal-red-missing-native-extraction-route"
+}

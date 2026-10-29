@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T22:19:51.000483+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "da97084a97ad2f683016b069055b29e4a537a54a",
+    "log_sha256": "0126b164c81e025bab843fd8ab41edec296ef4d3a2e09364e67ebe62a0a65940",
+    "seconds": 71.49307124875486,
+    "utc": "2026-10-29T22:19:15.162426+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASS_REAL_NATIVE"
+}

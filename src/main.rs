@@ -31,7 +31,9 @@ Commands:
   config show --effective
   capture reconcile|codex|claude BINDING_JSON INPUT_JSONL --idempotency-key ID
   model run PLAN_JSON --idempotency-key ID
+  extract run PLAN_JSON --idempotency-key ID
   index sync --idempotency-key ID
+  index rebuild --idempotency-key ID
   index status
   search QUERY --scope JSON_FILE --idempotency-key ID
   show SOURCE_ID --revision COMMIT --range START_BYTE END_BYTE
@@ -393,6 +395,16 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
                 idempotency_key: (*id).into(),
             })
         }
+        ["extract", "run", path, "--idempotency-key", id] => {
+            let input = config::read_file(std::path::Path::new(path))?;
+            if input.len() > 16 * 1024 {
+                return Err(Error("MESSAGE_TOO_LARGE"));
+            }
+            Some(Command::ExtractionRun {
+                plan: serde_json::from_str(&input)?,
+                idempotency_key: (*id).into(),
+            })
+        }
         ["show", id, "--revision", revision, "--range", start, end] => {
             Some(Command::OriginalShow {
                 range: akasha_otsuge::domain::OriginalRange {
@@ -407,6 +419,10 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         ["index", "status"] => Some(Command::IndexStatus),
         ["index", "sync", "--idempotency-key", id] => Some(Command::RetrievalRun {
             plan: akasha_otsuge::retrieval::Request::Sync,
+            idempotency_key: (*id).into(),
+        }),
+        ["index", "rebuild", "--idempotency-key", id] => Some(Command::RetrievalRun {
+            plan: akasha_otsuge::retrieval::Request::Rebuild,
             idempotency_key: (*id).into(),
         }),
         ["search", query, "--scope", scope, "--idempotency-key", id] => {

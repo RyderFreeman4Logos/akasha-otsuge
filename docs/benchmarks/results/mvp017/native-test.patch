@@ -1,0 +1,140 @@
+diff --git a/tests/support/daemon_extraction.rs b/tests/support/daemon_extraction.rs
+index 235c24f..bef0c03 100644
+--- a/tests/support/daemon_extraction.rs
++++ b/tests/support/daemon_extraction.rs
+@@ -219,3 +219,135 @@ fn native_extraction_cannot_expand_its_evidence_with_research_tools() {
+     assert_eq!(job["error"], "TOOL_DENIED", "{job}");
+     assert!(job["result"]["candidates"].is_null());
+ }
++
++#[test]
++#[ignore = "requires an explicitly supplied authenticated Pi profile and receipt path"]
++fn native_single_cli_extraction_actual() {
++    let binary = PathBuf::from(std::env::var_os("AKASHA_NATIVE_PI_BINARY").unwrap());
++    let home = PathBuf::from(std::env::var_os("AKASHA_NATIVE_PI_HOME").unwrap());
++    let output = PathBuf::from(std::env::var_os("AKASHA_NATIVE_EXTRACTION_RECEIPT").unwrap());
++    assert!(!output.exists());
++    let mut daemon = Daemon::new();
++    let originals = [
++        (
++            "conditional",
++            "This project must use keyword search when embeddings are offline.",
++        ),
++        (
++            "negative",
++            "Do not send private queries to an external reranker.",
++        ),
++        (
++            "quoted",
++            "Alice said she prefers tabs; this is Alice's view, not my preference.",
++        ),
++        (
++            "temporary",
++            "For this one debugging session only, use verbose logs; it is not a permanent policy.",
++        ),
++        (
++            "automated",
++            "Two automated agents suggested enabling auto-publish. I have not approved their suggestion.",
++        ),
++    ];
++    let sources: Vec<_> = originals
++        .iter()
++        .map(|(id, text)| seed_source(&daemon, id, text))
++        .collect();
++    daemon.configure(&format!("[access]\nread_roots=[{home:?}]\n[retrieval]\nextraction='executor:existing'\n[executors.existing]\nkind='pi'\nbinary={binary:?}\nnative_home={home:?}\n"));
++    daemon.cli(&[
++        "adapter",
++        "install",
++        "pi",
++        "--binary",
++        binary.to_str().unwrap(),
++        "--agent-dir",
++        home.to_str().unwrap(),
++    ]);
++    daemon.start();
++    let plan = json!({"scope":scope(),"sources":sources});
++    let path = daemon.root.join("extraction.json");
++    std::fs::write(&path, serde_json::to_vec(&plan).unwrap()).unwrap();
++    daemon.cli(&[
++        "extract",
++        "run",
++        path.to_str().unwrap(),
++        "--idempotency-key",
++        "actual-native-extraction",
++    ]);
++    let end = Instant::now() + Duration::from_secs(2200);
++    let job = loop {
++        let job = daemon.cli(&["job", "show", "actual-native-extraction"])["data"].clone();
++        if matches!(
++            job["state"].as_str(),
++            Some("succeeded" | "failed" | "cancelled")
++        ) {
++            break job;
++        }
++        assert!(
++            Instant::now() < end,
++            "native extraction exceeded the complete workflow envelope"
++        );
++        std::thread::sleep(Duration::from_millis(500));
++    };
++    let mut receipt = json!({"schema_version":1,"originals":originals,"plan":plan,"job":job,"native_home":home,"daemon_fixture":daemon.root,"extra_model_profiles":0});
++    std::fs::write(&output, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
++    assert_eq!(job["state"], "succeeded", "{job}");
++    assert_eq!(job["result"]["origin"], "extraction");
++    assert_eq!(job["result"]["trace"]["usage"]["starts"], 1);
++    assert_eq!(
++        submit(&daemon, "actual-native-extraction", &plan)["data"]["result"],
++        job["result"]
++    );
++    for span in &sources {
++        let shown = daemon.cli(&[
++            "show",
++            &span.event_id,
++            "--revision",
++            &span.revision.to_string(),
++            "--range",
++            &span.start.to_string(),
++            &span.end.to_string(),
++        ]);
++        assert_eq!(
++            shown["data"]["output"],
++            originals
++                .iter()
++                .find(|(id, _)| *id == span.event_id)
++                .unwrap()
++                .1
++        );
++    }
++    daemon.cli(&["daemon", "stop"]);
++    daemon.wait();
++    let records = runtime().block_on(async {
++        let store = Storage::open(&storage_config(&daemon)).await.unwrap();
++        let domain = Domain::new(&store);
++        let mut records = vec![];
++        for candidate in job["result"]["candidates"].as_array().unwrap() {
++            let memory = domain
++                .memory(candidate["memory_id"].as_str().unwrap())
++                .unwrap()
++                .unwrap();
++            assert_eq!(memory.record.authority, Authority::Candidate);
++            assert_eq!(memory.record.lifecycle, Lifecycle::Candidate);
++            assert_eq!(memory.record.provenance.origin, Origin::Extraction);
++            assert!(scope().contains(&memory.record.draft.scope));
++            for span in &memory.record.draft.source_spans {
++                let source = domain.source(&span.event_id, span.revision).unwrap();
++                assert_eq!(source.content_sha256, span.content_sha256);
++                assert!(source.payload.text.get(span.start..span.end).is_some());
++            }
++            records.push(serde_json::to_value(memory).unwrap());
++        }
++        store.close().await.unwrap();
++        records
++    });
++    assert!(
++        !records.is_empty(),
++        "actual extractor returned no sample candidates"
++    );
++    receipt["memories"] = json!(records);
++    receipt["status"] = json!("PASS_REAL_SINGLE_CLI_EXTRACTION");
++    std::fs::write(&output, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
++}

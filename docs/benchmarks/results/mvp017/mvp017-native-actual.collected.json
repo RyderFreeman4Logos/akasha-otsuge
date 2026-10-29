@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T22:17:37.189581+00:00",
+  "terminal": {
+    "exit_code": 1,
+    "head": "da97084a97ad2f683016b069055b29e4a537a54a",
+    "log_sha256": "f1f431b0b2c6edc60058af668ddb592a5df51707e2282d9fe81ab1c0da96ecb3",
+    "seconds": 0.7316888822242618,
+    "utc": "2026-10-29T22:17:18.177292+00:00"
+  },
+  "process_absent": true,
+  "classification": "setup-failure"
+}

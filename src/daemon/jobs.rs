@@ -10,10 +10,23 @@ use serde_json::Value;
 use std::collections::BTreeSet;
 #[path = "consult.rs"]
 pub(super) mod consult;
+#[path = "extraction.rs"]
+mod extraction;
+#[cfg(test)]
+#[path = "extraction_tests.rs"]
+mod extraction_tests;
 #[path = "models.rs"]
 mod models;
 #[path = "retrieval.rs"]
 mod retrieval;
+
+enum JobInput {
+    Capture(CaptureInput, PathBuf),
+    Model(crate::provider::Plan),
+    Retrieval(crate::retrieval::Request),
+    Consult(consult::Plan),
+    Extraction(crate::extraction::Plan),
+}
 
 const MAX_ACTIVE: usize = 256;
 const MAX_RUNNING: usize = 16;
@@ -23,25 +36,32 @@ const MAX_ATTEMPTS: u32 = 3;
 mod tests {
     use super::*;
 
-    struct Fixture(PathBuf);
+    pub(super) struct Fixture(pub(super) PathBuf);
     impl Drop for Fixture {
         fn drop(&mut self) {
             std::fs::remove_dir_all(&self.0).unwrap();
         }
     }
-    async fn fixture(name: &str, extra: &str) -> (Fixture, Arc<Service>, CaptureInput) {
+    pub(super) async fn fixture(name: &str, extra: &str) -> (Fixture, Arc<Service>, CaptureInput) {
         let fixture =
             Fixture(std::env::temp_dir().join(format!("akasha-job-{name}-{}", std::process::id())));
-        private_dir(&fixture.0).unwrap();
-        let input = format!("[access]\nread_roots=[{:?}]\n{extra}", fixture.0);
-        std::fs::write(fixture.0.join("config.toml"), &input).unwrap();
+        let (service, binding) = service_at(&fixture.0, extra).await;
+        (fixture, service, binding)
+    }
+    pub(super) async fn service_at(
+        root: &std::path::Path,
+        extra: &str,
+    ) -> (Arc<Service>, CaptureInput) {
+        private_dir(root).unwrap();
+        let input = format!("[access]\nread_roots=[{root:?}]\n{extra}");
+        std::fs::write(root.join("config.toml"), &input).unwrap();
         let initial = crate::config::resolve(
             &input,
             None,
             "",
             &crate::config::Paths {
-                data_dir: fixture.0.join("data"),
-                socket_path: fixture.0.join("run/socket"),
+                data_dir: root.join("data"),
+                socket_path: root.join("run/socket"),
             },
         )
         .unwrap();
@@ -50,7 +70,7 @@ mod tests {
         let service = Arc::new(Service {
             storage,
             config: manager,
-            config_path: fixture.0.join("config.toml"),
+            config_path: root.join("config.toml"),
             profile: None,
             admission: Mutex::new(()),
             operations: Mutex::new(JoinSet::new()),
@@ -75,7 +95,7 @@ mod tests {
             "source":{"adapter":"fixture","profile":"test","session":"session","thread":"thread","agent":"agent"},
             "scope":scope,"stream":"stream","coverage":"available_payloads"
         })).unwrap();
-        (fixture, service, binding)
+        (service, binding)
     }
 
     #[tokio::test]
@@ -568,6 +588,10 @@ pub(super) struct Job {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     model_plan: Option<crate::provider::Plan>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    extraction_plan: Option<crate::extraction::Plan>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    extraction_native: Option<consult::NativeExecutor>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     consult_plan: Option<consult::Plan>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     retrieval_plan: Option<crate::retrieval::Request>,
@@ -640,6 +664,7 @@ impl Service {
         if job.schema_version != 1
             || job.id != id
             || job.attempt > MAX_ATTEMPTS
+            || (job.extraction_native.is_some() && job.extraction_plan.is_none())
             || !matches!(
                 (
                     &job.binding,
@@ -647,14 +672,18 @@ impl Service {
                     &job.model_plan,
                     &job.retrieval_plan,
                     &job.consult_plan,
+                    &job.extraction_plan,
                 ),
-                (Some(_), Some(_), None, None, None)
-                    | (None, None, Some(_), None, None)
-                    | (None, None, None, Some(_), None)
-                    | (None, None, None, None, Some(_))
+                (Some(_), Some(_), None, None, None, None)
+                    | (None, None, Some(_), None, None, None)
+                    | (None, None, None, Some(_), None, None)
+                    | (None, None, None, None, Some(_), None)
+                    | (None, None, None, None, None, Some(_))
             )
-            || (matches!(job.retrieval_plan, Some(crate::retrieval::Request::Sync))
-                != job.retrieval_target_seq.is_some())
+            || (matches!(
+                job.retrieval_plan,
+                Some(crate::retrieval::Request::Sync | crate::retrieval::Request::Rebuild)
+            ) != job.retrieval_target_seq.is_some())
             || job
                 .retrieval_target_seq
                 .is_some_and(|seq| seq > revision.commit_seq)
@@ -710,6 +739,22 @@ impl Service {
         Ok(())
     }
     fn authorize_job(&self, job: &Job) -> Result<()> {
+        if let Some(plan) = &job.extraction_plan {
+            plan.sources(&self.storage, &context()?)?;
+            if let Some(native) = &job.extraction_native {
+                let snapshot = self.retrieval_snapshot(job.config_generation)?;
+                let profile = snapshot
+                    .resolved()
+                    .config()
+                    .retrieval
+                    .extraction
+                    .as_deref()
+                    .and_then(|s| s.strip_prefix("executor:"))
+                    .ok_or(Error("JOB_CORRUPT"))?;
+                self.authorize_executor(profile, native)?;
+            }
+            return Ok(());
+        }
         if let Some(plan) = &job.consult_plan {
             self.consult_invocation(plan)?;
             if plan.config_generation != job.config_generation {
@@ -762,26 +807,24 @@ impl Service {
         binding: CaptureInput,
         path: PathBuf,
     ) -> Result<Value> {
-        self.submit_job(id, Some(binding), Some(path), None, None, None)
-            .await
+        self.submit_job(id, JobInput::Capture(binding, path)).await
     }
     pub(super) async fn submit_model(
         self: &Arc<Self>,
         id: String,
         plan: crate::provider::Plan,
     ) -> Result<Value> {
-        self.submit_job(id, None, None, Some(plan), None, None)
-            .await
+        self.submit_job(id, JobInput::Model(plan)).await
     }
-    async fn submit_job(
-        self: &Arc<Self>,
-        id: String,
-        binding: Option<CaptureInput>,
-        path: Option<PathBuf>,
-        model_plan: Option<crate::provider::Plan>,
-        retrieval_plan: Option<crate::retrieval::Request>,
-        consult_plan: Option<consult::Plan>,
-    ) -> Result<Value> {
+    async fn submit_job(self: &Arc<Self>, id: String, input: JobInput) -> Result<Value> {
+        let (binding, path, model_plan, retrieval_plan, consult_plan, extraction_plan) = match input
+        {
+            JobInput::Capture(binding, path) => (Some(binding), Some(path), None, None, None, None),
+            JobInput::Model(plan) => (None, None, Some(plan), None, None, None),
+            JobInput::Retrieval(plan) => (None, None, None, Some(plan), None, None),
+            JobInput::Consult(plan) => (None, None, None, None, Some(plan), None),
+            JobInput::Extraction(plan) => (None, None, None, None, None, Some(plan)),
+        };
         let service = self.clone();
         self.operation(async move {
             let _guard = service.admission.lock().await;
@@ -803,12 +846,16 @@ impl Service {
                     _ => None,
                 })
                 .unwrap_or_else(owner_scope);
-            if let Some(plan) = &consult_plan {
+            if let Some(plan) = &extraction_plan {
+                plan.sources(&service.storage, &context()?)?;
+            } else if let Some(plan) = &consult_plan {
                 service.consult_invocation(plan)?;
             } else {
                 Domain::new(&service.storage).permission(&context()?, Some(&scope))?;
             }
-            let fingerprint = if let Some(plan) = &consult_plan {
+            let fingerprint = if let Some(plan) = &extraction_plan {
+                hash(&serde_json::to_vec(&("extraction", plan))?)
+            } else if let Some(plan) = &consult_plan {
                 hash(&serde_json::to_vec(&("consult", plan))?)
             } else if let Some(plan) = &retrieval_plan {
                 hash(&serde_json::to_vec(&("retrieval", plan))?)
@@ -847,12 +894,14 @@ impl Service {
             let now = ipc::now_ms()?;
             let queue_ms = u64::try_from(snapshot.resolved().timeouts().queue.as_millis())
                 .map_err(|_| Error("CONFIG_INVALID"))?;
-            let retrieval_target_seq =
-                if matches!(retrieval_plan, Some(crate::retrieval::Request::Sync)) {
-                    Some(service.storage.sequence()?)
-                } else {
-                    None
-                };
+            let retrieval_target_seq = if matches!(
+                retrieval_plan,
+                Some(crate::retrieval::Request::Sync | crate::retrieval::Request::Rebuild)
+            ) {
+                Some(service.storage.sequence()?)
+            } else {
+                None
+            };
             let vector_snapshot = if matches!(
                 retrieval_plan,
                 Some(crate::retrieval::Request::Search { .. })
@@ -866,7 +915,9 @@ impl Service {
                 Some(crate::retrieval::Request::Search { .. })
             )
             .then_some(vector_snapshot.generation());
-            let pending = if let Some(target) = retrieval_target_seq {
+            let pending = if matches!(retrieval_plan, Some(crate::retrieval::Request::Rebuild)) {
+                retrieval_target_seq.ok_or(Error("JOB_CORRUPT"))?
+            } else if let Some(target) = retrieval_target_seq {
                 let progress =
                     crate::retrieval::Index::status(&service.storage, snapshot.resolved())?;
                 target.saturating_sub(
@@ -880,10 +931,41 @@ impl Service {
             } else {
                 0
             };
+            let extraction_native = if extraction_plan.is_some() {
+                snapshot
+                    .resolved()
+                    .config()
+                    .retrieval
+                    .extraction
+                    .as_deref()
+                    .and_then(|s| s.strip_prefix("executor:"))
+                    .map(|profile| {
+                        let executor = snapshot
+                            .resolved()
+                            .config()
+                            .executors
+                            .get(profile)
+                            .ok_or(Error("CONFIG_CORRUPT"))?;
+                        let native = consult::NativeExecutor::from_profile(executor, None)?;
+                        service.authorize_executor(profile, &native)?;
+                        Ok::<_, Error>(native)
+                    })
+                    .transpose()?
+            } else {
+                None
+            };
             let budget = match (&model_plan, &retrieval_plan) {
                 (Some(plan), _) => plan.validate(snapshot.resolved()).map_err(|e| Error(e.0))?,
                 (_, Some(plan)) => {
                     plan.workflow_budget(snapshot.resolved(), vector_snapshot.resolved(), pending)?
+                }
+                _ if extraction_native.is_some() => snapshot.resolved().timeouts().workflow,
+                _ if extraction_plan.is_some() => {
+                    let call = service
+                        .extraction_call(extraction_plan.as_ref().unwrap(), snapshot.resolved())?;
+                    crate::provider::Plan { calls: vec![call] }
+                        .validate(snapshot.resolved())
+                        .map_err(|e| Error(e.0))?
                 }
                 _ if consult_plan.is_some() => snapshot.resolved().timeouts().workflow,
                 _ => snapshot.resolved().timeouts().tools,
@@ -897,6 +979,8 @@ impl Service {
                 binding,
                 path,
                 model_plan,
+                extraction_plan,
+                extraction_native,
                 consult_plan,
                 retrieval_plan,
                 retrieval_target_seq,
@@ -1072,8 +1156,14 @@ impl Service {
                 if job.model_plan.is_some()
                     || job.retrieval_plan.is_some()
                     || job.consult_plan.is_some()
+                    || (job.extraction_plan.is_some()
+                        && job
+                            .result
+                            .as_ref()
+                            .and_then(|v| v.get("checkpoint"))
+                            .is_none())
                 {
-                    let code = if job.consult_plan.is_some() {
+                    let code = if job.consult_plan.is_some() || job.extraction_native.is_some() {
                         "RUNNER_INTERRUPTED"
                     } else {
                         "PROVIDER_INTERRUPTED"
@@ -1140,7 +1230,11 @@ impl Service {
             self.job(&id)?.1
         };
         let deadline = job.execution_deadline_ms.ok_or(Error("JOB_CORRUPT"))?;
-        if job.model_plan.is_some() || job.retrieval_plan.is_some() || job.consult_plan.is_some() {
+        if job.model_plan.is_some()
+            || job.retrieval_plan.is_some()
+            || job.consult_plan.is_some()
+            || job.extraction_plan.is_some()
+        {
             let started = job.started_at_ms.ok_or(Error("JOB_CORRUPT"))?;
             if started.checked_add(job.execution_budget_ms) != Some(deadline) {
                 return Err(Error("JOB_CORRUPT"));
@@ -1150,7 +1244,9 @@ impl Service {
                 Duration::from_millis(job.execution_budget_ms),
                 started,
             )?;
-            return if job.consult_plan.is_some() {
+            return if job.extraction_plan.is_some() {
+                self.execute_extraction(id, workflow).await
+            } else if job.consult_plan.is_some() {
                 self.execute_consult(id, workflow).await
             } else if job.retrieval_plan.is_some() {
                 self.execute_retrieval(id, workflow).await

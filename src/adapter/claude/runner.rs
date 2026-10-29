@@ -173,7 +173,7 @@ impl AgentRunner for ClaudeRunner {
                     "--setting-sources",
                     "",
                     "--system-prompt",
-                    &if spec.uses_research_result() {
+                    &if spec.uses_structured_result() {
                         format!("{}\n{}", self.instructions, spec.result_instructions())
                     } else {
                         self.instructions.clone()

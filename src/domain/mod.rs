@@ -250,7 +250,7 @@ impl Provenance {
 }
 
 impl MemoryDraft {
-    fn validate(&self) -> Result<()> {
+    pub(crate) fn validate(&self) -> Result<()> {
         self.scope.validate()?;
         if self.claim.trim().is_empty()
             || self.claim.len() > 32 * 1024

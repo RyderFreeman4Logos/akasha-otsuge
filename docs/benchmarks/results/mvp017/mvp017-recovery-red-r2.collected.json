@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T21:55:31.094239+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "f7afd61f3a584466222c4efb31e262c0e7205146",
+    "log_sha256": "3889afaf50b8b2709ac390d87afa6fa20c9889860a747a5bbb6492ee79a56677",
+    "seconds": 11.109833864495158,
+    "utc": "2026-10-29T21:53:42.033927+00:00"
+  },
+  "process_absent": true,
+  "classification": "causal-red-model-response-replayed-after-sigkill"
+}

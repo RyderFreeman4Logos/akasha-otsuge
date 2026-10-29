@@ -1,0 +1,21 @@
+{
+  "head": "927dcad2816a6cc4e10aaf4510477bbdae80fdba",
+  "tree": "71016732e426c39d31afdf9a848cad7da74f617c",
+  "parent": "bbce3165c6a0aed91bd1ff4d5810724d0afae968",
+  "clean": true,
+  "paths": [
+    "docs/plan/todo.md",
+    "src/lib.rs",
+    "src/domain/mod.rs",
+    "src/ipc.rs",
+    "src/daemon.rs",
+    "src/daemon/jobs.rs",
+    "src/daemon/consult.rs",
+    "src/daemon/retrieval.rs",
+    "src/extraction.rs",
+    "src/daemon/extraction.rs",
+    "tests/daemon.rs",
+    "tests/support/model_endpoint.rs",
+    "tests/support/daemon_extraction.rs"
+  ]
+}

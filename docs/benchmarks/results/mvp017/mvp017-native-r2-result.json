@@ -1,0 +1,647 @@
+{
+  "daemon_fixture": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a17-native-hvf7jaf5/akasha-daemon-1186154-0",
+  "extra_model_profiles": 0,
+  "job": {
+    "accepted_at_ms": 1793312287320,
+    "attempt": 1,
+    "cancel_requested": false,
+    "config_digest": "e0878175add8719cf4eefe2301b78ca976ce97771bb7bccae98be8aecd1fd4e0",
+    "config_generation": 1,
+    "error": null,
+    "execution_budget_ms": 5400000,
+    "execution_deadline_ms": 1793317687323,
+    "extraction_native": {
+      "binary": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi",
+      "home": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a17-native-hvf7jaf5/profile",
+      "host": "pi"
+    },
+    "extraction_plan": {
+      "scope": {
+        "branch_or_version": null,
+        "project": "alpha",
+        "session": null,
+        "user": "uid:1001"
+      },
+      "sources": [
+        {
+          "content_sha256": "c4bd25ca0ca64af27a890123f25b1920e75ca12498e931e0a0ab313cef6e7443",
+          "end": 65,
+          "event_id": "conditional",
+          "revision": 1,
+          "start": 0
+        },
+        {
+          "content_sha256": "e06bbb18e8ad738adf08d75fc5fa2006529ffeabc41a64b73c91df1a6afe7ec8",
+          "end": 52,
+          "event_id": "negative",
+          "revision": 2,
+          "start": 0
+        },
+        {
+          "content_sha256": "0a08bceb7c55e5f90d76b12599fc908ef4abd32082452085450d7ee19c02a522",
+          "end": 69,
+          "event_id": "quoted",
+          "revision": 3,
+          "start": 0
+        },
+        {
+          "content_sha256": "6fee95ff3211d041bc5b9eab022bae3fc0e39bcdf651cb136f64878b1aecf300",
+          "end": 84,
+          "event_id": "temporary",
+          "revision": 4,
+          "start": 0
+        },
+        {
+          "content_sha256": "fb9d1fa1411c2bce5d69a97a335379b95a48a487c416931879fb7eeaf7787326",
+          "end": 91,
+          "event_id": "automated",
+          "revision": 5,
+          "start": 0
+        }
+      ]
+    },
+    "id": "actual-native-extraction",
+    "lease_owner": null,
+    "lease_until_ms": null,
+    "queue_deadline_ms": 1793312587320,
+    "request_sha256": "046783a01e374073e3e4c7acd74ff8044c868caeea78f69d8f033e85e0513af2",
+    "result": {
+      "candidates": [
+        {
+          "memory_id": "extracted/947175c35e9fc785bfdd5f74d078e2b12e184ec467cb313a071ed5661c43521b",
+          "revision": 13,
+          "status": "candidate"
+        },
+        {
+          "memory_id": "extracted/e7d923e6a2cbb9a33e6a3bccfdb5d27c6d860022cece06a89aa9a19c71c9c804",
+          "revision": 14,
+          "status": "candidate"
+        },
+        {
+          "memory_id": "extracted/f58f68de9e63c45378b66283fce305290b2594fed0a6e1af66f5ea8c6f00e95d",
+          "revision": 15,
+          "status": "candidate"
+        },
+        {
+          "memory_id": "extracted/8606d87f3d5ad59744d5b73bf862fb9a28e4b82df0a0d4ba330225fa2fa405af",
+          "revision": 16,
+          "status": "candidate"
+        },
+        {
+          "memory_id": "extracted/8b9099d2dc7b4c730688ddb81e0aceda18f82df27dba0d875712ea4e73abc4f7",
+          "revision": 17,
+          "status": "candidate"
+        },
+        {
+          "memory_id": "extracted/1da6acc86422a91bdc09b7087b31c7c23febdfaeed73f9ee250ef50ad980db6d",
+          "revision": 18,
+          "status": "candidate"
+        }
+      ],
+      "checkpoint": {
+        "bytes": 4553,
+        "parts": [
+          {
+            "commit_seq": 11,
+            "key": {
+              "id": "model-blob/5fb8a912a4fb8d39bc960a96c6df527a29405847dba640ef4a274fb5bd012151",
+              "kind": "evidence"
+            }
+          }
+        ],
+        "sha256": "5fb8a912a4fb8d39bc960a96c6df527a29405847dba640ef4a274fb5bd012151"
+      },
+      "generator": {
+        "model": "native-profile-default",
+        "prompt_version": "extraction-v1",
+        "runner": "executor/existing"
+      },
+      "origin": "extraction",
+      "prompt_version": "extraction-v1",
+      "trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 66237,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5333762,
+          "started_at_unix_ms": 1793312287323,
+          "triggered_layer": null
+        },
+        "host": "pi",
+        "origin": "extraction",
+        "usage": {
+          "output_bytes": 363973,
+          "read_bytes": 808,
+          "reads": 2,
+          "starts": 1,
+          "tokens": 10976
+        }
+      }
+    },
+    "retry_at_ms": 1793312287320,
+    "schema_version": 1,
+    "started_at_ms": 1793312287323,
+    "state": "succeeded"
+  },
+  "memories": [
+    {
+      "previous": null,
+      "record": {
+        "approval": null,
+        "authority": "candidate",
+        "authorization": {
+          "adopt_explicit_decisions": false,
+          "mode": "manual",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          }
+        },
+        "config_generation": 1,
+        "draft": {
+          "assumptions": [
+            "The tentative statement intent means the requirement is not treated as finalized approval beyond the speaker's wording."
+          ],
+          "claim": "This project must use keyword search when embeddings are offline.",
+          "conditions": [
+            "Embeddings are offline."
+          ],
+          "kind": "procedure",
+          "rationale": "The speaker states a conditional requirement for project alpha. The statement intent is tentative, so this is recorded as a stated procedure rather than a separately confirmed approval.",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          },
+          "source_spans": [
+            {
+              "content_sha256": "c4bd25ca0ca64af27a890123f25b1920e75ca12498e931e0a0ab313cef6e7443",
+              "end": 65,
+              "event_id": "conditional",
+              "revision": 1,
+              "start": 0
+            }
+          ],
+          "valid_from_ms": null,
+          "valid_until_ms": null
+        },
+        "lifecycle": "candidate",
+        "policy_revision": "extraction-v1/1",
+        "previous_adoption": null,
+        "provenance": {
+          "actor": {
+            "id": "extractor",
+            "kind": "agent"
+          },
+          "binding": "actual-native-extraction",
+          "generator": {
+            "model": "native-profile-default",
+            "prompt_version": "extraction-v1",
+            "runner": "executor/existing"
+          },
+          "origin": "extraction"
+        },
+        "schema_version": 1,
+        "semantic_sha256": "4365d7d7540689c612b06191718311f0a81ae10007d87b252b8edde065bd76a7"
+      },
+      "revision": {
+        "commit_seq": 13,
+        "key": {
+          "id": "extracted/947175c35e9fc785bfdd5f74d078e2b12e184ec467cb313a071ed5661c43521b",
+          "kind": "memory"
+        }
+      }
+    },
+    {
+      "previous": null,
+      "record": {
+        "approval": null,
+        "authority": "candidate",
+        "authorization": {
+          "adopt_explicit_decisions": false,
+          "mode": "manual",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          }
+        },
+        "config_generation": 1,
+        "draft": {
+          "assumptions": [
+            "The tentative statement intent means the prohibition is not treated as finalized approval beyond the speaker's wording."
+          ],
+          "claim": "Private queries must not be sent to an external reranker.",
+          "conditions": [
+            "The queries are private.",
+            "The destination is an external reranker."
+          ],
+          "kind": "preference",
+          "rationale": "The speaker states a prohibition on sending private queries to an external reranker. Tentative intent is preserved and no broader approval is inferred.",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          },
+          "source_spans": [
+            {
+              "content_sha256": "e06bbb18e8ad738adf08d75fc5fa2006529ffeabc41a64b73c91df1a6afe7ec8",
+              "end": 52,
+              "event_id": "negative",
+              "revision": 2,
+              "start": 0
+            }
+          ],
+          "valid_from_ms": null,
+          "valid_until_ms": null
+        },
+        "lifecycle": "candidate",
+        "policy_revision": "extraction-v1/1",
+        "previous_adoption": null,
+        "provenance": {
+          "actor": {
+            "id": "extractor",
+            "kind": "agent"
+          },
+          "binding": "actual-native-extraction",
+          "generator": {
+            "model": "native-profile-default",
+            "prompt_version": "extraction-v1",
+            "runner": "executor/existing"
+          },
+          "origin": "extraction"
+        },
+        "schema_version": 1,
+        "semantic_sha256": "ded2d57ae22c47c803b9e8308dfc0c0b7139ca1672cb42859d94579eb10c3633"
+      },
+      "revision": {
+        "commit_seq": 14,
+        "key": {
+          "id": "extracted/e7d923e6a2cbb9a33e6a3bccfdb5d27c6d860022cece06a89aa9a19c71c9c804",
+          "kind": "memory"
+        }
+      }
+    },
+    {
+      "previous": null,
+      "record": {
+        "approval": null,
+        "authority": "candidate",
+        "authorization": {
+          "adopt_explicit_decisions": false,
+          "mode": "manual",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          }
+        },
+        "config_generation": 1,
+        "draft": {
+          "assumptions": [
+            "Alice's reported view is not evidence of the speaker's preference."
+          ],
+          "claim": "Alice said she prefers tabs.",
+          "conditions": [
+            "The preference is attributed to Alice as reported by the speaker."
+          ],
+          "kind": "fact",
+          "rationale": "The speaker reports Alice's stated preference and explicitly separates it from the speaker's own preference.",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          },
+          "source_spans": [
+            {
+              "content_sha256": "0a08bceb7c55e5f90d76b12599fc908ef4abd32082452085450d7ee19c02a522",
+              "end": 69,
+              "event_id": "quoted",
+              "revision": 3,
+              "start": 0
+            }
+          ],
+          "valid_from_ms": null,
+          "valid_until_ms": null
+        },
+        "lifecycle": "candidate",
+        "policy_revision": "extraction-v1/1",
+        "previous_adoption": null,
+        "provenance": {
+          "actor": {
+            "id": "extractor",
+            "kind": "agent"
+          },
+          "binding": "actual-native-extraction",
+          "generator": {
+            "model": "native-profile-default",
+            "prompt_version": "extraction-v1",
+            "runner": "executor/existing"
+          },
+          "origin": "extraction"
+        },
+        "schema_version": 1,
+        "semantic_sha256": "42a04e73a271e904c1beaa4565e44dabf1f2f24616e278bc3e31c878856974be"
+      },
+      "revision": {
+        "commit_seq": 15,
+        "key": {
+          "id": "extracted/f58f68de9e63c45378b66283fce305290b2594fed0a6e1af66f5ea8c6f00e95d",
+          "kind": "memory"
+        }
+      }
+    },
+    {
+      "previous": null,
+      "record": {
+        "approval": null,
+        "authority": "candidate",
+        "authorization": {
+          "adopt_explicit_decisions": false,
+          "mode": "manual",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          }
+        },
+        "config_generation": 1,
+        "draft": {
+          "assumptions": [],
+          "claim": "A preference for tabs is Alice's view and is not the speaker's preference.",
+          "conditions": [
+            "The negation applies to the speaker, uid:1001, not to Alice."
+          ],
+          "kind": "fact",
+          "rationale": "The speaker explicitly negates adopting Alice's tabs preference as their own.",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          },
+          "source_spans": [
+            {
+              "content_sha256": "0a08bceb7c55e5f90d76b12599fc908ef4abd32082452085450d7ee19c02a522",
+              "end": 69,
+              "event_id": "quoted",
+              "revision": 3,
+              "start": 0
+            }
+          ],
+          "valid_from_ms": null,
+          "valid_until_ms": null
+        },
+        "lifecycle": "candidate",
+        "policy_revision": "extraction-v1/1",
+        "previous_adoption": null,
+        "provenance": {
+          "actor": {
+            "id": "extractor",
+            "kind": "agent"
+          },
+          "binding": "actual-native-extraction",
+          "generator": {
+            "model": "native-profile-default",
+            "prompt_version": "extraction-v1",
+            "runner": "executor/existing"
+          },
+          "origin": "extraction"
+        },
+        "schema_version": 1,
+        "semantic_sha256": "8b68f231c5cafd2affa4ad9cf1925799af1446edcb19f546a25078c3ba4bbecb"
+      },
+      "revision": {
+        "commit_seq": 16,
+        "key": {
+          "id": "extracted/8606d87f3d5ad59744d5b73bf862fb9a28e4b82df0a0d4ba330225fa2fa405af",
+          "kind": "memory"
+        }
+      }
+    },
+    {
+      "previous": null,
+      "record": {
+        "approval": null,
+        "authority": "candidate",
+        "authorization": {
+          "adopt_explicit_decisions": false,
+          "mode": "manual",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          }
+        },
+        "config_generation": 1,
+        "draft": {
+          "assumptions": [
+            "No specific session identifier or timestamp is given, so validity bounds remain unknown."
+          ],
+          "claim": "Use verbose logs for one debugging session only; this is not a permanent policy.",
+          "conditions": [
+            "Applies to one debugging session only.",
+            "It is not a permanent policy."
+          ],
+          "kind": "decision",
+          "rationale": "The speaker limits verbose logs to a single debugging session and explicitly denies permanence. No session identifier or time bound is supplied, so the requested null session scope is retained and the limit stays in conditions.",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          },
+          "source_spans": [
+            {
+              "content_sha256": "6fee95ff3211d041bc5b9eab022bae3fc0e39bcdf651cb136f64878b1aecf300",
+              "end": 84,
+              "event_id": "temporary",
+              "revision": 4,
+              "start": 0
+            }
+          ],
+          "valid_from_ms": null,
+          "valid_until_ms": null
+        },
+        "lifecycle": "candidate",
+        "policy_revision": "extraction-v1/1",
+        "previous_adoption": null,
+        "provenance": {
+          "actor": {
+            "id": "extractor",
+            "kind": "agent"
+          },
+          "binding": "actual-native-extraction",
+          "generator": {
+            "model": "native-profile-default",
+            "prompt_version": "extraction-v1",
+            "runner": "executor/existing"
+          },
+          "origin": "extraction"
+        },
+        "schema_version": 1,
+        "semantic_sha256": "31cd87fad21902671b8a98da88c75cf9c2c87adcfd925fe745e9a3a1767dbc0d"
+      },
+      "revision": {
+        "commit_seq": 17,
+        "key": {
+          "id": "extracted/8b9099d2dc7b4c730688ddb81e0aceda18f82df27dba0d875712ea4e73abc4f7",
+          "kind": "memory"
+        }
+      }
+    },
+    {
+      "previous": null,
+      "record": {
+        "approval": null,
+        "authority": "candidate",
+        "authorization": {
+          "adopt_explicit_decisions": false,
+          "mode": "manual",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          }
+        },
+        "config_generation": 1,
+        "draft": {
+          "assumptions": [
+            "Absence of approval means auto-publish is not recorded as an accepted decision."
+          ],
+          "claim": "Two automated agents suggested enabling auto-publish, and the speaker has not approved their suggestion.",
+          "conditions": [
+            "The suggestion came from two automated agents.",
+            "The speaker has not approved enabling auto-publish."
+          ],
+          "kind": "fact",
+          "rationale": "The speaker reports an automated suggestion and explicitly states that they have not approved it. Role or automation is not treated as approval to enable auto-publish.",
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          },
+          "source_spans": [
+            {
+              "content_sha256": "fb9d1fa1411c2bce5d69a97a335379b95a48a487c416931879fb7eeaf7787326",
+              "end": 91,
+              "event_id": "automated",
+              "revision": 5,
+              "start": 0
+            }
+          ],
+          "valid_from_ms": null,
+          "valid_until_ms": null
+        },
+        "lifecycle": "candidate",
+        "policy_revision": "extraction-v1/1",
+        "previous_adoption": null,
+        "provenance": {
+          "actor": {
+            "id": "extractor",
+            "kind": "agent"
+          },
+          "binding": "actual-native-extraction",
+          "generator": {
+            "model": "native-profile-default",
+            "prompt_version": "extraction-v1",
+            "runner": "executor/existing"
+          },
+          "origin": "extraction"
+        },
+        "schema_version": 1,
+        "semantic_sha256": "95c4270ca3f95523086c6285e2a4c3010ca9296fd0bc932de9e252922e59e256"
+      },
+      "revision": {
+        "commit_seq": 18,
+        "key": {
+          "id": "extracted/1da6acc86422a91bdc09b7087b31c7c23febdfaeed73f9ee250ef50ad980db6d",
+          "kind": "memory"
+        }
+      }
+    }
+  ],
+  "native_home": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a17-native-hvf7jaf5/profile",
+  "originals": [
+    [
+      "conditional",
+      "This project must use keyword search when embeddings are offline."
+    ],
+    [
+      "negative",
+      "Do not send private queries to an external reranker."
+    ],
+    [
+      "quoted",
+      "Alice said she prefers tabs; this is Alice's view, not my preference."
+    ],
+    [
+      "temporary",
+      "For this one debugging session only, use verbose logs; it is not a permanent policy."
+    ],
+    [
+      "automated",
+      "Two automated agents suggested enabling auto-publish. I have not approved their suggestion."
+    ]
+  ],
+  "plan": {
+    "scope": {
+      "branch_or_version": null,
+      "project": "alpha",
+      "session": null,
+      "user": "uid:1001"
+    },
+    "sources": [
+      {
+        "content_sha256": "c4bd25ca0ca64af27a890123f25b1920e75ca12498e931e0a0ab313cef6e7443",
+        "end": 65,
+        "event_id": "conditional",
+        "revision": 1,
+        "start": 0
+      },
+      {
+        "content_sha256": "e06bbb18e8ad738adf08d75fc5fa2006529ffeabc41a64b73c91df1a6afe7ec8",
+        "end": 52,
+        "event_id": "negative",
+        "revision": 2,
+        "start": 0
+      },
+      {
+        "content_sha256": "0a08bceb7c55e5f90d76b12599fc908ef4abd32082452085450d7ee19c02a522",
+        "end": 69,
+        "event_id": "quoted",
+        "revision": 3,
+        "start": 0
+      },
+      {
+        "content_sha256": "6fee95ff3211d041bc5b9eab022bae3fc0e39bcdf651cb136f64878b1aecf300",
+        "end": 84,
+        "event_id": "temporary",
+        "revision": 4,
+        "start": 0
+      },
+      {
+        "content_sha256": "fb9d1fa1411c2bce5d69a97a335379b95a48a487c416931879fb7eeaf7787326",
+        "end": 91,
+        "event_id": "automated",
+        "revision": 5,
+        "start": 0
+      }
+    ]
+  },
+  "schema_version": 1,
+  "status": "PASS_REAL_SINGLE_CLI_EXTRACTION"
+}

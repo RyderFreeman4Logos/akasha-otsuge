@@ -69,6 +69,27 @@ def usage(incoming, outgoing):
 
 usage(200000 if scenario == 'token_budget' else 10, 2)
 usage(9 if scenario == 'usage_regression' else 10, 2)
+if scenario.startswith('extraction'):
+    instructions = request['params']['baseInstructions']
+    assert 'extraction-v1' in instructions
+    assert 'candidates' in turn_request['params']['outputSchema']['properties']
+    scope = json.loads(instructions.split('Requested scope: ', 1)[1].split('\nEvidence:', 1)[0])
+    evidence = json.loads(instructions.split('\nEvidence: ', 1)[1])
+    assert evidence[0]['text'] == 'Only if offline, use keyword search.'
+    if scenario == 'extraction_denied':
+        send({'id':10,'method':'item/tool/call','params':{'threadId':'thread','turnId':'turn',
+            'callId':'forbidden-expansion','tool':'code_read',
+            'arguments':{'path':'private.txt','start':0,'max_bytes':1024}}})
+        time.sleep(30)
+    candidate = dict(kind='preference', scope=scope, claim='Use keyword search when offline.',
+        rationale='A conditional preference.', conditions=['offline'], assumptions=[],
+        sources=[dict(source=0, start=0, end=36)], valid_from_ms=None, valid_until_ms=None)
+    output = json.dumps(dict(schema_version=1, candidates=[candidate]))
+    send({'method':'turn/completed','params':{'threadId':'thread','turn':{
+        'id':'turn','status':'completed','error':None,'items':[{
+        'type':'agentMessage','id':'answer','phase':'final_answer','text':output}]}}})
+    assert sys.stdin.read() == ''
+    raise SystemExit(0)
 call = {'id': 10, 'method': 'item/tool/call', 'params': {'threadId': 'thread', 'turnId': 'turn', 'callId': 'call', 'tool': 'context_describe', 'arguments': {}}}
 if scenario == 'wrong_thread': call['params']['threadId'] = 'other'
 if scenario == 'wrong_turn': call['params']['turnId'] = 'other'
