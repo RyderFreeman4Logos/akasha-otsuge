@@ -199,8 +199,8 @@ All captured content is unverified input and conveys no human authority.
 
 [Native fixtures](../tests/fixtures/codex/0.164.0/README.md) bind sanitized examples
 to their native versions and source hashes. Controlled local SSE runs prove
-protocol and lifecycle behavior. Authenticated Caller/Runner, installation,
-actual tool restriction and concurrent TUI acceptance remain MVP-013 work.
+protocol and lifecycle behavior. Authenticated Caller/Runner, actual tool restriction and concurrent TUI
+acceptance remain MVP-013 work.
 
 `CodexCaller` accepts a server-owned registration and native hook identity outside
 the model's arguments. It verifies the registered session, workspace and root
@@ -216,7 +216,7 @@ ancestor returns `HISTORY_GAP`; a retry preserves its stored fence even if the
 native file is gone. Permission revocation applies to new calls and retries.
 Focused tests cover native hook data, concurrent registrations in one workspace,
 identity conflicts, unknown versions, duplicate calls, missing ancestors and
-revocation. These tests do not yet prove live TUI hook delivery or installation.
+revocation. These tests do not yet prove live TUI acceptance.
 
 The daemon's private `codex` transport persists root registrations with opaque
 credentials, binds native calls and queues native capture through the existing
@@ -234,3 +234,46 @@ PID, and deferred reaping retains ownership after the one-second cleanup grace.
 The daemon, CLI, Codex and library regression suites pass 75 tests (five existing
 ignored helpers/acceptance cases), including registration/replay across daemon
 restart and native background backfill. Full acceptance and review remain open.
+
+## Codex opt-in launcher and native hooks
+
+Install a separate launcher for the pinned Codex version:
+
+```sh
+akasha-otsuge --config /absolute/akasha.toml adapter install codex \
+  --binary /absolute/codex --launcher /absolute/akasha-codex \
+  --state-dir /absolute/private-call-state
+/absolute/akasha-codex
+akasha-otsuge adapter uninstall codex --launcher /absolute/akasha-codex
+```
+
+Parent directories must exist. Installation atomically publishes one owner-only
+script. Repeating an identical install is harmless; replacement, symlinks and
+edited scripts are refused. Undo verifies its content hash before removing that
+single file. Native settings and credentials are not edited. The native hook
+trust review still applies: installation never automatically approves hooks.
+Call-state files are separate from the launcher and are removed by their owning
+PostToolUse/PostToolUseFailure callback, so uninstall cannot delete active calls.
+Interrupted callbacks can leave small results; 258 directory entries stop further
+admission rather than trigger an age-based deletion sweep.
+
+The launcher passes inline hook configuration using the official CLI override
+mechanism. SessionStart/Stop schedule incremental native backfill. PreToolUse
+recognizes exactly `akasha-otsuge consult` or that command followed by one
+JSON-quoted hint; shell suffixes and identity arguments are rejected. At this
+stage the command returns a binding diagnostic; the consult workflow is MVP-016.
+The trusted callback binds the native identity and stores an atomic per-call
+result, then rewrites the command to an absolute read-only result reader. This
+is necessary because the native Linux read-only sandbox rejects Unix socket
+connections. Neither registration credentials nor a daemon connection enter the
+sandbox command. Concurrent sessions share no current-context file or global
+lock. Binding errors return the native explicit deny response.
+
+The native0.164.0 controlled-endpoint fixture passed the installed launcher,
+real hook, actual read-only shell sandbox, exact call fence, result cleanup and
+uninstall round trip. A prior failed socket bridge and a native EPERM diagnostic
+are retained; no sandbox or network permission was relaxed. The result proves
+that transport only, not authenticated model quality or two concurrent TUIs.
+The interface follows the official [hook protocol](https://learn.chatgpt.com/docs/hooks)
+and [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference),
+checked against the installed native binary rather than the older source clone.

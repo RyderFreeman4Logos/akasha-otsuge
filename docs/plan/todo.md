@@ -519,6 +519,13 @@ checks do not prove host protocol capabilities or an authenticated Runner.
   ownership across cancellation, EOF, errors and drop.
 - [ ] Provide opt-in install/undo, actual-version/capability doctor, official
   interface rationale, sanitized native fixtures and reproduction commands.
+  The owned single-file launcher, conflict-preserving undo and native hook
+  transport now pass focused and actual Codex0.164.0 controlled-endpoint tests.
+  A Linux sandbox Unix-socket EPERM was reproduced; the hook now prepares a
+  per-call result for an offline sandbox reader, without registration tokens.
+  Four transport/install regressions pass, including concurrent sessions,
+  daemon-free result delivery and explicit native denial on binding failure.
+  Authenticated and concurrent TUI acceptance remain open below.
 - [ ] With the other three CLIs absent, prove actual authenticated Caller/Runner,
   two concurrent TUIs, resume/fork/compact, interrupted backfill, denied writes,
   denied network/out-of-scope reads and structured output. Local SSE preflights

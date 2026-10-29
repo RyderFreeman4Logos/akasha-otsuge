@@ -17,6 +17,8 @@ Commands:
   doctor --json              Inspect the local daemon
   doctor --host codex [--binary PATH]
                              Inspect the installed Codex CLI
+  adapter install codex --binary PATH --launcher PATH --state-dir PATH
+  adapter uninstall codex --launcher PATH
   config validate|reload|status
   config show --effective
   capture reconcile|codex BINDING_JSON INPUT_JSONL --idempotency-key ID
@@ -116,7 +118,38 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         output(&bytes, false)?;
         return Ok(0);
     }
+    if let ["adapter", "codex-bound", path] = command.as_slice() {
+        let response =
+            akasha_otsuge::adapter::codex::hooks::bound_response(std::path::Path::new(path))?;
+        let mut bytes = serde_json::to_vec(&response)?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
+    if let ["adapter", "uninstall", "codex", flags @ ..] = command.as_slice() {
+        let flags = options(flags, &["--launcher"])?;
+        let response = akasha_otsuge::adapter::codex::installation::uninstall(
+            std::path::Path::new(flags.get("--launcher").ok_or(Error("INVALID_ARGUMENT"))?),
+        )?;
+        let mut bytes =
+            serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":response}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
+    let install_flags = if let ["adapter", "install", "codex", flags @ ..] = command.as_slice() {
+        Some(options(flags, &["--binary", "--launcher", "--state-dir"])?)
+    } else {
+        None
+    };
+    let hook_flags = if let ["adapter", "codex-hook", flags @ ..] = command.as_slice() {
+        Some(options(flags, &["--binary", "--state-dir"])?)
+    } else {
+        None
+    };
     let operation = match command.as_slice() {
+        ["adapter", "codex-hook", ..] => None,
+        ["adapter", "install", "codex", ..] => None,
         ["adapter", "codex-call"] => {
             use std::io::Read;
             let mut bytes = Vec::new();
@@ -266,6 +299,55 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         "",
         &defaults,
     )?;
+    if let Some(flags) = install_flags {
+        let path = |key| {
+            flags
+                .get(key)
+                .map(std::path::Path::new)
+                .ok_or(Error("INVALID_ARGUMENT"))
+        };
+        let response = akasha_otsuge::adapter::codex::installation::install(
+            path("--binary")?,
+            path("--launcher")?,
+            path("--state-dir")?,
+            socket
+                .as_deref()
+                .unwrap_or(&resolved.config().paths.socket_path),
+        )
+        .await?;
+        let mut bytes =
+            serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":response}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
+    if let Some(flags) = hook_flags {
+        use std::io::Read;
+        let binary = std::path::Path::new(flags.get("--binary").ok_or(Error("INVALID_ARGUMENT"))?);
+        let state =
+            std::path::Path::new(flags.get("--state-dir").ok_or(Error("INVALID_ARGUMENT"))?);
+        let socket = socket.unwrap_or_else(|| resolved.config().paths.socket_path.clone());
+        let mut bytes = Vec::new();
+        io::stdin().take(65537).read_to_end(&mut bytes)?;
+        let response = match akasha_otsuge::adapter::codex::hooks::handle(
+            &socket, binary, state, &bytes,
+        )
+        .await
+        {
+            Ok(value) => value,
+            Err(error)
+                if serde_json::from_slice::<serde_json::Value>(&bytes)
+                    .is_ok_and(|v| v["hook_event_name"] == "PreToolUse") =>
+            {
+                serde_json::json!({"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":error.0}})
+            }
+            Err(error) => return Err(error),
+        };
+        let mut output_bytes = serde_json::to_vec(&response)?;
+        output_bytes.push(b'\n');
+        output(&output_bytes, false)?;
+        return Ok(0);
+    }
     if let Some(operation) = operation {
         let socket = socket.unwrap_or_else(|| resolved.config().paths.socket_path.clone());
         let now = ipc::now_ms()?;

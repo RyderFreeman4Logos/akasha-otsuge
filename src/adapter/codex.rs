@@ -3,6 +3,8 @@ mod transcript;
 pub use transcript::reconcile_transcript;
 mod caller;
 pub use caller::{CodexCall, CodexCaller, CodexRegistration, NativeEvent};
+pub mod hooks;
+pub mod installation;
 
 pub const TRANSCRIPT_STREAM: &str = "codex-native-v1";
 
