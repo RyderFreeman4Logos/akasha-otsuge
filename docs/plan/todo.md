@@ -665,12 +665,24 @@ links exact identities and preserves the distinct controlled/native results.
   research execution and real consult acceptance remain separate work below.
 - [ ] Enforce shared token/read/output/start/depth/time/concurrency budgets across
   retries and descendants; retain run lineage and never reset origin or fence.
+  Delegates now reuse one research state and budget; run IDs, parentage, origin,
+  fence, configuration, usage and terminal errors are persisted separately from
+  public output. Named executor attempts/fallback remain to be connected.
 - [x] Add cumulative token accounting and real native-protocol usage checks for
   all four adapters, including cached input, duplicate/decreasing reports,
   overflow and shared-stop notification during blocked I/O. Focused RED/GREEN
   receipts are retained; authenticated consult acceptance still remains below.
-- [ ] Delegate with immediate resource refusal; exercise default single worker,
+- [x] Delegate with immediate resource refusal; exercise default single worker,
   two simultaneous parent delegates, grandchildren, recursion and branch failures.
+  Controlled native processes verify all cases, including shared72-token usage
+  for three starts, recovery after a failed branch, and whole-tree cancellation,
+  shutdown and crash cleanup. The thirteen consult cases and Clippy pass.
+  Broader serial regression passed118 cases and exposed one shutdown-directory
+  race; its failing receipt and passing guardian repair are retained. Earlier
+  parallel capture/IPC timing failures remain separate from this focused result.
+- [ ] Carry original runner deadlines through every native research bridge;
+  remove the premature10–15-second processing limits without relaxing bounded
+  framing, handshake checks, cancellation or the main caller's short IPC calls.
 - [ ] Publish concise found/no_hit/incomplete/pending/error results with scope,
   evidence, conflicts/gaps and durable RecallReceipt after final live validation.
   Retain receipt/show expansion and keep private research traces out of main output.

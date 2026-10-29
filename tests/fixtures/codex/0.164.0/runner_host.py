@@ -35,7 +35,9 @@ catalog = next(sys.argv[i+1] for i, arg in enumerate(sys.argv[:-1]) if arg == '-
 model = json.loads(pathlib.Path(json.loads(catalog.split('=', 1)[1])).read_text())['models'][0]
 assert model['apply_patch_tool_type'] is None and model['shell_type'] == 'disabled'
 send({'id': 3, 'result': {'thread': {'id': 'thread'}, 'model': 'fixture', 'approvalPolicy': 'never', 'sandbox': {'type': 'readOnly', 'networkAccess': False}}})
-assert read()['method'] == 'turn/start'
+turn_request = read()
+assert turn_request['method'] == 'turn/start'
+hint = json.loads(turn_request['params']['input'][0]['text']).get('hint')
 if scenario in ('timeout', 'cancel'):
     child = subprocess.Popen(['/bin/sleep', '30'], start_new_session=detached)
     (root / 'child.pid').write_text(str(child.pid))
@@ -78,7 +80,7 @@ send(call)
 result = read()
 assert result['id'] == 10 and result['result']['success'] is True
 assert 'invocation_id' in result['result']['contentItems'][0]['text']
-if scenario == 'research':
+if scenario == 'research' or scenario.startswith('delegate_'):
     call_number = 100
     def tool(name, arguments):
         global call_number
@@ -98,6 +100,45 @@ if scenario == 'research':
         return response
     page = tool('context_list', {'cursor':None,'limit':4})['value']
     assert tool('context_read', {'handle':page['events'][0]['handle'],'start':0,'max_bytes':1024})['kind'] == 'text'
+if scenario.startswith('delegate_'):
+    branch = hint or 'root'
+    if scenario == 'delegate_parents':
+        for phase in ('ready', 'returned'):
+            (root / f'{phase}-{os.getpid()}').touch()
+            end = time.monotonic() + 8
+            while len(list(root.glob(f'{phase}-*'))) != 2:
+                assert time.monotonic() < end, 'parent barrier timed out'
+                time.sleep(0.01)
+            if phase == 'ready':
+                result = tool('delegate', {'hint':'child'})
+                assert result['kind'] == 'error' and result['value']['code'] == 'DELEGATION_UNAVAILABLE'
+    elif scenario == 'delegate_cancel':
+        if branch == 'root':
+            (root / 'parent.pid').write_text(str(os.getpid()))
+            tool('delegate', {'hint':'child'})
+            raise AssertionError('cancelled delegate returned')
+        child = subprocess.Popen(['/bin/sleep', '30'], start_new_session=True)
+        (root / 'child.pid').write_text(str(child.pid))
+        time.sleep(30)
+    elif scenario == 'delegate_denied':
+        result = tool('delegate', {'hint':'child'})
+        assert result['kind'] == 'error' and result['value']['code'] == 'DELEGATION_UNAVAILABLE'
+    elif scenario == 'delegate_tree':
+        result = tool('delegate', {'hint':'child' if branch == 'root' else 'grandchild'})
+        if branch == 'grandchild':
+            assert result['kind'] == 'error' and result['value']['code'] == 'BUDGET_EXHAUSTED'
+        else:
+            assert result['kind'] == 'research' and result['value']['answer'] == 'bounded-context'
+    elif scenario == 'delegate_failure':
+        if branch == 'fail':
+            send({'method':'error','params':{'threadId':'thread','turnId':'turn','error':{'message':'controlled child failure','codexErrorInfo':'unauthorized'},'willRetry':False}})
+            time.sleep(30)
+        elif branch == 'root':
+            result = tool('delegate', {'hint':'fail'})
+            assert result['kind'] == 'error' and result['value']['code'] == 'AUTH_REQUIRED'
+            result = tool('delegate', {'hint':'succeed'})
+            assert result['kind'] == 'research' and result['value']['answer'] == 'bounded-context'
+if scenario == 'research':
     found = tool('memory_search', {'query':'offline'})['value']
     item = next(item for item in found['items'] if item['memory']['revision']['key']['id'] == 'offline')
     revision = item['memory']['revision']['commit_seq']

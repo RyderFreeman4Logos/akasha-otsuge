@@ -148,8 +148,7 @@ async fn run(args: &[OsString]) -> Result<u8> {
         }
     };
     cleanup();
-    if !alive() {
-        std::fs::remove_dir_all(directory).map_err(|_| ErrorCode::SourceUnavailable)?;
-    }
+    // The daemon can exit before its detached reaper runs the directory cleanup.
+    std::fs::remove_dir_all(directory).map_err(|_| ErrorCode::SourceUnavailable)?;
     Ok(code)
 }

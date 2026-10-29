@@ -7,6 +7,8 @@ use crate::domain::{Ingress, MemoryState, OriginalRange, SourceDraft, SourceSpan
 use crate::storage::RevisionRef;
 use futures::future::BoxFuture;
 use std::collections::BTreeMap;
+#[path = "consult_run.rs"]
+mod runs;
 
 pub(super) struct Research<'a> {
     service: &'a Service,
@@ -18,6 +20,10 @@ pub(super) struct Research<'a> {
     workspace: Option<BoundWorkspace<'a, ()>>,
     handles: BTreeMap<String, u64>,
     operations: u64,
+    native: NativeExecutor,
+    budget: RunBudget,
+    runs: Vec<Value>,
+    current_run: Option<usize>,
     pub selected: Vec<RevisionRef>,
     pub sources: Vec<SourceSpan>,
     pub code: Vec<Value>,
@@ -33,6 +39,8 @@ impl<'a> Research<'a> {
         invocation: Invocation,
         config: Arc<crate::config::Snapshot<()>>,
         workflow: &'a Deadline,
+        native: NativeExecutor,
+        budget: RunBudget,
     ) -> Result<Self> {
         Ok(Self {
             captured: CapturedContext::new(&service.storage, invocation.clone())?,
@@ -45,6 +53,10 @@ impl<'a> Research<'a> {
             workspace: None,
             handles: BTreeMap::new(),
             operations: 0,
+            native,
+            budget,
+            runs: vec![],
+            current_run: None,
             selected: vec![],
             sources: vec![],
             code: vec![],
@@ -273,6 +285,26 @@ impl<'a> Research<'a> {
         request: ContextRequest,
     ) -> Result<ContextResponse> {
         let value = match request {
+            ContextRequest::Delegate { hint } => {
+                let args = ConsultArgs::new(Some(hint))?;
+                let child = {
+                    let _guard = self.service.admission.lock().await;
+                    let max = self
+                        .service
+                        .config
+                        .pin()
+                        .resolved()
+                        .config()
+                        .runtime
+                        .max_concurrent_jobs
+                        .min(MAX_RUNNING);
+                    if MAX_RUNNING - self.service.runner_slots.available_permits() >= max {
+                        return Err(Error("DELEGATION_UNAVAILABLE"));
+                    }
+                    lease.delegate()?
+                };
+                json!({"answer":self.run(child, args).await?})
+            }
             ContextRequest::MemorySearch { query } => self.memory_search(lease, query).await?,
             ContextRequest::MemoryGet {
                 memory_id,

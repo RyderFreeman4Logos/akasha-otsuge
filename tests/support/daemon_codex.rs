@@ -16,7 +16,13 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
     let home = daemon.root.join("native-home");
     std::fs::create_dir(&workspace).unwrap();
     std::fs::create_dir(&home).unwrap();
-    daemon.configure(&format!("[access]\nread_roots=[{workspace:?},{home:?}]\n"));
+    let concurrency = match scenario {
+        "delegate_tree" => 4,
+        "delegate_failure" | "delegate_parents" | "delegate_cancel" => 2,
+        _ => 1,
+    };
+    let depth = if scenario == "delegate_tree" { 2 } else { 1 };
+    daemon.configure(&format!("[access]\nread_roots=[{workspace:?},{home:?}]\n[runtime]\nmax_concurrent_jobs={concurrency}\n[consult]\nmax_delegation_depth={depth}\n"));
     let binary = daemon.root.join("codex");
     let host = include_str!("../fixtures/codex/0.164.0/runner_host.py")
         .replace("scenario = (root / 'scenario').read_text()", "scenario = (root / 'scenario').read_text()\nwith (root / 'starts').open('a') as f: f.write('start\\n')\n(root / 'runner.pid').write_text(str(os.getpid()))");
@@ -57,6 +63,7 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
     );
     assert!(registered.get("error").is_none(), "{registered}");
     let token = registered["data"]["registration"].as_str().unwrap();
+    sync_consult_fixture(&daemon, token);
     let call = json!({"session_id":hook["session_id"],"agent_id":null,"turn_id":hook["turn_id"],"tool_call_id":hook["tool_use_id"],"cwd":workspace});
     let bound = native(
         &daemon,
@@ -65,6 +72,149 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
     assert!(bound.get("error").is_none(), "{bound}");
     let event = json!({"op":"consult","registration":token,"call":call,"args":{"hint":null}});
     (daemon, event, bound)
+}
+
+fn sync_consult_fixture(daemon: &Daemon, token: &str) {
+    let sync = native(
+        daemon,
+        json!({"op":"sync","registration":token,"until_ordinal":18}),
+    );
+    assert!(sync.get("error").is_none(), "{sync}");
+    let end = Instant::now() + Duration::from_secs(20);
+    loop {
+        let job =
+            daemon.cli(&["job", "show", sync["data"]["id"].as_str().unwrap()])["data"].clone();
+        if !matches!(job["state"].as_str(), Some("queued" | "running")) {
+            assert_eq!(job["state"], "succeeded", "{job}");
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "fixture capture did not finish: {job}"
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+}
+
+#[test]
+fn consult_delegate_two_parents_refuse_without_deadlock() {
+    let (daemon, event, _) = consult_fixture("delegate_parents");
+    let workspace = daemon.root.join("workspace");
+    let second_session = "01a184c7-1cbf-7093-af67-23202f7dceec";
+    let transcript = workspace.join("second.jsonl");
+    let text = std::fs::read_to_string(workspace.join("native.jsonl"))
+        .unwrap()
+        .replace(
+            event["call"]["session_id"].as_str().unwrap(),
+            second_session,
+        );
+    std::fs::write(&transcript, text).unwrap();
+    let registered = native(
+        &daemon,
+        json!({"op":"register","binary":daemon.root.join("codex"),"session_id":second_session,"transcript_path":transcript,"cwd":workspace,"native_home":daemon.root.join("native-home")}),
+    );
+    assert!(registered.get("error").is_none(), "{registered}");
+    let token = registered["data"]["registration"].as_str().unwrap();
+    sync_consult_fixture(&daemon, token);
+    let mut second = event.clone();
+    second["registration"] = json!(token);
+    second["call"]["session_id"] = json!(second_session);
+    let first = native(&daemon, event);
+    let second = native(&daemon, second);
+    for submitted in [&first, &second] {
+        assert!(submitted.get("error").is_none(), "{submitted}");
+        let end = Instant::now() + Duration::from_secs(15);
+        loop {
+            let job =
+                daemon.cli(&["job", "show", submitted["data"]["id"].as_str().unwrap()])["data"]
+                    .clone();
+            if !matches!(job["state"].as_str(), Some("queued" | "running")) {
+                assert_eq!(job["state"], "succeeded", "{job}");
+                assert_eq!(job["run_trace"]["usage"]["starts"], 1);
+                break;
+            }
+            assert!(Instant::now() < end, "parent delegate deadlocked: {job}");
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    }
+    assert_ne!(first["data"]["id"], second["data"]["id"]);
+    assert_eq!(
+        std::fs::read_to_string(daemon.root.join("starts"))
+            .unwrap()
+            .lines()
+            .count(),
+        2
+    );
+}
+
+#[test]
+fn consult_delegate_default_capacity_refuses_without_deadlock() {
+    consult_delegation("delegate_denied", 1, "DELEGATION_UNAVAILABLE");
+}
+
+#[test]
+fn consult_delegate_descendants_share_budget_and_origin() {
+    consult_delegation("delegate_tree", 3, "BUDGET_EXHAUSTED");
+}
+
+#[test]
+fn consult_delegate_failure_keeps_other_branch_evidence() {
+    consult_delegation("delegate_failure", 3, "AUTH_REQUIRED");
+}
+
+fn consult_delegation(scenario: &str, starts: usize, gap: &str) {
+    let (daemon, event, bound) = consult_fixture(scenario);
+    let submitted = native(&daemon, event);
+    assert!(submitted.get("error").is_none(), "{submitted}");
+    let end = Instant::now() + Duration::from_secs(20);
+    let job = loop {
+        let job =
+            daemon.cli(&["job", "show", submitted["data"]["id"].as_str().unwrap()])["data"].clone();
+        if !matches!(job["state"].as_str(), Some("queued" | "running")) {
+            break job;
+        }
+        assert!(Instant::now() < end, "delegate did not finish: {job}");
+        std::thread::sleep(Duration::from_millis(10));
+    };
+    assert_eq!(job["state"], "succeeded", "{job}");
+    let output: Value = serde_json::from_str(job["result"]["output"].as_str().unwrap()).unwrap();
+    assert_eq!(output["answer"], "bounded-context");
+    assert!(
+        output["gaps"].as_array().unwrap().iter().any(|v| v == gap),
+        "{output}"
+    );
+    assert!(!output["evidence"].as_array().unwrap().is_empty());
+    assert_eq!(
+        std::fs::read_to_string(daemon.root.join("starts"))
+            .unwrap()
+            .lines()
+            .count(),
+        starts
+    );
+    let trace = &job["run_trace"];
+    assert_eq!(trace["usage"]["starts"], starts);
+    let runs = trace["runs"].as_array().unwrap();
+    assert_eq!(runs.len(), starts);
+    assert!(
+        runs.iter()
+            .all(|r| r["origin"] == bound["data"]["invocation_id"])
+    );
+    assert!(
+        runs.iter()
+            .all(|r| r["state"] == "succeeded" || r["state"] == "failed")
+    );
+    assert!(runs[0]["parent"].is_null());
+    for run in &runs[1..] {
+        assert!(runs.iter().any(|parent| parent["id"] == run["parent"]
+            && parent["depth"].as_u64().unwrap() + 1 == run["depth"].as_u64().unwrap()));
+    }
+    if scenario == "delegate_tree" {
+        assert_eq!(trace["usage"]["tokens"], 72);
+    }
+    if scenario == "delegate_failure" {
+        assert_eq!(runs[1]["error"], "AUTH_REQUIRED");
+        assert_eq!(runs[2]["state"], "succeeded");
+    }
 }
 
 #[test]
@@ -331,6 +481,11 @@ fn consult_detached_descendants_settle_before_cancellation_releases_ownership() 
     consult_lifecycle("cancel_detached");
 }
 
+#[test]
+fn consult_delegate_cancellation_and_crash_reap_the_whole_run_tree() {
+    consult_lifecycle("delegate_cancel");
+}
+
 fn consult_lifecycle(scenario: &str) {
     use rustix::process::{Pid, PidfdFlags, Signal, pidfd_open, pidfd_send_signal};
     struct Cleanup(Vec<rustix::fd::OwnedFd>);
@@ -353,7 +508,12 @@ fn consult_lifecycle(scenario: &str) {
         }
         let mut cleanup = Cleanup(Vec::new());
         let mut processes = Vec::new();
-        for file in ["runner.pid", "child.pid"] {
+        let files = if scenario == "delegate_cancel" {
+            vec!["parent.pid", "runner.pid", "child.pid"]
+        } else {
+            vec!["runner.pid", "child.pid"]
+        };
+        for file in files {
             let pid: i32 = std::fs::read_to_string(daemon.root.join(file))
                 .unwrap()
                 .parse()
@@ -418,6 +578,15 @@ fn consult_lifecycle(scenario: &str) {
                 "RUNNER_INTERRUPTED"
             }
         );
+        let runs = job["data"]["run_trace"]["runs"].as_array().unwrap();
+        assert_eq!(
+            runs.len(),
+            if scenario == "delegate_cancel" { 2 } else { 1 }
+        );
+        for run in runs {
+            assert_eq!(run["state"], "failed");
+            assert_eq!(run["error"], job["data"]["error"]);
+        }
         assert_eq!(
             std::fs::read_dir(daemon.root.join("data/runner-work"))
                 .unwrap()
@@ -428,7 +597,11 @@ fn consult_lifecycle(scenario: &str) {
         assert_eq!(native(&daemon, event)["data"]["id"], id);
         assert_eq!(
             std::fs::read_to_string(daemon.root.join("starts")).unwrap(),
-            "start\n"
+            if scenario == "delegate_cancel" {
+                "start\nstart\n"
+            } else {
+                "start\n"
+            }
         );
     }
 }

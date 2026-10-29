@@ -939,6 +939,15 @@ impl Service {
         let (revision, job) = self.job(id)?;
         self.authorize_job(&job)?;
         let mut value = serde_json::to_value(&job)?;
+        if job.consult_plan.is_some()
+            && let Some(trace) = &job.result
+        {
+            value["run_trace"] =
+                json!({"usage":trace["usage"],"deadline":trace["deadline"],"runs":trace["runs"]});
+            if job.state != "succeeded" {
+                value["result"] = Value::Null;
+            }
+        }
         if job.model_plan.is_some()
             && let Some(result) = &job.result
         {
@@ -1013,6 +1022,16 @@ impl Service {
     ) -> Result<()> {
         job.state = state.into();
         job.error = error.map(str::to_owned);
+        if job.consult_plan.is_some()
+            && let Some(runs) = job.result.as_mut().and_then(|r| r["runs"].as_array_mut())
+        {
+            for run in runs {
+                if run["state"] == "running" {
+                    run["state"] = json!("failed");
+                    run["error"] = json!(error.unwrap_or("RUNNER_INTERRUPTED"));
+                }
+            }
+        }
         job.lease_owner = None;
         job.lease_until_ms = None;
         let (previous, mut ids) = self.active()?;
