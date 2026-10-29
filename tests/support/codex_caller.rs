@@ -347,6 +347,20 @@ async fn concurrent_registered_sessions_in_one_workspace_keep_separate_fences() 
     .unwrap();
     let mut second_call = first_call.clone();
     second_call.session_id = second.source.session.clone();
+    // Exercise concurrent identity binding independently of the bounded cold-capture budget.
+    for registration in [&first, &second] {
+        let report = reconcile_transcript(
+            &store,
+            &registration.source,
+            registration.scope.clone(),
+            &registration.transcript,
+            10,
+            1,
+        )
+        .await
+        .unwrap();
+        assert_eq!(report.processed, 10);
+    }
     let one = CodexCaller::new(store.clone(), first, first_call.clone(), 1);
     let two = CodexCaller::new(store.clone(), second, second_call.clone(), 1);
     let (left, right) = tokio::join!(
