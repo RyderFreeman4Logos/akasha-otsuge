@@ -46,8 +46,11 @@ reproduces it; preserving the opaque ID fixes it. Seven Node and13 Pi regression
 pass. Both native protocols now pass Runner/RPC Caller and real foreground-TUI
 coverage (four TUI bindings and11 jobs each). Compact source-bound evidence is
 retained under `protocol-controlled/`. An expanded daemon check exposed a
-short-control overlap assertion failure; its diagnosis and the next final gate,
-independent review and publication remain open. The complete TODO retains all
+short-control overlap assertion failure. A controlled late-observer probe proves
+that the status snapshot can reject actual overlap; test-only endpoint timestamps
+now verify the overlap after terminal collection. The focused check passes with
+unchanged timeouts. The original failed run's exact timing remains unknown.
+The next final gate, independent review and publication remain open. The complete TODO retains all
 acceptance criteria and dependencies.
 
 ## Completed Hermes adapter: MVP-014

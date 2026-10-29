@@ -677,8 +677,12 @@ Completed #14 implementation evidence:
   both native protocols pass five Runner cases, six RPC bindings/19 jobs and
   four real controlling-terminal bindings/11 jobs each. All scratch is removed.
   The broader focused daemon run exposed a short-control overlap assertion
-  failure (41 passes, one failure); preserve it for causal diagnosis. Final gate,
-  independent R3 review, CI and authenticated acceptance remain open.
+  failure (41 passes, one failure). A bounded late-observer diagnostic reproduces
+  the false assertion despite actual provider overlap (second request at102ms,
+  first response at1000ms). The harness now measures real provider overlap after
+  both jobs terminate; the focused check passes without changing any timeout.
+  The initial failure's exact timing remains unknown. Final gate, independent
+  R3 review, CI and authenticated acceptance remain open.
 
 The sole source writer starts from `24eda5a` on `feat/mvp-015-pi-adapter` at
 2026-10-29T06:23:17Z. A separate installation-only helper may qualify Pi1.4.0;
