@@ -1,9 +1,11 @@
 # Hermes 0.22.5 integration
 
-MVP-014 is in progress. The native Caller plugin, canonical export decoder and
-durable capture bridge and independent Runner are implemented. Authenticated
-CLI, interactive TUI and Runner acceptance pass. `akasha_consult` currently returns its
-binding diagnostic; the final consult workflow belongs to MVP-016.
+MVP-014's native Caller, canonical export, durable capture and independent Runner
+are merged. Its authenticated CLI, interactive TUI and Runner receipts are retained
+below. `akasha_consult` now submits a durable Consult with verified identity and an
+optional hint. Public status/results and receipt continuation are documented in
+[the shared guide](../../adapters.md#consult-results-and-continuation); subsequent
+native Consult samples are in [MVP-016 evidence](../../benchmarks/results/mvp016/README.md).
 
 | Surface | Current evidence |
 | --- | --- |
@@ -42,10 +44,12 @@ the public plugin CLI extension `hermes akasha-runner` and Hermes' native
 `AIAgent` in its owned process instead. Native configuration, runtime credential
 resolution, provider fallback and reasoning settings remain owned by Hermes.
 The Python bridge registers tools and translates native execution results;
-Rust owns read authorization, budgets and context retrieval.
+Rust owns read authorization, budgets and context retrieval. Private callbacks
+retain the original run deadline while queued behind delegated research; ordinary
+Caller IPC retains its short transport timeout.
 
 Runner requires the selected profile to enable the installed plugin with
-`plugins.isolation: in_process` and expose the four context tools directly
+`plugins.isolation: in_process` and expose the nine scoped research tools directly
 (`tools.tool_search.enabled: off`). Hermes explicitly skips plugin CLI commands
 under `host` isolation; that mode is supported for Caller capture, not Runner.
 The installer never changes these settings. An unexpected actual native tool

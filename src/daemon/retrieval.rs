@@ -20,10 +20,14 @@ impl Service {
         plan: RetrievalRequest,
     ) -> Result<Value> {
         plan.validate()?;
-        self.submit_job(id, None, None, None, Some(plan)).await
+        self.submit_job(id, None, None, None, Some(plan), None)
+            .await
     }
 
-    fn retrieval_snapshot(&self, generation: u64) -> Result<Arc<crate::config::Snapshot<()>>> {
+    pub(super) fn retrieval_snapshot(
+        &self,
+        generation: u64,
+    ) -> Result<Arc<crate::config::Snapshot<()>>> {
         let checkpoint = configuration::load(
             &self.storage,
             &format!("daemon/config-generation/{generation:020}"),
@@ -52,22 +56,11 @@ impl Service {
         Ok(requested.clone())
     }
 
-    async fn retrieval_result(&self, id: &str, workflow: &Deadline) -> Result<Value> {
-        let (plan, config, target, vector_generation) = {
-            let _guard = self.admission.lock().await;
-            let (_, job) = self.job(id)?;
-            self.authorize_job(&job)?;
-            let restored = self.retrieval_snapshot(job.config_generation)?;
-            if restored.resolved().digest() != job.config_digest {
-                return Err(Error("CONFIG_CORRUPT"));
-            }
-            (
-                job.retrieval_plan.ok_or(Error("JOB_CORRUPT"))?,
-                restored,
-                job.retrieval_target_seq,
-                job.retrieval_vector_config_generation,
-            )
-        };
+    pub(super) async fn retrieval_index(
+        &self,
+        id: &str,
+        workflow: &Deadline,
+    ) -> Result<Arc<Index>> {
         let index = {
             let mut owned = tokio::select! {
                 guard=self.search_index.lock()=>guard,
@@ -91,6 +84,26 @@ impl Service {
             }
             owned.as_ref().ok_or(Error("INDEX_MISSING"))?.clone()
         };
+        Ok(index)
+    }
+
+    async fn retrieval_result(&self, id: &str, workflow: &Deadline) -> Result<Value> {
+        let (plan, config, target, vector_generation) = {
+            let _guard = self.admission.lock().await;
+            let (_, job) = self.job(id)?;
+            self.authorize_job(&job)?;
+            let restored = self.retrieval_snapshot(job.config_generation)?;
+            if restored.resolved().digest() != job.config_digest {
+                return Err(Error("CONFIG_CORRUPT"));
+            }
+            (
+                job.retrieval_plan.ok_or(Error("JOB_CORRUPT"))?,
+                restored,
+                job.retrieval_target_seq,
+                job.retrieval_vector_config_generation,
+            )
+        };
+        let index = self.retrieval_index(id, workflow).await?;
         if workflow.expired().is_some() {
             return Err(Error("WORKFLOW_TIMEOUT"));
         }

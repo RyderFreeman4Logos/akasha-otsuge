@@ -118,6 +118,7 @@ fn invalid_configs_fail_closed_and_errors_never_echo_values() {
         "[models.m]\nkind='embedding'\nendpoint='http://localhost:9999/v1'\nmodel='m'\ndimension=65537\nlocal=true",
         "[retrieval]\nembedding='absent'",
         "[consult]\nexecutor='absent'",
+        "[executors.one]\nkind='codex'\nbinary='codex'\nnative_home='relative'",
         "[access]\nread_roots=['relative']",
         "[paths]\ndata_dir='relative'",
         "[profiles.unused.timeouts]\nDO_NOT_LEAK=1",

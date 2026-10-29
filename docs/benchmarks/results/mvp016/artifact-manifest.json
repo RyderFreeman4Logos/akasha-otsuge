@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 5837,
+      "sha256": "a700170afee544db3dcdf576811900c19eadbafd335d1f69bbad05ffb8bb41ae"
+    },
+    {
+      "path": "group-settlement.json",
+      "bytes": 9044,
+      "sha256": "c589a207e34b46a4290a9d1e74d1e883b771370b28ccc1a72b4fc469f9192092"
+    },
+    {
+      "path": "harnesses/mvp016-codex-pin.json",
+      "bytes": 736,
+      "sha256": "2907e442f6456bbb46c39d496f906e55d5c1b63d566c51c34e04604f6b77c4d9"
+    },
+    {
+      "path": "harnesses/mvp016-native-consult-v6.py",
+      "bytes": 10386,
+      "sha256": "fdf174c68aed172647c301e283dd618937495d3713359af82526729becba76b6"
+    },
+    {
+      "path": "harnesses/mvp016-native-hermes-v6.py",
+      "bytes": 11765,
+      "sha256": "04acb744084ad8941f7fb242188cf3496ac71ffbb2579d19d41c814618e7cb77"
+    },
+    {
+      "path": "harnesses/mvp016-native-long-v2.py",
+      "bytes": 7504,
+      "sha256": "d3ba74c0b100b946713c202214dba2aef489dc023ccd76900e1116795c382973"
+    },
+    {
+      "path": "harnesses/mvp016-pi-greeting-probe-v2.py",
+      "bytes": 3408,
+      "sha256": "e9ca8b3c929c27d69dac1f962605dffb8c946ce1d04fafca7347a763a51a6e9d"
+    },
+    {
+      "path": "harnesses/mvp016_native_provider_long.py",
+      "bytes": 10037,
+      "sha256": "493f6faa356966fdc7419d916c0ea5ecadcc43564edfa48899ecbb04ec88e2b1"
+    },
+    {
+      "path": "harnesses/mvp016_native_trace2.py",
+      "bytes": 2627,
+      "sha256": "18b8fc8a1c4cec8b90097679286e1091ab8dd0627e8478235553c0431bff4d26"
+    },
+    {
+      "path": "mvp016-ci104-failure.txt",
+      "bytes": 3002,
+      "sha256": "2d18231df30e5ba830b5f273efab0b93d7c99fb563c85e61edb84336bc69ac17"
+    },
+    {
+      "path": "mvp016-group-settlement-green.log",
+      "bytes": 20056,
+      "sha256": "ca67460cdf63a4ed5b63d64afcd0b7d40ab3d599945a1feb003dc339746990a1"
+    },
+    {
+      "path": "mvp016-group-settlement-red.log",
+      "bytes": 2907,
+      "sha256": "9d3d61bda43c8f0644684183b75d264e6fb2611cd63cf3a0c365f20a0d05578e"
+    },
+    {
+      "path": "mvp016-hermes-greeting-red.log",
+      "bytes": 1847,
+      "sha256": "67acc01119df5d8abaa2d22d5f8110f7f747fe61a6b7690dfdc149e8eecced53"
+    },
+    {
+      "path": "mvp016-native-cases-r8.log",
+      "bytes": 1075,
+      "sha256": "bc95cd9fb80b52947d00ad9b763ef6b302d7311ca6197de3428da7234f91f174"
+    },
+    {
+      "path": "mvp016-native-long-r1/config.toml",
+      "bytes": 204,
+      "sha256": "87999210bcf5063beb307c7efaedab4d570aeddafcf6b0be5e6b3ebb57866632"
+    },
+    {
+      "path": "mvp016-native-long-r1/protocol-control.log",
+      "bytes": 529,
+      "sha256": "e8d9cedd5be0c200f122851d3400ad42acb70a3f364a97c9174f4ac191dfca26"
+    },
+    {
+      "path": "mvp016-native-long-r1/state.json",
+      "bytes": 2383,
+      "sha256": "37300203df5c5408a7e2489c505051429fe68cc3d76e3cbb54a87a68665ea948"
+    },
+    {
+      "path": "mvp016-native-long-r1/terminal.json",
+      "bytes": 236,
+      "sha256": "ed023eb82b6979c2ea531dd27bd9218b5deaa703196f4d3bdb3e503167a9cb61"
+    },
+    {
+      "path": "mvp016-native-long-r2/config.toml",
+      "bytes": 204,
+      "sha256": "87999210bcf5063beb307c7efaedab4d570aeddafcf6b0be5e6b3ebb57866632"
+    },
+    {
+      "path": "mvp016-native-long-r2/deadline-cleanup.log",
+      "bytes": 531,
+      "sha256": "243d876f62b57583ff018028ccb0d69ad87c358ff9502e23f75e4536c56f7d35"
+    },
+    {
+      "path": "mvp016-native-long-r2/long-complete.log",
+      "bytes": 615,
+      "sha256": "dc3906a5bd6b1f096ac0cecc89903aa73ac0a582a38852127c4e8572a4a5b909"
+    },
+    {
+      "path": "mvp016-native-long-r2/protocol-control.log",
+      "bytes": 168,
+      "sha256": "c6fe3c67237adc6a19f282be13960284f8de8ca244409c13b2a266a83cf9f8cc"
+    },
+    {
+      "path": "mvp016-native-long-r2/state.json",
+      "bytes": 5144,
+      "sha256": "09b2b76f8d2cbb6a9ea2668a08e3d3ebfd0bb064bc9a34cd47d5e3a8677b5b03"
+    },
+    {
+      "path": "mvp016-native-long-r2/terminal.json",
+      "bytes": 237,
+      "sha256": "694f7b897ea4ec4465950d1db50a9a36a75fabbf7a75a79a8c2e01ecb3de4da4"
+    },
+    {
+      "path": "mvp016-native-long-r3/config.toml",
+      "bytes": 204,
+      "sha256": "87999210bcf5063beb307c7efaedab4d570aeddafcf6b0be5e6b3ebb57866632"
+    },
+    {
+      "path": "mvp016-native-long-r3/deadline-cleanup.log",
+      "bytes": 532,
+      "sha256": "92792159d26802d8b2616e961ae10b3cdbbd9de9aa190a22398d5bd6484ad05f"
+    },
+    {
+      "path": "mvp016-native-long-r3/long-complete.log",
+      "bytes": 254,
+      "sha256": "69d9e2c69c9da5e0c6115ace84ff831be6c1b9d838ac618be08afe6522c74443"
+    },
+    {
+      "path": "mvp016-native-long-r3/protocol-control.log",
+      "bytes": 167,
+      "sha256": "78c2276e7bed4e4a1ac649cfd13184414818c8d06b71b5f20ca38819f8f63ada"
+    },
+    {
+      "path": "mvp016-native-long-r3/state.json",
+      "bytes": 7144,
+      "sha256": "0d630f792b5d7df91edae5819561bc8cad6dd501f412cccfb643235e16f7cadc"
+    },
+    {
+      "path": "mvp016-native-long-r3/terminal.json",
+      "bytes": 237,
+      "sha256": "b608dd5edb9ea439cb699886df4bac710359dcaf08d21f7dc8783dac46bf3a85"
+    },
+    {
+      "path": "mvp016-pi-greeting-probe-red-r2.json",
+      "bytes": 1008,
+      "sha256": "a07dfa54336ea8fb5e4c1921b31f873348c24ac5cb1585ece6156d4f6e93b898"
+    },
+    {
+      "path": "mvp016-pi-queued-greeting-red.log",
+      "bytes": 3358,
+      "sha256": "06449376dbb87371ac2249099372f0c8f77477bd18f25348bd6228810710b84f"
+    },
+    {
+      "path": "mvp016-queued-greeting-green.log",
+      "bytes": 9824,
+      "sha256": "f07a565ca28247dc4c09820238aeca8b7e961bd509a1a0e184971c2ab107b24b"
+    },
+    {
+      "path": "native-consult.json",
+      "bytes": 68023,
+      "sha256": "8f7c18c1755a8cad6f615c7e0702595725971c44f150a53e5874e80f3a2cc176"
+    },
+    {
+      "path": "qualification.json",
+      "bytes": 3439,
+      "sha256": "713d6f132b2b22638262f1e8e714f8a0a285e88e2e0b4acd21be4b50e10248c9"
+    },
+    {
+      "path": "reuse.json",
+      "bytes": 954,
+      "sha256": "e9cf458ca27d58a5047dafc36a8a1e1a8aac226a15cf66a0bfd11f48eea98731"
+    }
+  ]
+}

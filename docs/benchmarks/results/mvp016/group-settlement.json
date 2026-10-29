@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "tested_candidate": {
+    "base_head": "f55d19b3ed91e195012e90339492c2168cd89be0",
+    "native_source_sha256": "ad793c5c0d11ba62ec7ac4c8f859e88921388bccf6f4c3f82c044de5f6893f90",
+    "tracked_patch_sha256": "a5f30da0f06aa1f78d5762b268f26dddd5bd7a284c7a6f509b2b15a65d37b174",
+    "note": "Focused checks ran with the native.rs repair uncommitted on this base. The final commit and gate are recorded separately on PR45."
+  },
+  "focused": {
+    "rust_passed": 73,
+    "rust_ignored": 10,
+    "clippy": "PASS",
+    "fmt": "PASS",
+    "terminal": {
+      "exit_code": 0,
+      "head": "f55d19b3ed91e195012e90339492c2168cd89be0",
+      "log_sha256": "ca67460cdf63a4ed5b63d64afcd0b7d40ab3d599945a1feb003dc339746990a1",
+      "seconds": 127.46810177434236,
+      "utc": "2026-10-29T20:53:13.571253+00:00"
+    }
+  },
+  "native": {
+    "started_utc": "2026-10-29T20:53:08.127603+00:00",
+    "scratch": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/akasha-native-pi-runner-lj77f7lp",
+    "provider_api": "openai-completions",
+    "kind": "actual Pi CLI RPC with controlled local SSE; no authenticated model",
+    "status": "PASS_NATIVE_CONTROLLED_RUNNER",
+    "binary_sha256": {
+      "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/akasha-otsuge": "ecd52612e230be18faf4fb77060430c9616cbef19c873df1b220b83d03738819",
+      "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi": "2d6702dd4a52461f50f304bcef3aa0261464ea0b921f72ea7ed6d07df16edef0",
+      "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a": "29302a9064955de0d47d3e529a728fcd9b3e78fdd4183e80a416f07ab0399a55"
+    },
+    "cases": [
+      {
+        "case": "roundtrip",
+        "exit_code": 0,
+        "requests": [
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 0
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 1
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 2
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 3
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 4
+          }
+        ],
+        "errors": [],
+        "residual_before_cleanup": []
+      },
+      {
+        "case": "retry",
+        "exit_code": 0,
+        "requests": [
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 0
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 0
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 1
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 2
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 3
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 4
+          }
+        ],
+        "errors": [],
+        "residual_before_cleanup": []
+      },
+      {
+        "case": "denied",
+        "exit_code": 0,
+        "requests": [
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 0
+          }
+        ],
+        "errors": [],
+        "residual_before_cleanup": []
+      },
+      {
+        "case": "cancel",
+        "exit_code": 0,
+        "requests": [
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 0
+          },
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 1
+          }
+        ],
+        "errors": [],
+        "residual_before_cleanup": []
+      },
+      {
+        "case": "forbidden",
+        "exit_code": 0,
+        "requests": [
+          {
+            "api": "openai-completions",
+            "tool_names": [
+              "code_read",
+              "code_search",
+              "context_describe",
+              "context_list",
+              "context_read",
+              "context_search",
+              "delegate",
+              "memory_get",
+              "memory_search"
+            ],
+            "previous_tool_results": 0
+          }
+        ],
+        "errors": [],
+        "residual_before_cleanup": []
+      }
+    ],
+    "other_cli_absent": {
+      "claude": true,
+      "codex": true,
+      "hermes": true
+    },
+    "processes_ended": true,
+    "scratch_removed": true,
+    "finished_utc": "2026-10-29T20:53:13.548413+00:00"
+  }
+}

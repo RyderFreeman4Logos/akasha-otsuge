@@ -2,11 +2,13 @@ import contextvars
 import importlib.util
 import io
 import json
+import os
 import pathlib
 import socket
 import struct
 import tempfile
 import threading
+import time
 import types
 import unittest
 from unittest.mock import patch
@@ -36,8 +38,9 @@ def send(sock, value):
 
 
 class Server:
-    def __init__(self, path):
+    def __init__(self, path, greeting_delay=0):
         self.path = path
+        self.greeting_delay = greeting_delay
         self.requests = []
         self.errors = []
         self.stop = threading.Event()
@@ -67,6 +70,8 @@ class Server:
             with client:
                 client.settimeout(2)
                 try:
+                    if self.stop.wait(self.greeting_delay):
+                        return
                     send(client, {'protocol_version': 1, 'max_message_bytes': 2097152})
                     request = receive(client)
                     self.requests.append(request)
@@ -116,6 +121,51 @@ class Context:
 
 
 class HermesPlugin(unittest.TestCase):
+    def test_runner_queued_greeting_uses_original_deadline(self):
+        name = 'akasha-' + 'c' * 64
+        for budget_ms, greeting_delay, error in [(30000, 11, None), (2000, 2.5, 'RUNNER_TIMEOUT')]:
+            with self.subTest(budget_ms=budget_ms):
+                server = Server('\0' + name, greeting_delay=greeting_delay)
+                server.reply = lambda r: {'schema_version': 1, 'sequence': 1,
+                    'request_id': r['request_id'], 'data': {'answer': 'queued research'}}
+                try:
+                    with patch.dict(os.environ, {
+                        'AKASHA_HERMES_RUN_SOCKET': name,
+                        'AKASHA_HERMES_RUN_TOKEN': 'b' * 64,
+                        'AKASHA_RUN_DEADLINE_MS': str(int(time.time() * 1000) + budget_ms),
+                    }):
+                        if error:
+                            with self.assertRaisesRegex(self.plugin.BridgeError, error):
+                                self.plugin._exchange(self.ctx, {'op': 'context'}, runner=True)
+                        else:
+                            result = self.plugin._exchange(self.ctx, {'op': 'context'}, runner=True)
+                            self.assertEqual(result['answer'], 'queued research')
+                finally:
+                    server.close()
+
+    def test_runner_research_uses_original_deadline(self):
+        name = 'akasha-' + 'a' * 64
+        server = Server('\0' + name)
+        self.addCleanup(server.close)
+        def delayed(request):
+            time.sleep(11)
+            return {'schema_version': 1, 'sequence': 1,
+                    'request_id': request['request_id'], 'data': {'answer': 'slow research'}}
+        server.reply = delayed
+        with patch.dict(os.environ, {
+            'AKASHA_HERMES_RUN_SOCKET': name,
+            'AKASHA_HERMES_RUN_TOKEN': 'b' * 64,
+            'AKASHA_RUN_DEADLINE_MS': str(int(time.time() * 1000) + 30000),
+        }):
+            result = self.plugin._exchange(self.ctx, {'op': 'context', 'request': {'operation': 'delegate', 'hint': 'child'}}, runner=True)
+            self.assertEqual(result['answer'], 'slow research')
+            os.environ['AKASHA_RUN_DEADLINE_MS'] = '1'
+            with self.assertRaisesRegex(self.plugin.BridgeError, 'RUNNER_TIMEOUT'):
+                self.plugin._exchange(self.ctx, {'op': 'context'}, runner=True)
+            del os.environ['AKASHA_RUN_DEADLINE_MS']
+            with self.assertRaisesRegex(self.plugin.BridgeError, 'CONFIG_INVALID'):
+                self.plugin._exchange(self.ctx, {'op': 'context'}, runner=True)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='akasha-hermes-plugin-')
         self.addCleanup(self.temp.cleanup)
@@ -169,7 +219,9 @@ class HermesPlugin(unittest.TestCase):
                          'turn_id': 'turn-a', 'tool_call_id': 'call-a',
                          'profile_home': str(self.home_a), 'cwd': str(self.root)})
         self.assertEqual(event['binary'], '/native/hermes')
-        self.assertEqual(len(self.server.requests), 2)
+        self.assertEqual([r['command']['event']['op'] for r in self.server.requests],
+                         ['bind', 'bind', 'consult', 'consult'])
+        self.assertEqual(self.server.requests[-1]['command']['event']['args'], {'hint': 'preferences'})
 
     def test_duplicate_pending_calls_fail_closed_and_session_end_recovers(self):
         self.assertIsNone(self.bind())
@@ -233,7 +285,7 @@ class HermesPlugin(unittest.TestCase):
                                       'AKASHA_HERMES_RUN_TOKEN': 'a' * 64}), \
                 patch.object(self.plugin, '_exchange', side_effect=exchange):
             self.plugin.register(runner)
-            names = {'context_describe', 'context_list', 'context_read', 'context_search'}
+            names = {'code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search'}
             self.assertEqual(set(runner.tools), names)
             self.assertEqual(set(runner.hooks), {'pre_tool_call'})
             self.assertEqual(events, [])
@@ -253,12 +305,14 @@ class HermesPlugin(unittest.TestCase):
         request.write_text('Read context.')
         request.chmod(0o600)
         args = types.SimpleNamespace(request=str(request), budget=30.0)
-        names = {'context_describe', 'context_list', 'context_read', 'context_search'}
+        names = {'code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search'}
         calls = []
         completion = {}
         class Agent:
             valid_tool_names = names
             session_id = 'native-session'
+            session_prompt_tokens = 12
+            session_output_tokens = 7
             def __init__(self, **kwargs):
                 calls.append(kwargs)
             def run_conversation(self, prompt):
@@ -275,19 +329,25 @@ class HermesPlugin(unittest.TestCase):
         }
         native = __import__('sys').modules['hermes_constants']
         native.resolve_reasoning_config = lambda *a: None
-        for widened, completion in ((False, {}), (True, {}), (False, {'partial': True}),
-                                    (False, {'completed': False}), (False, {'interrupted': True})):
+        route = {'kind':'text', 'endpoint':'http://127.0.0.1:9/v1', 'model':'chosen-model', 'local':True}
+        cases = [(False, {}, None), (True, {}, None), (False, {'partial': True}, None),
+                 (False, {'completed': False}, None), (False, {'interrupted': True}, None),
+                 (False, {}, route)]
+        for widened, completion, selected in cases:
             failed = widened or bool(completion)
             calls.clear()
             Agent.valid_tool_names = names | ({'terminal'} if widened else set())
             output = io.StringIO()
             with patch.dict('sys.modules', modules), patch('sys.stdout', output), \
-                    patch.object(self.plugin, '_exchange', return_value={'ready': True}), \
+                    patch.dict(os.environ, {'AKASHA_EXECUTOR_MODEL':json.dumps(selected) if selected else '', 'AKASHA_EXECUTOR_KEY':'test-only-fixture-token'}), \
+                    patch.object(self.plugin, '_exchange', side_effect=lambda ctx, event, **kw: {'ready': True} if event['op'] == 'ready' else {'accepted': True}), \
                     self.assertRaises(SystemExit) as exited:
                 self.plugin._run_native(self.ctx, names, args)
             self.assertEqual(exited.exception.code, 1 if failed else 0)
             frames = [json.loads(s) for s in output.getvalue().splitlines()]
             self.assertEqual(frames[-1]['exit_code'], 1 if failed else 0)
+            if not failed:
+                self.assertEqual(frames[-1]['tokens'], {'input':12, 'output':7})
             self.assertEqual(calls[-1], 'closed')
             if widened:
                 self.assertNotIn('Read context.', calls)
@@ -297,6 +357,11 @@ class HermesPlugin(unittest.TestCase):
                 self.assertEqual(calls[0]['enabled_toolsets'], ['akasha_context'])
                 self.assertGreater(calls[0]['run_budget_seconds'], 0)
                 self.assertLessEqual(calls[0]['run_budget_seconds'], 30)
+                if selected:
+                    self.assertEqual(calls[0]['model'], 'chosen-model')
+                    self.assertEqual(calls[0]['base_url'], selected['endpoint'])
+                    self.assertEqual(calls[0]['api_key'], 'test-only-fixture-token')
+                    self.assertIsNone(calls[0]['fallback_model'])
 
     def test_omitted_null_and_blank_hints_follow_the_shared_consult_contract(self):
         for args in ({}, {'hint': None}, {'hint': '   '}):

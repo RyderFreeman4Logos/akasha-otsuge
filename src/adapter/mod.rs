@@ -1,8 +1,13 @@
 //! Shared host contracts; host integrations authenticate runtime identity.
 mod budget;
+pub mod claude;
 pub use budget::*;
 mod runner;
 pub use runner::*;
+mod executor;
+pub(crate) use executor::NativeOptions;
+mod conclusion;
+pub(crate) use conclusion::*;
 mod binding;
 pub use binding::*;
 mod context;
@@ -10,8 +15,11 @@ pub use context::*;
 mod code;
 pub use code::*;
 pub mod codex;
+mod guardian;
 pub mod hermes;
 mod native;
+#[doc(hidden)]
+pub use guardian::run_guard;
 pub mod pi;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::io::{BufRead, Read};

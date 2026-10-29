@@ -7,6 +7,18 @@ use crate::{
 use futures::future::BoxFuture;
 use std::collections::BTreeMap;
 
+pub const RESEARCH_TOOLS: [&str; 9] = [
+    "code_read",
+    "code_search",
+    "context_describe",
+    "context_list",
+    "context_read",
+    "context_search",
+    "delegate",
+    "memory_get",
+    "memory_search",
+];
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(tag = "operation", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ContextRequest {
@@ -25,6 +37,56 @@ pub enum ContextRequest {
         query: String,
         limit: usize,
     },
+    MemorySearch {
+        query: String,
+    },
+    MemoryGet {
+        memory_id: String,
+        revision: u64,
+    },
+    CodeSearch {
+        paths: Vec<String>,
+        query: String,
+    },
+    CodeRead {
+        path: String,
+        start: usize,
+        max_bytes: usize,
+    },
+    Delegate {
+        hint: String,
+    },
+}
+
+impl ContextRequest {
+    pub fn from_tool(name: &str, arguments: serde_json::Value) -> Result<Self> {
+        if !RESEARCH_TOOLS.contains(&name) {
+            return Err(ErrorCode::ToolDenied.into());
+        }
+        let mut args = arguments
+            .as_object()
+            .ok_or(ErrorCode::InvalidArgument)?
+            .clone();
+        let operation = name.strip_prefix("context_").unwrap_or(name);
+        if args.insert("operation".into(), operation.into()).is_some() {
+            return Err(ErrorCode::InvalidArgument.into());
+        }
+        serde_json::from_value(serde_json::Value::Object(args))
+            .map_err(|_| ErrorCode::InvalidArgument.into())
+    }
+    pub fn tool(&self) -> &'static str {
+        match self {
+            Self::Describe {} => "context.describe",
+            Self::List { .. } => "context.list",
+            Self::Read { .. } => "context.read",
+            Self::Search { .. } => "context.search",
+            Self::MemorySearch { .. } => "memory.search",
+            Self::MemoryGet { .. } => "memory.get",
+            Self::CodeSearch { .. } => "code.search",
+            Self::CodeRead { .. } => "code.read",
+            Self::Delegate { .. } => "delegate",
+        }
+    }
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct ContextEvent {
@@ -48,6 +110,7 @@ pub struct ContextText {
     pub total_bytes: usize,
     pub sha256: String,
     pub truncated: bool,
+    pub sources: Vec<crate::domain::SourceSpan>,
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct ContextDescription {
@@ -65,6 +128,8 @@ pub enum ContextResponse {
     Description(ContextDescription),
     Page(ContextPage),
     Text(ContextText),
+    Research(serde_json::Value),
+    Error(AdapterError),
 }
 
 pub trait ContextSource: Send {
@@ -78,6 +143,7 @@ pub struct CapturedContext<'a> {
     storage: &'a Storage,
     invocation: Invocation,
     handles: BTreeMap<String, EventRef>,
+    read_sources: Vec<crate::domain::SourceSpan>,
 }
 impl<'a> CapturedContext<'a> {
     pub fn new(storage: &'a Storage, invocation: Invocation) -> Result<Self> {
@@ -87,7 +153,11 @@ impl<'a> CapturedContext<'a> {
             storage,
             invocation,
             handles: BTreeMap::new(),
+            read_sources: Vec::new(),
         })
+    }
+    pub(crate) fn read_sources(&self) -> &[crate::domain::SourceSpan] {
+        &self.read_sources
     }
     fn check(&self, lease: &RunLease) -> Result<()> {
         if lease.origin() != self.invocation.id() || lease.fence() != self.invocation.fence_hash() {
@@ -248,6 +318,25 @@ impl<'a> CapturedContext<'a> {
             while !text.is_char_boundary(end) {
                 end -= 1;
             }
+            let mut offset = 0;
+            let sources = event
+                .event
+                .normalized
+                .into_iter()
+                .filter_map(|mut source| {
+                    let length = source.end - source.start;
+                    let a = start.max(offset);
+                    let b = end.min(offset + length);
+                    let begin = offset;
+                    offset += length;
+                    if a >= b {
+                        return None;
+                    }
+                    source.start += a - begin;
+                    source.end = source.start + b - a;
+                    Some(source)
+                })
+                .collect();
             Ok(ContextText {
                 text: text[start..end].into(),
                 start,
@@ -255,6 +344,7 @@ impl<'a> CapturedContext<'a> {
                 total_bytes: text.len(),
                 sha256: event.event.text_sha256,
                 truncated: end < text.len(),
+                sources,
             })
         })
         .await
@@ -302,7 +392,18 @@ impl ContextSource for CapturedContext<'_> {
                     }
                     ContextResponse::Page(self.page(lease, cursor, limit, Some(&query)).await?)
                 }
+                _ => return Err(ErrorCode::ToolDenied.into()),
             };
+            if let ContextResponse::Text(text) = &response {
+                for source in &text.sources {
+                    if !self.read_sources.contains(source) {
+                        if self.read_sources.len() >= 64 {
+                            return Err(ErrorCode::BudgetExhausted.into());
+                        }
+                        self.read_sources.push(source.clone());
+                    }
+                }
+            }
             let bytes = serde_json::to_vec(&response)
                 .map_err(|_| ErrorCode::ProtocolInvalid)?
                 .len();

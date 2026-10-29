@@ -72,13 +72,22 @@ async fn rpc_runner_waits_for_settled_after_retries_and_preserves_line_separator
         let mut handle = runner.start(spec, &mut context).await.unwrap();
         let mut collector = RunCollector::new(&lease, 1024);
         let mut calls = 0;
+        let mut usage = None;
         while let Some(event) = handle.next().await.unwrap() {
+            if let RunnerEvent::Usage {
+                input_tokens,
+                output_tokens,
+            } = &event
+            {
+                usage = Some((*input_tokens, *output_tokens));
+            }
             if matches!(&event,RunnerEvent::Tool{name} if name=="context.describe") {
                 calls += 1;
             }
             collector.push(event).unwrap();
         }
         assert_eq!(calls, 1);
+        assert_eq!(usage, Some((20, 4)));
         assert_eq!(
             collector
                 .finish(handle.exit_status().await.unwrap())
@@ -100,6 +109,8 @@ async fn rpc_runner_waits_for_settled_after_retries_and_preserves_line_separator
 #[tokio::test]
 async fn rpc_runner_rejects_authority_protocol_inventory_and_incomplete_terminals() {
     for (scenario, expected) in [
+        ("token_budget", ErrorCode::BudgetExhausted),
+        ("usage_regression", ErrorCode::ProtocolInvalid),
         ("wrong_token", ErrorCode::ReadDenied),
         ("wrong_home", ErrorCode::ReadDenied),
         ("inventory", ErrorCode::ToolDenied),

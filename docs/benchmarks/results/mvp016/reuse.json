@@ -1,0 +1,23 @@
+{
+  "long_run_head": "22543963c36f00923cd5a008a055ef438057c2d7",
+  "bridge_fix_head": "ec95da585a11ed945e0ea22c8973b5cf1219046e",
+  "reused_evidence": "mvp016-native-long-r3",
+  "paths": [
+    {
+      "path": "src/adapter/pi/runner.rs",
+      "sha256": "c9973bbf4d96c46a195f1212836697c4588844dfd782c2d0827690efe68c4a25",
+      "unchanged_from_long_run": true
+    },
+    {
+      "path": "tests/fixtures/pi/1.4.0/native_provider.py",
+      "sha256": "493f6faa356966fdc7419d916c0ea5ecadcc43564edfa48899ecbb04ec88e2b1",
+      "unchanged_from_long_run": true
+    },
+    {
+      "path": "tests/support/pi_runner.rs",
+      "sha256": "e679697ee54eecae02ab8b81676488e188a86cff9c34351febaf55a8bf77b3cd",
+      "unchanged_from_long_run": true
+    }
+  ],
+  "limits": "The long case retains its original binary identity. This source comparison supports reuse of HTTP deadline behavior only; queued bridge changes have separate causal tests and native acceptance."
+}

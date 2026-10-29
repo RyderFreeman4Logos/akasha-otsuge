@@ -128,7 +128,8 @@ test('Caller accepts 512 Unicode characters and rejects 513 before binding', asy
   const accepted = JSON.parse((await execute({hint})).content[0].text);
   assert.equal(accepted.error, undefined);
   assert.equal(accepted.data.invocation_id, 'session-a');
-  assert.deepEqual(f.requests().map(r => r.op), ['register', 'bind']);
+  assert.deepEqual(f.requests().map(r => r.op), ['register', 'consult']);
+  assert.equal(f.requests().at(-1).args.hint, hint);
   const refused = JSON.parse((await execute({hint: hint + '😀'})).content[0].text);
   assert.equal(refused.error.code, 'INVALID_ARGUMENT');
   assert.equal(f.requests().length, 2);
@@ -165,11 +166,14 @@ test('bridge cancellation reaps its child and rejects bounded malformed replies'
 });
 
 test('runner registers only context tools and attests real inventories before work', async t => {
-  const f = fixture(t, `if (event.op === 'ready' || event.op === 'context') {
+  const previous = process.env.AKASHA_RUN_DEADLINE_MS;
+  process.env.AKASHA_RUN_DEADLINE_MS = String(Date.now() + 30000);
+  t.after(() => { if (previous === undefined) delete process.env.AKASHA_RUN_DEADLINE_MS; else process.env.AKASHA_RUN_DEADLINE_MS = previous; });
+  const f = fixture(t, `if (event.op === 'ready' || event.op === 'context' || event.op === 'usage') {
     if (process.argv.at(-1) !== 'pi-context') process.exit(2);
-    console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:event.op === 'ready' ? {ready:true} : {kind:'description'}})); return;
+    console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:event.op === 'ready' ? {ready:true} : event.op === 'usage' ? {accepted:true} : {kind:'description'}})); return;
   }`);
-  const names = ['context_describe', 'context_list', 'context_read', 'context_search'];
+  const names = ['code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search'];
   f.pi.getAllTools = () => names.map(name => ({name}));
   f.pi.getActiveTools = () => names;
   registerRunner(f.pi, () => f.agent, f.defaults, '1.4.0', Object.fromEntries(names.map(name => [name, {type:'object'}])));
@@ -182,6 +186,16 @@ test('runner registers only context tools and attests real inventories before wo
   assert.equal(await f.hooks.tool_call({toolName:'context_read'},f.ctx), undefined);
   const result = await f.tools.context_describe.execute('native-context',{},undefined,undefined,f.ctx);
   assert.equal(JSON.parse(result.content[0].text).kind, 'description');
+  const usage = {input:10,output:3,cacheRead:7,cacheWrite:2,totalTokens:22};
+  await f.hooks.message_end({message:{role:'assistant',usage}},f.ctx);
+  await f.hooks.session_compact({compactionEntry:{usage}},f.ctx);
+  assert.deepEqual(f.requests().filter(r => r.op === 'usage'), [
+    {op:'usage',input_tokens:19,output_tokens:3},
+    {op:'usage',input_tokens:38,output_tokens:6},
+  ]);
+  let aborted = false; f.ctx.abort = () => { aborted = true; };
+  await assert.rejects(f.hooks.message_end({message:{role:'assistant',usage:{...usage,input:-1}}},f.ctx), /PROTOCOL_INVALID/);
+  assert(aborted);
   const count = f.requests().length;
   const denied = await f.tools.context_describe.execute('native-context',{operation:'read'},undefined,undefined,f.ctx);
   assert.equal(JSON.parse(denied.content[0].text).error.code, 'INVALID_ARGUMENT');
@@ -189,4 +203,56 @@ test('runner registers only context tools and attests real inventories before wo
   f.pi.getActiveTools = () => [...names,'bash'];
   await assert.rejects(f.hooks.session_start({},f.ctx), /TOOL_DENIED/);
   assert.equal(f.requests().length, count);
+});
+
+test('runner research may exceed transport timeout but keeps the original deadline', async t => {
+  const f = fixture(t, `setTimeout(() => console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:{answer:'slow research'}})),11000); return;`);
+  const previous = process.env.AKASHA_RUN_DEADLINE_MS;
+  t.after(() => { if (previous === undefined) delete process.env.AKASHA_RUN_DEADLINE_MS; else process.env.AKASHA_RUN_DEADLINE_MS = previous; });
+  process.env.AKASHA_RUN_DEADLINE_MS = String(Date.now() + 30000);
+  assert.equal((await exchange(f.defaults, {op:'context',request:{operation:'delegate',hint:'child'}}, undefined, true)).answer, 'slow research');
+  process.env.AKASHA_RUN_DEADLINE_MS = String(Date.now() - 1);
+  await assert.rejects(exchange(f.defaults, {op:'context'}, undefined, true), /RUNNER_TIMEOUT/);
+  delete process.env.AKASHA_RUN_DEADLINE_MS;
+  await assert.rejects(exchange(f.defaults, {op:'context'}, undefined, true), /CONFIG_INVALID/);
+});
+
+test('runner applies an explicit model route without changing native defaults', async t => {
+  const keys = ['AKASHA_EXECUTOR_MODEL', 'AKASHA_EXECUTOR_KEY', 'AKASHA_RUN_DEADLINE_MS'];
+  const previous = keys.map(key => process.env[key]);
+  t.after(() => keys.forEach((key, i) => { if (previous[i] === undefined) delete process.env[key]; else process.env[key] = previous[i]; }));
+  process.env.AKASHA_EXECUTOR_MODEL = JSON.stringify({kind:'text',endpoint:'http://127.0.0.1:9/v1',model:'chosen',local:true});
+  process.env.AKASHA_EXECUTOR_KEY = 'test-only-fixture-token';
+  process.env.AKASHA_RUN_DEADLINE_MS = String(Date.now()+30000);
+  const f = fixture(t, "console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:{ready:true}}));return;");
+  const names = ['code_read','code_search','context_describe','context_list','context_read','context_search','delegate','memory_get','memory_search'];
+  const model = {id:'chosen',name:'Chosen',provider:'configured',api:'openai-completions',reasoning:false,input:['text'],contextWindow:32768,maxTokens:8192,cost:{input:0,output:0,cacheRead:0,cacheWrite:0}};
+  let registered, selected;
+  f.pi.getAllTools = () => names.map(name => ({name})); f.pi.getActiveTools = () => names;
+  f.pi.registerProvider = (name, config) => { registered = {name,config}; };
+  f.pi.setModel = async value => { selected = value; return true; };
+  f.ctx.model = model;
+  f.ctx.modelRegistry = {getAll:() => [model], find:(provider,id) => ({...model,provider,id})};
+  registerRunner(f.pi, () => f.agent, f.defaults, '1.4.0', Object.fromEntries(names.map(name => [name,{type:'object'}])));
+  await f.hooks.session_start({},f.ctx);
+  assert.equal(registered.name,'akasha_executor');
+  assert.equal(registered.config.baseUrl,'http://127.0.0.1:9/v1');
+  assert.equal(registered.config.apiKey,'$AKASHA_EXECUTOR_KEY');
+  assert.equal(registered.config.models[0].id,'chosen');
+  assert.equal(registered.config.models[0].contextWindow,32768);
+  assert.equal(selected.provider,'akasha_executor');
+  assert.equal(f.ctx.model.provider,'configured');
+  const readyCount = f.requests().length;
+  for (const invalid of [{...model,api:'openai-codex-responses'}, {...model,id:'unknown'}]) {
+    f.ctx.model = invalid;
+    f.ctx.modelRegistry.getAll = () => [invalid];
+    registered = undefined;
+    await assert.rejects(f.hooks.session_start({},f.ctx), /ADAPTER_UNSUPPORTED/);
+    assert.equal(registered,undefined);
+    assert.equal(f.requests().length,readyCount);
+  }
+  f.ctx.model = model;
+  delete process.env.AKASHA_EXECUTOR_KEY;
+  await assert.rejects(f.hooks.session_start({},f.ctx), /AUTH_REQUIRED/);
+  assert.equal(f.requests().length,readyCount);
 });

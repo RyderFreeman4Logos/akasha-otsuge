@@ -1,6 +1,8 @@
 //! Native CLI process ownership shared by version probes and runners.
 use super::{AdapterError, ErrorCode, Result};
-use rustix::process::{Pid, Signal, WaitId, WaitIdOptions, kill_process_group, waitid};
+use rustix::process::{
+    Pid, Signal, WaitId, WaitIdOptions, kill_process, kill_process_group, waitid,
+};
 use std::{
     os::unix::{fs::PermissionsExt, process::CommandExt},
     path::{Path, PathBuf},
@@ -8,6 +10,24 @@ use std::{
     time::Duration,
 };
 use tokio::io::{AsyncRead, AsyncReadExt};
+
+pub(crate) fn bridge_deadline() -> Result<tokio::time::Instant> {
+    let raw = std::env::var("AKASHA_RUN_DEADLINE_MS").map_err(|_| ErrorCode::ConfigInvalid)?;
+    let end = if raw.len() <= 20 && !raw.is_empty() && raw.bytes().all(|b| b.is_ascii_digit()) {
+        raw.parse::<u64>().ok()
+    } else {
+        None
+    }
+    .ok_or(ErrorCode::ConfigInvalid)?;
+    let now = crate::ipc::now_ms().map_err(|_| ErrorCode::SourceUnavailable)?;
+    let remaining = end
+        .checked_sub(now)
+        .filter(|ms| *ms > 0)
+        .ok_or(ErrorCode::RunnerTimeout)?;
+    tokio::time::Instant::now()
+        .checked_add(Duration::from_millis(remaining))
+        .ok_or_else(|| ErrorCode::ConfigInvalid.into())
+}
 
 pub(crate) async fn version_output(binary: &Path, timeout: Duration) -> Result<(PathBuf, String)> {
     let executable = resolve(binary)?;
@@ -25,6 +45,7 @@ pub(crate) async fn version_output(binary: &Path, timeout: Duration) -> Result<(
     let group = ProcessGroup(
         Pid::from_raw(child.id().ok_or(ErrorCode::RunnerFailed)? as i32)
             .ok_or(ErrorCode::RunnerFailed)?,
+        false,
     );
     let stdout = child.stdout.take().ok_or(ErrorCode::RunnerFailed)?;
     let stderr = child.stderr.take().ok_or(ErrorCode::RunnerFailed)?;
@@ -34,7 +55,7 @@ pub(crate) async fn version_output(binary: &Path, timeout: Duration) -> Result<(
     .await
     .map_err(|_| ErrorCode::RunnerTimeout);
     drop(group);
-    let status = reap(child, || {}).wait().await;
+    let status = reap(child, false, || {}).wait().await;
     let (stdout, _, ()) = result??;
     if !status.ok_or(ErrorCode::RunnerTimeout)?.success() {
         return Err(ErrorCode::RunnerFailed.into());
@@ -68,10 +89,15 @@ pub(crate) fn resolve(binary: &Path) -> Result<PathBuf> {
         .ok_or_else(|| ErrorCode::ExecutorUnavailable.into())
 }
 
-pub(crate) struct ProcessGroup(pub(crate) Pid);
+pub(crate) struct ProcessGroup(pub(crate) Pid, pub(crate) bool);
 impl Drop for ProcessGroup {
     fn drop(&mut self) {
-        let _ = kill_process_group(self.0, Signal::KILL);
+        if self.1 {
+            // The unreaped guardian retains its PID and must settle the native tree itself.
+            let _ = kill_process(self.0, Signal::TERM);
+        } else {
+            let _ = kill_process_group(self.0, Signal::KILL);
+        }
     }
 }
 
@@ -143,10 +169,57 @@ impl Reap {
 
 pub(crate) fn reap(
     mut child: tokio::process::Child,
+    guarded: bool,
     cleanup: impl FnOnce() + Send + 'static,
 ) -> Reap {
-    let _ = child.start_kill();
-    reap_with(move || child.try_wait(), cleanup)
+    let group = if guarded { None } else { child.id() };
+    if !guarded {
+        let _ = child.start_kill();
+    }
+    reap_with(
+        move || {
+            // Keep the leader PID reserved until asynchronous group termination settles.
+            if let Some(group) = group
+                && !group_exited(group)?
+            {
+                return Ok(None);
+            }
+            child.try_wait()
+        },
+        cleanup,
+    )
+}
+
+fn group_exited(group: u32) -> std::io::Result<bool> {
+    for entry in std::fs::read_dir("/proc")? {
+        let entry = entry?;
+        if !entry
+            .file_name()
+            .as_encoded_bytes()
+            .iter()
+            .all(u8::is_ascii_digit)
+        {
+            continue;
+        }
+        let stat = match std::fs::read_to_string(entry.path().join("stat")) {
+            Ok(stat) => stat,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+            Err(error) => return Err(error),
+        };
+        let invalid = || std::io::Error::other("invalid native process state");
+        let (_, tail) = stat.rsplit_once(") ").ok_or_else(invalid)?;
+        let mut fields = tail.split_whitespace();
+        let state = fields.next().ok_or_else(invalid)?;
+        let observed = fields
+            .nth(1)
+            .ok_or_else(invalid)?
+            .parse::<u32>()
+            .map_err(|_| invalid())?;
+        if observed == group && !matches!(state, "Z" | "X") {
+            return Ok(false);
+        }
+    }
+    Ok(true)
 }
 
 fn reap_with(
@@ -188,6 +261,97 @@ mod cleanup_tests {
                 let _ = sender.send(());
             }
         }
+    }
+
+    #[tokio::test]
+    async fn unguarded_reap_retains_resources_until_the_whole_group_exits() {
+        use tokio::io::AsyncBufReadExt;
+        let mut command = std::process::Command::new("/bin/sh");
+        command
+            .args(["-c", "/bin/sleep 30 & echo $!; wait"])
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .process_group(0);
+        let mut child = tokio::process::Command::from(command).spawn().unwrap();
+        let leader = child.id().unwrap();
+        let group = ProcessGroup(Pid::from_raw(leader as i32).unwrap(), false);
+        let mut output = tokio::io::BufReader::new(child.stdout.take().unwrap());
+        let mut pid = String::new();
+        tokio::time::timeout(Duration::from_secs(3), output.read_line(&mut pid))
+            .await
+            .unwrap()
+            .unwrap();
+        let descendant: u32 = pid.trim().parse().unwrap();
+        let (released, release) = std::sync::mpsc::channel();
+        let (settled, done) = tokio::sync::oneshot::channel();
+        // Hold group termination to deterministically model a descendant still exiting.
+        let mut cleanup = reap(child, false, move || {
+            let _ = released.send(());
+            let _ = settled.send(());
+        });
+        let early = cleanup.wait().await;
+        let resource_released_early = release.try_recv().is_ok();
+        let leader_reserved = Path::new(&format!("/proc/{leader}")).exists();
+        let descendant_live = std::fs::read_to_string(format!("/proc/{descendant}/stat"))
+            .is_ok_and(|stat| {
+                stat.rsplit_once(") ").unwrap().1.split_whitespace().next() != Some("Z")
+            });
+        drop(group);
+        tokio::time::timeout(Duration::from_secs(3), done)
+            .await
+            .unwrap()
+            .unwrap();
+        assert!(
+            early.is_none(),
+            "leader exit acknowledged a still-live native group"
+        );
+        assert!(
+            !resource_released_early,
+            "native resources released before descendant exit"
+        );
+        assert!(
+            leader_reserved,
+            "leader PID was reusable before group settlement"
+        );
+        assert!(descendant_live, "fixture did not retain a live descendant");
+    }
+
+    #[tokio::test]
+    async fn guarded_reap_keeps_live_owner_after_bounded_wait_and_caller_drop() {
+        let slots = Arc::new(tokio::sync::Semaphore::new(1));
+        let budget = RunBudget::new(
+            "origin",
+            "fence",
+            slots.clone(),
+            BudgetLimits::default(),
+            Deadline::start(Layer::Workflow, Duration::from_secs(30), None).unwrap(),
+        )
+        .unwrap();
+        let lease = budget.start().unwrap();
+        let mut child = tokio::process::Command::new("/bin/cat")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::null())
+            .spawn()
+            .unwrap();
+        let input = child.stdin.take().unwrap();
+        let pid = child.id().unwrap();
+        let (settled, done) = tokio::sync::oneshot::channel();
+        let mut cleanup = reap(child, true, move || {
+            drop(lease);
+            let _ = settled.send(());
+        });
+        assert!(cleanup.wait().await.is_none());
+        drop(cleanup);
+        assert_eq!(slots.available_permits(), 0);
+        assert!(std::path::Path::new(&format!("/proc/{pid}")).exists());
+        drop(input);
+        tokio::time::timeout(Duration::from_secs(2), done)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(slots.available_permits(), 1);
+        assert!(!std::path::Path::new(&format!("/proc/{pid}")).exists());
     }
 
     #[tokio::test]

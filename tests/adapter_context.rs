@@ -1,3 +1,6 @@
+#[path = "support/executable.rs"]
+mod executable;
+
 use akasha_otsuge::{
     adapter::*,
     capture::*,
@@ -13,6 +16,12 @@ use std::{
 
 #[path = "support/adapter_matrix.rs"]
 mod matrix;
+
+#[path = "support/claude_runner.rs"]
+mod claude_runner;
+
+#[path = "support/runner_bridge_deadlines.rs"]
+mod bridge_deadlines;
 
 struct Fixture(PathBuf);
 impl Fixture {
@@ -654,6 +663,11 @@ fn context_requests_reject_model_supplied_identity_fields() {
         serde_json::json!({"operation":"list","limit":1}),
         serde_json::json!({"operation":"read","handle":"issued","start":0,"max_bytes":32}),
         serde_json::json!({"operation":"search","query":"q","limit":1}),
+        serde_json::json!({"operation":"memory_search","query":"q"}),
+        serde_json::json!({"operation":"memory_get","memory_id":"memory","revision":1}),
+        serde_json::json!({"operation":"code_search","paths":["src/lib.rs"],"query":"q"}),
+        serde_json::json!({"operation":"code_read","path":"src/lib.rs","start":0,"max_bytes":32}),
+        serde_json::json!({"operation":"delegate","hint":"Check the alternative"}),
     ] {
         assert!(serde_json::from_value::<ContextRequest>(request.clone()).is_ok());
         for field in ["session_id", "token", "principal", "home"] {

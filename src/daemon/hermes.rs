@@ -74,15 +74,27 @@ impl Service {
             let scope = jobs::owner_scope();
             Domain::new(&service.storage).permission(&jobs::context()?, Some(&scope))?;
             let generation = service.config.pin().generation();
-            let (binary, home, session, call) = match event {
+            let (binary, home, session, call, args) = match event {
                 NativeEvent::Bind { binary, home, call } => {
-                    (binary, home, call.session_id.clone(), Some(call))
+                    (binary, home, call.session_id.clone(), Some(call), None)
                 }
+                NativeEvent::Consult {
+                    binary,
+                    home,
+                    call,
+                    args,
+                } => (
+                    binary,
+                    home,
+                    call.session_id.clone(),
+                    Some(call),
+                    Some(args),
+                ),
                 NativeEvent::Sync {
                     binary,
                     home,
                     session_id,
-                } => (binary, home, session_id, None),
+                } => (binary, home, session_id, None, None),
             };
             if !ipc::identifier(&session) {
                 return Err(Error("INVALID_REQUEST"));
@@ -137,6 +149,14 @@ impl Service {
             let frames = hermes::export::decode_export(&source, &profile, &bytes)?;
             if let Some(call) = call {
                 let id = call.tool_call_id.clone();
+                let native = jobs::consult::NativeExecutor {
+                    host: capability.host,
+                    binary: capability
+                        .executable
+                        .clone()
+                        .ok_or(Error("EXECUTOR_UNAVAILABLE"))?,
+                    home: canonical_home.clone(),
+                };
                 let registration = HermesRegistration {
                     capability,
                     source,
@@ -154,6 +174,13 @@ impl Service {
                         .with_export(bytes)
                         .bind(&id)
                         .await?;
+                if let Some(args) = args {
+                    drop(guard);
+                    let job = service.submit_consult(bound, native, args).await?;
+                    return service
+                        .show_consult(job["id"].as_str().ok_or(Error("JOB_CORRUPT"))?)
+                        .await;
+                }
                 Ok(serde_json::to_value(bound.diagnostic())?)
             } else {
                 let path = spool(&canonical_home, &source, &frames)?;

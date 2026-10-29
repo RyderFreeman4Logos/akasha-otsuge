@@ -1,0 +1,226 @@
+{
+  "head": "22543963c36f00923cd5a008a055ef438057c2d7",
+  "tree": "96f4756205abab37c6d692596d5af8650817418e",
+  "started_utc": "2026-10-29T20:04:47.250102+00:00",
+  "scratch": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a16-native-long-nrvibl7v",
+  "run_id": "mvp016-native-long-r3",
+  "kind": "actual Pi 1.4.0 RPC with controlled local SSE; no model quality or token cost claim",
+  "binaries": {
+    "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp016/target/debug/akasha-otsuge": "8b9d78fa3fa36773be4b99742b751b81cc06e02f79a67ba925f9471cae8476b5",
+    "/home/obj/.local/share/mise/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi": "2d6702dd4a52461f50f304bcef3aa0261464ea0b921f72ea7ed6d07df16edef0",
+    "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a": "f3ff8bfa6dd0a426ea8b61c00033544961ce38ca72a405ca8606db66a6190ab3"
+  },
+  "harness_sha256": "d3ba74c0b100b946713c202214dba2aef489dc023ccd76900e1116795c382973",
+  "controlled_provider_sha256": "493f6faa356966fdc7419d916c0ea5ecadcc43564edfa48899ecbb04ec88e2b1",
+  "cases": [
+    {
+      "case": "protocol-control",
+      "exit_code": 0,
+      "elapsed_seconds": 1.3205207623541355,
+      "deadline_seconds": 180,
+      "controlled_delay_seconds": 0,
+      "request_count": 5,
+      "served_requests": [
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 0
+        },
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 1
+        },
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 2
+        },
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 3
+        },
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 4
+        }
+      ],
+      "provider_errors": [],
+      "owned_processes_after": [],
+      "passed": true,
+      "log_sha256": "78c2276e7bed4e4a1ac649cfd13184414818c8d06b71b5f20ca38819f8f63ada"
+    },
+    {
+      "case": "long-complete",
+      "exit_code": 0,
+      "elapsed_seconds": 1612.3274853583425,
+      "deadline_seconds": 1700,
+      "controlled_delay_seconds": 1605,
+      "request_count": 5,
+      "served_requests": [
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 0
+        },
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 1
+        },
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 2
+        },
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 3
+        },
+        {
+          "api": "openai-completions",
+          "tool_names": [
+            "code_read",
+            "code_search",
+            "context_describe",
+            "context_list",
+            "context_read",
+            "context_search",
+            "delegate",
+            "memory_get",
+            "memory_search"
+          ],
+          "previous_tool_results": 4
+        }
+      ],
+      "provider_errors": [],
+      "owned_processes_after": [],
+      "passed": true,
+      "log_sha256": "69d9e2c69c9da5e0c6115ace84ff831be6c1b9d838ac618be08afe6522c74443"
+    },
+    {
+      "case": "deadline-cleanup",
+      "exit_code": 101,
+      "elapsed_seconds": 11.200485748238862,
+      "deadline_seconds": 10,
+      "controlled_delay_seconds": 25,
+      "request_count": 1,
+      "served_requests": [],
+      "provider_errors": [],
+      "owned_processes_after": [],
+      "passed": true,
+      "log_sha256": "92792159d26802d8b2616e961ae10b3cdbbd9de9aa190a22398d5bd6484ad05f"
+    }
+  ],
+  "active": null,
+  "status": "PASS_REAL_NATIVE_LONG_AND_TIMEOUT",
+  "config_epoch": "87999210bcf5063beb307c7efaedab4d570aeddafcf6b0be5e6b3ebb57866632",
+  "phase": "collected",
+  "elapsed_seconds": 1637.2834816137329,
+  "unit_started_utc": "2026-10-29T20:31:50.279949+00:00",
+  "request_count": 1,
+  "delay_seconds": 25,
+  "observed_delay_seconds": 1605.2395209819078,
+  "processes_ended": true,
+  "scratch_removed": true,
+  "ssd_free_after": 230599413760,
+  "binaries_unchanged": {
+    "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp016/target/debug/akasha-otsuge": true,
+    "/home/obj/.local/share/mise/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi": true,
+    "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a": true
+  },
+  "finished_utc": "2026-10-29T20:32:04.532395+00:00"
+}

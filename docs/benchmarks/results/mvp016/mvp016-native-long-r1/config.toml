@@ -1,0 +1,7 @@
+[execution]
+long_delay_seconds = 1605
+runner_deadline_seconds = 1700
+max_tokens = 2048
+[reliability]
+max_attempts = 1
+reason = "controlled deterministic protocol; no retry on semantic or timeout failure"

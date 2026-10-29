@@ -39,10 +39,40 @@ the corresponding kind. These are configuration contracts; actual requests are
 implemented in MVP-009/010/017.
 
 `executors.NAME` requires `kind` (`claude_code`, `codex`, `hermes`, `pi`) and `binary`.
-Optional fields are `args`, `enabled`, a text `model`, `timeout` and an ordered
-`fallback` list. No other host, fallback or paid API is enabled by default. Resolving
-config does not spawn a binary. The selected host's prepare consumer validates its
-capabilities. `notifiers.NAME` accepts `local` or `stdio`; stdio requires `command`.
+Optional fields are `args`, `enabled`, a text `model`, `timeout`, an absolute
+`native_home` and an ordered `fallback` list. No other host, fallback or paid API
+is enabled by default. Resolving config does not spawn a binary. The selected
+host's prepare consumer validates its capabilities. `notifiers.NAME` accepts
+`local` or `stdio`; stdio requires `command`.
+
+Consult pins the selected profiles and native-home locations before queuing. An
+omitted home uses the bound caller profile for the same host; another host uses
+its daemon environment override (`CODEX_HOME`, `CLAUDE_CONFIG_DIR`, `HERMES_HOME`,
+`PI_CODING_AGENT_DIR`) or its standard directory under `HOME`. Configure
+`native_home` for a different profile, and include that directory in `read_roots`.
+Live path restrictions and executor disablement are checked before startup.
+Fallback follows only the configured ordered lists, depth first, without repeating
+a profile. Every attempt and descendant shares the original invocation, workflow
+clock and start budget. Authority, cancellation and budget failures stop fallback.
+A delegate starts from its parent's active executor. Profile-specific timeouts
+remain bounded by the original workflow. An explicitly selected model's `timeout`
+also caps the entire native attempt; it cannot extend the executor deadline.
+
+Native model overrides apply only to the isolated worker. Codex uses a Responses
+endpoint and requires the model in its native catalog. Hermes uses a Chat
+Completions endpoint. Pi retains the matching native model's capabilities and
+supports its OpenAI Completions/Responses or Anthropic Messages protocol; unknown,
+ambiguous or provider-specific OAuth models return `ADAPTER_UNSUPPORTED`. Claude
+uses an Anthropic endpoint (`/v1` is removed before passing its API base URL).
+An explicit override requires an available `credential_ref = "env:NAME"`, except
+Codex permits an anonymous endpoint when that field is omitted. No credential or
+fallback is borrowed from another provider. Default-self execution retains the
+native profile; overrides never write its defaults.
+
+`args` accepts up to eight flag/value pairs: Codex `-c`/`--config` for only
+`model_reasoning_effort` or `model_verbosity`; Claude `--effort`; Pi `--thinking`;
+Hermes `--max-iterations`. Values must be supported by the pinned host. Tool,
+profile, prompt, resume and extension options return `CONFIG_INVALID`.
 
 | Settings | Activation | Accepted/queued jobs |
 | --- | --- | --- |

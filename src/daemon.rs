@@ -12,6 +12,7 @@ use tokio::task::JoinSet;
 use crate::config::ResolvedConfig;
 use crate::ipc::{self, Command, Error, Request, Result};
 use crate::storage::Storage;
+mod claude;
 mod codex;
 mod configuration;
 mod hermes;
@@ -119,6 +120,7 @@ struct Service {
     stopping: std::sync::atomic::AtomicBool,
     instance: String,
     providers: crate::provider::Client,
+    runner_slots: Arc<Semaphore>,
     search_index: Mutex<Option<Arc<crate::retrieval::Index>>>,
     index_builder: Mutex<()>,
     index_epoch: std::sync::atomic::AtomicU64,
@@ -186,6 +188,7 @@ impl Service {
             }
             Command::ConfigStatus => self.config_status().await,
             Command::ConfigShow => Ok(self.config_status().await?["effective"].clone()),
+            Command::Claude { event } => self.claude(event).await,
             Command::ConfigValidate => self.validate(),
             Command::ConfigReload => self.reload().await,
             Command::Reconcile {
@@ -236,6 +239,18 @@ impl Service {
                 Ok(value)
             }
             Command::JobShow { id } => self.show_job(&id).await,
+            Command::ConsultShow { id } => self.show_consult(&id).await,
+            Command::ConsultReceipt { id, full } => self.consult_receipt(&id, full).await,
+            Command::ConsultOriginal { id, source, start } => {
+                let service = self.clone();
+                let request_id = request_id.to_owned();
+                self.operation(async move {
+                    service
+                        .consult_original(&id, source, start, &request_id)
+                        .await
+                })
+                .await
+            }
             Command::JobCancel { id } => self.cancel_job(id).await,
             Command::JobList { after } => self.list_jobs(after.as_deref()).await,
             Command::MemoryShow { id, at } => Ok(serde_json::to_value(
@@ -519,6 +534,7 @@ pub async fn run(
         stopping: std::sync::atomic::AtomicBool::new(false),
         instance,
         providers,
+        runner_slots: Arc::new(Semaphore::new(16)),
         search_index: Mutex::new(None),
         index_builder: Mutex::new(()),
         index_epoch: std::sync::atomic::AtomicU64::new(0),

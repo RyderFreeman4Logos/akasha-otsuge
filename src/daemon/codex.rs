@@ -34,6 +34,11 @@ impl Service {
         {
             return Err(Error("READ_DENIED"));
         }
+        if let Some(home) = &reg.native_home
+            && self.allowed_path(home)? != *home
+        {
+            return Err(Error("READ_DENIED"));
+        }
         Ok(reg)
     }
 
@@ -50,6 +55,7 @@ impl Service {
                     session_id,
                     transcript_path,
                     cwd,
+                    native_home,
                 } => {
                     if !ipc::identifier(&session_id) {
                         return Err(Error("INVALID_REQUEST"));
@@ -76,6 +82,7 @@ impl Service {
                         scope,
                         transcript,
                         workspace,
+                        native_home: native_home.map(|p| service.allowed_path(&p)).transpose()?,
                     };
                     let mut bytes = [0; 32];
                     File::open("/dev/urandom")?.read_exact(&mut bytes)?;
@@ -104,6 +111,32 @@ impl Service {
                             .bind(&id)
                             .await?;
                     Ok(serde_json::to_value(invocation.diagnostic())?)
+                }
+                NativeEvent::Consult {
+                    registration,
+                    call,
+                    args,
+                } => {
+                    let reg = service.codex_registration(&registration)?;
+                    let native = jobs::consult::NativeExecutor {
+                        host: reg.capability.host,
+                        binary: reg
+                            .capability
+                            .executable
+                            .clone()
+                            .ok_or(Error("EXECUTOR_UNAVAILABLE"))?,
+                        home: reg
+                            .native_home
+                            .clone()
+                            .ok_or(Error("BINDING_UNAVAILABLE"))?,
+                    };
+                    let id = call.tool_call_id.clone();
+                    let invocation =
+                        CodexCaller::new(service.storage.clone(), reg, call, generation)
+                            .bind(&id)
+                            .await?;
+                    drop(guard);
+                    service.submit_consult(invocation, native, args).await
                 }
                 NativeEvent::Sync {
                     registration,

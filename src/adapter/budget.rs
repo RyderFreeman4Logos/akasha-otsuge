@@ -10,6 +10,7 @@ pub struct BudgetLimits {
     pub reads: u64,
     pub read_bytes: u64,
     pub output_bytes: u64,
+    pub tokens: u64,
 }
 impl Default for BudgetLimits {
     fn default() -> Self {
@@ -19,6 +20,7 @@ impl Default for BudgetLimits {
             reads: 128,
             read_bytes: 4 * 1024 * 1024,
             output_bytes: 1024 * 1024,
+            tokens: 128_000,
         }
     }
 }
@@ -28,6 +30,7 @@ pub struct BudgetUsage {
     pub reads: u64,
     pub read_bytes: u64,
     pub output_bytes: u64,
+    pub tokens: u64,
 }
 #[derive(Clone, Debug)]
 pub struct RunBudget(Arc<BudgetState>);
@@ -39,16 +42,19 @@ struct BudgetState {
     limits: BudgetLimits,
     deadline: Deadline,
     state: Mutex<Counters>,
+    stopped: tokio::sync::watch::Sender<()>,
 }
 #[derive(Debug, Default)]
 struct Counters {
     usage: BudgetUsage,
     cancelled: bool,
+    exhausted: bool,
 }
 #[derive(Debug)]
 pub struct RunLease {
     budget: RunBudget,
     depth: u32,
+    reported_tokens: Mutex<(u64, u64)>,
     _permit: OwnedSemaphorePermit,
 }
 impl RunBudget {
@@ -66,6 +72,7 @@ impl RunBudget {
             || limits.reads == 0
             || limits.read_bytes == 0
             || limits.output_bytes == 0
+            || limits.tokens == 0
         {
             return Err(ErrorCode::ConfigInvalid.into());
         }
@@ -76,12 +83,13 @@ impl RunBudget {
             limits,
             deadline,
             state: Mutex::new(Counters::default()),
+            stopped: tokio::sync::watch::channel(()).0,
         })))
     }
     pub fn start(&self) -> Result<RunLease> {
         self.reserve(0)
     }
-    fn reserve(&self, depth: u32) -> Result<RunLease> {
+    pub(crate) fn reserve(&self, depth: u32) -> Result<RunLease> {
         let mut state = self
             .0
             .state
@@ -101,6 +109,7 @@ impl RunBudget {
         Ok(RunLease {
             budget: self.clone(),
             depth,
+            reported_tokens: Mutex::new((0, 0)),
             _permit: permit,
         })
     }
@@ -122,6 +131,7 @@ impl RunBudget {
         // Poisoning already denies every subsequent operation.
         if let Ok(mut state) = self.0.state.lock() {
             state.cancelled = true;
+            self.0.stopped.send_replace(());
         }
     }
     fn check(&self, state: &Counters) -> Result<()> {
@@ -130,6 +140,9 @@ impl RunBudget {
     fn check_deadline(state: &Counters, deadline: &Deadline) -> Result<()> {
         if state.cancelled {
             return Err(ErrorCode::Cancelled.into());
+        }
+        if state.exhausted {
+            return Err(ErrorCode::BudgetExhausted.into());
         }
         if let Some(layer) = deadline.expired() {
             return Err(match layer {
@@ -206,6 +219,61 @@ impl RunLease {
     }
     pub fn check(&self) -> Result<()> {
         self.check_deadline(self.deadline())
+    }
+    pub fn charge_tokens(&self, input: u64, output: u64) -> Result<()> {
+        let mut state = self
+            .budget
+            .0
+            .state
+            .lock()
+            .map_err(|_| ErrorCode::BudgetExhausted)?;
+        let total = state
+            .usage
+            .tokens
+            .checked_add(input)
+            .and_then(|n| n.checked_add(output));
+        // Native usage has already occurred; retain overshoot and stop every branch.
+        state.usage.tokens = total.unwrap_or(u64::MAX);
+        if total.is_none() || state.usage.tokens > self.budget.0.limits.tokens {
+            state.exhausted = true;
+            self.budget.0.stopped.send_replace(());
+        }
+        self.budget.check(&state)
+    }
+    pub(super) fn interrupted(&self) -> futures::future::BoxFuture<'static, AdapterError> {
+        let budget = self.budget.clone();
+        Box::pin(async move {
+            let mut stopped = budget.0.stopped.subscribe();
+            loop {
+                let result = budget
+                    .0
+                    .state
+                    .lock()
+                    .map_err(|_| AdapterError::from(ErrorCode::BudgetExhausted))
+                    .and_then(|state| budget.check(&state));
+                if let Err(error) = result {
+                    return error;
+                }
+                if stopped.changed().await.is_err() {
+                    return ErrorCode::Cancelled.into();
+                }
+            }
+        })
+    }
+    pub fn report_tokens(&self, input: u64, output: u64) -> Result<()> {
+        let mut previous = self
+            .reported_tokens
+            .lock()
+            .map_err(|_| ErrorCode::BudgetExhausted)?;
+        let incoming = input
+            .checked_sub(previous.0)
+            .ok_or(ErrorCode::ProtocolInvalid)?;
+        let outgoing = output
+            .checked_sub(previous.1)
+            .ok_or(ErrorCode::ProtocolInvalid)?;
+        let result = self.charge_tokens(incoming, outgoing);
+        *previous = (input, output);
+        result
     }
     pub(super) fn check_deadline(&self, deadline: &Deadline) -> Result<()> {
         let state = self

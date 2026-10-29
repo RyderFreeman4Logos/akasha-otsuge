@@ -1,0 +1,13 @@
+{
+  "root": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a16-codex-pin-hb_jgsqx",
+  "started_utc": "2026-10-29T19:37:04.741576+00:00",
+  "source": "https://github.com/openai/codex/releases/download/rust-v0.164.0/codex-x86_64-unknown-linux-musl.tar.gz",
+  "expected_archive_sha256": "90dd0b03b28afcb7fa733a4f73b413db2916a47347efd43fb669cc1c774ee8e4",
+  "consumer": "MVP-016 and MVP-027 native acceptance; no global installation",
+  "binary": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a16-codex-pin-hb_jgsqx/codex",
+  "binary_sha256": "b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306",
+  "version": "codex-cli 0.164.0",
+  "archive_removed": true,
+  "allocated_bytes": 308142080,
+  "finished_utc": "2026-10-29T19:37:38.011326+00:00"
+}

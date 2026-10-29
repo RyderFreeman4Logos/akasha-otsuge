@@ -35,7 +35,19 @@ def _exchange(ctx, event, *, runner=False):
         path = '\0' + name
     if not runner and (not isinstance(path, str) or not Path(path).is_absolute()):
         raise BridgeError('CONFIG_INVALID')
-    deadline = time.monotonic() + 10
+    run_deadline = None
+    if runner:
+        raw = os.environ.get('AKASHA_RUN_DEADLINE_MS', '')
+        if not re.fullmatch(r'[0-9]{1,20}', raw):
+            raise BridgeError('CONFIG_INVALID')
+        seconds = int(raw) / 1000 - time.time()
+        if seconds <= 0:
+            raise BridgeError('RUNNER_TIMEOUT')
+        if seconds > threading.TIMEOUT_MAX:
+            raise BridgeError('CONFIG_INVALID')
+        run_deadline = time.monotonic() + seconds
+    deadline = min(time.monotonic() + 10, run_deadline) if runner else time.monotonic() + 10
+    processing = False
     request_id = uuid.uuid4().hex
     request = {'protocol_version': 1, 'request_id': request_id,
                'command': {'op': 'hermes', 'event': event}}
@@ -45,7 +57,7 @@ def _exchange(ctx, event, *, runner=False):
         def remaining():
             seconds = deadline - time.monotonic()
             if seconds <= 0:
-                raise BridgeError('IPC_TIMEOUT')
+                raise BridgeError('RUNNER_TIMEOUT' if runner and processing else 'IPC_TIMEOUT')
             client.settimeout(seconds)
 
         def exact(size):
@@ -73,6 +85,10 @@ def _exchange(ctx, event, *, runner=False):
             peer = struct.unpack('3i', client.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
             if peer[1] != os.geteuid():
                 raise BridgeError('PEER_DENIED')
+            # A preceding delegated callback can delay the broker's greeting.
+            if runner:
+                deadline = run_deadline
+                processing = True
             greeting = read()
             if greeting.get('protocol_version') != 1 or greeting.get('max_message_bytes') != 2097152:
                 raise BridgeError('PROTOCOL_VERSION')
@@ -96,7 +112,7 @@ def _exchange(ctx, event, *, runner=False):
                 raise BridgeError('PROTOCOL_ERROR')
             return reply['data']
         except TimeoutError:
-            raise BridgeError('IPC_TIMEOUT') from None
+            raise BridgeError('RUNNER_TIMEOUT' if runner and processing else 'IPC_TIMEOUT') from None
         except OSError:
             raise BridgeError('DAEMON_UNAVAILABLE') from None
         except (ValueError, UnicodeError):
@@ -130,6 +146,17 @@ def _run_native(ctx, names, args):
     result = {'type': 'result', 'session_id': '', 'exit_code': 1, 'error': 'RUNNER_FAILED'}
     started = time.monotonic()
     print(json.dumps({'type': 'system', 'subtype': 'init'}), file=output, flush=True)
+
+    def report_usage(*_args, **_kwargs):
+        tokens = {'input': getattr(agent, 'session_prompt_tokens', None),
+                  'output': getattr(agent, 'session_output_tokens', None)}
+        if any(type(n) is not int or not 0 <= n <= 2**64 - 1 for n in tokens.values()):
+            raise BridgeError('PROTOCOL_INVALID')
+        if _exchange(ctx, {'op':'usage', 'input_tokens':tokens['input'],
+                          'output_tokens':tokens['output']}, runner=True) != {'accepted':True}:
+            raise BridgeError('PROTOCOL_INVALID')
+        return tokens
+
     try:
         with open(os.devnull, 'w') as quiet, redirect_stdout(quiet), redirect_stderr(quiet):
             from hermes_cli.config import load_config_readonly, split_model_config_default
@@ -151,27 +178,43 @@ def _run_native(ctx, names, args):
             if not prompt.strip() or len(prompt.encode()) > 131072:
                 raise BridgeError('INVALID_ARGUMENT')
             cfg = load_config_readonly()
-            choice = cfg.get('model') or {}
-            raw = choice.get('default') or choice.get('model') if isinstance(choice, dict) else choice
-            model, provider = split_model_config_default(raw)
-            if not model:
-                raise BridgeError('CONFIG_INVALID')
-            provider = provider or (choice.get('provider') if isinstance(choice, dict) else None)
-            runtime, fallback = resolve_runtime_with_fallback(cfg, requested=provider, target_model=model)
-            if fallback is not None:
-                model = fallback['model']
+            selected = os.environ.get('AKASHA_EXECUTOR_MODEL')
+            if selected:
+                route = json.loads(selected)
+                if route.get('kind') != 'text' or not route.get('model') or not route.get('endpoint'):
+                    raise BridgeError('CONFIG_INVALID')
+                model = route['model']
+                key = os.environ.get('AKASHA_EXECUTOR_KEY')
+                if not key:
+                    raise BridgeError('AUTH_REQUIRED')
+                runtime = {'model':model, 'api_key':key, 'base_url':route['endpoint'],
+                           'provider':'custom', 'requested_provider':'custom', 'api_mode':'chat_completions'}
+                fallback_chain = None
+            else:
+                choice = cfg.get('model') or {}
+                raw = choice.get('default') or choice.get('model') if isinstance(choice, dict) else choice
+                model, provider = split_model_config_default(raw)
+                if not model:
+                    raise BridgeError('CONFIG_INVALID')
+                provider = provider or (choice.get('provider') if isinstance(choice, dict) else None)
+                runtime, fallback = resolve_runtime_with_fallback(cfg, requested=provider, target_model=model)
+                if fallback is not None:
+                    model = fallback['model']
+                fallback_chain = get_fallback_chain(cfg) or None
             remaining = args.budget - (time.monotonic() - started)
             if remaining <= 0:
                 raise BridgeError('RUNNER_TIMEOUT')
             agent = AIAgent(
                 **{key: runtime.get(key) for key in ('api_key', 'base_url', 'provider',
                     'requested_provider', 'api_mode', 'credential_pool', 'request_overrides')},
-                model=model, fallback_model=get_fallback_chain(cfg) or None,
+                model=model, fallback_model=fallback_chain,
+                **({'max_iterations':args.max_iterations} if getattr(args, 'max_iterations', None) is not None else {}),
                 reasoning_config=resolve_reasoning_config(cfg, model),
                 enabled_toolsets=['akasha_context'], quiet_mode=True, platform='cli',
                 skip_context_files=True, skip_memory=True, skip_background_review=True,
                 load_soul_identity=False, prefill_messages=[], checkpoints_enabled=False,
-                cwd=str(Path.cwd()), run_budget_seconds=remaining)
+                cwd=str(Path.cwd()), run_budget_seconds=remaining,
+                step_callback=report_usage, tool_start_callback=report_usage)
             if agent.valid_tool_names != names:
                 raise BridgeError('ADAPTER_UNSUPPORTED')
             if _exchange(ctx, {'op': 'ready', 'home': str(get_hermes_home().resolve()),
@@ -184,7 +227,7 @@ def _run_native(ctx, names, args):
                     or not answer['final_response'].strip()):
                 raise BridgeError('RUNNER_FAILED')
             result = {'type': 'result', 'session_id': agent.session_id, 'exit_code': 0,
-                      'text': answer['final_response']}
+                      'text': answer['final_response'], 'tokens': report_usage()}
     except BridgeError as error:
         result['error'] = str(error)
     except AuthError as error:
@@ -206,16 +249,21 @@ def _run_native(ctx, names, args):
 
 def _register_runner(ctx):
     schemas = {
-        'describe': ({}, []),
-        'list': ({'cursor': {'type': ['string', 'null']},
+        'context_describe': ({}, []),
+        'context_list': ({'cursor': {'type': ['string', 'null']},
                   'limit': {'type': 'integer', 'minimum': 1, 'maximum': 16}}, ['limit']),
-        'read': ({'handle': {'type': 'string'}, 'start': {'type': 'integer', 'minimum': 0},
+        'context_read': ({'handle': {'type': 'string'}, 'start': {'type': 'integer', 'minimum': 0},
                   'max_bytes': {'type': 'integer', 'minimum': 1, 'maximum': 16384}},
                  ['handle', 'start', 'max_bytes']),
-        'search': ({'cursor': {'type': ['string', 'null']}, 'query': {'type': 'string'},
+        'context_search': ({'cursor': {'type': ['string', 'null']}, 'query': {'type': 'string'},
                     'limit': {'type': 'integer', 'minimum': 1, 'maximum': 16}}, ['query', 'limit']),
+        'memory_search': ({'query': {'type': 'string', 'maxLength': 512}}, ['query']),
+        'memory_get': ({'memory_id': {'type': 'string'}, 'revision': {'type': 'integer', 'minimum': 1}}, ['memory_id', 'revision']),
+        'code_search': ({'paths': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1, 'maxItems': 16}, 'query': {'type': 'string', 'maxLength': 512}}, ['paths', 'query']),
+        'code_read': ({'path': {'type': 'string'}, 'start': {'type': 'integer', 'minimum': 0}, 'max_bytes': {'type': 'integer', 'minimum': 1, 'maximum': 16384}}, ['path', 'start', 'max_bytes']),
+        'delegate': ({'hint': {'type': 'string', 'maxLength': 512}}, ['hint']),
     }
-    names = {'context_' + op for op in schemas}
+    names = set(schemas)
 
     def before(tool_name='', **_):
         if tool_name not in names:
@@ -233,8 +281,8 @@ def _register_runner(ctx):
                 return json.dumps({'error': {'code': str(error)}})
         return call
 
-    for op, (properties, required) in schemas.items():
-        name = 'context_' + op
+    for name, (properties, required) in schemas.items():
+        op = name.removeprefix('context_')
         if ctx.register_tool(name=name, toolset='akasha_context', handler=handler(op),
                 schema={'name': name, 'description': op + ' the authorized caller context',
                         'parameters': {'type': 'object', 'properties': properties,
@@ -244,6 +292,7 @@ def _register_runner(ctx):
     def setup(parser):
         parser.add_argument('--request', required=True)
         parser.add_argument('--budget', required=True, type=float)
+        parser.add_argument('--max-iterations', type=int)
     ctx.register_cli_command(name='akasha-runner', help='Run a scoped Akasha worker.',
                              setup_fn=setup, handler_fn=lambda args: _run_native(ctx, names, args))
 
@@ -269,17 +318,17 @@ def register(ctx):
                     raise BridgeError('CALLER_AMBIGUOUS')
                 if len(pending) >= 128:
                     raise BridgeError('RESOURCE_BUSY')
-                entry = {'bound': None}
+                entry = {'event': None}
                 pending[key] = entry
             event = _event(ctx, 'bind')
             event['call'] = {'session_id': session_id, 'task_id': task_id, 'turn_id': turn_id,
                              'tool_call_id': tool_call_id, 'profile_home': key[0],
                              'cwd': ctx.session_cwd()}
-            bound = _exchange(ctx, event)
+            _exchange(ctx, event)
             with lock:
                 if pending.get(key) is not entry:
                     raise BridgeError('CALLER_AMBIGUOUS')
-                entry['bound'] = bound
+                entry['event'] = dict(event, op='consult', args=dict(args))
         except BridgeError as error:
             with lock:
                 if entry is not None and pending.get(key) is entry:
@@ -296,9 +345,9 @@ def register(ctx):
                 if pending[key] is None:
                     raise BridgeError('CALLER_AMBIGUOUS')
                 entry = pending.pop(key)
-            if entry['bound'] is None:
+            if entry['event'] is None:
                 raise BridgeError('BINDING_UNAVAILABLE')
-            result = {'schema_version': 1, 'data': entry['bound']}
+            result = {'schema_version': 1, 'data': _exchange(ctx, entry['event'])}
         except BridgeError as error:
             result = {'schema_version': 1, 'error': {'code': str(error)}}
         return json.dumps(result)
@@ -331,7 +380,7 @@ def register(ctx):
         sync(session_id=session_id, **kwargs)
 
     registered = ctx.register_tool(name='akasha_consult', toolset='akasha', handler=consult,
-                      schema={'name': 'akasha_consult', 'description': 'Consult saved user context.',
+                      schema={'name': 'akasha_consult', 'description': 'Consult saved user context. A pending result contains a durable job_id; retrieve it with akasha-otsuge consult show JOB_ID or cancel with akasha-otsuge job cancel JOB_ID.',
                               'parameters': {'type': 'object', 'properties': {
                                   'hint': {'type': ['string', 'null'], 'maxLength': 512,
                                            'description': 'Short optional intent.'}},

@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::{Coverage, MemoryState, RecallDraft, RecallStatus, RetrievalMode, Truncation};
 
 impl Service {
-    pub(super) async fn search(
+    pub(in crate::daemon::jobs) async fn search(
         &self,
         id: &str,
         workflow: &Deadline,
@@ -15,7 +15,12 @@ impl Service {
             return Err(Error("JOB_CORRUPT"));
         };
         let domain = Domain::new(&self.storage);
-        let context = context()?;
+        let (context, consult) = {
+            let _guard = self.admission.lock().await;
+            let (_, job) = self.job(id)?;
+            self.authorize_job(&job)?;
+            (self.job_read_context(&job)?, job.consult_plan.is_some())
+        };
         domain.permission(&context, Some(&scope))?;
         let index_epoch = self.index_epoch.load(Ordering::Acquire);
         let read_seq = self.storage.sequence()?;
@@ -390,7 +395,14 @@ impl Service {
             original_bytes: original_bytes as u64,
             reason: "retrieval_budget".into(),
         });
-        let receipt_id = format!("search/{}", hash(id.as_bytes()));
+        let receipt_id = if consult {
+            format!(
+                "consult-search/{}",
+                hash(&serde_json::to_vec(&(id, &query, read_seq))?)
+            )
+        } else {
+            format!("search/{}", hash(id.as_bytes()))
+        };
         drop(index);
         let _guard = self.admission.lock().await;
         let (_, job) = self.job(id)?;

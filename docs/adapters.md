@@ -46,6 +46,58 @@ installed CLI alone proves none of those optional capabilities. `NotRun` is not
 a successful self-test. `CompleteToFence`, `Lagging` and `Unavailable` describe
 retained context; unavailable or missing originals must be reported as gaps.
 
+## Consult results and continuation
+
+A trusted Consult submission creates a durable job handle. Pi, Hermes and Claude
+native tools submit Consult using their automatically verified identity and optional
+hint. Pending results survive the short caller request; use the same daemon socket
+or CLI profile for the commands below. The installed Codex hook submits Consult
+and transports its follow-up commands through the read-only sandbox.
+A binding diagnostic is not a completed Consult.
+
+```sh
+akasha-otsuge consult show JOB_ID
+akasha-otsuge consult receipt JOB_ID
+akasha-otsuge consult receipt JOB_ID --full
+akasha-otsuge consult original JOB_ID SOURCE_INDEX
+akasha-otsuge consult original JOB_ID SOURCE_INDEX --start BYTE_OFFSET
+akasha-otsuge job cancel JOB_ID
+```
+
+`consult show` returns only a public result. Pending and failed jobs explicitly
+have no final receipt; failures retain their error code. Successful results come
+from the immutable RecallReceipt body and exclude the private plan, execution
+trace and usage. The same handle works after a daemon restart. `job show` retains
+management diagnostics separately.
+
+Research runners return a structured `found`, `no_hit` or `incomplete` conclusion.
+Selected source references must match actual reads; selected memory revisions must
+have been expanded with their originals. A no-hit conclusion requires a search.
+Unresolved conflicts become incomplete results. Conditions and conflicts remain
+in the public result, alongside the selected memories' recorded scope, authority,
+conditions, assumptions and validity. Delegates use the same contract; their
+private execution traces stay separate.
+
+The public body includes its receipt and job IDs within `consult.max_result_chars`
+Unicode characters. If the complete answer and references exceed that budget,
+the body contains an incomplete result and a `detail_receipt_id`. The full answer,
+including its conditions and evidence, remains in a separate immutable receipt;
+`consult receipt JOB_ID --full` expands it. JSON and individual source references
+are never cut to fit. A budget too small even for the scoped handle fails with
+`OUTPUT_LIMIT`; the native result and serialized receipt also retain hard size
+bounds.
+
+`consult receipt` includes the recorded and currently validated sequence metadata.
+`consult show` additionally checks each selected memory's current adopted revision
+and validity, returning `STALE_RECALL` if the completed answer is superseded.
+The zero-based `SOURCE_INDEX` addresses only that receipt's sources; the optional
+byte offset is relative to the recorded span and must be a UTF-8 boundary. Reads
+remain bounded by the accepted original-text budget and return a continuation
+endpoint when truncated. Each expansion uses the original verified binding and
+live permissions. Code results also retain the original workspace identity, so
+read-root revocation or replacement blocks publication and replay, even after
+restart. Historical receipt replay does not claim the old answer is current.
+
 ## Framing, events and completion
 
 JSONL connections start with `FrameStream::handshake`: sequence zero is an
@@ -65,6 +117,26 @@ deadline. `RunSpec::check` preserves the triggering timeout layer. Every host
 adapter must check it at admission and event/I/O waits and enforce cancellation
 of its owned process or session; an outer timeout does not prove a CLI's inner
 provider timeout supports 1700 seconds.
+
+Pi Runner writes only HTTP idle and provider request timeouts into its private
+per-run `.pi/settings.json`, using the remaining original RunSpec budget. It
+approves that owned directory so Pi reads these settings; built-in tools, other
+extensions, MCP, skills and context files remain disabled. The native profile is
+unchanged. Akasha's configured Runner deadline governs this subprocess, including
+when it is shorter than Pi's profile timeout. Later requests and retries remain
+bounded by the original outer deadline; this override cannot restart that clock.
+
+Native Runner cleanup has a separate one-second grace period, which repeated
+waits do not renew. Unguarded process groups retain the leader PID and resources
+until every observed group member has exited; a failed process-state inspection
+keeps cleanup unacknowledged. Daemon-owned guardians retain their subreaper path.
+Cancellation reports `acknowledged: false` if exit is still unknown;
+the original timeout/error remains authoritative. A background cleanup owner
+retains the child, workspace and concurrency lease until exit is observed, even
+after the handle is dropped. The version probe uses the same bounded cleanup
+after its five-second query timeout. A successful native result still requires
+a successful process exit. Spawn failures preserve the OS errno in
+`source_code` without exposing executable paths or arguments.
 
 `AgentRunner::start` receives that spec and a separate `ContextSource`; choosing
 a Runner does not change the caller's history source. `RunHandle` provides typed
@@ -134,6 +206,19 @@ The default is three starts total and depth one. Reads, bytes and outputs share
 the same bounded counters across descendants; children cannot refresh a deadline
 or reset their depth. An observer's `lease_handle` shares the same lease/permit,
 not a new worker admission. Dropping all owners releases the slot.
+
+The default reported-token limit is 128,000 across the run tree. `Usage` events
+are cumulative per lease; repeated native/collector reports are charged once,
+and decreasing counters are protocol errors. Cached input counts toward the
+limit; reasoning already included in output is not added again. Codex uses its
+thread totals, Claude reconciles per-message and final usage, and Pi/Hermes send
+native usage through the authenticated context broker. Pi includes compaction
+usage; Hermes checks cumulative counts before model iterations and tools.
+All four adapters charge before exposing the usage event. Exhaustion wakes
+blocked native reads and stops the owned process group, descendants and retries.
+Native usage arrives after a request, so in-flight requests can overshoot the
+limit; observed overshoot remains in the report. This is not pre-send token
+reservation. Missing required native usage refuses a successful terminal result.
 
 The workflow decides whether to continue sequentially after a delegation refusal;
 it must not silently create a fresh budget. Cancellation denies later admissions,
@@ -268,15 +353,19 @@ files untouched, and never infers a parent call from JavaScript text.
 
 The hook configuration uses the official CLI override
 mechanism. SessionStart/Stop schedule incremental native backfill. PreToolUse
-recognizes exactly `akasha-otsuge consult` or that command followed by one
-JSON-quoted hint; shell suffixes and identity arguments are rejected. At this
-stage the command returns a binding diagnostic; the consult workflow is MVP-016.
-The trusted callback binds the native identity and stores an atomic per-call
-result, then rewrites the command to an absolute read-only result reader. This
+recognizes `akasha-otsuge consult` with an optional JSON-quoted hint, and the
+`consult show/receipt/original` and `job cancel` commands above. Follow-up IDs
+must be Consult job IDs; shell suffixes and identity arguments are rejected.
+The trusted callback binds and submits the initial call, then returns public
+status/result through an atomic per-call file. Follow-ups recheck current
+permissions before publishing their response. The command is rewritten to an
+absolute read-only result reader. This
 is necessary because the native Linux read-only sandbox rejects Unix socket
 connections. Neither registration credentials nor a daemon connection enter the
 sandbox command. Concurrent sessions share no current-context file or global
-lock. Binding errors return the native explicit deny response.
+lock. Repeated native calls reuse the same job and per-call response; a new show
+call retrieves updated status. Result files remain bounded by the IPC size cap,
+including explicit full receipts. Binding errors return the native deny response.
 
 ## Codex standalone Runner
 
@@ -293,10 +382,13 @@ retaining the model's remaining metadata. Before starting an ephemeral thread,
 the Runner disables every effective MCP server, native hooks, plugins, agent
 delegation and host skill discovery. It requests the native read-only sandbox,
 disabled tool networking and no approvals, and verifies the returned policy.
-Only `context_describe`, `context_list`, `context_read` and `context_search` are
-registered. Their requests pass the existing invocation, permission and shared
-budget checks; model arguments cannot supply the operation or caller identity.
-Memory/code tools and workflow composition are integrated in MVP-016.
+The registered inventory contains `context_describe/list/read/search`,
+`memory_search/get`, `code_search/read` and `delegate`. Strict shared request
+decoding rejects model-supplied caller identity. CapturedContext serves only the
+context operations; the consult workflow supplies the remaining research tools
+under the same invocation, permissions and budget.
+Both code tools take individual workspace-relative file paths; they do not expand
+directories, globs or absolute paths. Read a named file directly with `code_read`.
 
 The Runner accepts one structured nonempty `answer`, then closes stdin and waits
 for the native process to exit successfully. EOF, an answer followed by a failing
@@ -325,3 +417,118 @@ The Hermes0.22.5 plugin, opt-in install/undo, immutable call fences and canonica
 export backfill are described in the [Hermes support and recovery notes](adapters/hermes-0.22.5/README.md).
 Controlled native plugin tests cover two profiles and both plugin isolation modes.
 Independent Runner and authenticated CLI/TUI acceptance remain pending in MVP-014.
+
+## Claude native bridge under development
+
+`adapter claude-call` accepts a bounded host-only JSON envelope on stdin and uses
+the existing private daemon IPC. It is not a model tool schema. Registration
+checks the installed2.1.311 executable and configured read roots, then retains
+only a hash of its random bearer token with the session, source and workspace.
+The token response is for the native bridge; it must never become a tool result.
+The same-UID local management boundary remains the declared trust boundary.
+
+Root binding fixes the native turn, tool call, event UUID and observed event
+cursor before research. It reuses the existing incremental file cursor and checks
+for the requested tip between at most256 single-frame batches, stopping new
+batches after two seconds. This bounds catch-up work, not an individual storage
+operation's latency. A missing tip returns `HISTORY_GAP`; it never selects the
+latest session or substitutes another caller. Long backlogs can be imported with
+the existing capture command before retrying. The saved invocation and capture
+sequence are immutable across retries and daemon restarts; live permissions and
+read roots are checked again. Changed identity or fence data conflicts, and an
+unregistered child is refused. Re-registering the same source preserves call
+identity. Brief native transcript flush delays are retried within the same
+catch-up deadline; malformed records remain explicit gaps.
+
+The native `caller.js` module captures session, turn and append events, registers
+the optional-hint `consult` tool and submits it as a durable job from the verified
+native call. It returns only public status/results and queues durable backfill on
+turn completion and session end. Caller binding waits until the native transcript
+directory exists. The registered native home is inherited by children and checked
+against current read roots before use; diagnostic Bind requests remain supported.
+`scripts/check-claude-caller.py` verifies startup/resume bindings and completed
+backfill with the actual CLI, production hook and daemon under local synthetic
+SSE. That probe replaces Consult with diagnostic Bind and explicitly does not
+qualify Runner execution or authenticated model use. Claude2.1.311 requires at
+least one native builtin (such as `ToolSearch`) to register plugin tools;
+`--tools ""` refuses Consult registration. Native children are identified by append/turn events and the host's agent
+registry. Only a known registered parent can admit a child. The pinned2.1.311
+transcript layout and each frame's session/agent/sidechain identity are checked;
+an unknown or mismatched child cannot fall back to the root. Parent identity is
+immutable across registration retries. Ordinary child transcripts have their
+own ancestry; registering the parent does not invent inherited originals.
+The hook checks the live cwd against the session's registered workspace before
+binding either a root or descendant call. A changed cwd returns
+`BINDING_UNAVAILABLE` before the tool body executes; start a new native session in
+the new directory. It does not rewrite cached parent/child registrations.
+The canonical gate exercises the production hook with root, child and grandchild
+workspace transitions, including a root call before a descendant call.
+
+Native sync jobs persist `until_event` with their capture input and wait for
+that event within the original job deadline, including delayed file creation
+or a partial final record. Restart preserves the deadline and cancellation
+remains available. Malformed frames before the target fail with `HISTORY_GAP`.
+Manual imports without a target retain their existing partial/gap reports.
+Native startup/resume/clear/compact/fork reasons are retained in registration
+evidence. A CLI fork copies its retained UUID chain into the new session; those
+originals remain readable within that branch. The2.1.311 SessionStart contract
+does not expose a fork's parent session ID, so that relationship stays unknown.
+No later parent or sibling events are imported into the branch.
+
+### Claude session plugin installation
+
+The supported native version is2.1.311. Install into a new directory whose parent
+already exists, using the same executable/configuration as the running daemon:
+
+```sh
+akasha-otsuge --config /absolute/path/akasha.toml adapter install claude \
+  --binary /absolute/path/claude --directory /absolute/path/akasha-claude-v1
+akasha-otsuge doctor --host claude --binary /absolute/path/claude \
+  --directory /absolute/path/akasha-claude-v1
+claude --plugin-dir /absolute/path/akasha-claude-v1
+```
+
+The returned `launch_args` identify the exact native executable and plugin.
+This uses the native [session plugin option](https://code.claude.com/docs/en/plugins);
+loading is explicit on each launch. Start the daemon first and include the
+native transcript directory in its configured read roots. Explicit `--config`,
+`--profile` and `--socket` options are retained in the bridge arguments; omitted
+configuration uses normal defaults. The plugin registers `akasha_consult` with an
+optional short hint and submits durable research using the verified native call.
+Installation does not start a daemon. Claude-native authentication remains deferred
+under the owner's temporary Codex/Pi/Hermes substitution; controlled plugin tests
+do not establish authenticated Claude Consult acceptance.
+
+The installer publishes a verified private directory atomically and never edits
+native user/project settings or other hooks. An identical reinstall succeeds;
+changed owned files, symlinks and unexpected content are refused. Upgrade into a new
+directory, validate it with `claude plugin validate DIR`, then switch the launch
+path. Keep the old directory to roll back by selecting its launch path again.
+The executable paths in the old plugin must remain available for rollback.
+
+```sh
+akasha-otsuge adapter uninstall claude --directory /absolute/path/akasha-claude-v1
+```
+
+Uninstall removes only the receipt's verified files and empty owned directories;
+user additions or edits outside the native-generated paths prevent removal.
+The native TUI [generates type support](https://code.claude.com/docs/en/plugins/mods/create#get-type-definitions-for-your-version)
+under `.claude-plugin/types/` and at `tsconfig.json`. These paths, including user
+edits, are preserved and listed in `preserved_paths`; their parent directories
+remain after uninstall. The installer neither validates nor deletes their contents.
+Removal first detaches the verified plugin directory and retains a recovery receipt.
+If removal fails, `doctor --directory <original-path>` reports
+`uninstall_pending` and `recovery_dir`. Resolve the reported filesystem problem
+and repeat the same uninstall command; reinstall is refused while removal is
+pending. Changed files and replacements at the original path are retained.
+`doctor` reports the observed CLI
+version, supported-version match, optional installation integrity and explicit
+coverage limits. Its version probe does not execute a caller/model self-test,
+check authentication or claim that a running session loaded the plugin. Fork
+parent IDs remain unavailable. The local native protocol fixture exercises the
+unmodified generated plugin in headless and controlling-PTY sessions, durable
+capture, doctor and removal. UUIDs and cursor-prefix hashes bind the captured
+input/output to native files. Local command/queue notifications that may not be
+persisted cannot advance the file fence. Native permission metadata is skipped;
+turn-duration events retain their identity and session visibility. Authenticated
+model and the remaining TUI lifecycle acceptance remain separate.

@@ -23,9 +23,13 @@ Commands:
   adapter uninstall hermes --home PATH
   adapter install pi --binary PATH --agent-dir PATH
   adapter uninstall pi --agent-dir PATH
+  doctor --host claude [--binary PATH] [--directory DIR]
+                             Inspect the installed Claude CLI
+  adapter install claude --directory DIR [--binary PATH]
+  adapter uninstall claude --directory DIR
   config validate|reload|status
   config show --effective
-  capture reconcile|codex BINDING_JSON INPUT_JSONL --idempotency-key ID
+  capture reconcile|codex|claude BINDING_JSON INPUT_JSONL --idempotency-key ID
   model run PLAN_JSON --idempotency-key ID
   index sync --idempotency-key ID
   index status
@@ -33,6 +37,9 @@ Commands:
   show SOURCE_ID --revision COMMIT --range START_BYTE END_BYTE
   job show|cancel ID
   job list [--after KEY]
+  consult show JOB_ID
+  consult receipt JOB_ID [--full]
+  consult original JOB_ID SOURCE_INDEX [--start BYTE_OFFSET]
   memory show ID [--at COMMIT]
   memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]
   state show --scope JSON_FILE --at COMMIT [--cursor JSON_FILE]
@@ -219,17 +226,118 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     } else {
         None
     };
+    if command == ["adapter", "claude-read"] {
+        let (response, failed) = match akasha_otsuge::adapter::claude::read_bridge().await {
+            Ok(response) => (response, false),
+            Err(error) => (serde_json::json!({"error":error}), true),
+        };
+        let mut bytes = serde_json::to_vec(&response)?;
+        bytes.push(b'\n');
+        output(&bytes, failed)?;
+        return Ok(u8::from(failed));
+    }
+    if let [
+        "adapter",
+        action @ ("install" | "uninstall"),
+        "claude",
+        flags @ ..,
+    ] = command.as_slice()
+    {
+        let names: &[&str] = if *action == "install" {
+            &["--directory", "--binary"]
+        } else {
+            &["--directory"]
+        };
+        let flags = options(flags, names)?;
+        let directory =
+            std::path::Path::new(flags.get("--directory").ok_or(Error("INVALID_ARGUMENT"))?);
+        let data = if *action == "install" {
+            let mut bridge_args = Vec::new();
+            if explicit_config {
+                bridge_args.extend([
+                    "--config".into(),
+                    std::path::absolute(&config_path)?
+                        .to_str()
+                        .ok_or(Error("INVALID_ARGUMENT"))?
+                        .into(),
+                ]);
+            }
+            if let Some(profile) = &profile {
+                bridge_args.extend(["--profile".into(), profile.clone()]);
+            }
+            if let Some(socket) = &socket {
+                bridge_args.extend([
+                    "--socket".into(),
+                    std::path::absolute(socket)?
+                        .to_str()
+                        .ok_or(Error("INVALID_ARGUMENT"))?
+                        .into(),
+                ]);
+            }
+            akasha_otsuge::adapter::claude::installation::install(
+                std::path::Path::new(flags.get("--binary").copied().unwrap_or("claude")),
+                directory,
+                bridge_args,
+            )
+            .await?
+        } else {
+            akasha_otsuge::adapter::claude::installation::uninstall(directory)?
+        };
+        let mut bytes = serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":data}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
+    if let ["doctor", "--host", "claude", flags @ ..] = command.as_slice() {
+        let flags = options(flags, &["--binary", "--directory"])?;
+        let binary = std::path::Path::new(flags.get("--binary").copied().unwrap_or("claude"));
+        let (response, failed) = match akasha_otsuge::adapter::claude::probe(binary).await {
+            Ok(report) => {
+                let installation = flags
+                    .get("--directory")
+                    .map(|path| {
+                        akasha_otsuge::adapter::claude::installation::inspect(std::path::Path::new(
+                            path,
+                        ))
+                    })
+                    .transpose()?;
+                let coverage = serde_json::json!({
+                    "version_supported":report.version.as_deref()==Some("2.1.311"),
+                    "supported_versions":["2.1.311"],
+                    "session_loading":"explicit_plugin_dir",
+                    "fork_parent":"unavailable",
+                    "model_auth":"not_checked"
+                });
+                (
+                    serde_json::json!({"schema_version":1,"data":report,"installation":installation,"coverage":coverage}),
+                    false,
+                )
+            }
+            Err(error) => (serde_json::json!({"schema_version":1,"error":error}), true),
+        };
+        let mut bytes = serde_json::to_vec(&response)?;
+        bytes.push(b'\n');
+        output(&bytes, failed)?;
+        return Ok(u8::from(failed));
+    }
     let operation = match command.as_slice() {
         ["adapter", "codex-hook", ..] => None,
         ["adapter", "install", "codex" | "hermes" | "pi", ..] => None,
-        ["adapter", host @ ("codex-call" | "hermes-call" | "pi-call")] => {
+        [
+            "adapter",
+            host @ ("codex-call" | "hermes-call" | "pi-call" | "claude-call"),
+        ] => {
             use std::io::Read;
             let mut bytes = Vec::new();
             io::stdin().take(16 * 1024 + 1).read_to_end(&mut bytes)?;
             if bytes.len() > 16 * 1024 {
                 return Err(Error("MESSAGE_TOO_LARGE"));
             }
-            Some(if *host == "pi-call" {
+            Some(if *host == "claude-call" {
+                Command::Claude {
+                    event: serde_json::from_slice(&bytes)?,
+                }
+            } else if *host == "pi-call" {
                 Command::Pi {
                     event: serde_json::from_slice(&bytes)?,
                 }
@@ -253,7 +361,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         ["config", "show", "--effective"] => Some(Command::ConfigShow),
         [
             "capture",
-            format @ ("reconcile" | "codex"),
+            format @ ("reconcile" | "codex" | "claude"),
             binding,
             path,
             "--idempotency-key",
@@ -266,6 +374,8 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             let mut binding: ipc::CaptureInput = serde_json::from_str(&input)?;
             if *format == "codex" {
                 binding.host = Some(config::Host::Codex);
+            } else if *format == "claude" {
+                binding.host = Some(config::Host::ClaudeCode);
             }
             Some(Command::Reconcile {
                 binding,
@@ -313,6 +423,30 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             })
         }
         ["job", "show", id] => Some(Command::JobShow { id: (*id).into() }),
+        ["consult", "show", id] => Some(Command::ConsultShow { id: (*id).into() }),
+        ["consult", "receipt", id] => Some(Command::ConsultReceipt {
+            id: (*id).into(),
+            full: false,
+        }),
+        ["consult", "receipt", id, "--full"] => Some(Command::ConsultReceipt {
+            id: (*id).into(),
+            full: true,
+        }),
+        ["consult", "original", id, source, flags @ ..] => {
+            let flags = options(flags, &["--start"])?;
+            Some(Command::ConsultOriginal {
+                id: (*id).into(),
+                source: usize::try_from(number(source)?).map_err(|_| Error("INVALID_ARGUMENT"))?,
+                start: usize::try_from(
+                    flags
+                        .get("--start")
+                        .map(|v| number(v))
+                        .transpose()?
+                        .unwrap_or(0),
+                )
+                .map_err(|_| Error("INVALID_ARGUMENT"))?,
+            })
+        }
         ["job", "cancel", id] => Some(Command::JobCancel { id: (*id).into() }),
         ["job", "list"] => Some(Command::JobList { after: None }),
         ["job", "list", "--after", after] => Some(Command::JobList {
@@ -524,6 +658,9 @@ fn json_file<T: serde::de::DeserializeOwned>(path: &str) -> Result<T> {
 }
 fn run() -> Result<u8> {
     let args: Vec<_> = std::env::args_os().skip(1).collect();
+    if args.first().is_some_and(|s| s == "__native-runner") {
+        return akasha_otsuge::adapter::run_guard(&args[1..]).map_err(Into::into);
+    }
     if args.is_empty()
         || args.len() == 1 && matches!(args[0].to_str(), Some("-h" | "--help" | "help"))
     {

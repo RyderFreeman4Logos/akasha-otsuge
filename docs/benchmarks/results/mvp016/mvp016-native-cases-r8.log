@@ -1,0 +1,13 @@
+{"phase": "native_caller_start", "case": "pi-empty", "elapsed_seconds": 1.356}
+{"phase": "native_caller_submitted", "case": "pi-empty", "elapsed_seconds": 4.495}
+{"phase": "consult_terminal", "case": "pi-empty", "elapsed_seconds": 16.341}
+{"phase": "finished", "case": "pi-empty", "elapsed_seconds": 16.705}
+{"phase": "native_caller_start", "case": "pi-delegate", "elapsed_seconds": 1.373}
+{"phase": "native_caller_submitted", "case": "pi-delegate", "elapsed_seconds": 4.716}
+{"phase": "consult_terminal", "case": "pi-delegate", "elapsed_seconds": 30.497}
+{"phase": "finished", "case": "pi-delegate", "elapsed_seconds": 30.974}
+{"phase": "native_caller_start", "case": "hermes-empty", "elapsed_seconds": 6.266}
+{"phase": "native_caller_submitted", "case": "hermes-empty", "elapsed_seconds": 21.695}
+{"phase": "consult_terminal", "case": "hermes-empty", "elapsed_seconds": 31.005}
+{"phase": "finished", "case": "hermes-empty", "elapsed_seconds": 31.715}
+[{"case": "pi-empty", "exit_code": 0}, {"case": "pi-delegate", "exit_code": 0}, {"case": "hermes-empty", "exit_code": 0}]

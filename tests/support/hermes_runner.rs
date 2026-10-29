@@ -96,6 +96,8 @@ async fn standalone_runner_uses_profile_plugin_scoped_context_and_structured_fin
 #[tokio::test]
 async fn runner_rejects_forged_authority_protocol_errors_and_unfinished_native_processes() {
     for (scenario, expected) in [
+        ("token_budget", ErrorCode::BudgetExhausted),
+        ("usage_regression", ErrorCode::ProtocolInvalid),
         ("wrong_token", ErrorCode::ReadDenied),
         ("wrong_home", ErrorCode::ReadDenied),
         ("double_ready", ErrorCode::ProtocolInvalid),

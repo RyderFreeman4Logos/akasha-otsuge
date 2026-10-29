@@ -51,7 +51,7 @@ if scenario == 'cancel':
     child = subprocess.Popen([sys.executable, '-c', 'import time;time.sleep(30)'])
     (home / 'child.pid').write_text(str(child.pid))
 ready = {'op': 'ready', 'home': str(home if scenario != 'wrong_home' else home / 'other'),
-         'tools': ['context_describe', 'context_list', 'context_read', 'context_search']}
+         'tools': ['code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search']}
 if scenario != 'no_ready':
     assert exchange(ready) == {'ready': True}
 if scenario == 'double_ready':
@@ -61,6 +61,9 @@ if scenario in ('cancel', 'timeout', 'eof_live'):
         os.close(1)
         os.close(2)
     time.sleep(30)
+if scenario != 'no_ready':
+    assert exchange({'op':'usage','input_tokens':200000 if scenario == 'token_budget' else 12,'output_tokens':7}) == {'accepted':True}
+if scenario == 'usage_regression': exchange({'op':'usage','input_tokens':11,'output_tokens':7})
 if scenario == 'denied_tool':
     emit({'type': 'tool_use', 'name': 'terminal'})
 elif scenario == 'forged_args':

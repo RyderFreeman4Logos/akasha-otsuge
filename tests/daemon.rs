@@ -28,6 +28,9 @@ mod hermes_tests;
 #[path = "support/daemon_pi.rs"]
 mod pi_tests;
 
+#[path = "support/daemon_claude.rs"]
+mod claude_tests;
+
 struct Daemon {
     root: PathBuf,
     socket_name: String,
