@@ -61,7 +61,7 @@ if scenario == 'denied_tool':
     emit({'type':'tool_execution_start', 'toolName':'bash', 'toolCallId':'forbidden'})
 if scenario == 'forged_args': exchange({'op':'context', 'request':{'operation':'describe', 'session_id':'forged'}})
 if scenario == 'unissued_handle': exchange({'op':'context', 'request':{'operation':'read', 'handle':'forged', 'start':0, 'max_bytes':16}})
-if scenario in ['success', 'retry', 'auth_retry']:
+if scenario in ['success', 'retry', 'auth_retry', 'compaction']:
     assert exchange({'op':'context', 'request':{'operation':'describe'}})['kind'] == 'description'
     emit({'type':'tool_execution_start', 'toolName':'context_describe', 'toolCallId':'description'})
     emit({'type':'tool_execution_end', 'toolName':'context_describe', 'toolCallId':'description', 'isError':False})
@@ -70,7 +70,14 @@ if scenario in ['retry', 'auth_retry']:
     emit({'type':'message_end', 'message':{'role':'assistant','content':[], 'stopReason':'error', 'errorMessage':error}})
     emit({'type':'agent_end','messages':[]})
     emit({'type':'auto_retry_start','attempt':1})
+    emit({'type':'entry_appended','entry':{'type':'context_edit','targetId':'failed-attempt','replacement':None}})
     emit({'type':'auto_retry_end','success':True})
+if scenario == 'compaction':
+    emit({'type':'compaction_start','reason':'threshold'})
+    emit({'type':'summarization_retry_scheduled','attempt':1})
+    emit({'type':'summarization_retry_attempt_start','source':'compaction','reason':'threshold'})
+    emit({'type':'summarization_retry_finished'})
+    emit({'type':'compaction_end','reason':'threshold','aborted':False,'willRetry':False})
 if scenario == 'oversized': print('x' * 131073, flush=True)
 elif scenario == 'stderr': print('x' * 8193, file=sys.stderr, flush=True)
 elif scenario == 'partial': print('{', end='', flush=True); sys.exit(0)

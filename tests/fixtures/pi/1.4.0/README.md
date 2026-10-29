@@ -31,3 +31,37 @@ resume/rotation/replay and fail-closed format/identity regressions. The adapter
 preserves fork `parentSession` as provenance and reads only the copied fork path;
 it does not infer authority to open the parent path. Missing parent entries remain
 explicit lineage gaps. Current model-context edits do not rewrite raw history.
+
+## Native CLI protocol and lifecycle qualification
+
+`check_native_runner.py` and `check_native_caller.py` use the actual Pi1.4.0 CLI,
+the compiled Akasha executable and an isolated, synthetic loopback SSE provider.
+They create and remove their own private profile, extension installation, daemon
+data and native sessions. They do not read the user's native authentication.
+Caller lifecycle commands come from the acceptance-only `lifecycle.ts` extension;
+that extension is not installed in product profiles. The compact acceptance
+receipt and three unmodified native output files are in `rpc-controlled/`.
+The files contain only synthetic content and paths to already removed scratch.
+
+Build with `cargo build --locked` and `cargo test --test pi --no-run --locked`,
+then use the test executable printed by the latter command:
+
+```sh
+export AKASHA_BINARY=/absolute/path/to/target/debug/akasha-otsuge
+export AKASHA_PI_BINARY=/absolute/path/to/pi-1.4.0
+export AKASHA_PI_TEST=/absolute/path/to/target/debug/deps/pi-TEST_HASH
+export AKASHA_NATIVE_PATH=/directory/containing/node:/usr/bin:/bin
+export TMPDIR=/private/writable/ssd/tmp
+export PYTHONDONTWRITEBYTECODE=1
+python3 tests/fixtures/pi/1.4.0/check_native_runner.py /new/runner-output
+python3 tests/fixtures/pi/1.4.0/check_native_caller.py /new/caller-output
+```
+
+Output directories must not exist. The scripts require128MiB of free scratch
+space and reject a PATH containing Claude, Codex or Hermes. New IDs, paths and
+timestamps are expected. The retained receipt binds source/binary/file hashes,
+five Runner cases, six Caller bindings,19 completed jobs and cleanup. The retry
+case causes one real local HTTP503 before native recovery. The hostile-tool case
+requires `TOOL_DENIED` and verifies its outside marker was never created.
+These checks qualify native RPC behavior; authenticated provider and interactive
+TUI acceptance remain separate requirements.

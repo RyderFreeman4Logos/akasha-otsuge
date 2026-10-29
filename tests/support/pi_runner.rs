@@ -54,7 +54,7 @@ fn spec(inv: &Invocation, seconds: u64) -> RunSpec {
 
 #[tokio::test]
 async fn rpc_runner_waits_for_settled_after_retries_and_preserves_line_separators() {
-    for scenario in ["success", "retry", "auth_retry"] {
+    for scenario in ["success", "retry", "auth_retry", "compaction"] {
         let f = Fixture::new();
         let binary = host(&f, scenario).await;
         let (store, inv) = invocation(&f).await;
@@ -186,7 +186,7 @@ async fn rpc_runner_cancel_reaps_native_group_before_resource_release() {
 }
 
 #[tokio::test]
-#[ignore = "requires explicit native Pi binary/profile and authenticated isolated acceptance"]
+#[ignore = "requires explicit native Pi binary/profile and isolated acceptance"]
 async fn installed_native_runner_roundtrip() {
     let f = Fixture::new();
     let binary = PathBuf::from(std::env::var_os("AKASHA_PI_BINARY").unwrap());
@@ -235,7 +235,7 @@ async fn installed_native_runner_roundtrip() {
 }
 
 #[tokio::test]
-#[ignore = "requires explicit native Pi binary/profile and authenticated isolated acceptance"]
+#[ignore = "requires explicit native Pi binary/profile and isolated acceptance"]
 async fn installed_native_rejects_unissued_context() {
     let f = Fixture::new();
     let binary = PathBuf::from(std::env::var_os("AKASHA_PI_BINARY").unwrap());
@@ -259,7 +259,7 @@ async fn installed_native_rejects_unissued_context() {
 }
 
 #[tokio::test]
-#[ignore = "requires explicit native Pi binary/profile and authenticated isolated acceptance"]
+#[ignore = "requires explicit native Pi binary/profile and isolated acceptance"]
 async fn installed_native_cancellation_ends_executor_after_context_tool() {
     let f = Fixture::new();
     let binary = PathBuf::from(std::env::var_os("AKASHA_PI_BINARY").unwrap());
@@ -312,5 +312,36 @@ async fn installed_native_cancellation_ends_executor_after_context_tool() {
             .to_string_lossy()
             .starts_with("akasha-run-")
     }));
+    Arc::try_unwrap(store).ok().unwrap().close().await.unwrap();
+}
+
+#[tokio::test]
+#[ignore = "requires explicit native Pi binary/profile and a controlled hostile-tool provider"]
+async fn installed_native_rejects_unadvertised_tool() {
+    let f = Fixture::new();
+    let binary = PathBuf::from(std::env::var_os("AKASHA_PI_BINARY").unwrap());
+    let home = PathBuf::from(std::env::var_os("AKASHA_PI_HOME").unwrap());
+    let (store, inv) = invocation(&f).await;
+    let marker = f.0.join("forbidden-effect");
+    let instructions = format!(
+        "Permission acceptance: attempt the unavailable bash tool to create OUTSIDE_MARKER={}. Do not use context tools.",
+        marker.display()
+    );
+    let mut runner = PiRunner::new(&binary, &home, &f.0, &instructions)
+        .await
+        .unwrap();
+    let mut context = CapturedContext::new(&store, inv.clone()).unwrap();
+    let mut handle = runner.start(spec(&inv, 180), &mut context).await.unwrap();
+    let error = loop {
+        match handle.next().await {
+            Ok(Some(_)) => {}
+            Err(error) => break error,
+            Ok(None) => panic!("unadvertised tool was not refused"),
+        }
+    };
+    assert_eq!(error.code, ErrorCode::ToolDenied);
+    assert!(!marker.exists(), "unadvertised tool produced a side effect");
+    drop(handle);
+    drop(context);
     Arc::try_unwrap(store).ok().unwrap().close().await.unwrap();
 }

@@ -455,8 +455,16 @@ impl Handle<'_> {
             | "turn_end"
             | "agent_end"
             | "auto_retry_end"
-            | "auto_compaction_start"
-            | "auto_compaction_end" => {}
+            | "entry_appended"
+            | "queue_update"
+            | "session_info_changed"
+            | "thinking_level_changed"
+            | "compaction_start"
+            | "compaction_end"
+            | "summarization_retry_scheduled"
+            | "summarization_retry_attempt_start"
+            | "summarization_retry_finished" => {}
+            "bash_execution_update" => return Err(ErrorCode::ToolDenied.into()),
             "extension_error" => return Err(ErrorCode::RunnerFailed.into()),
             _ => return Err(ErrorCode::ProtocolInvalid.into()),
         }

@@ -1,0 +1,165 @@
+{
+  "kind": "actual Pi 1.4.0 CLI with synthetic loopback SSE; no authenticated model",
+  "source_base": "70c7089f80d7dc3c48b9c21b23e412501ff83f65",
+  "source_note": "plus the native recovery-event fix and maintained fixture sources identified here",
+  "fixture_sha256": {
+    "native_provider.py": "a02e21443716de47178b3b68289752bd81e704599b7d4c61424dcb34da7645fa",
+    "check_native_caller.py": "e317675cdad8fe038defb60908b8838dcb52a6fc70daaf21562523c413605503",
+    "check_native_runner.py": "e2756cedfeda9e6a8957917fc33e50141c96fd2743ba1ac8342b51c6dc7772e5",
+    "lifecycle.ts": "1a4576144399da2b01f882e4630a0b44833249192399caa5956cc43f3dd66b2f"
+  },
+  "production_sha256": {
+    "src/adapter/pi/runner.rs": "bb021668f043f89122299c1a66c3d19177fa2620c91dff16a6a49a4ce4fc09b3",
+    "tests/support/pi_runner.rs": "753a560528dac919a05788a30d289b559867d5af97bfaf891b71e1d2fc0d24ce",
+    "plugins/pi/index.ts": "88ce02119e25222cde658046ee5cb586733205b5cb695844584a5de422fd9a14",
+    "plugins/pi/bridge.cjs": "67c828746481e9a7ff3a0113c926ce910202435334e2aa36a79783752c131bca"
+  },
+  "binary_sha256": {
+    "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/akasha-otsuge": "7f5dd685aaf0272e66e8d377d2d23c4d7df257ab99d1e6ed390a2a3d94e356dc",
+    "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi": "2d6702dd4a52461f50f304bcef3aa0261464ea0b921f72ea7ed6d07df16edef0",
+    "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a": "0b08bd1b80b588d7f148feebf6aec769a4e288fdcf0e6e70467bae2432af5310"
+  },
+  "runner": {
+    "status": "PASS_NATIVE_CONTROLLED_RUNNER",
+    "cases": [
+      {
+        "case": "roundtrip",
+        "exit_code": 0,
+        "provider_requests": 5,
+        "errors": [],
+        "residual_before_cleanup": []
+      },
+      {
+        "case": "retry",
+        "exit_code": 0,
+        "provider_requests": 6,
+        "errors": [],
+        "residual_before_cleanup": []
+      },
+      {
+        "case": "denied",
+        "exit_code": 0,
+        "provider_requests": 1,
+        "errors": [],
+        "residual_before_cleanup": []
+      },
+      {
+        "case": "cancel",
+        "exit_code": 0,
+        "provider_requests": 2,
+        "errors": [],
+        "residual_before_cleanup": []
+      },
+      {
+        "case": "forbidden",
+        "exit_code": 0,
+        "provider_requests": 1,
+        "errors": [],
+        "residual_before_cleanup": []
+      }
+    ],
+    "other_cli_absent": {
+      "claude": true,
+      "codex": true,
+      "hermes": true
+    },
+    "processes_ended": true,
+    "scratch_removed": true
+  },
+  "caller": {
+    "status": "PASS_NATIVE_CONTROLLED_CALLER",
+    "checks": [
+      "overlapping native sessions bound independently",
+      "reload",
+      "tree branch",
+      "native compaction",
+      "clone fork",
+      "resume",
+      "interrupted native run settles before shutdown",
+      "final transform persisted once",
+      "context edits retain original entries",
+      "durable capture jobs drained"
+    ],
+    "bindings": 6,
+    "completed_capture_jobs": 19,
+    "other_cli_absent": {
+      "claude": true,
+      "codex": true,
+      "hermes": true
+    },
+    "native_event_counts": [
+      {
+        "extension_ui_request": 39,
+        "response": 15,
+        "agent_start": 6,
+        "turn_start": 11,
+        "message_start": 23,
+        "message_end": 23,
+        "message_update": 30,
+        "tool_execution_start": 5,
+        "tool_execution_end": 5,
+        "turn_end": 11,
+        "agent_end": 6,
+        "entry_appended": 2,
+        "agent_settled": 6,
+        "compaction_start": 1,
+        "compaction_end": 1
+      },
+      {
+        "extension_ui_request": 6,
+        "response": 1,
+        "agent_start": 1,
+        "turn_start": 2,
+        "message_start": 5,
+        "message_end": 5,
+        "message_update": 6,
+        "tool_execution_start": 1,
+        "tool_execution_end": 1,
+        "turn_end": 2,
+        "agent_end": 1,
+        "entry_appended": 1,
+        "agent_settled": 1
+      }
+    ],
+    "processes_ended": true,
+    "scratch_removed": true
+  },
+  "files": [
+    {
+      "file": "session-0.jsonl",
+      "sha256": "82e9c85095cdc185d8c223c7a7d9bea3d065f22ab7033aee2283f8814c3f688c",
+      "bytes": 13663,
+      "session": "01a186e5-f05d-72fa-bda6-79f2151417b3",
+      "rows": 14
+    },
+    {
+      "file": "session-1.jsonl",
+      "sha256": "c33f248e5e7f963b79f03f0b19f345bdf5e01f9b0d6aa958cba376f05045a809",
+      "bytes": 21354,
+      "session": "01a186e5-eba1-72fa-bda6-79f04a5fd501",
+      "rows": 25
+    },
+    {
+      "file": "session-2.jsonl",
+      "sha256": "06a92581a1dd1c1978d7213b642672ae9c1091b711a1afc2ddd5d49aa61f1860",
+      "bytes": 7048,
+      "session": "01a186e5-eba2-730e-8743-6a65fbcde731",
+      "rows": 9
+    }
+  ],
+  "terminal": {
+    "exit_code": 0,
+    "head": "70c7089f80d7dc3c48b9c21b23e412501ff83f65",
+    "log_sha256": "1a0f4e4ceab9ce86583a1dbf571689cf9dcc142b48595710df1da7d333e25ef0",
+    "seconds": 9.25075981207192,
+    "utc": "2026-10-29T09:02:59.924211+00:00"
+  },
+  "provider_partial_body": {
+    "partial_body_eof": true,
+    "errors": [
+      "TimeoutError: timed out"
+    ],
+    "seconds": 5.0075222328305244,
+    "thread_ended": true
+  }
+}

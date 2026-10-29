@@ -66,6 +66,8 @@ JSON answer, native `agent_settled` and zero process exit. `agent_end` can prece
 automatic retries and is not completion. The original deadline and shared
 budgets cover tools, events and cleanup. Cancellation kills the owned process
 group, including bridge children, and reaps it before releasing run resources.
+Native retry context edits and compaction/summarization events are accepted as
+metadata; they cannot complete a run or expand its tool authority.
 Missing credentials and an expired OAuth refresh token return `AUTH_REQUIRED`.
 Reauthenticate through Pi's native `/login`; the adapter does not copy credentials
 from another host. Provider error text is not returned to the model.
@@ -74,13 +76,18 @@ from another host. Provider error text is not returned to the model.
 
 Native SDK loading, native SessionManager tree fixtures, five Node bridge
 behaviors, three controlled Runner regressions and daemon recovery/cancellation
-checks pass. The Runner cases include 21 negative scenarios and exercise the
-actual Rust context bridge; authentication regression coverage adds two refusal
-cases and verifies a recovered retry can still complete. A separate native SDK lifecycle harness binds three
-calls across root/reload/fork, reconciles another extension's message transform,
-context edits, compaction, resume and interrupted shutdown, and drains seven
-capture jobs. Its messages are synthetic; it does not prove authenticated model
-execution.
+checks pass. The Runner cases include 23 negative scenarios and exercise the
+actual Rust context bridge, including recovered authentication retries.
+The maintained [native CLI fixtures](../../../tests/fixtures/pi/1.4.0/README.md)
+also pass five Runner cases: all four context tools, actual automatic recovery
+after a local HTTP503, unissued-context refusal, cancellation and an unadvertised
+Bash call with no side effect. The native Caller binds six calls across two
+overlapping sessions, reload, tree selection, fork and resume. Other-extension
+transforms, context edits, native compaction and interrupted settlement pass;
+all19 capture jobs finish. The three retained native files total42,065bytes.
+These fixtures use an isolated profile and synthetic loopback SSE, with the other
+three host CLIs absent. They do not prove authenticated model execution or a
+controlling-terminal interactive UI. All owned processes and scratch are removed.
 The bridge's child cleanup and output bounds are tested with controlled executables.
 Two earlier Caller identity tests reported `HISTORY_GAP` during a full run.
 A content-free timing probe subsequently passed (cold reconcile 1.136–1.313s);

@@ -621,7 +621,9 @@ Completed #14 implementation evidence:
   verify simultaneous sessions, durable retries and immutable fences.
   The Rust Caller passes four new regressions for exact persisted calls, selected
   ancestry, simultaneous profiles, durable fences and current permission revocation.
-  All nine Pi tests and all-target Clippy pass; native extension transport remains.
+  All nine Pi tests and all-target Clippy pass. The native CLI fixture now binds
+  six calls across two overlapping sessions, reload, tree, fork and resume.
+  Authenticated interactive acceptance remains below.
   The private daemon bridge also passes registration retry/conflict, CLI transport,
   restart with the original capture deadline, cancellation settlement and current
   path/grant revocation. Cancellation acknowledgement precedes worker settlement.
@@ -631,7 +633,9 @@ Completed #14 implementation evidence:
   A native1.4.0 SDK lifecycle harness passes three root/reload/fork bindings,
   transformed-message reconciliation, context edits, compaction, resume and
   interrupted shutdown, with seven completed capture jobs. Messages are synthetic;
-  actual authenticated native CLI coverage remains below.
+  actual authenticated native CLI coverage remains below. The maintained native
+  CLI fixture also passes these lifecycle cases and drains19 capture jobs;
+  three unmodified synthetic session files retain42,065bytes of evidence.
 - [x] Provide a minimal native extension with opt-in installation, integrity
   checks and recoverable uninstall that preserves unrelated user configuration.
   The pinned native SDK loads it successfully. Four Node extension regressions,
@@ -643,9 +647,12 @@ Completed #14 implementation evidence:
   `agent_settled` completion plus zero exit, bounded output, original deadlines,
   cancellation and process-group cleanup. Verify forbidden tool operations.
   Three controlled Runner regressions pass through the real Rust context CLI,
-  including21 refusal cases, retry settlement and group cancellation. Five Node
-  extension behaviors pass. Native authenticated tool inventory and execution
-  remain to be qualified before this item is complete.
+  including23 refusal cases, retry settlement and group cancellation. Five Node
+  extension behaviors pass. Actual Pi1.4.0 with synthetic local SSE passes all
+  four context tools, recovery after one HTTP503, unissued-context denial,
+  cancellation and unadvertised Bash refusal with no side effect. Native recovery
+  context-edit/compaction metadata has a retained RED/GREEN regression. Native
+  authenticated execution remains to be qualified before this item is complete.
 - [ ] Exercise real authenticated Caller and Runner with the other three CLIs
   absent, including concurrent sessions, tree branches/forks, reload/resume,
   context edits, compaction and interruption. Retain sanitized native fixtures,
