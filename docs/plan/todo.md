@@ -738,6 +738,15 @@ links exact identities and preserves the distinct controlled/native results.
   passed afterward. Native submission remains.
 - [ ] Verify default-self native Codex/Hermes/Pi, optional/empty hint, descendant
   delegation, a real cross-host combination and original long-call deadlines.
+  Real Pi1.4.0/grok-4.7 at localhost:48317 submits and completes a no-hint Consult
+  with an exact replayable receipt. Policy retrieval remains incomplete: a bounded
+  forwarding diagnostic captured `code_search(paths=["."])`, correctly rejected
+  because the tool accepts individual files. Shared Runner guidance now states
+  the path contract; the progressive-code regression passes. A fresh real run
+  must verify actual policy evidence before this acceptance is complete.
+  Independent whole-range source review of57286ee/tree0977884 passes87 files and
+  closes both prior findings. The subsequent guidance edit and final native/gate
+  evidence still require their own validation; the source verdict is not closure.
   Claude-native authenticated acceptance is explicitly deferred by the owner's
   temporary Codex or localhost:48317 Pi/Hermes substitution; never label it passed.
 - [ ] Complete focused regressions, canonical gate, independent final review,

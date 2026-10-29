@@ -376,6 +376,8 @@ The registered inventory contains `context_describe/list/read/search`,
 decoding rejects model-supplied caller identity. CapturedContext serves only the
 context operations; the consult workflow supplies the remaining research tools
 under the same invocation, permissions and budget.
+Both code tools take individual workspace-relative file paths; they do not expand
+directories, globs or absolute paths. Read a named file directly with `code_read`.
 
 The Runner accepts one structured nonempty `answer`, then closes stdin and waits
 for the native process to exit successfully. EOF, an answer followed by a failing
