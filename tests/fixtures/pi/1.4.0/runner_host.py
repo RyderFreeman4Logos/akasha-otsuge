@@ -13,8 +13,13 @@ if sys.argv[1:] == ['--version']:
 home = Path(os.environ['PI_CODING_AGENT_DIR'])
 scenario = (home / 'scenario').read_text()
 for flag in ['--no-session', '--no-builtin-tools', '--no-extensions', '--no-mcp', '--no-skills',
-             '--no-prompt-templates', '--no-themes', '--no-context-files', '--no-approve']:
+             '--no-prompt-templates', '--no-themes', '--no-context-files', '--approve']:
     assert flag in sys.argv
+settings = json.loads((Path.cwd() / '.pi/settings.json').read_text())
+remaining = int(os.environ['AKASHA_RUN_DEADLINE_MS']) - int(time.time() * 1000)
+assert set(settings) == {'httpIdleTimeoutMs', 'retry'}
+assert settings['retry'] == {'provider': {'timeoutMs': settings['httpIdleTimeoutMs']}}
+assert remaining <= settings['httpIdleTimeoutMs'] <= remaining + 3000
 assert sys.argv[sys.argv.index('--mode') + 1] == 'rpc'
 tools = ['code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search']
 assert sys.argv[sys.argv.index('--tools') + 1].split(',') == tools

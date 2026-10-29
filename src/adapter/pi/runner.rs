@@ -108,6 +108,21 @@ impl AgentRunner for PiRunner {
                 .create(&directory)
                 .map_err(|_| ErrorCode::SourceUnavailable)?;
             let mut setup = SetupCleanup(Some(directory.clone()));
+            // Pi defaults both HTTP idle and provider requests to five minutes.
+            let timeout_ms = u64::try_from(spec.deadline().remaining().as_millis())
+                .map_err(|_| ErrorCode::ConfigInvalid)?
+                .max(1);
+            let settings = directory.join(".pi");
+            std::fs::DirBuilder::new()
+                .mode(0o700)
+                .create(&settings)
+                .map_err(|_| ErrorCode::SourceUnavailable)?;
+            std::fs::write(
+                settings.join("settings.json"),
+                json!({"httpIdleTimeoutMs": timeout_ms, "retry": {"provider": {"timeoutMs": timeout_ms}}})
+                    .to_string(),
+            )
+            .map_err(|_| ErrorCode::SourceUnavailable)?;
             // Abstract UDS avoids filesystem path limits; peer UID and a per-run capability authenticate it.
             let address =
                 std::os::unix::net::SocketAddr::from_abstract_name(format!("akasha-{nonce}"))
@@ -153,7 +168,7 @@ impl AgentRunner for PiRunner {
                     "--no-prompt-templates",
                     "--no-themes",
                     "--no-context-files",
-                    "--no-approve",
+                    "--approve",
                     "-e",
                 ])
                 .arg(&extension)

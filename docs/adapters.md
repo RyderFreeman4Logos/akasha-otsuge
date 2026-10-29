@@ -118,6 +118,14 @@ adapter must check it at admission and event/I/O waits and enforce cancellation
 of its owned process or session; an outer timeout does not prove a CLI's inner
 provider timeout supports 1700 seconds.
 
+Pi Runner writes only HTTP idle and provider request timeouts into its private
+per-run `.pi/settings.json`, using the remaining original RunSpec budget. It
+approves that owned directory so Pi reads these settings; built-in tools, other
+extensions, MCP, skills and context files remain disabled. The native profile is
+unchanged. Akasha's configured Runner deadline governs this subprocess, including
+when it is shorter than Pi's profile timeout. Later requests and retries remain
+bounded by the original outer deadline; this override cannot restart that clock.
+
 Claude cleanup has a separate one-second grace period, which repeated waits do
 not renew. Cancellation reports `acknowledged: false` if exit is still unknown;
 the original timeout/error remains authoritative. A background cleanup owner

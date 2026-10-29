@@ -747,6 +747,13 @@ links exact identities and preserves the distinct controlled/native results.
   successor passed without reproducing it. Original long-call acceptance remains.
   Codex0.164.0 is an isolated verified SSD artifact because the global install
   moved to0.165.0; the Hermes test profile shares existing installed dependencies.
+  Native long-call R2 exposed Pi1.4.0's default300-second HTTP/provider ceiling:
+  one request failed at300.746s despite the original1700-second Runner budget.
+  Its short protocol control and10-second timeout cleanup passed; all scratch
+  was removed. The Runner now configures both native timeouts in its owned private
+  directory from the remaining original budget, preserving the native home.
+  The causal RPC fixture RED, all13 Pi tests, Clippy and five actual native
+  controlled cases pass after repair. A fresh1605-second run is still required.
   Independent whole-range source review of57286ee/tree0977884 passes87 files and
   closes both prior findings. The subsequent guidance edit and final native/gate
   evidence still require their own validation; the source verdict is not closure.
