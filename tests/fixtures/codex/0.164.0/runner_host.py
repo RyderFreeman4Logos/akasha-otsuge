@@ -168,6 +168,8 @@ if scenario == 'duplicate_call':
     send(call); time.sleep(30)
 usage(20, 4)
 final = {'method': 'turn/completed', 'params': {'threadId': 'thread', 'turn': {'id': 'turn', 'status': 'completed', 'error': None, 'items': [{'type': 'agentMessage', 'id': 'answer', 'phase': 'final_answer', 'text': '{"answer":"bounded-context"}'}]}}}
+if hint == 'long-output':
+    final['params']['turn']['items'][0]['text'] = json.dumps({'answer':'说明' * 2500 + '；仅在全部测试通过时适用。'}, ensure_ascii=False)
 if scenario == 'malformed_final': final['params']['turn']['items'][0]['text'] = '{"answer":"ok","authority":"forged"}'
 send(final)
 if scenario == 'double_final': send(final)

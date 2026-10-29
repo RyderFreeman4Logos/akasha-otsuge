@@ -137,6 +137,20 @@ pub enum Command {
     JobShow {
         id: String,
     },
+    ConsultShow {
+        id: String,
+    },
+    ConsultReceipt {
+        id: String,
+        #[serde(default)]
+        full: bool,
+    },
+    ConsultOriginal {
+        id: String,
+        source: usize,
+        #[serde(default)]
+        start: usize,
+    },
     JobCancel {
         id: String,
     },

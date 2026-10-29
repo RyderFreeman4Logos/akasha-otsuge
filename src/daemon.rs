@@ -239,6 +239,18 @@ impl Service {
                 Ok(value)
             }
             Command::JobShow { id } => self.show_job(&id).await,
+            Command::ConsultShow { id } => self.show_consult(&id).await,
+            Command::ConsultReceipt { id, full } => self.consult_receipt(&id, full).await,
+            Command::ConsultOriginal { id, source, start } => {
+                let service = self.clone();
+                let request_id = request_id.to_owned();
+                self.operation(async move {
+                    service
+                        .consult_original(&id, source, start, &request_id)
+                        .await
+                })
+                .await
+            }
             Command::JobCancel { id } => self.cancel_job(id).await,
             Command::JobList { after } => self.list_jobs(after.as_deref()).await,
             Command::MemoryShow { id, at } => Ok(serde_json::to_value(

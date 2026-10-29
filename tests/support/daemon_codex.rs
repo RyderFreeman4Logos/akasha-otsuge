@@ -299,9 +299,54 @@ fn consult_progressive_research_keeps_source_versions_and_workspace_changes() {
                 .unwrap()
                 .data;
             assert_eq!(receipt.output, job["result"]["output"].as_str().unwrap());
+            let domain = Domain::new(&store);
+            let previous = domain.active("offline").unwrap().unwrap();
+            let mut draft = previous.record.draft.clone();
+            draft.claim.push_str(" updated after completion");
+            let scope = draft.scope.clone();
+            domain
+                .propose(
+                    &akasha_otsuge::domain::MemoryWrite {
+                        request_id: "changed-after-consult".into(),
+                        memory_id: "offline".into(),
+                        expected_revision: Some(previous.revision.commit_seq),
+                        draft,
+                    },
+                    &akasha_otsuge::domain::Ingress::tool("fixture", "fixture", scope.clone())
+                        .unwrap(),
+                    &akasha_otsuge::domain::Policy {
+                        revision: "fixture".into(),
+                        config_generation: 1,
+                        mode: akasha_otsuge::config::ReviewMode::Automatic,
+                        scope,
+                        adopt_explicit_decisions: false,
+                    },
+                )
+                .await
+                .unwrap();
             store.close().await.unwrap();
             serde_json::to_value(receipt).unwrap()
         });
+    daemon.start();
+    let current = daemon
+        .command()
+        .args(["consult", "show", job["id"].as_str().unwrap()])
+        .output()
+        .unwrap();
+    assert!(
+        !current.status.success(),
+        "superseded memory was returned as current"
+    );
+    assert_eq!(
+        serde_json::from_slice::<Value>(&current.stderr).unwrap()["error"]["code"],
+        "STALE_RECALL"
+    );
+    let historical = daemon.cli(&["consult", "receipt", job["id"].as_str().unwrap()]);
+    assert_eq!(
+        historical["data"]["data"]["output"],
+        job["result"]["output"]
+    );
+    assert_eq!(historical["data"]["retrieval_mode"], "receipt_replay");
     let record = &receipt["record"];
     assert!(
         record["selected"]
@@ -326,6 +371,139 @@ fn consult_progressive_research_keeps_source_versions_and_workspace_changes() {
                 .contains(&observation["source"])
         );
     }
+}
+
+#[test]
+fn consult_public_result_expands_receipt_and_originals_without_private_trace() {
+    consult_public_result(false);
+}
+
+#[test]
+fn consult_public_large_result_preserves_complete_answer_and_conditions() {
+    consult_public_result(true);
+}
+
+fn consult_public_result(large: bool) {
+    let (mut daemon, mut event, _) = consult_fixture("code_policy");
+    if large {
+        event["args"]["hint"] = json!("long-output");
+    }
+    let submitted = native(&daemon, event);
+    let id = submitted["data"]["id"].as_str().unwrap();
+    let end = Instant::now() + Duration::from_secs(15);
+    while !daemon.root.join("code-read-ready").exists() {
+        assert!(Instant::now() < end);
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let pending = daemon.cli(&["consult", "show", id])["data"].clone();
+    assert_eq!(
+        pending,
+        json!({"status":"pending","job_id":id,"receipt_id":null})
+    );
+    std::fs::write(daemon.root.join("code-read-release"), "").unwrap();
+    let result = loop {
+        let result = daemon.cli(&["consult", "show", id])["data"].clone();
+        if result["status"] != "pending" {
+            break result;
+        }
+        assert!(Instant::now() < end);
+        std::thread::sleep(Duration::from_millis(10));
+    };
+    assert_eq!(
+        result["status"],
+        if large { "incomplete" } else { "found" },
+        "{result}"
+    );
+    assert!(result.to_string().chars().count() <= 4000);
+    for private in ["run_trace", "consult_plan", "usage", "native", "workspace"] {
+        assert!(result.get(private).is_none());
+    }
+    assert_eq!(result["job_id"], id);
+    let receipt = daemon.cli(&["consult", "receipt", id])["data"].clone();
+    assert_eq!(
+        serde_json::from_str::<Value>(receipt["data"]["output"].as_str().unwrap()).unwrap(),
+        result
+    );
+    let full = daemon.cli(&["consult", "receipt", id, "--full"])["data"].clone();
+    let expanded: Value = serde_json::from_str(full["data"]["output"].as_str().unwrap()).unwrap();
+    if large {
+        assert_eq!(
+            expanded["answer"],
+            "说明".repeat(2500) + "；仅在全部测试通过时适用。"
+        );
+        assert_eq!(
+            result["detail_receipt_id"],
+            full["data"]["record"]["receipt_id"]
+        );
+        assert_eq!(
+            receipt["data"]["record"]["truncation"]["reason"],
+            "result_budget"
+        );
+        assert!(result.get("answer").is_none());
+    } else {
+        assert_eq!(expanded, result);
+    }
+    let index = receipt["data"]["record"]["sources"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .position(|s| s["event_id"].as_str().unwrap().starts_with("consult-code/"))
+        .unwrap()
+        .to_string();
+    let original = daemon.cli(&["consult", "original", id, &index])["data"].clone();
+    assert_eq!(original["output"], "memory needle\n");
+    let rest = daemon.cli(&["consult", "original", id, &index, "--start", "7"])["data"].clone();
+    assert_eq!(rest["output"], "needle\n");
+    let invalid = daemon
+        .command()
+        .args(["consult", "original", id, "999"])
+        .output()
+        .unwrap();
+    assert!(!invalid.status.success());
+    assert_eq!(
+        serde_json::from_slice::<Value>(&invalid.stderr).unwrap()["error"]["code"],
+        "INVALID_RANGE"
+    );
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    assert_eq!(daemon.cli(&["consult", "show", id])["data"], result);
+    let home = daemon.root.join("native-home");
+    daemon.configure(&format!("[access]\nread_roots=[{home:?}]\n"));
+    daemon.cli(&["config", "reload"]);
+    for args in [
+        vec!["consult", "show", id],
+        vec!["consult", "receipt", id],
+        vec!["consult", "receipt", id, "--full"],
+        vec!["consult", "original", id, &index],
+    ] {
+        let output = daemon.command().args(args).output().unwrap();
+        assert!(!output.status.success());
+        assert_eq!(
+            serde_json::from_slice::<Value>(&output.stderr).unwrap()["error"]["code"],
+            "READ_DENIED"
+        );
+    }
+}
+
+#[test]
+fn consult_public_failure_reports_error_without_a_receipt() {
+    let (daemon, event, _) = consult_fixture("auth");
+    let submitted = native(&daemon, event);
+    let id = submitted["data"]["id"].as_str().unwrap();
+    let end = Instant::now() + Duration::from_secs(15);
+    let result = loop {
+        let result = daemon.cli(&["consult", "show", id])["data"].clone();
+        if result["status"] != "pending" {
+            break result;
+        }
+        assert!(Instant::now() < end);
+        std::thread::sleep(Duration::from_millis(10));
+    };
+    assert_eq!(
+        result,
+        json!({"status":"error","job_id":id,"receipt_id":null,"error":{"code":"AUTH_REQUIRED"}})
+    );
 }
 
 #[test]

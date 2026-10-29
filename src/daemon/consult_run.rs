@@ -135,7 +135,7 @@ impl Research<'_> {
         )?
         .with_guard(std::env::current_exe()?);
         let lease = spec.lease_handle();
-        let mut collector = RunCollector::new(&lease, settings.max_result_chars);
+        let mut collector = RunCollector::new(&lease, MAX_FRAME_BYTES);
         let mut handle = {
             let _guard = service.admission.lock().await;
             let (_, job) = service.job(id)?;

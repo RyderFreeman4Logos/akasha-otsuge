@@ -695,6 +695,16 @@ links exact identities and preserves the distinct controlled/native results.
 - [ ] Publish concise found/no_hit/incomplete/pending/error results with scope,
   evidence, conflicts/gaps and durable RecallReceipt after final live validation.
   Retain receipt/show expansion and keep private research traces out of main output.
+- [x] Add public `consult show`, bounded original expansion and receipt/full-result
+  views with the original verified authority. Public output excludes private plans
+  and run traces. Oversized answers retain their full text and conditions in a
+  second immutable receipt; the main receipt contains a bounded scoped handle.
+  Three end-to-end CLI cases and the progressive source-version case pass with
+  Clippy, including restart, live revocation, exact receipt/body equality, invalid
+  source indexes and5000-character Chinese output. Current-result reads reject
+  changed adopted memories, while explicit historical replay retains the original.
+  An earlier capture-fixture timeout is preserved; its isolated lifecycle case
+  passed afterward. Structured conclusions/no-hit and native submission remain.
 - [ ] Verify default-self native Codex/Hermes/Pi, optional/empty hint, descendant
   delegation, a real cross-host combination and original long-call deadlines.
   Claude-native authenticated acceptance is explicitly deferred by the owner's

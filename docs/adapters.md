@@ -46,6 +46,47 @@ installed CLI alone proves none of those optional capabilities. `NotRun` is not
 a successful self-test. `CompleteToFence`, `Lagging` and `Unavailable` describe
 retained context; unavailable or missing originals must be reported as gaps.
 
+## Consult results and continuation
+
+A trusted Consult submission creates a durable job handle. The current daemon
+submission path is Codex IPC; connecting the four installed caller tools remains
+part of MVP-016. A binding diagnostic is not a completed Consult.
+
+```sh
+akasha-otsuge consult show JOB_ID
+akasha-otsuge consult receipt JOB_ID
+akasha-otsuge consult receipt JOB_ID --full
+akasha-otsuge consult original JOB_ID SOURCE_INDEX
+akasha-otsuge consult original JOB_ID SOURCE_INDEX --start BYTE_OFFSET
+akasha-otsuge job cancel JOB_ID
+```
+
+`consult show` returns only a public result. Pending and failed jobs explicitly
+have no final receipt; failures retain their error code. Successful results come
+from the immutable RecallReceipt body and exclude the private plan, execution
+trace and usage. The same handle works after a daemon restart. `job show` retains
+management diagnostics separately.
+
+The public body includes its receipt and job IDs within `consult.max_result_chars`
+Unicode characters. If the complete answer and references exceed that budget,
+the body contains an incomplete result and a `detail_receipt_id`. The full answer,
+including its conditions and evidence, remains in a separate immutable receipt;
+`consult receipt JOB_ID --full` expands it. JSON and individual source references
+are never cut to fit. A budget too small even for the scoped handle fails with
+`OUTPUT_LIMIT`; the native result and serialized receipt also retain hard size
+bounds.
+
+`consult receipt` includes the recorded and currently validated sequence metadata.
+`consult show` additionally checks each selected memory's current adopted revision
+and validity, returning `STALE_RECALL` if the completed answer is superseded.
+The zero-based `SOURCE_INDEX` addresses only that receipt's sources; the optional
+byte offset is relative to the recorded span and must be a UTF-8 boundary. Reads
+remain bounded by the accepted original-text budget and return a continuation
+endpoint when truncated. Each expansion uses the original verified binding and
+live permissions. Code results also retain the original workspace identity, so
+read-root revocation or replacement blocks publication and replay, even after
+restart. Historical receipt replay does not claim the old answer is current.
+
 ## Framing, events and completion
 
 JSONL connections start with `FrameStream::handshake`: sequence zero is an

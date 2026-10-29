@@ -37,6 +37,9 @@ Commands:
   show SOURCE_ID --revision COMMIT --range START_BYTE END_BYTE
   job show|cancel ID
   job list [--after KEY]
+  consult show JOB_ID
+  consult receipt JOB_ID [--full]
+  consult original JOB_ID SOURCE_INDEX [--start BYTE_OFFSET]
   memory show ID [--at COMMIT]
   memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]
   state show --scope JSON_FILE --at COMMIT [--cursor JSON_FILE]
@@ -420,6 +423,30 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             })
         }
         ["job", "show", id] => Some(Command::JobShow { id: (*id).into() }),
+        ["consult", "show", id] => Some(Command::ConsultShow { id: (*id).into() }),
+        ["consult", "receipt", id] => Some(Command::ConsultReceipt {
+            id: (*id).into(),
+            full: false,
+        }),
+        ["consult", "receipt", id, "--full"] => Some(Command::ConsultReceipt {
+            id: (*id).into(),
+            full: true,
+        }),
+        ["consult", "original", id, source, flags @ ..] => {
+            let flags = options(flags, &["--start"])?;
+            Some(Command::ConsultOriginal {
+                id: (*id).into(),
+                source: usize::try_from(number(source)?).map_err(|_| Error("INVALID_ARGUMENT"))?,
+                start: usize::try_from(
+                    flags
+                        .get("--start")
+                        .map(|v| number(v))
+                        .transpose()?
+                        .unwrap_or(0),
+                )
+                .map_err(|_| Error("INVALID_ARGUMENT"))?,
+            })
+        }
         ["job", "cancel", id] => Some(Command::JobCancel { id: (*id).into() }),
         ["job", "list"] => Some(Command::JobList { after: None }),
         ["job", "list", "--after", after] => Some(Command::JobList {

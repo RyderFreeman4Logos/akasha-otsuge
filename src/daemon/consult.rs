@@ -2,6 +2,8 @@ use super::*;
 use crate::adapter::{BudgetLimits, CapturedContext, ConsultArgs, Invocation, RunBudget};
 use crate::config::{Host, deadline::Deadline};
 use crate::domain::{Coverage, RecallDraft, RecallStatus, RetrievalMode};
+#[path = "consult_delivery.rs"]
+mod delivery;
 #[path = "consult_research.rs"]
 mod research;
 
@@ -160,12 +162,11 @@ impl Service {
             RecallStatus::Incomplete
         };
         let scope = invocation.diagnostic().scope.clone();
-        let output = serde_json::to_string(&json!({"status":status,"answer":answer,"scope":scope,
-            "evidence":sources,"memories":context.selected,"code":context.code,"conflicts":[],"gaps":gaps}))?;
-        if output.chars().count() > settings.max_result_chars {
-            return Err(Error("OUTPUT_LIMIT"));
-        }
         let receipt_id = format!("consult-result/{}", hash(id.as_bytes()));
+        let output = serde_json::to_string(
+            &json!({"status":status,"job_id":id,"receipt_id":receipt_id,"answer":answer,"scope":scope,
+            "evidence":sources,"memories":context.selected,"code":context.code,"conflicts":[],"gaps":gaps}),
+        )?;
         let _guard = self.admission.lock().await;
         let (_, job) = self.job(id)?;
         self.authorize_job(&job)?;
@@ -176,28 +177,53 @@ impl Service {
             return Err(Error("WORKFLOW_TIMEOUT"));
         }
         self.authorize_consult_result(&trace)?;
-        Domain::new(&self.storage)
-            .prepare_recall(
-                &self.job_read_context(&job)?,
-                &RecallDraft {
-                    request_id: receipt_id.clone(),
-                    output,
-                    scope,
-                    read_seq: context.read_seq,
-                    retrieval_mode: RetrievalMode::CurrentState,
-                    selected: context.selected,
-                    sources,
-                    status,
-                    coverage: Coverage {
-                        complete: gaps.is_empty(),
-                        gaps,
-                    },
-                    truncation: None,
-                    config_generation: config.generation(),
-                    index_generation: context.index_generation,
-                },
-            )
-            .await?;
+        let domain = Domain::new(&self.storage);
+        let read_context = self.job_read_context(&job)?;
+        let mut draft = RecallDraft {
+            request_id: receipt_id.clone(),
+            output,
+            scope,
+            read_seq: context.read_seq,
+            retrieval_mode: RetrievalMode::CurrentState,
+            selected: context.selected,
+            sources,
+            status,
+            coverage: Coverage {
+                complete: gaps.is_empty(),
+                gaps,
+            },
+            truncation: None,
+            config_generation: config.generation(),
+            index_generation: context.index_generation,
+        };
+        if draft.output.chars().count() > settings.max_result_chars {
+            let mut full = draft.clone();
+            full.request_id = format!("{receipt_id}/full");
+            let mut value: Value = serde_json::from_str(&full.output)?;
+            value["receipt_id"] = json!(full.request_id);
+            full.output = serde_json::to_string(&value)?;
+            draft.output = serde_json::to_string(&json!({
+                "status":"incomplete", "job_id":id, "receipt_id":receipt_id,
+                "scope":draft.scope, "gaps":["result_budget"], "detail_receipt_id":full.request_id,
+            }))?;
+            if draft.output.chars().count() > settings.max_result_chars
+                || full.output.len() > crate::adapter::MAX_FRAME_BYTES
+            {
+                return Err(Error("OUTPUT_LIMIT"));
+            }
+            domain.prepare_recall(&read_context, &full).await?;
+            trace["detail_receipt_id"] = json!(full.request_id);
+            draft.status = RecallStatus::Incomplete;
+            draft.coverage = Coverage {
+                complete: false,
+                gaps: vec!["result_budget".into()],
+            };
+            draft.truncation = Some(crate::domain::Truncation {
+                original_bytes: full.output.len() as u64,
+                reason: "result_budget".into(),
+            });
+        }
+        domain.prepare_recall(&read_context, &draft).await?;
         trace["receipt_id"] = json!(receipt_id);
         Ok(trace)
     }
