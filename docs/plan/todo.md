@@ -697,7 +697,7 @@ hashes actually cover. #12 alone retains deferred Claude authentication.
   historical cause is unknown, and no timeout or durability policy was changed.
 - [x] Add asynchronous extraction to existing durable daemon jobs. Persist raw
   input first; model failure must leave sources and recoverable work intact.
-- [ ] Support configured text profiles and existing authenticated CLI Runners,
+- [x] Support configured text profiles and existing authenticated CLI Runners,
   including the single-CLI path without extra text/embedding/reranker API keys.
 - [x] Add `extract run PLAN_JSON --idempotency-key ID` and the configured
   `executor:NAME` route, sharing existing native-home admission, model options,
@@ -719,12 +719,27 @@ hashes actually cover. #12 alone retains deferred Claude authentication.
   and stop publication on the original workflow deadline. Eighteen job tests,
   three extraction integration tests, Clippy and formatting pass; retained RED
   receipts distinguish real failures from the corrected test harness/selector.
-- [ ] Cover conditional, negated, quoted and temporary statements, malformed or
+- [x] Cover conditional, negated, quoted and temporary statements, malformed or
   forged sources, duplicate delivery, partial publication/restart, unavailable
   models and later retry. Verify the existing index pause/resume/rebuild and
   retraction filters with extracted records.
-- [ ] Run actual single-CLI authenticated extraction on a compact source/answer
+- [x] Run actual single-CLI authenticated extraction on a compact source/answer
   sample; retain failures, source/binary identities and owned cleanup evidence.
+  Pi 1.4.0 / mp-cpi grok-4.7 through localhost:48317 produced six candidates
+  from five conditional/negative/quoted/temporary/automated source statements.
+  No extra model profiles were configured; every candidate retained source
+  identity and candidate authority. Original Pi settings stayed unchanged and
+  the 3 MiB disposable profile/fixture was removed. This compact sample is not
+  the broader quality evaluation owned by #27.
+- [x] Add explicit native index rebuild through the existing bounded index jobs;
+  verify missing derived files, a fresh generation, quiescent cache ownership,
+  original sources retained and obsolete native tables reclaimed. Existing sync
+  alone cannot rebuild a missing completed index. Keep full-scale concurrent
+  generation/performance acceptance under #24.
+  Six index library tests, four extraction integration tests and 21 retrieval
+  integration tests pass, including an active-reader refusal and repeated native
+  table replacement. Clippy and formatting pass. Compact evidence and the actual
+  source/candidate comparison are archived under `docs/benchmarks/results/mvp017`.
 - [ ] Finish focused checks, one final canonical gate and independent review,
   CI, publication, merge and closure. Keep #18–#28 queued until their turn.
 

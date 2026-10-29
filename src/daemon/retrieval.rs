@@ -86,6 +86,48 @@ impl Service {
         Ok(index)
     }
 
+    async fn rebuild_index(
+        &self,
+        id: &str,
+        generation: u64,
+        workflow: &Deadline,
+    ) -> Result<Arc<Index>> {
+        let mut owned = tokio::select! {
+            guard=self.search_index.lock()=>guard,
+            code=self.model_cancelled(id)=>return Err(Error(code)),
+            _=tokio::time::sleep(workflow.remaining())=>return Err(Error("WORKFLOW_TIMEOUT")),
+        };
+        if owned
+            .as_ref()
+            .is_some_and(|index| Arc::strong_count(index) > 1)
+        {
+            return Err(Error("RESOURCE_BUSY"));
+        }
+        let authorize = || {
+            let (_, job) = self
+                .job(id)
+                .map_err(|e| crate::storage::StorageError::new(e.0))?;
+            self.authorize_job(&job)
+                .map_err(|e| crate::storage::StorageError::new(e.0))?;
+            let code = if job.cancel_requested {
+                Some("CANCELLED")
+            } else if self.stopping.load(Ordering::Acquire) {
+                Some("INDEX_INTERRUPTED")
+            } else if workflow.expired().is_some() {
+                Some("WORKFLOW_TIMEOUT")
+            } else {
+                None
+            };
+            code.map_or(Ok(()), |code| Err(crate::storage::StorageError::new(code)))
+        };
+        Index::begin_rebuild(&self.storage, id, generation, &authorize).await?;
+        *owned = None;
+        let index = Arc::new(Index::open(self.config.pin().resolved(), &self.storage).await?);
+        index.retire_previous_tables(&authorize).await?;
+        *owned = Some(index.clone());
+        Ok(index)
+    }
+
     async fn retrieval_result(&self, id: &str, workflow: &Deadline) -> Result<Value> {
         let (plan, config, target, vector_generation) = {
             let _guard = self.admission.lock().await;
@@ -102,17 +144,26 @@ impl Service {
                 job.retrieval_vector_config_generation,
             )
         };
-        let index = self.retrieval_index(id, workflow).await?;
+        let _builder = if matches!(plan, RetrievalRequest::Sync | RetrievalRequest::Rebuild) {
+            Some(tokio::select! {
+                guard=self.index_builder.lock()=>guard,
+                code=self.model_cancelled(id)=>return Err(Error(code)),
+                _=tokio::time::sleep(workflow.remaining())=>return Err(Error("WORKFLOW_TIMEOUT")),
+            })
+        } else {
+            None
+        };
+        let index = if matches!(plan, RetrievalRequest::Rebuild) {
+            self.rebuild_index(id, config.generation(), workflow)
+                .await?
+        } else {
+            self.retrieval_index(id, workflow).await?
+        };
         if workflow.expired().is_some() {
             return Err(Error("WORKFLOW_TIMEOUT"));
         }
         match plan {
-            RetrievalRequest::Sync => {
-                let _builder = tokio::select! {
-                    guard=self.index_builder.lock()=>guard,
-                    code=self.model_cancelled(id)=>return Err(Error(code)),
-                    _=tokio::time::sleep(workflow.remaining())=>return Err(Error("WORKFLOW_TIMEOUT")),
-                };
+            RetrievalRequest::Sync | RetrievalRequest::Rebuild => {
                 let target = target.ok_or(Error("JOB_CORRUPT"))?;
                 let context = context()?;
                 let scope = owner_scope();

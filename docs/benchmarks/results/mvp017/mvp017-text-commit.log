@@ -1,0 +1,5 @@
+[feat/mvp-017-extraction 927dcad] feat(extraction): derive source-backed candidates through durable text jobs
+ 13 files changed, 662 insertions(+), 51 deletions(-)
+ create mode 100644 src/daemon/extraction.rs
+ create mode 100644 src/extraction.rs
+ create mode 100644 tests/support/daemon_extraction.rs

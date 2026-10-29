@@ -1,0 +1,26 @@
+{
+  "native": {
+    "head": "da97084a97ad2f683016b069055b29e4a537a54a",
+    "test_patch_sha256": "6d20189b9b8d0bf48c3b64bafeba1f8bd3d61c77f8115c8154dbdd77d722168a",
+    "result": "PASS_REAL_SINGLE_CLI_EXTRACTION",
+    "cases": 5,
+    "candidates": 6,
+    "native": "Pi 1.4.0",
+    "provider": "mp-cpi",
+    "model": "grok-4.7",
+    "extra_model_profiles": 0,
+    "semantic_inspection": "Conditions, negation, attributed preference, temporary choice and unapproved agent suggestion retained; all candidate authority. This is not a general quality benchmark."
+  },
+  "fixtures": {
+    "durability": "18 lib job tests plus 3 extraction integration tests",
+    "index": "6 lib index tests, 4 extraction integration tests, 21 retrieval integration tests; clippy/fmt PASS"
+  },
+  "limits": [
+    "Explicit evidence-unit submission; no automatic capture scanner",
+    "Exact candidate identity merge; no semantic paraphrase clustering",
+    "Candidate batch publication may be partial on failure",
+    "Explicit index rebuild requires idle cache readers and may serve not-ready/partial status",
+    "Claude-native authentication still deferred under issue 12",
+    "Full-scale/concurrent production index acceptance under issue 24 and broad model quality under issue 27"
+  ]
+}

@@ -680,8 +680,10 @@ impl Service {
                     | (None, None, None, None, Some(_), None)
                     | (None, None, None, None, None, Some(_))
             )
-            || (matches!(job.retrieval_plan, Some(crate::retrieval::Request::Sync))
-                != job.retrieval_target_seq.is_some())
+            || (matches!(
+                job.retrieval_plan,
+                Some(crate::retrieval::Request::Sync | crate::retrieval::Request::Rebuild)
+            ) != job.retrieval_target_seq.is_some())
             || job
                 .retrieval_target_seq
                 .is_some_and(|seq| seq > revision.commit_seq)
@@ -892,12 +894,14 @@ impl Service {
             let now = ipc::now_ms()?;
             let queue_ms = u64::try_from(snapshot.resolved().timeouts().queue.as_millis())
                 .map_err(|_| Error("CONFIG_INVALID"))?;
-            let retrieval_target_seq =
-                if matches!(retrieval_plan, Some(crate::retrieval::Request::Sync)) {
-                    Some(service.storage.sequence()?)
-                } else {
-                    None
-                };
+            let retrieval_target_seq = if matches!(
+                retrieval_plan,
+                Some(crate::retrieval::Request::Sync | crate::retrieval::Request::Rebuild)
+            ) {
+                Some(service.storage.sequence()?)
+            } else {
+                None
+            };
             let vector_snapshot = if matches!(
                 retrieval_plan,
                 Some(crate::retrieval::Request::Search { .. })
@@ -911,7 +915,9 @@ impl Service {
                 Some(crate::retrieval::Request::Search { .. })
             )
             .then_some(vector_snapshot.generation());
-            let pending = if let Some(target) = retrieval_target_seq {
+            let pending = if matches!(retrieval_plan, Some(crate::retrieval::Request::Rebuild)) {
+                retrieval_target_seq.ok_or(Error("JOB_CORRUPT"))?
+            } else if let Some(target) = retrieval_target_seq {
                 let progress =
                     crate::retrieval::Index::status(&service.storage, snapshot.resolved())?;
                 target.saturating_sub(

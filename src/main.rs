@@ -33,6 +33,7 @@ Commands:
   model run PLAN_JSON --idempotency-key ID
   extract run PLAN_JSON --idempotency-key ID
   index sync --idempotency-key ID
+  index rebuild --idempotency-key ID
   index status
   search QUERY --scope JSON_FILE --idempotency-key ID
   show SOURCE_ID --revision COMMIT --range START_BYTE END_BYTE
@@ -418,6 +419,10 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         ["index", "status"] => Some(Command::IndexStatus),
         ["index", "sync", "--idempotency-key", id] => Some(Command::RetrievalRun {
             plan: akasha_otsuge::retrieval::Request::Sync,
+            idempotency_key: (*id).into(),
+        }),
+        ["index", "rebuild", "--idempotency-key", id] => Some(Command::RetrievalRun {
+            plan: akasha_otsuge::retrieval::Request::Rebuild,
             idempotency_key: (*id).into(),
         }),
         ["search", query, "--scope", scope, "--idempotency-key", id] => {

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T22:06:37.678125+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "f7afd61f3a584466222c4efb31e262c0e7205146",
+    "log_sha256": "b8a9194c3bc70ed128f5519db3d701956870c779b8b92381ed0d2a4485484021",
+    "seconds": 9.032063520513475,
+    "utc": "2026-10-29T22:05:38.510774+00:00"
+  },
+  "process_absent": true,
+  "classification": "causal-red-source-union-limit-escapes-job-boundary"
+}

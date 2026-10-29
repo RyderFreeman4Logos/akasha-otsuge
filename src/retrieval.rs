@@ -45,6 +45,7 @@ fn state_key() -> RecordKey {
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Request {
     Sync,
+    Rebuild,
     Search { query: String, scope: Scope },
 }
 impl Request {
@@ -66,7 +67,7 @@ impl Request {
         if config.config().timeouts.workflow != "auto" {
             return Ok(config.timeouts().workflow);
         }
-        let batches = if matches!(self, Self::Sync) {
+        let batches = if matches!(self, Self::Sync | Self::Rebuild) {
             pending.div_ceil(32).max(1)
         } else {
             1
@@ -85,7 +86,7 @@ impl Request {
         let embedding_calls = match self {
             Self::Search { .. } => 1,
             // Each authority transaction has at most64 changes; a32KiB claim has at most9 UTF-8 chunks.
-            Self::Sync => pending
+            Self::Sync | Self::Rebuild => pending
                 .checked_mul(64 * 9)
                 .ok_or_else(|| error("CONFIG_INVALID"))?,
         };
@@ -139,14 +140,30 @@ pub fn status(storage: &Storage) -> Result<Status> {
         indexed_rows: 0,
         vector: None,
     });
-    if status.generation != GENERATION || status.lexical_watermark > storage.sequence()? {
+    if !valid_generation(&status.generation) || status.lexical_watermark > storage.sequence()? {
         return Err(error("INDEX_CORRUPT"));
     }
     Ok(status)
 }
 
+fn valid_generation(generation: &str) -> bool {
+    generation == GENERATION
+        || generation
+            .strip_prefix(&format!("{GENERATION}-"))
+            .is_some_and(|v| v.len() == 64 && v.bytes().all(|b| b.is_ascii_hexdigit()))
+}
+
+fn table_name(generation: &str) -> String {
+    if generation == GENERATION {
+        TABLE.into()
+    } else {
+        format!("{TABLE}_{}", hash(generation.as_bytes()))
+    }
+}
+
 pub struct Index {
     pub budget_mib: u32,
+    generation: String,
     connection: Connection,
     table: Table,
     schema: Arc<Schema>,
@@ -154,6 +171,8 @@ pub struct Index {
 }
 impl Index {
     pub async fn open(config: &ResolvedConfig, storage: &Storage) -> Result<Self> {
+        let progress = status(storage)?;
+        let name = table_name(&progress.generation);
         let root = config.config().paths.data_dir.join("search");
         crate::daemon::private_dir(&root).map_err(|e| error(e.0))?;
         let budget_mib = config.config().runtime.memory_budget_mib;
@@ -184,21 +203,21 @@ impl Index {
             .await
             .map_err(index_error)?
             .iter()
-            .any(|n| n == TABLE)
+            .any(|n| n == &name)
         {
             connection
-                .open_table(TABLE)
+                .open_table(&name)
                 .execute()
                 .await
                 .map_err(index_error)?
         } else {
-            if status(storage)?.lexical_watermark > 0 {
+            if progress.lexical_watermark > 0 {
                 return Err(error("INDEX_MISSING"));
             }
             let batch = RecordBatch::new_empty(schema.clone());
             connection
                 .create_table(
-                    TABLE,
+                    &name,
                     Box::new(RecordBatchIterator::new(vec![Ok(batch)], schema.clone()))
                         as Box<dyn arrow_array::RecordBatchReader + Send>,
                 )
@@ -211,11 +230,71 @@ impl Index {
         }
         Ok(Self {
             budget_mib,
+            generation: progress.generation,
             connection,
             table,
             schema,
             vector: tokio::sync::Mutex::new(None),
         })
+    }
+
+    pub(crate) async fn begin_rebuild(
+        storage: &Storage,
+        id: &str,
+        config_generation: u64,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        let generation = format!("{GENERATION}-{}", hash(id.as_bytes()));
+        if status(storage)?.generation == generation {
+            return Ok(());
+        }
+        let progress = Status {
+            generation,
+            lexical_watermark: 0,
+            indexed_rows: 0,
+            vector: None,
+        };
+        publish_progress(
+            storage,
+            state_key(),
+            config_generation,
+            &progress,
+            vec![],
+            authorize,
+        )
+        .await
+    }
+
+    // The daemon holds exclusive cache ownership before discarding any old native table.
+    pub(crate) async fn retire_previous_tables(
+        &self,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        let current = table_name(&self.generation);
+        for name in self
+            .connection
+            .table_names()
+            .execute()
+            .await
+            .map_err(index_error)?
+        {
+            let derived = name == TABLE
+                || [format!("{TABLE}_"), "memory_vector_".into()]
+                    .iter()
+                    .any(|prefix| {
+                        name.strip_prefix(prefix).is_some_and(|v| {
+                            v.len() == 64 && v.bytes().all(|b| b.is_ascii_hexdigit())
+                        })
+                    });
+            if derived && name != current {
+                authorize()?;
+                self.connection
+                    .drop_table(&name, &[])
+                    .await
+                    .map_err(index_error)?;
+            }
+        }
+        Ok(())
     }
 
     pub(crate) async fn vector_index(
@@ -258,6 +337,9 @@ impl Index {
             })
             .await?;
         let before = progress.lexical_watermark;
+        if progress.generation != self.generation {
+            return Err(error("INDEX_GENERATION_MISMATCH"));
+        }
         let end = target.min(before.saturating_add(32));
         let mut changed = false;
         let mut completions = Vec::new();
@@ -320,7 +402,7 @@ impl Index {
                 }
                 changed = true;
             }
-            completions.push(completion_change(GENERATION, seq, records)?);
+            completions.push(completion_change(&progress.generation, seq, records)?);
             progress.lexical_watermark = seq;
         }
         if progress.lexical_watermark == before {

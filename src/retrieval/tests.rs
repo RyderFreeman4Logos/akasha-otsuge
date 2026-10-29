@@ -299,3 +299,62 @@ async fn missing_native_index_does_not_reuse_a_completed_watermark() {
     assert!(matches!(Index::open(&config, &store).await, Err(e) if e.code == "INDEX_MISSING"));
     store.close().await.unwrap();
 }
+
+#[tokio::test]
+async fn rebuild_generation_survives_restart_and_reclaims_only_old_native_tables() {
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let target = memory(&store, "original", "rebuild searchable text", None).await;
+    let original = Domain::new(&store).memory("original").unwrap().unwrap();
+    let index = Index::open(&config, &store).await.unwrap();
+    sync(&index, &store, target).await;
+    drop(index);
+    Index::begin_rebuild(&store, "rebuild-1", 1, &|| Ok(()))
+        .await
+        .unwrap();
+    let pending = status(&store).unwrap();
+    assert_eq!(pending.lexical_watermark, 0);
+    assert_ne!(pending.generation, GENERATION);
+    store.close().await.unwrap();
+    let store = Storage::open(&config).await.unwrap();
+    assert_eq!(status(&store).unwrap().generation, pending.generation);
+    let index = Index::open(&config, &store).await.unwrap();
+    assert_eq!(
+        index
+            .connection
+            .table_names()
+            .execute()
+            .await
+            .unwrap()
+            .len(),
+        2
+    );
+    index.retire_previous_tables(&|| Ok(())).await.unwrap();
+    assert_eq!(
+        index.connection.table_names().execute().await.unwrap(),
+        [table_name(&pending.generation)]
+    );
+    let progress = sync(&index, &store, target).await;
+    assert_eq!(progress.indexed_rows, 1);
+    assert_eq!(
+        index.keyword("rebuild", &scope(), 10).await.unwrap(),
+        [("original".into(), original.revision.commit_seq)]
+    );
+    assert_eq!(
+        Domain::new(&store)
+            .memory("original")
+            .unwrap()
+            .unwrap()
+            .revision,
+        original.revision
+    );
+    let sequence = store.sequence().unwrap();
+    Index::begin_rebuild(&store, "rebuild-1", 1, &|| Ok(()))
+        .await
+        .unwrap();
+    assert_eq!(store.sequence().unwrap(), sequence);
+    assert_eq!(status(&store).unwrap().lexical_watermark, target);
+    drop(index);
+    store.close().await.unwrap();
+}

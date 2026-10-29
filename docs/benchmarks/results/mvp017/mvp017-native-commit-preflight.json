@@ -1,0 +1,31 @@
+{
+  "parent": "927dcad2816a6cc4e10aaf4510477bbdae80fdba",
+  "tree": "1d5565d5cac2ac00eb625398af39710a1cefadf9",
+  "paths": [
+    "docs/plan/todo.md",
+    "docs/configuration.md",
+    "src/adapter/claude/runner.rs",
+    "src/adapter/runner.rs",
+    "src/config/schema.rs",
+    "src/daemon/consult.rs",
+    "src/daemon/consult_run.rs",
+    "src/daemon/extraction.rs",
+    "src/daemon/jobs.rs",
+    "src/main.rs",
+    "tests/config.rs",
+    "tests/fixtures/codex/0.164.0/runner_host.py",
+    "tests/support/daemon_codex.rs",
+    "tests/support/daemon_extraction.rs"
+  ],
+  "identity": {
+    "GIT_AUTHOR_NAME": "RyderFreeman",
+    "GIT_AUTHOR_EMAIL": "RyderFreeman4Logos@gmail.com",
+    "GIT_COMMITTER_NAME": "RyderFreeman",
+    "GIT_COMMITTER_EMAIL": "RyderFreeman4Logos@gmail.com"
+  },
+  "patch_sha256": "2e3f28dc35ae853d9eb3543d0fc91a2eb9016aa136ab1e798c7d817534096d4f",
+  "messages": [
+    "feat(extraction): use existing authenticated native executors",
+    "Expose extract run, pin executor homes and reuse shared runner options, containment and clocks. Restrict extraction to supplied evidence and candidate output. Refs #17."
+  ]
+}

@@ -1,0 +1,53 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp017)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.00s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 19 tests
+test daemon::jobs::extraction_tests::extraction_crash_child ... ignored, owned subprocess launched by the extraction crash supervisor
+test daemon::jobs::tests::serve_accept_error_stops_and_closes_storage ... ok
+test daemon::jobs::extraction_tests::extraction_internal_origins_cannot_feed_another_extraction ... ok
+test daemon::jobs::tests::disconnected_mutation_owners_are_bounded_and_drained ... ok
+test daemon::jobs::extraction_tests::extraction_publication_cannot_start_writes_after_its_workflow_expires ... ok
+test daemon::jobs::extraction_tests::extraction_rejects_forged_authority_scope_and_citations_before_publication ... ok
+test daemon::jobs::tests::completed_scheduler_error_is_collected_before_storage_close ... ok
+test daemon::jobs::extraction_tests::extraction_merges_distinct_sources_once_and_keeps_contradictory_candidates ... ok
+test daemon::jobs::extraction_tests::extraction_model_failure_keeps_originals_and_a_durable_failed_job ... ok
+test daemon::jobs::tests::scheduler_error_collects_a_sibling_physical_batch ... ok
+test daemon::jobs::tests::claim_checks_reloaded_cap_after_waiting_for_admission ... ok
+test daemon::jobs::tests::final_physical_batch_obeys_the_original_execution_deadline ... ok
+test daemon::jobs::tests::shutdown_collects_reload_after_its_client_timeout ... ok
+test daemon::jobs::tests::recovered_jobs_keep_retry_exhaustion_and_original_deadlines ... ok
+test daemon::jobs::extraction_tests::extraction_interrupted_before_checkpoint_needs_explicit_retry ... ok
+test daemon::jobs::extraction_tests::extraction_does_not_merge_new_sources_into_a_revised_candidate_identity ... ok
+clock-case before: state="succeeded" error=null sends=1
+clock-case after: state="failed" error="WORKFLOW_TIMEOUT" sends=0
+clock-case expired: state="failed" error="WORKFLOW_TIMEOUT" sends=0
+test daemon::jobs::tests::model_workflow_keeps_its_original_clock_through_restore_wait ... ok
+test daemon::jobs::extraction_tests::extraction_response_and_partial_publication_survive_sigkill_without_model_replay ... ok
+test daemon::jobs::extraction_tests::extraction_source_union_limit_fails_the_job_without_losing_old_sources ... ok
+
+test result: ok. 18 passed; 0 failed; 1 ignored; 0 measured; 29 filtered out; finished in 0.32s
+
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp017)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.03s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s
+
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+    Checking akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp017)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 11.81s

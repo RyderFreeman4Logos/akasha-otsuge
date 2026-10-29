@@ -30,10 +30,14 @@ pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<Vecto
     let dimension = config.config().models[profile]
         .dimension
         .ok_or_else(|| error("CONFIG_INVALID"))?;
-    let generation = hash(&serde_json::to_vec(&(
+    let mut generation = hash(&serde_json::to_vec(&(
         "claim-4096-byte-mean-cosine-v1",
         &identity,
     ))?);
+    let lexical = super::status(storage)?.generation;
+    if lexical != GENERATION {
+        generation = hash(&serde_json::to_vec(&(&generation, lexical))?);
+    }
     let progress = storage
         .current(&key(&generation))?
         .map(|r| serde_json::from_str::<VectorStatus>(&r.content))
@@ -397,15 +401,20 @@ pub(crate) struct ActiveVector {
     pub generation: String,
     pub config_generation: u64,
 }
-fn active_key() -> RecordKey {
-    RecordKey {
+fn active_key(storage: &Storage) -> Result<RecordKey> {
+    let generation = super::status(storage)?.generation;
+    Ok(RecordKey {
         kind: RecordKind::State,
-        id: "search/vector-active".into(),
-    }
+        id: if generation == GENERATION {
+            "search/vector-active".into()
+        } else {
+            format!("search/vector-active/{}", hash(generation.as_bytes()))
+        },
+    })
 }
 pub(crate) fn active_vector(storage: &Storage) -> Result<Option<ActiveVector>> {
     let active = storage
-        .current(&active_key())?
+        .current(&active_key(storage)?)?
         .map(|r| serde_json::from_str::<ActiveVector>(&r.content))
         .transpose()?;
     if active.as_ref().is_some_and(|v| {
@@ -439,7 +448,8 @@ pub(crate) async fn activate_vector(
     {
         return Ok(());
     }
-    let current = storage.current(&active_key())?;
+    let active_key = active_key(storage)?;
+    let current = storage.current(&active_key)?;
     storage
         .commit_checked(|| {
             authorize()?;
@@ -451,7 +461,7 @@ pub(crate) async fn activate_vector(
                 config_generation: snapshot.generation(),
                 policy_revision: None,
                 changes: vec![Change {
-                    key: active_key(),
+                    key: active_key,
                     expected_revision: current.map(|r| r.commit_seq),
                     content: serde_json::to_string(&candidate)?,
                 }],

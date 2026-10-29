@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T21:53:22.352339+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "f7afd61f3a584466222c4efb31e262c0e7205146",
+    "log_sha256": "05914111bb841222161c571ce9a9b81dd47718262b5c9e67e2fd5420568e8818",
+    "seconds": 10.871107218787074,
+    "utc": "2026-10-29T21:52:39.734736+00:00"
+  },
+  "process_absent": true,
+  "classification": "native-guard-harness-incompatible-not-behavioral-red"
+}

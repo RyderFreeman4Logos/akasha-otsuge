@@ -1,0 +1,35 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp017)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.97s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 6 tests
+test daemon::jobs::extraction_tests::extraction_crash_child ... ignored, owned subprocess launched by the extraction crash supervisor
+
+thread 'daemon::jobs::extraction_tests::extraction_internal_origins_cannot_feed_another_extraction' (1168268) panicked at src/daemon/extraction_tests.rs:156:27:
+called `Result::unwrap_err()` on an `Ok` value: Object {"accepted_at_ms": Number(1793311263746), "attempt": Number(0), "cancel_requested": Bool(false), "config_digest": String("a065db60bdcc57ea365d32c64ef42d4280ac9bb5d18582d8b811940a192e0345"), "config_generation": Number(1), "error": Null, "execution_budget_ms": Number(2010000), "execution_deadline_ms": Null, "extraction_plan": Object {"scope": Object {"branch_or_version": Null, "project": String("alpha"), "session": Null, "user": String("uid:1001")}, "sources": Array [Object {"content_sha256": String("12eeee869d051b482f798d4cc3e78ab58ac8e9728f9f5d1c3c12f531d5837f6f"), "end": Number(55), "event_id": String("internal-extraction"), "revision": Number(4), "start": Number(0)}]}, "id": String("recursive/internal-extraction"), "lease_owner": Null, "lease_until_ms": Null, "queue_deadline_ms": Number(1793311563746), "request_sha256": String("1c4118ddc2d42a56ab3e4f128fb557d750abc08e2f698e7dff2fabb98595596d"), "result": Null, "retry_at_ms": Number(1793311263746), "schema_version": Number(1), "started_at_ms": Null, "state": String("queued")}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test daemon::jobs::extraction_tests::extraction_rejects_forged_authority_scope_and_citations_before_publication ... ok
+test daemon::jobs::extraction_tests::extraction_internal_origins_cannot_feed_another_extraction ... FAILED
+
+thread 'daemon::jobs::extraction_tests::extraction_does_not_merge_new_sources_into_a_revised_candidate_identity' (1168267) panicked at src/daemon/extraction_tests.rs:276:9:
+assertion `left == right` failed: extraction overwrote edited
+  left: 8
+ right: 7
+test daemon::jobs::extraction_tests::extraction_does_not_merge_new_sources_into_a_revised_candidate_identity ... FAILED
+test daemon::jobs::extraction_tests::extraction_merges_distinct_sources_once_and_keeps_contradictory_candidates ... ok
+test daemon::jobs::extraction_tests::extraction_response_and_partial_publication_survive_sigkill_without_model_replay ... ok
+
+failures:
+
+failures:
+    daemon::jobs::extraction_tests::extraction_does_not_merge_new_sources_into_a_revised_candidate_identity
+    daemon::jobs::extraction_tests::extraction_internal_origins_cannot_feed_another_extraction
+
+test result: FAILED. 3 passed; 2 failed; 1 ignored; 0 measured; 38 filtered out; finished in 0.25s
+
+error: test failed, to rerun pass `--lib`
