@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T23:58:31.687985+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "1fef14504925dfb6690aebd38db538e7fa69c6a4",
+    "log_sha256": "02eb34645e28d6e73a2196ccbccb7991501df6ac82f9ebd20af208ba32bc85f6",
+    "seconds": 26.94057362154126,
+    "utc": "2026-10-29T23:57:58.259004+00:00"
+  },
+  "process_absent": true,
+  "classification": "pass_daemon_fixture_clippy_fmt"
+}

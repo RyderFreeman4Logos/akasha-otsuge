@@ -4,8 +4,8 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 4451,
-      "sha256": "efc9e860bee8e25a7b69d8102452a9889eecd788a0efdcbc48c812c96bceb4f0"
+      "bytes": 5165,
+      "sha256": "45e93f39012ab2811f25d83c0652290ebc6c987fdd5623759e6bcdff5e96e68e"
     },
     {
       "path": "mvp018-authority-red.admission.json",
@@ -66,6 +66,71 @@
       "path": "mvp018-boundaries-green.terminal.json",
       "bytes": 239,
       "sha256": "b71fa9f334e3edf295939af223f6e89a56b7c7711447638c6aed0cff8f5464da"
+    },
+    {
+      "path": "mvp018-canonical-r1.admission.json",
+      "bytes": 1003,
+      "sha256": "5dab27df4d2e99b173dadfd12ae7dee78ac5eca348fa08d11a52acc76583d41e"
+    },
+    {
+      "path": "mvp018-canonical-r1.collected.json",
+      "bytes": 402,
+      "sha256": "aa89d38115a0d4aa90672be17bf6ce0b8db8c366cc9a319e31737f40cc8e6b6c"
+    },
+    {
+      "path": "mvp018-canonical-r1.log",
+      "bytes": 32257,
+      "sha256": "32fe4956c620a0d873f2c91904b02e2a50c685b596de821390a6b488141632e9"
+    },
+    {
+      "path": "mvp018-canonical-r1.terminal.json",
+      "bytes": 238,
+      "sha256": "89701bfb491eeffcb49cd8bd3465426b8461e79b18d9e85ac6ae8e03a59c664f"
+    },
+    {
+      "path": "mvp018-codex-concurrency-diagnostic.admission.json",
+      "bytes": 1047,
+      "sha256": "235224e0861ce8bcfb9400b7c4a1e63f2e8939f57684b943338ce7e5a03dcec8"
+    },
+    {
+      "path": "mvp018-codex-concurrency-diagnostic.collected.json",
+      "bytes": 413,
+      "sha256": "0bea7debbda52a08ffef6a549f06096b892dea6e59d83d0bf225b51ee5d29ea7"
+    },
+    {
+      "path": "mvp018-codex-concurrency-diagnostic.log",
+      "bytes": 10935,
+      "sha256": "98956bec9cddcb667b5e6b78940d51ef930a0c5513c1f735d876e9aeb4ca7912"
+    },
+    {
+      "path": "mvp018-codex-concurrency-diagnostic.terminal.json",
+      "bytes": 236,
+      "sha256": "3a0d387923ac06bad044b82580504db0b60077630e32b19c56f428ab7f4b38d1"
+    },
+    {
+      "path": "mvp018-codex-fixture-checks.admission.json",
+      "bytes": 1137,
+      "sha256": "d378b4ee3babc94bc345ca8861ec9609759080519355c5049543a03a1e4237ad"
+    },
+    {
+      "path": "mvp018-codex-fixture-checks.collected.json",
+      "bytes": 390,
+      "sha256": "3e891ed92b96cdf033c0d45753be640f9a7996451d5083d61d3261f7f40ecc2f"
+    },
+    {
+      "path": "mvp018-codex-fixture-checks.log",
+      "bytes": 12259,
+      "sha256": "02eb34645e28d6e73a2196ccbccb7991501df6ac82f9ebd20af208ba32bc85f6"
+    },
+    {
+      "path": "mvp018-codex-fixture-checks.terminal.json",
+      "bytes": 236,
+      "sha256": "79ba94d4258ce4ede06bea3ad5c26a2a38e399db5cc8823bffea33949b171862"
+    },
+    {
+      "path": "mvp018-codex-fixture-disposition.json",
+      "bytes": 988,
+      "sha256": "45e7ea02a1c5ae2acd9ef39f4fbf32f5b0d2bf99cd5bffe53f9e8f5c062a123d"
     },
     {
       "path": "mvp018-config-green-r2.admission.json",

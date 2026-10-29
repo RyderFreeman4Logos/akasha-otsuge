@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-29T23:58:07.553753+00:00",
+  "candidate": "1fef14504925dfb6690aebd38db538e7fa69c6a4",
+  "failed_gate": "mvp018-canonical-r1",
+  "failure": "concurrent_native_hooks_share_state_without_cross_binding_or_global_lock_contention; updatedInput.command was absent; original response was not logged",
+  "source_attribution": "tests/support/daemon_codex.rs unchanged from base d64051e",
+  "diagnostic": "Same daemon vector with four lines of diagnostic assertion:89 passed,5 ignored; no rejection reproduced",
+  "historical_cause": "unknown",
+  "fixture_isolation": "Use existing sync_fixture_until(...,9) before spawning both hooks; retain parallel children, per-session ownership assertions and original two-second product bind budget",
+  "canonical_retry_policy": "No repeated unchanged canonical gates. Verify changed fixture, commit, then one new full candidate gate. If a second same-class failure occurs, diagnose the full fixture class before another canonical run."
+}

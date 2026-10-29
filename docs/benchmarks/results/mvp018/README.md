@@ -68,3 +68,13 @@ relabeled as an all-passing command. See the verbatim logs and dispositions.
 The final focused run passes four controlled daemon discussions (two authenticated
 selectors remain opt-in), all-target Clippy and formatting. Its receipts are
 separate from the subsequent exact-HEAD canonical gate.
+
+The first canonical gate at1fef145 fails in an unchanged Codex concurrent-hook
+fixture: updatedInput.command is absent, but the original hook response was not
+logged. A diagnostic-only full daemon vector passes89 cases with5 opt-in skips,
+so the historical rejection reason remains unknown. The fixture now synchronizes
+its two transcripts before launching both concurrent hooks, using the existing
+async helper. It retains ownership/isolation assertions and adds a useful failure
+message; product binding deadlines remain unchanged. The repaired fixture's full
+daemon suite, Clippy and formatting pass. These passes do not erase the failed
+canonical receipt or substitute for the new candidate's canonical gate.
