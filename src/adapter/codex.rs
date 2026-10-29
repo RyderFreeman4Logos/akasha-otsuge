@@ -5,6 +5,9 @@ mod caller;
 pub use caller::{CodexCall, CodexCaller, CodexRegistration, NativeEvent};
 pub mod hooks;
 pub mod installation;
+mod runner;
+mod runner_policy;
+pub use runner::CodexRunner;
 
 pub const TRANSCRIPT_STREAM: &str = "codex-native-v1";
 

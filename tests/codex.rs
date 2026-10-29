@@ -12,6 +12,8 @@ use std::{
 
 #[path = "support/codex_caller.rs"]
 mod caller;
+#[path = "support/codex_runner.rs"]
+mod runner;
 
 #[tokio::test]
 async fn version_probe_reports_only_observed_capabilities_and_bounds_native_output() {

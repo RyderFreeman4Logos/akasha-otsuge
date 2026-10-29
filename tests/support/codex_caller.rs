@@ -10,7 +10,7 @@ use akasha_otsuge::{
 };
 use std::{sync::Arc, time::Duration};
 
-fn native(fixture: &Fixture) -> (CodexRegistration, CodexCall) {
+pub(super) fn native(fixture: &Fixture) -> (CodexRegistration, CodexCall) {
     let raw = include_str!("../fixtures/codex/0.164.0/exec-root.jsonl")
         .replace("/fixture/workspace", fixture.0.to_str().unwrap());
     let path = fixture.0.join("native.jsonl");
@@ -142,6 +142,62 @@ async fn native_call_binds_exact_turn_before_its_result_and_retries_keep_the_fen
     assert_eq!(retry.revision(), invocation.revision());
     assert_eq!(retry.fence_hash(), invocation.fence_hash());
     assert_eq!(retry.diagnostic().config_generation, 1);
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn native_model_tool_definitions_preserve_fences_without_exposing_harness_text() {
+    let fixture = Fixture::new();
+    let store = Arc::new(fixture.open().await);
+    Domain::new(&store)
+        .set_read_grant("grant", "reader", Some(&scope()), None, 1)
+        .await
+        .unwrap();
+    let (registration, call) = native(&fixture);
+    let mut rows: Vec<serde_json::Value> = std::fs::read_to_string(&registration.transcript)
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    rows.insert(2, serde_json::json!({"type":"response_item","payload":{"type":"additional_tools","role":"developer","tools":[{"type":"namespace","name":"functions","description":"private-harness-description","tools":[]}]}}));
+    for (ordinal, row) in rows.iter_mut().enumerate() {
+        row["ordinal"] = ordinal.into();
+    }
+    std::fs::write(
+        &registration.transcript,
+        rows.iter()
+            .map(|row| format!("{row}\n"))
+            .collect::<String>(),
+    )
+    .unwrap();
+    let inv = CodexCaller::new(store.clone(), registration.clone(), call.clone(), 1)
+        .bind(&call.tool_call_id)
+        .await
+        .unwrap();
+    assert_eq!(inv.diagnostic().requested_cursor, 11);
+    let binding = CaptureBinding::from_source(
+        registration.source.clone(),
+        scope(),
+        TRANSCRIPT_STREAM,
+        CoverageLevel::VisibleText,
+    )
+    .unwrap();
+    let event = Capture::new(&store)
+        .event(
+            &binding,
+            &EventRef {
+                source: registration.source,
+                event_id: "row:2".into(),
+            },
+            store.sequence().unwrap(),
+        )
+        .unwrap()
+        .unwrap();
+    assert!(
+        !String::from_utf8(Capture::new(&store).raw(&event).unwrap())
+            .unwrap()
+            .contains("private-harness-description")
+    );
     store.close().await.unwrap();
 }
 

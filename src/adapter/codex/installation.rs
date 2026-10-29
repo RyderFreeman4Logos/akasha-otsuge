@@ -66,6 +66,11 @@ pub async fn install(binary: &Path, launcher: &Path, state: &Path, socket: &Path
         words[0], words[1], words[2], words[3]
     );
     let mut body = format!("exec {}", words[2]);
+    // Nested Code Mode calls have no matching rollout call ID in native0.164.0.
+    body.push_str(&format!(
+        " -c {}",
+        quote("features.code_mode={direct_only_tool_namespaces=[\"functions\"]}")
+    ));
     for event in [
         "SessionStart",
         "PreToolUse",
@@ -120,7 +125,7 @@ pub async fn install(binary: &Path, launcher: &Path, state: &Path, socket: &Path
         result?;
     }
     Ok(
-        json!({"launcher":launcher,"state_dir":state,"version":"0.164.0","hook_trust":"native_review_required","settings_modified":false}),
+        json!({"launcher":launcher,"state_dir":state,"version":"0.164.0","hook_trust":"native_review_required","direct_tool_namespaces":["functions"],"settings_modified":false}),
     )
 }
 

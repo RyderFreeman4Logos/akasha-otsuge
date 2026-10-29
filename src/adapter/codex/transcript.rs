@@ -175,6 +175,10 @@ fn decode(
         "response_item" => {
             let item_type = field(payload, "type")?;
             match item_type {
+                "additional_tools" if payload["role"] == "developer" => {
+                    raw["payload"] = select(payload, &["type", "id", "role"]);
+                    raw["omitted"] = json!(["native_tool_definitions"]);
+                }
                 "message" => {
                     let role = field(payload, "role")?;
                     let harness =

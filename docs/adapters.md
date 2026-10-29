@@ -257,7 +257,15 @@ PostToolUse/PostToolUseFailure callback, so uninstall cannot delete active calls
 Interrupted callbacks can leave small results; 258 directory entries stop further
 admission rather than trigger an age-based deletion sweep.
 
-The launcher passes inline hook configuration using the official CLI override
+The launcher selects `features.code_mode={direct_only_tool_namespaces=["functions"]}`
+for that launch. This exposes native function tools directly even for models that
+default to Code Mode, replacing the corresponding per-launch namespace setting.
+Codex0.164.0 assigns random IDs to nested Code Mode calls without a matching
+rollout entry; those calls cannot establish an exact fence. Other namespaces can
+still use Code Mode. Installation reports this setting, leaves native settings
+files untouched, and never infers a parent call from JavaScript text.
+
+The hook configuration uses the official CLI override
 mechanism. SessionStart/Stop schedule incremental native backfill. PreToolUse
 recognizes exactly `akasha-otsuge consult` or that command followed by one
 JSON-quoted hint; shell suffixes and identity arguments are rejected. At this
@@ -268,6 +276,37 @@ is necessary because the native Linux read-only sandbox rejects Unix socket
 connections. Neither registration credentials nor a daemon connection enter the
 sandbox command. Concurrent sessions share no current-context file or global
 lock. Binding errors return the native explicit deny response.
+
+## Codex standalone Runner
+
+`CodexRunner::new(binary, native_home, workspace, instructions)` starts the pinned
+native `codex app-server --stdio` with the selected native home and its existing
+authentication/provider configuration. No other agent CLI is used. The native
+home must contain a valid bounded `models_cache.json` from Codex0.164.0; missing or
+unsupported metadata returns `ADAPTER_UNSUPPORTED`. This versioned dependency is
+necessary because model metadata can enable tools even when feature flags are off.
+
+Each run creates one private temporary workspace and a private catalog that
+disables native shell, patch, search, image, Code Mode and unrelated tools while
+retaining the model's remaining metadata. Before starting an ephemeral thread,
+the Runner disables every effective MCP server, native hooks, plugins, agent
+delegation and host skill discovery. It requests the native read-only sandbox,
+disabled tool networking and no approvals, and verifies the returned policy.
+Only `context_describe`, `context_list`, `context_read` and `context_search` are
+registered. Their requests pass the existing invocation, permission and shared
+budget checks; model arguments cannot supply the operation or caller identity.
+Memory/code tools and workflow composition are integrated in MVP-016.
+
+The Runner accepts one structured nonempty `answer`, then closes stdin and waits
+for the native process to exit successfully. EOF, an answer followed by a failing
+exit, duplicate calls/finals, unexpected identities, malformed requests, excessive
+output and expiry cannot become success. All waits use the original deadline.
+Cancellation and drop retain process-group, lease and directory ownership until
+the shared reaper terminates and reaps the child. Native unauthorized/HTTP401
+errors become `AUTH_REQUIRED`; provider error prose is never returned as a
+diagnostic. Native configuration/account/moderation notifications are metadata,
+not tool requests or completion evidence. `doctor` remains a free version probe;
+its `NotRun` self-test status does not claim authentication or model acceptance.
 
 The native0.164.0 controlled-endpoint fixture passed the installed launcher,
 real hook, actual read-only shell sandbox, exact call fence, result cleanup and

@@ -517,6 +517,13 @@ checks do not prove host protocol capabilities or an authenticated Runner.
   scoped dynamic read tools. Verify native sandbox/tool restrictions, original
   deadlines, bounded output, structured final/exit status and retained cleanup
   ownership across cancellation, EOF, errors and drop.
+  Implementation now passes 14 focused Codex tests (one explicit native test is
+  ignored in ordinary runs), including 19 injected failure scenarios and native
+  cancellation. Codex0.164.0 with the existing ChatGPT login completed one scoped
+  tool call, structured answer and zero exit in 6.43 seconds, directly invoking
+  the pinned executable with other CLIs absent from PATH. Controlled native
+  acceptance separately proves the exact four-tool inventory and MCP/hook
+  exclusion. The final candidate gate/review and native denial matrix remain.
 - [ ] Provide opt-in install/undo, actual-version/capability doctor, official
   interface rationale, sanitized native fixtures and reproduction commands.
   The owned single-file launcher, conflict-preserving undo and native hook
@@ -526,10 +533,20 @@ checks do not prove host protocol capabilities or an authenticated Runner.
   Four transport/install regressions pass, including concurrent sessions,
   daemon-free result delivery and explicit native denial on binding failure.
   Authenticated and concurrent TUI acceptance remain open below.
+  Current model metadata required two compatibility fixes: retain the ordinal of
+  native `additional_tools` metadata without exposing its tool descriptions, and
+  explicitly expose the `functions` namespace directly in the opt-in launcher.
+  Nested Code Mode tool IDs are random and lack a matching rollout entry; they
+  remain an explicit binding refusal. No user configuration file is edited.
 - [ ] With the other three CLIs absent, prove actual authenticated Caller/Runner,
   two concurrent TUIs, resume/fork/compact, interrupted backfill, denied writes,
   denied network/out-of-scope reads and structured output. Local SSE preflights
   do not substitute for this acceptance.
+  The first authenticated TUI bound the correct root/call and returned its marker.
+  The simultaneous fresh-home startup exposed a native SQLite migration race in
+  the second TUI; a security-setup popup then blocked graceful exit. This failed
+  run is retained, its scratch is removed, and concurrent acceptance remains
+  pending a fixture with one-time database initialization and idle-aware exit.
 - [ ] Complete focused regressions, exact-candidate gate, independent review,
   hosted CI, publication/merge and issue closure. Keep every later queue entry.
 
