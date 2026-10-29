@@ -17,7 +17,7 @@ fn legal_large_rule_is_dropped_whole_with_a_budget_gap() {
 
 fn large_memory(ancestor: bool, rule: bool) {
     let mut daemon = Daemon::new();
-    seed_records(&daemon, &[("large", "alpha", "large fixture")], 1);
+    seed_records(&daemon, &[("large", Some("alpha"), "large fixture")], 1);
     let config = resolve(
         "",
         None,
@@ -216,7 +216,7 @@ fn invalid_vector(model: &str) {
     let endpoint = super::super::model_tests::Endpoint::retrieval();
     let mut daemon = Daemon::new();
     let claim = format!("{}y", "x".repeat(4096));
-    seed_records(&daemon, &[("invalid", "alpha", &claim)], 1);
+    seed_records(&daemon, &[("invalid", Some("alpha"), &claim)], 1);
     daemon.configure(&format!("[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel={model:?}\ndimension=2\nlocal=true\ntimeout='2s'",endpoint.address));
     daemon.start();
     daemon.cli(&["index", "sync", "--idempotency-key", "invalid-build"]);
@@ -252,8 +252,8 @@ fn sync_stops_after_a_live_grant_shrinks() {
     seed_records(
         &daemon,
         &[
-            ("first", "alpha", "offline first"),
-            ("forbidden", "beta", "private forbidden"),
+            ("first", Some("alpha"), "offline first"),
+            ("forbidden", Some("beta"), "private forbidden"),
         ],
         1,
     );

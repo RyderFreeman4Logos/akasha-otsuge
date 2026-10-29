@@ -21,16 +21,20 @@ fn seed(daemon: &Daemon) -> u64 {
         &[
             (
                 "offline",
-                "alpha",
+                Some("alpha"),
                 "离线时仍支持关键词检索 offline keyword search",
             ),
-            ("private", "beta", "离线私有检索 private search"),
-            ("weather", "alpha", "Tomorrow the weather is sunny"),
+            ("private", Some("beta"), "离线私有检索 private search"),
+            ("weather", Some("alpha"), "Tomorrow the weather is sunny"),
         ],
         1,
     )
 }
-fn seed_records(daemon: &Daemon, records: &[(&str, &str, &str)], span_parts: usize) -> u64 {
+pub(super) fn seed_records(
+    daemon: &Daemon,
+    records: &[(&str, Option<&str>, &str)],
+    span_parts: usize,
+) -> u64 {
     let config = resolve(
         "",
         None,
@@ -49,7 +53,10 @@ fn seed_records(daemon: &Daemon, records: &[(&str, &str, &str)], span_parts: usi
             let store = Storage::open(&config).await.unwrap();
             let domain = Domain::new(&store);
             for &(id, project, text) in records {
-                let scope = scope(project);
+                let scope = Scope {
+                    project: project.map(Into::into),
+                    ..scope("")
+                };
                 let ingress = Ingress::tool("fixture", "fixture", scope.clone()).unwrap();
                 let source = SourceDraft {
                     event_id: id.into(),

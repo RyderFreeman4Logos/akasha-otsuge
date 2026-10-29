@@ -78,6 +78,43 @@ send(call)
 result = read()
 assert result['id'] == 10 and result['result']['success'] is True
 assert 'invocation_id' in result['result']['contentItems'][0]['text']
+if scenario == 'research':
+    call_number = 100
+    def tool(name, arguments):
+        global call_number
+        call_number += 1
+        send({'id':call_number,'method':'item/tool/call','params':{
+            'threadId':'thread','turnId':'turn','callId':f'research-{call_number}',
+            'tool':name,'arguments':arguments}})
+        reply = read()
+        assert reply['id'] == call_number and reply['result']['success'] is True
+        response = json.loads(reply['result']['contentItems'][0]['text'])
+        value = response.get('value', {})
+        (root / 'research-checkpoint.json').write_text(json.dumps({
+            'tool':name,'kind':response.get('kind'),'code':value.get('code'),
+            'source_code':value.get('source_code'),'keys':list(value),
+            'items':[item['memory']['revision']['key']['id'] for item in value.get('items', [])],
+            'changed':value.get('changed'),'originals':len(value.get('originals', []))}))
+        return response
+    page = tool('context_list', {'cursor':None,'limit':4})['value']
+    assert tool('context_read', {'handle':page['events'][0]['handle'],'start':0,'max_bytes':1024})['kind'] == 'text'
+    found = tool('memory_search', {'query':'offline'})['value']
+    item = next(item for item in found['items'] if item['memory']['revision']['key']['id'] == 'offline')
+    revision = item['memory']['revision']['commit_seq']
+    denied = tool('memory_get', {'memory_id':'private','revision':revision})
+    assert denied['kind'] == 'error' and denied['value']['code'] == 'READ_DENIED'
+    expanded = tool('memory_get', {'memory_id':'offline','revision':revision})['value']
+    assert 'offline' in expanded['originals'][0]['output']
+    other = tool('memory_search', {'query':'weather'})['value']
+    assert any(item['memory']['revision']['key']['id'] == 'weather' for item in other['items'])
+    assert tool('code_search', {'paths':['notes.rs'],'query':'needle'})['value']['matches']
+    first = tool('code_read', {'path':'notes.rs','start':0,'max_bytes':1024})['value']
+    assert first['text'] == 'memory needle\n' and first['changed'] is False
+    (root / 'workspace' / 'notes.rs').write_text('memory needle changed\n')
+    second = tool('code_read', {'path':'notes.rs','start':0,'max_bytes':1024})['value']
+    assert second['changed'] is True and second['sha256'] != first['sha256']
+    denied = tool('code_read', {'path':'../scenario','start':0,'max_bytes':1024})
+    assert denied['kind'] == 'error' and denied['value']['code'] == 'READ_DENIED'
 send({'method': 'turn/moderationMetadata', 'params': {'threadId': 'thread', 'turnId': 'turn', 'metadata': {}}})
 if scenario == 'duplicate_call':
     send(call); time.sleep(30)

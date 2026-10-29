@@ -34,6 +34,22 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
         "../fixtures/codex/0.164.0/exec-pre-tool-use.json"
     ))
     .unwrap();
+    if scenario == "research" {
+        super::retrieval_tests::seed_records(
+            &daemon,
+            &[
+                (
+                    "offline",
+                    None,
+                    "离线时仍支持关键词检索 offline keyword search",
+                ),
+                ("weather", None, "Tomorrow the weather is sunny"),
+                ("private", Some("beta"), "离线私有检索 private search"),
+            ],
+            1,
+        );
+        std::fs::write(workspace.join("notes.rs"), "memory needle\n").unwrap();
+    }
     daemon.start();
     let registered = native(
         &daemon,
@@ -49,6 +65,115 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
     assert!(bound.get("error").is_none(), "{bound}");
     let event = json!({"op":"consult","registration":token,"call":call,"args":{"hint":null}});
     (daemon, event, bound)
+}
+
+#[test]
+fn consult_progressive_research_keeps_source_versions_and_workspace_changes() {
+    let (mut daemon, event, bound) = consult_fixture("research");
+    daemon.cli(&["index", "sync", "--idempotency-key", "research-index"]);
+    let finished = |id: &str| {
+        let end = Instant::now() + Duration::from_secs(20);
+        loop {
+            let job = daemon.cli(&["job", "show", id])["data"].clone();
+            if !matches!(job["state"].as_str(), Some("queued" | "running")) {
+                assert_eq!(
+                    job["state"],
+                    "succeeded",
+                    "{job}; checkpoint={:?}",
+                    std::fs::read_to_string(daemon.root.join("research-checkpoint.json"))
+                );
+                break job;
+            }
+            assert!(Instant::now() < end, "research did not finish: {job}");
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    };
+    finished("research-index");
+    let submitted = native(&daemon, event);
+    assert!(submitted.get("error").is_none(), "{submitted}");
+    let job = finished(submitted["data"]["id"].as_str().unwrap());
+    let output = job["result"]["output"].as_str().unwrap();
+    assert!(output.chars().count() <= 4000);
+    let output: Value = serde_json::from_str(output).unwrap();
+    assert_eq!(output["status"], "incomplete");
+    assert!(
+        output["gaps"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|v| v == "workspace_changed")
+    );
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    let receipt = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            use akasha_otsuge::{
+                adapter::Invocation,
+                config::{Paths, resolve},
+                domain::{Domain, ReadContext},
+                storage::Storage,
+            };
+            let config = resolve(
+                "",
+                None,
+                "",
+                &Paths {
+                    data_dir: daemon.root.join("data"),
+                    socket_path: daemon.socket(),
+                },
+            )
+            .unwrap();
+            let store = Storage::open(&config).await.unwrap();
+            let principal = format!("uid:{}", rustix::process::geteuid().as_raw());
+            let invocation = Invocation::load(
+                &store,
+                bound["data"]["invocation_id"].as_str().unwrap(),
+                &principal,
+            )
+            .await
+            .unwrap();
+            let context = ReadContext::from_verified_binding(
+                &principal,
+                invocation.id(),
+                job["id"].as_str().unwrap(),
+            )
+            .unwrap();
+            let receipt = Domain::new(&store)
+                .recall_receipt(&context, job["result"]["receipt_id"].as_str().unwrap())
+                .await
+                .unwrap()
+                .data;
+            assert_eq!(receipt.output, job["result"]["output"].as_str().unwrap());
+            store.close().await.unwrap();
+            serde_json::to_value(receipt).unwrap()
+        });
+    let record = &receipt["record"];
+    assert!(
+        record["selected"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|v| v["key"]["id"] == "offline")
+    );
+    assert!(
+        record["sources"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|v| v["event_id"].as_str().unwrap().starts_with("consult-code/"))
+    );
+    assert!(record["read_seq"].as_u64().unwrap() <= record["validated_at_seq"].as_u64().unwrap());
+    for observation in output["code"].as_array().unwrap() {
+        assert!(
+            record["sources"]
+                .as_array()
+                .unwrap()
+                .contains(&observation["source"])
+        );
+    }
 }
 
 #[test]

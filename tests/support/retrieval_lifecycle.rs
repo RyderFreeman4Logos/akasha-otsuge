@@ -155,7 +155,10 @@ fn reranking_long_claims_respects_wire_budget_and_reports_truncation() {
     let long = format!("offline {}", "long claim text ".repeat(1400));
     seed_records(
         &daemon,
-        &[("long-one", "alpha", &long), ("long-two", "alpha", &long)],
+        &[
+            ("long-one", Some("alpha"), &long),
+            ("long-two", Some("alpha"), &long),
+        ],
         1,
     );
     daemon.configure(&format!("[retrieval]\nreranker='rank'\nmax_original_chars=100000\n[models.rank]\nkind='reranker'\nendpoint={:?}\nmodel='ranking'\nlocal=true\ntimeout='2s'",endpoint.address));
@@ -207,7 +210,7 @@ fn source_union_budget_returns_partial_output_instead_of_failing_the_job() {
     let ids: Vec<_> = (0..20).map(|n| format!("span-{n:02}")).collect();
     let records: Vec<_> = ids
         .iter()
-        .map(|id| (id.as_str(), "alpha", "offline source evidence"))
+        .map(|id| (id.as_str(), Some("alpha"), "offline source evidence"))
         .collect();
     seed_records(&daemon, &records, 4);
     let scope_file = daemon.root.join("scope.json");
