@@ -12,6 +12,7 @@ pub use code::*;
 pub mod codex;
 pub mod hermes;
 mod native;
+pub mod pi;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::io::{BufRead, Read};
 

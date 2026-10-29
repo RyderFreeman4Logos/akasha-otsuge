@@ -3,11 +3,67 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#11 and #13
-are merged and completed; #12 and #14–#28 remain open (16 Issues). The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#11 and #13–#14
+are merged and completed; #12 and #15–#28 remain open (15 Issues). The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-014
+## Current issue: MVP-015
+
+The Pi adapter starts from merge `24eda5a` in one SSD source checkout, reusing
+the shared target. Official `earendil-works/pi` and npm
+`@earendil-works/pi-coding-agent` currently identify1.4.0. Independent installation
+and free RPC qualification pass, preserving the default0.78.0 install. Two doctor
+regressions and the actual native version probe pass; doctor makes no model claim.
+Native version3 tree semantics and `agent_settled` govern the implementation;
+native tree capture now passes three regressions using native SessionManager
+fixtures. The Rust Caller adds four regressions for persisted tool identity,
+branch isolation, retries and revoked grants; all nine Pi tests and Clippy pass.
+The daemon bridge passes its focused registration/binding, restart/backfill,
+original-deadline, cancellation and grant-revocation regression (45.353s with
+the nine Pi tests and all-target Clippy). The initial cancellation assertion was
+corrected to await worker settlement after the durable cancellation request;
+production cancellation behavior is unchanged.
+The native extension and recoverable installer pass four Node bridge regressions,
+ten Pi tests, the daemon regression and Clippy in17.356s. The actual pinned native
+SDK loads the extension without a model call. Two prior Caller `HISTORY_GAP`
+failures remain causally unproven; their identity tests now pre-capture histories,
+while cold capture and daemon binding remain separately covered. No timeout was
+changed. [Pi support and recovery](../adapters/pi-1.4.0/README.md) records the limits.
+The scoped RPC Runner and native recovery handling are now implemented. Actual
+Pi with synthetic local SSE passes five Runner cases and six Caller bindings,
+including concurrent sessions, tree/fork/reload/resume, context edits, compaction
+and interruption;19 capture jobs finish and all scratch is removed. These controls
+do not establish authenticated provider acceptance. Pi's
+selected profile fails OAuth refresh with401/invalid_refresh_token; native login
+is pending. #12 also waits for lawful Claude authentication in draft #41.
+
+Candidate `c098a0c` passed the full gate (27Python,196Rust and42installed-daemon
+executions). Independent R1 review found one Unicode hint length defect. Its
+causal regression and native SDK schema checks now accept512 emoji and reject513;
+all six Node bridge tests pass. Candidate `be0c06c` passed its own full gate.
+Independent R2 found a native Responses tool-call ID refusal. The old binary
+reproduces it; preserving the opaque ID fixes it. Seven Node and13 Pi regressions
+pass. Both native protocols now pass Runner/RPC Caller and real foreground-TUI
+coverage (four TUI bindings and11 jobs each). Compact source-bound evidence is
+retained under `protocol-controlled/`. An expanded daemon check exposed a
+short-control overlap assertion failure. A controlled late-observer probe proves
+that the status snapshot can reject actual overlap; test-only endpoint timestamps
+now verify the overlap after terminal collection. The focused check passes with
+unchanged timeouts. The original failed run's exact timing remains unknown.
+Independent R3 source review passed all51 frozen files at `72e854f`. Its full gate
+failed a synthetic Hermes fixture probe after42daemon passes. The original spawn
+errno is unknown; isolated execution passes. A separate writable-FD inheritance
+control reaches ETXTBSY and succeeds with an isolated writer. Thirteen executable
+fixture writes now use the existing child-writer helper; production spawning is
+unchanged. The14 Codex and11 Hermes checks pass. A separate daemon readiness
+assertion observed the bound socket before its0600 permission initialization.
+Delaying the real chmod reproduces the old failure; awaiting the protocol greeting
+fixes it within the unchanged startup deadline. The delayed control and all42
+ordinary daemon checks pass. Successor gate/review, publication and real
+authentication remain open. The complete TODO retains all acceptance criteria
+and dependencies.
+
+## Completed Hermes adapter: MVP-014
 
 Hermes Caller, canonical export, native plugin installation and independent
 Runner are implemented at `2786c7a`. Two authenticated Runner profiles and a real
@@ -23,9 +79,14 @@ Two simultaneous interactive TUIs now pass in distinct `in_process` and `host`
 profiles, including correct bindings, final answers, zero exits and completed
 capture jobs. The successful71.103-second harness removed all23,113,728bytes of
 temporary fixture files. A separate scripted-exit failure remains preserved.
-Final gate, independent review, CI and closure remain pending. #12's draft PR #41
-is waiting only for lawful Claude authentication; #15 is the next independent leaf.
-The complete TODO retains every prerequisite and acceptance item.
+Final candidate `ada3e9e` passed the83.276-second gate (26 Python tests,
+182 workspace Rust tests and41 installed-daemon executions), independent
+whole-candidate R1 review with0 findings and CI40827971067. PR #43 merged as
+`24eda5a` with the reviewed tree; #14 is closed and the source checkout removed.
+[Full gate/review receipts](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/43#issuecomment-6489449325)
+preserve the preceding Codex HistoryGap failure. The final test-only change
+prepares both histories before testing concurrent Caller identity; production
+timeouts remain unchanged and the earlier runtime cause remains unproven.
 
 PR #42 merged Codex candidate `329bba1` as `d49be08`; #13 is closed. Its final
 gate, authenticated Runner and simultaneous TUIs, native denial fixtures,

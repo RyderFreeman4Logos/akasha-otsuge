@@ -98,6 +98,9 @@ pub struct Request {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    Pi {
+        event: crate::adapter::pi::NativeEvent,
+    },
     Hermes {
         event: crate::adapter::hermes::NativeEvent,
     },
@@ -192,6 +195,11 @@ impl CaptureInput {
         }
         if let Some(host) = self.host {
             let host_valid = match host {
+                crate::config::Host::Pi => {
+                    self.source.adapter == "pi"
+                        && self.source.agent == "main"
+                        && self.stream == crate::adapter::pi::TRANSCRIPT_STREAM
+                }
                 crate::config::Host::Codex => {
                     self.source.adapter == "codex"
                         && self.source.agent == "main"

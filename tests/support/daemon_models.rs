@@ -71,11 +71,6 @@ fn wall_clock_case(real: bool, receipt: Option<PathBuf>) -> Value {
     }
     await_request(&success);
     await_request(&over);
-    assert_eq!(
-        daemon.cli(&["job", "show", "success"])["data"]["state"],
-        "running",
-        "the two deadline cases must overlap"
-    );
     let mut completed = serde_json::Map::new();
     loop {
         for profile in ["success", "over"] {
@@ -111,6 +106,20 @@ fn wall_clock_case(real: bool, receipt: Option<PathBuf>) -> Value {
         );
         std::thread::sleep(Duration::from_millis(if real { 1000 } else { 20 }));
     }
+    // Measure actual overlap; the observer may run after a successful job ends.
+    let success_received = success.received_at.lock().unwrap()[0];
+    let over_received = over.received_at.lock().unwrap()[0];
+    let success_responded = success.responded_at.lock().unwrap()[0];
+    assert!(
+        success_received.max(over_received) < success_responded,
+        "both provider requests must arrive before the first response"
+    );
+    let overlap = json!({
+        "over_request_after_success_ms": over_received.saturating_duration_since(success_received).as_millis(),
+        "success_request_after_over_ms": success_received.saturating_duration_since(over_received).as_millis(),
+        "success_response_ms": success_responded.duration_since(success_received).as_millis(),
+        "observed_after_both_jobs_terminal": true
+    });
     assert_eq!(jobs["success"]["state"], "succeeded");
     assert_eq!(
         jobs["success"]["result"]["calls"][0]["output"]["text"],
@@ -134,7 +143,7 @@ fn wall_clock_case(real: bool, receipt: Option<PathBuf>) -> Value {
     daemon.wait();
     drop(success);
     drop(over);
-    let result = json!({"identity":identity,"completed":completed,"passed":true,"owned_daemon_and_endpoint_threads_ended":true,"finished_at_ms":now_ms().unwrap(),"elapsed_s":started.elapsed().as_secs_f64()});
+    let result = json!({"identity":identity,"completed":completed,"overlap":overlap,"passed":true,"owned_daemon_and_endpoint_threads_ended":true,"finished_at_ms":now_ms().unwrap(),"elapsed_s":started.elapsed().as_secs_f64()});
     publish(&receipt.join("verified.json"), &result);
     result
 }

@@ -15,12 +15,14 @@ Commands:
   daemon status              Show daemon and storage status
   daemon stop                Stop intake and drain the daemon
   doctor --json              Inspect the local daemon
-  doctor --host codex|hermes [--binary PATH]
+  doctor --host codex|hermes|pi [--binary PATH]
                              Inspect the installed native CLI
   adapter install codex --binary PATH --launcher PATH --state-dir PATH
   adapter uninstall codex --launcher PATH
   adapter install hermes --binary PATH --home PATH
   adapter uninstall hermes --home PATH
+  adapter install pi --binary PATH --agent-dir PATH
+  adapter uninstall pi --agent-dir PATH
   config validate|reload|status
   config show --effective
   capture reconcile|codex BINDING_JSON INPUT_JSONL --idempotency-key ID
@@ -131,6 +133,17 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         output(&bytes, false)?;
         return Ok(0);
     }
+    if let ["doctor", "--host", "pi", flags @ ..] = command.as_slice() {
+        let flags = options(flags, &["--binary"])?;
+        let binary = std::path::Path::new(flags.get("--binary").copied().unwrap_or("pi"));
+        let report = akasha_otsuge::adapter::pi::probe(binary).await?;
+        let supported = akasha_otsuge::adapter::pi::SUPPORTED_VERSION;
+        let mut bytes = serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":report,
+            "coverage":{"version_supported":report.version.as_deref()==Some(supported),"supported_versions":[supported],"native_children":false,"model_auth":"not_checked","hook_trust":"not_checked"}}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
     if let ["adapter", "codex-bound", path] = command.as_slice() {
         let response =
             akasha_otsuge::adapter::codex::hooks::bound_response(std::path::Path::new(path))?;
@@ -139,21 +152,40 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         output(&bytes, false)?;
         return Ok(0);
     }
+    if let ["adapter", "pi-context"] = command.as_slice() {
+        use std::io::Read;
+        let mut bytes = Vec::new();
+        io::stdin().take(16385).read_to_end(&mut bytes)?;
+        if bytes.len() > 16384 {
+            return Err(Error("MESSAGE_TOO_LARGE"));
+        }
+        let reply =
+            akasha_otsuge::adapter::pi::context_bridge::call(serde_json::from_slice(&bytes)?)
+                .await?;
+        let mut bytes = serde_json::to_vec(&reply)?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(if reply.get("error").is_some() { 1 } else { 0 });
+    }
     if let [
         "adapter",
         "uninstall",
-        host @ ("codex" | "hermes"),
+        host @ ("codex" | "hermes" | "pi"),
         flags @ ..,
     ] = command.as_slice()
     {
-        let key = if *host == "hermes" {
+        let key = if *host == "pi" {
+            "--agent-dir"
+        } else if *host == "hermes" {
             "--home"
         } else {
             "--launcher"
         };
         let flags = options(flags, &[key])?;
         let path = std::path::Path::new(flags.get(key).ok_or(Error("INVALID_ARGUMENT"))?);
-        let response = if *host == "hermes" {
+        let response = if *host == "pi" {
+            akasha_otsuge::adapter::pi::installation::uninstall(path)?
+        } else if *host == "hermes" {
             akasha_otsuge::adapter::hermes::installation::uninstall(path)?
         } else {
             akasha_otsuge::adapter::codex::installation::uninstall(path)?
@@ -167,11 +199,13 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     let install_flags = if let [
         "adapter",
         "install",
-        host @ ("codex" | "hermes"),
+        host @ ("codex" | "hermes" | "pi"),
         flags @ ..,
     ] = command.as_slice()
     {
-        let keys: &[&str] = if *host == "hermes" {
+        let keys: &[&str] = if *host == "pi" {
+            &["--binary", "--agent-dir"]
+        } else if *host == "hermes" {
             &["--binary", "--home"]
         } else {
             &["--binary", "--launcher", "--state-dir"]
@@ -187,15 +221,19 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     };
     let operation = match command.as_slice() {
         ["adapter", "codex-hook", ..] => None,
-        ["adapter", "install", "codex" | "hermes", ..] => None,
-        ["adapter", host @ ("codex-call" | "hermes-call")] => {
+        ["adapter", "install", "codex" | "hermes" | "pi", ..] => None,
+        ["adapter", host @ ("codex-call" | "hermes-call" | "pi-call")] => {
             use std::io::Read;
             let mut bytes = Vec::new();
             io::stdin().take(16 * 1024 + 1).read_to_end(&mut bytes)?;
             if bytes.len() > 16 * 1024 {
                 return Err(Error("MESSAGE_TOO_LARGE"));
             }
-            Some(if *host == "hermes-call" {
+            Some(if *host == "pi-call" {
+                Command::Pi {
+                    event: serde_json::from_slice(&bytes)?,
+                }
+            } else if *host == "hermes-call" {
                 Command::Hermes {
                     event: serde_json::from_slice(&bytes)?,
                 }
@@ -353,7 +391,14 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         let socket = socket
             .as_deref()
             .unwrap_or(&resolved.config().paths.socket_path);
-        let response = if host == "hermes" {
+        let response = if host == "pi" {
+            akasha_otsuge::adapter::pi::installation::install(
+                path("--binary")?,
+                path("--agent-dir")?,
+                socket,
+            )
+            .await?
+        } else if host == "hermes" {
             akasha_otsuge::adapter::hermes::installation::install(
                 path("--binary")?,
                 path("--home")?,

@@ -1,9 +1,11 @@
 use std::{
-    os::unix::fs::PermissionsExt,
     path::PathBuf,
     process::Command,
     sync::atomic::{AtomicU64, Ordering},
 };
+
+#[path = "support/executable.rs"]
+mod executable;
 
 #[path = "support/hermes_caller.rs"]
 mod caller;
@@ -54,12 +56,10 @@ impl Drop for Fixture {
 fn doctor_observes_hermes_without_model_calls_or_a_daemon() {
     let fixture = Fixture::new();
     let binary = fixture.0.join("hermes");
-    std::fs::write(
+    crate::executable::write(
         &binary,
         "#!/bin/sh\n[ \"$#\" = 1 ] && [ \"$1\" = --version ] || exit 78\nprintf 'Hermes Agent v0.22.5+1914.gfdb04a0 (2026.9.24) · stable · local fdb04a00c162\\n'\n",
-    )
-    .unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    );
     let output = Command::new(env!("CARGO_BIN_EXE_akasha-otsuge"))
         .args(["doctor", "--host", "hermes", "--binary"])
         .arg(&binary)
@@ -89,12 +89,10 @@ async fn qualified_git_build_labels_do_not_admit_other_older_versions() {
         ("0.21.5+18146.g0000000", false),
         ("0.21.5", false),
     ] {
-        std::fs::write(
+        crate::executable::write(
             &binary,
-            format!("#!/bin/sh\nprintf 'Hermes Agent v{version}\\n'\n"),
-        )
-        .unwrap();
-        std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+            &format!("#!/bin/sh\nprintf 'Hermes Agent v{version}\\n'\n"),
+        );
         let report = akasha_otsuge::adapter::hermes::probe(&binary)
             .await
             .unwrap();

@@ -7,16 +7,14 @@ use akasha_otsuge::{
     config::deadline::{Deadline, Layer},
     domain::Domain,
 };
-use std::{os::unix::fs::PermissionsExt, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 
 fn host(fixture: &Fixture, scenario: &str) -> PathBuf {
     let binary = fixture.0.join("codex");
-    std::fs::write(
+    crate::executable::write(
         &binary,
         include_str!("../fixtures/codex/0.164.0/runner_host.py"),
-    )
-    .unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    );
     std::fs::write(fixture.0.join("scenario"), scenario).unwrap();
     std::fs::write(fixture.0.join("models_cache.json"), r#"{"models":[{"slug":"fixture","shell_type":"unified_exec","apply_patch_tool_type":"freeform","experimental_supported_tools":["clock"],"tool_mode":"code_mode"}]}"#).unwrap();
     binary

@@ -1148,6 +1148,15 @@ impl Service {
                         1,
                         generation,
                     ))
+                } else if input.host == Some(crate::config::Host::Pi) {
+                    runtime.block_on(crate::adapter::pi::reconcile_transcript(
+                        &storage,
+                        &input.source,
+                        input.scope.clone(),
+                        &path,
+                        1,
+                        generation,
+                    ))
                 } else {
                     runtime.block_on(capture.reconcile_jsonl(&binding, &path, 1, generation))
                 };

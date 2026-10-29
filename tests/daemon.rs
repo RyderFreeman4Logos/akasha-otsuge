@@ -11,6 +11,9 @@ use std::time::{Duration, Instant};
 
 const BIN: &str = env!("CARGO_BIN_EXE_akasha-otsuge");
 
+#[path = "support/executable.rs"]
+mod executable;
+
 #[path = "support/daemon_models.rs"]
 mod model_tests;
 
@@ -22,6 +25,8 @@ mod codex_tests;
 
 #[path = "support/daemon_hermes.rs"]
 mod hermes_tests;
+#[path = "support/daemon_pi.rs"]
+mod pi_tests;
 
 struct Daemon {
     root: PathBuf,
@@ -102,7 +107,12 @@ impl Daemon {
                     .unwrap();
                 panic!("daemon exited before readiness: {exit}: {stderr}");
             }
-            if UnixStream::connect(self.socket()).is_ok() {
+            if let Ok(mut stream) = UnixStream::connect(self.socket()) {
+                // Connect can succeed before the daemon secures its socket and initializes.
+                stream
+                    .set_read_timeout(Some(end.saturating_duration_since(Instant::now())))
+                    .unwrap();
+                assert_eq!(receive(&mut stream)["protocol_version"], 1);
                 break;
             }
             assert!(Instant::now() < end, "daemon never became ready");

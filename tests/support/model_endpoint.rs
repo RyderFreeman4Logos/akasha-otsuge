@@ -5,6 +5,8 @@ use std::sync::{Arc, Mutex, atomic::AtomicBool};
 pub(crate) struct Endpoint {
     pub(crate) address: String,
     pub(crate) requests: Arc<Mutex<Vec<(String, Value)>>>,
+    pub(crate) received_at: Arc<Mutex<Vec<Instant>>>,
+    pub(crate) responded_at: Arc<Mutex<Vec<Instant>>>,
     stop: Arc<AtomicBool>,
     paused: Arc<AtomicBool>,
     worker: Option<std::thread::JoinHandle<()>>,
@@ -39,6 +41,10 @@ impl Endpoint {
         let address = format!("http://{}/v1", listener.local_addr().unwrap());
         let requests = Arc::new(Mutex::new(Vec::new()));
         let saved = requests.clone();
+        let received_at = Arc::new(Mutex::new(Vec::new()));
+        let responded_at = Arc::new(Mutex::new(Vec::new()));
+        let arrivals = received_at.clone();
+        let responses = responded_at.clone();
         let stop = Arc::new(AtomicBool::new(false));
         let stopping = stop.clone();
         let paused = Arc::new(AtomicBool::new(false));
@@ -86,6 +92,7 @@ impl Endpoint {
                     .nth(1)
                     .unwrap();
                 let body: Value = serde_json::from_slice(&bytes).unwrap();
+                arrivals.lock().unwrap().push(Instant::now());
                 saved.lock().unwrap().push((path.into(), body.clone()));
                 while held.load(Ordering::Acquire) {
                     if stopping.load(Ordering::Acquire) {
@@ -154,6 +161,7 @@ impl Endpoint {
                 } else {
                     "200 OK"
                 };
+                responses.lock().unwrap().push(Instant::now());
                 let sent = write!(
                     stream,
                     "HTTP/1.1 {status}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
@@ -179,6 +187,8 @@ impl Endpoint {
         Self {
             address,
             requests,
+            received_at,
+            responded_at,
             stop,
             paused,
             worker: Some(worker),

@@ -1,0 +1,364 @@
+{
+  "schema_version": 1,
+  "native_version": "1.4.0",
+  "authenticated_provider": false,
+  "source_base_commit": "be0c06c16c79413de0bf86c5e62973a813426c02",
+  "source_had_uncommitted_id_fix": true,
+  "source_sha256": {
+    "plugins/pi/bridge.cjs": "21f942879a432b62990f7563f7e7f3c9d0863aec4cab53cba087f34b05722a78",
+    "plugins/pi/index.ts": "88ce02119e25222cde658046ee5cb586733205b5cb695844584a5de422fd9a14",
+    "scripts/test_pi_extension.cjs": "84ea6ec16556cd7b4836bd9c1a9cda31371ef93ca618baca37081d9fd40373d4",
+    "tests/fixtures/pi/1.4.0/native_provider.py": "5138615421c2dbbee1fe9263114af12490463b9098254a4eb74451a873d8b1a6",
+    "tests/fixtures/pi/1.4.0/check_native_caller.py": "4aa7d307b25449c6da48a364d1b6cb3cf5f9ad3e05a23422935e2a4e2f4f228d",
+    "tests/fixtures/pi/1.4.0/check_native_runner.py": "2a871c2d7af9cc0c92c48d76d0c8ea5fe55a0ce0f6bb218ea1910fd64f868c42",
+    "tests/fixtures/pi/1.4.0/check_native_tui.py": "ae25893b5dc3cad5ec34506efc81576d6bba201143f006861358585e0c310f93",
+    "tests/fixtures/pi/1.4.0/lifecycle.ts": "1a4576144399da2b01f882e4630a0b44833249192399caa5956cc43f3dd66b2f"
+  },
+  "runs": [
+    {
+      "started_utc": "2026-10-29T10:04:46.260917+00:00",
+      "finished_utc": "2026-10-29T10:04:51.541298+00:00",
+      "status": "PASS_NATIVE_CONTROLLED_RUNNER",
+      "provider_api": "openai-completions",
+      "kind": "actual Pi CLI RPC with controlled local SSE; no authenticated model",
+      "other_cli_absent": {
+        "claude": true,
+        "codex": true,
+        "hermes": true
+      },
+      "processes_ended": true,
+      "scratch_removed": true,
+      "receipt_sha256": "b057046b0013cacdb9da90cc8a2faa234342e50acd54a936080c394796277179",
+      "binary_sha256": {
+        "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/akasha-otsuge": "a640d71a152de58e2ead478806d17819bf856f0307f313a80697114d04ac6e1e",
+        "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi": "2d6702dd4a52461f50f304bcef3aa0261464ea0b921f72ea7ed6d07df16edef0",
+        "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a": "3cd897ce58ac45182a437a20cf3a1e35e402b7abd67ebd4b7170c898bcd1c09b"
+      },
+      "cases": [
+        {
+          "case": "roundtrip",
+          "exit_code": 0,
+          "request_count": 5,
+          "errors": [],
+          "residual_before_cleanup": []
+        },
+        {
+          "case": "retry",
+          "exit_code": 0,
+          "request_count": 6,
+          "errors": [],
+          "residual_before_cleanup": []
+        },
+        {
+          "case": "denied",
+          "exit_code": 0,
+          "request_count": 1,
+          "errors": [],
+          "residual_before_cleanup": []
+        },
+        {
+          "case": "cancel",
+          "exit_code": 0,
+          "request_count": 2,
+          "errors": [],
+          "residual_before_cleanup": []
+        },
+        {
+          "case": "forbidden",
+          "exit_code": 0,
+          "request_count": 1,
+          "errors": [],
+          "residual_before_cleanup": []
+        }
+      ]
+    },
+    {
+      "started_utc": "2026-10-29T10:04:51.594749+00:00",
+      "finished_utc": "2026-10-29T10:04:57.771640+00:00",
+      "status": "PASS_NATIVE_CONTROLLED_CALLER",
+      "provider_api": "openai-completions",
+      "kind": "actual Pi CLI lifecycle with controlled local SSE; no authenticated model",
+      "other_cli_absent": {
+        "claude": true,
+        "codex": true,
+        "hermes": true
+      },
+      "processes_ended": true,
+      "scratch_removed": true,
+      "receipt_sha256": "6a24cc2351ff528132801c2fb792e2eaa0dab08fc967e4915eb6fa2113ad4b0d",
+      "akasha_sha256": "a640d71a152de58e2ead478806d17819bf856f0307f313a80697114d04ac6e1e",
+      "binding_count": 6,
+      "successful_capture_jobs": 19,
+      "checks": [
+        "overlapping native sessions bound independently",
+        "reload",
+        "tree branch",
+        "native compaction",
+        "clone fork",
+        "resume",
+        "interrupted native run settles before shutdown",
+        "final transform persisted once",
+        "context edits retain original entries",
+        "durable capture jobs drained"
+      ]
+    },
+    {
+      "started_utc": "2026-10-29T10:04:57.815123+00:00",
+      "finished_utc": "2026-10-29T10:05:01.919403+00:00",
+      "status": "PASS_NATIVE_CONTROLLED_TUI",
+      "provider_api": "openai-completions",
+      "kind": "actual controlling-PTY Pi interactive lifecycle with controlled local SSE; no authenticated model",
+      "other_cli_absent": {
+        "claude": true,
+        "codex": true,
+        "hermes": true
+      },
+      "processes_ended": true,
+      "scratch_removed": true,
+      "receipt_sha256": "a862a863ea708b5bea9ad7ae6a9c10a7e3c2316cc3df2add9c5583737e29150a",
+      "akasha_sha256": "a640d71a152de58e2ead478806d17819bf856f0307f313a80697114d04ac6e1e",
+      "binding_count": 4,
+      "successful_capture_jobs": 11,
+      "checks": [
+        "two overlapping controlling-PTY sessions bind distinct native identities and quit with zero exit",
+        "same native session resumed in a fresh controlling terminal",
+        "native interactive compact then another bound consult"
+      ],
+      "tty": [
+        {
+          "name": "a",
+          "pid": 3703060,
+          "start_ticks": "508619580",
+          "pgid": 3703060,
+          "sid": 3703060,
+          "tty_nr": 34960,
+          "foreground": true
+        },
+        {
+          "name": "b",
+          "pid": 3703081,
+          "start_ticks": "508619631",
+          "pgid": 3703081,
+          "sid": 3703081,
+          "tty_nr": 34961,
+          "foreground": true
+        },
+        {
+          "name": "resumed",
+          "pid": 3703150,
+          "start_ticks": "508619758",
+          "pgid": 3703150,
+          "sid": 3703150,
+          "tty_nr": 34960,
+          "foreground": true
+        }
+      ]
+    },
+    {
+      "started_utc": "2026-10-29T10:05:02.006055+00:00",
+      "finished_utc": "2026-10-29T10:05:07.492555+00:00",
+      "status": "PASS_NATIVE_CONTROLLED_RUNNER",
+      "provider_api": "openai-responses",
+      "kind": "actual Pi CLI RPC with controlled local SSE; no authenticated model",
+      "other_cli_absent": {
+        "claude": true,
+        "codex": true,
+        "hermes": true
+      },
+      "processes_ended": true,
+      "scratch_removed": true,
+      "receipt_sha256": "7cae401033421f5d7ea5659c4457c886ec1169bce36ae7743520a067ff448667",
+      "binary_sha256": {
+        "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/akasha-otsuge": "a640d71a152de58e2ead478806d17819bf856f0307f313a80697114d04ac6e1e",
+        "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi": "2d6702dd4a52461f50f304bcef3aa0261464ea0b921f72ea7ed6d07df16edef0",
+        "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a": "3cd897ce58ac45182a437a20cf3a1e35e402b7abd67ebd4b7170c898bcd1c09b"
+      },
+      "cases": [
+        {
+          "case": "roundtrip",
+          "exit_code": 0,
+          "request_count": 5,
+          "errors": [],
+          "residual_before_cleanup": []
+        },
+        {
+          "case": "retry",
+          "exit_code": 0,
+          "request_count": 6,
+          "errors": [],
+          "residual_before_cleanup": []
+        },
+        {
+          "case": "denied",
+          "exit_code": 0,
+          "request_count": 1,
+          "errors": [],
+          "residual_before_cleanup": []
+        },
+        {
+          "case": "cancel",
+          "exit_code": 0,
+          "request_count": 2,
+          "errors": [],
+          "residual_before_cleanup": []
+        },
+        {
+          "case": "forbidden",
+          "exit_code": 0,
+          "request_count": 1,
+          "errors": [],
+          "residual_before_cleanup": []
+        }
+      ]
+    },
+    {
+      "started_utc": "2026-10-29T10:05:07.534061+00:00",
+      "finished_utc": "2026-10-29T10:05:11.708410+00:00",
+      "status": "PASS_NATIVE_CONTROLLED_CALLER",
+      "provider_api": "openai-responses",
+      "kind": "actual Pi CLI lifecycle with controlled local SSE; no authenticated model",
+      "other_cli_absent": {
+        "claude": true,
+        "codex": true,
+        "hermes": true
+      },
+      "processes_ended": true,
+      "scratch_removed": true,
+      "receipt_sha256": "7315ed3b89519b59d3284d96a59f1d6faf213e8d16d9ebd026c98c954b9186e9",
+      "akasha_sha256": "a640d71a152de58e2ead478806d17819bf856f0307f313a80697114d04ac6e1e",
+      "binding_count": 6,
+      "successful_capture_jobs": 19,
+      "checks": [
+        "overlapping native sessions bound independently",
+        "reload",
+        "tree branch",
+        "native compaction",
+        "clone fork",
+        "resume",
+        "interrupted native run settles before shutdown",
+        "final transform persisted once",
+        "context edits retain original entries",
+        "durable capture jobs drained"
+      ]
+    },
+    {
+      "started_utc": "2026-10-29T10:05:11.750737+00:00",
+      "finished_utc": "2026-10-29T10:05:15.821150+00:00",
+      "status": "PASS_NATIVE_CONTROLLED_TUI",
+      "provider_api": "openai-responses",
+      "kind": "actual controlling-PTY Pi interactive lifecycle with controlled local SSE; no authenticated model",
+      "other_cli_absent": {
+        "claude": true,
+        "codex": true,
+        "hermes": true
+      },
+      "processes_ended": true,
+      "scratch_removed": true,
+      "receipt_sha256": "a57c7c9c6dff60e2d39bf48df54c92349e680d9e20a079fe8d4e34b5733747b3",
+      "akasha_sha256": "a640d71a152de58e2ead478806d17819bf856f0307f313a80697114d04ac6e1e",
+      "binding_count": 4,
+      "successful_capture_jobs": 11,
+      "checks": [
+        "two overlapping controlling-PTY sessions bind distinct native identities and quit with zero exit",
+        "same native session resumed in a fresh controlling terminal",
+        "native interactive compact then another bound consult"
+      ],
+      "tty": [
+        {
+          "name": "a",
+          "pid": 3703743,
+          "start_ticks": "508620973",
+          "pgid": 3703743,
+          "sid": 3703743,
+          "tty_nr": 34960,
+          "foreground": true
+        },
+        {
+          "name": "b",
+          "pid": 3703772,
+          "start_ticks": "508621022",
+          "pgid": 3703772,
+          "sid": 3703772,
+          "tty_nr": 34961,
+          "foreground": true
+        },
+        {
+          "name": "resumed",
+          "pid": 3703841,
+          "start_ticks": "508621154",
+          "pgid": 3703841,
+          "sid": 3703841,
+          "tty_nr": 34960,
+          "foreground": true
+        }
+      ]
+    }
+  ],
+  "native_files": [
+    {
+      "path": "caller-session-0.jsonl",
+      "bytes": 14192,
+      "sha256": "14651da0594e6d55ca889ececd0c381e3c23dd33e74406036b59aa1470d70ce9",
+      "compound_tool_call_ids": [
+        "call_d516f22e14884ee6928875fdb79c00ef|fc_246b1ba6928f4d32a6c3c706d8661e81",
+        "call_235ac285d388477da78ebb4e6662347f|fc_283d7fc952964840b13676b30fee780d"
+      ]
+    },
+    {
+      "path": "caller-session-1.jsonl",
+      "bytes": 22409,
+      "sha256": "ffb6dc55da4d2551b4920852ceb147a3159f7d3aa57857605e1a45bf6249fca4",
+      "compound_tool_call_ids": [
+        "call_73b03e238b2d46149ae671bb53d45fa4|fc_5605d20403a8414ca3e06d48c1969cb6",
+        "call_cd68dcaed5264e858558d2c9f93da845|fc_a64ad66266894adbbb42e7f48c9a3a41",
+        "call_d516f22e14884ee6928875fdb79c00ef|fc_246b1ba6928f4d32a6c3c706d8661e81",
+        "call_20c2ee38955340559d9a253409129d98|fc_26ea547f20bf4cf2b40045fc9b953ed6"
+      ]
+    },
+    {
+      "path": "caller-session-2.jsonl",
+      "bytes": 7312,
+      "sha256": "c89366ee3a0bef425c95bad6dd0b101368b88eca310205b316ce8ba16d5be4f7",
+      "compound_tool_call_ids": [
+        "call_71b5a0f523964d5e8a9c7dd86d07bea9|fc_38347545d694470690b50a577628d4f1"
+      ]
+    },
+    {
+      "path": "tui-session-0.jsonl",
+      "bytes": 17834,
+      "sha256": "b37dd9c028322479ca1744fa998612af56d2c37396b38ee50f70f3ca3236bfa6",
+      "compound_tool_call_ids": [
+        "call_749ef85aa3854c68af559c6ab185217f|fc_47d584550a074facac7b2b3f833d83d2",
+        "call_034d74bc4f2c4e24bab283ee129c34d1|fc_5d93af41403242449285c3d030097562",
+        "call_910c476ace5c40dbbdedf299c97a1446|fc_2c080b1f2b3a46218f02b348a0cbac66"
+      ]
+    },
+    {
+      "path": "tui-session-1.jsonl",
+      "bytes": 7312,
+      "sha256": "3821c7ac9f3b789200f80418eaa20a9278d9a6adc8c4efd83ff7095570429dd6",
+      "compound_tool_call_ids": [
+        "call_08ecc1aff8a8450cacc5fb5cc885a4ea|fc_ccb40fecfc1c4bff93ffcd3f5fda466d"
+      ]
+    }
+  ],
+  "red": {
+    "source_commit": "be0c06c16c79413de0bf86c5e62973a813426c02",
+    "node": {
+      "exit_code": 1,
+      "head": "be0c06c16c79413de0bf86c5e62973a813426c02",
+      "log_sha256": "e85c1ecf5a6708d94043382575f487b1920d83aed924f52af036e3be53b72dcc",
+      "seconds": 3.1168138403445482,
+      "utc": "2026-10-29T09:53:41.118270+00:00"
+    },
+    "native_responses": {
+      "exit_code": 1,
+      "head": "be0c06c16c79413de0bf86c5e62973a813426c02",
+      "log_sha256": "1edf0f3c1c3aa171587e2d0a930ee1d9bbc5a50e0fc1549686309b3df9b5228b",
+      "seconds": 3.093699127435684,
+      "utc": "2026-10-29T09:56:14.064089+00:00"
+    },
+    "error": "CALLER_AMBIGUOUS",
+    "native_akasha_sha256": "67b9c3e8c16998f394346c6e2b0568b7bfd0dd19b8abbac5153681959f52eea6"
+  }
+}

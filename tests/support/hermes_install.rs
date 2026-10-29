@@ -13,8 +13,10 @@ fn plugin_install_is_opt_in_idempotent_and_undo_preserves_edits() {
     )
     .unwrap();
     let binary = fixture.0.join("hermes");
-    std::fs::write(&binary, "#!/bin/sh\n[ \"$1\" = --version ] || exit 78\nprintf 'Hermes Agent v0.22.5+1914.gfdb04a0\\n'\n").unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    crate::executable::write(
+        &binary,
+        "#!/bin/sh\n[ \"$1\" = --version ] || exit 78\nprintf 'Hermes Agent v0.22.5+1914.gfdb04a0\\n'\n",
+    );
     let install = || {
         Command::new(env!("CARGO_BIN_EXE_akasha-otsuge"))
             .arg("--socket")
