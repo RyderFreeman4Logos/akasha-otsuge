@@ -1,0 +1,14 @@
+{
+  "session_id": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+  "turn_id": "01a184c7-1ccb-7a41-8ea6-0dc926feb95a",
+  "transcript_path": "/fixture/config/sessions/2026/10/28/rollout-2026-10-28T16-10-03-01a184c7-1cbf-7093-af67-23202f7dceeb.jsonl",
+  "cwd": "/fixture/workspace",
+  "hook_event_name": "PreToolUse",
+  "model": "fixture",
+  "permission_mode": "bypassPermissions",
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "printf synthetic-exec"
+  },
+  "tool_use_id": "call_fixture"
+}

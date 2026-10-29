@@ -1,7 +1,9 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-28 UTC after PR #38 merged at `d566101`. Live GitHub audit: **18 open
-Issues, 10 completed Issues**. #11 is the first unresolved dependency. The complete queue below preserves every Issue and dependency.
+Updated 2026-10-28 UTC after PR #40 merged at `19efca1`. Live GitHub audit: **17 open
+Issues, 11 completed Issues**. #12 is waiting for authenticated Claude acceptance in draft PR #41. #13 is the
+active independent leaf; its sole prerequisite #11 is complete. The complete
+queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
 does not narrow them. Close an Issue only after evidence, review, gates and merge.
 
@@ -43,8 +45,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-28 audit finds 18 open Issues (#11–#28). #4–#10 are closed with
-merged PRs #32–#38; no completed implementation is waiting for closure. #7's
+The 2026-10-28 audit finds 17 open Issues (#12–#28). #4–#11 are closed with
+merged PRs #32–#38/#40; no completed implementation is waiting for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -56,10 +58,13 @@ passing unchanged full-data receipts, rather than rerunning them for each leaf.
 #10's final exact-HEAD gate and hosted CI passed before the intentional restart.
 After resume, the unchanged receipts were collected, independent R2 review
 passed with zero actionable findings, and the PR/Issue were closed promptly.
-The cold hosted build took about38 minutes; a separate small CI-cache leaf
-reuses Cargo inputs/artifacts without skipping checks. Then implement #11's
-binding/protocol, restricted context, shared Runner budget and frozen evaluation
-reference set. Real host adapters remain #12–#15, not mock completion claims.
+The cold hosted build took about38 minutes; the independent CI-cache PR #39
+merged before #11. CI40717707611 actually restored its1.94GB cache and ran the
+full gate in about144 seconds. This one run proves restoration, not a general
+benchmark. #11's exact gate and fresh whole-candidate R2 review passed; PR #40
+merged and #11 closed. Collect terminal review/CI results promptly instead of
+letting completed work wait through the next implementation phase.
+Real host adapters remain #12–#15, not mock completion claims.
 
 ## MVP-003 completed acceptance
 
@@ -315,7 +320,7 @@ does not attest those repairs.
 - [x] Publish search/show documentation, quality and withdrawal fixtures, focused
   results, final exact-HEAD gate/review, CI, merge and Issue closure. Then #11–#28.
 
-## MVP-011 acceptance and remaining work
+## MVP-011 completed acceptance
 
 - [x] Versioned bounded JSONL envelopes, request/sequence correlation, capabilities,
   structured externally constructible errors, cancellation and terminal results.
@@ -340,9 +345,133 @@ does not attest those repairs.
   retaining the real revocation barrier, all60 cases and critical scoring.
   Erratum manifest `09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16`.
   Erratum freeze commit `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
-- [ ] Publish protocol/trait/binding/permission documentation and evidence, pass
-  exact-HEAD gate and independent review, then merge and close #11. The four real
+- [x] Publish protocol/trait/binding/permission documentation and evidence, pass
+  exact-HEAD gate and independent review, then merge and close #11. Candidate
+  `639e991` passed146 Rust,17 Python and36 installed daemon cases in140.200s;
+  R2 whole-candidate review passed with0 actionable findings. CI40717707611
+  passed; PR #40 merged as `19efca1`. Full originals are published in the PR.
+  The four real
   host integrations remain #12–#15; full quality/combination acceptance remains #27.
+
+## MVP-012 draft PR #41 acceptance and remaining work
+
+- [x] Verify the installed Claude2.1.311 executable against its official manifest;
+  validate a native plugin and execute a non-model native metadata command with
+  isolated config, unchanged user files, no other host CLI and no MCP server.
+  The native TUI also executed that local command in a controlling PTY and exited
+  normally, without model requests. This does not establish model acceptance.
+- [x] Add the daemon-independent bounded CLI version probe and native transcript
+  import through the existing durable capture cursor. The first slice preserves
+  root-message parent links, visible text/tool results and partial-tail recovery;
+  private thinking is excluded and a user role remains unverified authority.
+  Focused regression:77 passed/5 existing ignored; all-target Clippy passed.
+  Native child/fork/compaction coverage and live caller registration remain below.
+- [x] Implement the smallest native plugin and Rust bridge for actual caller
+  identity, parent/child registration, per-call turn/fence and immutable binding.
+  Re-read identity after resume/clear; unknown child identity must refuse.
+  The private root registration/binding bridge now passes durable retry/restart,
+  identity replacement, missing-tip, unknown-field and live read-root withdrawal
+  regressions; all-target Clippy passed. Actual native hooks now pass startup and
+  resume, fork and native child binding plus13 durable backfill jobs against local
+  synthetic SSE. The child registry preserves parent identity and rejects
+  unregistered identities, changed parents and mismatched native source frames.
+  Re-registration preserves call identity; a delayed transcript flush is retried
+  within the original bound. Native sync waits for its persisted target event
+  within the original job deadline. Native lifecycle reasons are retained;
+  fork-parent session IDs are not exposed by the supported hook and remain
+  unknown. Root tokens cannot claim child identity.
+- [x] Capture original prompts, visible outputs and tool results; normalize native
+  transcripts with bounded resume/backfill, partial-tail/gap handling, exact
+  parent/fork/compaction lineage and no private-thinking extraction or false approval.
+  Capture and binding now pass7 regressions and all-target Clippy,
+  replaying the actual2.1.311 transcript. Attachments retain rendered visible
+  text when present; native attachments without rendered bodies retain identity
+  and an explicit omission marker. The fixture preserves that native absence.
+  Summary flags remain recorded as session information. Missing original
+  ancestry stays explicitly pending. Ordinary native children retain their own
+  transcript ancestry and their registered runtime parent separately. Native
+  fork replay retains copied originals and excludes later parent/sibling events;
+  the unexposed fork-parent ID remains an explicit coverage limit.
+- [ ] Implement a standalone Claude Runner using existing lawful CLI auth,
+  structured terminal events plus exit status, bounded output, cancellation and
+  original deadlines. Disable built-in/unrelated tools and enforce shared Rust
+  read capabilities; verify denied writes, network and out-of-scope reads.
+  The native process/read-bridge phase is implemented:23 focused tests and
+  all-target Clippy pass. Native2.1.311 loads the actual plugin and completes
+  list/read/final-output through real CapturedContext under a local SSE fixture;
+  initial model input contains no original. Replayed native fixtures cover
+  authentication, retries, tool pairing and incomplete/unsafe output. Native
+  Bash/Read/WebFetch/ToolSearch denials, bounded output, original deadlines and
+  process-group cancellation have separate evidence. This phase does not prove
+  authenticated model acceptance or live Caller identity. Fixture provenance and
+  reproduction are in `tests/fixtures/claude/2.1.311/README.md`.
+- [x] Provide install/uninstall/rollback that preserves unrelated hooks and
+  configuration; expose actual version, capability and coverage in doctor.
+  The owned session plugin uses explicit native `--plugin-dir` loading. A new
+  directory allows upgrade/rollback without overwriting the previous plugin.
+  Integrity/extra-file/symlink guards and preserved native settings pass the CLI
+  test; actual2.1.311 validates the generated plugin, captures a turn through its
+  unmodified bridge, verifies doctor and uninstalls successfully. Runtime model
+  authentication and loaded-session self-test are explicitly not asserted.
+  Actual TUI type generation is supported: owned files remain hash-verified,
+  generated type/config files and user edits within them are preserved on removal.
+- [ ] Prove real TUI and Runner behavior with the other three CLIs absent:
+  concurrent sessions, resume, compact, interrupted backfill, tool results,
+  cancellation and denied operations, with traceable inputs/final output.
+  Controlled local fixtures do not substitute for authenticated model acceptance.
+  The unmodified installed plugin now captures a real controlling-PTY turn with
+  native input/output UUIDs and cursor hashes, then passes doctor/uninstall.
+  Permission metadata, duration events and nonpersistent local-command UUIDs
+  have causal native evidence and regressions. A fixture-tool execution failure
+  remains unclassified; richer diagnostics were added before the next passing run.
+  Subsequent native checks pass concurrent sessions, TUI resume, manual compact
+  and a turn after compact, retaining input/output UUIDs and original ancestry.
+  A real daemon restart during an unfinished backfill preserves its deadline;
+  the same job succeeds once the original arrives. Cancellation remains terminal.
+  Authenticated model acceptance still needs an available lawful Claude login or
+  provider configuration; the existing request for that input remains pending.
+- [ ] Retain sanitized native fixtures and failures, official API/version evidence,
+  reproduction commands and limitations; pass exact-candidate gate, independent
+  review and CI, then merge and close #12. Continue every queue entry below.
+  Candidate `0aede7c` passed the full local gate and exact-candidate native Caller
+  and Runner protocol checks; draft PR #41 is published. Independent review found
+  three defects that must pass new regressions, a fresh gate and re-review:
+  - [x] Match the native read-tool schema to the shared 16 KiB reader limit.
+    The actual native schema assertion fails before the fix and passes after;
+    bridge tests accept 16,384 bytes and reject 16,385 bytes.
+  - [x] Make uninstall recoverable after partial failure and preserve replacements.
+    Permission-failure retry, detached-tree edits/replacements, resumed cleanup
+    and preserved native configuration pass four unit and two real CLI tests.
+  - [x] Bound Runner/probe reap waits while retaining cleanup ownership.
+    The pending-reap regression fails with an unbounded wait and passes with
+    a non-renewable one-second grace. Child/workspace/lease ownership survives
+    caller drop; 17 focused tests and all-target Clippy pass.
+  - [x] Diagnose and repair fixture startup before the fresh candidate gate.
+    Gate2 at `bfc301b` failed before cancellation at executor startup. A later
+    native spawn diagnostic reproduced `ETXTBSY` (OS26); script creation now
+    occurs in an isolated writer process. A distinct procfs `ESRCH` observation
+    is treated as an exited process. All33 focused cases, Clippy and20 parallel
+    rounds pass; both earlier failures remain retained.
+  - [x] R2: Reject changed native workspaces before binding root or child calls.
+    The production JavaScript hook's child and grandchild regression fails on the
+    old implementation. The repaired hook keeps the immutable session workspace;
+    a cwd change requires a new native session. Root/child/grandchild and fresh
+    session controls run in the shared gate with Node.js. Candidate `62ef371`
+    passed its full gate, native checks and CI40776089474, but R2 found this
+    binding defect; those passing checks do not approve the repair candidate.
+
+Candidate `5424ead` passed the full159.958-second gate, fresh native Caller/Runner
+checks, independent R3 review (zero actionable findings) and CI40778944541. The
+[full review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/41#issuecomment-6482322686)
+records all four repaired findings. Its clean SSD checkout was removed after the
+remote SHA was verified; branch and draft PR #41 retain the source. This section
+records that draft implementation, which is not yet merged into main. Real Claude
+authentication is the outstanding external prerequisite; #12 stays open.
+
+The four original TUI onboarding probes remain setup failures. A distinct probe
+used a controlling PTY and task-only trusted workspace configuration, ran the
+local native command through the actual TUI, and exited successfully. User files
+were unchanged. Real model/compact/cancellation acceptance is still required.
 
 Host preparation: Claude Code2.1.311, Codex0.164.0, Hermes0.22.5+1914 and Pi0.78.0
 are executable. Claude's broken link was repaired through mise onto SSD; the
@@ -350,6 +479,52 @@ native digest matches the official manifest. Non-billable auth status reports
 unauthenticated. Its startup config migration was restored byte-for-byte; future
 startup may migrate again. #12 still needs real host/model acceptance. PATH/version
 checks do not prove host protocol capabilities or an authenticated Runner.
+
+## MVP-013 acceptance and remaining work
+
+- [x] Pin native Codex0.164.0 schemas, hook fields and tool policy to the installed
+  executable and official tagged sources. The native executable SHA-256 is
+  `b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306`.
+- [x] Capture bounded native ordinal chains and original public messages/tools,
+  preserve compaction originals and fork cutoffs, suppress duplicate replay and
+  resume interrupted backfill. Missing history stays observable. Controlled
+  native fixtures include a separate-process resume after fork; private reasoning
+  and binary bodies remain outside explicit `visible_text` coverage.
+- [x] Bind registered root session/turn/call/workspace to an immutable call-ordinal
+  fence before tool execution. Reject ambiguous, explicit child or unknown native
+  identity; never infer a child from a parent session. Cover concurrent roots,
+  permission changes, restart, bounded catch-up and replay. Daemon registration
+  and capture use the existing durable scheduler. The shared test-only empty
+  readiness-marker race was fixed in `8aec4ac` without changing product timeouts.
+- [x] Implement the standalone native app-server Runner with four scoped context
+  tools, bounded frames/output, original deadlines, structured final/exit checks
+  and retained process-group/lease cleanup. Fourteen ordinary Codex tests include
+  19 injected failure scenarios; two explicit native tests are ignored by default.
+  Capability negotiation advertises the actual four context operations.
+- [x] Provide opt-in single-file install/undo and free version/capability doctor.
+  Actual hooks bind outside the native sandbox and prepare a private per-call
+  result for its offline reader. No credentials enter that file. Concurrent
+  calls share no current-context file; installation conflicts preserve user data.
+  The launcher explicitly exposes `functions` directly because nested Code Mode
+  calls lack a provable rollout identity. No native configuration file is edited.
+- [x] Verify actual authenticated Runner and two simultaneous authenticated TUIs,
+  with other agent CLIs absent from PATH. Both TUIs have controlling terminals,
+  distinct session/call/fence identities, isolated synthetic context and zero exit.
+  Controlled native tests separately force denied writes, networking, outside
+  reads, patch/MCP tools and unissued context handles. They prove the actual native
+  tool boundary, while authenticated runs prove configured-model operation.
+  [Sanitized acceptance](../adapters/codex-0.164.0/README.md) records exact binary,
+  receipt and source-base hashes plus reproduction steps. Failed probes remain
+  preserved. The successful TUI fixture allocated about4.9MiB, measured without
+  following symlinks, and was removed after all consumers ended.
+- [ ] Run the canonical full gate on the final clean candidate, then obtain an
+  independent review of the full base-to-head range. Resolve every finding.
+- [ ] Pass hosted CI, publish/merge the reviewed candidate and close #13 with
+  linked evidence. Keep all later queue entries until their own acceptance passes.
+
+One source writer works in the SSD mirror and reuses the existing shared target.
+#12 is deferred only for its recorded external authentication prerequisite;
+#13–#15 no longer carry the stale dependency-blocked label after #11 completed.
 
 ## Complete Issue queue
 
@@ -363,7 +538,7 @@ checks do not prove host protocol capabilities or an authenticated Runner.
 - [x] [#8 [MVP-008] CLI、私有 IPC daemon 与持久后台作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/8) — dependencies: #2, #4, #7.
 - [x] [#9 [MVP-009] 可配置本地模型客户端与 1700 秒全链长测](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9) — dependencies: #2, #8.
 - [x] [#10 [MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10) — dependencies: #5, #6, #9.
-- [ ] [#11 [MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11) — dependencies: #7, #8, #10.
+- [x] [#11 [MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11) — dependencies: #7, #8, #10.
 - [ ] [#12 [MVP-012] Claude Code CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) — dependencies: #11.
 - [ ] [#13 [MVP-013] Codex CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/13) — dependencies: #11.
 - [ ] [#14 [MVP-014] Hermes CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/14) — dependencies: #11.

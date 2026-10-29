@@ -12,6 +12,7 @@ use tokio::task::JoinSet;
 use crate::config::ResolvedConfig;
 use crate::ipc::{self, Command, Error, Request, Result};
 use crate::storage::Storage;
+mod codex;
 mod configuration;
 mod jobs;
 
@@ -166,6 +167,7 @@ impl Service {
         command: Command,
     ) -> Result<serde_json::Value> {
         match command {
+            Command::Codex { event } => self.codex(event).await,
             Command::Status => Ok(
                 json!({"state":"running","pid":std::process::id(),"storage_seq":self.storage.sequence()?}),
             ),

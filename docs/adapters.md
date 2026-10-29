@@ -169,3 +169,152 @@ independently pinned manifest is
 Its freeze commit is `f0dcef99bdc6aaae9635aa77054df525b688f5aa`.
 Evaluation consumers use `scripts/check_reference.py::read_reference()` to load
 the effective set; reading the uncorrected v1 task file alone is not sufficient.
+
+## Codex native capture component
+
+`adapter::codex::reconcile_transcript` accepts an explicitly authenticated source
+identity and an explicit file, using the existing durable bounded file cursor.
+It supports the captured **Codex 0.164.0** rollout format. Each native ordinal
+has one event identity; native message/call IDs remain in retained visible raw
+payloads. Display text comes from response items, so duplicate `item_completed`
+notifications do not repeat user messages or tool results. Unknown records,
+missing ordinals and incomplete tails remain pending. Unknown native versions
+and mismatched session headers are rejected. This parser does not authenticate
+a caller or discover the latest session.
+
+The native fork metadata identifies the parent thread and exclusive ordinal
+cutoff. A later root resume cannot expand that inherited history. Compaction
+records link the already retained ancestor range and its summary, without
+replacing originals. An unavailable ancestor stays observable; traversal is
+bounded to 65,536 events per compaction. The native rollout does not identify
+process resumes as a distinct event, so capture preserves the continuing chain
+without inventing a resume marker.
+
+Coverage is `visible_text`, not every native payload. Native system/developer
+instructions, environment configuration, private reasoning and binary attachment
+bodies are omitted explicitly. Public reasoning summaries and tool inputs/results
+are retained; attachments have visible unavailable markers. Retained raw JSON is
+a filtered native record, not a byte-identical copy of private configuration.
+All captured content is unverified input and conveys no human authority.
+
+[Native fixtures](../tests/fixtures/codex/0.164.0/README.md) bind sanitized examples
+to their native versions and source hashes. Controlled local SSE runs prove
+protocol and lifecycle behavior. [Native acceptance](adapters/codex-0.164.0/README.md)
+records authenticated Caller/Runner, actual tool restrictions and concurrent TUI
+results separately from the final source gate and review.
+
+`CodexCaller` accepts a server-owned registration and native hook identity outside
+the model's arguments. It verifies the registered session, workspace and root
+source, then matches the exact native function-call ID and turn ID in an 8 MiB
+tail snapshot. Missing or ambiguous identity is refused. Missing `agent_id` is
+insufficient proof: unknown/subagent native sources and explicit child hooks are
+currently unsupported. No caller is selected by cwd or by the latest file.
+
+The immutable fence ends at the function-call ordinal, excluding subsequent
+usage records, tool results and final output. Catch-up uses the shared capture
+cursor, with a 256-frame budget and a two-second checked deadline. A missing
+ancestor returns `HISTORY_GAP`; a retry preserves its stored fence even if the
+native file is gone. Permission revocation applies to new calls and retries.
+Focused tests cover native hook data, concurrent registrations in one workspace,
+identity conflicts, unknown versions, duplicate calls, missing ancestors and
+revocation. Separate native acceptance proves two simultaneous authenticated TUIs.
+
+The daemon's private `codex` transport persists root registrations with opaque
+credentials, binds native calls and queues native capture through the existing
+durable scheduler. Registration credentials travel over the owner-only local
+socket and stdin bridge; binding responses contain no credential. Access roots
+and current read grants are rechecked for subsequent calls and capture batches.
+The `adapter codex-call` stdin bridge is internal host transport, not a model
+tool. `capture codex` selects the pinned format for explicit backfill input;
+the binding must use stream `codex-native-v1` and `visible_text` coverage.
+
+`doctor --host codex [--binary PATH]` observes the executable/version with bounded
+output and a five-second probe deadline. It reports authentication and hook trust
+as unchecked. The process owner signals its group before releasing the leader
+PID, and deferred reaping retains ownership after the one-second cleanup grace.
+The daemon, CLI, Codex and library regression suites pass 75 tests (five existing
+ignored helpers/acceptance cases), including registration/replay across daemon
+restart and native background backfill. Full acceptance and review remain open.
+
+## Codex opt-in launcher and native hooks
+
+Install a separate launcher for the pinned Codex version:
+
+```sh
+akasha-otsuge --config /absolute/akasha.toml adapter install codex \
+  --binary /absolute/codex --launcher /absolute/akasha-codex \
+  --state-dir /absolute/private-call-state
+/absolute/akasha-codex
+akasha-otsuge adapter uninstall codex --launcher /absolute/akasha-codex
+```
+
+Parent directories must exist. Installation atomically publishes one owner-only
+script. Repeating an identical install is harmless; replacement, symlinks and
+edited scripts are refused. Undo verifies its content hash before removing that
+single file. Native settings and credentials are not edited. The native hook
+trust review still applies: installation never automatically approves hooks.
+Call-state files are separate from the launcher and are removed by their owning
+PostToolUse/PostToolUseFailure callback, so uninstall cannot delete active calls.
+Interrupted callbacks can leave small results; 258 directory entries stop further
+admission rather than trigger an age-based deletion sweep.
+
+The launcher selects `features.code_mode={direct_only_tool_namespaces=["functions"]}`
+for that launch. This exposes native function tools directly even for models that
+default to Code Mode, replacing the corresponding per-launch namespace setting.
+Codex0.164.0 assigns random IDs to nested Code Mode calls without a matching
+rollout entry; those calls cannot establish an exact fence. Other namespaces can
+still use Code Mode. Installation reports this setting, leaves native settings
+files untouched, and never infers a parent call from JavaScript text.
+
+The hook configuration uses the official CLI override
+mechanism. SessionStart/Stop schedule incremental native backfill. PreToolUse
+recognizes exactly `akasha-otsuge consult` or that command followed by one
+JSON-quoted hint; shell suffixes and identity arguments are rejected. At this
+stage the command returns a binding diagnostic; the consult workflow is MVP-016.
+The trusted callback binds the native identity and stores an atomic per-call
+result, then rewrites the command to an absolute read-only result reader. This
+is necessary because the native Linux read-only sandbox rejects Unix socket
+connections. Neither registration credentials nor a daemon connection enter the
+sandbox command. Concurrent sessions share no current-context file or global
+lock. Binding errors return the native explicit deny response.
+
+## Codex standalone Runner
+
+`CodexRunner::new(binary, native_home, workspace, instructions)` starts the pinned
+native `codex app-server --stdio` with the selected native home and its existing
+authentication/provider configuration. No other agent CLI is used. The native
+home must contain a valid bounded `models_cache.json` from Codex0.164.0; missing or
+unsupported metadata returns `ADAPTER_UNSUPPORTED`. This versioned dependency is
+necessary because model metadata can enable tools even when feature flags are off.
+
+Each run creates one private temporary workspace and a private catalog that
+disables native shell, patch, search, image, Code Mode and unrelated tools while
+retaining the model's remaining metadata. Before starting an ephemeral thread,
+the Runner disables every effective MCP server, native hooks, plugins, agent
+delegation and host skill discovery. It requests the native read-only sandbox,
+disabled tool networking and no approvals, and verifies the returned policy.
+Only `context_describe`, `context_list`, `context_read` and `context_search` are
+registered. Their requests pass the existing invocation, permission and shared
+budget checks; model arguments cannot supply the operation or caller identity.
+Memory/code tools and workflow composition are integrated in MVP-016.
+
+The Runner accepts one structured nonempty `answer`, then closes stdin and waits
+for the native process to exit successfully. EOF, an answer followed by a failing
+exit, duplicate calls/finals, unexpected identities, malformed requests, excessive
+output and expiry cannot become success. All waits use the original deadline.
+Cancellation and drop retain process-group, lease and directory ownership until
+the shared reaper terminates and reaps the child. Native unauthorized/HTTP401
+errors become `AUTH_REQUIRED`; provider error prose is never returned as a
+diagnostic. Native configuration/account/moderation notifications are metadata,
+not tool requests or completion evidence. `doctor` remains a free version probe;
+its `NotRun` self-test status does not claim authentication or model acceptance.
+
+The native0.164.0 controlled-endpoint fixture passed the installed launcher,
+real hook, actual read-only shell sandbox, exact call fence, result cleanup and
+uninstall round trip. A prior failed socket bridge and a native EPERM diagnostic
+are retained; no sandbox or network permission was relaxed. The result proves
+that transport. Separate authenticated Runner and concurrent-TUI receipts are
+linked above; they do not measure model quality.
+The interface follows the official [hook protocol](https://learn.chatgpt.com/docs/hooks)
+and [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference),
+checked against the installed native binary rather than the older source clone.

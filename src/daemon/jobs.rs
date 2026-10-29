@@ -715,7 +715,7 @@ impl Service {
         Domain::new(&self.storage).permission(&context()?, Some(&scope))?;
         Ok(())
     }
-    fn allowed_path(&self, path: &Path) -> Result<PathBuf> {
+    pub(super) fn allowed_path(&self, path: &Path) -> Result<PathBuf> {
         if !path.is_absolute() {
             return Err(Error("PATH_DENIED"));
         }
@@ -1130,33 +1130,58 @@ impl Service {
                     .await;
             }
             let storage = self.storage.clone();
-            let binding = job
-                .binding
-                .as_ref()
-                .ok_or(Error("JOB_CORRUPT"))?
-                .binding()?;
+            let input = job.binding.as_ref().ok_or(Error("JOB_CORRUPT"))?.clone();
+            let binding = input.binding()?;
             let path = job.path.clone().ok_or(Error("JOB_CORRUPT"))?;
             let generation = job.config_generation;
             let runtime = tokio::runtime::Handle::current();
             #[cfg(test)]
             let gate = self.batch_gate.lock().await.take();
             let result = tokio::task::spawn_blocking(move || {
-                let result = runtime.block_on(
-                    Capture::new(&storage).reconcile_jsonl(&binding, &path, 1, generation),
-                );
+                let capture = Capture::new(&storage);
+                let result = if input.host == Some(crate::config::Host::Codex) {
+                    runtime.block_on(crate::adapter::codex::reconcile_transcript(
+                        &storage,
+                        &input.source,
+                        input.scope.clone(),
+                        &path,
+                        1,
+                        generation,
+                    ))
+                } else {
+                    runtime.block_on(capture.reconcile_jsonl(&binding, &path, 1, generation))
+                };
                 #[cfg(test)]
                 if let Some(gate) = gate {
                     gate.reached.send(end).unwrap();
                     gate.resume.blocking_recv().unwrap();
                 }
-                result
+                result.and_then(|report| {
+                    let reached = match input.until_event {
+                        Some(event_id) => capture
+                            .event(
+                                &binding,
+                                &crate::capture::EventRef {
+                                    source: input.source,
+                                    event_id,
+                                },
+                                storage.sequence()?,
+                            )?
+                            .is_some(),
+                        None => true,
+                    };
+                    Ok((report, reached))
+                })
             })
             .await
             .map_err(|_| Error("JOB_ERROR"))?;
             match result {
-                Ok(report) => {
-                    let more = report.checkpoint.checkpoint.pending == Some(PendingReason::Backlog);
-                    job.result = Some(serde_json::to_value(report)?);
+                Ok((report, reached)) => {
+                    let pending = report.checkpoint.checkpoint.pending.clone();
+                    let more = pending == Some(PendingReason::Backlog) || !reached;
+                    let result = Some(serde_json::to_value(report)?);
+                    let changed = job.result != result;
+                    job.result = result;
                     if tokio::time::Instant::now() >= end {
                         return self
                             .finish_job(job, revision, "failed", Some("JOB_TIMEOUT"))
@@ -1165,8 +1190,33 @@ impl Service {
                     if !more {
                         return self.finish_job(job, revision, "succeeded", None).await;
                     }
-                    job.lease_until_ms = Some(ipc::now_ms()?.saturating_add(30_000));
-                    self.save_job(&job, Some(revision), vec![]).await?;
+                    if !reached
+                        && !matches!(
+                            pending,
+                            None | Some(
+                                PendingReason::Backlog
+                                    | PendingReason::PartialTail
+                                    | PendingReason::SourceMissing
+                            )
+                        )
+                    {
+                        return self
+                            .finish_job(job, revision, "failed", Some("HISTORY_GAP"))
+                            .await;
+                    }
+                    let now = ipc::now_ms()?;
+                    if changed
+                        || job
+                            .lease_until_ms
+                            .is_none_or(|lease| lease <= now.saturating_add(10_000))
+                    {
+                        job.lease_until_ms = Some(now.saturating_add(30_000));
+                        self.save_job(&job, Some(revision), vec![]).await?;
+                    }
+                    if !reached && pending != Some(PendingReason::Backlog) {
+                        drop(_guard);
+                        tokio::time::sleep(Duration::from_millis(25)).await;
+                    }
                 }
                 Err(error)
                     if matches!(error.code, "CAPTURE_SOURCE_CHANGED" | "REVISION_CONFLICT")
