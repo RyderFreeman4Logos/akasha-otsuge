@@ -38,8 +38,9 @@ def send(sock, value):
 
 
 class Server:
-    def __init__(self, path):
+    def __init__(self, path, greeting_delay=0):
         self.path = path
+        self.greeting_delay = greeting_delay
         self.requests = []
         self.errors = []
         self.stop = threading.Event()
@@ -69,6 +70,8 @@ class Server:
             with client:
                 client.settimeout(2)
                 try:
+                    if self.stop.wait(self.greeting_delay):
+                        return
                     send(client, {'protocol_version': 1, 'max_message_bytes': 2097152})
                     request = receive(client)
                     self.requests.append(request)
@@ -118,6 +121,28 @@ class Context:
 
 
 class HermesPlugin(unittest.TestCase):
+    def test_runner_queued_greeting_uses_original_deadline(self):
+        name = 'akasha-' + 'c' * 64
+        for budget_ms, greeting_delay, error in [(30000, 11, None), (2000, 2.5, 'RUNNER_TIMEOUT')]:
+            with self.subTest(budget_ms=budget_ms):
+                server = Server('\0' + name, greeting_delay=greeting_delay)
+                server.reply = lambda r: {'schema_version': 1, 'sequence': 1,
+                    'request_id': r['request_id'], 'data': {'answer': 'queued research'}}
+                try:
+                    with patch.dict(os.environ, {
+                        'AKASHA_HERMES_RUN_SOCKET': name,
+                        'AKASHA_HERMES_RUN_TOKEN': 'b' * 64,
+                        'AKASHA_RUN_DEADLINE_MS': str(int(time.time() * 1000) + budget_ms),
+                    }):
+                        if error:
+                            with self.assertRaisesRegex(self.plugin.BridgeError, error):
+                                self.plugin._exchange(self.ctx, {'op': 'context'}, runner=True)
+                        else:
+                            result = self.plugin._exchange(self.ctx, {'op': 'context'}, runner=True)
+                            self.assertEqual(result['answer'], 'queued research')
+                finally:
+                    server.close()
+
     def test_runner_research_uses_original_deadline(self):
         name = 'akasha-' + 'a' * 64
         server = Server('\0' + name)

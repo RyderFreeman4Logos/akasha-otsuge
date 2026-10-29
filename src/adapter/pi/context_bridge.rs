@@ -15,8 +15,8 @@ pub async fn call(event: Value) -> Result<Value> {
         return Err(Error("MESSAGE_TOO_LARGE"));
     }
     let deadline = crate::adapter::native::bridge_deadline()?;
-    let handshake = deadline.min(tokio::time::Instant::now() + ipc::TRANSPORT_TIMEOUT);
-    let mut stream = tokio::time::timeout_at(handshake, async {
+    let connect_deadline = deadline.min(tokio::time::Instant::now() + ipc::TRANSPORT_TIMEOUT);
+    let mut stream = tokio::time::timeout_at(connect_deadline, async {
         // Nonblocking connect is completed by Tokio; no unbounded synchronous connect.
         let fd = rustix::net::socket_with(
             rustix::net::AddressFamily::UNIX,
@@ -33,7 +33,7 @@ pub async fn call(event: Value) -> Result<Value> {
             Err(rustix::io::Errno::INPROGRESS) => {}
             Err(_) => return Err(Error("DAEMON_UNAVAILABLE")),
         }
-        let mut stream = tokio::net::UnixStream::from_std(raw)?;
+        let stream = tokio::net::UnixStream::from_std(raw)?;
         stream.writable().await?;
         if stream.take_error()?.is_some() {
             return Err(Error("DAEMON_UNAVAILABLE"));
@@ -41,18 +41,21 @@ pub async fn call(event: Value) -> Result<Value> {
         if stream.peer_cred()?.uid() != rustix::process::geteuid().as_raw() {
             return Err(Error("PEER_DENIED"));
         }
+        Ok::<_, Error>(stream)
+    })
+    .await
+    .map_err(|_| Error("IPC_TIMEOUT"))??;
+    // A preceding delegated callback can delay the broker's greeting.
+    let reply: Value = tokio::time::timeout_at(deadline, async {
         let greeting: Value = ipc::read(&mut stream).await?;
         if greeting["protocol_version"] != 1 || greeting["max_message_bytes"] != ipc::MAX_MESSAGE {
             return Err(Error("PROTOCOL_VERSION"));
         }
         ipc::write(&mut stream, &request).await?;
-        Ok::<_, Error>(stream)
+        ipc::read(&mut stream).await
     })
     .await
-    .map_err(|_| Error("IPC_TIMEOUT"))??;
-    let reply: Value = tokio::time::timeout_at(deadline, ipc::read(&mut stream))
-        .await
-        .map_err(|_| Error("RUNNER_TIMEOUT"))??;
+    .map_err(|_| Error("RUNNER_TIMEOUT"))??;
     if reply["schema_version"] != 1 || reply["sequence"] != 1 || reply["request_id"] != id {
         return Err(Error("PROTOCOL_INVALID"));
     }

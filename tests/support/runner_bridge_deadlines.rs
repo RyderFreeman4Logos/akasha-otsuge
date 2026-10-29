@@ -20,7 +20,10 @@ async fn receive(stream: &mut tokio::net::UnixStream) -> Value {
 
 #[tokio::test]
 async fn private_bridges_wait_for_research_beyond_the_transport_timeout() {
-    let (claude, pi) = tokio::join!(bridge(false, 30000, 11000), bridge(true, 30000, 11000));
+    let (claude, pi) = tokio::join!(
+        bridge(false, 30000, 0, 11000),
+        bridge(true, 30000, 0, 11000)
+    );
     for output in [claude, pi] {
         assert!(
             output.status.success(),
@@ -33,8 +36,28 @@ async fn private_bridges_wait_for_research_beyond_the_transport_timeout() {
 }
 
 #[tokio::test]
+async fn pi_bridge_waits_for_queued_greeting_beyond_transport_timeout() {
+    let output = bridge(true, 30000, 11000, 0).await;
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let reply: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(reply["data"]["answer"], "slow research");
+}
+
+#[tokio::test]
+async fn pi_bridge_queued_greeting_stops_at_original_deadline() {
+    let output = bridge(true, 2000, 2500, 0).await;
+    assert!(!output.status.success());
+    let reply: Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(reply["error"]["code"], "RUNNER_TIMEOUT");
+}
+
+#[tokio::test]
 async fn private_bridges_stop_at_the_original_deadline() {
-    let (claude, pi) = tokio::join!(bridge(false, 2000, 2500), bridge(true, 2000, 2500));
+    let (claude, pi) = tokio::join!(bridge(false, 2000, 0, 2500), bridge(true, 2000, 0, 2500));
     for output in [claude, pi] {
         assert!(!output.status.success());
         let reply: Value = serde_json::from_slice(&output.stderr).unwrap();
@@ -90,7 +113,7 @@ async fn private_bridges_reject_missing_malformed_and_expired_deadlines() {
     }
 }
 
-async fn bridge(pi: bool, budget_ms: u64, delay_ms: u64) -> std::process::Output {
+async fn bridge(pi: bool, budget_ms: u64, greeting_ms: u64, delay_ms: u64) -> std::process::Output {
     let fixture = Fixture::new();
     let directory = std::fs::File::open(&fixture.0).unwrap();
     let socket = format!(
@@ -157,12 +180,16 @@ async fn bridge(pi: bool, budget_ms: u64, delay_ms: u64) -> std::process::Output
     let serve = async {
         let (mut stream, _) = listener.accept().await.unwrap();
         if pi {
-            send(
+            tokio::time::sleep(Duration::from_millis(greeting_ms)).await;
+            if send(
                 &mut stream,
                 &json!({"protocol_version":1,"max_message_bytes":ipc::MAX_MESSAGE}),
             )
             .await
-            .unwrap();
+            .is_err()
+            {
+                return;
+            }
         }
         let request = receive(&mut stream).await;
         assert_eq!(

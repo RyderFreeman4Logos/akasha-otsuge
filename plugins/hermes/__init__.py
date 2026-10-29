@@ -85,6 +85,10 @@ def _exchange(ctx, event, *, runner=False):
             peer = struct.unpack('3i', client.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
             if peer[1] != os.geteuid():
                 raise BridgeError('PEER_DENIED')
+            # A preceding delegated callback can delay the broker's greeting.
+            if runner:
+                deadline = run_deadline
+                processing = True
             greeting = read()
             if greeting.get('protocol_version') != 1 or greeting.get('max_message_bytes') != 2097152:
                 raise BridgeError('PROTOCOL_VERSION')
@@ -95,9 +99,6 @@ def _exchange(ctx, event, *, runner=False):
                 raise BridgeError('MESSAGE_TOO_LARGE')
             remaining()
             client.sendall(struct.pack('!I', len(encoded)) + encoded)
-            if runner:
-                deadline = run_deadline
-                processing = True
             reply = read()
             if (reply.get('schema_version') != 1 or reply.get('sequence') != 1
                     or reply.get('request_id') != request_id):
