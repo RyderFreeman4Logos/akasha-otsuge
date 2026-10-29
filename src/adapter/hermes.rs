@@ -3,6 +3,7 @@ use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
 mod caller;
 pub mod capture;
 pub mod export;
+pub mod installation;
 mod native;
 pub use caller::{HermesCall, HermesCaller, HermesRegistration, profile_key};
 pub use native::NativeEvent;

@@ -8,6 +8,9 @@ use std::{
 #[path = "support/hermes_caller.rs"]
 mod caller;
 
+#[path = "support/hermes_install.rs"]
+mod installation;
+
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {

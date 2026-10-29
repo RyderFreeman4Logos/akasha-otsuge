@@ -571,7 +571,12 @@ Current #14 implementation evidence (overall acceptance remains pending):
   Immediate and background capture share the ingress identity to prevent false
   event conflicts. One earlier IPC timeout remains unclassified; a diagnostic run
   passed at 346/41/53 ms for first bind/retry/sync without changing deadlines.
-- Remaining: native plugin/install/undo, independent restricted Runner, actual
+- Native plugin/install/undo now pass focused tests. Actual Hermes loader/hooks
+  and daemon capture pass in two isolated profiles (`in_process` and `host`),
+  including interrupted backfill; the synthetic fixture used962,560 bytes and
+  was removed. [Support and recovery](../adapters/hermes-0.22.5/README.md) retain
+  scope limits and the repaired native-launcher fixture failure.
+- Remaining: independent restricted Runner, actual
   authenticated CLI/TUI and recovery acceptance, final gate/review/CI and closure.
 
 ## Complete Issue queue

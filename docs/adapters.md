@@ -318,3 +318,10 @@ linked above; they do not measure model quality.
 The interface follows the official [hook protocol](https://learn.chatgpt.com/docs/hooks)
 and [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference),
 checked against the installed native binary rather than the older source clone.
+
+## Hermes native Caller and capture
+
+The Hermes0.22.5 plugin, opt-in install/undo, immutable call fences and canonical
+export backfill are described in the [Hermes support and recovery notes](adapters/hermes-0.22.5/README.md).
+Controlled native plugin tests cover two profiles and both plugin isolation modes.
+Independent Runner and authenticated CLI/TUI acceptance remain pending in MVP-014.

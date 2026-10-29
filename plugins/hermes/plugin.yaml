@@ -1,0 +1,11 @@
+name: akasha-otsuge
+version: "0.1.0"
+description: "Private native Caller binding and durable public-history capture."
+author: "Ryder Freeman"
+provides_hooks:
+  - pre_tool_call
+  - on_session_start
+  - on_session_end
+  - post_compaction
+provides_tools:
+  - akasha_consult
