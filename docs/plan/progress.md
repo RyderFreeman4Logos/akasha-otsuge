@@ -3,11 +3,21 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#11 and #13
-are merged and completed; #12 and #14–#28 remain open (16 Issues). The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#11 and #13–#14
+are merged and completed; #12 and #15–#28 remain open (15 Issues). The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-014
+## Current issue: MVP-015
+
+The Pi adapter starts from merge `24eda5a` in one SSD source checkout, reusing
+the shared target. Official `earendil-works/pi` and npm
+`@earendil-works/pi-coding-agent` currently identify1.4.0. Independent installation
+and free RPC qualification are in progress, preserving the default0.78.0 install.
+Native version3 tree semantics and `agent_settled` govern the implementation;
+no Caller or Runner acceptance is claimed yet. The complete TODO lists every
+remaining criterion. #12 still waits for lawful Claude authentication in draft #41.
+
+## Completed Hermes adapter: MVP-014
 
 Hermes Caller, canonical export, native plugin installation and independent
 Runner are implemented at `2786c7a`. Two authenticated Runner profiles and a real
@@ -23,9 +33,14 @@ Two simultaneous interactive TUIs now pass in distinct `in_process` and `host`
 profiles, including correct bindings, final answers, zero exits and completed
 capture jobs. The successful71.103-second harness removed all23,113,728bytes of
 temporary fixture files. A separate scripted-exit failure remains preserved.
-Final gate, independent review, CI and closure remain pending. #12's draft PR #41
-is waiting only for lawful Claude authentication; #15 is the next independent leaf.
-The complete TODO retains every prerequisite and acceptance item.
+Final candidate `ada3e9e` passed the83.276-second gate (26 Python tests,
+182 workspace Rust tests and41 installed-daemon executions), independent
+whole-candidate R1 review with0 findings and CI40827971067. PR #43 merged as
+`24eda5a` with the reviewed tree; #14 is closed and the source checkout removed.
+[Full gate/review receipts](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/43#issuecomment-6489449325)
+preserve the preceding Codex HistoryGap failure. The final test-only change
+prepares both histories before testing concurrent Caller identity; production
+timeouts remain unchanged and the earlier runtime cause remains unproven.
 
 PR #42 merged Codex candidate `329bba1` as `d49be08`; #13 is closed. Its final
 gate, authenticated Runner and simultaneous TUIs, native denial fixtures,
