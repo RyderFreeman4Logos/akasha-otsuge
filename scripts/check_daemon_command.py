@@ -141,8 +141,11 @@ for path,kind in [(endpoint,'socket'),(data,'data')]:
  else: raise AssertionError(kind+' was accessible')
 print(json.dumps({'private_paths_denied':True,'uid':os.geteuid()}))
 '''
-                denied = command([*prefix, sys.executable, '-c', script, str(control_path),
-                                  str(endpoint), str(data / 'authority/format.json')])
+                # Inherit this accessible cwd; TMPDIR's ancestors may be private.
+                denied = command([*prefix, sys.executable, '-c', script, 'control.sock',
+                                  str(endpoint.relative_to(root)),
+                                  str((data / 'authority/format.json').relative_to(root))],
+                                 cwd=root)
                 assert denied.returncode == 0, denied.stderr
                 with control.accept()[0] as connection:
                     _, peer_uid, _ = struct.unpack('3i', connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
@@ -159,7 +162,8 @@ with socket.socket(socket.AF_UNIX) as s:
 print('peer_denied')
 '''
                 try:
-                    peer = command([*prefix, sys.executable, '-c', peer_script, str(endpoint)])
+                    peer = command([*prefix, sys.executable, '-c', peer_script,
+                                    str(endpoint.relative_to(root))], cwd=root)
                     assert peer.returncode == 0 and peer.stdout.strip() == 'peer_denied', peer.stderr
                 finally:
                     endpoint.chmod(0o600)
