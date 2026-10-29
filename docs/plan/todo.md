@@ -738,12 +738,15 @@ links exact identities and preserves the distinct controlled/native results.
   passed afterward. Native submission remains.
 - [ ] Verify default-self native Codex/Hermes/Pi, optional/empty hint, descendant
   delegation, a real cross-host combination and original long-call deadlines.
-  Real Pi1.4.0/grok-4.7 at localhost:48317 submits and completes a no-hint Consult
-  with an exact replayable receipt. Policy retrieval remains incomplete: a bounded
-  forwarding diagnostic captured `code_search(paths=["."])`, correctly rejected
-  because the tool accepts individual files. Shared Runner guidance now states
-  the path contract; the progressive-code regression passes. A fresh real run
-  must verify actual policy evidence before this acceptance is complete.
+  At dd6418b, real Pi1.4.0/grok-4.7, Codex0.164.0 and Hermes4960e41 default-self
+  no-hint calls, Pi parent/child delegation and Pi-to-Codex all read the actual
+  policy file with its matching SHA256 and exact public/receipt equality. Results
+  retain incomplete status when additional searches report gaps. Owned disposable
+  roots were removed after their processes ended. The earlier Pi delegation
+  PROTOCOL_INVALID remains an unexplained failed observation; the diagnostic
+  successor passed without reproducing it. Original long-call acceptance remains.
+  Codex0.164.0 is an isolated verified SSD artifact because the global install
+  moved to0.165.0; the Hermes test profile shares existing installed dependencies.
   Independent whole-range source review of57286ee/tree0977884 passes87 files and
   closes both prior findings. The subsequent guidance edit and final native/gate
   evidence still require their own validation; the source verdict is not closure.
@@ -751,6 +754,10 @@ links exact identities and preserves the distinct controlled/native results.
   temporary Codex or localhost:48317 Pi/Hermes substitution; never label it passed.
 - [ ] Complete focused regressions, canonical gate, independent final review,
   CI, publication/merge and issue closure; clean exact owned disposable resources.
+  Draft PR45 is open. CI40940522570 rejected the Claude private-read test's stale
+  fixture: it omitted the required absolute deadline and returned CONFIG_INVALID.
+  The fixture now supplies the same original three-second window as its server;
+  missing, malformed and expired deadline refusal remains covered separately.
 
 ## Complete Issue queue
 

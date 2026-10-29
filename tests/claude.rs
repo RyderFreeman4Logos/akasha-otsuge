@@ -237,6 +237,10 @@ fn native_read_bridge_keeps_capability_out_of_model_arguments() {
         .env("HOME", &f.0)
         .env("AKASHA_RUN_SOCKET", &socket)
         .env("AKASHA_RUN_TOKEN", "opaque-transport-token")
+        .env(
+            "AKASHA_RUN_DEADLINE_MS",
+            (akasha_otsuge::ipc::now_ms().unwrap() + 3000).to_string(),
+        )
         .args(["adapter", "claude-read"])
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
