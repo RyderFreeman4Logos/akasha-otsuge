@@ -15,8 +15,8 @@ Commands:
   daemon status              Show daemon and storage status
   daemon stop                Stop intake and drain the daemon
   doctor --json              Inspect the local daemon
-  doctor --host codex [--binary PATH]
-                             Inspect the installed Codex CLI
+  doctor --host codex|hermes [--binary PATH]
+                             Inspect the installed native CLI
   adapter install codex --binary PATH --launcher PATH --state-dir PATH
   adapter uninstall codex --launcher PATH
   config validate|reload|status
@@ -114,6 +114,17 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         let report = akasha_otsuge::adapter::codex::probe(binary).await?;
         let mut bytes = serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":report,
             "coverage":{"version_supported":report.version.as_deref()==Some("0.164.0"),"supported_versions":["0.164.0"],"native_children":false,"model_auth":"not_checked","hook_trust":"not_checked"}}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
+    if let ["doctor", "--host", "hermes", flags @ ..] = command.as_slice() {
+        let flags = options(flags, &["--binary"])?;
+        let binary = std::path::Path::new(flags.get("--binary").copied().unwrap_or("hermes"));
+        let report = akasha_otsuge::adapter::hermes::probe(binary).await?;
+        let supported = akasha_otsuge::adapter::hermes::SUPPORTED_VERSION;
+        let mut bytes = serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":report,
+            "coverage":{"version_supported":report.version.as_deref().and_then(|v|v.split('+').next())==Some(supported),"supported_versions":[supported],"native_children":false,"model_auth":"not_checked","hook_trust":"not_checked"}}))?;
         bytes.push(b'\n');
         output(&bytes, false)?;
         return Ok(0);
