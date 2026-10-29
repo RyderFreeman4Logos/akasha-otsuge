@@ -117,8 +117,7 @@ impl Service {
             executors,
             args: ConsultArgs::new(args.hint)?,
         };
-        self.submit_job(id, None, None, None, None, Some(plan))
-            .await
+        self.submit_job(id, JobInput::Consult(plan)).await
     }
 
     pub(super) fn consult_invocation(&self, plan: &Plan) -> Result<Invocation> {

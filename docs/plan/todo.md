@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-29 UTC after PR #44 merged at `c43c087`: **14 completed,
-14 open Issues (#12, #16–#28)**. #16 is the sole active implementation.
+Updated 2026-10-29 UTC after PR #45 merged at `bbce316`: **15 completed,
+13 open Issues (#12, #17–#28)**. #17 is the sole active implementation.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -47,8 +47,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-29 audit finds 14 open Issues (#12, #16–#28). #4–#11 and #13–#15 are closed
-with merged PRs #32–#38/#40/#42/#43/#44; no verified implementation waits for closure. #7's
+The 2026-10-29 audit finds 13 open Issues (#12, #17–#28). #4–#11 and #13–#16 are closed
+with merged PRs #32–#38/#40/#42/#43/#44/#45; no verified implementation waits for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -628,7 +628,7 @@ Completed #14 implementation evidence:
 [Final native acceptance receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/44#issuecomment-6497475368)
 links exact identities and preserves the distinct controlled/native results.
 
-## MVP-016 active acceptance and remaining work
+## MVP-016 completed acceptance
 
 - [x] Verify #11's frozen60-task/31-critical/10-intent-pair reference set, original
   commit/hash and separate permission erratum before research prompt changes.
@@ -669,25 +669,54 @@ links exact identities and preserves the distinct controlled/native results.
   and correct all current host guides. Retain the model's disallowed gaps_note,
   removed Codex path, Hermes profile setup failure, directory argument/oracle defects
   and historical parent PROTOCOL_INVALID observations beside the successful samples.
-- [ ] Complete the final exact-tree canonical gate, independent review, CI,
-  PR publication/merge and #16 closure. Draft PR45 is open. Canonical R2,
-  independent R4 source review and CI40946026740 pass on2254396; the final changed
-  candidate still requires its own gate and review. CI40940522570's stale Claude
-  deadline fixture failure is retained separately from its passing repair.
-  Final CI40951189004 exposed cancellation acknowledgement before a native
-  descendant exited. A deterministic shared-reaper control reproduces early
-  release; the correction retains the leader PID/resources until group settlement.
-  All 73 affected Rust tests, Clippy and formatting pass; five real Pi protocol
-  cases pass with no owned process or scratch residue. Successor independent
-  review and final canonical/CI remain required.
+- [x] Fix CI104's early native cancellation acknowledgement. A deterministic
+  shared-reaper control fails before the repair; all 73 affected Rust tests,
+  Clippy and formatting pass after it. Five real Pi protocol cases pass without
+  owned process/scratch residue. The leader PID/resources stay reserved until
+  the observed native group exits; guarded daemon cleanup is unchanged.
+- [x] Candidate `6418c92` passes canonical R4 (196.204s), independent R6 review
+  (zero actionable findings) and CI40953882208. PR #45 merged as `bbce316` and
+  #16 closed completed. The completed SSD checkout was removed before #17.
+  [Published source reviews and exact receipts](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/45#issuecomment-6508345541)
+  preserve the earlier failures and each native sample's own source identity.
 
-#16 process correction: keep feature scope frozen. The demonstrated bridge
-failure class is repaired; finish the same candidate through publication. Native
-model schema violations remain failed observations; do not relax parsing or replay
-unchanged batches until they happen to pass. Reuse the unchanged long-run HTTP
-receipt after unrelated bridge/documentation edits, with explicit source hashes.
-#17–#28 remain fully listed below. No completed implementation is waiting for
-issue closure; #12 alone retains deferred Claude authentication.
+#16 process correction: finish a verified leaf through publication promptly.
+Keep native model schema violations as failures and preserve strict parsing.
+Reuse unchanged expensive transport receipts only for the behavior their source
+hashes actually cover. #12 alone retains deferred Claude authentication.
+
+## MVP-017 active acceptance and remaining work
+
+- [x] Add the first text-profile extraction path through durable jobs, strict
+  versioned output validation and source-backed candidate publication. The
+  conditional-source end-to-end regression passes with automatic review configured;
+  extraction still creates only candidates and duplicate delivery reuses the job.
+  Focused job tests, 102 integration tests, Clippy and formatting pass. An initial
+  default-parallel run had 18 IPC timeouts; bounded-concurrency isolation and one
+  observed unchanged default-parallel run passed. Preserve that failure: its
+  historical cause is unknown, and no timeout or durability policy was changed.
+- [ ] Add asynchronous extraction to existing durable daemon jobs. Persist raw
+  input first; model failure must leave sources and recoverable work intact.
+- [ ] Support configured text profiles and existing authenticated CLI Runners,
+  including the single-CLI path without extra text/embedding/reranker API keys.
+- [ ] Version the prompt/output schema. Resolve model source indices to exact
+  immutable source spans; preserve scope, conditions, assumptions and generator
+  identity. Extraction produces candidates, without claiming human confirmation.
+- [ ] Persist idempotent progress, merge duplicate candidates with all sources,
+  keep contradictory candidates, and mark internal memory-service origins to
+  prevent recursively extracting derived discussions.
+- [ ] Cover conditional, negated, quoted and temporary statements, malformed or
+  forged sources, duplicate delivery, partial publication/restart, unavailable
+  models and later retry. Verify the existing index pause/resume/rebuild and
+  retraction filters with extracted records.
+- [ ] Run actual single-CLI authenticated extraction on a compact source/answer
+  sample; retain failures, source/binary identities and owned cleanup evidence.
+- [ ] Finish focused checks, one final canonical gate and independent review,
+  CI, publication, merge and closure. Keep #18–#28 queued until their turn.
+
+#28 also owns final remote dependency-index validation: completed dependencies
+are historical links, not active blockers. Reconcile the legacy checker's literal
+`Blocked by` requirement with current Issue status without deleting dependencies.
 
 ## Complete Issue queue
 
@@ -706,7 +735,7 @@ issue closure; #12 alone retains deferred Claude authentication.
 - [x] [#13 [MVP-013] Codex CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/13) — dependencies: #11.
 - [x] [#14 [MVP-014] Hermes CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/14) — dependencies: #11.
 - [x] [#15 [MVP-015] pi CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/15) — dependencies: #11.
-- [ ] [#16 [MVP-016] consult 可选短 hint、渐进调研与子孙共享预算](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/16) — dependencies: #12, #13, #14, #15.
+- [x] [#16 [MVP-016] consult 可选短 hint、渐进调研与子孙共享预算](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/16) — dependencies: #12, #13, #14, #15.
 - [ ] [#17 [MVP-017] 异步提取候选、来源引用与可重建索引作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/17) — dependencies: #5, #7, #9, #10, #16.
 - [ ] [#18 [MVP-018] 单一或组合 Runner 的 Auto-Grill 工作流](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/18) — dependencies: #16, #17.
 - [ ] [#19 [MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19) — dependencies: #5, #6, #18.

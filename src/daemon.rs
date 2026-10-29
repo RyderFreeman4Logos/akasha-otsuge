@@ -200,6 +200,10 @@ impl Service {
                 plan,
                 idempotency_key,
             } => self.submit_model(idempotency_key, plan).await,
+            Command::ExtractionRun {
+                plan,
+                idempotency_key,
+            } => self.submit_extraction(idempotency_key, plan).await,
             Command::RetrievalRun {
                 plan,
                 idempotency_key,

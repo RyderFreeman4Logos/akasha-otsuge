@@ -21,6 +21,7 @@ pub(super) enum Mode {
     NearLimit,
     Delay(u64),
     Retrieval,
+    Extraction,
 }
 impl Endpoint {
     pub(crate) fn pause(&self) {
@@ -31,6 +32,9 @@ impl Endpoint {
     }
     pub(crate) fn retrieval() -> Self {
         Self::with_mode(Mode::Retrieval)
+    }
+    pub(crate) fn extraction() -> Self {
+        Self::with_mode(Mode::Extraction)
     }
     pub(super) fn new() -> Self {
         Self::with_mode(Mode::Normal)
@@ -146,6 +150,14 @@ impl Endpoint {
                         }
                         _ => panic!("unexpected retrieval path"),
                     }
+                } else if matches!(mode, Mode::Extraction) {
+                    let content = json!({"schema_version":1,"candidates":[{
+                        "kind":"decision","scope":{"user":format!("uid:{}",rustix::process::geteuid().as_raw()),"project":"alpha","branch_or_version":null,"session":null},
+                        "claim":"Use keyword search when offline.","rationale":"A conditional proposal.",
+                        "conditions":["offline"],"assumptions":[],"sources":[{"source":0,"start":0,"end":36}],
+                        "valid_from_ms":null,"valid_until_ms":null
+                    }]}).to_string();
+                    json!({"choices":[{"index":0,"message":{"role":"assistant","content":content},"finish_reason":"stop"}]})
                 } else if matches!(mode, Mode::NearLimit) {
                     json!({"choices":[{"index":0,"message":{"role":"assistant","content":"x".repeat(512*1024-128)},"finish_reason":"stop"}]})
                 } else if matches!(mode, Mode::Malformed) {

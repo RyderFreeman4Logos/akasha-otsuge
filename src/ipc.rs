@@ -126,6 +126,10 @@ pub enum Command {
         plan: crate::provider::Plan,
         idempotency_key: String,
     },
+    ExtractionRun {
+        plan: crate::extraction::Plan,
+        idempotency_key: String,
+    },
     RetrievalRun {
         plan: crate::retrieval::Request,
         idempotency_key: String,

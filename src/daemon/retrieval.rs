@@ -20,8 +20,7 @@ impl Service {
         plan: RetrievalRequest,
     ) -> Result<Value> {
         plan.validate()?;
-        self.submit_job(id, None, None, None, Some(plan), None)
-            .await
+        self.submit_job(id, JobInput::Retrieval(plan)).await
     }
 
     pub(super) fn retrieval_snapshot(
