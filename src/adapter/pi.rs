@@ -1,7 +1,10 @@
 //! Version-pinned native Pi integration.
 use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
+mod transcript;
+pub use transcript::reconcile_transcript;
 
 pub const SUPPORTED_VERSION: &str = "1.4.0";
+pub const TRANSCRIPT_STREAM: &str = "pi-native-tree-v1";
 
 /// Observe only the native version; authentication and extension trust need separate checks.
 pub async fn probe(binary: &std::path::Path) -> Result<CapabilityReport> {

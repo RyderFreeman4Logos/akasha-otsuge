@@ -610,9 +610,12 @@ Completed #14 implementation evidence:
   expose a bounded, free version doctor with honest untested capabilities.
   Native version/help and isolated free RPC pass; all installation-helper processes
   and scratch ended. Two doctor regressions and the actual native version probe pass.
-- [ ] Parse bounded native version3 session trees with stable IDs, parent links,
+- [x] Parse bounded native version3 session trees with stable IDs, parent links,
   selected branches, fork provenance, context edits and compaction originals.
   Exclude private thinking; preserve absent ancestry and source gaps explicitly.
+  Native SessionManager fixtures pass three capture regressions, including
+  selected-branch/fork isolation, raw/edit separation and durable rotation/replay.
+  All five Pi tests and all-target Clippy pass. Actual extension lifecycle remains below.
 - [ ] Bind extension calls to actual session/file/workspace/leaf/tool-call identity
   and current grants. Refuse unproven nested calls and changed registrations;
   verify simultaneous sessions, durable retries and immutable fences.

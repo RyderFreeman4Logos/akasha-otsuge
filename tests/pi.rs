@@ -4,6 +4,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "support/pi_capture.rs"]
+mod capture;
+
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
@@ -15,6 +18,23 @@ impl Fixture {
         ));
         std::fs::create_dir(&path).unwrap();
         Self(path)
+    }
+    async fn open(&self) -> akasha_otsuge::storage::Storage {
+        use akasha_otsuge::config::{Paths, resolve};
+        akasha_otsuge::storage::Storage::open(
+            &resolve(
+                "",
+                None,
+                "",
+                &Paths {
+                    data_dir: self.0.join("data"),
+                    socket_path: self.0.join("service.sock"),
+                },
+            )
+            .unwrap(),
+        )
+        .await
+        .unwrap()
     }
     fn executable(&self, name: &str, script: &str) -> PathBuf {
         let path = self.0.join(name);

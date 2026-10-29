@@ -1,0 +1,33 @@
+{
+  "package": "@earendil-works/pi-coding-agent",
+  "version": "1.4.0",
+  "session_version": 3,
+  "provenance": "Native SessionManager with synthetic content; no authenticated model or extension run",
+  "root_id": "01a18663-4515-7256-9d3b-6a7c231c1ae6",
+  "fork_id": "01a18663-4517-7256-9d3b-6a7fb7a6017d",
+  "root_file": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-tree-90qdgxm8/sessions/2026-10-29T06-40-15-126Z_01a18663-4515-7256-9d3b-6a7c231c1ae6.jsonl",
+  "fork_file": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-tree-90qdgxm8/sessions/2026-10-29T06-40-15-127Z_01a18663-4517-7256-9d3b-6a7fb7a6017d.jsonl",
+  "workspace": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-tree-90qdgxm8/workspace",
+  "ids": {
+    "user": "ec3ebe38",
+    "assistant": "288f6808",
+    "tool": "b74fc398",
+    "sibling": "228630bc",
+    "branch_summary": "e36817a4",
+    "current_user": "30b14e9c",
+    "edit": "d99d265b",
+    "omission": "cec002e8",
+    "compaction": "5aac4db7",
+    "final": "3aba15b9",
+    "other_root": "9f2d40ff",
+    "fork_user": "ddf05df7",
+    "parent_later": "dc5c1fff"
+  },
+  "hashes": {
+    "root-before.jsonl": "2bf8fdf097fd9f757827b90ca89cc1e3d5e20a65d4682c91676577ef56ed37ba",
+    "root-tree.jsonl": "117cd426a1640804c3154ad1e889dc167b811de2e9d40a15986c5918978c849c",
+    "fork.jsonl": "a201c0ac4cda9a78e24fe084e95a30aa993482b4378756436cc58ee5f658bf01"
+  },
+  "session_manager_sha256": "046b6a1109ac3f0ed893bb85bf0648709362fa926a5da75761216cf2fcf9d926",
+  "generator_sha256": "563935a0837db272a0a1e36b3297eeb06049d8b1b0163aef10993f8e1a66c54b"
+}
