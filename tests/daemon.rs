@@ -11,6 +11,9 @@ use std::time::{Duration, Instant};
 
 const BIN: &str = env!("CARGO_BIN_EXE_akasha-otsuge");
 
+#[path = "support/executable.rs"]
+mod executable;
+
 #[path = "support/daemon_models.rs"]
 mod model_tests;
 

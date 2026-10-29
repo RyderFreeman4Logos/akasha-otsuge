@@ -7,12 +7,10 @@ use std::{sync::Arc, time::Duration};
 
 async fn host(f: &Fixture, scenario: &str) -> PathBuf {
     let binary = f.0.join("hermes");
-    std::fs::write(
+    crate::executable::write(
         &binary,
         include_str!("../fixtures/hermes/0.22.5/runner_host.py"),
-    )
-    .unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    );
     std::fs::write(f.0.join("scenario"), scenario).unwrap();
     akasha_otsuge::adapter::hermes::installation::install(&binary, &f.0, &f.0.join("unused.sock"))
         .await

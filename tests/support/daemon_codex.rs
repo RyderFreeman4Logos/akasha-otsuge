@@ -1,5 +1,4 @@
 use super::*;
-use std::os::unix::fs::PermissionsExt;
 
 fn native(daemon: &Daemon, event: Value) -> Value {
     let mut stream = daemon.connect();
@@ -16,8 +15,7 @@ fn native_hook_uses_private_call_files_without_exposing_registration_credentials
     let mut daemon = Daemon::new();
     daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
     let binary = daemon.root.join("codex");
-    std::fs::write(&binary, "#!/bin/sh\nprintf 'codex-cli 0.164.0\\n'\n").unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    crate::executable::write(&binary, "#!/bin/sh\nprintf 'codex-cli 0.164.0\\n'\n");
     let transcript = daemon.root.join("native.jsonl");
     let raw = include_str!("../fixtures/codex/0.164.0/exec-root.jsonl")
         .replace("/fixture/workspace", daemon.root.to_str().unwrap());
@@ -179,12 +177,10 @@ fn concurrent_native_hooks_share_state_without_cross_binding_or_global_lock_cont
     let mut daemon = Daemon::new();
     daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
     let binary = daemon.root.join("codex");
-    std::fs::write(
+    crate::executable::write(
         &binary,
         "#!/bin/sh\nsleep 0.2\nprintf 'codex-cli 0.164.0\\n'\n",
-    )
-    .unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    );
     let state = daemon.root.join("hook-state");
     daemon.start();
     let original: Value = serde_json::from_str(include_str!(
@@ -257,8 +253,7 @@ fn native_registration_binding_and_backfill_survive_daemon_restart() {
     let mut daemon = Daemon::new();
     daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
     let binary = daemon.root.join("codex");
-    std::fs::write(&binary, "#!/bin/sh\nprintf 'codex-cli 0.164.0\\n'\n").unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    crate::executable::write(&binary, "#!/bin/sh\nprintf 'codex-cli 0.164.0\\n'\n");
     let raw = include_str!("../fixtures/codex/0.164.0/exec-root.jsonl")
         .replace("/fixture/workspace", daemon.root.to_str().unwrap());
     let transcript = daemon.root.join("native.jsonl");
@@ -346,8 +341,7 @@ fn native_registration_binding_and_backfill_survive_daemon_restart() {
 fn codex_launcher_install_is_opt_in_atomic_and_preserves_edited_files() {
     let daemon = Daemon::new();
     let binary = daemon.root.join("codex ' native");
-    std::fs::write(&binary, "#!/bin/sh\nprintf 'codex-cli 0.164.0\\n'\n").unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    crate::executable::write(&binary, "#!/bin/sh\nprintf 'codex-cli 0.164.0\\n'\n");
     let launcher = daemon.root.join("akasha codex");
     let state = daemon.root.join("call state");
     let install = || {

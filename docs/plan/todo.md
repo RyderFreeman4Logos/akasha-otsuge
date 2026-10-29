@@ -681,8 +681,19 @@ Completed #14 implementation evidence:
   the false assertion despite actual provider overlap (second request at102ms,
   first response at1000ms). The harness now measures real provider overlap after
   both jobs terminate; the focused check passes without changing any timeout.
-  The initial failure's exact timing remains unknown. Final gate, independent
-  R3 review, CI and authenticated acceptance remain open.
+  The initial failure's exact timing remains unknown. Independent R3 source
+  review passed all51 changed files at `72e854f` with zero actionable findings.
+  Its canonical gate passed27Python and42daemon tests, then failed a synthetic
+  Hermes installer probe with `EXECUTOR_UNAVAILABLE` (original errno unknown).
+  An isolated selector passes; a separate controlled inherited-writable-FD probe
+  reproduces ETXTBSY and proves isolated writer publication. The13 sibling
+  executable fixture writes now share the existing subprocess-writer helper.
+  This is test-only and does not retroactively classify the failed gate.
+  The14 Codex and11 Hermes tests pass. Daemon's changed native fixtures pass,
+  but an unrelated readiness check observes socket0755 before initialization
+  sets0600. Delaying the real chmod reproduces that same assertion failure;
+  the test helper must await the service greeting. Final gate/review, CI and
+  real authentication remain open.
 
 The sole source writer starts from `24eda5a` on `feat/mvp-015-pi-adapter` at
 2026-10-29T06:23:17Z. A separate installation-only helper may qualify Pi1.4.0;

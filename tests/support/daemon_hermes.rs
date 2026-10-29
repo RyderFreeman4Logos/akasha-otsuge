@@ -1,5 +1,4 @@
 use super::*;
-use std::os::unix::fs::PermissionsExt;
 
 fn bridge(daemon: &Daemon, phase: &str, event: Value) -> Value {
     let started = Instant::now();
@@ -44,8 +43,10 @@ fn hermes_bridge_exports_the_requested_native_home_and_persists_background_histo
     )
     .unwrap();
     let binary = daemon.root.join("hermes");
-    std::fs::write(&binary,"#!/bin/sh\nif [ \"$#\" = 1 ] && [ \"$1\" = --version ]; then printf 'Hermes Agent v0.22.5+1914.gfdb04a0\\n'; exit 0; fi\n[ \"$#\" = 7 ] && [ \"$1\" = sessions ] && [ \"$2\" = export ] && [ \"$3\" = - ] && [ \"$4\" = --session-id ] && [ \"$6\" = --format ] && [ \"$7\" = jsonl ] || exit 78\n[ \"$HERMES_DISABLE_LAZY_INSTALLS\" = 1 ] || exit 79\nexec /bin/cat \"$HERMES_HOME/native.jsonl\"\n").unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    crate::executable::write(
+        &binary,
+        "#!/bin/sh\nif [ \"$#\" = 1 ] && [ \"$1\" = --version ]; then printf 'Hermes Agent v0.22.5+1914.gfdb04a0\\n'; exit 0; fi\n[ \"$#\" = 7 ] && [ \"$1\" = sessions ] && [ \"$2\" = export ] && [ \"$3\" = - ] && [ \"$4\" = --session-id ] && [ \"$6\" = --format ] && [ \"$7\" = jsonl ] || exit 78\n[ \"$HERMES_DISABLE_LAZY_INSTALLS\" = 1 ] || exit 79\nexec /bin/cat \"$HERMES_HOME/native.jsonl\"\n",
+    );
     daemon.start();
     let event = json!({"op":"bind","binary":binary,"home":home,"call":{
         "session_id":export["id"],"task_id":"native-task","turn_id":"native-turn","tool_call_id":"call_alpha",

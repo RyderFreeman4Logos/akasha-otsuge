@@ -10,6 +10,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "support/executable.rs"]
+mod executable;
+
 #[path = "support/codex_caller.rs"]
 mod caller;
 #[path = "support/codex_runner.rs"]
@@ -18,11 +21,9 @@ mod runner;
 #[tokio::test]
 async fn version_probe_reports_only_observed_capabilities_and_bounds_native_output() {
     use akasha_otsuge::adapter::{ErrorCode, SelfTest, codex::probe};
-    use std::os::unix::fs::PermissionsExt;
     let fixture = Fixture::new();
     let binary = fixture.0.join("codex");
-    std::fs::write(&binary, "#!/bin/sh\nprintf 'codex-cli 0.164.0\\n'\n").unwrap();
-    std::fs::set_permissions(&binary, std::fs::Permissions::from_mode(0o700)).unwrap();
+    crate::executable::write(&binary, "#!/bin/sh\nprintf 'codex-cli 0.164.0\\n'\n");
     let report = probe(&binary).await.unwrap();
     assert_eq!(report.version.as_deref(), Some("0.164.0"));
     assert_eq!(report.executable, Some(binary.canonicalize().unwrap()));
@@ -30,15 +31,13 @@ async fn version_probe_reports_only_observed_capabilities_and_bounds_native_outp
     assert!(!report.native_children);
     assert!(report.capabilities.is_empty());
     let malformed = fixture.0.join("malformed");
-    std::fs::write(&malformed, "#!/bin/sh\nprintf 'fixture 0.164.0\\n'\n").unwrap();
-    std::fs::set_permissions(&malformed, std::fs::Permissions::from_mode(0o700)).unwrap();
+    crate::executable::write(&malformed, "#!/bin/sh\nprintf 'fixture 0.164.0\\n'\n");
     assert_eq!(
         probe(&malformed).await.unwrap_err().code,
         ErrorCode::AdapterUnsupported
     );
     let oversized = fixture.0.join("oversized");
-    std::fs::write(&oversized, "#!/bin/sh\nhead -c 4097 /dev/zero\n").unwrap();
-    std::fs::set_permissions(&oversized, std::fs::Permissions::from_mode(0o700)).unwrap();
+    crate::executable::write(&oversized, "#!/bin/sh\nhead -c 4097 /dev/zero\n");
     assert_eq!(
         probe(&oversized).await.unwrap_err().code,
         ErrorCode::OutputLimit
