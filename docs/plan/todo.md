@@ -692,8 +692,9 @@ Completed #14 implementation evidence:
   The14 Codex and11 Hermes tests pass. Daemon's changed native fixtures pass,
   but an unrelated readiness check observes socket0755 before initialization
   sets0600. Delaying the real chmod reproduces that same assertion failure;
-  the test helper must await the service greeting. Final gate/review, CI and
-  real authentication remain open.
+  the helper now awaits the service greeting within the unchanged startup deadline.
+  The same real-chmod delay control passes after the correction, and all42 daemon
+  tests pass. Final gate/review, CI and real authentication remain open.
 
 The sole source writer starts from `24eda5a` on `feat/mvp-015-pi-adapter` at
 2026-10-29T06:23:17Z. A separate installation-only helper may qualify Pi1.4.0;

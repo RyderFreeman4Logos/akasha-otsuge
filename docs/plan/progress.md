@@ -55,8 +55,13 @@ failed a synthetic Hermes fixture probe after42daemon passes. The original spawn
 errno is unknown; isolated execution passes. A separate writable-FD inheritance
 control reaches ETXTBSY and succeeds with an isolated writer. Thirteen executable
 fixture writes now use the existing child-writer helper; production spawning is
-unchanged. Successor gate/review, publication and real authentication remain open. The complete TODO retains all
-acceptance criteria and dependencies.
+unchanged. The14 Codex and11 Hermes checks pass. A separate daemon readiness
+assertion observed the bound socket before its0600 permission initialization.
+Delaying the real chmod reproduces the old failure; awaiting the protocol greeting
+fixes it within the unchanged startup deadline. The delayed control and all42
+ordinary daemon checks pass. Successor gate/review, publication and real
+authentication remain open. The complete TODO retains all acceptance criteria
+and dependencies.
 
 ## Completed Hermes adapter: MVP-014
 
