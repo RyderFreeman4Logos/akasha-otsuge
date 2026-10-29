@@ -660,8 +660,7 @@ links exact identities and preserves the distinct controlled/native results.
   Final return and replay now recheck live code-read policy and the observed
   workspace's durable device/inode identity, including after daemon restart.
   Four failing controls pass after the repair;17 consult cases, the focused
-  workspace case and all-target Clippy pass. Remaining core work: structured
-  branch results, evidence selection, configured executors and
+  workspace case and all-target Clippy pass. Remaining core work: configured executors and
   explicit fallback routing. The initial daemon path uses the caller executor.
 - [x] Extend all native tool inventories and strict request decoding to the nine
   shared research tools. Focused Rust58, Hermes9 and Pi7 regressions pass; daemon
@@ -692,9 +691,15 @@ links exact identities and preserves the distinct controlled/native results.
   malformed and expired deadlines fail closed. Node13/Python10 and Rust68 tests
   pass, with10 authenticated/long cases explicitly ignored; all-target Clippy
   passes. Authenticated long-call acceptance remains below.
-- [ ] Publish concise found/no_hit/incomplete/pending/error results with scope,
+- [x] Publish concise found/no_hit/incomplete/pending/error results with scope,
   evidence, conflicts/gaps and durable RecallReceipt after final live validation.
   Retain receipt/show expansion and keep private research traces out of main output.
+  All four Runner parsers share a strict research conclusion contract. Selection
+  is restricted to actual source reads and expanded memory revisions; no-hit
+  requires a search. Conflicts force incomplete status, while selected memories'
+  stored conditions, assumptions, scope and validity accompany model conclusions.
+  The21 consult and68 affected adapter cases pass with Clippy;10 authenticated
+  acceptances remain explicitly ignored and require the native checks below.
 - [x] Add public `consult show`, bounded original expansion and receipt/full-result
   views with the original verified authority. Public output excludes private plans
   and run traces. Oversized answers retain their full text and conditions in a
@@ -704,7 +709,7 @@ links exact identities and preserves the distinct controlled/native results.
   source indexes and5000-character Chinese output. Current-result reads reject
   changed adopted memories, while explicit historical replay retains the original.
   An earlier capture-fixture timeout is preserved; its isolated lifecycle case
-  passed afterward. Structured conclusions/no-hit and native submission remain.
+  passed afterward. Native submission remains.
 - [ ] Verify default-self native Codex/Hermes/Pi, optional/empty hint, descendant
   delegation, a real cross-host combination and original long-call deadlines.
   Claude-native authenticated acceptance is explicitly deferred by the owner's

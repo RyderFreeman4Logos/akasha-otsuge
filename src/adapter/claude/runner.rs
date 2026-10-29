@@ -173,7 +173,11 @@ impl AgentRunner for ClaudeRunner {
                     "--setting-sources",
                     "",
                     "--system-prompt",
-                    &self.instructions,
+                    &if spec.uses_research_result() {
+                        format!("{}\n{}", self.instructions, spec.result_instructions())
+                    } else {
+                        self.instructions.clone()
+                    },
                 ])
                 .env("CLAUDE_CODE_DISABLE_CLAUDE_MDS", "1")
                 .env("DISABLE_AUTOUPDATER", "1")
@@ -437,11 +441,12 @@ impl Handle<'_> {
                     return Err(ErrorCode::RunnerIncomplete.into());
                 }
                 self.result = Some(
-                    value["result"]
-                        .as_str()
-                        .filter(|s| !s.trim().is_empty())
-                        .ok_or(ErrorCode::RunnerIncomplete)?
-                        .into(),
+                    self.spec.final_output(
+                        value["result"]
+                            .as_str()
+                            .ok_or(ErrorCode::RunnerIncomplete)?,
+                        true,
+                    )?,
                 );
                 Ok(Some(usage))
             }

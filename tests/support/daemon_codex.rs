@@ -41,7 +41,7 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
     ))
     .unwrap();
     if scenario == "research" {
-        super::retrieval_tests::seed_records(
+        super::retrieval_tests::seed_records_with(
             &daemon,
             &[
                 (
@@ -53,6 +53,11 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
                 ("private", Some("beta"), "离线私有检索 private search"),
             ],
             1,
+            |draft| {
+                draft.conditions = vec!["Only for the original local environment.".into()];
+                draft.assumptions = vec!["The local index is available.".into()];
+                draft.valid_from_ms = Some(1);
+            },
         );
     }
     if matches!(scenario, "research" | "code_policy") {
@@ -248,6 +253,19 @@ fn consult_progressive_research_keeps_source_versions_and_workspace_changes() {
     assert!(output.chars().count() <= 4000);
     let output: Value = serde_json::from_str(output).unwrap();
     assert_eq!(output["status"], "incomplete");
+    let memory = output["memories"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|m| m["reference"]["key"]["id"] == "offline")
+        .unwrap();
+    assert_eq!(
+        memory["conditions"][0],
+        "Only for the original local environment."
+    );
+    assert_eq!(memory["assumptions"][0], "The local index is available.");
+    assert_eq!(memory["valid_from_ms"], 1);
+    assert!(memory["valid_until_ms"].is_null());
     assert!(
         output["gaps"]
             .as_array()
@@ -370,6 +388,49 @@ fn consult_progressive_research_keeps_source_versions_and_workspace_changes() {
                 .unwrap()
                 .contains(&observation["source"])
         );
+    }
+}
+
+#[test]
+fn consult_conclusions_validate_evidence_no_hit_conditions_and_conflicts() {
+    for scenario in [
+        "conclusion_found",
+        "conclusion_no_hit",
+        "conclusion_forged",
+        "conclusion_conflict",
+    ] {
+        let (daemon, event, _) = consult_fixture(scenario);
+        let submitted = native(&daemon, event);
+        let id = submitted["data"]["id"].as_str().unwrap();
+        let end = Instant::now() + Duration::from_secs(15);
+        let result = loop {
+            let value = daemon.cli(&["consult", "show", id])["data"].clone();
+            if value["status"] != "pending" {
+                break value;
+            }
+            assert!(Instant::now() < end);
+            std::thread::sleep(Duration::from_millis(10));
+        };
+        match scenario {
+            "conclusion_found" => {
+                assert_eq!(result["status"], "found", "{result}");
+                assert_eq!(result["evidence"].as_array().unwrap().len(), 1);
+            }
+            "conclusion_no_hit" => {
+                assert_eq!(result["status"], "no_hit", "{result}");
+                assert!(result["evidence"].as_array().unwrap().is_empty());
+                assert!(result["memories"].as_array().unwrap().is_empty());
+            }
+            "conclusion_forged" => assert_eq!(result["error"]["code"], "READ_DENIED", "{result}"),
+            _ => {
+                assert_eq!(result["status"], "incomplete", "{result}");
+                assert_eq!(
+                    result["conditions"][0],
+                    "Only for the original local environment."
+                );
+                assert_eq!(result["conflicts"][0], "The two observations disagree.");
+            }
+        }
     }
 }
 

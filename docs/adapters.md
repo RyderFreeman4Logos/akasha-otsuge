@@ -67,6 +67,14 @@ from the immutable RecallReceipt body and exclude the private plan, execution
 trace and usage. The same handle works after a daemon restart. `job show` retains
 management diagnostics separately.
 
+Research runners return a structured `found`, `no_hit` or `incomplete` conclusion.
+Selected source references must match actual reads; selected memory revisions must
+have been expanded with their originals. A no-hit conclusion requires a search.
+Unresolved conflicts become incomplete results. Conditions and conflicts remain
+in the public result, alongside the selected memories' recorded scope, authority,
+conditions, assumptions and validity. Delegates use the same contract; their
+private execution traces stay separate.
+
 The public body includes its receipt and job IDs within `consult.max_result_chars`
 Unicode characters. If the complete answer and references exceed that budget,
 the body contains an incomplete result and a `detail_receipt_id`. The full answer,

@@ -4,6 +4,8 @@ pub mod claude;
 pub use budget::*;
 mod runner;
 pub use runner::*;
+mod conclusion;
+pub(crate) use conclusion::*;
 mod binding;
 pub use binding::*;
 mod context;

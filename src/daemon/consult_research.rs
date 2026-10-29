@@ -19,6 +19,8 @@ pub(super) struct Research<'a> {
     captured: CapturedContext<'a>,
     workspace: Option<BoundWorkspace<'a, ()>>,
     handles: BTreeMap<String, u64>,
+    expanded: BTreeMap<String, (u64, Value)>,
+    searched: bool,
     operations: u64,
     native: NativeExecutor,
     budget: RunBudget,
@@ -52,6 +54,8 @@ impl<'a> Research<'a> {
             workflow,
             workspace: None,
             handles: BTreeMap::new(),
+            expanded: BTreeMap::new(),
+            searched: false,
             operations: 0,
             native,
             budget,
@@ -217,21 +221,38 @@ impl<'a> Research<'a> {
             }
             remaining -= original.output.chars().count();
             truncated |= original.truncated;
+            if !self.sources.contains(&original.reference) {
+                if self.sources.len() == 64 {
+                    return Err(Error("BUDGET_EXHAUSTED"));
+                }
+                self.sources.push(original.reference.clone());
+            }
             originals.push(original);
         }
         self.read_seq = self.read_seq.max(memory.read_seq);
         if truncated {
             self.gap("original_budget");
         }
+        self.expanded.insert(memory_id, (revision, json!({
+            "reference":active.memory.revision, "scope":active.memory.record.draft.scope,
+            "authority":active.memory.record.authority, "conditions":active.memory.record.draft.conditions,
+            "assumptions":active.memory.record.draft.assumptions,
+            "valid_from_ms":active.memory.record.draft.valid_from_ms,
+            "valid_until_ms":active.memory.record.draft.valid_until_ms,
+        })));
         Ok(json!({"memory":memory,"originals":originals,"truncated":truncated}))
     }
 
-    async fn record_code(&mut self, lease: &RunLease, read: &CodeRead) -> Result<()> {
+    async fn record_code(
+        &mut self,
+        lease: &RunLease,
+        read: &CodeRead,
+    ) -> Result<Option<SourceSpan>> {
         if read.changed || read.changed_during_read {
             self.gap("workspace_changed");
         }
         if read.text.is_empty() {
-            return Ok(());
+            return Ok(None);
         }
         if self.sources.len() == 64 {
             return Err(Error("BUDGET_EXHAUSTED"));
@@ -273,10 +294,10 @@ impl<'a> Research<'a> {
             .expect("code read object")
             .remove("text");
         observation["source"] = serde_json::to_value(&span)?;
-        self.sources.push(span);
+        self.sources.push(span.clone());
         self.code.push(observation);
         self.read_seq = self.read_seq.max(receipt.commit_seq);
-        Ok(())
+        Ok(Some(span))
     }
 
     async fn dispatch(
@@ -303,15 +324,20 @@ impl<'a> Research<'a> {
                     }
                     lease.delegate()?
                 };
-                json!({"answer":self.run(child, args).await?})
+                serde_json::to_value(self.run(child, args).await?)?
             }
-            ContextRequest::MemorySearch { query } => self.memory_search(lease, query).await?,
+            ContextRequest::MemorySearch { query } => {
+                let found = self.memory_search(lease, query).await?;
+                self.searched = true;
+                found
+            }
             ContextRequest::MemoryGet {
                 memory_id,
                 revision,
             } => self.memory_get(lease, memory_id, revision).await?,
             ContextRequest::CodeSearch { paths, query } => {
                 let found = self.workspace()?.search(lease, &paths, &query).await?;
+                self.searched = true;
                 if found
                     .matches
                     .iter()
@@ -333,11 +359,15 @@ impl<'a> Research<'a> {
                     .workspace()?
                     .read(lease, &path, start, max_bytes)
                     .await?;
-                self.record_code(lease, &read).await?;
-                serde_json::to_value(read)?
+                let source = self.record_code(lease, &read).await?;
+                let mut value = serde_json::to_value(read)?;
+                value["source"] = serde_json::to_value(source)?;
+                value
             }
             request => {
+                let searched = matches!(request, ContextRequest::Search { .. });
                 let response = self.captured.execute(lease, request).await?;
+                self.searched |= searched;
                 for source in self.captured.read_sources() {
                     if !self.sources.contains(source) {
                         if self.sources.len() == 64 {
@@ -350,6 +380,44 @@ impl<'a> Research<'a> {
             }
         };
         Ok(ContextResponse::Research(value))
+    }
+
+    fn conclusion(&self, text: &str) -> Result<crate::adapter::ResearchConclusion> {
+        let conclusion = crate::adapter::ResearchConclusion::parse(text)?;
+        if conclusion.sources.iter().any(|s| !self.sources.contains(s))
+            || conclusion.memories.iter().any(|m| {
+                !self
+                    .expanded
+                    .get(&m.memory_id)
+                    .is_some_and(|(revision, _)| *revision == m.revision)
+            })
+        {
+            return Err(Error("READ_DENIED"));
+        }
+        if conclusion.status == RecallStatus::NoHit && !self.searched {
+            return Err(Error("PROTOCOL_INVALID"));
+        }
+        Ok(conclusion)
+    }
+
+    pub fn selected_memories(
+        &self,
+        conclusion: &crate::adapter::ResearchConclusion,
+    ) -> Result<(Vec<RevisionRef>, Vec<Value>)> {
+        let mut selected = vec![];
+        let mut details = vec![];
+        for memory in &conclusion.memories {
+            let (_, detail) = self
+                .expanded
+                .get(&memory.memory_id)
+                .ok_or(Error("READ_DENIED"))?;
+            let reference = serde_json::from_value(detail["reference"].clone())?;
+            if !selected.contains(&reference) {
+                selected.push(reference);
+                details.push(detail.clone());
+            }
+        }
+        Ok((selected, details))
     }
 }
 

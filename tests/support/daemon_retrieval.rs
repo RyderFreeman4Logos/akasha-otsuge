@@ -35,6 +35,15 @@ pub(super) fn seed_records(
     records: &[(&str, Option<&str>, &str)],
     span_parts: usize,
 ) -> u64 {
+    seed_records_with(daemon, records, span_parts, |_| {})
+}
+
+pub(super) fn seed_records_with(
+    daemon: &Daemon,
+    records: &[(&str, Option<&str>, &str)],
+    span_parts: usize,
+    customize: impl Fn(&mut MemoryDraft),
+) -> u64 {
     let config = resolve(
         "",
         None,
@@ -80,7 +89,7 @@ pub(super) fn seed_records(
                     start: 0,
                     end: text.len(),
                 };
-                let draft = MemoryDraft {
+                let mut draft = MemoryDraft {
                     kind: MemoryKind::Fact,
                     scope: scope.clone(),
                     claim: text.into(),
@@ -101,6 +110,7 @@ pub(super) fn seed_records(
                     valid_from_ms: None,
                     valid_until_ms: None,
                 };
+                customize(&mut draft);
                 let policy = Policy {
                     revision: "fixture".into(),
                     config_generation: 1,

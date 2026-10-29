@@ -25,7 +25,7 @@ impl Research<'_> {
         &'b mut self,
         lease: RunLease,
         args: ConsultArgs,
-    ) -> BoxFuture<'b, Result<String>> {
+    ) -> BoxFuture<'b, Result<crate::adapter::ResearchConclusion>> {
         Box::pin(async move {
             self.authorize(&lease).await?;
             let index = self.runs.len();
@@ -36,7 +36,10 @@ impl Research<'_> {
                 "config_generation":self.config.generation(),"host":self.native.host,"state":"running",
                 "started_at_ms":ipc::now_ms()?}));
             self.save_trace().await?;
-            let outcome = self.run_inner(lease, args, &run_id).await;
+            let outcome = self
+                .run_inner(lease, args, &run_id)
+                .await
+                .and_then(|text| self.conclusion(&text));
             self.current_run = parent;
             self.runs[index]["state"] = json!(if outcome.is_ok() {
                 "succeeded"
@@ -133,7 +136,8 @@ impl Research<'_> {
             ReadCapability::issue(&self.invocation)?,
             lease,
         )?
-        .with_guard(std::env::current_exe()?);
+        .with_guard(std::env::current_exe()?)
+        .with_research_result();
         let lease = spec.lease_handle();
         let mut collector = RunCollector::new(&lease, MAX_FRAME_BYTES);
         let mut handle = {

@@ -80,7 +80,8 @@ send(call)
 result = read()
 assert result['id'] == 10 and result['result']['success'] is True
 assert 'invocation_id' in result['result']['contentItems'][0]['text']
-if scenario in ('research', 'code_policy') or scenario.startswith('delegate_'):
+seen_sources, seen_memories = [], []
+if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 'conclusion_')):
     call_number = 100
     def tool(name, arguments):
         global call_number
@@ -92,6 +93,10 @@ if scenario in ('research', 'code_policy') or scenario.startswith('delegate_'):
         assert reply['id'] == call_number and reply['result']['success'] is True
         response = json.loads(reply['result']['contentItems'][0]['text'])
         value = response.get('value', {})
+        for span in value.get('sources', []) + ([value['source']] if value.get('source') else []) + [v['reference'] for v in value.get('originals', [])]:
+            if span not in seen_sources: seen_sources.append(span)
+        if name == 'memory_get' and response.get('kind') != 'error':
+            seen_memories.append({'memory_id':arguments['memory_id'],'revision':arguments['revision']})
         (root / 'research-checkpoint.json').write_text(json.dumps({
             'tool':name,'kind':response.get('kind'),'code':value.get('code'),
             'source_code':value.get('source_code'),'keys':list(value),
@@ -170,6 +175,19 @@ usage(20, 4)
 final = {'method': 'turn/completed', 'params': {'threadId': 'thread', 'turn': {'id': 'turn', 'status': 'completed', 'error': None, 'items': [{'type': 'agentMessage', 'id': 'answer', 'phase': 'final_answer', 'text': '{"answer":"bounded-context"}'}]}}}
 if hint == 'long-output':
     final['params']['turn']['items'][0]['text'] = json.dumps({'answer':'说明' * 2500 + '；仅在全部测试通过时适用。'}, ensure_ascii=False)
+if scenario.startswith('conclusion_') or 'status' in turn_request['params']['outputSchema']['properties']:
+    conclusion = dict(answer=json.loads(final['params']['turn']['items'][0]['text'])['answer'],
+        status='found' if seen_sources or seen_memories else 'incomplete', sources=seen_sources,
+        memories=seen_memories, conditions=[], conflicts=[], gaps=[] if seen_sources or seen_memories else ['no_evidence'])
+    if scenario == 'conclusion_no_hit':
+        tool('context_search', {'cursor':None,'query':'absent-conclusion-query','limit':4})
+        conclusion.update(status='no_hit', answer='No reliable relevant result in the searched scope.', sources=[], memories=[], gaps=[])
+    elif scenario == 'conclusion_forged':
+        conclusion['sources'] = [dict(seen_sources[0], event_id='private/unissued')]
+    elif scenario == 'conclusion_conflict':
+        conclusion['conditions'] = ['Only for the original local environment.']
+        conclusion['conflicts'] = ['The two observations disagree.']
+    final['params']['turn']['items'][0]['text'] = json.dumps(conclusion, ensure_ascii=False)
 if scenario == 'malformed_final': final['params']['turn']['items'][0]['text'] = '{"answer":"ok","authority":"forged"}'
 send(final)
 if scenario == 'double_final': send(final)

@@ -147,26 +147,52 @@ impl Service {
             budget.cancel();
         }
         let answer = outcome?;
+        let (selected, memories) = context.selected_memories(&answer)?;
         let mut trace = context.trace()?;
-        let sources = context.sources;
-        let mut gaps = context.gaps;
-        if sources.is_empty() && context.selected.is_empty() {
-            gaps.push("no_evidence".to_owned());
+        let mut sources = vec![];
+        for source in &answer.sources {
+            if !sources.contains(source) {
+                sources.push(source.clone());
+            }
         }
-        if invocation.coverage() != crate::adapter::FenceCoverage::CompleteToFence {
-            gaps.push("history_gap".to_owned());
+        let mut gaps = context.gaps;
+        for gap in answer
+            .gaps
+            .iter()
+            .map(String::as_str)
+            .chain(
+                (invocation.coverage() != crate::adapter::FenceCoverage::CompleteToFence)
+                    .then_some("history_gap"),
+            )
+            .chain((!answer.conflicts.is_empty()).then_some("unresolved_conflict"))
+        {
+            if !gaps.iter().any(|g| g == gap) {
+                if gaps.len() == 32 {
+                    return Err(Error("BUDGET_EXHAUSTED"));
+                }
+                gaps.push(gap.into());
+            }
         }
         let status = if gaps.is_empty() {
-            RecallStatus::Found
+            answer.status
         } else {
             RecallStatus::Incomplete
         };
+        let code: Vec<_> = context
+            .code
+            .into_iter()
+            .filter(|observation| {
+                serde_json::from_value::<crate::domain::SourceSpan>(observation["source"].clone())
+                    .is_ok_and(|span| sources.contains(&span))
+            })
+            .collect();
         let scope = invocation.diagnostic().scope.clone();
         let receipt_id = format!("consult-result/{}", hash(id.as_bytes()));
-        let output = serde_json::to_string(
-            &json!({"status":status,"job_id":id,"receipt_id":receipt_id,"answer":answer,"scope":scope,
-            "evidence":sources,"memories":context.selected,"code":context.code,"conflicts":[],"gaps":gaps}),
-        )?;
+        let output = serde_json::to_string(&json!({
+            "status":status,"job_id":id,"receipt_id":receipt_id,"answer":answer.answer,"scope":scope,
+            "evidence":sources,"memories":memories,"code":code,"conditions":answer.conditions,
+            "conflicts":answer.conflicts,"gaps":gaps,
+        }))?;
         let _guard = self.admission.lock().await;
         let (_, job) = self.job(id)?;
         self.authorize_job(&job)?;
@@ -185,7 +211,7 @@ impl Service {
             scope,
             read_seq: context.read_seq,
             retrieval_mode: RetrievalMode::CurrentState,
-            selected: context.selected,
+            selected,
             sources,
             status,
             coverage: Coverage {
