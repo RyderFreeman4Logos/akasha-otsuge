@@ -8,6 +8,8 @@ use std::{
 mod caller;
 #[path = "support/pi_capture.rs"]
 mod capture;
+#[path = "support/pi_install.rs"]
+mod installation;
 
 struct Fixture(PathBuf);
 impl Fixture {

@@ -21,6 +21,8 @@ Commands:
   adapter uninstall codex --launcher PATH
   adapter install hermes --binary PATH --home PATH
   adapter uninstall hermes --home PATH
+  adapter install pi --binary PATH --agent-dir PATH
+  adapter uninstall pi --agent-dir PATH
   config validate|reload|status
   config show --effective
   capture reconcile|codex BINDING_JSON INPUT_JSONL --idempotency-key ID
@@ -153,18 +155,22 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     if let [
         "adapter",
         "uninstall",
-        host @ ("codex" | "hermes"),
+        host @ ("codex" | "hermes" | "pi"),
         flags @ ..,
     ] = command.as_slice()
     {
-        let key = if *host == "hermes" {
+        let key = if *host == "pi" {
+            "--agent-dir"
+        } else if *host == "hermes" {
             "--home"
         } else {
             "--launcher"
         };
         let flags = options(flags, &[key])?;
         let path = std::path::Path::new(flags.get(key).ok_or(Error("INVALID_ARGUMENT"))?);
-        let response = if *host == "hermes" {
+        let response = if *host == "pi" {
+            akasha_otsuge::adapter::pi::installation::uninstall(path)?
+        } else if *host == "hermes" {
             akasha_otsuge::adapter::hermes::installation::uninstall(path)?
         } else {
             akasha_otsuge::adapter::codex::installation::uninstall(path)?
@@ -178,11 +184,13 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     let install_flags = if let [
         "adapter",
         "install",
-        host @ ("codex" | "hermes"),
+        host @ ("codex" | "hermes" | "pi"),
         flags @ ..,
     ] = command.as_slice()
     {
-        let keys: &[&str] = if *host == "hermes" {
+        let keys: &[&str] = if *host == "pi" {
+            &["--binary", "--agent-dir"]
+        } else if *host == "hermes" {
             &["--binary", "--home"]
         } else {
             &["--binary", "--launcher", "--state-dir"]
@@ -198,7 +206,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     };
     let operation = match command.as_slice() {
         ["adapter", "codex-hook", ..] => None,
-        ["adapter", "install", "codex" | "hermes", ..] => None,
+        ["adapter", "install", "codex" | "hermes" | "pi", ..] => None,
         ["adapter", host @ ("codex-call" | "hermes-call" | "pi-call")] => {
             use std::io::Read;
             let mut bytes = Vec::new();
@@ -368,7 +376,14 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         let socket = socket
             .as_deref()
             .unwrap_or(&resolved.config().paths.socket_path);
-        let response = if host == "hermes" {
+        let response = if host == "pi" {
+            akasha_otsuge::adapter::pi::installation::install(
+                path("--binary")?,
+                path("--agent-dir")?,
+                socket,
+            )
+            .await?
+        } else if host == "hermes" {
             akasha_otsuge::adapter::hermes::installation::install(
                 path("--binary")?,
                 path("--home")?,

@@ -3,6 +3,7 @@ use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
 mod transcript;
 pub use transcript::reconcile_transcript;
 mod caller;
+pub mod installation;
 pub use caller::{PiCall, PiCaller, PiRegistration, profile_key};
 pub(crate) use transcript::header as session_header;
 

@@ -628,8 +628,12 @@ Completed #14 implementation evidence:
 - [ ] Reconcile input/message/session lifecycle events against persisted originals,
   including other extensions' transformations, reload, resume, interruption and
   delta/final deduplication. Interactive input alone never proves human authority.
-- [ ] Provide a minimal native extension with opt-in installation, integrity
+- [x] Provide a minimal native extension with opt-in installation, integrity
   checks and recoverable uninstall that preserves unrelated user configuration.
+  The pinned native SDK loads it successfully. Four Node extension regressions,
+  ten Pi tests, daemon recovery and all-target Clippy pass; authenticated native
+  lifecycle acceptance remains separate below. Installation is profile-local and
+  uses the Rust CLI for peer-checked IPC, without editing native settings/auth.
 - [ ] Implement independent RPC Runner with four scoped context tools, native
   capability/tool inventory checks, LF-delimited correlated responses,
   `agent_settled` completion plus zero exit, bounded output, original deadlines,

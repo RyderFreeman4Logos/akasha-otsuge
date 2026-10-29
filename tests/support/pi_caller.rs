@@ -91,12 +91,30 @@ pub(super) async fn store(f: &Fixture) -> Arc<Storage> {
     store
 }
 
+async fn captured(store: &Storage, registration: &PiRegistration) {
+    // These tests isolate immutable binding and concurrent identities from cold-ingest timing.
+    // Cold native capture and daemon-driven binding are covered by their own integration tests.
+    let report = reconcile_transcript(
+        store,
+        &registration.source,
+        registration.scope.clone(),
+        &registration.transcript,
+        64,
+        1,
+    )
+    .await
+    .unwrap();
+    assert!(report.processed > 0);
+    assert!(report.checkpoint.checkpoint.pending.is_none());
+}
+
 #[tokio::test]
 async fn native_call_fence_survives_source_loss_and_rechecks_current_permission() {
     let f = Fixture::new();
     let s = store(&f).await;
     let grant = s.sequence().unwrap();
     let (r, c) = native(&f, "root");
+    captured(&s, &r).await;
     let invocation = PiCaller::new(s.clone(), r.clone(), c.clone(), 1)
         .bind(&c.tool_call_id)
         .await
@@ -281,6 +299,8 @@ async fn two_native_sessions_share_a_workspace_without_sharing_context_fences() 
     let s = store(&f).await;
     let (r1, c1) = native(&f, "first");
     let (r2, c2) = native(&f, "second");
+    captured(&s, &r1).await;
+    captured(&s, &r2).await;
     let first = PiCaller::new(s.clone(), r1, c1.clone(), 1);
     let second = PiCaller::new(s, r2, c2.clone(), 1);
     let (a, b) = tokio::join!(first.bind(&c1.tool_call_id), second.bind(&c2.tool_call_id));

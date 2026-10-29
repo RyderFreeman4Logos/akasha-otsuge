@@ -23,6 +23,12 @@ original-deadline, cancellation and grant-revocation regression (45.353s with
 the nine Pi tests and all-target Clippy). The initial cancellation assertion was
 corrected to await worker settlement after the durable cancellation request;
 production cancellation behavior is unchanged.
+The native extension and recoverable installer pass four Node bridge regressions,
+ten Pi tests, the daemon regression and Clippy in17.356s. The actual pinned native
+SDK loads the extension without a model call. Two prior Caller `HISTORY_GAP`
+failures remain causally unproven; their identity tests now pre-capture histories,
+while cold capture and daemon binding remain separately covered. No timeout was
+changed. [Pi support and recovery](../adapters/pi-1.4.0/README.md) records the limits.
 Native extension Caller and Runner acceptance remain outstanding. The complete TODO lists every
 remaining criterion. #12 still waits for lawful Claude authentication in draft #41.
 
