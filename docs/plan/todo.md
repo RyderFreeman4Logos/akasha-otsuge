@@ -650,6 +650,11 @@ Completed #14 implementation evidence:
   absent, including concurrent sessions, tree branches/forks, reload/resume,
   context edits, compaction and interruption. Retain sanitized native fixtures,
   actual version/executable identities, negative controls and failed receipts.
+  Native RPC on2026-10-29 accepts the prompt but the selected profile's OAuth
+  refresh fails with401/invalid_refresh_token. A native login request is pending;
+  do not repeat authenticated attempts until that prerequisite changes. The
+  temporary integration/processes/scratch were removed and settings stayed intact.
+  Continue controlled native protocol/lifecycle checks while preserving this gap.
 - [ ] Publish support/install/recovery documentation; pass final canonical gate,
   independent whole-candidate review and CI. Merge, close #15, remove owned
   scratch/worktree and proceed through every remaining queue item below.

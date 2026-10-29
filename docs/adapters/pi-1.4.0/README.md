@@ -66,13 +66,17 @@ JSON answer, native `agent_settled` and zero process exit. `agent_end` can prece
 automatic retries and is not completion. The original deadline and shared
 budgets cover tools, events and cleanup. Cancellation kills the owned process
 group, including bridge children, and reaps it before releasing run resources.
+Missing credentials and an expired OAuth refresh token return `AUTH_REQUIRED`.
+Reauthenticate through Pi's native `/login`; the adapter does not copy credentials
+from another host. Provider error text is not returned to the model.
 
 ## Evidence limits
 
 Native SDK loading, native SessionManager tree fixtures, five Node bridge
 behaviors, three controlled Runner regressions and daemon recovery/cancellation
 checks pass. The Runner cases include 21 negative scenarios and exercise the
-actual Rust context bridge. A separate native SDK lifecycle harness binds three
+actual Rust context bridge; authentication regression coverage adds two refusal
+cases and verifies a recovered retry can still complete. A separate native SDK lifecycle harness binds three
 calls across root/reload/fork, reconciles another extension's message transform,
 context edits, compaction, resume and interrupted shutdown, and drains seven
 capture jobs. Its messages are synthetic; it does not prove authenticated model
@@ -87,3 +91,7 @@ coverage. Production timeouts are unchanged.
 
 Authenticated native Caller/Runner acceptance, final review and
 publication remain tracked in [the complete checklist](../../plan/todo.md).
+The 2026-10-29 native attempt accepted the prompt and then ended with an OAuth
+refresh error (`401`, `invalid_refresh_token`) on `openai-codex/gpt-6.1-sol`.
+The selected profile needs a renewed native login. No authenticated success is
+claimed; the temporary integration was removed and native settings were unchanged.

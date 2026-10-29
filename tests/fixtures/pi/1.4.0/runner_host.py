@@ -50,6 +50,8 @@ assert prompt['type'] == 'prompt' and 'Read context.' in prompt['message']
 response = {'type':'response', 'command':'prompt', 'id':prompt['id'], 'success':True,
             'data':{'disposition':'handled' if scenario == 'handled' else 'started'}}
 if scenario == 'wrong_id': response['id'] = 'wrong'
+if scenario == 'preflight_auth':
+    response.update(success=False, error='No API key found for "fixture"')
 emit(response)
 emit({'type':'agent_start'})
 if scenario in ['timeout', 'cancel', 'eof_live']:
@@ -59,12 +61,13 @@ if scenario == 'denied_tool':
     emit({'type':'tool_execution_start', 'toolName':'bash', 'toolCallId':'forbidden'})
 if scenario == 'forged_args': exchange({'op':'context', 'request':{'operation':'describe', 'session_id':'forged'}})
 if scenario == 'unissued_handle': exchange({'op':'context', 'request':{'operation':'read', 'handle':'forged', 'start':0, 'max_bytes':16}})
-if scenario in ['success', 'retry']:
+if scenario in ['success', 'retry', 'auth_retry']:
     assert exchange({'op':'context', 'request':{'operation':'describe'}})['kind'] == 'description'
     emit({'type':'tool_execution_start', 'toolName':'context_describe', 'toolCallId':'description'})
     emit({'type':'tool_execution_end', 'toolName':'context_describe', 'toolCallId':'description', 'isError':False})
-if scenario == 'retry':
-    emit({'type':'message_end', 'message':{'role':'assistant','content':[], 'stopReason':'error', 'errorMessage':'TRANSIENT_PRIVATE_SENTINEL'}})
+if scenario in ['retry', 'auth_retry']:
+    error = 'OAuth refresh failed for fixture: token refresh failed (401): invalid_refresh_token' if scenario == 'auth_retry' else 'TRANSIENT_PRIVATE_SENTINEL'
+    emit({'type':'message_end', 'message':{'role':'assistant','content':[], 'stopReason':'error', 'errorMessage':error}})
     emit({'type':'agent_end','messages':[]})
     emit({'type':'auto_retry_start','attempt':1})
     emit({'type':'auto_retry_end','success':True})
@@ -73,7 +76,10 @@ elif scenario == 'stderr': print('x' * 8193, file=sys.stderr, flush=True)
 elif scenario == 'partial': print('{', end='', flush=True); sys.exit(0)
 if scenario != 'no_final':
     text = 'bad' if scenario == 'malformed_final' else '{"answer":"bounded-context\u2028retained"}'
-    emit({'type':'message_end','message':{'role':'assistant','content':[{'type':'text','text':text}], 'stopReason':'stop'}})
+    message = {'role':'assistant','content':[{'type':'text','text':text}], 'stopReason':'stop'}
+    if scenario == 'expired_auth':
+        message.update(content=[],stopReason='error',errorMessage='OAuth refresh failed for fixture: token refresh failed (401): invalid_refresh_token')
+    emit({'type':'message_end','message':message})
 emit({'type':'agent_end','messages':[]})
 if scenario != 'no_settled': emit({'type':'agent_settled','aborted':scenario == 'aborted'})
 if scenario == 'double_settled': emit({'type':'agent_settled','aborted':False})

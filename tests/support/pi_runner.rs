@@ -54,7 +54,7 @@ fn spec(inv: &Invocation, seconds: u64) -> RunSpec {
 
 #[tokio::test]
 async fn rpc_runner_waits_for_settled_after_retries_and_preserves_line_separators() {
-    for scenario in ["success", "retry"] {
+    for scenario in ["success", "retry", "auth_retry"] {
         let f = Fixture::new();
         let binary = host(&f, scenario).await;
         let (store, inv) = invocation(&f).await;
@@ -107,6 +107,8 @@ async fn rpc_runner_rejects_authority_protocol_inventory_and_incomplete_terminal
         ("no_ready", ErrorCode::AdapterUnsupported),
         ("wrong_id", ErrorCode::ProtocolInvalid),
         ("handled", ErrorCode::RunnerIncomplete),
+        ("preflight_auth", ErrorCode::AuthRequired),
+        ("expired_auth", ErrorCode::AuthRequired),
         ("denied_tool", ErrorCode::ToolDenied),
         ("forged_args", ErrorCode::InvalidArgument),
         ("unissued_handle", ErrorCode::ReadDenied),

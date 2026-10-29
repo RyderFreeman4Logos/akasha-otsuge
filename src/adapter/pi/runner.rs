@@ -224,7 +224,7 @@ struct Handle<'a> {
     prompt_id: String,
     prompt_sent: bool,
     settled: bool,
-    last_assistant: Option<(String, String)>,
+    last_assistant: Option<(String, String, ErrorCode)>,
     initialized: bool,
     ready: bool,
     buffer: Vec<u8>,
@@ -373,7 +373,7 @@ impl Handle<'_> {
                 return Err(ErrorCode::ProtocolInvalid.into());
             }
             if value["success"] != true {
-                return Err(ErrorCode::RunnerFailed.into());
+                return Err(native_failure(&value["error"]).into());
             }
             if value["data"]["disposition"] != "started" {
                 return Err(ErrorCode::RunnerIncomplete.into());
@@ -411,6 +411,7 @@ impl Handle<'_> {
                             .as_str()
                             .ok_or(ErrorCode::ProtocolInvalid)?
                             .into(),
+                        native_failure(&message["errorMessage"]),
                     ));
                 }
             }
@@ -430,12 +431,12 @@ impl Handle<'_> {
                 if value["aborted"] != false {
                     return Err(ErrorCode::ProtocolInvalid.into());
                 }
-                let (text, reason) = self
+                let (text, reason, failure) = self
                     .last_assistant
                     .take()
                     .ok_or(ErrorCode::RunnerIncomplete)?;
                 if reason != "stop" {
-                    return Err(ErrorCode::RunnerFailed.into());
+                    return Err(failure.into());
                 }
                 #[derive(Deserialize)]
                 #[serde(deny_unknown_fields)]
@@ -620,5 +621,20 @@ fn check_tool(name: Option<&str>) -> Result<()> {
         Ok(())
     } else {
         Err(ErrorCode::ToolDenied.into())
+    }
+}
+
+fn native_failure(message: &Value) -> ErrorCode {
+    let Some(message) = message.as_str() else {
+        return ErrorCode::RunnerFailed;
+    };
+    // Classify native authentication errors without exposing credentials or provider text.
+    if message.starts_with("No API key")
+        || (message.starts_with("OAuth refresh failed for ")
+            && message.contains("invalid_refresh_token"))
+    {
+        ErrorCode::AuthRequired
+    } else {
+        ErrorCode::RunnerFailed
     }
 }
