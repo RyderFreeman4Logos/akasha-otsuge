@@ -62,7 +62,7 @@ class Provider:
                     request = json.loads(self.rfile.read(size))
                     assert request['stream'] is True
                     names = sorted(tool['name'] if responses else tool['function']['name'] for tool in request['tools'])
-                    expected = ['akasha_consult'] if owner.case == 'caller' else ['context_describe', 'context_list', 'context_read', 'context_search']
+                    expected = ['akasha_consult'] if owner.case == 'caller' else ['code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search']
                     assert names == expected, names
                     messages = request['input'] if responses else request['messages']
                     last_user = max(i for i,m in enumerate(messages) if m.get('role')=='user')
