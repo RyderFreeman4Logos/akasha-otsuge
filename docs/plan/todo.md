@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-28 UTC after PR #40 merged at `19efca1`. Live GitHub audit: **17 open
-Issues, 11 completed Issues**. #12 is waiting for authenticated Claude acceptance in draft PR #41. #13 is the
+Updated 2026-10-29 UTC after PR #42 merged at `d49be08`. Live GitHub audit: **16 open
+Issues, 12 completed Issues**. #12 is waiting for authenticated Claude acceptance in draft PR #41. #14 is the
 active independent leaf; its sole prerequisite #11 is complete. The complete
 queue below preserves every Issue and dependency.
 Each linked Issue's full acceptance criteria remain authoritative; this checklist
@@ -45,8 +45,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-28 audit finds 17 open Issues (#12–#28). #4–#11 are closed with
-merged PRs #32–#38/#40; no completed implementation is waiting for closure. #7's
+The 2026-10-29 audit finds 16 open Issues (#12, #14–#28). #4–#11 and #13 are closed
+with merged PRs #32–#38/#40/#42; no verified implementation waits for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -480,7 +480,7 @@ unauthenticated. Its startup config migration was restored byte-for-byte; future
 startup may migrate again. #12 still needs real host/model acceptance. PATH/version
 checks do not prove host protocol capabilities or an authenticated Runner.
 
-## MVP-013 acceptance and remaining work
+## MVP-013 completed acceptance
 
 - [x] Pin native Codex0.164.0 schemas, hook fields and tool policy to the installed
   executable and official tagged sources. The native executable SHA-256 is
@@ -517,14 +517,46 @@ checks do not prove host protocol capabilities or an authenticated Runner.
   receipt and source-base hashes plus reproduction steps. Failed probes remain
   preserved. The successful TUI fixture allocated about4.9MiB, measured without
   following symlinks, and was removed after all consumers ended.
-- [ ] Run the canonical full gate on the final clean candidate, then obtain an
-  independent review of the full base-to-head range. Resolve every finding.
-- [ ] Pass hosted CI, publish/merge the reviewed candidate and close #13 with
-  linked evidence. Keep all later queue entries until their own acceptance passes.
+- [x] Run the canonical full gate on final clean candidate `329bba1`, then obtain
+  independent full-range review. Gate3 passes165 Rust/17 Python tests plus40
+  installed-daemon cases; R1 review passes with zero actionable findings.
+  Historical gate1 timing failures remain unclassified. Gate2's private-TMPDIR
+  UID fixture error has a separate causal RED/GREEN repair, preserving all checks.
+- [x] [Hosted CI40801384231](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/40801384231)
+  passes at `329bba1`; PR #42 merged as `d49be08`, and #13 closed completed.
+  Source worktree removed after all consumers ended; shared SSD target retained.
+
+## MVP-014 acceptance and remaining work
+
+- [ ] Qualify the installed Hermes version against official plugin hooks,
+  canonical session/export and stream-json interfaces. Record mode/version limits
+  and actual capabilities; keep doctor free of model calls.
+- [ ] Parse one session per native JSONL export, retaining stable message UIDs,
+  visible text/tool records, inactive compaction originals, parent/child lineage
+  and interrupted-round backfill. Never tail obsolete session JSONL or invent
+  human-input answers absent from native telemetry. Size guards, unsupported
+  records, source changes and export failures must remain observable.
+- [ ] Bind native session/task/turn/call identity and the owning profile before
+  tool execution; persist an immutable fence, preserve retry identity, enforce
+  current grants and prove simultaneous sessions/profiles cannot cross contexts.
+- [ ] Ship the minimal native plugin and Rust bridge, opt-in install/undo and
+  durable background capture. Verify hooks across real CLI/TUI and interruption,
+  rather than assuming gateway-only or successful-turn callbacks cover all work.
+- [ ] Implement independent one-shot stream-json Runner with profile selection,
+  four scoped context tools, final-result plus exit-status checks, bounded output,
+  original deadlines and process-group cancellation/cleanup. Disable unrelated
+  native/MCP tools and verify writes, network and outside reads are denied.
+- [ ] Run real authenticated CLI/TUI Caller and Runner with the other three
+  CLIs absent; test at least two profiles, pre-compaction originals, native child
+  sources and interrupted recovery. Retain actual export fixtures, source/binary
+  hashes and sanitized receipts; distinguish controlled fixtures from model runs.
+- [ ] Publish support/install/recovery documentation; pass final canonical gate,
+  independent full-candidate review and hosted CI. Merge and close #14 with
+  evidence, remove its owned scratch/worktree, then proceed to #15.
 
 One source writer works in the SSD mirror and reuses the existing shared target.
 #12 is deferred only for its recorded external authentication prerequisite;
-#13–#15 no longer carry the stale dependency-blocked label after #11 completed.
+#14–#15 have their prerequisite #11 complete. No second feature writer is active.
 
 ## Complete Issue queue
 
@@ -540,7 +572,7 @@ One source writer works in the SSD mirror and reuses the existing shared target.
 - [x] [#10 [MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10) — dependencies: #5, #6, #9.
 - [x] [#11 [MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11) — dependencies: #7, #8, #10.
 - [ ] [#12 [MVP-012] Claude Code CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) — dependencies: #11.
-- [ ] [#13 [MVP-013] Codex CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/13) — dependencies: #11.
+- [x] [#13 [MVP-013] Codex CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/13) — dependencies: #11.
 - [ ] [#14 [MVP-014] Hermes CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/14) — dependencies: #11.
 - [ ] [#15 [MVP-015] pi CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/15) — dependencies: #11.
 - [ ] [#16 [MVP-016] consult 可选短 hint、渐进调研与子孙共享预算](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/16) — dependencies: #12, #13, #14, #15.
