@@ -96,6 +96,29 @@ test('tool execution binds the unique native call, rejecting nested and model au
   assert.equal(f.requests().length, count);
 });
 
+test('Caller preserves opaque native Responses IDs and shared ID boundaries', async t => {
+  const f = fixture(t); fs.writeFileSync(f.transcript, 'persisted');
+  registerCaller(f.pi, () => f.agent, f.defaults, {type:'object'});
+  const execute = id => f.tools.akasha_consult.execute(id, {}, undefined, undefined, f.ctx);
+  for (const id of ['call_abc|fc_def', '😀'.repeat(64)]) {
+    f.branch[0].message.content[0].id = id;
+    assert.equal(JSON.parse((await execute(id)).content[0].text).error, undefined);
+    assert.equal(f.requests().at(-1).call.tool_call_id, id);
+  }
+  const count = f.requests().length;
+  for (const id of ['', 'call\u0000id', 'a'.repeat(257), '😀'.repeat(65)]) {
+    f.branch[0].message.content[0].id = id;
+    assert.equal(JSON.parse((await execute(id)).content[0].text).error.code, 'CALLER_AMBIGUOUS');
+  }
+  f.branch[0].message.content[0].id = 'call_abc|fc_def';
+  for (const id of ['call_abc', 'call_abc|fc_def/child']) {
+    assert.equal(JSON.parse((await execute(id)).content[0].text).error.code, 'CALLER_AMBIGUOUS');
+  }
+  f.branch.push(f.branch[0]);
+  assert.equal(JSON.parse((await execute('call_abc|fc_def')).content[0].text).error.code, 'CALLER_AMBIGUOUS');
+  assert.equal(f.requests().length, count);
+});
+
 test('Caller accepts 512 Unicode characters and rejects 513 before binding', async t => {
   const f = fixture(t); fs.writeFileSync(f.transcript, 'persisted');
   registerCaller(f.pi, () => f.agent, f.defaults, {type:'object'});

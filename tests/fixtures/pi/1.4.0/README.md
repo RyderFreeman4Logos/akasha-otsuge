@@ -63,5 +63,24 @@ timestamps are expected. The retained receipt binds source/binary/file hashes,
 five Runner cases, six Caller bindings,19 completed jobs and cleanup. The retry
 case causes one real local HTTP503 before native recovery. The hostile-tool case
 requires `TOOL_DENIED` and verifies its outside marker was never created.
-These checks qualify native RPC behavior; authenticated provider and interactive
-TUI acceptance remain separate requirements.
+Set `AKASHA_NATIVE_API=openai-responses` to exercise native compound tool-call IDs;
+the default is `openai-completions`. Both use the native provider parser.
+`protocol-controlled/manifest.json` pins the corrected bridge, fixture sources,
+all six protocol/lifecycle runs, failed pre-fix evidence and cleanup. Its five
+unchanged native files come from the Responses RPC and TUI runs.
+
+For controlling-terminal coverage, supply a directory containing executable `fd`
+and `rg`, then run `check_native_tui.py` with the same environment:
+
+```sh
+export AKASHA_TUI_TOOLS=/directory/containing/fd-and-rg
+python3 tests/fixtures/pi/1.4.0/check_native_tui.py /new/tui-output
+```
+
+The script gives each Pi process a foreground controlling PTY and waits for its
+native `session_start` event. The tools prevent Pi from downloading them during
+startup. It checks two overlapping sessions, fresh-process resume, native compact,
+four bindings,11 completed jobs and zero-exit cleanup. A first diagnostic failed
+when startup-triggered fd download raced and input arrived before readiness;
+that failed receipt remains separate from the successful prepared-tool runs.
+Authenticated provider acceptance remains a separate requirement.

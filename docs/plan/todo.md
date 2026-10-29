@@ -669,8 +669,16 @@ Completed #14 implementation evidence:
   196Rust workspace and42installed-daemon passes. Independent R1 review found
   one introduced Unicode hint defect: UTF-16 length rejected legal emoji hints.
   Its regression fails before the correction and all six Node tests pass after;
-  the actual1.4.0 schema also accepts512 emoji and rejects513. The corrected
-  candidate still needs its own final gate and independent re-review.
+  the actual1.4.0 schema also accepts512 emoji and rejects513. Candidate `be0c06c`
+  passed its own191.476-second gate. Independent R2 review then found a MODERATE
+  native Responses ID defect: `call_...|fc_...` was incorrectly refused. Both the
+  Node regression and actual old native binary reproduce `CALLER_AMBIGUOUS`.
+  The corrected opaque-ID boundary passes seven Node and13 Pi regressions;
+  both native protocols pass five Runner cases, six RPC bindings/19 jobs and
+  four real controlling-terminal bindings/11 jobs each. All scratch is removed.
+  The broader focused daemon run exposed a short-control overlap assertion
+  failure (41 passes, one failure); preserve it for causal diagnosis. Final gate,
+  independent R3 review, CI and authenticated acceptance remain open.
 
 The sole source writer starts from `24eda5a` on `feat/mvp-015-pi-adapter` at
 2026-10-29T06:23:17Z. A separate installation-only helper may qualify Pi1.4.0;

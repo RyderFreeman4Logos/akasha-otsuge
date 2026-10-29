@@ -26,7 +26,9 @@ current Akasha executable and socket; keep the executable at that path.
 The extension registers `akasha_consult` with an optional short `hint`. Session,
 branch, workspace and tool identity come from the native runtime and are checked
 against persisted native entries. Nested calls without their own persisted entry
-fail closed. Interactive input is machine-observed provenance, not human approval.
+fail closed. Native tool-call IDs are opaque: Responses IDs such as
+`call_...|fc_...` are preserved exactly, with the shared256-byte/no-control
+boundary. Interactive input is machine-observed provenance, not human approval.
 The current tool returns a verified binding; the consult workflow is tracked in #16.
 
 Input and message callbacks mark capture pending. Turn completion, settled,
@@ -76,7 +78,7 @@ from another host. Provider error text is not returned to the model.
 
 ## Evidence limits
 
-Native SDK loading, native SessionManager tree fixtures, six Node bridge
+Native SDK loading, native SessionManager tree fixtures, seven Node bridge
 behaviors, three controlled Runner regressions and daemon recovery/cancellation
 checks pass. The Runner cases include 23 negative scenarios and exercise the
 actual Rust context bridge, including recovered authentication retries.
@@ -90,8 +92,16 @@ all19 capture jobs finish. The three retained native files total42,065bytes.
 These fixtures use an isolated profile and synthetic loopback SSE, with the other
 three host CLIs absent. Their manifests pin the source before the Unicode hint
 correction; its separate regression accepts512 emoji and refuses513, matching
-the actual1.4.0 SDK schema validator. They do not prove authenticated model execution or a
-controlling-terminal interactive UI. All owned processes and scratch are removed.
+the actual1.4.0 SDK schema validator. A subsequent [protocol receipt](../../../tests/fixtures/pi/1.4.0/protocol-controlled/manifest.json)
+binds the corrected source and both Chat Completions and Responses protocols.
+Each passes five Runner cases, six RPC Caller bindings/19 capture jobs, and four
+interactive Caller bindings/11 jobs in real foreground controlling terminals.
+The TUI cases include overlapping sessions, fresh-process resume and compact.
+Responses-native IDs retain their pipe separator; five unchanged native files
+retain69,059bytes. The previous binary fails the same Responses Caller with
+`CALLER_AMBIGUOUS`; the corrected bridge passes without normalizing its ID.
+These synthetic providers do not establish authenticated model execution.
+All owned processes and scratch are removed.
 The bridge's child cleanup and output bounds are tested with controlled executables.
 Two earlier Caller identity tests reported `HISTORY_GAP` during a full run.
 A content-free timing probe subsequently passed (cold reconcile 1.136–1.313s);

@@ -1,5 +1,6 @@
 """Loopback protocol fixture. This does not attest authenticated model quality."""
 import json
+import os
 import threading
 import re
 import shlex
@@ -9,6 +10,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 class Provider:
     def __init__(self):
+        self.api = os.environ.get('AKASHA_NATIVE_API', 'openai-completions')
+        assert self.api in ['openai-completions', 'openai-responses']
         self.case = 'roundtrip'
         self.requests = []
         self.errors = []
@@ -22,23 +25,52 @@ class Provider:
             def log_message(self, *_args):
                 pass
 
+            def responses_reply(self, name, args):
+                response_id = 'resp_' + uuid.uuid4().hex
+                def emit(kind, **fields):
+                    value = {'type': kind, **fields}
+                    self.wfile.write(('event: ' + kind + '\ndata: ' + json.dumps(value) + '\n\n').encode())
+                    self.wfile.flush()
+                emit('response.created', response={'id': response_id, 'status': 'in_progress', 'output': []})
+                if name:
+                    item = {'type': 'function_call', 'id': 'fc_' + uuid.uuid4().hex,
+                            'call_id': 'call_' + uuid.uuid4().hex, 'name': name, 'arguments': '', 'status': 'in_progress'}
+                    emit('response.output_item.added', output_index=0, item=item)
+                    arguments = json.dumps(args)
+                    emit('response.function_call_arguments.delta', output_index=0, item_id=item['id'], delta=arguments)
+                    item = {**item, 'arguments': arguments, 'status': 'completed'}
+                    emit('response.function_call_arguments.done', output_index=0, item_id=item['id'], arguments=arguments)
+                else:
+                    text = 'BEFORE_TRANSFORM' if owner.case == 'caller' else '{"answer":"bounded-context"}'
+                    item = {'type': 'message', 'id': 'msg_' + uuid.uuid4().hex, 'role': 'assistant', 'content': [], 'status': 'in_progress'}
+                    emit('response.output_item.added', output_index=0, item=item)
+                    emit('response.content_part.added', output_index=0, content_index=0, item_id=item['id'], part={'type': 'output_text', 'text': '', 'annotations': []})
+                    emit('response.output_text.delta', output_index=0, content_index=0, item_id=item['id'], delta=text)
+                    item = {**item, 'content': [{'type': 'output_text', 'text': text, 'annotations': []}], 'status': 'completed'}
+                emit('response.output_item.done', output_index=0, item=item)
+                emit('response.completed', response={'id': response_id, 'status': 'completed', 'output': [item],
+                     'usage': {'input_tokens': 10, 'output_tokens': 10, 'total_tokens': 20}})
+                self.close_connection = True
+
             def do_POST(self):
                 try:
                     self.connection.settimeout(5)
-                    assert self.path == '/v1/chat/completions'
+                    responses = owner.api == 'openai-responses'
+                    assert self.path == ('/v1/responses' if responses else '/v1/chat/completions')
                     size = int(self.headers['Content-Length'])
                     assert 0 < size < 1048576
                     request = json.loads(self.rfile.read(size))
                     assert request['stream'] is True
-                    names = sorted(tool['function']['name'] for tool in request['tools'])
+                    names = sorted(tool['name'] if responses else tool['function']['name'] for tool in request['tools'])
                     expected = ['akasha_consult'] if owner.case == 'caller' else ['context_describe', 'context_list', 'context_read', 'context_search']
                     assert names == expected, names
-                    messages = request['messages']
-                    last_user = max(i for i,m in enumerate(messages) if m['role']=='user')
+                    messages = request['input'] if responses else request['messages']
+                    last_user = max(i for i,m in enumerate(messages) if m.get('role')=='user')
                     prompt = messages[last_user]['content']
                     if not isinstance(prompt,str):prompt = json.dumps(prompt)
-                    results = [m for m in messages[last_user+1:] if m['role'] == 'tool']
-                    owner.requests.append({'tool_names': names, 'previous_tool_results': len(results)})
+                    results = ([{'content': m['output']} for m in messages[last_user+1:] if m.get('type') == 'function_call_output']
+                               if responses else [m for m in messages[last_user+1:] if m['role'] == 'tool'])
+                    owner.requests.append({'api': owner.api, 'tool_names': names, 'previous_tool_results': len(results)})
                     assert len(owner.requests) <= 64
                     if owner.case == 'retry' and len(owner.requests) == 1:
                         body=json.dumps({'error':{'message':'controlled transient server failure','type':'server_error'}}).encode()
@@ -75,6 +107,9 @@ class Provider:
                     self.send_header('Content-Type', 'text/event-stream')
                     self.send_header('Connection', 'close')
                     self.end_headers()
+                    if responses:
+                        self.responses_reply(name, args)
+                        return
                     def chunk(delta, finish=None):
                         value = {'id': 'fixture-stream', 'object': 'chat.completion.chunk', 'created': 1,
                                  'model': 'fixture', 'choices': [{'index': 0, 'delta': delta, 'finish_reason': finish}]}
@@ -108,7 +143,7 @@ class Provider:
             'defaultModel': 'fixture', 'defaultThinkingLevel': 'off', 'compaction': {'enabled': False, 'keepRecentTokens': 32, 'reserveTokens': 512},
             'retry': {'enabled': True, 'maxRetries': 1, 'baseDelayMs': 1, 'maxAgentDelayMs': 1, 'provider': {'maxRetries': 0}}}))
         (profile / 'models.json').write_text(json.dumps({'providers': {'akasha-fixture': {
-            'baseUrl': f'http://127.0.0.1:{self.server.server_port}/v1', 'api': 'openai-completions',
+            'baseUrl': f'http://127.0.0.1:{self.server.server_port}/v1', 'api': self.api,
             'apiKey': 'fixture-only-not-a-secret', 'models': [{'id': 'fixture', 'name': 'Controlled fixture',
             'reasoning': False, 'input': ['text'], 'contextWindow': 32768, 'maxTokens': 2048,
             'cost': {'input': 0, 'output': 0, 'cacheRead': 0, 'cacheWrite': 0}}]}}}))

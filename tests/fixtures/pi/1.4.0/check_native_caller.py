@@ -41,6 +41,7 @@ config.write_text('[paths]\ndata_dir=' + json.dumps(str(root / 'data')) + '\nsoc
                   + '\n[access]\nread_roots=[' + json.dumps(str(root)) + ']\n')
 base = [str(A), '--config', str(config), '--socket', str(sock)]
 receipt = {'started_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'scratch': str(root),
+           'provider_api': provider.api,
            'kind': 'actual Pi CLI lifecycle with controlled local SSE; no authenticated model',
            'akasha_sha256': hashlib.sha256(A.read_bytes()).hexdigest(), 'status': 'failed', 'checks': []}
 children = []

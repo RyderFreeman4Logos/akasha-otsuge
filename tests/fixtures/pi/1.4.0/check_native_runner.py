@@ -30,6 +30,7 @@ provider = Provider()
 installed = False
 child = None
 receipt = {'started_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'scratch': str(root),
+           'provider_api': provider.api,
            'kind': 'actual Pi CLI RPC with controlled local SSE; no authenticated model', 'status': 'failed',
            'binary_sha256': {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in [A, PI, TEST]}, 'cases': []}
 

@@ -7,7 +7,9 @@ function code(error) {
   return /^[A-Z][A-Z0-9_]{0,63}$/.test(error?.message) ? error.message : 'SOURCE_UNAVAILABLE';
 }
 function identifier(value) {
-  return typeof value === 'string' && /^[A-Za-z0-9_./:+-]{1,512}$/.test(value);
+  // Preserve opaque native IDs with the shared Rust byte/control boundary.
+  return typeof value === 'string' && value.trim().length > 0
+    && Buffer.byteLength(value, 'utf8') <= 256 && !/\p{Cc}/u.test(value);
 }
 
 // The installed Rust CLI owns framing, peer-UID verification and request correlation.
