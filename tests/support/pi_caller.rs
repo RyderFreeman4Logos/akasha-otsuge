@@ -91,7 +91,7 @@ pub(super) async fn store(f: &Fixture) -> Arc<Storage> {
     store
 }
 
-async fn captured(store: &Storage, registration: &PiRegistration) {
+pub(super) async fn captured(store: &Storage, registration: &PiRegistration) {
     // These tests isolate immutable binding and concurrent identities from cold-ingest timing.
     // Cold native capture and daemon-driven binding are covered by their own integration tests.
     let report = reconcile_transcript(

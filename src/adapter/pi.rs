@@ -3,8 +3,11 @@ use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
 mod transcript;
 pub use transcript::reconcile_transcript;
 mod caller;
+pub mod context_bridge;
 pub mod installation;
+mod runner;
 pub use caller::{PiCall, PiCaller, PiRegistration, profile_key};
+pub use runner::PiRunner;
 pub(crate) use transcript::header as session_header;
 
 /// Same-user private transport. Registration authority is never a model tool parameter.

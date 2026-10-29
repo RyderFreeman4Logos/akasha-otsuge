@@ -12,21 +12,23 @@ function identifier(value) {
 
 // The installed Rust CLI owns framing, peer-UID verification and request correlation.
 // Wait for close even on cancellation; never leave an unowned bridge process behind.
-async function exchange(defaults, event, signal) {
-  if (!path.isAbsolute(defaults.akasha_binary ?? '') || !path.isAbsolute(defaults.socket ?? '')) {
+async function exchange(defaults, event, signal, runner = false) {
+  if (!path.isAbsolute(defaults.akasha_binary ?? '') || (!runner && !path.isAbsolute(defaults.socket ?? ''))) {
     throw new Error('CONFIG_INVALID');
   }
   const input = Buffer.from(JSON.stringify(event));
   if (input.length > 16384) throw new Error('OUTPUT_LIMIT');
   if (signal?.aborted) throw new Error('CANCELLED');
   return new Promise((resolve, reject) => {
-    const child = spawn(defaults.akasha_binary, ['--socket', defaults.socket, 'adapter', 'pi-call'],
-      {stdio:['pipe', 'pipe', 'pipe'], detached:true});
+    const args = runner ? ['adapter', 'pi-context'] : ['--socket', defaults.socket, 'adapter', 'pi-call'];
+    const child = spawn(defaults.akasha_binary, args,
+      {stdio:['pipe', 'pipe', 'pipe'], detached:!runner});
     let failure, output = [], errors = [], outSize = 0, errSize = 0;
     const stop = reason => {
       failure ??= reason;
       if (child.pid) {
-        try { process.kill(-child.pid, 'SIGKILL'); } catch (error) { if (error.code !== 'ESRCH') child.kill('SIGKILL'); }
+        if (runner) child.kill('SIGKILL');
+        else try { process.kill(-child.pid, 'SIGKILL'); } catch (error) { if (error.code !== 'ESRCH') child.kill('SIGKILL'); }
       }
     };
     const abort = () => stop('CANCELLED');
@@ -132,4 +134,23 @@ function registerCaller(pi, getAgentDir, defaults, parameters) {
   pi.on('session_shutdown', async (event, ctx) => { await sync(event, ctx); registration = undefined; });
 }
 
-module.exports = { exchange, registerCaller };
+function registerRunner(pi, getAgentDir, defaults, version, schemas) {
+  const names = ['context_describe', 'context_list', 'context_read', 'context_search'];
+  for (const name of names) pi.registerTool({name, label:name, description:'Read authorized caller context.', parameters:schemas[name],
+    async execute(_id, args, signal) {
+      let result;
+      try {
+        if (!args || typeof args !== 'object' || Array.isArray(args) || Object.hasOwn(args, 'operation')) throw new Error('INVALID_ARGUMENT');
+        result = await exchange(defaults, {op:'context',request:{operation:name.slice(8),...args}}, signal, true);
+      } catch (error) { result = {error:{code:code(error)}}; }
+      return {content:[{type:'text',text:JSON.stringify(result)}],details:{}};
+    }});
+  pi.on('tool_call', event => names.includes(event.toolName) ? undefined : {block:true,reason:'TOOL_DENIED'});
+  pi.on('session_start', async () => {
+    const tools = pi.getAllTools().map(tool => tool.name).sort(), active = [...pi.getActiveTools()].sort();
+    if (JSON.stringify(tools) !== JSON.stringify(names) || JSON.stringify(active) !== JSON.stringify(names)) throw new Error('TOOL_DENIED');
+    const result = await exchange(defaults, {op:'ready',agent_dir:fs.realpathSync(getAgentDir()),version,tools,active_tools:active},undefined,true);
+    if (result.ready !== true) throw new Error('PROTOCOL_INVALID');
+  });
+}
+module.exports = { exchange, registerCaller, registerRunner };

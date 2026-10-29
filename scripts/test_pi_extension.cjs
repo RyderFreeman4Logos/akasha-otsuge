@@ -4,7 +4,7 @@ const { test } = require('node:test');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { registerCaller, exchange } = require('../plugins/pi/bridge.cjs');
+const { registerCaller, registerRunner, exchange } = require('../plugins/pi/bridge.cjs');
 
 function fixture(t, behavior = '') {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'akasha-pi-extension-'));
@@ -124,4 +124,31 @@ test('bridge cancellation reaps its child and rejects bounded malformed replies'
   const pid = Number(fs.readFileSync(pidFile, 'utf8'));
   abort.abort(); await rejected;
   assert.throws(() => process.kill(pid, 0), {code:'ESRCH'});
+});
+
+test('runner registers only context tools and attests real inventories before work', async t => {
+  const f = fixture(t, `if (event.op === 'ready' || event.op === 'context') {
+    if (process.argv.at(-1) !== 'pi-context') process.exit(2);
+    console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:event.op === 'ready' ? {ready:true} : {kind:'description'}})); return;
+  }`);
+  const names = ['context_describe', 'context_list', 'context_read', 'context_search'];
+  f.pi.getAllTools = () => names.map(name => ({name}));
+  f.pi.getActiveTools = () => names;
+  registerRunner(f.pi, () => f.agent, f.defaults, '1.4.0', Object.fromEntries(names.map(name => [name, {type:'object'}])));
+  assert.deepEqual(Object.keys(f.tools).sort(), names);
+  assert.deepEqual(f.requests(), []);
+  await f.hooks.session_start({}, f.ctx);
+  const ready = f.requests()[0];
+  assert.deepEqual(ready, {op:'ready',agent_dir:f.agent,version:'1.4.0',tools:names,active_tools:names});
+  assert.deepEqual(await f.hooks.tool_call({toolName:'bash'},f.ctx), {block:true,reason:'TOOL_DENIED'});
+  assert.equal(await f.hooks.tool_call({toolName:'context_read'},f.ctx), undefined);
+  const result = await f.tools.context_describe.execute('native-context',{},undefined,undefined,f.ctx);
+  assert.equal(JSON.parse(result.content[0].text).kind, 'description');
+  const count = f.requests().length;
+  const denied = await f.tools.context_describe.execute('native-context',{operation:'read'},undefined,undefined,f.ctx);
+  assert.equal(JSON.parse(denied.content[0].text).error.code, 'INVALID_ARGUMENT');
+  assert.equal(f.requests().length, count);
+  f.pi.getActiveTools = () => [...names,'bash'];
+  await assert.rejects(f.hooks.session_start({},f.ctx), /TOOL_DENIED/);
+  assert.equal(f.requests().length, count);
 });

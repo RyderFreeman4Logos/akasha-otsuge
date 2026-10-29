@@ -10,6 +10,8 @@ mod caller;
 mod capture;
 #[path = "support/pi_install.rs"]
 mod installation;
+#[path = "support/pi_runner.rs"]
+mod runner;
 
 struct Fixture(PathBuf);
 impl Fixture {

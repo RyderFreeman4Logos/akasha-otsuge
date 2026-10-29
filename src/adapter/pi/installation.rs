@@ -116,6 +116,28 @@ fn temporary(path: &Path) -> Result<PathBuf> {
     Ok(path.with_file_name(format!(".akasha-{}", hash(&nonce))))
 }
 
+pub(super) fn runner_extension(home: &Path) -> Result<PathBuf> {
+    let path = destination(home, false)?;
+    verify(&path, false)?;
+    let bytes = read(&path.join(FILES[0]))?;
+    let installed = std::str::from_utf8(&bytes).map_err(|_| Error("ADAPTER_INSTALL_CONFLICT"))?;
+    let defaults = installed
+        .lines()
+        .find(|line| line.starts_with("const DEFAULTS = "))
+        .ok_or(Error("ADAPTER_INSTALL_CONFLICT"))?;
+    let _: Value = serde_json::from_str(
+        defaults
+            .trim_start_matches("const DEFAULTS = ")
+            .trim_end_matches(';'),
+    )?;
+    if SOURCE.replacen("const DEFAULTS = {};", defaults, 1) != installed
+        || read(&path.join(FILES[1]))? != BRIDGE
+    {
+        return Err(Error("ADAPTER_INSTALL_CONFLICT"));
+    }
+    Ok(path.join(FILES[0]))
+}
+
 pub async fn install(binary: &Path, home: &Path, socket: &Path) -> Result<Value> {
     let report = super::probe(binary).await?;
     if report.version.as_deref() != Some(super::SUPPORTED_VERSION) {

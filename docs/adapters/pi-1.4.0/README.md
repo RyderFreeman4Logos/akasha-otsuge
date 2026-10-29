@@ -50,10 +50,33 @@ an interruption completes the same removal. Extra user files remain in place;
 native settings and credentials are never edited. Changing the executable or
 socket requires uninstalling the unchanged extension and installing again.
 
+## RPC Runner
+
+The Runner uses the same selected Pi profile and its native authentication. It
+starts a separate `--mode rpc --no-session` process with the installed extension
+and exactly four tools: `context_describe`, `context_list`, `context_read` and
+`context_search`. Built-in tools, other extensions, MCP, skills, prompt templates,
+themes and context files are disabled. The native tool inventory must match
+before the Runner sends its prompt. Each run has a private read capability and
+an abstract Unix socket with peer-UID checks; model arguments cannot choose the
+source session or expand its scope.
+
+Responses are correlated to the submitted prompt. Completion requires a final
+JSON answer, native `agent_settled` and zero process exit. `agent_end` can precede
+automatic retries and is not completion. The original deadline and shared
+budgets cover tools, events and cleanup. Cancellation kills the owned process
+group, including bridge children, and reaps it before releasing run resources.
+
 ## Evidence limits
 
-Native SDK loading, native SessionManager tree fixtures, four Node bridge
-regressions, ten Rust Pi tests and daemon recovery/cancellation checks pass.
+Native SDK loading, native SessionManager tree fixtures, five Node bridge
+behaviors, three controlled Runner regressions and daemon recovery/cancellation
+checks pass. The Runner cases include 21 negative scenarios and exercise the
+actual Rust context bridge. A separate native SDK lifecycle harness binds three
+calls across root/reload/fork, reconciles another extension's message transform,
+context edits, compaction, resume and interrupted shutdown, and drains seven
+capture jobs. Its messages are synthetic; it does not prove authenticated model
+execution.
 The bridge's child cleanup and output bounds are tested with controlled executables.
 Two earlier Caller identity tests reported `HISTORY_GAP` during a full run.
 A content-free timing probe subsequently passed (cold reconcile 1.136–1.313s);
@@ -62,5 +85,5 @@ now pre-capture their histories, separating binding assertions from cold ingest.
 Cold tree capture and daemon-driven cold binding retain separate integration
 coverage. Production timeouts are unchanged.
 
-Authenticated native Caller/lifecycle acceptance, RPC Runner, final review and
+Authenticated native Caller/Runner acceptance, final review and
 publication remain tracked in [the complete checklist](../../plan/todo.md).

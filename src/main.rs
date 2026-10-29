@@ -152,6 +152,21 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         output(&bytes, false)?;
         return Ok(0);
     }
+    if let ["adapter", "pi-context"] = command.as_slice() {
+        use std::io::Read;
+        let mut bytes = Vec::new();
+        io::stdin().take(16385).read_to_end(&mut bytes)?;
+        if bytes.len() > 16384 {
+            return Err(Error("MESSAGE_TOO_LARGE"));
+        }
+        let reply =
+            akasha_otsuge::adapter::pi::context_bridge::call(serde_json::from_slice(&bytes)?)
+                .await?;
+        let mut bytes = serde_json::to_vec(&reply)?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(if reply.get("error").is_some() { 1 } else { 0 });
+    }
     if let [
         "adapter",
         "uninstall",

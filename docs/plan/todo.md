@@ -628,6 +628,10 @@ Completed #14 implementation evidence:
 - [ ] Reconcile input/message/session lifecycle events against persisted originals,
   including other extensions' transformations, reload, resume, interruption and
   delta/final deduplication. Interactive input alone never proves human authority.
+  A native1.4.0 SDK lifecycle harness passes three root/reload/fork bindings,
+  transformed-message reconciliation, context edits, compaction, resume and
+  interrupted shutdown, with seven completed capture jobs. Messages are synthetic;
+  actual authenticated native CLI coverage remains below.
 - [x] Provide a minimal native extension with opt-in installation, integrity
   checks and recoverable uninstall that preserves unrelated user configuration.
   The pinned native SDK loads it successfully. Four Node extension regressions,
@@ -638,6 +642,10 @@ Completed #14 implementation evidence:
   capability/tool inventory checks, LF-delimited correlated responses,
   `agent_settled` completion plus zero exit, bounded output, original deadlines,
   cancellation and process-group cleanup. Verify forbidden tool operations.
+  Three controlled Runner regressions pass through the real Rust context CLI,
+  including21 refusal cases, retry settlement and group cancellation. Five Node
+  extension behaviors pass. Native authenticated tool inventory and execution
+  remain to be qualified before this item is complete.
 - [ ] Exercise real authenticated Caller and Runner with the other three CLIs
   absent, including concurrent sessions, tree branches/forks, reload/resume,
   context edits, compaction and interruption. Retain sanitized native fixtures,
