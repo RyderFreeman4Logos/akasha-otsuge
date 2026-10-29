@@ -37,6 +37,17 @@ pub async fn reconcile_export(
     // Decode the complete bounded snapshot before writing anything: malformed or foreign
     // snapshots never advance a successful checkpoint or turn into empty history.
     let frames = super::export::decode_export(source, profile, bytes)?;
+    reconcile_frames(store, source, scope, &frames, limit, config).await
+}
+
+pub(super) async fn reconcile_frames(
+    store: &Storage,
+    source: &SourceIdentity,
+    scope: Scope,
+    frames: &[CaptureFrame],
+    limit: usize,
+    config: u64,
+) -> Result<ExportReport> {
     let snapshot = hash(&serde_json::to_vec(&frames)?);
     let binding = CaptureBinding::from_source(
         source.clone(),

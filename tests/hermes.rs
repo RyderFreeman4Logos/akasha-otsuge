@@ -5,6 +5,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "support/hermes_caller.rs"]
+mod caller;
+
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
