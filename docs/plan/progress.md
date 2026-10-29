@@ -16,8 +16,9 @@ and free RPC qualification pass, preserving the default0.78.0 install. Two docto
 regressions and the actual native version probe pass; doctor makes no model claim.
 Native version3 tree semantics and `agent_settled` govern the implementation;
 native tree capture now passes three regressions using native SessionManager
-fixtures, plus both doctor tests and all-target Clippy. No Caller or Runner
-acceptance is claimed yet. The complete TODO lists every
+fixtures. The Rust Caller adds four regressions for persisted tool identity,
+branch isolation, retries and revoked grants; all nine Pi tests and Clippy pass.
+Native extension Caller and Runner acceptance remain outstanding. The complete TODO lists every
 remaining criterion. #12 still waits for lawful Claude authentication in draft #41.
 
 ## Completed Hermes adapter: MVP-014

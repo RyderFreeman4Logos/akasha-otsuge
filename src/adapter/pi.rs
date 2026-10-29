@@ -2,6 +2,8 @@
 use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
 mod transcript;
 pub use transcript::reconcile_transcript;
+mod caller;
+pub use caller::{PiCall, PiCaller, PiRegistration, profile_key};
 
 pub const SUPPORTED_VERSION: &str = "1.4.0";
 pub const TRANSCRIPT_STREAM: &str = "pi-native-tree-v1";

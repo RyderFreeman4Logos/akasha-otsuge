@@ -4,6 +4,8 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "support/pi_caller.rs"]
+mod caller;
 #[path = "support/pi_capture.rs"]
 mod capture;
 

@@ -110,7 +110,7 @@ fn validate_header(row: &Value, source: &SourceIdentity) -> Result<()> {
     Ok(())
 }
 
-fn decode(
+pub(super) fn decode(
     store: &Storage,
     binding: &CaptureBinding,
     source: &SourceIdentity,

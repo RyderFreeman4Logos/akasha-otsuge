@@ -619,6 +619,9 @@ Completed #14 implementation evidence:
 - [ ] Bind extension calls to actual session/file/workspace/leaf/tool-call identity
   and current grants. Refuse unproven nested calls and changed registrations;
   verify simultaneous sessions, durable retries and immutable fences.
+  The Rust Caller passes four new regressions for exact persisted calls, selected
+  ancestry, simultaneous profiles, durable fences and current permission revocation.
+  All nine Pi tests and all-target Clippy pass; native extension transport remains.
 - [ ] Reconcile input/message/session lifecycle events against persisted originals,
   including other extensions' transformations, reload, resume, interruption and
   delta/final deduplication. Interactive input alone never proves human authority.
