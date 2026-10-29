@@ -75,3 +75,16 @@ The retained workspace and policy text are synthetic. Owned processes ended befo
 scratch removal; the isolated Codex pin remains for the later MVP-027 evaluation.
 The original native profiles were preserved. See the complete [remaining issue
 queue](../../../plan/todo.md) for acceptance still assigned to later milestones.
+
+The final CI40951189004 retained a running descendant after native cancellation
+was acknowledged. A controlled shared-reaper test reproduces premature resource
+release when the leader exits first. The successor fix retains its PID and the
+resources until the entire observed process group has exited, preserving the
+original one-second acknowledgement grace. All 73 affected Rust tests pass, as
+do Clippy, formatting and five real Pi protocol cases (roundtrip, retry, denied
+handle, cancellation and forbidden tool), with no owned process or scratch
+residue. [group-settlement.json](group-settlement.json) binds the tested source
+and binary hashes; final gate/review/CI checks are recorded on PR45. This CI
+failure is not relabeled as a passing run. The earlier 26-minute native HTTP
+deadline receipt retains its original identity; this cleanup change has its own
+short native qualification.

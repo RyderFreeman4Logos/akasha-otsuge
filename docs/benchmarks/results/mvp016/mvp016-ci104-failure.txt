@@ -1,0 +1,36 @@
+HEAD f55d19b3ed91e195012e90339492c2168cd89be0; CI40951189004; job123719425969
+2026-10-29T20:44:47.7668847Z test runner::rpc_runner_rejects_authority_protocol_inventory_and_incomplete_terminals ... ok
+2026-10-29T20:44:47.7669269Z 
+2026-10-29T20:44:47.7669352Z failures:
+2026-10-29T20:44:47.7669470Z 
+2026-10-29T20:44:47.7669721Z ---- runner::rpc_runner_cancel_reaps_native_group_before_resource_release stdout ----
+2026-10-29T20:44:47.7670060Z 
+2026-10-29T20:44:47.7670501Z thread 'runner::rpc_runner_cancel_reaps_native_group_before_resource_release' (7807) panicked at tests/support/pi_runner.rs:189:9:
+2026-10-29T20:44:47.7671092Z assertion `left == right` failed
+2026-10-29T20:44:47.7671355Z   left: Some("R")
+2026-10-29T20:44:47.7671557Z  right: Some("Z")
+2026-10-29T20:44:47.7671886Z note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+2026-10-29T20:44:47.7672192Z 
+2026-10-29T20:44:47.7672197Z 
+2026-10-29T20:44:47.7672275Z failures:
+2026-10-29T20:44:47.7672578Z     runner::rpc_runner_cancel_reaps_native_group_before_resource_release
+2026-10-29T20:44:47.7672878Z 
+2026-10-29T20:44:47.7673154Z test result: FAILED. 12 passed; 1 failed; 4 ignored; 0 measured; 0 filtered out; finished in 10.07s
+2026-10-29T20:44:47.7673538Z 
+2026-10-29T20:44:47.7699555Z error: test failed, to rerun pass `--test pi`
+2026-10-29T20:44:47.7831892Z ##[error]Process completed with exit code 101.
+2026-10-29T20:44:47.7975127Z Post job cleanup.
+2026-10-29T20:44:47.8883192Z [command]/usr/bin/git version
+2026-10-29T20:44:47.8932423Z git version 2.56.0
+2026-10-29T20:44:47.8974882Z Temporarily overriding HOME='/home/runner/work/_temp/21b3f045-e630-404e-bf7f-1af0a636eae7' before making global git config changes
+2026-10-29T20:44:47.8975867Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-29T20:44:47.8981068Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/akasha-otsuge/akasha-otsuge
+2026-10-29T20:44:47.9018264Z Removing SSH command configuration
+2026-10-29T20:44:47.9025160Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-29T20:44:47.9066746Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-29T20:44:47.9346626Z Removing HTTP extra header
+2026-10-29T20:44:47.9352892Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-29T20:44:47.9392687Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-29T20:44:47.9669746Z Removing includeIf entries pointing to credentials config files
+2026-10-29T20:44:47.9683571Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+

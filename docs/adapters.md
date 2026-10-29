@@ -126,8 +126,11 @@ unchanged. Akasha's configured Runner deadline governs this subprocess, includin
 when it is shorter than Pi's profile timeout. Later requests and retries remain
 bounded by the original outer deadline; this override cannot restart that clock.
 
-Claude cleanup has a separate one-second grace period, which repeated waits do
-not renew. Cancellation reports `acknowledged: false` if exit is still unknown;
+Native Runner cleanup has a separate one-second grace period, which repeated
+waits do not renew. Unguarded process groups retain the leader PID and resources
+until every observed group member has exited; a failed process-state inspection
+keeps cleanup unacknowledged. Daemon-owned guardians retain their subreaper path.
+Cancellation reports `acknowledged: false` if exit is still unknown;
 the original timeout/error remains authoritative. A background cleanup owner
 retains the child, workspace and concurrency lease until exit is observed, even
 after the handle is dropped. The version probe uses the same bounded cleanup

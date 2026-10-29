@@ -674,6 +674,12 @@ links exact identities and preserves the distinct controlled/native results.
   independent R4 source review and CI40946026740 pass on2254396; the final changed
   candidate still requires its own gate and review. CI40940522570's stale Claude
   deadline fixture failure is retained separately from its passing repair.
+  Final CI40951189004 exposed cancellation acknowledgement before a native
+  descendant exited. A deterministic shared-reaper control reproduces early
+  release; the correction retains the leader PID/resources until group settlement.
+  All 73 affected Rust tests, Clippy and formatting pass; five real Pi protocol
+  cases pass with no owned process or scratch residue. Successor independent
+  review and final canonical/CI remain required.
 
 #16 process correction: keep feature scope frozen. The demonstrated bridge
 failure class is repaired; finish the same candidate through publication. Native

@@ -3,8 +3,13 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 4944,
-      "sha256": "150c9b676395f17b5126239c73fdb60e9f2732aefd6675b3e66b4cbf43dcb039"
+      "bytes": 5837,
+      "sha256": "a700170afee544db3dcdf576811900c19eadbafd335d1f69bbad05ffb8bb41ae"
+    },
+    {
+      "path": "group-settlement.json",
+      "bytes": 9044,
+      "sha256": "c589a207e34b46a4290a9d1e74d1e883b771370b28ccc1a72b4fc469f9192092"
     },
     {
       "path": "harnesses/mvp016-codex-pin.json",
@@ -40,6 +45,21 @@
       "path": "harnesses/mvp016_native_trace2.py",
       "bytes": 2627,
       "sha256": "18b8fc8a1c4cec8b90097679286e1091ab8dd0627e8478235553c0431bff4d26"
+    },
+    {
+      "path": "mvp016-ci104-failure.txt",
+      "bytes": 3002,
+      "sha256": "2d18231df30e5ba830b5f273efab0b93d7c99fb563c85e61edb84336bc69ac17"
+    },
+    {
+      "path": "mvp016-group-settlement-green.log",
+      "bytes": 20056,
+      "sha256": "ca67460cdf63a4ed5b63d64afcd0b7d40ab3d599945a1feb003dc339746990a1"
+    },
+    {
+      "path": "mvp016-group-settlement-red.log",
+      "bytes": 2907,
+      "sha256": "9d3d61bda43c8f0644684183b75d264e6fb2611cd63cf3a0c365f20a0d05578e"
     },
     {
       "path": "mvp016-hermes-greeting-red.log",
