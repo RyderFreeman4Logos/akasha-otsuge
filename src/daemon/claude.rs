@@ -80,6 +80,11 @@ impl Service {
         {
             return Err(Error("READ_DENIED"));
         }
+        if let Some(home) = &registration.native_home
+            && self.allowed_path(home)? != *home
+        {
+            return Err(Error("READ_DENIED"));
+        }
         Ok(registration)
     }
     pub(super) async fn claude(self: &Arc<Self>, event: NativeEvent) -> Result<serde_json::Value> {
@@ -96,6 +101,7 @@ impl Service {
                     transcript_path,
                     cwd,
                     start_kind,
+                    native_home,
                 } => {
                     if !ipc::identifier(&session_id)
                         || start_kind.as_deref().is_some_and(|kind| {
@@ -127,6 +133,9 @@ impl Service {
                         workspace,
                         parent: None,
                         start_kind,
+                        native_home: native_home
+                            .map(|path| service.allowed_path(&path))
+                            .transpose()?,
                     };
                     service
                         .save_claude_registration(registration, generation)
@@ -171,6 +180,7 @@ impl Service {
                         scope: parent.scope,
                         workspace: parent.workspace,
                         start_kind: None,
+                        native_home: parent.native_home,
                     };
                     service
                         .save_claude_registration(registration, generation)
@@ -186,6 +196,33 @@ impl Service {
                     };
                     let invocation = caller.bind(&caller.call.tool_call_id).await?;
                     Ok(serde_json::to_value(invocation.diagnostic())?)
+                }
+                NativeEvent::Consult { call, args } => {
+                    let registration = service.claude_registration(&call.registration)?;
+                    let native = jobs::consult::NativeExecutor {
+                        host: registration.capability.host,
+                        binary: registration
+                            .capability
+                            .executable
+                            .clone()
+                            .ok_or(Error("EXECUTOR_UNAVAILABLE"))?,
+                        home: registration
+                            .native_home
+                            .clone()
+                            .ok_or(Error("BINDING_UNAVAILABLE"))?,
+                    };
+                    let caller = ClaudeCaller {
+                        store: service.storage.clone(),
+                        registration,
+                        call,
+                        generation,
+                    };
+                    let invocation = caller.bind(&caller.call.tool_call_id).await?;
+                    drop(_guard);
+                    let job = service.submit_consult(invocation, native, args).await?;
+                    service
+                        .show_consult(job["id"].as_str().ok_or(Error("JOB_CORRUPT"))?)
+                        .await
                 }
                 NativeEvent::Sync {
                     registration: token,

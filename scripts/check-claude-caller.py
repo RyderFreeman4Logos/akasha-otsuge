@@ -1,10 +1,12 @@
 import datetime, fcntl, hashlib, http.server, json, os, pathlib, pty, re, select, shutil, signal, struct, subprocess, sys, termios, threading, time
 
-# Uses the real host, hook module, daemon and Storage with local synthetic SSE.
+# Uses the real Caller, daemon and Storage with local synthetic SSE.
+# Consult is replaced by a Bind probe here; this script does not qualify Runner execution.
 # The scratch path must be new; all owned processes and scratch files are removed.
 REPO=pathlib.Path(__file__).resolve().parents[1]
 NATIVE, AKASHA, ROOT = [pathlib.Path(value).resolve() for value in sys.argv[1:]]
 assert NATIVE.is_file() and AKASHA.is_file() and not ROOT.exists()
+assert subprocess.check_output([str(NATIVE),'--version'],text=True,timeout=10).strip()=='2.1.311 (Claude Code)', 'unsupported native Claude version'
 KEY='akasha-caller-fixture-not-real'
 ROOT.mkdir(mode=0o700)
 for name in ['home','config','workspace','plugin/.claude-plugin','plugin/hooks']:(ROOT/name).mkdir(parents=True,exist_ok=True)
@@ -14,23 +16,23 @@ config=ROOT/'akasha.toml';config.write_text('[paths]\ndata_dir='+json.dumps(str(
 argv=[str(AKASHA),'--config',str(config),'--socket',str(socket)]
 wrapper=ROOT/'bridge';wrapper.write_text('#!/usr/bin/python3\n'+'''import json,subprocess,sys,pathlib
 event=json.load(sys.stdin)
+consult_probe=event['op']=='consult'
+if consult_probe:event=dict(event['call'],op='bind')
 result=subprocess.run(ARGV+['adapter','claude-call'],input=json.dumps(event).encode(),stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=12)
 response=json.loads(result.stdout if result.returncode==0 else result.stderr)
 record={'event':{k:v for k,v in event.items() if k not in ['registration','parent_registration']},'response':response}
 if event['op'] in ['register','register_child'] and response.get('data'):record={'event':record['event'],'registered':True}
 with LOG.open('a') as f:f.write(json.dumps(record)+'\\n')
-sys.stdout.buffer.write(result.stdout);sys.stderr.buffer.write(result.stderr);sys.exit(result.returncode)
+if consult_probe and result.returncode==0:
+ print(json.dumps({'data':{'probe':'native caller probe','binding_verified':True,'consult_submitted':False}}))
+else:sys.stdout.buffer.write(result.stdout)
+sys.stderr.buffer.write(result.stderr);sys.exit(result.returncode)
 '''.replace('ARGV',repr(argv)).replace('LOG',"pathlib.Path("+repr(str(ROOT/'bridge.jsonl'))+")"));wrapper.chmod(0o700)
 (ROOT/'plugin/.claude-plugin/plugin.json').write_text('{"name":"akasha-otsuge","version":"0.1.0","description":"Native caller protocol fixture"}')
 (ROOT/'plugin/hooks/hooks.json').write_text('{"modules":["./entry.js"]}')
 shutil.copyfile(REPO/'src/adapter/claude/caller.js',ROOT/'plugin/hooks/caller.js')
 (ROOT/'plugin/hooks/config.js').write_text('export const bridge='+json.dumps(str(wrapper))+';\nexport const binary='+json.dumps(str(NATIVE))+';\nexport const args=[];\n')
-(ROOT/'plugin/hooks/probe.js').write_text('''export function register(on) {
- on('session.start',async ($,e,next)=>{await $.tool.register({name:'consult',description:'Test native binding before a tool executes',inputSchema:{type:'object',properties:{hint:{type:'string'}},additionalProperties:false},isDeferred:false});return next(e);});
- on('tool.check',async ($,e,next)=>e.tool==='mcp__akasha-otsuge__consult'?{decision:'allow'}:next(e));
- on('tool.call',async ($,e,next)=>e.tool==='mcp__akasha-otsuge__consult'?{result:'native caller probe'}:next(e));
-}''')
-(ROOT/'plugin/hooks/entry.js').write_text("import {register as caller} from './caller.js'; import {register as probe} from './probe.js'; export function register(on) {caller(on);probe(on);}")
+(ROOT/'plugin/hooks/entry.js').write_text("import {register as callerRegister} from './caller.js';\nexport function register(on){callerRegister(on);}")
 workspace=str((ROOT/'workspace').resolve())
 (ROOT/'config/.claude.json').write_text(json.dumps({'hasCompletedOnboarding':True,'lastOnboardingVersion':'2.1.311','customApiKeyResponses':{'approved':[KEY[-20:]],'rejected':[]},'projects':{workspace:{'hasTrustDialogAccepted':True}}}))
 stage = ''
@@ -184,7 +186,7 @@ try:
  validation=subprocess.run([str(NATIVE),'plugin','validate',str(installed)],env=env,capture_output=True,timeout=10)
  assert validation.returncode==0,validation.stdout+validation.stderr
  stage='installed';count=0
- child=subprocess.Popen(launch+['-p','--output-format','stream-json','--verbose','--tools','','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources','','--session-id',installed_session],cwd=workspace,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+ child=subprocess.Popen(launch+['-p','--output-format','stream-json','--verbose','--tools','ToolSearch','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources','','--session-id',installed_session],cwd=workspace,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
  try:stdout,stderr=child.communicate(b'PRIVATE_INSTALLED_PLUGIN_INPUT',timeout=30)
  finally:
   if child.poll() is None:
@@ -194,7 +196,7 @@ try:
  stage='parallel';count=0;parallel=[]
  try:
   for name,identity in zip(['A','B'],parallel_sessions,strict=True):
-   child=subprocess.Popen(launch+['-p','PRIVATE_PARALLEL_'+name,'--session-id',identity,'--tools','','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources',''],cwd=workspace,env=env,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+   child=subprocess.Popen(launch+['-p','PRIVATE_PARALLEL_'+name,'--session-id',identity,'--tools','ToolSearch','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources',''],cwd=workspace,env=env,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
    parallel.append(child)
   assert all(child.poll() is None for child in parallel),'native sessions did not overlap'
   for name,child in zip(['A','B'],parallel,strict=True):
@@ -206,11 +208,11 @@ try:
   for child in parallel:
    if child.poll() is None:os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=5)
  stage='tui';count=0;tui_session='55555555-5555-4555-8555-555555555555'
- tui_check=tui(launch+['PRIVATE_TUI_INPUT','--session-id',tui_session,'--tools','','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources',''],'Observed caller tui')
+ tui_check=tui(launch+['PRIVATE_TUI_INPUT','--session-id',tui_session,'--tools','ToolSearch','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources',''],'Observed caller tui')
  tui_requests=[r for r in requests if r['stage']=='tui']
  assert sum(r['kind']=='conversation' for r in tui_requests)==1 and sum(r['kind']=='title' for r in tui_requests)<=1
  stage='tui_resume';count=0
- tui_resume=tui(launch+['PRIVATE_TUI_RESUME','--resume',tui_session,'--tools','','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources',''],'Observed caller tui_resume',[
+ tui_resume=tui(launch+['PRIVATE_TUI_RESUME','--resume',tui_session,'--tools','ToolSearch','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--setting-sources',''],'Observed caller tui_resume',[
   ('tui_compact','/compact','Compacted',False),
   ('tui_after_compact','PRIVATE_TUI_AFTER_COMPACT','Observed caller tui_after_compact',True)])
  end=time.monotonic()+15
@@ -263,7 +265,7 @@ try:
  tui_check['capture_jobs']=sum(j['binding']['source']['session']==tui_session for j in jobs);checks.append(tui_check)
  checks.append(tui_resume)
  assert not errors,errors
- print(json.dumps({'native_sha256':hashlib.sha256(NATIVE.read_bytes()).hexdigest(),'akasha_sha256':hashlib.sha256(AKASHA.read_bytes()).hexdigest(),'native_bindings':len(bindings),'native_backfill_jobs':len(syncs),'checks':checks,'traces':traces,'authenticated_model_acceptance':False}),flush=True)
+ print(json.dumps({'native_sha256':hashlib.sha256(NATIVE.read_bytes()).hexdigest(),'akasha_sha256':hashlib.sha256(AKASHA.read_bytes()).hexdigest(),'native_bindings':len(bindings),'native_backfill_jobs':len(syncs),'checks':checks,'traces':traces,'authenticated_model_acceptance':False,'consult_execution':'not_exercised_caller_probe_only'}),flush=True)
 finally:
  server.shutdown();thread.join(timeout=2);server.server_close()
  try:

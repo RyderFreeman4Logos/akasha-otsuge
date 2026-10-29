@@ -45,6 +45,7 @@ async function fixture(initialCwd = '/workspace/A') {
   const session = 'native-session';
   const $ = {
     session: { id: async () => session, cwd: async () => cwd },
+    env: {get:async key => key === 'HOME' ? '/fixture/home' : undefined},
     agent: { list: async () => [{ id: 'child' }, { id: 'grandchild', parentId: 'child' }] },
     process: { run: async (_argv, { stdin }) => {
       const event = JSON.parse(stdin);
@@ -53,14 +54,15 @@ async function fixture(initialCwd = '/workspace/A') {
         const parent = registrations.get(event.parent_registration);
         if (event.op === 'register_child') assert.ok(parent);
         const registration = `registration-${registrations.size}`;
+        if (!parent) assert.equal(event.native_home, '/fixture/home/.claude');
         registrations.set(registration, { cwd: parent ? parent.cwd : event.cwd });
         data = { registration };
       } else {
-        assert.equal(event.op, 'bind');
-        const registered = registrations.get(event.registration);
+        assert.equal(event.op, 'consult');
+        const registered = registrations.get(event.call.registration);
         assert.ok(registered);
-        data = { workspace: registered.cwd };
-        binds.push({ ...event, ...data });
+        data = {status:'pending',job_id:'consult-fixture',receipt_id:null};
+        binds.push({...event.call, args:event.args, workspace:registered.cwd});
       }
       return { exitCode: 0, stdout: JSON.stringify({ data }), stderr: '' };
     } },
@@ -79,22 +81,25 @@ async function fixture(initialCwd = '/workspace/A') {
   }
   return {
     move: path => { cwd = path; },
-    async invoke(agentId) {
+    async invoke(agentId, hint) {
       const before = binds.length;
       let executed = false;
-      const result = await hooks.get('tool.call')($, { agentId, tool_use_id: `call-${before}` }, async () => {
+      const result = await hooks.get('tool.call')($, { agentId, tool_use_id: `call-${before}`, hint }, async () => {
         executed = true;
         return { workspace: binds.at(-1).workspace };
       });
-      if (executed) {
+      assert.equal(executed, false, 'the registered tool must handle its own result');
+      if (result.result) {
         assert.equal(binds.length, before + 1);
-        assert.equal(result.workspace, cwd, 'tool body received stale workspace');
+        assert.equal(binds.at(-1).workspace, cwd, 'tool received stale workspace');
         assert.equal(binds.at(-1).tip, `tip-${agentId || 'root'}`);
+        assert.deepEqual(binds.at(-1).args, {hint:hint ?? null});
+        assert.equal(JSON.parse(result.result).status, 'pending');
       } else {
-        assert.deepEqual(result, { deny: 'BINDING_UNAVAILABLE' });
-        assert.equal(binds.length, before, 'refusal must precede binding');
+        assert(['BINDING_UNAVAILABLE','INVALID_ARGUMENT'].includes(result.deny));
+        assert.equal(binds.length, before, 'refusal must precede submission');
       }
-      return executed;
+      return Boolean(result.result);
     },
   };
 }
@@ -117,3 +122,26 @@ for (const agentId of [undefined, 'child', 'grandchild']) {
     }
   });
 }
+
+
+test('caller registers the real consult tool with only an optional hint', async () => {
+  const { register } = await import(`data:text/javascript;base64,${Buffer.from(fixtureSource).toString('base64')}#${instance++}`);
+  const hooks = new Map(), definitions = [];
+  register((name, ...args) => { hooks.set(name, args.at(-1)); return {catch: () => {}}; });
+  assert(hooks.has('session.start'), 'the installed caller must register its model tool');
+  const $ = {tool:{register:async definition => definitions.push(definition)}};
+  await hooks.get('session.start')($, {}, async () => {});
+  assert.equal(definitions.length, 1);
+  assert.equal(definitions[0].name, 'consult');
+  assert.deepEqual(Object.keys(definitions[0].inputSchema.properties), ['hint']);
+  assert.equal(definitions[0].inputSchema.additionalProperties, false);
+  assert.deepEqual(await hooks.get('tool.check')($, {tool:'mcp__akasha-otsuge__consult'}, async () => 'untouched'), {decision:'allow'});
+});
+
+
+test('caller accepts empty and Unicode hints and rejects oversized hints before submission', async () => {
+  const host = await fixture();
+  assert.equal(await host.invoke(undefined, ''), true);
+  assert.equal(await host.invoke(undefined, '😀'.repeat(512)), true);
+  assert.equal(await host.invoke(undefined, '😀'.repeat(513)), false);
+});

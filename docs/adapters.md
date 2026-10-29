@@ -48,12 +48,11 @@ retained context; unavailable or missing originals must be reported as gaps.
 
 ## Consult results and continuation
 
-A trusted Consult submission creates a durable job handle. Pi and Hermes native
-tools now submit Consult using their automatically verified identity and optional
+A trusted Consult submission creates a durable job handle. Pi, Hermes and Claude
+native tools submit Consult using their automatically verified identity and optional
 hint. Pending results survive the short caller request; use the same daemon socket
 or CLI profile for the commands below. The installed Codex hook submits Consult
-and transports its follow-up commands through the read-only sandbox. The Claude
-caller entry remains part of MVP-016.
+and transports its follow-up commands through the read-only sandbox.
 A binding diagnostic is not a completed Consult.
 
 ```sh
@@ -428,13 +427,18 @@ unregistered child is refused. Re-registering the same source preserves call
 identity. Brief native transcript flush delays are retried within the same
 catch-up deadline; malformed records remain explicit gaps.
 
-The native `caller.js` module captures session, turn and append events, binds
-the consult call before its body executes, and queues durable backfill on turn
-completion and session end. It registers only after the native transcript
-directory exists. It declares no model tool; the consult workflow remains #16.
+The native `caller.js` module captures session, turn and append events, registers
+the optional-hint `consult` tool and submits it as a durable job from the verified
+native call. It returns only public status/results and queues durable backfill on
+turn completion and session end. Caller binding waits until the native transcript
+directory exists. The registered native home is inherited by children and checked
+against current read roots before use; diagnostic Bind requests remain supported.
 `scripts/check-claude-caller.py` verifies startup/resume bindings and completed
 backfill with the actual CLI, production hook and daemon under local synthetic
-SSE. Native children are identified by append/turn events and the host's agent
+SSE. That probe replaces Consult with diagnostic Bind and explicitly does not
+qualify Runner execution or authenticated model use. Claude2.1.311 requires at
+least one native builtin (such as `ToolSearch`) to register plugin tools;
+`--tools ""` refuses Consult registration. Native children are identified by append/turn events and the host's agent
 registry. Only a known registered parent can admit a child. The pinned2.1.311
 transcript layout and each frame's session/agent/sidechain identity are checked;
 an unknown or mismatched child cannot fall back to the root. Parent identity is

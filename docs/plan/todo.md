@@ -657,7 +657,13 @@ links exact identities and preserves the distinct controlled/native results.
   The Codex hook now submits Consult and safely transports show/receipt/original
   and cancel through the read-only sandbox. Three hook cases and Clippy pass,
   including concurrent calls, retries, restart, full Unicode output and revocation.
-  Claude's installed entry and authenticated Consult acceptance remain.
+  Claude now registers the real optional-hint tool, retains the native profile and
+  submits a durable Consult. Node7 and eight daemon cases cover submission,
+  deduplication, restart and current directory/read revocation. The native Caller
+  harness passes9.23s with five bindings and13 backfill jobs and its explicit Bind-only scope;
+  authenticated Consult acceptance remains separate. The failed re-export and
+  disabled-builtin fixtures, and the preflight discovery of global Claude2.1.312,
+  are retained separately; this acceptance uses the pinned2.1.311 binary.
 - [ ] Provide progressive context/memory/code reads through shared Rust authority;
   keep current grants, source versions, workspace limits and untrusted content.
   Memory search/get and bound workspace search/read now reuse the existing

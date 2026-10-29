@@ -948,3 +948,69 @@ fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() 
             store.close().await.unwrap();
         });
 }
+
+#[test]
+fn native_claude_consult_returns_public_status_and_deduplicates() {
+    let mut daemon = Daemon::new();
+    daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
+    let binary = daemon.root.join("claude");
+    super::executable::write(
+        &binary,
+        "#!/bin/sh\nif [ \"$1\" = --version ]; then printf '2.1.311 (Claude Code)\\n'; else exit 7; fi\n",
+    );
+    let transcript = daemon.root.join("native.jsonl");
+    std::fs::write(
+        &transcript,
+        include_str!("../fixtures/claude/2.1.311/native-root-resume-compact.jsonl"),
+    )
+    .unwrap();
+    daemon.start();
+    let registration = native_bridge(
+        &daemon,
+        &json!({"op":"register","binary":binary,
+        "session_id":"11111111-1111-4111-8111-111111111111","transcript_path":transcript,
+        "cwd":daemon.root,"native_home":daemon.root,"start_kind":"resume"}),
+    );
+    let token = registration["data"]["registration"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{registration}"));
+    let call = json!({"registration":token,"session_id":"11111111-1111-4111-8111-111111111111",
+        "agent_id":null,"turn_id":"turn-a","tool_call_id":"consult-a","cursor":1,
+        "tip":"a7c3b44a-26cd-4a68-9aff-3e98cce20493"});
+    let event = json!({"op":"consult","call":call,"args":{"hint":null}});
+    let submitted = native_bridge(&daemon, &event);
+    let id = submitted["data"]["job_id"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{submitted}"));
+    assert!(submitted["data"].get("consult_plan").is_none());
+    assert!(submitted["data"].get("run_trace").is_none());
+    assert_eq!(native_bridge(&daemon, &event)["data"]["job_id"], id);
+    let job = terminal(&daemon, id);
+    assert_eq!(job["state"], "failed", "{job}");
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    let replay = native_bridge(&daemon, &event);
+    assert_eq!(replay["data"]["job_id"], id);
+    assert_eq!(replay["data"]["status"], "error");
+    assert!(replay["data"]["receipt_id"].is_null());
+    let mut changed = event.clone();
+    changed["args"]["hint"] = json!("different intent");
+    assert_eq!(
+        native_bridge(&daemon, &changed)["error"]["code"],
+        "IDEMPOTENCY_CONFLICT"
+    );
+    daemon.configure("[access]\nread_roots=[]\n");
+    daemon.cli(&["config", "reload"]);
+    assert_eq!(
+        native_bridge(&daemon, &event)["error"]["code"],
+        "PATH_DENIED"
+    );
+    daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
+    daemon.cli(&["config", "reload"]);
+    daemon.cli(&["access", "revoke"]);
+    assert_eq!(
+        native_bridge(&daemon, &event)["error"]["code"],
+        "READ_DENIED"
+    );
+}

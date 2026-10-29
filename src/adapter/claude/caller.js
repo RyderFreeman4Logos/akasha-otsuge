@@ -41,8 +41,10 @@ async function ensureRegistration($, state, seen = new Set()) {
       await ensureRegistration($, parent, seen);
       event = {op: 'register_child', parent_registration: parent.registration, agent_id: state.agent};
     } else {
+      const home = await $.env.get('CLAUDE_CONFIG_DIR') || ((await $.env.get('HOME')) + '/.claude');
+      if (!home.startsWith('/')) throw new Error('BINDING_UNAVAILABLE');
       event = {op: 'register', binary, session_id: state.session,
-        transcript_path: state.transcript, cwd: state.cwd, start_kind: state.start};
+        transcript_path: state.transcript, cwd: state.cwd, start_kind: state.start, native_home:home};
     }
     const registered = await send($, event);
     state.registration = registered.registration;
@@ -50,6 +52,14 @@ async function ensureRegistration($, state, seen = new Set()) {
 }
 
 export function register(on) {
+  on('session.start', async ($, e, next) => {
+    await $.tool.register({name:'consult',
+      description:'Consult saved user context. A pending result contains a durable job_id; retrieve it with akasha-otsuge consult show JOB_ID or cancel with akasha-otsuge job cancel JOB_ID.',
+      inputSchema:{type:'object',properties:{hint:{type:['string','null'],maxLength:512}},additionalProperties:false},
+      isDeferred:false});
+    return next(e);
+  });
+  on('tool.check', {tool:'mcp__akasha-otsuge__consult'}, async () => ({decision:'allow'}));
   on('classic.SessionStart', async ($, e, next) => {
     const state = {session: e.session_id, transcript: e.transcript_path, cwd: e.cwd, cursor: 0, start: e.source};
     root = state;
@@ -82,6 +92,7 @@ export function register(on) {
   on('classic.SubagentStop', async ($, e, next) => {await sync($, children.get(e.agent_id)); return next(e);});
   on('classic.SessionEnd', async ($, e, next) => {await sync($, root); return next(e);});
   on('tool.call', {tool: 'mcp__akasha-otsuge__consult'}, async ($, e, next) => {
+    if (e.hint != null && (typeof e.hint !== 'string' || [...e.hint].length > 512)) return {deny:'INVALID_ARGUMENT'};
     // Freeze the event fence before any await can allow another turn to advance it.
     const selected = e.agentId ? children.get(e.agentId) : root;
     const generation = root;
@@ -93,8 +104,9 @@ export function register(on) {
     if (cwd !== caller.cwd) return {deny: 'BINDING_UNAVAILABLE'};
     await ensureRegistration($, caller);
     if (root !== generation) return {deny: 'BINDING_UNAVAILABLE'};
-    await send($, {op: 'bind', registration: caller.registration, session_id: caller.session,
-      agent_id: caller.agent || null, turn_id: caller.turn, tool_call_id: e.tool_use_id, cursor: caller.cursor, tip: caller.tip});
-    return next(e);
+    const result = await send($, {op:'consult', args:{hint:e.hint ?? null}, call:{
+      registration:caller.registration, session_id:caller.session, agent_id:caller.agent || null,
+      turn_id:caller.turn, tool_call_id:e.tool_use_id, cursor:caller.cursor, tip:caller.tip}});
+    return {result:JSON.stringify(result)};
   }).catch(() => ({deny: 'BINDING_UNAVAILABLE'}));
 }

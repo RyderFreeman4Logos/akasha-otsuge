@@ -17,12 +17,18 @@ pub enum NativeEvent {
         transcript_path: PathBuf,
         cwd: PathBuf,
         start_kind: Option<String>,
+        #[serde(default)]
+        native_home: Option<PathBuf>,
     },
     RegisterChild {
         parent_registration: String,
         agent_id: String,
     },
     Bind(NativeCall),
+    Consult {
+        call: NativeCall,
+        args: ConsultArgs,
+    },
     Sync {
         registration: String,
         tip: String,
@@ -53,6 +59,8 @@ pub(crate) struct Registration {
     pub parent: Option<String>,
     #[serde(default)]
     pub start_kind: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_home: Option<PathBuf>,
 }
 
 pub struct ClaudeCaller {
