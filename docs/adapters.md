@@ -490,8 +490,11 @@ This uses the native [session plugin option](https://code.claude.com/docs/en/plu
 loading is explicit on each launch. Start the daemon first and include the
 native transcript directory in its configured read roots. Explicit `--config`,
 `--profile` and `--socket` options are retained in the bridge arguments; omitted
-configuration uses normal defaults. Installation does not start a daemon or add
-a consult model tool; that workflow is tracked in #16.
+configuration uses normal defaults. The plugin registers `akasha_consult` with an
+optional short hint and submits durable research using the verified native call.
+Installation does not start a daemon. Claude-native authentication remains deferred
+under the owner's temporary Codex/Pi/Hermes substitution; controlled plugin tests
+do not establish authenticated Claude Consult acceptance.
 
 The installer publishes a verified private directory atomically and never edits
 native user/project settings or other hooks. An identical reinstall succeeds;

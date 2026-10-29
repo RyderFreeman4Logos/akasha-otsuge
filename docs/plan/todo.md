@@ -631,140 +631,57 @@ links exact identities and preserves the distinct controlled/native results.
 ## MVP-016 active acceptance and remaining work
 
 - [x] Verify #11's frozen60-task/31-critical/10-intent-pair reference set, original
-  commit/hash and separately frozen permission erratum before prompt changes.
-- [x] Integrate reviewed Claude `5424ead` with main `c43c087`, retaining all four
-  adapters and host-specific identity checks. Focused integration:93 passed.
-- [ ] Persist a distinct consult job from the trusted invocation, with durable
-  idempotency, original pinned configuration/deadline and terminal-only delivery.
-  Codex's trusted IPC submission and durable receipt path are implemented;
-  idempotency/restart, cancel, shutdown and daemon-crash regressions pass. The
-  affected152-test suite and all-target Clippy pass. Remaining validation
-  includes queued configuration/deadline cases and all native user-facing tools.
-  Independent core review exposed detached-descendant cancellation and live
-  native-profile admission gaps. Both have failing controls and passing repairs:
-  seven consult lifecycle/path tests,158 affected regressions and Clippy pass.
-  Queued calls retain their original generation while profile revocation and
-  redirection deny execution. Final independent review remains required.
-- [ ] Expose optional short hint through CLI and native tools; retain automatic
-  Caller binding and support no hint without caller-built context packages.
-  Preserve diagnostic Bind requests; connect each actual native tool to the
-  separate Consult operation and durable status/cancel/delivery path.
-  Pi and Hermes tools now submit a durable Consult using the native call identity
-  and optional hint, returning only public status/results. Hermes submits only
-  when its verified tool handler executes. Both daemon entry tests, Node8/Python10
-  plugin checks and Clippy pass, including deduplication and restart recovery.
-  An earlier Hermes first-bind IPC timeout is retained; its isolated case passed.
-  The Codex hook now submits Consult and safely transports show/receipt/original
-  and cancel through the read-only sandbox. Three hook cases and Clippy pass,
-  including concurrent calls, retries, restart, full Unicode output and revocation.
-  Claude now registers the real optional-hint tool, retains the native profile and
-  submits a durable Consult. Node7 and eight daemon cases cover submission,
-  deduplication, restart and current directory/read revocation. The native Caller
-  harness passes9.23s with five bindings and13 backfill jobs and its explicit Bind-only scope;
-  authenticated Consult acceptance remains separate. The failed re-export and
-  disabled-builtin fixtures, and the preflight discovery of global Claude2.1.312,
-  are retained separately; this acceptance uses the pinned2.1.311 binary.
-- [ ] Provide progressive context/memory/code reads through shared Rust authority;
-  keep current grants, source versions, workspace limits and untrusted content.
-  Memory search/get and bound workspace search/read now reuse the existing
-  retrieval and authority paths. A controlled native-protocol test covers two
-  queries, original expansion, unissued-reference/path denial, changed files and
-  source-version links in the archived result. The affected suites passed75
-  tests; one existing wall-clock overlap control failed under concurrent load
-  and passed separately. Clippy passes. This is not authenticated acceptance.
-  Final return and replay now recheck live code-read policy and the observed
-  workspace's durable device/inode identity, including after daemon restart.
-  Four failing controls pass after the repair;17 consult cases, the focused
-  workspace case and all-target Clippy pass. Named executors now pin the accepted
-  route and native home, enforce live enable/read policy and follow only explicit
-  ordered fallback. Native model and safe argument overrides now reach each
-  isolated worker with explicit credentials, native catalog checks and a small
-  argument allowlist. Node9/Python10, two option units and nine named-executor
-  cases pass across the focused runs; Clippy passes. One earlier IPC WouldBlock
-  failure remains unexplained: the observed nine-case diagnostic passed without
-  any timeout change, which does not establish the historical cause. Real
-  default-self and cross-host acceptance remain below. The29 consult and17 config
-  regressions plus Clippy pass. An earlier capture-setup timeout remains recorded;
-  its exact isolated case passed without extending the deadline.
-- [x] Extend all native tool inventories and strict request decoding to the nine
-  shared research tools. Focused Rust58, Hermes9 and Pi7 regressions pass; daemon
-  research execution and real consult acceptance remain separate work below.
-- [ ] Enforce shared token/read/output/start/depth/time/concurrency budgets across
-  retries and descendants; retain run lineage and never reset origin or fence.
-  Delegates now reuse one research state and budget; run IDs, parentage, origin,
-  fence, configuration, usage and terminal errors are persisted separately from
-  public output. Named fallback attempts share that budget and original clock;
-  descendants inherit the active executor. Live disablement and source-authority
-  failures cannot silently move work onto an unconfigured provider.
-- [x] Add cumulative token accounting and real native-protocol usage checks for
-  all four adapters, including cached input, duplicate/decreasing reports,
-  overflow and shared-stop notification during blocked I/O. Focused RED/GREEN
-  receipts are retained; authenticated consult acceptance still remains below.
-- [x] Delegate with immediate resource refusal; exercise default single worker,
-  two simultaneous parent delegates, grandchildren, recursion and branch failures.
-  Controlled native processes verify all cases, including shared72-token usage
-  for three starts, recovery after a failed branch, and whole-tree cancellation,
-  shutdown and crash cleanup. The thirteen consult cases and Clippy pass.
-  Broader serial regression passed118 cases and exposed one shutdown-directory
-  race; its failing receipt and passing guardian repair are retained. Earlier
-  parallel capture/IPC timing failures remain separate from this focused result.
-- [x] Carry original runner deadlines through every native research bridge;
-  remove the premature10–15-second processing limits without relaxing bounded
-  framing, handshake checks, cancellation or the main caller's short IPC calls.
-  The original absolute deadline reaches Claude/Pi/Hermes private bridges;
-  Codex already uses the remaining RunSpec deadline. Real delayed private
-  subprocesses and native-protocol callbacks pass beyond10 seconds; missing,
-  malformed and expired deadlines fail closed. Node13/Python10 and Rust68 tests
-  pass, with10 authenticated/long cases explicitly ignored; all-target Clippy
-  passes. Authenticated long-call acceptance remains below.
-- [x] Publish concise found/no_hit/incomplete/pending/error results with scope,
-  evidence, conflicts/gaps and durable RecallReceipt after final live validation.
-  Retain receipt/show expansion and keep private research traces out of main output.
-  All four Runner parsers share a strict research conclusion contract. Selection
-  is restricted to actual source reads and expanded memory revisions; no-hit
-  requires a search. Conflicts force incomplete status, while selected memories'
-  stored conditions, assumptions, scope and validity accompany model conclusions.
-  The21 consult and68 affected adapter cases pass with Clippy;10 authenticated
-  acceptances remain explicitly ignored and require the native checks below.
-- [x] Add public `consult show`, bounded original expansion and receipt/full-result
-  views with the original verified authority. Public output excludes private plans
-  and run traces. Oversized answers retain their full text and conditions in a
-  second immutable receipt; the main receipt contains a bounded scoped handle.
-  Three end-to-end CLI cases and the progressive source-version case pass with
-  Clippy, including restart, live revocation, exact receipt/body equality, invalid
-  source indexes and5000-character Chinese output. Current-result reads reject
-  changed adopted memories, while explicit historical replay retains the original.
-  An earlier capture-fixture timeout is preserved; its isolated lifecycle case
-  passed afterward. Native submission remains.
-- [ ] Verify default-self native Codex/Hermes/Pi, optional/empty hint, descendant
-  delegation, a real cross-host combination and original long-call deadlines.
-  At dd6418b, real Pi1.4.0/grok-4.7, Codex0.164.0 and Hermes4960e41 default-self
-  no-hint calls, Pi parent/child delegation and Pi-to-Codex all read the actual
-  policy file with its matching SHA256 and exact public/receipt equality. Results
-  retain incomplete status when additional searches report gaps. Owned disposable
-  roots were removed after their processes ended. The earlier Pi delegation
-  PROTOCOL_INVALID remains an unexplained failed observation; the diagnostic
-  successor passed without reproducing it. Original long-call acceptance remains.
-  Codex0.164.0 is an isolated verified SSD artifact because the global install
-  moved to0.165.0; the Hermes test profile shares existing installed dependencies.
-  Native long-call R2 exposed Pi1.4.0's default300-second HTTP/provider ceiling:
-  one request failed at300.746s despite the original1700-second Runner budget.
-  Its short protocol control and10-second timeout cleanup passed; all scratch
-  was removed. The Runner now configures both native timeouts in its owned private
-  directory from the remaining original budget, preserving the native home.
-  The causal RPC fixture RED, all13 Pi tests, Clippy and five actual native
-  controlled cases pass after repair. A fresh1605-second run is still required.
-  Independent whole-range source review of57286ee/tree0977884 passes87 files and
-  closes both prior findings. The subsequent guidance edit and final native/gate
-  evidence still require their own validation; the source verdict is not closure.
-  Claude-native authenticated acceptance is explicitly deferred by the owner's
-  temporary Codex or localhost:48317 Pi/Hermes substitution; never label it passed.
-- [ ] Complete focused regressions, canonical gate, independent final review,
-  CI, publication/merge and issue closure; clean exact owned disposable resources.
-  Draft PR45 is open. CI40940522570 rejected the Claude private-read test's stale
-  fixture: it omitted the required absolute deadline and returned CONFIG_INVALID.
-  The fixture now supplies the same original three-second window as its server;
-  missing, malformed and expired deadline refusal remains covered separately.
+  commit/hash and separate permission erratum before research prompt changes.
+- [x] Persist trusted Consult jobs with durable idempotency, accepted configuration,
+  original deadline, terminal receipts and cancellation/restart/crash recovery.
+  Current profile/read authority is revalidated before execution and publication.
+- [x] Connect the native optional-hint tools and Codex hook to durable Consult,
+  preserving runtime identity, empty hint and continuation through show/receipt.
+  Claude controlled plugin coverage is retained; its authenticated host acceptance
+  remains deferred under the owner's explicit substitute authorization.
+- [x] Expose the nine shared research tools with current context/memory/code
+  authority, issued references, durable workspace identity and exact source versions.
+  Named executors pin accepted routes/native homes; fallback stays explicitly ordered.
+- [x] Share token/read/output/start/depth/time/concurrency budgets across retries
+  and descendants. Persist lineage separately from the main result. Controlled
+  regressions cover a single worker, two simultaneous parent delegates, descendants,
+  immediate resource refusal, recursive requests, failed branches and whole-tree cleanup.
+- [x] Enforce strict structured conclusions and real source/memory expansion.
+  Return bounded found/no_hit/incomplete results, conditions, conflicts and gaps.
+  Receipt/show/original expansion preserves authority and historical versus current
+  semantics; oversized answers retain their complete immutable detail receipt.
+- [x] Qualify actual Codex0.164.0, Hermes4960e41 and Pi1.4.0 default-self empty-hint
+  samples plus Pi descendant delegation and Pi-to-Codex at dd6418b. These read the
+  actual policy file with its expected SHA256 and public/receipt equality. Extra
+  failed searches remain explicit incomplete results. All owned disposable roots
+  were removed. The Codex pin is isolated on SSD; native user settings stay unchanged.
+- [x] Qualify native long execution after repairing Pi's300-second inner limit.
+  Actual Pi1.4.0 with a1605s controlled first-response delay completed1612.327s
+  within the original1700s budget. The10s timeout case cleaned up in11.200s.
+  All binary identities were unchanged; processes ended and scratch was removed.
+  This proves native timeout behavior, not paid-model quality. R1/R2 failures remain.
+- [x] Repair queued private greetings in Pi and Hermes using the original run
+  deadline after bounded connect/peer checks. Deterministic controls fail on old
+  code;49 affected Rust tests,11 Hermes tests, fmt and Clippy pass after repair.
+  Actual Pi empty-hint/delegation and Hermes empty-hint samples pass on ec95da5,
+  including policy source SHA, receipt equality and complete owned cleanup.
+- [x] Archive compact selected [acceptance evidence](../benchmarks/results/mvp016/README.md)
+  and correct all current host guides. Retain the model's disallowed gaps_note,
+  removed Codex path, Hermes profile setup failure, directory argument/oracle defects
+  and historical parent PROTOCOL_INVALID observations beside the successful samples.
+- [ ] Complete the final exact-tree canonical gate, independent review, CI,
+  PR publication/merge and #16 closure. Draft PR45 is open. Canonical R2,
+  independent R4 source review and CI40946026740 pass on2254396; the final changed
+  candidate still requires its own gate and review. CI40940522570's stale Claude
+  deadline fixture failure is retained separately from its passing repair.
+
+#16 process correction: keep feature scope frozen. The demonstrated bridge
+failure class is repaired; finish the same candidate through publication. Native
+model schema violations remain failed observations; do not relax parsing or replay
+unchanged batches until they happen to pass. Reuse the unchanged long-run HTTP
+receipt after unrelated bridge/documentation edits, with explicit source hashes.
+#17–#28 remain fully listed below. No completed implementation is waiting for
+issue closure; #12 alone retains deferred Claude authentication.
 
 ## Complete Issue queue
 

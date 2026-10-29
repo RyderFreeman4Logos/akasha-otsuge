@@ -1,0 +1,28 @@
+EF
+======================================================================
+ERROR: test_runner_queued_greeting_uses_original_deadline (__main__.HermesPlugin.test_runner_queued_greeting_uses_original_deadline) (budget_ms=30000)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp016-hermes-greeting-tests.py", line 141, in test_runner_queued_greeting_uses_original_deadline
+    result = self.plugin._exchange(self.ctx, {'op': 'context'}, runner=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp016/plugins/hermes/__init__.py", line 114, in _exchange
+    raise BridgeError('RUNNER_TIMEOUT' if runner and processing else 'IPC_TIMEOUT') from None
+akasha_hermes_plugin_test.BridgeError: IPC_TIMEOUT
+
+======================================================================
+FAIL: test_runner_queued_greeting_uses_original_deadline (__main__.HermesPlugin.test_runner_queued_greeting_uses_original_deadline) (budget_ms=2000)
+----------------------------------------------------------------------
+akasha_hermes_plugin_test.BridgeError: IPC_TIMEOUT
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp016-hermes-greeting-tests.py", line 138, in test_runner_queued_greeting_uses_original_deadline
+    with self.assertRaisesRegex(self.plugin.BridgeError, error):
+AssertionError: "RUNNER_TIMEOUT" does not match "IPC_TIMEOUT"
+
+----------------------------------------------------------------------
+Ran 1 test in 12.031s
+
+FAILED (failures=1, errors=1)

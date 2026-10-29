@@ -1,0 +1,92 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp016)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.59s
+     Running tests/adapter_context.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/adapter_context-34c2e5b348f55d02)
+
+running 26 tests
+test claude_runner::native_runner_local_protocol_round_trip ... ignored, requires pinned native Claude and an isolated local Anthropic protocol fixture
+test bridge_deadlines::private_bridges_reject_missing_malformed_and_expired_deadlines ... ok
+test context_requests_reject_model_supplied_identity_fields ... ok
+test binding_rejects_missing_ambiguous_future_and_false_root_identity ... ok
+test code_reads_pin_workspace_reject_escape_and_report_changed_content ... ok
+test claude_runner::native_runner_requires_init_terminal_and_exit_with_isolated_tool_flags ... ok
+test claude_runner::native_runner_normalizes_native_authentication_failure_without_echoing_output ... ok
+test claude_runner::native_runner_context_bridge_uses_bound_capability_and_rejects_forgery ... ok
+test claude_runner::native_runner_reports_native_retry_without_exposing_provider_details ... ok
+test claude_runner::native_runner_cancellation_is_terminal_and_reaps_owned_process_group ... ok
+test claude_runner::native_runner_removes_owned_setup_when_executor_disappears_after_probe ... ok
+test bridge_deadlines::pi_bridge_queued_greeting_stops_at_original_deadline ... ok
+test bridge_deadlines::private_bridges_stop_at_the_original_deadline ... ok
+test description_reports_actual_binding_precision_even_on_capable_hosts ... ok
+test context_reports_missing_history_and_search_never_reads_future_messages ... ok
+test bridge_deadlines::private_bridges_wait_for_research_beyond_the_transport_timeout ... ok
+test bridge_deadlines::pi_bridge_waits_for_queued_greeting_beyond_transport_timeout ... ok
+test claude_runner::native_research_callback_can_exceed_the_handshake_timeout ... ok
+test matrix::runspec_preserves_earliest_timeout_after_both_clocks_expire ... ok
+test matrix::external_sources_can_construct_distinct_refusals_and_capabilities_bind_origin ... ok
+test claude_runner::native_runner_preserves_original_deadline_and_drop_cleans_up ... ok
+test invocation_is_durable_immutable_and_concurrent_same_cwd_callers_do_not_mix ... ok
+test context_handles_follow_only_fenced_ancestry_and_recheck_live_grants ... ok
+test matrix::all_sixteen_caller_runner_pairs_use_scoped_context_and_terminal_contract ... ok
+test claude_runner::native_runner_pairs_recorded_native_tool_results ... ok
+test claude_runner::native_runner_refuses_incomplete_mismatched_unsafe_and_failed_streams ... ok
+
+test result: ok. 25 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 14.38s
+
+     Running tests/hermes.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/hermes-2f5e159cb0a7424c)
+
+running 14 tests
+test runner::installed_native_cancellation_ends_executor_after_context_tool ... ignored, requires explicit native Hermes binary/profile and authenticated isolated acceptance
+test runner::installed_native_rejects_unissued_context ... ignored, requires explicit native Hermes binary/profile and authenticated isolated acceptance
+test runner::installed_native_runner_roundtrip ... ignored, requires explicit native Hermes binary/profile and authenticated isolated acceptance
+test doctor_observes_hermes_without_model_calls_or_a_daemon ... ok
+test caller::child_proof_uses_its_native_parent_without_substituting_root_history ... ok
+test caller::exact_call_fence_omits_later_results_and_retry_survives_source_loss ... ok
+test qualified_git_build_labels_do_not_admit_other_older_versions ... ok
+test caller::simultaneous_homes_with_identical_native_labels_and_ids_remain_isolated ... ok
+test installation::plugin_install_is_opt_in_idempotent_and_undo_preserves_edits ... ok
+test caller::foreign_profile_session_task_or_missing_call_cannot_read_the_root ... ok
+test runner::standalone_runner_uses_profile_plugin_scoped_context_and_structured_final ... ok
+test runner::runner_cancellation_reaps_owned_group_before_releasing_resources ... ok
+test snapshot_backfill_resumes_and_preserves_old_fences_across_native_rewrites ... ok
+test runner::runner_rejects_forged_authority_protocol_errors_and_unfinished_native_processes ... ok
+
+test result: ok. 11 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 4.94s
+
+     Running tests/pi.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a)
+
+running 17 tests
+test runner::installed_native_cancellation_ends_executor_after_context_tool ... ignored, requires explicit native Pi binary/profile and isolated acceptance
+test runner::installed_native_rejects_unadvertised_tool ... ignored, requires explicit native Pi binary/profile and a controlled hostile-tool provider
+test runner::installed_native_rejects_unissued_context ... ignored, requires explicit native Pi binary/profile and isolated acceptance
+test runner::installed_native_runner_roundtrip ... ignored, requires explicit native Pi binary/profile and isolated acceptance
+test caller::native_context_cannot_borrow_another_branch_profile_workspace_or_nested_call ... ok
+test caller::actual_native_tool_name_unique_call_id_and_short_hint_schema_are_required ... ok
+test doctor_observes_pi_version_without_model_or_daemon_claims ... ok
+test capture::foreign_headers_conflicting_ids_and_unsupported_records_never_advance_as_complete ... ok
+test doctor_rejects_malformed_failed_or_unbounded_pi_probes ... ok
+test installation::extension_install_is_opt_in_integrity_checked_and_uninstall_recovers ... ok
+test caller::native_call_fence_survives_source_loss_and_rechecks_current_permission ... ok
+test capture::native_capture_resumes_partial_tail_reopen_and_rotation_without_duplicate_finals ... ok
+test runner::rpc_runner_cancel_reaps_native_group_before_resource_release ... ok
+test capture::native_tree_keeps_selected_branches_fork_cutoff_edits_and_compaction_originals ... ok
+test caller::two_native_sessions_share_a_workspace_without_sharing_context_fences ... ok
+test runner::rpc_runner_waits_for_settled_after_retries_and_preserves_line_separators ... ok
+test runner::rpc_runner_rejects_authority_protocol_inventory_and_incomplete_terminals ... ok
+
+test result: ok. 13 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 8.44s
+
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 25.195s
+
+OK
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+    Checking akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp016)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.34s

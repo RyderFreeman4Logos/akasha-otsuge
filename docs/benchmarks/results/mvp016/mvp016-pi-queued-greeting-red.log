@@ -1,0 +1,32 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp016)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.78s
+     Running tests/adapter_context.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/adapter_context-34c2e5b348f55d02)
+
+running 2 tests
+
+thread 'bridge_deadlines::pi_bridge_queued_greeting_stops_at_original_deadline' (1032440) panicked at tests/support/runner_bridge_deadlines.rs:48:5:
+assertion `left == right` failed
+  left: String("IPC_TIMEOUT")
+ right: "RUNNER_TIMEOUT"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test bridge_deadlines::pi_bridge_queued_greeting_stops_at_original_deadline ... FAILED
+
+thread 'bridge_deadlines::pi_bridge_waits_for_queued_greeting_beyond_transport_timeout' (1032441) panicked at tests/support/runner_bridge_deadlines.rs:38:5:
+{"schema_version":1,"error":{"code":"IPC_TIMEOUT","message":"The operation could not be completed"}}
+
+test bridge_deadlines::pi_bridge_waits_for_queued_greeting_beyond_transport_timeout ... FAILED
+
+failures:
+
+failures:
+    bridge_deadlines::pi_bridge_queued_greeting_stops_at_original_deadline
+    bridge_deadlines::pi_bridge_waits_for_queued_greeting_beyond_transport_timeout
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 24 filtered out; finished in 11.01s
+
+error: test failed, to rerun pass `--test adapter_context`

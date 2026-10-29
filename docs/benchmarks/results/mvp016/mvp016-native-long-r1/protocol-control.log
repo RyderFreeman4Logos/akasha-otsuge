@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'runner::installed_native_runner_roundtrip' (967707) panicked at tests/support/pi_runner.rs:219:49:
+called `Result::unwrap()` on an `Err` value: AdapterError { code: RunnerFailed, source_code: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test runner::installed_native_runner_roundtrip ... FAILED
+
+failures:
+
+failures:
+    runner::installed_native_runner_roundtrip
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out; finished in 1.03s
+

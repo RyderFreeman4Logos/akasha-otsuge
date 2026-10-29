@@ -1,0 +1,1704 @@
+{
+  "schema_version": 1,
+  "scope": "MVP-016 authenticated synthetic-workspace Consult samples; not the MVP-027 quality evaluation",
+  "claude_native": "deferred: owner authorized Codex or existing localhost:48317 Pi/Hermes substitute",
+  "policy_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+  "cases": [
+    {
+      "case": "pi-empty",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "57286eed9cda018102ede67ab481b117c122726a",
+      "tree": "0977884fc0ddf1e74c353e9e490426f1b2e90879",
+      "binary_sha256": "c50af1fecebed828dfdc0c6556968269f965a5ca0a8fa6cfa28d9be19c63bb1c",
+      "started_utc": "2026-10-29T19:13:24.288117+00:00",
+      "finished_utc": "2026-10-29T19:13:45.442438+00:00",
+      "elapsed_seconds": 21.154,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "0573feb830974cabd8752c8ed8758414bf926416754b717b53265c0cbf2fd8d4",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/c6e27dcf1f881d9f15bca6fd1eeedd4849a558302d0e0470b9e7854e13d23763",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3272704,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230999224320,
+      "evidence_id": "pi-empty-r1",
+      "original_receipt_sha256": "0da46f1ae6765da2218e1d0e203dde0282546ea89f01ab5b6df7c8d4c49d3739",
+      "qualification_note": "Transport passed; policy-file evidence was absent because the model supplied a directory path. Not complete Consult acceptance.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "The bound turn asks what the project should do when embeddings are offline and points research at the current question and decision.md. That policy text was not retrieved: workspace code search was denied, memory search returned INDEX_NOT_READY twice, and context search found no decision.md content. No offline-embeddings behavior is established.",
+        "code": [],
+        "conditions": [
+          "Answer requires reading decision.md and any project policy it cites about offline embeddings."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "eb355b8deba26caa1242cfa3fc1409afabe120c5a0da72724c494f5964590097",
+            "end": 306,
+            "event_id": "capture/5a1c51c871d135f601cf3cb3026992346be0128a1aff3928e786e5b9468b618f/0000",
+            "revision": 19,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "INDEX_NOT_READY",
+          "READ_DENIED",
+          "decision.md was not readable; code_search returned READ_DENIED.",
+          "memory_search returned SOURCE_UNAVAILABLE / INDEX_NOT_READY; no memory revisions could be expanded.",
+          "context_search for decision.md and embeddings offline returned no events."
+        ],
+        "job_id": "consult/fac672203aa9be90dddcdeae51b7569ff1375cea5f8a5535f6dde12eec182753",
+        "memories": [],
+        "receipt_id": "consult-result/c6e27dcf1f881d9f15bca6fd1eeedd4849a558302d0e0470b9e7854e13d23763",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 14945,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5385054,
+          "started_at_unix_ms": 1793301209912,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 216544,
+          "read_bytes": 338104,
+          "reads": 38,
+          "starts": 1,
+          "tokens": 33082
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793301224856,
+            "host": "pi",
+            "id": "consult/fac672203aa9be90dddcdeae51b7569ff1375cea5f8a5535f6dde12eec182753/run/0",
+            "parent": null,
+            "started_at_ms": 1793301209918,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": null
+    },
+    {
+      "case": "pi-empty",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "57286eed9cda018102ede67ab481b117c122726a",
+      "tree": "0977884fc0ddf1e74c353e9e490426f1b2e90879",
+      "binary_sha256": "c50af1fecebed828dfdc0c6556968269f965a5ca0a8fa6cfa28d9be19c63bb1c",
+      "started_utc": "2026-10-29T19:19:32.386289+00:00",
+      "finished_utc": "2026-10-29T19:19:49.227550+00:00",
+      "elapsed_seconds": 16.875,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "428bab61a1a031439fc49d60f18888d4e3bcb20ea231ee68d2cc20910a4dc780",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/7d8c94938ce178da7bcfbd730c9571fbf96ad27c12c8f66727225ea4645bc922",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3272704,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230999261184,
+      "evidence_id": "pi-trace-r2",
+      "original_receipt_sha256": "6fb7869c41088aa6755294caaf9bb239d7e2b6cc0837fb1bf911a47da458d60e",
+      "qualification_note": "Diagnostic successor reproduced directory arguments. Transport passed; not complete policy evidence.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "The bound user message asks what the project should do when embeddings are offline and points at decision.md, but the policy itself was not retrieved. Workspace code search was denied, memory search returned INDEX_NOT_READY, and no matching session text was found beyond the question.",
+        "code": [],
+        "conditions": [
+          "The user required research of the current question and decision.md and forbade answering the policy from outside that research."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "eb355b8deba26caa1242cfa3fc1409afabe120c5a0da72724c494f5964590097",
+            "end": 306,
+            "event_id": "capture/9e990f49ffa6d9621f28ae52d6c462af33cf575112cf4dd71fb682bd53b9ccd1/0000",
+            "revision": 19,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "INDEX_NOT_READY",
+          "READ_DENIED",
+          "DELEGATION_UNAVAILABLE",
+          "decision.md was not readable in the bound workspace (code_search READ_DENIED).",
+          "memory_search failed with INDEX_NOT_READY, so no memory revisions could be expanded.",
+          "Session context search found no events containing the embeddings-offline policy text."
+        ],
+        "job_id": "consult/848dcee34f5c474cced38fe50d8f5d778ea18a1296e146f7bf379176b47a42fb",
+        "memories": [],
+        "receipt_id": "consult-result/7d8c94938ce178da7bcfbd730c9571fbf96ad27c12c8f66727225ea4645bc922",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 12614,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5387385,
+          "started_at_unix_ms": 1793301576024,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 210493,
+          "read_bytes": 204774,
+          "reads": 35,
+          "starts": 1,
+          "tokens": 32577
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793301588637,
+            "host": "pi",
+            "id": "consult/848dcee34f5c474cced38fe50d8f5d778ea18a1296e146f7bf379176b47a42fb/run/0",
+            "parent": null,
+            "started_at_ms": 1793301576028,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "pi-empty",
+      "status": "FAILED",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:23:48.698019+00:00",
+      "finished_utc": "2026-10-29T19:24:07.576853+00:00",
+      "elapsed_seconds": 18.891,
+      "checks": [],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "8adb0fa87c670123b93588c771953d013629ea51664303d989d5f2b1ce711f5e",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3293184,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230957252608,
+      "evidence_id": "pi-guidance-r3",
+      "original_receipt_sha256": "4c7e4c50d83f6ebf2e3b7ba7958825b54b9471f72ee1d9b89c9a4673cd02de58",
+      "qualification_note": "Actual source file read succeeded; the old lexical offline substring oracle rejected an equivalent unavailable answer. Harness defect; not product RED.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "If embeddings are unavailable, keep keyword search working. Never silently send the query to another provider. This decision applies to this disposable acceptance workspace.",
+        "code": [
+          {
+            "changed": false,
+            "changed_during_read": false,
+            "end": 197,
+            "observed_at_unix_ms": 1793301842977,
+            "path": "decision.md",
+            "sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "source": {
+              "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+              "end": 197,
+              "event_id": "consult-code/e035803d3c1297858fae541bddb4f5bdcdbac1b1bcb7fecbb43fc5715f293571",
+              "revision": 32,
+              "start": 0
+            },
+            "start": 0,
+            "total_bytes": 197
+          }
+        ],
+        "conditions": [
+          "The decision applies to this disposable acceptance workspace.",
+          "decision.md was unchanged at the time it was read."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "end": 197,
+            "event_id": "consult-code/e035803d3c1297858fae541bddb4f5bdcdbac1b1bcb7fecbb43fc5715f293571",
+            "revision": 32,
+            "start": 0
+          },
+          {
+            "content_sha256": "eb355b8deba26caa1242cfa3fc1409afabe120c5a0da72724c494f5964590097",
+            "end": 306,
+            "event_id": "capture/9addc838d548c507b3a63326763f2fd5ec4b51fb27884454dd6d45ce0f873eaf/0000",
+            "revision": 19,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "INDEX_NOT_READY",
+          "SOURCE_UNAVAILABLE",
+          "Memory search was unavailable (INDEX_NOT_READY), so no memory revisions were consulted."
+        ],
+        "job_id": "consult/917dc8afc2284c78a3338fb80a5d7e2a06c7a3c8123829351bee5182587e5ae2",
+        "memories": [],
+        "receipt_id": "consult-result/fdbba191b6e44dc5dec7c946aae499e25b2aa15b8b1f259320b6b32b4f8bdd21",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 15604,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5384395,
+          "started_at_unix_ms": 1793301831599,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 264112,
+          "read_bytes": 304682,
+          "reads": 37,
+          "starts": 1,
+          "tokens": 33890
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793301847202,
+            "host": "pi",
+            "id": "consult/917dc8afc2284c78a3338fb80a5d7e2a06c7a3c8123829351bee5182587e5ae2/run/0",
+            "parent": null,
+            "started_at_ms": 1793301831605,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "pi-empty",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:26:08.373254+00:00",
+      "finished_utc": "2026-10-29T19:26:31.532189+00:00",
+      "elapsed_seconds": 23.172,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "8ee034270cbf769009b29e1870798fcb9976c0a2fd1bd9400584d7eeef0fd9c5",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/eea8f0bd57e1507ad91e6763e5edff77c5e80c49e91e3e7ac03f0bc5eab8d8af",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3334144,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230957457408,
+      "evidence_id": "pi-empty-r4",
+      "original_receipt_sha256": "3a1505964203125062db82681077a99dd861efddb69569ab6b78efa9d5a5d8e5",
+      "qualification_note": "Actual policy SHA and public/receipt equality checked by the retained harness.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "When embeddings are offline, the project should keep keyword search working and never silently send the query to another provider. This decision applies to this disposable acceptance workspace.",
+        "code": [
+          {
+            "changed": false,
+            "changed_during_read": false,
+            "end": 197,
+            "observed_at_unix_ms": 1793301984967,
+            "path": "decision.md",
+            "sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "source": {
+              "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+              "end": 197,
+              "event_id": "consult-code/c6004111d998e390671bc10e25cefc57a5693a9684700dd4acddcd3669da500e",
+              "revision": 37,
+              "start": 0
+            },
+            "start": 0,
+            "total_bytes": 197
+          }
+        ],
+        "conditions": [
+          "The policy applies only while embeddings are unavailable.",
+          "It is scoped to this disposable acceptance workspace."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "end": 197,
+            "event_id": "consult-code/c6004111d998e390671bc10e25cefc57a5693a9684700dd4acddcd3669da500e",
+            "revision": 37,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "READ_DENIED",
+          "SOURCE_UNAVAILABLE",
+          "Active memory search returned no hits (indexed_rows 0), so no memory qualifies or conflicts with decision.md.",
+          "Only decision.md was readable in the bound workspace; README.md and other candidate paths were unavailable."
+        ],
+        "job_id": "consult/77cf7b995cfb785ec23009f1faad9ea6c9dcfb0920fe7ff176d75a01068c8f2c",
+        "memories": [],
+        "receipt_id": "consult-result/eea8f0bd57e1507ad91e6763e5edff77c5e80c49e91e3e7ac03f0bc5eab8d8af",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 19163,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5380836,
+          "started_at_unix_ms": 1793301971855,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 249787,
+          "read_bytes": 337969,
+          "reads": 42,
+          "starts": 1,
+          "tokens": 38476
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793301991012,
+            "host": "pi",
+            "id": "consult/77cf7b995cfb785ec23009f1faad9ea6c9dcfb0920fe7ff176d75a01068c8f2c/run/0",
+            "parent": null,
+            "started_at_ms": 1793301971861,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "pi-delegate",
+      "status": "FAILED",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:26:31.583441+00:00",
+      "finished_utc": "2026-10-29T19:26:58.099778+00:00",
+      "elapsed_seconds": 26.529,
+      "checks": [],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "9c9ddd9250a80b9ddd4463f5617b6f8c524ad57cfd0d9a147a79a9c30bb8ebac",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3325952,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230957096960,
+      "evidence_id": "pi-delegate-r4",
+      "original_receipt_sha256": "11572f7a0dc5b082715af3d677385aff78219ad108815a759f3d385fc98ac2ed",
+      "qualification_note": "Parent PROTOCOL_INVALID after child success. Historical event did not capture the failed connection itself.",
+      "owned_processes_ended": true,
+      "job_state": "failed",
+      "error": "PROTOCOL_INVALID",
+      "public": {
+        "error": {
+          "code": "PROTOCOL_INVALID"
+        },
+        "job_id": "consult/7e741590e43e67c148714b333568c1a58cdca141a8e5b6550be3f7423557bb4e",
+        "receipt_id": null,
+        "status": "error"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 22217,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5377782,
+          "started_at_unix_ms": 1793301994844,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 348829,
+          "read_bytes": 541247,
+          "reads": 67,
+          "starts": 2,
+          "tokens": 47579
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "error": "PROTOCOL_INVALID",
+            "executor_profile": "caller",
+            "finished_at_ms": 1793302017061,
+            "host": "pi",
+            "id": "consult/7e741590e43e67c148714b333568c1a58cdca141a8e5b6550be3f7423557bb4e/run/0",
+            "parent": null,
+            "started_at_ms": 1793301994848,
+            "state": "failed"
+          },
+          {
+            "depth": 1,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793302017035,
+            "host": "pi",
+            "id": "consult/7e741590e43e67c148714b333568c1a58cdca141a8e5b6550be3f7423557bb4e/run/1",
+            "parent": "consult/7e741590e43e67c148714b333568c1a58cdca141a8e5b6550be3f7423557bb4e/run/0",
+            "started_at_ms": 1793302005290,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "pi-delegate",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:30:52.352852+00:00",
+      "finished_utc": "2026-10-29T19:31:22.573530+00:00",
+      "elapsed_seconds": 30.234,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace",
+        "real native descendant delegation"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "467e1a0b17eb97758c765ac9a314011fb57b7742ac3241dc34e9870ad272f1c2",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/69d599399a298413bdde518135941a10f0a5f81034a4b88b1a9eb5feaea063b5",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3342336,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230956949504,
+      "evidence_id": "pi-delegate-r5",
+      "original_receipt_sha256": "75b91e744a923f9b80aeece1a5b4acd887c63fa1094fe96976ffb47ff8969b61",
+      "qualification_note": "Diagnostic successor passed. Does not erase or explain the prior failed observation.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "If embeddings are unavailable, keep keyword search working and never silently send the query to another provider. This decision applies to this disposable acceptance workspace.",
+        "code": [
+          {
+            "changed": false,
+            "changed_during_read": false,
+            "end": 197,
+            "observed_at_unix_ms": 1793302278984,
+            "path": "decision.md",
+            "sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "source": {
+              "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+              "end": 197,
+              "event_id": "consult-code/dc6d5655daef2b294e1f1fc0290054eb0c9996c6cbe45239ab8a3d7a9c8a3e9b",
+              "revision": 58,
+              "start": 0
+            },
+            "start": 0,
+            "total_bytes": 197
+          }
+        ],
+        "conditions": [
+          "Embeddings are unavailable.",
+          "The decision applies only to this disposable acceptance workspace.",
+          "The query must not be silently sent to another provider."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "end": 197,
+            "event_id": "consult-code/dc6d5655daef2b294e1f1fc0290054eb0c9996c6cbe45239ab8a3d7a9c8a3e9b",
+            "revision": 58,
+            "start": 0
+          },
+          {
+            "content_sha256": "dc60cc402bde811710cbcfb5e833e34e6db6773cbea18e59db32ffdc558a4063",
+            "end": 368,
+            "event_id": "capture/551036c345be4da092728dd36fe76be3f5cf54ca8d67b35ad3008c2f69cfb087/0000",
+            "revision": 23,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "SOURCE_UNAVAILABLE",
+          "Active memory search returned no hits for this decision.",
+          "The bound conversation does not itself state the fallback; the user message only asks that decision.md be researched."
+        ],
+        "job_id": "consult/8e0612dc5a589e80189033be57ce45b106941cc1d8e77937c9e11c74525414b6",
+        "memories": [],
+        "receipt_id": "consult-result/69d599399a298413bdde518135941a10f0a5f81034a4b88b1a9eb5feaea063b5",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 26453,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5373546,
+          "started_at_unix_ms": 1793302255472,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 510730,
+          "read_bytes": 526036,
+          "reads": 73,
+          "starts": 2,
+          "tokens": 61603
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793302281922,
+            "host": "pi",
+            "id": "consult/8e0612dc5a589e80189033be57ce45b106941cc1d8e77937c9e11c74525414b6/run/0",
+            "parent": null,
+            "started_at_ms": 1793302255480,
+            "state": "succeeded"
+          },
+          {
+            "depth": 1,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793302277217,
+            "host": "pi",
+            "id": "consult/8e0612dc5a589e80189033be57ce45b106941cc1d8e77937c9e11c74525414b6/run/1",
+            "parent": "consult/8e0612dc5a589e80189033be57ce45b106941cc1d8e77937c9e11c74525414b6/run/0",
+            "started_at_ms": 1793302261719,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "codex-empty",
+      "status": "FAILED",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:31:22.625924+00:00",
+      "finished_utc": "2026-10-29T19:31:23.681628+00:00",
+      "elapsed_seconds": 1.068,
+      "checks": [],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 81920,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230956834816,
+      "evidence_id": "codex-empty-r5",
+      "original_receipt_sha256": "c2a0a43160b835f5637893e12b000560b3508af9e0327f87d6cb1565d88064f6",
+      "qualification_note": "Setup failed because the previous global Codex0.164.0 path had disappeared. No native acceptance.",
+      "owned_processes_ended": true,
+      "job_state": null,
+      "error": null,
+      "public": null,
+      "run_trace": {
+        "deadline": null,
+        "usage": null,
+        "runs": []
+      },
+      "effective_models": null
+    },
+    {
+      "case": "pi-codex",
+      "status": "FAILED",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:31:23.731968+00:00",
+      "finished_utc": "2026-10-29T19:31:28.253671+00:00",
+      "elapsed_seconds": 4.534,
+      "checks": [],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "2f06b66e0987ccf27610a95e9518b40444140066e76290eaf3adaab72b985c6b",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3244032,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230956834816,
+      "evidence_id": "pi-codex-r5",
+      "original_receipt_sha256": "1b55b7b378cfa7e5ef94d30697c796ae39198f37e2f7ff1daeab9f47496da506",
+      "qualification_note": "Named executor unavailable at the removed global Codex pathname. No successful cross-host acceptance.",
+      "owned_processes_ended": true,
+      "job_state": "failed",
+      "error": "EXECUTOR_UNAVAILABLE",
+      "public": {
+        "error": {
+          "code": "EXECUTOR_UNAVAILABLE"
+        },
+        "job_id": "consult/8d39a4b8a8a35248a59e69ff76c4d646510c259f5186b9ecee2cc6ef8712e007",
+        "receipt_id": null,
+        "status": "error"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 6,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5399993,
+          "started_at_unix_ms": 1793302286659,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 0,
+          "read_bytes": 0,
+          "reads": 0,
+          "starts": 1,
+          "tokens": 0
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "error": "EXECUTOR_UNAVAILABLE",
+            "executor_profile": "native_codex",
+            "finished_at_ms": 1793302286665,
+            "host": "codex",
+            "id": "consult/8d39a4b8a8a35248a59e69ff76c4d646510c259f5186b9ecee2cc6ef8712e007/run/0",
+            "parent": null,
+            "started_at_ms": 1793302286663,
+            "state": "failed"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "hermes-empty",
+      "status": "FAILED",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:31:28.290772+00:00",
+      "finished_utc": "2026-10-29T19:31:29.295262+00:00",
+      "elapsed_seconds": 1.005,
+      "checks": [],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 86016,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230956834816,
+      "evidence_id": "hermes-empty-r5",
+      "original_receipt_sha256": "9cf31ebdb4a50290fc582af9cdd647380318e17c868422647412d578207e1674",
+      "qualification_note": "Isolated profile had no shared installed dependency environment. Corrected profile layout; no global repair.",
+      "owned_processes_ended": true,
+      "job_state": null,
+      "error": null,
+      "public": null,
+      "run_trace": {
+        "deadline": null,
+        "usage": null,
+        "runs": []
+      },
+      "effective_models": null
+    },
+    {
+      "case": "codex-empty",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:43:35.197308+00:00",
+      "finished_utc": "2026-10-29T19:44:18.307337+00:00",
+      "elapsed_seconds": 43.132,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "codex-cli 0.164.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "a48c33725d065bc490905ad52fc638ed7f1b50fc7080bd15ec6bcf610a680339",
+      "caller_error_sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/5ce0f4ddbedcdf133b59e688e20b0734e907414e737b8c10b30f9bbc01231f86",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 4902912,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230647177216,
+      "evidence_id": "codex-empty-r6",
+      "original_receipt_sha256": "d5aa8e1c13ea72e2326ff545f6c48eabaedaff8712b8d1bf51096cecd83fa994",
+      "qualification_note": "Actual policy SHA and public/receipt equality checked by the retained harness.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "When embeddings are unavailable, keep keyword search working. Never silently send the query to another provider.",
+        "code": [
+          {
+            "changed": false,
+            "changed_during_read": false,
+            "end": 197,
+            "observed_at_unix_ms": 1793303049387,
+            "path": "decision.md",
+            "sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "source": {
+              "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+              "end": 197,
+              "event_id": "consult-code/80ad82d4572c7a789f1a6767d207af7fb666aabb15d9c78da4bc2d62b26cad14",
+              "revision": 86,
+              "start": 0
+            },
+            "start": 0,
+            "total_bytes": 197
+          }
+        ],
+        "conditions": [
+          "This policy applies to the disposable acceptance workspace."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "end": 197,
+            "event_id": "consult-code/80ad82d4572c7a789f1a6767d207af7fb666aabb15d9c78da4bc2d62b26cad14",
+            "revision": 86,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "INVALID_ARGUMENT"
+        ],
+        "job_id": "consult/c0e644652a2ee3646568539e435fdaa5586c63b19e16753d1f6e8e08cd719f58",
+        "memories": [],
+        "receipt_id": "consult-result/5ce0f4ddbedcdf133b59e688e20b0734e907414e737b8c10b30f9bbc01231f86",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 30516,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5369483,
+          "started_at_unix_ms": 1793303027535,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 156040,
+          "read_bytes": 154225,
+          "reads": 6,
+          "starts": 1,
+          "tokens": 57046
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793303058045,
+            "host": "codex",
+            "id": "consult/c0e644652a2ee3646568539e435fdaa5586c63b19e16753d1f6e8e08cd719f58/run/0",
+            "parent": null,
+            "started_at_ms": 1793303027540,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": null
+    },
+    {
+      "case": "pi-codex",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:44:18.607137+00:00",
+      "finished_utc": "2026-10-29T19:45:13.500231+00:00",
+      "elapsed_seconds": 54.909,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "39f3b2d72a4a11602ce16d2a8c81ff9685098daa4a3ce07c49fcaa64d14d27cf",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/e79a2ec6873b0e802c7e34c9c972240f43d958bb5a82261d6294c1b399e2ab0e",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3252224,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230643871744,
+      "evidence_id": "pi-codex-r6",
+      "original_receipt_sha256": "23f622b525e2fe74be4e06533af42f0d78435df40dbf4a92519e74e855ba0bff",
+      "qualification_note": "Actual policy SHA and public/receipt equality checked by the retained harness.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "If embeddings are unavailable, keep keyword search working. Never silently send the query to another provider.",
+        "code": [
+          {
+            "changed": false,
+            "changed_during_read": false,
+            "end": 197,
+            "observed_at_unix_ms": 1793303102961,
+            "path": "decision.md",
+            "sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "source": {
+              "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+              "end": 197,
+              "event_id": "consult-code/b0de98082bdcf5d4c532cccc275c1c9ed3189b723db481a18e38c1224e27003b",
+              "revision": 36,
+              "start": 0
+            },
+            "start": 0,
+            "total_bytes": 197
+          }
+        ],
+        "conditions": [
+          "This policy applies to the disposable acceptance workspace."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "end": 197,
+            "event_id": "consult-code/b0de98082bdcf5d4c532cccc275c1c9ed3189b723db481a18e38c1224e27003b",
+            "revision": 36,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "INVALID_ARGUMENT"
+        ],
+        "job_id": "consult/a2c1913792339f30fa549858bfe375d27d1718c9890b481910b9016469d229b4",
+        "memories": [],
+        "receipt_id": "consult-result/e79a2ec6873b0e802c7e34c9c972240f43d958bb5a82261d6294c1b399e2ab0e",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 51325,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5348674,
+          "started_at_unix_ms": 1793303061841,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 149830,
+          "read_bytes": 145912,
+          "reads": 5,
+          "starts": 1,
+          "tokens": 54968
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "native_codex",
+            "finished_at_ms": 1793303113163,
+            "host": "codex",
+            "id": "consult/a2c1913792339f30fa549858bfe375d27d1718c9890b481910b9016469d229b4/run/0",
+            "parent": null,
+            "started_at_ms": 1793303061846,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "hermes-empty",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "dd6418b360fcbe2e5cf8e2adb07ce660a9c90d0a",
+      "tree": "256ca3d276508cdfc006e3637c81a87c75e19028",
+      "binary_sha256": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+      "started_utc": "2026-10-29T19:45:13.777129+00:00",
+      "finished_utc": "2026-10-29T19:45:44.345364+00:00",
+      "elapsed_seconds": 30.568,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "Hermes Agent v0.22.5+1915.g4960e41 (2026.9.24) · stable · local 4960e41cec01\nInstall directory: /home/obj/.hermes/hermes-agent\nInstall method: git\nPython: 3.14.9\nOpenAI SDK: 2.54.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "56ddb3789befd60c08102d8b4330baa04fb54736deb08335ffd45a6862b3f2c3",
+      "caller_error_sha256": "541c0538972bc926fc7ebd631687ce7576c8fe2ef2c4ef73874c7a3d1ea04208",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/9ca42dc715672cb559cccac4a412e43585bec9e562add36e6f4773b6b73d6337",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 4780032,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230647447552,
+      "evidence_id": "hermes-empty-r6",
+      "original_receipt_sha256": "c07f1c2a25d29dc8d034fd111fae2467dbd52a7292258a3d4408c1516d8f7de5",
+      "qualification_note": "Actual policy SHA and public/receipt equality checked by the retained harness.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "When embeddings are offline, keep keyword search working. Never silently send the query to another provider. This applies to this disposable acceptance workspace.",
+        "code": [
+          {
+            "changed": false,
+            "changed_during_read": false,
+            "end": 197,
+            "observed_at_unix_ms": 1793303139315,
+            "path": "decision.md",
+            "sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "source": {
+              "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+              "end": 197,
+              "event_id": "consult-code/3011e8329e12bb719b911a73bb7f9ddc6829fc31d162a5600cd36b331829b623",
+              "revision": 32,
+              "start": 0
+            },
+            "start": 0,
+            "total_bytes": 197
+          }
+        ],
+        "conditions": [
+          "This decision applies to this disposable acceptance workspace.",
+          "Policy applies when embeddings are unavailable."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "end": 197,
+            "event_id": "consult-code/3011e8329e12bb719b911a73bb7f9ddc6829fc31d162a5600cd36b331829b623",
+            "revision": 32,
+            "start": 0
+          },
+          {
+            "content_sha256": "eb355b8deba26caa1242cfa3fc1409afabe120c5a0da72724c494f5964590097",
+            "end": 306,
+            "event_id": "capture/191bcc69e96095c1a37facb103d7a9037c998fe7432631dac1c1440858692ad3/0000",
+            "revision": 20,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "SOURCE_UNAVAILABLE",
+          "No matching memory revisions were found; memory_search returned no_hit with an empty index of active memories.",
+          "No other workspace files were read; README.md was unavailable."
+        ],
+        "job_id": "consult/b0ef9e7234e3d06070331c107ab38384a6fbe77d359467322c1818899f67faf3",
+        "memories": [],
+        "receipt_id": "consult-result/9ca42dc715672cb559cccac4a412e43585bec9e562add36e6f4773b6b73d6337",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 15449,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5384550,
+          "started_at_unix_ms": 1793303127745,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 22326,
+          "read_bytes": 208967,
+          "reads": 43,
+          "starts": 1,
+          "tokens": 39037
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793303143191,
+            "host": "hermes",
+            "id": "consult/b0ef9e7234e3d06070331c107ab38384a6fbe77d359467322c1818899f67faf3/run/0",
+            "parent": null,
+            "started_at_ms": 1793303127750,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": null,
+      "configured_model": "custom/grok-4.7 through localhost:48317; effect not separately traced"
+    },
+    {
+      "case": "pi-empty",
+      "status": "FAILED",
+      "head": "22543963c36f00923cd5a008a055ef438057c2d7",
+      "tree": "96f4756205abab37c6d692596d5af8650817418e",
+      "binary_sha256": "8b9d78fa3fa36773be4b99742b751b81cc06e02f79a67ba925f9471cae8476b5",
+      "started_utc": "2026-10-29T20:06:53.885590+00:00",
+      "finished_utc": "2026-10-29T20:07:15.965719+00:00",
+      "elapsed_seconds": 23.031,
+      "checks": [],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "a226a813dcbcfc5bea83bf4412956e8b0ca350e9bc34b19693933627b046e6ac",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3321856,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230622052352,
+      "evidence_id": "pi-empty-r7",
+      "original_receipt_sha256": "07401f18459aa78d96ba3b951a7215f90a003a16ef78a0e251c4179bcc13f9a0",
+      "qualification_note": "Native model added disallowed gaps_note. Strict conclusion parser correctly rejected it; no successful result.",
+      "owned_processes_ended": true,
+      "job_state": "failed",
+      "error": "PROTOCOL_INVALID",
+      "public": {
+        "error": {
+          "code": "PROTOCOL_INVALID"
+        },
+        "job_id": "consult/9a807447ea2ff47a706e70ed06062f76420072b39b2853aaf8087e4fd529889f",
+        "receipt_id": null,
+        "status": "error"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 17821,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5382178,
+          "started_at_unix_ms": 1793304417380,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 288641,
+          "read_bytes": 536027,
+          "reads": 62,
+          "starts": 1,
+          "tokens": 35110
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "error": "PROTOCOL_INVALID",
+            "executor_profile": "caller",
+            "finished_at_ms": 1793304435201,
+            "host": "pi",
+            "id": "consult/9a807447ea2ff47a706e70ed06062f76420072b39b2853aaf8087e4fd529889f/run/0",
+            "parent": null,
+            "started_at_ms": 1793304417401,
+            "state": "failed"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "pi-delegate",
+      "status": "FAILED",
+      "head": "22543963c36f00923cd5a008a055ef438057c2d7",
+      "tree": "96f4756205abab37c6d692596d5af8650817418e",
+      "binary_sha256": "8b9d78fa3fa36773be4b99742b751b81cc06e02f79a67ba925f9471cae8476b5",
+      "started_utc": "2026-10-29T20:07:16.266725+00:00",
+      "finished_utc": "2026-10-29T20:07:48.928319+00:00",
+      "elapsed_seconds": 32.675,
+      "checks": [],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "8ff757b83105b0ba765bc088eb8badf371fa12066fb2903415965dd6124991b9",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3338240,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230726823936,
+      "evidence_id": "pi-delegate-r7",
+      "original_receipt_sha256": "d2f15d6fb9839e5fdfee512e174963ca5f0cbc0d089d87a2010f1229cb3acaef",
+      "qualification_note": "Parent PROTOCOL_INVALID immediately after child success. Delayed greeting was independently reproduced in both private bridges; historical connection timing was not captured.",
+      "owned_processes_ended": true,
+      "job_state": "failed",
+      "error": "PROTOCOL_INVALID",
+      "public": {
+        "error": {
+          "code": "PROTOCOL_INVALID"
+        },
+        "job_id": "consult/ab6f70bbb2cad2c82bf0606221ecd6a865b5623dbb3fa5ed1d2205430cfc03ec",
+        "receipt_id": null,
+        "status": "error"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 26390,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5373609,
+          "started_at_unix_ms": 1793304442068,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 419774,
+          "read_bytes": 609052,
+          "reads": 85,
+          "starts": 2,
+          "tokens": 53256
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "error": "PROTOCOL_INVALID",
+            "executor_profile": "caller",
+            "finished_at_ms": 1793304468457,
+            "host": "pi",
+            "id": "consult/ab6f70bbb2cad2c82bf0606221ecd6a865b5623dbb3fa5ed1d2205430cfc03ec/run/0",
+            "parent": null,
+            "started_at_ms": 1793304442088,
+            "state": "failed"
+          },
+          {
+            "depth": 1,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793304468432,
+            "host": "pi",
+            "id": "consult/ab6f70bbb2cad2c82bf0606221ecd6a865b5623dbb3fa5ed1d2205430cfc03ec/run/1",
+            "parent": "consult/ab6f70bbb2cad2c82bf0606221ecd6a865b5623dbb3fa5ed1d2205430cfc03ec/run/0",
+            "started_at_ms": 1793304450113,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "pi-empty",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "ec95da585a11ed945e0ea22c8973b5cf1219046e",
+      "tree": "1dbf5a0849bb83d1f47f7a01317c9a0dbf1e41e2",
+      "binary_sha256": "b2dc9cbf0d2f3a84612a9a71ad3b99c329af3a3a24575f3e24ea4eb6a001cb1a",
+      "started_utc": "2026-10-29T20:36:00.169553+00:00",
+      "finished_utc": "2026-10-29T20:36:16.847339+00:00",
+      "elapsed_seconds": 16.705,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "dbc5227a08d88d7feb5ce07c705b8ad86995f0e8266d1cb283ab6b5f46a7ffbd",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/48483f1b4e72c38a3b64302a1e81d404f198fa9a9666261b59e5c475daa4ee37",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3317760,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230511296512,
+      "evidence_id": "pi-empty-r8",
+      "original_receipt_sha256": "ae5bb32d087d240a950aa0d765f5f2dcd8d6f81cec28d05aaf7bb05c5ddd91ce",
+      "qualification_note": "Actual policy SHA and public/receipt equality checked by the retained harness.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "If embeddings are unavailable, keep keyword search working and never silently send the query to another provider. This applies to this disposable acceptance workspace.",
+        "code": [
+          {
+            "changed": false,
+            "changed_during_read": false,
+            "end": 197,
+            "observed_at_unix_ms": 1793306173267,
+            "path": "decision.md",
+            "sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "source": {
+              "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+              "end": 197,
+              "event_id": "consult-code/e1e8dd0426523b8f70689db81f522abdcd93e788453c8792b17f3ca8521a8990",
+              "revision": 38,
+              "start": 0
+            },
+            "start": 0,
+            "total_bytes": 197
+          }
+        ],
+        "conditions": [
+          "The decision applies to this disposable acceptance workspace."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "end": 197,
+            "event_id": "consult-code/e1e8dd0426523b8f70689db81f522abdcd93e788453c8792b17f3ca8521a8990",
+            "revision": 38,
+            "start": 0
+          },
+          {
+            "content_sha256": "eb355b8deba26caa1242cfa3fc1409afabe120c5a0da72724c494f5964590097",
+            "end": 306,
+            "event_id": "capture/ae133b333cde6a71542653c2df7e3d7d3153600bd7cc30e7b9a3e8e9d9255e8e/0000",
+            "revision": 23,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "SOURCE_UNAVAILABLE",
+          "DELEGATION_UNAVAILABLE"
+        ],
+        "job_id": "consult/bd5fa19e955b297b81e8f349e1a2d092fbd773b981a19fecc1809202ba1daa67",
+        "memories": [],
+        "receipt_id": "consult-result/48483f1b4e72c38a3b64302a1e81d404f198fa9a9666261b59e5c475daa4ee37",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 12379,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5387620,
+          "started_at_unix_ms": 1793306163602,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 237871,
+          "read_bytes": 304184,
+          "reads": 34,
+          "starts": 1,
+          "tokens": 33752
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793306175980,
+            "host": "pi",
+            "id": "consult/bd5fa19e955b297b81e8f349e1a2d092fbd773b981a19fecc1809202ba1daa67/run/0",
+            "parent": null,
+            "started_at_ms": 1793306163607,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "pi-delegate",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "ec95da585a11ed945e0ea22c8973b5cf1219046e",
+      "tree": "1dbf5a0849bb83d1f47f7a01317c9a0dbf1e41e2",
+      "binary_sha256": "b2dc9cbf0d2f3a84612a9a71ad3b99c329af3a3a24575f3e24ea4eb6a001cb1a",
+      "started_utc": "2026-10-29T20:36:17.133771+00:00",
+      "finished_utc": "2026-10-29T20:36:48.095382+00:00",
+      "elapsed_seconds": 30.974,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace",
+        "real native descendant delegation"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "1.4.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "5aca428d069a9b2669f35fc93f891a0f849ffd936871f2b36050625399ddd4bf",
+      "caller_error_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/8cce8896ba04e8bebafd93a5aea3f24b5c7ccb81ad6f4667312b81a09cd9a1b7",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 3354624,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230508154880,
+      "evidence_id": "pi-delegate-r8",
+      "original_receipt_sha256": "8f99d7c2dd741724b075d269fcbdd6b00351da0fca152abbc20528f78db7dc10",
+      "qualification_note": "Actual policy SHA and public/receipt equality checked by the retained harness.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "When embeddings are unavailable, keep keyword search working and never silently send the query to another provider. decision.md limits this to the disposable acceptance workspace and does not separately name semantic search. Active memory searches returned no matching policy.",
+        "code": [
+          {
+            "changed": false,
+            "changed_during_read": false,
+            "end": 197,
+            "observed_at_unix_ms": 1793306204497,
+            "path": "decision.md",
+            "sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "source": {
+              "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+              "end": 197,
+              "event_id": "consult-code/43ebc282d60654e94c5d9ec7bc46a242b82aba21232cff3d35fa78f01a4df774",
+              "revision": 60,
+              "start": 0
+            },
+            "start": 0,
+            "total_bytes": 197
+          }
+        ],
+        "conditions": [
+          "Applies only if embeddings are unavailable.",
+          "The decision applies to this disposable acceptance workspace."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "dc60cc402bde811710cbcfb5e833e34e6db6773cbea18e59db32ffdc558a4063",
+            "end": 368,
+            "event_id": "capture/6f2ba69d4e642a3220806d85acb2dc320c9c37627bda9901bca55bd387a3332f/0000",
+            "revision": 23,
+            "start": 0
+          },
+          {
+            "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "end": 197,
+            "event_id": "consult-code/43ebc282d60654e94c5d9ec7bc46a242b82aba21232cff3d35fa78f01a4df774",
+            "revision": 60,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "SOURCE_UNAVAILABLE",
+          "DELEGATION_UNAVAILABLE",
+          "decision.md does not name semantic search separately from embeddings being unavailable.",
+          "No active memories matched this policy."
+        ],
+        "job_id": "consult/83958cf92ac787e4e5514cfdce743035807b7cc811663db5513d1a1aa438d720",
+        "memories": [],
+        "receipt_id": "consult-result/8cce8896ba04e8bebafd93a5aea3f24b5c7ccb81ad6f4667312b81a09cd9a1b7",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 26797,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5373202,
+          "started_at_unix_ms": 1793306180600,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 507286,
+          "read_bytes": 839483,
+          "reads": 90,
+          "starts": 2,
+          "tokens": 56701
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793306207397,
+            "host": "pi",
+            "id": "consult/83958cf92ac787e4e5514cfdce743035807b7cc811663db5513d1a1aa438d720/run/0",
+            "parent": null,
+            "started_at_ms": 1793306180604,
+            "state": "succeeded"
+          },
+          {
+            "depth": 1,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793306200893,
+            "host": "pi",
+            "id": "consult/83958cf92ac787e4e5514cfdce743035807b7cc811663db5513d1a1aa438d720/run/1",
+            "parent": "consult/83958cf92ac787e4e5514cfdce743035807b7cc811663db5513d1a1aa438d720/run/0",
+            "started_at_ms": 1793306188126,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": [
+        "grok-4.7"
+      ]
+    },
+    {
+      "case": "hermes-empty",
+      "status": "PASS_REAL_NATIVE_CONSULT",
+      "head": "ec95da585a11ed945e0ea22c8973b5cf1219046e",
+      "tree": "1dbf5a0849bb83d1f47f7a01317c9a0dbf1e41e2",
+      "binary_sha256": "b2dc9cbf0d2f3a84612a9a71ad3b99c329af3a3a24575f3e24ea4eb6a001cb1a",
+      "started_utc": "2026-10-29T20:36:48.360852+00:00",
+      "finished_utc": "2026-10-29T20:37:20.075902+00:00",
+      "elapsed_seconds": 31.715,
+      "checks": [
+        "real native caller submitted exactly once",
+        "default-self or explicitly named runner",
+        "public terminal conclusion",
+        "durable receipt equals public output",
+        "shared run trace"
+      ],
+      "provider_origin": "real authenticated native model; no synthetic provider responses",
+      "native_version": "Hermes Agent v0.22.5+1915.g4960e41 (2026.9.24) · stable · local 4960e41cec01\nInstall directory: /home/obj/.hermes/hermes-agent\nInstall method: git\nPython: 3.14.9\nOpenAI SDK: 2.54.0",
+      "caller_exit": 0,
+      "caller_output_sha256": "f93542965ffbcc4dc5f2eaf13fb310e9297189ebe79bb2f39b756a0b80ecee71",
+      "caller_error_sha256": "fce0df14af467ed94ad7d8b9b9a3d8d4f29801861ea7ee81391ff3775d3b780a",
+      "consult_jobs": 1,
+      "receipt_id": "consult-result/1987126cffbdbd3210f156f5245d8a668df325792abdefca968aec0724bb1ebb",
+      "native_settings_unchanged": true,
+      "head_unchanged": true,
+      "allocated_bytes": 4788224,
+      "scratch_removed": true,
+      "ssd_free_bytes_after": 230511435776,
+      "evidence_id": "hermes-empty-r8",
+      "original_receipt_sha256": "0e45de1a1107510e73014864a3a0faa98344dac021a6be854b7a3465ea75fb1a",
+      "qualification_note": "Actual policy SHA and public/receipt equality checked by the retained harness.",
+      "owned_processes_ended": true,
+      "job_state": "succeeded",
+      "error": null,
+      "public": {
+        "answer": "If embeddings are unavailable, keep keyword search working and never silently send the query to another provider. This applies to this disposable acceptance workspace.",
+        "code": [
+          {
+            "changed": false,
+            "changed_during_read": false,
+            "end": 197,
+            "observed_at_unix_ms": 1793306235214,
+            "path": "decision.md",
+            "sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "source": {
+              "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+              "end": 197,
+              "event_id": "consult-code/51178712c50727bb8da3063956adc78a18d86030f779e8019cadcaa9f7b06884",
+              "revision": 32,
+              "start": 0
+            },
+            "start": 0,
+            "total_bytes": 197
+          }
+        ],
+        "conditions": [
+          "This decision applies to this disposable acceptance workspace.",
+          "decision.md was unchanged during the read (changed=false)."
+        ],
+        "conflicts": [],
+        "evidence": [
+          {
+            "content_sha256": "a0b5e425cfef580e8d43e020156b95dda5fcb4179d798c24c8fbc64b41a95d77",
+            "end": 197,
+            "event_id": "consult-code/51178712c50727bb8da3063956adc78a18d86030f779e8019cadcaa9f7b06884",
+            "revision": 32,
+            "start": 0
+          },
+          {
+            "content_sha256": "eb355b8deba26caa1242cfa3fc1409afabe120c5a0da72724c494f5964590097",
+            "end": 306,
+            "event_id": "capture/eafedf0bc0569fb50cc6bb3fca243cc8a5662031c41877c82b289b3bf60d9e42/0000",
+            "revision": 20,
+            "start": 0
+          }
+        ],
+        "gaps": [
+          "SOURCE_UNAVAILABLE",
+          "No active memories matched embeddings or the offline-search policy.",
+          "README.md was unavailable (SOURCE_UNAVAILABLE); only decision.md was read."
+        ],
+        "job_id": "consult/0a8705686c314884beb80d596afcc000dcf6ba6390ff6b0e0c0dd2480811e156",
+        "memories": [],
+        "receipt_id": "consult-result/1987126cffbdbd3210f156f5245d8a668df325792abdefca968aec0724bb1ebb",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        },
+        "status": "incomplete"
+      },
+      "run_trace": {
+        "deadline": {
+          "configured_ms": 5400000,
+          "effective_ms": 5400000,
+          "elapsed_ms": 14202,
+          "layer": "workflow",
+          "limiting_layer": "workflow",
+          "remaining_ms": 5385797,
+          "started_at_unix_ms": 1793306224714,
+          "triggered_layer": null
+        },
+        "usage": {
+          "output_bytes": 22095,
+          "read_bytes": 339567,
+          "reads": 42,
+          "starts": 1,
+          "tokens": 32039
+        },
+        "runs": [
+          {
+            "depth": 0,
+            "executor_profile": "caller",
+            "finished_at_ms": 1793306238911,
+            "host": "hermes",
+            "id": "consult/0a8705686c314884beb80d596afcc000dcf6ba6390ff6b0e0c0dd2480811e156/run/0",
+            "parent": null,
+            "started_at_ms": 1793306224719,
+            "state": "succeeded"
+          }
+        ]
+      },
+      "effective_models": null
+    }
+  ]
+}

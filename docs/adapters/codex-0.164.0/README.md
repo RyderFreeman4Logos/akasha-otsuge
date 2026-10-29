@@ -14,8 +14,8 @@ the final source gate, independent review, CI and merge have separate receipts.
 - Native forced attempts to write, use tool networking, read outside context,
   apply a patch or invoke an unregistered MCP tool produced unsupported-tool
   results without the sentinel effect. An unissued context handle produced
-  `READ_DENIED`. The model's actual tool inventory contained exactly four context
-  tools. The controlled endpoint supplies hostile responses; prompts are not the
+  `READ_DENIED`. That MVP-013 model inventory contained four context tools;
+  MVP-016 adds five shared memory/code/delegation tools. The controlled endpoint supplies hostile responses; prompts are not the
   enforcement boundary.
 - Versioned native history fixtures cover original public messages/tools,
   compaction, fork cutoffs and separate-process resume. Product tests additionally
@@ -36,13 +36,13 @@ Ordinary `cargo test` skips it. Do not run the ignored hostile-handle test again
 a normal model: it requires a controlled endpoint that emits the specified
 unissued handle. The committed fake-host fault suite runs without authentication.
 
-For Caller acceptance, install the opt-in launcher as described in
-[the adapter guide](../../adapters.md), review its hooks in Codex, then open two
-terminals in the same workspace using that launcher. In each ask for one
-`exec_command` invocation of `akasha-otsuge consult "distinct-marker"` and compare
-the returned `caller.session`, `tool_call_id`, `turn_id` and call cursor with its
-own native rollout. The present command returns a binding diagnostic; the recall
-workflow is MVP-016. Do not interpret missing child proof as the root session.
+Install the opt-in launcher as described in [the adapter guide](../../adapters.md)
+and review its hooks in Codex. An `exec_command` call to `akasha-otsuge consult`
+may omit the hint; the hook supplies verified runtime identity and submits a
+durable job. Public output contains status and a bounded conclusion/receipt after
+success, while `consult show JOB_ID` continues a pending request. Private binding
+and run diagnostics remain in `job show JOB_ID`. Missing child proof never falls
+back to the root session. See the subsequent [MVP-016 Consult evidence](../../benchmarks/results/mvp016/README.md).
 
 All native scratch, fixture credentials and owned processes were removed after
 each run. The successful two-TUI fixture allocated 5,115,904 bytes excluding

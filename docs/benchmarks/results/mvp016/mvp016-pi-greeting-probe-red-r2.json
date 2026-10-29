@@ -1,0 +1,30 @@
+{
+  "source_head": "22543963c36f00923cd5a008a055ef438057c2d7",
+  "binary_sha256": "8b9d78fa3fa36773be4b99742b751b81cc06e02f79a67ba925f9471cae8476b5",
+  "harness_sha256": "e9ca8b3c929c27d69dac1f962605dffb8c946ce1d04fafca7347a763a51a6e9d",
+  "binaries_unchanged": true,
+  "cases": [
+    {
+      "budget_ms": 30000,
+      "greeting_delay_seconds": 11,
+      "exit_code": 1,
+      "client_elapsed_seconds": 10.014036868698895,
+      "stdout": "",
+      "stderr": "{\"schema_version\":1,\"error\":{\"code\":\"IPC_TIMEOUT\",\"message\":\"The operation could not be completed\"}}\n",
+      "server_errors": [
+        "BrokenPipeError"
+      ]
+    },
+    {
+      "budget_ms": 2000,
+      "greeting_delay_seconds": 2.5,
+      "exit_code": 1,
+      "client_elapsed_seconds": 2.007500638253987,
+      "stdout": "",
+      "stderr": "{\"schema_version\":1,\"error\":{\"code\":\"IPC_TIMEOUT\",\"message\":\"The operation could not be completed\"}}\n",
+      "server_errors": [
+        "BrokenPipeError"
+      ]
+    }
+  ]
+}

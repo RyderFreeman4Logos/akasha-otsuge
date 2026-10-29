@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "code_head": "ec95da585a11ed945e0ea22c8973b5cf1219046e",
+  "code_tree": "1dbf5a0849bb83d1f47f7a01317c9a0dbf1e41e2",
+  "bridge_regression": {
+    "rust_passed": 49,
+    "hermes_plugin_passed": 11,
+    "ignored_native": 8,
+    "clippy": "passed",
+    "format": "passed"
+  },
+  "checks": [
+    {
+      "name": "mvp016-pi-queued-greeting-red",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--test",
+        "adapter_context",
+        "pi_bridge_",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "head": "22543963c36f00923cd5a008a055ef438057c2d7",
+      "log_sha256": "06449376dbb87371ac2249099372f0c8f77477bd18f25348bd6228810710b84f",
+      "seconds": 32.23288191575557,
+      "utc": "2026-10-29T20:33:01.365768+00:00",
+      "candidate_tree": null
+    },
+    {
+      "name": "mvp016-hermes-greeting-red",
+      "command": [
+        "python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp016-hermes-greeting-tests.py",
+        "HermesPlugin.test_runner_queued_greeting_uses_original_deadline"
+      ],
+      "exit_code": 1,
+      "head": "22543963c36f00923cd5a008a055ef438057c2d7",
+      "log_sha256": "67acc01119df5d8abaa2d22d5f8110f7f747fe61a6b7690dfdc149e8eecced53",
+      "seconds": 12.167666464112699,
+      "utc": "2026-10-29T20:23:02.616477+00:00",
+      "candidate_tree": null
+    },
+    {
+      "name": "mvp016-queued-greeting-green",
+      "command": [
+        "bash",
+        "-c",
+        "set -e\ncargo test --locked --test adapter_context --test pi --test hermes\npython3 -m unittest discover -s scripts -p test_hermes_plugin.py\ncargo fmt --all -- --check\ncargo clippy --workspace --all-targets --locked -- -D warnings\ngit diff --check"
+      ],
+      "exit_code": 0,
+      "head": "22543963c36f00923cd5a008a055ef438057c2d7",
+      "log_sha256": "f07a565ca28247dc4c09820238aeca8b7e961bd509a1a0e184971c2ab107b24b",
+      "seconds": 74.43679150380194,
+      "utc": "2026-10-29T20:34:50.988582+00:00",
+      "candidate_tree": "1dbf5a0849bb83d1f47f7a01317c9a0dbf1e41e2"
+    },
+    {
+      "name": "mvp016-native-cases-r8",
+      "command": [
+        "python3",
+        "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp016-native-cases-r8.py",
+        "ec95da585a11ed945e0ea22c8973b5cf1219046e"
+      ],
+      "exit_code": 0,
+      "head": "ec95da585a11ed945e0ea22c8973b5cf1219046e",
+      "log_sha256": "bc95cd9fb80b52947d00ad9b763ef6b302d7311ca6197de3428da7234f91f174",
+      "seconds": 80.6172527950257,
+      "utc": "2026-10-29T20:37:20.084520+00:00",
+      "candidate_tree": null
+    }
+  ],
+  "long": {
+    "source_head": "22543963c36f00923cd5a008a055ef438057c2d7",
+    "delay_seconds": 1605,
+    "budget_seconds": 1700,
+    "completed_seconds": 1612.3274853583425,
+    "timeout_budget_seconds": 10,
+    "timeout_cleanup_seconds": 11.200485748238862,
+    "scratch_removed": true,
+    "native_processes_ended": true,
+    "binaries_unchanged": true,
+    "native_kind": "actual Pi CLI against controlled synthetic local SSE; no paid model"
+  },
+  "native_final_cases": [
+    "pi-empty-r8",
+    "pi-delegate-r8",
+    "hermes-empty-r8"
+  ],
+  "claude_native": "deferred by owner authorization; #12 remains open",
+  "canonical_review_ci": "Recorded separately on the final documentation/evidence commit in PR45; prior checks do not authorize a changed tree."
+}

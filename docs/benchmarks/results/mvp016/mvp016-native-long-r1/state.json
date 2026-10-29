@@ -1,0 +1,47 @@
+{
+  "head": "534f9b257a175f0fc2b72b9610a71d936ec5d792",
+  "tree": "3c36182e9b3c0c01fc219002b41b6f29c01fda18",
+  "started_utc": "2026-10-29T19:49:26.461410+00:00",
+  "scratch": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a16-native-long-if8_3pnd",
+  "run_id": "mvp016-native-long-r1",
+  "kind": "actual Pi 1.4.0 RPC with controlled local SSE; no model quality or token cost claim",
+  "binaries": {
+    "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp016/target/debug/akasha-otsuge": "126e0ae9807273e3c503d20d158aacee77eb1d68a33f4934588337ac03ac6526",
+    "/home/obj/.local/share/mise/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi": "2d6702dd4a52461f50f304bcef3aa0261464ea0b921f72ea7ed6d07df16edef0",
+    "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a": "3bd33fab1b43cd8e2274b9081bce268f05d87b79adbbc9914c10b813884a4654"
+  },
+  "cases": [
+    {
+      "case": "protocol-control",
+      "exit_code": 101,
+      "elapsed_seconds": 1.0665531549602747,
+      "deadline_seconds": 180,
+      "controlled_delay_seconds": 0,
+      "request_count": 1,
+      "served_requests": [],
+      "provider_errors": [
+        "AssertionError: ['code_read', 'code_search', 'context_describe', 'context_list', 'context_read', 'context_search', 'delegate', 'memory_get', 'memory_search']"
+      ],
+      "owned_processes_after": [],
+      "passed": false,
+      "log_sha256": "e8d9cedd5be0c200f122851d3400ad42acb70a3f364a97c9174f4ac191dfca26"
+    }
+  ],
+  "active": null,
+  "status": "running",
+  "config_epoch": "87999210bcf5063beb307c7efaedab4d570aeddafcf6b0be5e6b3ebb57866632",
+  "phase": "collected",
+  "elapsed_seconds": 3.574378853663802,
+  "unit_started_utc": "2026-10-29T19:49:27.611045+00:00",
+  "request_count": 1,
+  "delay_seconds": 0,
+  "processes_ended": true,
+  "scratch_removed": true,
+  "ssd_free_after": 230640570368,
+  "binaries_unchanged": {
+    "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp016/target/debug/akasha-otsuge": true,
+    "/home/obj/.local/share/mise/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi": true,
+    "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/pi-f9a5d0085c71ef4a": true
+  },
+  "finished_utc": "2026-10-29T19:49:30.034453+00:00"
+}

@@ -29,7 +29,9 @@ against persisted native entries. Nested calls without their own persisted entry
 fail closed. Native tool-call IDs are opaque: Responses IDs such as
 `call_...|fc_...` are preserved exactly, with the shared256-byte/no-control
 boundary. Interactive input is machine-observed provenance, not human approval.
-The current tool returns a verified binding; the consult workflow is tracked in #16.
+The tool submits a durable Consult job. Its public result contains the job status
+and, after successful research, a bounded conclusion with evidence and a receipt.
+Use `consult show JOB_ID` and `consult receipt JOB_ID` to continue after a pending response.
 
 Input and message callbacks mark capture pending. Turn completion, settled,
 session start/tree/compact and shutdown queue durable reconciliation from the
@@ -58,8 +60,9 @@ socket requires uninstalling the unchanged extension and installing again.
 
 The Runner uses the same selected Pi profile and its native authentication. It
 starts a separate `--mode rpc --no-session` process with the installed extension
-and exactly four tools: `context_describe`, `context_list`, `context_read` and
-`context_search`. Built-in tools, other extensions, MCP, skills, prompt templates,
+and exactly nine research tools: `context_describe/list/read/search`,
+`memory_search/get`, `code_search/read` and `delegate`. Built-in tools, other
+extensions, MCP, skills, prompt templates,
 themes and context files are disabled. The native tool inventory must match
 before the Runner sends its prompt. Each run has a private read capability and
 an abstract Unix socket with peer-UID checks; model arguments cannot choose the
@@ -68,7 +71,10 @@ source session or expand its scope.
 Responses are correlated to the submitted prompt. Completion requires a final
 JSON answer, native `agent_settled` and zero process exit. `agent_end` can precede
 automatic retries and is not completion. The original deadline and shared
-budgets cover tools, events and cleanup. Cancellation kills the owned process
+budgets cover tools, events and cleanup. Owned run-local settings propagate its
+remaining time to Pi HTTP/provider timeouts. Only that private directory is
+approved; native user settings remain unchanged. Private callback greetings may
+wait behind delegated research and retain the same original deadline. Cancellation kills the owned process
 group, including bridge children, and reaps it before releasing run resources.
 Native retry context edits and compaction/summarization events are accepted as
 metadata; they cannot complete a run or expand its tool authority.
@@ -120,5 +126,5 @@ real summarization without changing user defaults. Earlier failed receipts remai
 All owned processes/scratch ended and original native settings/models stayed
 unchanged. [The final acceptance receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/44#issuecomment-6497475368)
 records hashes and scope. The exact candidate also passed the canonical gate,
-independent R4 review and CI40860874178. PR #44 merged and #15 closed; consult
-workflow delivery remains tracked in [the complete checklist](../../plan/todo.md).
+independent R4 review and CI40860874178. PR #44 merged and #15 closed. The subsequent durable Consult, delegation and
+long-request receipts are in the [MVP-016 evidence](../../benchmarks/results/mvp016/README.md).
