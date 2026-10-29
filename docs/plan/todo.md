@@ -766,8 +766,15 @@ Original task start2026-10-29T22:50:15.286265+00:00; base `d64051e`.
   SIGKILL tests preserve original deadlines and usage; ambiguous native work
   fails without replay. Manual/policy/automatic publication retains automated
   provenance and never claims human approval. Clippy and formatting pass.
-- [ ] Execute actual single-CLI and mixed-Runner samples through authorized
+- [x] Execute actual single-CLI and mixed-Runner samples through authorized
   profiles; archive compact source/candidate mappings and cleanup receipts.
+  Pi1.4.0/mp-cpi/grok-4.7 and Pi plus native Codex0.164.0 each produce four
+  source-linked hypothesis candidates. Observed output-budget stops retain
+  disagreements and unresolved dependencies. R5 single-case PASS is preserved
+  inside a failed combined harness; isolated R6 mixed-case PASS includes a real
+  Codex initial answer and Pi cross-questioning. Prompt ID ambiguity and duplicate
+  dependency admission are repaired without weakening evidence validation.
+  See [compact evidence](../benchmarks/results/mvp018/README.md).
 - [ ] Finish focused checks, canonical gate, independent review, CI, publication,
   merge and verified closure before advancing #19.
 

@@ -2,6 +2,7 @@ use super::extraction_tests::{finished, runtime, scope, seed_source, storage_con
 use super::*;
 use akasha_otsuge::domain::{Authority, Domain, Origin};
 use akasha_otsuge::storage::Storage;
+use sha2::{Digest, Sha256};
 
 fn fixture(extra: &str) -> (Daemon, Value) {
     let mut daemon = Daemon::new();
@@ -199,4 +200,212 @@ fn auto_grill_cancel_stops_native_process_and_keeps_completed_discussion_sources
             .unwrap()
             .contains("q1")
     );
+}
+
+#[test]
+#[ignore = "requires explicitly supplied authenticated native profiles and receipt path"]
+fn native_single_grill_actual() {
+    native_grill_actual("single_pi");
+}
+
+#[test]
+#[ignore = "requires explicitly supplied authenticated native profiles and receipt path"]
+fn native_mixed_grill_actual() {
+    native_grill_actual("pi_codex");
+}
+
+fn native_grill_actual(case: &str) {
+    let pi = PathBuf::from(std::env::var_os("AKASHA_NATIVE_PI_BINARY").unwrap());
+    let pi_home = PathBuf::from(std::env::var_os("AKASHA_NATIVE_PI_HOME").unwrap());
+    let codex = PathBuf::from(std::env::var_os("AKASHA_NATIVE_CODEX_BINARY").unwrap());
+    let codex_home = PathBuf::from(std::env::var_os("AKASHA_NATIVE_CODEX_HOME").unwrap());
+    let output = PathBuf::from(std::env::var_os("AKASHA_NATIVE_GRILL_RECEIPT").unwrap());
+    assert!(!output.exists());
+    let originals = [
+        (
+            "offline",
+            "This project must keep keyword search available when embeddings are offline.",
+        ),
+        (
+            "private",
+            "Do not send private queries to an external reranker.",
+        ),
+        (
+            "measurement",
+            "No latency measurements or rollout approval have been recorded for the proposed offline mode.",
+        ),
+    ];
+    let mut receipt = json!({"schema_version":1,"status":"RUNNING","originals":originals,"cases":[],"extra_model_profiles":0});
+    {
+        let mut daemon = Daemon::new();
+        let sources: Vec<_> = originals
+            .iter()
+            .map(|(id, text)| seed_source(&daemon, id, text))
+            .collect();
+        let mixed = if case == "pi_codex" {
+            format!(
+                "[executors.codex]\nkind='codex'\nbinary={codex:?}\nnative_home={codex_home:?}\nargs=['-c','model_reasoning_effort=\"low\"']\n"
+            )
+        } else {
+            String::new()
+        };
+        let reviewer = if case == "pi_codex" { "codex" } else { "pi" };
+        daemon.configure(&format!("[access]\nread_roots=[{pi_home:?},{codex_home:?}]\n[grill]\ninterviewer='pi'\nexpert='pi'\nreviewer='{reviewer}'\nmax_questions=2\nmax_rounds=2\nmax_runner_starts=5\n[executors.pi]\nkind='pi'\nbinary={pi:?}\nnative_home={pi_home:?}\n{mixed}"));
+        daemon.cli(&[
+            "adapter",
+            "install",
+            "pi",
+            "--binary",
+            pi.to_str().unwrap(),
+            "--agent-dir",
+            pi_home.to_str().unwrap(),
+        ]);
+        daemon.start();
+        let plan = json!({"scope":scope(),"sources":sources,"question":"Propose a scoped offline search decision and a dependent rollout check. Preserve missing latency evidence and lack of human rollout approval. Choose exactly two questions, with the rollout question depending on the search question. Do not invent measurements."});
+        let path = daemon.root.join("grill.json");
+        std::fs::write(&path, serde_json::to_vec(&plan).unwrap()).unwrap();
+        let admitted = daemon.cli(&[
+            "grill",
+            "run",
+            path.to_str().unwrap(),
+            "--idempotency-key",
+            case,
+        ]);
+        assert_eq!(admitted["data"]["id"], case);
+        let workflow_ms = admitted["data"]["execution_budget_ms"].as_u64().unwrap();
+        let end = Instant::now() + Duration::from_millis(workflow_ms + 60_000);
+        let mut previous_steps = None;
+        let job = loop {
+            let job = daemon.cli(&["job", "show", case])["data"].clone();
+            if previous_steps != job["result"]["steps"].as_u64() {
+                previous_steps = job["result"]["steps"].as_u64();
+                receipt["progress"] = json!({"case":case,"completed_phases":previous_steps,"phase_budget":5,"job":job});
+                std::fs::write(&output, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
+                eprintln!("actual-grill case={case} completed_phases={previous_steps:?}");
+            }
+            if matches!(
+                job["state"].as_str(),
+                Some("succeeded" | "failed" | "cancelled")
+            ) {
+                break job;
+            }
+            assert!(
+                Instant::now() < end,
+                "native discussion exceeded its original workflow envelope"
+            );
+            std::thread::sleep(Duration::from_millis(500));
+        };
+        let mut row = json!({"case":case,"job":job,"plan":plan,"status":"FAILED","discussion":[]});
+        receipt["current"] = row.clone();
+        std::fs::write(&output, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
+        if job["state"] == "succeeded" {
+            assert_eq!(
+                submit(&daemon, case, &plan)["data"]["result"],
+                job["result"]
+            );
+        }
+        let mut discussion = vec![];
+        for step in job["result"]["discussion"].as_array().unwrap() {
+            let mut texts = json!({"stage":step["stage"],"generator":step["generator"]});
+            for kind in ["prompt", "output"] {
+                let span = &step[kind];
+                texts[kind] = daemon.cli(&[
+                    "show",
+                    span["event_id"].as_str().unwrap(),
+                    "--revision",
+                    &span["revision"].to_string(),
+                    "--range",
+                    &span["start"].to_string(),
+                    &span["end"].to_string(),
+                ])["data"]
+                    .clone();
+            }
+            discussion.push(texts);
+        }
+        row["discussion"] = json!(discussion);
+        daemon.cli(&["daemon", "stop"]);
+        daemon.wait();
+        let memories = runtime().block_on(async {
+            let store = Storage::open(&storage_config(&daemon)).await.unwrap();
+            let pointer = &job["result"]["checkpoint"];
+            if let Some(parts) = pointer["parts"].as_array() {
+                let mut text = String::new();
+                for part in parts {
+                    let part: akasha_otsuge::storage::RevisionRef =
+                        serde_json::from_value(part.clone()).unwrap();
+                    text.push_str(
+                        &store
+                            .revision(&part.key, part.commit_seq)
+                            .unwrap()
+                            .unwrap()
+                            .content,
+                    );
+                }
+                assert_eq!(text.len() as u64, pointer["bytes"].as_u64().unwrap());
+                assert_eq!(
+                    Sha256::digest(text.as_bytes())
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>(),
+                    pointer["sha256"]
+                );
+                row["checkpoint"] = serde_json::from_str(&text).unwrap();
+                receipt["current"] = row.clone();
+                std::fs::write(&output, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
+            }
+            let domain = Domain::new(&store);
+            let mut memories = vec![];
+            for candidate in job["result"]["candidates"].as_array().into_iter().flatten() {
+                let memory = domain
+                    .memory(candidate["memory_id"].as_str().unwrap())
+                    .unwrap()
+                    .unwrap();
+                assert_eq!(memory.record.authority, Authority::Candidate);
+                assert_eq!(memory.record.provenance.origin, Origin::AutoGrill);
+                assert!(scope().contains(&memory.record.draft.scope));
+                for span in &memory.record.draft.source_spans {
+                    let original = domain.source(&span.event_id, span.revision).unwrap();
+                    assert_eq!(original.content_sha256, span.content_sha256);
+                    assert!(original.payload.text.get(span.start..span.end).is_some());
+                }
+                memories.push(serde_json::to_value(memory).unwrap());
+            }
+            store.close().await.unwrap();
+            memories
+        });
+        assert_eq!(job["state"], "succeeded", "{job}");
+        let questions = row["checkpoint"]["questions"].as_array().unwrap();
+        assert_eq!(questions.len(), 2);
+        assert!(questions[0]["depends_on"].as_array().unwrap().is_empty());
+        assert_eq!(questions[1]["depends_on"], json!([questions[0]["id"]]));
+        let steps = row["checkpoint"]["steps"].as_array().unwrap();
+        for (role, runner) in [
+            ("interviewer", "pi"),
+            ("expert", "pi"),
+            ("reviewer", reviewer),
+        ] {
+            assert!(steps.iter().any(|step| {
+                step["stage"]["role"] == role
+                    && step["generator"]["runner"] == format!("executor/{runner}")
+            }));
+        }
+        assert!(job["result"]["usage"]["starts"].as_u64().unwrap() <= 5);
+        assert!(
+            !memories.is_empty(),
+            "native discussion produced no sample candidates"
+        );
+        assert!(memories.iter().any(|m| {
+            !m["record"]["draft"]["assumptions"]
+                .as_array()
+                .unwrap()
+                .is_empty()
+        }));
+        row["memories"] = json!(memories);
+        row["status"] = json!("PASS_REAL_NATIVE_GRILL");
+        receipt["cases"].as_array_mut().unwrap().push(row);
+        receipt.as_object_mut().unwrap().remove("current");
+        std::fs::write(&output, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
+    }
+    receipt["status"] = json!("PASS_REAL_NATIVE_GRILL");
+    std::fs::write(&output, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
 }

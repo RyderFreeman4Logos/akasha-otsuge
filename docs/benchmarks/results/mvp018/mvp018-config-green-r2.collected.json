@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T23:04:24.965775+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "d64051e2b550bec90b06fd5b20b32f9430570bf0",
+    "log_sha256": "4a663aba1403360eb1c4f54a54f564f6d83c1677b1c13c2f713c774c3dfba4cc",
+    "seconds": 67.93960166163743,
+    "utc": "2026-10-29T23:03:43.266415+00:00"
+  },
+  "process_absent": true,
+  "classification": "pass_config_and_legacy_checkpoint"
+}

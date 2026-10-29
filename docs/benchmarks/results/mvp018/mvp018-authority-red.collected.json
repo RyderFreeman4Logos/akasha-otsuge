@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T23:14:54.071968+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "c0a807c58c8d48fbfaae72cf4880f9fa76529471",
+    "log_sha256": "46fdc7870ea40f388958a6793e6ad2a79a868273b2a5e690e728a26bfa0bb55b",
+    "seconds": 10.08083047810942,
+    "utc": "2026-10-29T23:14:15.714772+00:00"
+  },
+  "process_absent": true,
+  "classification": "failed_unresolved_answer_authority"
+}

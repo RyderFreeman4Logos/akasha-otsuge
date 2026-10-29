@@ -1,0 +1,300 @@
+{
+  "cases": [],
+  "current": {
+    "case": "single_pi",
+    "discussion": [],
+    "job": {
+      "accepted_at_ms": 1793316388104,
+      "attempt": 1,
+      "cancel_requested": false,
+      "config_digest": "27d4edac16fbceab02bb524177c1b4b10febb517e1de38f3d5e13e97668c47cb",
+      "config_generation": 1,
+      "error": "GRILL_OUTPUT_INVALID",
+      "execution_budget_ms": 8880000,
+      "execution_deadline_ms": 1793325268726,
+      "grill_natives": {
+        "pi": {
+          "binary": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi",
+          "home": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a18-native-8butc42c/profile",
+          "host": "pi"
+        }
+      },
+      "grill_plan": {
+        "question": "Propose a scoped offline search decision and a dependent rollout check. Preserve missing latency evidence and lack of human rollout approval. Choose exactly two questions, with the rollout question depending on the search question. Do not invent measurements.",
+        "scope": {
+          "branch_or_version": null,
+          "project": "alpha",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "sources": [
+          {
+            "content_sha256": "5f212d35e7587492ee205c908c9a87e68b55463128f0d1022d47240f1c513e79",
+            "end": 76,
+            "event_id": "offline",
+            "revision": 1,
+            "start": 0
+          },
+          {
+            "content_sha256": "e06bbb18e8ad738adf08d75fc5fa2006529ffeabc41a64b73c91df1a6afe7ec8",
+            "end": 52,
+            "event_id": "private",
+            "revision": 2,
+            "start": 0
+          },
+          {
+            "content_sha256": "477c6e166b3087868b4af6a9269c07f992ed41d57539cb4ca1fa5c2bc3df9cd4",
+            "end": 93,
+            "event_id": "measurement",
+            "revision": 3,
+            "start": 0
+          }
+        ]
+      },
+      "id": "single_pi",
+      "lease_owner": null,
+      "lease_until_ms": null,
+      "queue_deadline_ms": 1793316688104,
+      "request_sha256": "34836503f6578cbf2178010ca321000e861b5e6906e4583652d1563a8bb89c4e",
+      "result": {
+        "attempt_prompt": {
+          "content_sha256": "66cfb987830226dfcc0593254a5188bf476f2ab92cbf150cbac0391804591dff",
+          "end": 3995,
+          "event_id": "grill/48013c282e368938a1f75610a452c11805e303b0a36262e2ec151ae734676f34/1/prompt",
+          "revision": 17,
+          "start": 0
+        },
+        "checkpoint": {
+          "bytes": 5458,
+          "parts": [
+            {
+              "commit_seq": 20,
+              "key": {
+                "id": "model-blob/38fcfc5547643318e6f8fc4fb010e09af5e7986a1b1e566fffe499af16e62d53",
+                "kind": "evidence"
+              }
+            }
+          ],
+          "sha256": "38fcfc5547643318e6f8fc4fb010e09af5e7986a1b1e566fffe499af16e62d53"
+        },
+        "discussion": [
+          {
+            "generator": {
+              "model": "native-profile-default",
+              "prompt_version": "auto-grill-v1",
+              "runner": "executor/pi"
+            },
+            "output": {
+              "content_sha256": "855a5b2f7d92fe222199bda24fb48dfb71ec89eae7d82f11dc220afba0cd7507",
+              "end": 567,
+              "event_id": "grill/48013c282e368938a1f75610a452c11805e303b0a36262e2ec151ae734676f34/0/response",
+              "revision": 14,
+              "start": 0
+            },
+            "prompt": {
+              "content_sha256": "82edf20eeb1bc131d3d598a7a80a0f3177c69e04a1b2f476fae50075f3239ce8",
+              "end": 3481,
+              "event_id": "grill/48013c282e368938a1f75610a452c11805e303b0a36262e2ec151ae734676f34/0/prompt",
+              "revision": 9,
+              "start": 0
+            },
+            "stage": {
+              "role": "interviewer",
+              "round": 0
+            }
+          }
+        ],
+        "origin": "auto_grill",
+        "parent": null,
+        "prompt_version": "auto-grill-v1",
+        "steps": 1,
+        "stop_reason": null,
+        "usage": {
+          "output_bytes": 380367,
+          "read_bytes": 1615,
+          "reads": 4,
+          "starts": 2,
+          "tokens": 13744
+        }
+      },
+      "retry_at_ms": 1793316388104,
+      "schema_version": 1,
+      "started_at_ms": 1793316388726,
+      "state": "failed"
+    },
+    "plan": {
+      "question": "Propose a scoped offline search decision and a dependent rollout check. Preserve missing latency evidence and lack of human rollout approval. Choose exactly two questions, with the rollout question depending on the search question. Do not invent measurements.",
+      "scope": {
+        "branch_or_version": null,
+        "project": "alpha",
+        "session": null,
+        "user": "uid:1001"
+      },
+      "sources": [
+        {
+          "content_sha256": "5f212d35e7587492ee205c908c9a87e68b55463128f0d1022d47240f1c513e79",
+          "end": 76,
+          "event_id": "offline",
+          "revision": 1,
+          "start": 0
+        },
+        {
+          "content_sha256": "e06bbb18e8ad738adf08d75fc5fa2006529ffeabc41a64b73c91df1a6afe7ec8",
+          "end": 52,
+          "event_id": "private",
+          "revision": 2,
+          "start": 0
+        },
+        {
+          "content_sha256": "477c6e166b3087868b4af6a9269c07f992ed41d57539cb4ca1fa5c2bc3df9cd4",
+          "end": 93,
+          "event_id": "measurement",
+          "revision": 3,
+          "start": 0
+        }
+      ]
+    },
+    "status": "FAILED"
+  },
+  "extra_model_profiles": 0,
+  "originals": [
+    [
+      "offline",
+      "This project must keep keyword search available when embeddings are offline."
+    ],
+    [
+      "private",
+      "Do not send private queries to an external reranker."
+    ],
+    [
+      "measurement",
+      "No latency measurements or rollout approval have been recorded for the proposed offline mode."
+    ]
+  ],
+  "progress": {
+    "case": "single_pi",
+    "completed_phases": 1,
+    "job": {
+      "accepted_at_ms": 1793316388104,
+      "attempt": 1,
+      "cancel_requested": false,
+      "config_digest": "27d4edac16fbceab02bb524177c1b4b10febb517e1de38f3d5e13e97668c47cb",
+      "config_generation": 1,
+      "error": null,
+      "execution_budget_ms": 8880000,
+      "execution_deadline_ms": 1793325268726,
+      "grill_natives": {
+        "pi": {
+          "binary": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi",
+          "home": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a18-native-8butc42c/profile",
+          "host": "pi"
+        }
+      },
+      "grill_plan": {
+        "question": "Propose a scoped offline search decision and a dependent rollout check. Preserve missing latency evidence and lack of human rollout approval. Choose exactly two questions, with the rollout question depending on the search question. Do not invent measurements.",
+        "scope": {
+          "branch_or_version": null,
+          "project": "alpha",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "sources": [
+          {
+            "content_sha256": "5f212d35e7587492ee205c908c9a87e68b55463128f0d1022d47240f1c513e79",
+            "end": 76,
+            "event_id": "offline",
+            "revision": 1,
+            "start": 0
+          },
+          {
+            "content_sha256": "e06bbb18e8ad738adf08d75fc5fa2006529ffeabc41a64b73c91df1a6afe7ec8",
+            "end": 52,
+            "event_id": "private",
+            "revision": 2,
+            "start": 0
+          },
+          {
+            "content_sha256": "477c6e166b3087868b4af6a9269c07f992ed41d57539cb4ca1fa5c2bc3df9cd4",
+            "end": 93,
+            "event_id": "measurement",
+            "revision": 3,
+            "start": 0
+          }
+        ]
+      },
+      "id": "single_pi",
+      "lease_owner": "1282718/1793316387543",
+      "lease_until_ms": 1793316418726,
+      "queue_deadline_ms": 1793316688104,
+      "request_sha256": "34836503f6578cbf2178010ca321000e861b5e6906e4583652d1563a8bb89c4e",
+      "result": {
+        "attempt_prompt": {
+          "content_sha256": "66cfb987830226dfcc0593254a5188bf476f2ab92cbf150cbac0391804591dff",
+          "end": 3995,
+          "event_id": "grill/48013c282e368938a1f75610a452c11805e303b0a36262e2ec151ae734676f34/1/prompt",
+          "revision": 17,
+          "start": 0
+        },
+        "checkpoint": {
+          "bytes": 2134,
+          "parts": [
+            {
+              "commit_seq": 18,
+              "key": {
+                "id": "model-blob/296d622816862c0064e06848b491caeff33a673139013a571180a8434f27fc3b",
+                "kind": "evidence"
+              }
+            }
+          ],
+          "sha256": "296d622816862c0064e06848b491caeff33a673139013a571180a8434f27fc3b"
+        },
+        "discussion": [
+          {
+            "generator": {
+              "model": "native-profile-default",
+              "prompt_version": "auto-grill-v1",
+              "runner": "executor/pi"
+            },
+            "output": {
+              "content_sha256": "855a5b2f7d92fe222199bda24fb48dfb71ec89eae7d82f11dc220afba0cd7507",
+              "end": 567,
+              "event_id": "grill/48013c282e368938a1f75610a452c11805e303b0a36262e2ec151ae734676f34/0/response",
+              "revision": 14,
+              "start": 0
+            },
+            "prompt": {
+              "content_sha256": "82edf20eeb1bc131d3d598a7a80a0f3177c69e04a1b2f476fae50075f3239ce8",
+              "end": 3481,
+              "event_id": "grill/48013c282e368938a1f75610a452c11805e303b0a36262e2ec151ae734676f34/0/prompt",
+              "revision": 9,
+              "start": 0
+            },
+            "stage": {
+              "role": "interviewer",
+              "round": 0
+            }
+          }
+        ],
+        "origin": "auto_grill",
+        "parent": null,
+        "prompt_version": "auto-grill-v1",
+        "steps": 1,
+        "stop_reason": null,
+        "usage": {
+          "output_bytes": 84994,
+          "read_bytes": 807,
+          "reads": 2,
+          "starts": 2,
+          "tokens": 4797
+        }
+      },
+      "retry_at_ms": 1793316388104,
+      "schema_version": 1,
+      "started_at_ms": 1793316388726,
+      "state": "running"
+    },
+    "phase_budget": 5
+  },
+  "schema_version": 1,
+  "status": "RUNNING"
+}

@@ -1,0 +1,37 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp018)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.55s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 3 tests
+test grill::tests::unresolved_or_conditionally_different_answers_never_become_an_agreed_decision ... ok
+test grill::tests::repeated_dependencies_cannot_amplify_resolution_work ... ok
+test grill::tests::discussion_schema_rejects_cycles_forged_authority_unread_spans_and_false_resolution ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 54 filtered out; finished in 0.00s
+
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp018)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 56.64s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 1 test
+actual-grill case=pi_codex completed_phases=Some(0)
+actual-grill case=pi_codex completed_phases=Some(1)
+test grill_tests::native_mixed_grill_actual has been running for over 60 seconds
+actual-grill case=pi_codex completed_phases=Some(2)
+actual-grill case=pi_codex completed_phases=Some(3)
+actual-grill case=pi_codex completed_phases=Some(4)
+test grill_tests::native_mixed_grill_actual ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 93 filtered out; finished in 210.64s
+
+{"started_utc": "2026-10-29T23:44:00.521724+00:00", "head": "8becbee8ac52654edffc3667f492522ce752b70e", "dirty_diff_sha256": "03c6bb486a19da3cd7989dacf9c5a1231126cf56018a9c13da078b90e5beae2e", "source": "real authenticated Pi and Codex; existing native authentication; no Akasha model profiles", "host_version": "1.4.0", "native_binary": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi", "native_binary_sha256": "2d6702dd4a52461f50f304bcef3aa0261464ea0b921f72ea7ed6d07df16edef0", "provider": "mp-cpi", "model": "grok-4.7", "endpoint_host": "127.0.0.1", "endpoint_port": 48317, "scratch": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a18-native-hxfyhphp", "status": "PASS_REAL_NATIVE_GRILL", "command": ["cargo", "test", "--locked", "--test", "daemon", "grill_tests::native_mixed_grill_actual", "--", "--exact", "--ignored", "--nocapture"], "exit_code": 0, "binary_sha256": "d2134fb6c1c07572b1f20f5051fbdeb0c0477626d2a977608ea0efe5f9c62d31", "result_sha256": "393c9261a8c6a9a3bf75954337c46cf841aa72f39660d984a7f2b686ed2025e3", "cases": [{"case": "pi_codex", "candidate_count": 4, "usage": {"output_bytes": 1048254, "read_bytes": 2423, "reads": 6, "starts": 5, "tokens": 31465}, "stop_reason": "resource_budget"}], "case": "pi_codex", "codex_config_unchanged": true, "codex_version": "codex-cli 0.164.0", "codex_binary_sha256": "b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306", "owned_live_processes": [], "native_settings_unchanged": true, "scratch_allocated_bytes": 3084288, "scratch_removed": true, "ssd_free_bytes_after": 230444101632, "seconds": 269.15173829719424, "finished_utc": "2026-10-29T23:48:29.910603+00:00"}

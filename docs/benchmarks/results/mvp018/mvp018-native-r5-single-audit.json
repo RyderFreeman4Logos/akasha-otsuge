@@ -1,0 +1,16 @@
+{
+  "case": "single_pi",
+  "receipt_sha256": "d56a1d29d065f70f9f03ee1605ad9f0900f32392092572518c92f067f3c6095d",
+  "classification": "case PASS; combined harness FAILED before starting mixed case due to adapter profile reuse",
+  "candidate_count": 4,
+  "stop_reason": "resource_budget",
+  "usage": {
+    "output_bytes": 1048405,
+    "read_bytes": 3000,
+    "reads": 7,
+    "starts": 4,
+    "tokens": 24117
+  },
+  "manual_semantics": "Offline keyword availability and private-reranker restriction preserved; missing measurements and approval remain absent. Proposed rollout gates are assumptions, not human decisions. Both role differences and unresolved prerequisite are retained. No invented latency value.",
+  "scope_limit": "Three synthetic originals and one two-question graph; not general model-quality evidence."
+}

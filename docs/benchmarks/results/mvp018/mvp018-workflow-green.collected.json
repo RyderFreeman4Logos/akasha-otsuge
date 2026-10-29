@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T23:12:03.851273+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "c0a807c58c8d48fbfaae72cf4880f9fa76529471",
+    "log_sha256": "7bb38b0f1984cf5b400b69fb1faf694a319d9b8c95f65e65be2760d84a945ee0",
+    "seconds": 6.640005727298558,
+    "utc": "2026-10-29T23:11:26.681906+00:00"
+  },
+  "process_absent": true,
+  "classification": "failed_compile_inspect"
+}

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T23:48:51.533188+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "8becbee8ac52654edffc3667f492522ce752b70e",
+    "log_sha256": "8d0857a03a324d2caaed58650bc3fc1dcb0bb13344af5419718063090a0b780c",
+    "seconds": 286.14576285518706,
+    "utc": "2026-10-29T23:48:29.915348+00:00"
+  },
+  "process_absent": true,
+  "classification": "pass_real_mixed_pi_codex_and_dependency_regression"
+}

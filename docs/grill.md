@@ -32,7 +32,7 @@ profile is sufficient for isolated testing. No fallback is implicit.
 
 Create `grill.json` with `question`, `scope` and `sources`. Scope and exact source
 span objects have the same format as [extraction](extraction.md). The question is
-limited to4096 UTF-8 bytes. Supply1–8 original spans totaling at most12 KiB;
+limited to 4096 UTF-8 bytes. Supply 1–8 original spans totaling at most 12 KiB;
 source revisions/hashes, UTF-8 boundaries, scope and current permissions are
 validated. Internal Extraction/Auto-Grill sources cannot seed a new discussion.
 
@@ -62,8 +62,10 @@ conclusions use the configured review policy; manual review is not hardcoded.
 Jobs pin configuration at admission and share a finite start/token/output budget
 and the original workflow deadline across all roles. Stop reasons distinguish
 resolved questions, unchanged reports (`no_new_evidence`), round/start/token or
-other resource limits, cancellation and native errors. Tokens include cached input;
-native usage can arrive after consumption, so the observed overshoot is retained
+other resource limits, cancellation and native errors. Tokens include cached input.
+The shared native transport-output cap is 1 MiB, including streamed events, so
+verbose hosts can reach it before the configured round limit. Native usage can
+arrive after consumption, so the observed overshoot is retained
 and further calls stop. This is not a provider-specific currency estimate or a
 hard pre-billing quota. Runtime pause blocks new admission/claims; use job cancel
 to stop an active discussion.
@@ -84,3 +86,6 @@ errors and original sources remain unchanged. Retrying an idempotency key return
 the same job; changing its plan is a conflict. Resuming an unfinished job or
 changing the inherited question/evidence is rejected. New candidates are separate
 proposals; they never overwrite a previously reviewed or edited record.
+
+[Acceptance evidence](benchmarks/results/mvp018/README.md) includes real Pi and
+Pi/Codex samples, precise source identities and the retained failures.
