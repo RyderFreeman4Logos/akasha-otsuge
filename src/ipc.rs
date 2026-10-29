@@ -114,6 +114,9 @@ pub enum Command {
     ConfigReload,
     ConfigStatus,
     ConfigShow,
+    Claude {
+        event: crate::adapter::claude::NativeEvent,
+    },
     Reconcile {
         binding: CaptureInput,
         path: std::path::PathBuf,
@@ -210,10 +213,19 @@ impl CaptureInput {
                         && (self.source.agent == "main" || self.source.agent == self.source.session)
                         && self.stream == crate::adapter::hermes::BACKGROUND_STREAM
                 }
-                _ => return Err(Error("ADAPTER_UNSUPPORTED")),
+                crate::config::Host::ClaudeCode => {
+                    self.source.adapter == "claude_code"
+                        && self.source.thread
+                            == if self.source.agent == "main" {
+                                self.source.session.clone()
+                            } else {
+                                format!("{}/{}", self.source.session, self.source.agent)
+                            }
+                }
             };
             if !host_valid
-                || self.source.session != self.source.thread
+                || (host != crate::config::Host::ClaudeCode
+                    && self.source.session != self.source.thread)
                 || self.coverage != crate::capture::CoverageLevel::VisibleText
             {
                 return Err(Error("INVALID_CAPTURE_BINDING"));
@@ -254,8 +266,14 @@ pub(crate) fn response(request: Option<&str>, result: Result<Value>) -> Value {
 }
 
 pub(crate) async fn read<T: DeserializeOwned>(stream: &mut UnixStream) -> Result<T> {
+    read_bounded(stream, MAX_MESSAGE).await
+}
+pub(crate) async fn read_bounded<T: DeserializeOwned>(
+    stream: &mut UnixStream,
+    limit: usize,
+) -> Result<T> {
     let size = stream.read_u32().await? as usize;
-    if size == 0 || size > MAX_MESSAGE {
+    if size == 0 || size > limit {
         return Err(Error("MESSAGE_TOO_LARGE"));
     }
     let mut bytes = vec![0; size];

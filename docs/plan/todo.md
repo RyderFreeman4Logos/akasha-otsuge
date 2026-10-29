@@ -1,11 +1,13 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-29 UTC after PR #43 merged at `24eda5a`. Live GitHub audit: **15 open
-Issues, 13 completed Issues**. #12 is waiting for authenticated Claude acceptance in draft PR #41. #15 is the
-active independent leaf; its sole prerequisite #11 is complete. The complete
-queue below preserves every Issue and dependency.
-Each linked Issue's full acceptance criteria remain authoritative; this checklist
-does not narrow them. Close an Issue only after evidence, review, gates and merge.
+Updated 2026-10-29 UTC after PR #44 merged at `c43c087`: **14 completed,
+14 open Issues (#12, #16–#28)**. #16 is the sole active implementation.
+#12's reviewed code is retained, but Claude-native authentication remains deferred.
+The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
+temporary substitute because no Claude subscription is available. This overrides
+the original development-order blocker; it does not turn substitute results
+into Claude-native evidence. All other acceptance and closure requirements remain.
+Every unfinished Issue and its original dependencies are listed below.
 
 ## Session operating rules
 
@@ -45,8 +47,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-29 audit finds 15 open Issues (#12, #15–#28). #4–#11 and #13–#14 are closed
-with merged PRs #32–#38/#40/#42/#43; no verified implementation waits for closure. #7's
+The 2026-10-29 audit finds 14 open Issues (#12, #16–#28). #4–#11 and #13–#15 are closed
+with merged PRs #32–#38/#40/#42/#43/#44; no verified implementation waits for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -64,8 +66,8 @@ full gate in about144 seconds. This one run proves restoration, not a general
 benchmark. #11's exact gate and fresh whole-candidate R2 review passed; PR #40
 merged and #11 closed. Collect terminal review/CI results promptly instead of
 letting completed work wait through the next implementation phase.
-The remaining real host adapters are #12 and #15; controlled fixtures do not
-substitute for their authenticated acceptance.
+The sole deferred host acceptance is #12. Codex, Hermes and Pi have genuine
+model evidence; controlled fixtures are still distinguished from authenticated runs.
 
 ## MVP-003 completed acceptance
 
@@ -556,8 +558,8 @@ checks do not prove host protocol capabilities or an authenticated Runner.
   evidence, remove its owned scratch/worktree, then proceed to #15.
 
 One source writer works in the SSD mirror and reuses the existing shared target.
-#12 is deferred only for its recorded external authentication prerequisite;
-#15 has its prerequisite #11 complete. No second feature writer is active.
+#12 is deferred under the explicit temporary host substitution; #15 is complete.
+#16 is the sole feature writer and reuses the shared SSD target.
 
 Completed #14 implementation evidence:
 
@@ -602,103 +604,55 @@ Completed #14 implementation evidence:
   before concurrent binding; this removes cold-capture timing from that fixture.
   Product deadlines are unchanged; the earlier runtime cause remains unproven.
 
-## MVP-015 acceptance and remaining work
+## MVP-015 completed acceptance
 
-- [x] Qualify canonical `earendil-works/pi`, npm
-  `@earendil-works/pi-coding-agent` and native1.4.0 against official tagged sources.
-  Install through normal mise on SSD without changing the existing0.78.0 default;
-  expose a bounded, free version doctor with honest untested capabilities.
-  Native version/help and isolated free RPC pass; all installation-helper processes
-  and scratch ended. Two doctor regressions and the actual native version probe pass.
-- [x] Parse bounded native version3 session trees with stable IDs, parent links,
-  selected branches, fork provenance, context edits and compaction originals.
-  Exclude private thinking; preserve absent ancestry and source gaps explicitly.
-  Native SessionManager fixtures pass three capture regressions, including
-  selected-branch/fork isolation, raw/edit separation and durable rotation/replay.
-  All five Pi tests and all-target Clippy pass. Actual extension lifecycle remains below.
-- [ ] Bind extension calls to actual session/file/workspace/leaf/tool-call identity
-  and current grants. Refuse unproven nested calls and changed registrations;
-  verify simultaneous sessions, durable retries and immutable fences.
-  The Rust Caller passes four new regressions for exact persisted calls, selected
-  ancestry, simultaneous profiles, durable fences and current permission revocation.
-  All nine Pi tests and all-target Clippy pass. The native CLI fixture now binds
-  six calls across two overlapping sessions, reload, tree, fork and resume.
-  Authenticated interactive acceptance remains below.
-  The private daemon bridge also passes registration retry/conflict, CLI transport,
-  restart with the original capture deadline, cancellation settlement and current
-  path/grant revocation. Cancellation acknowledgement precedes worker settlement.
-- [ ] Reconcile input/message/session lifecycle events against persisted originals,
-  including other extensions' transformations, reload, resume, interruption and
-  delta/final deduplication. Interactive input alone never proves human authority.
-  A native1.4.0 SDK lifecycle harness passes three root/reload/fork bindings,
-  transformed-message reconciliation, context edits, compaction, resume and
-  interrupted shutdown, with seven completed capture jobs. Messages are synthetic;
-  actual authenticated native CLI coverage remains below. The maintained native
-  CLI fixture also passes these lifecycle cases and drains19 capture jobs;
-  three unmodified synthetic session files retain42,065bytes of evidence.
-- [x] Provide a minimal native extension with opt-in installation, integrity
-  checks and recoverable uninstall that preserves unrelated user configuration.
-  The pinned native SDK loads it successfully. Four Node extension regressions,
-  ten Pi tests, daemon recovery and all-target Clippy pass; authenticated native
-  lifecycle acceptance remains separate below. Installation is profile-local and
-  uses the Rust CLI for peer-checked IPC, without editing native settings/auth.
-- [ ] Implement independent RPC Runner with four scoped context tools, native
-  capability/tool inventory checks, LF-delimited correlated responses,
-  `agent_settled` completion plus zero exit, bounded output, original deadlines,
-  cancellation and process-group cleanup. Verify forbidden tool operations.
-  Three controlled Runner regressions pass through the real Rust context CLI,
-  including23 refusal cases, retry settlement and group cancellation. Five Node
-  extension behaviors pass. Actual Pi1.4.0 with synthetic local SSE passes all
-  four context tools, recovery after one HTTP503, unissued-context denial,
-  cancellation and unadvertised Bash refusal with no side effect. Native recovery
-  context-edit/compaction metadata has a retained RED/GREEN regression. Native
-  authenticated execution remains to be qualified before this item is complete.
-- [ ] Exercise real authenticated Caller and Runner with the other three CLIs
-  absent, including concurrent sessions, tree branches/forks, reload/resume,
-  context edits, compaction and interruption. Retain sanitized native fixtures,
-  actual version/executable identities, negative controls and failed receipts.
-  Native RPC on2026-10-29 accepts the prompt but the selected profile's OAuth
-  refresh fails with401/invalid_refresh_token. A native login request is pending;
-  do not repeat authenticated attempts until that prerequisite changes. The
-  temporary integration/processes/scratch were removed and settings stayed intact.
-  Continue controlled native protocol/lifecycle checks while preserving this gap.
-- [ ] Publish support/install/recovery documentation; pass final canonical gate,
-  independent whole-candidate review and CI. Merge, close #15, remove owned
-  scratch/worktree and proceed through every remaining queue item below.
-  Candidate `c098a0c` passed the complete553.768-second gate:27Python,
-  196Rust workspace and42installed-daemon passes. Independent R1 review found
-  one introduced Unicode hint defect: UTF-16 length rejected legal emoji hints.
-  Its regression fails before the correction and all six Node tests pass after;
-  the actual1.4.0 schema also accepts512 emoji and rejects513. Candidate `be0c06c`
-  passed its own191.476-second gate. Independent R2 review then found a MODERATE
-  native Responses ID defect: `call_...|fc_...` was incorrectly refused. Both the
-  Node regression and actual old native binary reproduce `CALLER_AMBIGUOUS`.
-  The corrected opaque-ID boundary passes seven Node and13 Pi regressions;
-  both native protocols pass five Runner cases, six RPC bindings/19 jobs and
-  four real controlling-terminal bindings/11 jobs each. All scratch is removed.
-  The broader focused daemon run exposed a short-control overlap assertion
-  failure (41 passes, one failure). A bounded late-observer diagnostic reproduces
-  the false assertion despite actual provider overlap (second request at102ms,
-  first response at1000ms). The harness now measures real provider overlap after
-  both jobs terminate; the focused check passes without changing any timeout.
-  The initial failure's exact timing remains unknown. Independent R3 source
-  review passed all51 changed files at `72e854f` with zero actionable findings.
-  Its canonical gate passed27Python and42daemon tests, then failed a synthetic
-  Hermes installer probe with `EXECUTOR_UNAVAILABLE` (original errno unknown).
-  An isolated selector passes; a separate controlled inherited-writable-FD probe
-  reproduces ETXTBSY and proves isolated writer publication. The13 sibling
-  executable fixture writes now share the existing subprocess-writer helper.
-  This is test-only and does not retroactively classify the failed gate.
-  The14 Codex and11 Hermes tests pass. Daemon's changed native fixtures pass,
-  but an unrelated readiness check observes socket0755 before initialization
-  sets0600. Delaying the real chmod reproduces that same assertion failure;
-  the helper now awaits the service greeting within the unchanged startup deadline.
-  The same real-chmod delay control passes after the correction, and all42 daemon
-  tests pass. Final gate/review, CI and real authentication remain open.
+- [x] Qualify native Pi1.4.0 and preserve the existing default installation.
+- [x] Capture native trees, fork cutoffs, original text, edits, compaction and
+  interrupted/replayed tails with explicit gaps and without private thinking.
+- [x] Bind actual runtime/session/workspace/leaf/tool identity and enforce current
+  grants, immutable retry fences, concurrent isolation and nested-call refusal.
+- [x] Install/remove the opt-in extension recoverably, preserving unrelated files.
+- [x] Execute the standalone RPC Runner with verified four-tool inventory,
+  native settlement, zero exit, original deadlines and process-group cleanup.
+- [x] Pass real localrouter `mp-cpi/grok-4.7` Runner roundtrip, denial and cancel;
+  six RPC bindings/19 capture jobs and four foreground-TUI bindings/11 jobs,
+  including native model compaction, fork, reload, resume and interruption.
+- [x] Preserve controlled hostile-tool/protocol controls and earlier failures.
+  The original OAuth401 and small-fixture compaction refusal remain recorded;
+  the real model fixture uses native keepRecentTokens256 only in its owned profile.
+- [x] Source `a11130f` passes canonical gate, independent full R4 review and
+  CI40860874178. PR #44 merged as `c43c087` with the reviewed tree; #15 closed.
+  User settings stayed unchanged, owned scratch and the completed checkout were
+  removed, and shared target/corpus inputs were retained.
 
-The sole source writer starts from `24eda5a` on `feat/mvp-015-pi-adapter` at
-2026-10-29T06:23:17Z. A separate installation-only helper may qualify Pi1.4.0;
-it does not write project source. One shared wd relay supervises both scopes.
+[Final native acceptance receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/44#issuecomment-6497475368)
+links exact identities and preserves the distinct controlled/native results.
+
+## MVP-016 active acceptance and remaining work
+
+- [x] Verify #11's frozen60-task/31-critical/10-intent-pair reference set, original
+  commit/hash and separately frozen permission erratum before prompt changes.
+- [x] Integrate reviewed Claude `5424ead` with main `c43c087`, retaining all four
+  adapters and host-specific identity checks. Focused integration:93 passed.
+- [ ] Persist a distinct consult job from the trusted invocation, with durable
+  idempotency, original pinned configuration/deadline and terminal-only delivery.
+- [ ] Expose optional short hint through CLI and native tools; retain automatic
+  Caller binding and support no hint without caller-built context packages.
+- [ ] Provide progressive context/memory/code reads through shared Rust authority;
+  keep current grants, source versions, workspace limits and untrusted content.
+- [ ] Enforce shared token/read/output/start/depth/time/concurrency budgets across
+  retries and descendants; retain run lineage and never reset origin or fence.
+- [ ] Delegate with immediate resource refusal; exercise default single worker,
+  two simultaneous parent delegates, grandchildren, recursion and branch failures.
+- [ ] Publish concise found/no_hit/incomplete/pending/error results with scope,
+  evidence, conflicts/gaps and durable RecallReceipt after final live validation.
+  Retain receipt/show expansion and keep private research traces out of main output.
+- [ ] Verify default-self native Codex/Hermes/Pi, optional/empty hint, descendant
+  delegation, a real cross-host combination and original long-call deadlines.
+  Claude-native authenticated acceptance is explicitly deferred by the owner's
+  temporary Codex or localhost:48317 Pi/Hermes substitution; never label it passed.
+- [ ] Complete focused regressions, canonical gate, independent final review,
+  CI, publication/merge and issue closure; clean exact owned disposable resources.
 
 ## Complete Issue queue
 
@@ -716,7 +670,7 @@ it does not write project source. One shared wd relay supervises both scopes.
 - [ ] [#12 [MVP-012] Claude Code CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) — dependencies: #11.
 - [x] [#13 [MVP-013] Codex CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/13) — dependencies: #11.
 - [x] [#14 [MVP-014] Hermes CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/14) — dependencies: #11.
-- [ ] [#15 [MVP-015] pi CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/15) — dependencies: #11.
+- [x] [#15 [MVP-015] pi CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/15) — dependencies: #11.
 - [ ] [#16 [MVP-016] consult 可选短 hint、渐进调研与子孙共享预算](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/16) — dependencies: #12, #13, #14, #15.
 - [ ] [#17 [MVP-017] 异步提取候选、来源引用与可重建索引作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/17) — dependencies: #5, #7, #9, #10, #16.
 - [ ] [#18 [MVP-018] 单一或组合 Runner 的 Auto-Grill 工作流](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/18) — dependencies: #16, #17.

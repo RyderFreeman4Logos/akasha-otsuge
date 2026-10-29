@@ -1,3 +1,6 @@
+#[path = "support/executable.rs"]
+mod executable;
+
 use akasha_otsuge::{
     adapter::*,
     capture::*,
@@ -13,6 +16,9 @@ use std::{
 
 #[path = "support/adapter_matrix.rs"]
 mod matrix;
+
+#[path = "support/claude_runner.rs"]
+mod claude_runner;
 
 struct Fixture(PathBuf);
 impl Fixture {

@@ -12,6 +12,7 @@ use tokio::task::JoinSet;
 use crate::config::ResolvedConfig;
 use crate::ipc::{self, Command, Error, Request, Result};
 use crate::storage::Storage;
+mod claude;
 mod codex;
 mod configuration;
 mod hermes;
@@ -186,6 +187,7 @@ impl Service {
             }
             Command::ConfigStatus => self.config_status().await,
             Command::ConfigShow => Ok(self.config_status().await?["effective"].clone()),
+            Command::Claude { event } => self.claude(event).await,
             Command::ConfigValidate => self.validate(),
             Command::ConfigReload => self.reload().await,
             Command::Reconcile {

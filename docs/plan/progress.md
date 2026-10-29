@@ -3,11 +3,31 @@
 Repository: https://github.com/RyderFreeman4Logos/akasha-otsuge
 
 The public Apache-2.0 repository contains all41 original specification pages and
-28 linked Issues. The specification snapshots remain immutable. #1–#11 and #13–#14
-are merged and completed; #12 and #15–#28 remain open (15 Issues). The full acceptance queue
+28 linked Issues. The specification snapshots remain immutable. #1–#11 and #13–#15
+are merged and completed; #12 and #16–#28 remain open (14 Issues). The full acceptance queue
 is in [todo.md](todo.md); each linked Issue retains its complete criteria.
 
-## Current issue: MVP-015
+## Current issue: MVP-016
+
+The owner explicitly authorized Codex or localhost:48317 Pi/Hermes as a temporary
+Claude execution substitute. Claude-native authentication remains deferred in #12;
+it no longer blocks downstream development. One SSD branch integrates the exact
+reviewed Claude candidate `5424ead` over main `c43c087`, preserving all four host
+routes and using one shared target. The 60-task/31-critical/10-pair #11 reference
+set and its original/erratum hashes pass verification before any prompt changes.
+Integration checks and consult implementation remain unfinished.
+
+## Completed Pi adapter: MVP-015
+
+PR #44 merged source `a11130f` as `c43c087` and #15 closed. The canonical gate,
+independent whole-candidate R4 review and CI40860874178 passed. Real localrouter
+`mp-cpi/grok-4.7` then passed three Runner cases, six RPC Caller bindings/19 jobs,
+and four foreground-TUI bindings/11 jobs. Native model compaction, fork, reload,
+resume and interruption pass. [Final acceptance receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/44#issuecomment-6497475368)
+records exact hashes, the original failures and isolated fixture settings. All
+owned processes, scratch and the finished source checkout ended; user settings
+and the shared SSD target were preserved. The history below remains historical.
+
 
 The Pi adapter starts from merge `24eda5a` in one SSD source checkout, reusing
 the shared target. Official `earendil-works/pi` and npm

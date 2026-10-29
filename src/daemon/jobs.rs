@@ -1157,6 +1157,22 @@ impl Service {
                         1,
                         generation,
                     ))
+                } else if input.host == Some(crate::config::Host::ClaudeCode) {
+                    runtime.block_on(capture.reconcile_decoded(
+                        &binding,
+                        &path,
+                        1,
+                        generation,
+                        |line| {
+                            crate::adapter::claude::transcript_frame(
+                                &storage,
+                                &binding,
+                                &input.source,
+                                line,
+                            )
+                        },
+                        |_| {},
+                    ))
                 } else {
                     runtime.block_on(capture.reconcile_jsonl(&binding, &path, 1, generation))
                 };

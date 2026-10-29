@@ -110,9 +110,15 @@ now pre-capture their histories, separating binding assertions from cold ingest.
 Cold tree capture and daemon-driven cold binding retain separate integration
 coverage. Production timeouts are unchanged.
 
-Authenticated native Caller/Runner acceptance, final review and
-publication remain tracked in [the complete checklist](../../plan/todo.md).
-The 2026-10-29 native attempt accepted the prompt and then ended with an OAuth
-refresh error (`401`, `invalid_refresh_token`) on `openai-codex/gpt-6.1-sol`.
-The selected profile needs a renewed native login. No authenticated success is
-claimed; the temporary integration was removed and native settings were unchanged.
+Real native Caller, Runner and foreground-TUI acceptance subsequently passed
+on unchanged source `a11130f` through the owner's configured localrouter and
+`mp-cpi/grok-4.7`. Three Runner cases, six RPC bindings/19 jobs and four TUI
+bindings/11 jobs pass, including native model compaction, fork, reload, resume
+and interruption. The first real compaction fixture was too small for the native
+20,000-token keep window; a private profile with keepRecentTokens256 exercises
+real summarization without changing user defaults. Earlier failed receipts remain.
+All owned processes/scratch ended and original native settings/models stayed
+unchanged. [The final acceptance receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/44#issuecomment-6497475368)
+records hashes and scope. The exact candidate also passed the canonical gate,
+independent R4 review and CI40860874178. PR #44 merged and #15 closed; consult
+workflow delivery remains tracked in [the complete checklist](../../plan/todo.md).
