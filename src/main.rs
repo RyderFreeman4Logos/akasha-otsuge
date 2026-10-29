@@ -199,14 +199,18 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     let operation = match command.as_slice() {
         ["adapter", "codex-hook", ..] => None,
         ["adapter", "install", "codex" | "hermes", ..] => None,
-        ["adapter", host @ ("codex-call" | "hermes-call")] => {
+        ["adapter", host @ ("codex-call" | "hermes-call" | "pi-call")] => {
             use std::io::Read;
             let mut bytes = Vec::new();
             io::stdin().take(16 * 1024 + 1).read_to_end(&mut bytes)?;
             if bytes.len() > 16 * 1024 {
                 return Err(Error("MESSAGE_TOO_LARGE"));
             }
-            Some(if *host == "hermes-call" {
+            Some(if *host == "pi-call" {
+                Command::Pi {
+                    event: serde_json::from_slice(&bytes)?,
+                }
+            } else if *host == "hermes-call" {
                 Command::Hermes {
                     event: serde_json::from_slice(&bytes)?,
                 }

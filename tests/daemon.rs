@@ -22,6 +22,8 @@ mod codex_tests;
 
 #[path = "support/daemon_hermes.rs"]
 mod hermes_tests;
+#[path = "support/daemon_pi.rs"]
+mod pi_tests;
 
 struct Daemon {
     root: PathBuf,

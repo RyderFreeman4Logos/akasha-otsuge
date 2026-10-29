@@ -61,7 +61,7 @@ pub async fn reconcile_transcript(
         .await
 }
 
-pub(super) fn header(path: &Path, source: &SourceIdentity) -> Result<Option<Value>> {
+pub(crate) fn header(path: &Path, source: &SourceIdentity) -> Result<Option<Value>> {
     let file = match OpenOptions::new()
         .read(true)
         .custom_flags(0o4000)

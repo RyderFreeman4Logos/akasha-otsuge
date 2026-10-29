@@ -11,8 +11,8 @@ mod code;
 pub use code::*;
 pub mod codex;
 pub mod hermes;
-pub mod pi;
 mod native;
+pub mod pi;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::io::{BufRead, Read};
 

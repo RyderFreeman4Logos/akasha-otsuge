@@ -4,6 +4,28 @@ mod transcript;
 pub use transcript::reconcile_transcript;
 mod caller;
 pub use caller::{PiCall, PiCaller, PiRegistration, profile_key};
+pub(crate) use transcript::header as session_header;
+
+/// Same-user private transport. Registration authority is never a model tool parameter.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
+pub enum NativeEvent {
+    Register {
+        binary: std::path::PathBuf,
+        agent_dir: std::path::PathBuf,
+        session_id: String,
+        transcript_path: std::path::PathBuf,
+        cwd: std::path::PathBuf,
+    },
+    Bind {
+        registration: String,
+        call: PiCall,
+    },
+    Sync {
+        registration: String,
+        until_entry: String,
+    },
+}
 
 pub const SUPPORTED_VERSION: &str = "1.4.0";
 pub const TRANSCRIPT_STREAM: &str = "pi-native-tree-v1";

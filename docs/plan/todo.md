@@ -622,6 +622,9 @@ Completed #14 implementation evidence:
   The Rust Caller passes four new regressions for exact persisted calls, selected
   ancestry, simultaneous profiles, durable fences and current permission revocation.
   All nine Pi tests and all-target Clippy pass; native extension transport remains.
+  The private daemon bridge also passes registration retry/conflict, CLI transport,
+  restart with the original capture deadline, cancellation settlement and current
+  path/grant revocation. Cancellation acknowledgement precedes worker settlement.
 - [ ] Reconcile input/message/session lifecycle events against persisted originals,
   including other extensions' transformations, reload, resume, interruption and
   delta/final deduplication. Interactive input alone never proves human authority.

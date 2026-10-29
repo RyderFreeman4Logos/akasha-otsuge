@@ -18,6 +18,11 @@ Native version3 tree semantics and `agent_settled` govern the implementation;
 native tree capture now passes three regressions using native SessionManager
 fixtures. The Rust Caller adds four regressions for persisted tool identity,
 branch isolation, retries and revoked grants; all nine Pi tests and Clippy pass.
+The daemon bridge passes its focused registration/binding, restart/backfill,
+original-deadline, cancellation and grant-revocation regression (45.353s with
+the nine Pi tests and all-target Clippy). The initial cancellation assertion was
+corrected to await worker settlement after the durable cancellation request;
+production cancellation behavior is unchanged.
 Native extension Caller and Runner acceptance remain outstanding. The complete TODO lists every
 remaining criterion. #12 still waits for lawful Claude authentication in draft #41.
 

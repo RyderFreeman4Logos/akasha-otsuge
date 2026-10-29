@@ -16,6 +16,7 @@ mod codex;
 mod configuration;
 mod hermes;
 mod jobs;
+mod pi;
 
 pub(crate) fn private_dir(path: &Path) -> Result<()> {
     if !path.is_absolute()
@@ -168,6 +169,7 @@ impl Service {
         command: Command,
     ) -> Result<serde_json::Value> {
         match command {
+            Command::Pi { event } => self.pi(event).await,
             Command::Hermes { event } => self.hermes(event).await,
             Command::Codex { event } => self.codex(event).await,
             Command::Status => Ok(
