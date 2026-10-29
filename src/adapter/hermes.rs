@@ -1,5 +1,7 @@
 //! Native Hermes protocol and identity bridge.
 use super::{BindingLevel, CapabilityReport, ErrorCode, Result, SelfTest};
+pub mod capture;
+pub mod export;
 
 pub const SUPPORTED_VERSION: &str = "0.22.5";
 

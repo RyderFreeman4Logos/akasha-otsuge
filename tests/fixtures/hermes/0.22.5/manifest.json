@@ -1,0 +1,23 @@
+{
+  "native_version": "0.22.5+1914.gfdb04a0",
+  "installed_commit": "fdb04a00c1626acb589552f5634a383e2b4beccc",
+  "kind": "canonical_cli_export_of_synthetic_SessionDB_fixture",
+  "not_authenticated_model_acceptance": true,
+  "files": {
+    "root-before.jsonl": {
+      "sha256": "73e29db4200709b8f3273e73cfbcce221ecb9ad33cd6ddaa1ad60e1f3bf56663",
+      "bytes": 6002,
+      "messages": 5
+    },
+    "root-compacted.jsonl": {
+      "sha256": "5b04d454c23fe96eb0f23495195e22ac4fd90fc08b90dcfda50042514357a33a",
+      "bytes": 8301,
+      "messages": 8
+    },
+    "child.jsonl": {
+      "sha256": "2ddaa27c21c104e1a578685c37e5a493118b5a76c5651ccd630d1b606313a27a",
+      "bytes": 2701,
+      "messages": 1
+    }
+  }
+}
