@@ -193,6 +193,7 @@ impl AgentRunner for PiRunner {
                 last_assistant: None,
                 initialized: false,
                 ready: false,
+                usage_seen: false,
                 buffer: vec![],
                 stderr_bytes: 0,
                 stdout_closed: false,
@@ -227,6 +228,7 @@ struct Handle<'a> {
     last_assistant: Option<(String, String, ErrorCode)>,
     initialized: bool,
     ready: bool,
+    usage_seen: bool,
     buffer: Vec<u8>,
     stderr_bytes: usize,
     stdout_closed: bool,
@@ -254,6 +256,10 @@ struct Command {
 #[derive(Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 enum Event {
+    Usage {
+        input_tokens: u64,
+        output_tokens: u64,
+    },
     Ready {
         agent_dir: PathBuf,
         version: String,
@@ -301,6 +307,25 @@ impl Handle<'_> {
             .capability()
             .authorize(&request.command.token, self.spec.lease())?;
         let (data, event) = match request.command.event {
+            Event::Usage {
+                input_tokens,
+                output_tokens,
+            } => {
+                if !self.ready {
+                    return Err(ErrorCode::AdapterUnsupported.into());
+                }
+                self.spec
+                    .lease()
+                    .report_tokens(input_tokens, output_tokens)?;
+                self.usage_seen = true;
+                (
+                    json!({"accepted":true}),
+                    Some(RunnerEvent::Usage {
+                        input_tokens,
+                        output_tokens,
+                    }),
+                )
+            }
             Event::Ready {
                 agent_dir,
                 version,
@@ -437,6 +462,9 @@ impl Handle<'_> {
                     .ok_or(ErrorCode::RunnerIncomplete)?;
                 if reason != "stop" {
                     return Err(failure.into());
+                }
+                if !self.usage_seen {
+                    return Err(ErrorCode::RunnerIncomplete.into());
                 }
                 #[derive(Deserialize)]
                 #[serde(deny_unknown_fields)]
@@ -586,7 +614,11 @@ impl Handle<'_> {
 impl RunHandle for Handle<'_> {
     fn next(&mut self) -> BoxFuture<'_, Result<Option<RunnerEvent>>> {
         Box::pin(async move {
-            let result = self.advance().await;
+            let stopped = self.spec.lease().interrupted();
+            let result = tokio::select! {
+                result = self.advance() => result,
+                error = stopped => Err(error),
+            };
             if let Err(error) = &result {
                 self.error = Some(error.clone());
                 self.stop().await;

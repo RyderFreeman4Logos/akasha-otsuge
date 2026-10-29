@@ -144,6 +144,19 @@ the same bounded counters across descendants; children cannot refresh a deadline
 or reset their depth. An observer's `lease_handle` shares the same lease/permit,
 not a new worker admission. Dropping all owners releases the slot.
 
+The default reported-token limit is 128,000 across the run tree. `Usage` events
+are cumulative per lease; repeated native/collector reports are charged once,
+and decreasing counters are protocol errors. Cached input counts toward the
+limit; reasoning already included in output is not added again. Codex uses its
+thread totals, Claude reconciles per-message and final usage, and Pi/Hermes send
+native usage through the authenticated context broker. Pi includes compaction
+usage; Hermes checks cumulative counts before model iterations and tools.
+All four adapters charge before exposing the usage event. Exhaustion wakes
+blocked native reads and stops the owned process group, descendants and retries.
+Native usage arrives after a request, so in-flight requests can overshoot the
+limit; observed overshoot remains in the report. This is not pre-send token
+reservation. Missing required native usage refuses a successful terminal result.
+
 The workflow decides whether to continue sequentially after a delegation refusal;
 it must not silently create a fresh budget. Cancellation denies later admissions,
 reads and output. Host cancellation ACK, process termination and resource cleanup

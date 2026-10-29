@@ -138,6 +138,22 @@ function registerCaller(pi, getAgentDir, defaults, parameters) {
 
 function registerRunner(pi, getAgentDir, defaults, version, schemas) {
   const names = ['context_describe', 'context_list', 'context_read', 'context_search'];
+  let input_tokens = 0, output_tokens = 0;
+  async function usage(value, ctx) {
+    try {
+      const counts = ['input','output','cacheRead','cacheWrite','totalTokens'].map(key => value?.[key]);
+      if (!counts.every(n => Number.isSafeInteger(n) && n >= 0)
+          || counts[0] + counts[1] + counts[2] + counts[3] !== counts[4]) throw new Error('PROTOCOL_INVALID');
+      input_tokens += counts[0] + counts[2] + counts[3]; output_tokens += counts[1];
+      if (!Number.isSafeInteger(input_tokens) || !Number.isSafeInteger(output_tokens)) throw new Error('PROTOCOL_INVALID');
+      const result = await exchange(defaults, {op:'usage',input_tokens,output_tokens},undefined,true);
+      if (result.accepted !== true) throw new Error('PROTOCOL_INVALID');
+    } catch (error) { ctx.abort(); throw error; }
+  }
+  pi.on('message_end', async (event, ctx) => {
+    if (event.message.role === 'assistant') await usage(event.message.usage, ctx);
+  });
+  pi.on('session_compact', async (event, ctx) => { await usage(event.compactionEntry.usage, ctx); });
   for (const name of names) pi.registerTool({name, label:name, description:'Read authorized caller context.', parameters:schemas[name],
     async execute(_id, args, signal) {
       let result;

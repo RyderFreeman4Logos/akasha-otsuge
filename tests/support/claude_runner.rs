@@ -56,8 +56,8 @@ async fn native_runner_requires_init_terminal_and_exit_with_isolated_tool_flags(
         r#"printf '%s\n' "$@" > "$0.argv"
 /bin/cat > "$0.stdin"
 printf '%s\n' '{"type":"system","subtype":"init","session_id":"runner-session","claude_code_version":"2.1.311","tools":["ToolSearch","mcp__akasha-runner__context_describe","mcp__akasha-runner__context_list","mcp__akasha-runner__context_read","mcp__akasha-runner__context_search"],"mcp_servers":[{"name":"akasha-runner","status":"connected","source":"plugin"}]}'
-printf '%s\n' '{"type":"assistant","session_id":"runner-session","message":{"content":[{"type":"text","text":"PROVISIONAL_NOT_FINAL"}]}}'
-printf '%s\n' '{"type":"result","subtype":"success","is_error":false,"session_id":"runner-session","result":"final referenced answer"}'
+printf '%s\n' '{"type":"assistant","session_id":"runner-session","message":{"id":"msg-1","usage":{"input_tokens":10,"output_tokens":1},"content":[{"type":"text","text":"PROVISIONAL_NOT_FINAL"}]}}'
+printf '%s\n' '{"type":"result","subtype":"success","is_error":false,"session_id":"runner-session","result":"final referenced answer","usage":{"input_tokens":10,"output_tokens":2}}'
 "#,
     );
     let mut runner = ClaudeRunner::new(
@@ -114,7 +114,7 @@ printf '%s\n' '{"type":"result","subtype":"success","is_error":false,"session_id
 }
 
 const INIT: &str = r#"{"type":"system","subtype":"init","session_id":"runner-session","claude_code_version":"2.1.311","tools":["ToolSearch","mcp__akasha-runner__context_describe","mcp__akasha-runner__context_list","mcp__akasha-runner__context_read","mcp__akasha-runner__context_search"],"mcp_servers":[{"name":"akasha-runner","status":"connected","source":"plugin"}]}"#;
-const DONE: &str = r#"{"type":"result","subtype":"success","is_error":false,"session_id":"runner-session","result":"final answer"}"#;
+const DONE: &str = r#"{"type":"result","subtype":"success","is_error":false,"session_id":"runner-session","result":"final answer","usage":{"input_tokens":10,"output_tokens":2}}"#;
 
 fn no_live_process(pid: u32) -> bool {
     let path = format!("/proc/{pid}/stat");
@@ -213,6 +213,19 @@ async fn native_runner_cancellation_is_terminal_and_reaps_owned_process_group() 
 async fn native_runner_refuses_incomplete_mismatched_unsafe_and_failed_streams() {
     let cases = [
         (
+            format!(
+                "printf '%s\\n' '{INIT}' '{{\"type\":\"result\",\"session_id\":\"runner-session\",\"subtype\":\"error_during_execution\",\"is_error\":true}}'"
+            ),
+            ErrorCode::RunnerFailed,
+        ),
+        (
+            format!(
+                "printf '%s\\n' '{INIT}' '{}'",
+                DONE.replace("\"input_tokens\":10", "\"input_tokens\":200000")
+            ),
+            ErrorCode::BudgetExhausted,
+        ),
+        (
             format!("printf '%s\\n' '{DONE}'"),
             ErrorCode::ProtocolInvalid,
         ),
@@ -292,7 +305,7 @@ async fn native_runner_refuses_incomplete_mismatched_unsafe_and_failed_streams()
         let error = loop {
             match handle.next().await {
                 Err(error) => break error,
-                Ok(Some(RunnerEvent::Started)) => {}
+                Ok(Some(RunnerEvent::Started | RunnerEvent::Usage { .. })) => {}
                 result => panic!("case {index} accepted invalid stream: {result:?}"),
             }
         };
@@ -405,7 +418,7 @@ page=call(dict(operation='list',cursor=None,limit=16))['data']['value']
 assert call(dict(operation='read',handle=page['events'][0]['handle'],start=0,max_bytes=16385))['error']['code']=='INVALID_ARGUMENT'
 result=call(dict(operation='read',handle=page['events'][0]['handle'],start=0,max_bytes=16384))['data']['value']['text']
 assert result=='PRIVATE_ORIGINAL_STAYS_OUT_OF_PROMPT'
-print(json.dumps(dict(type='result',subtype='success',is_error=False,session_id='runner-session',result='read-authorized-original')),flush=True)
+print(json.dumps(dict(type='result',subtype='success',is_error=False,session_id='runner-session',result='read-authorized-original',usage=dict(input_tokens=10,output_tokens=2))),flush=True)
 PY
 "#,
     );
@@ -621,6 +634,13 @@ async fn native_runner_reports_native_retry_without_exposing_provider_details() 
         handle.next().await.unwrap(),
         Some(RunnerEvent::Progress {
             message: "Provider retry".into()
+        })
+    );
+    assert_eq!(
+        handle.next().await.unwrap(),
+        Some(RunnerEvent::Usage {
+            input_tokens: 10,
+            output_tokens: 2
         })
     );
     assert!(matches!(

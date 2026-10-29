@@ -56,6 +56,14 @@ if scenario == 'oversized':
 if scenario == 'stderr':
     print('x' * 8193, file=sys.stderr, flush=True); time.sleep(30)
 
+def usage(incoming, outgoing):
+    counts = dict(inputTokens=incoming, outputTokens=outgoing, cachedInputTokens=0,
+                  reasoningOutputTokens=0, totalTokens=incoming + outgoing)
+    send({'method':'thread/tokenUsage/updated', 'params':{'threadId':'thread',
+          'turnId':'turn', 'tokenUsage':{'total':counts,'last':counts}}})
+
+usage(200000 if scenario == 'token_budget' else 10, 2)
+usage(9 if scenario == 'usage_regression' else 10, 2)
 call = {'id': 10, 'method': 'item/tool/call', 'params': {'threadId': 'thread', 'turnId': 'turn', 'callId': 'call', 'tool': 'context_describe', 'arguments': {}}}
 if scenario == 'wrong_thread': call['params']['threadId'] = 'other'
 if scenario == 'wrong_turn': call['params']['turnId'] = 'other'
@@ -70,6 +78,7 @@ assert 'invocation_id' in result['result']['contentItems'][0]['text']
 send({'method': 'turn/moderationMetadata', 'params': {'threadId': 'thread', 'turnId': 'turn', 'metadata': {}}})
 if scenario == 'duplicate_call':
     send(call); time.sleep(30)
+usage(20, 4)
 final = {'method': 'turn/completed', 'params': {'threadId': 'thread', 'turn': {'id': 'turn', 'status': 'completed', 'error': None, 'items': [{'type': 'agentMessage', 'id': 'answer', 'phase': 'final_answer', 'text': '{"answer":"bounded-context"}'}]}}}
 if scenario == 'malformed_final': final['params']['turn']['items'][0]['text'] = '{"answer":"ok","authority":"forged"}'
 send(final)

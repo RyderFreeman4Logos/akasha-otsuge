@@ -174,6 +174,8 @@ impl AgentRunner for ClaudeRunner {
                 stderr_closed: false,
                 session: None,
                 tools: Default::default(),
+                message_tokens: Default::default(),
+                tokens: (0, 0),
                 result: None,
                 status: None,
                 finished: false,
@@ -215,6 +217,8 @@ struct Handle<'a> {
     stderr_closed: bool,
     session: Option<String>,
     tools: std::collections::BTreeMap<String, bool>,
+    message_tokens: std::collections::BTreeMap<String, (u64, u64)>,
+    tokens: (u64, u64),
     result: Option<String>,
     status: Option<i32>,
     finished: bool,
@@ -222,6 +226,51 @@ struct Handle<'a> {
     error: Option<AdapterError>,
 }
 impl Handle<'_> {
+    fn usage(&mut self, value: &Value, message: Option<&str>) -> Result<RunnerEvent> {
+        let count = |key| value[key].as_u64().ok_or(ErrorCode::ProtocolInvalid);
+        let mut input = count("input_tokens")?;
+        for key in ["cache_creation_input_tokens", "cache_read_input_tokens"] {
+            if value.get(key).is_some() {
+                input = input
+                    .checked_add(count(key)?)
+                    .ok_or(ErrorCode::ProtocolInvalid)?;
+            }
+        }
+        let output = count("output_tokens")?;
+        let totals = if let Some(id) = message {
+            if !super::super::valid_id(id)
+                || self.message_tokens.len() >= 256 && !self.message_tokens.contains_key(id)
+            {
+                return Err(ErrorCode::ProtocolInvalid.into());
+            }
+            let previous = self.message_tokens.get(id).copied().unwrap_or_default();
+            let incoming = input
+                .checked_sub(previous.0)
+                .ok_or(ErrorCode::ProtocolInvalid)?;
+            let outgoing = output
+                .checked_sub(previous.1)
+                .ok_or(ErrorCode::ProtocolInvalid)?;
+            self.message_tokens.insert(id.into(), (input, output));
+            (
+                self.tokens
+                    .0
+                    .checked_add(incoming)
+                    .ok_or(ErrorCode::ProtocolInvalid)?,
+                self.tokens
+                    .1
+                    .checked_add(outgoing)
+                    .ok_or(ErrorCode::ProtocolInvalid)?,
+            )
+        } else {
+            (input, output)
+        };
+        self.spec.lease().report_tokens(totals.0, totals.1)?;
+        self.tokens = totals;
+        Ok(RunnerEvent::Usage {
+            input_tokens: totals.0,
+            output_tokens: totals.1,
+        })
+    }
     fn frame(&mut self, bytes: &[u8]) -> Result<Option<RunnerEvent>> {
         let value: Value = serde_json::from_slice(bytes).map_err(|_| ErrorCode::ProtocolInvalid)?;
         let session = value["session_id"]
@@ -304,7 +353,10 @@ impl Handle<'_> {
                         return Err(ErrorCode::ProtocolInvalid.into());
                     }
                 }
-                Ok(None)
+                let id = value["message"]["id"]
+                    .as_str()
+                    .ok_or(ErrorCode::ProtocolInvalid)?;
+                self.usage(&value["message"]["usage"], Some(id)).map(Some)
             }
             Some("user") => {
                 let blocks = value["message"]["content"]
@@ -328,9 +380,14 @@ impl Handle<'_> {
                 Ok(None)
             }
             Some("result") => {
+                let usage = value
+                    .get("usage")
+                    .map(|v| self.usage(v, None))
+                    .transpose()?;
                 if value["subtype"] != "success" || value["is_error"] != false {
                     return Err(ErrorCode::RunnerFailed.into());
                 }
+                let usage = usage.ok_or(ErrorCode::RunnerIncomplete)?;
                 if self.tools.values().any(|pending| *pending) {
                     return Err(ErrorCode::RunnerIncomplete.into());
                 }
@@ -341,7 +398,7 @@ impl Handle<'_> {
                         .ok_or(ErrorCode::RunnerIncomplete)?
                         .into(),
                 );
-                Ok(None)
+                Ok(Some(usage))
             }
             _ => Err(ErrorCode::ProtocolInvalid.into()),
         }
@@ -486,7 +543,11 @@ impl Handle<'_> {
 impl RunHandle for Handle<'_> {
     fn next(&mut self) -> BoxFuture<'_, Result<Option<RunnerEvent>>> {
         Box::pin(async move {
-            let result = self.advance().await;
+            let stopped = self.spec.lease().interrupted();
+            let result = tokio::select! {
+                result = self.advance() => result,
+                error = stopped => Err(error),
+            };
             if let Err(error) = &result {
                 self.error = Some(error.clone());
                 self.stop().await;

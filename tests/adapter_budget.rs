@@ -153,6 +153,15 @@ fn reported_tokens_exhaust_one_shared_budget_and_stop_every_descendant() {
             .is_err()
     );
     assert_eq!(b.usage().unwrap().tokens, 200_000);
+    assert_eq!(
+        root.charge_tokens(2, 3).unwrap_err().code,
+        ErrorCode::BudgetExhausted
+    );
+    assert_eq!(
+        b.usage().unwrap().tokens,
+        200_005,
+        "retain late observed in-flight usage"
+    );
     drop(parent_output);
     drop(child_output);
     drop(root);

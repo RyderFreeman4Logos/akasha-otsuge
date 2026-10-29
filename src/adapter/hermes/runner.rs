@@ -187,6 +187,7 @@ impl AgentRunner for HermesRunner {
                 home: self.home.clone(),
                 initialized: false,
                 ready: false,
+                usage_seen: false,
                 buffer: vec![],
                 stderr_bytes: 0,
                 stdout_closed: false,
@@ -215,6 +216,7 @@ struct Handle<'a> {
     home: PathBuf,
     initialized: bool,
     ready: bool,
+    usage_seen: bool,
     buffer: Vec<u8>,
     stderr_bytes: usize,
     stdout_closed: bool,
@@ -242,8 +244,17 @@ struct Command {
 #[derive(Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 enum Event {
-    Ready { home: PathBuf, tools: Vec<String> },
-    Context { request: Value },
+    Usage {
+        input_tokens: u64,
+        output_tokens: u64,
+    },
+    Ready {
+        home: PathBuf,
+        tools: Vec<String>,
+    },
+    Context {
+        request: Value,
+    },
 }
 
 impl Handle<'_> {
@@ -282,6 +293,25 @@ impl Handle<'_> {
             .capability()
             .authorize(&request.command.token, self.spec.lease())?;
         let (data, event) = match request.command.event {
+            Event::Usage {
+                input_tokens,
+                output_tokens,
+            } => {
+                if !self.ready {
+                    return Err(ErrorCode::AdapterUnsupported.into());
+                }
+                self.spec
+                    .lease()
+                    .report_tokens(input_tokens, output_tokens)?;
+                self.usage_seen = true;
+                (
+                    json!({"accepted":true}),
+                    Some(RunnerEvent::Usage {
+                        input_tokens,
+                        output_tokens,
+                    }),
+                )
+            }
             Event::Ready { home, tools } => {
                 if self.ready {
                     return Err(ErrorCode::ProtocolInvalid.into());
@@ -390,6 +420,16 @@ impl Handle<'_> {
                 if final_text.answer.trim().is_empty() {
                     return Err(ErrorCode::RunnerIncomplete.into());
                 }
+                if !self.usage_seen {
+                    return Err(ErrorCode::RunnerIncomplete.into());
+                }
+                let tokens = &value["tokens"];
+                self.spec.lease().report_tokens(
+                    tokens["input"].as_u64().ok_or(ErrorCode::ProtocolInvalid)?,
+                    tokens["output"]
+                        .as_u64()
+                        .ok_or(ErrorCode::ProtocolInvalid)?,
+                )?;
                 self.result = Some(final_text.answer);
                 Ok(())
             }
@@ -495,7 +535,11 @@ impl Handle<'_> {
 impl RunHandle for Handle<'_> {
     fn next(&mut self) -> BoxFuture<'_, Result<Option<RunnerEvent>>> {
         Box::pin(async move {
-            let result = self.advance().await;
+            let stopped = self.spec.lease().interrupted();
+            let result = tokio::select! {
+                result = self.advance() => result,
+                error = stopped => Err(error),
+            };
             if let Err(error) = &result {
                 self.error = Some(error.clone());
                 self.stop().await;

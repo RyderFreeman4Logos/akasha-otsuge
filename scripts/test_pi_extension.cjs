@@ -165,9 +165,9 @@ test('bridge cancellation reaps its child and rejects bounded malformed replies'
 });
 
 test('runner registers only context tools and attests real inventories before work', async t => {
-  const f = fixture(t, `if (event.op === 'ready' || event.op === 'context') {
+  const f = fixture(t, `if (event.op === 'ready' || event.op === 'context' || event.op === 'usage') {
     if (process.argv.at(-1) !== 'pi-context') process.exit(2);
-    console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:event.op === 'ready' ? {ready:true} : {kind:'description'}})); return;
+    console.log(JSON.stringify({schema_version:1,sequence:1,request_id:'native-request',data:event.op === 'ready' ? {ready:true} : event.op === 'usage' ? {accepted:true} : {kind:'description'}})); return;
   }`);
   const names = ['context_describe', 'context_list', 'context_read', 'context_search'];
   f.pi.getAllTools = () => names.map(name => ({name}));
@@ -182,6 +182,16 @@ test('runner registers only context tools and attests real inventories before wo
   assert.equal(await f.hooks.tool_call({toolName:'context_read'},f.ctx), undefined);
   const result = await f.tools.context_describe.execute('native-context',{},undefined,undefined,f.ctx);
   assert.equal(JSON.parse(result.content[0].text).kind, 'description');
+  const usage = {input:10,output:3,cacheRead:7,cacheWrite:2,totalTokens:22};
+  await f.hooks.message_end({message:{role:'assistant',usage}},f.ctx);
+  await f.hooks.session_compact({compactionEntry:{usage}},f.ctx);
+  assert.deepEqual(f.requests().filter(r => r.op === 'usage'), [
+    {op:'usage',input_tokens:19,output_tokens:3},
+    {op:'usage',input_tokens:38,output_tokens:6},
+  ]);
+  let aborted = false; f.ctx.abort = () => { aborted = true; };
+  await assert.rejects(f.hooks.message_end({message:{role:'assistant',usage:{...usage,input:-1}}},f.ctx), /PROTOCOL_INVALID/);
+  assert(aborted);
   const count = f.requests().length;
   const denied = await f.tools.context_describe.execute('native-context',{operation:'read'},undefined,undefined,f.ctx);
   assert.equal(JSON.parse(denied.content[0].text).error.code, 'INVALID_ARGUMENT');

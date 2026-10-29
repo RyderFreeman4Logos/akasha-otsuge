@@ -130,6 +130,17 @@ def _run_native(ctx, names, args):
     result = {'type': 'result', 'session_id': '', 'exit_code': 1, 'error': 'RUNNER_FAILED'}
     started = time.monotonic()
     print(json.dumps({'type': 'system', 'subtype': 'init'}), file=output, flush=True)
+
+    def report_usage(*_args, **_kwargs):
+        tokens = {'input': getattr(agent, 'session_prompt_tokens', None),
+                  'output': getattr(agent, 'session_output_tokens', None)}
+        if any(type(n) is not int or not 0 <= n <= 2**64 - 1 for n in tokens.values()):
+            raise BridgeError('PROTOCOL_INVALID')
+        if _exchange(ctx, {'op':'usage', 'input_tokens':tokens['input'],
+                          'output_tokens':tokens['output']}, runner=True) != {'accepted':True}:
+            raise BridgeError('PROTOCOL_INVALID')
+        return tokens
+
     try:
         with open(os.devnull, 'w') as quiet, redirect_stdout(quiet), redirect_stderr(quiet):
             from hermes_cli.config import load_config_readonly, split_model_config_default
@@ -171,7 +182,8 @@ def _run_native(ctx, names, args):
                 enabled_toolsets=['akasha_context'], quiet_mode=True, platform='cli',
                 skip_context_files=True, skip_memory=True, skip_background_review=True,
                 load_soul_identity=False, prefill_messages=[], checkpoints_enabled=False,
-                cwd=str(Path.cwd()), run_budget_seconds=remaining)
+                cwd=str(Path.cwd()), run_budget_seconds=remaining,
+                step_callback=report_usage, tool_start_callback=report_usage)
             if agent.valid_tool_names != names:
                 raise BridgeError('ADAPTER_UNSUPPORTED')
             if _exchange(ctx, {'op': 'ready', 'home': str(get_hermes_home().resolve()),
@@ -184,7 +196,7 @@ def _run_native(ctx, names, args):
                     or not answer['final_response'].strip()):
                 raise BridgeError('RUNNER_FAILED')
             result = {'type': 'result', 'session_id': agent.session_id, 'exit_code': 0,
-                      'text': answer['final_response']}
+                      'text': answer['final_response'], 'tokens': report_usage()}
     except BridgeError as error:
         result['error'] = str(error)
     except AuthError as error:

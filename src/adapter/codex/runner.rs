@@ -188,6 +188,7 @@ impl AgentRunner for CodexRunner {
                 stdout_closed: false,
                 stderr_closed: false,
                 result: None,
+                usage_seen: false,
                 status: None,
                 finished: false,
                 cleanup: None,
@@ -220,6 +221,7 @@ struct Handle<'a> {
     stdout_closed: bool,
     stderr_closed: bool,
     result: Option<String>,
+    usage_seen: bool,
     status: Option<i32>,
     finished: bool,
     cleanup: Option<Reap>,
@@ -360,6 +362,31 @@ impl Handle<'_> {
             return Err(ErrorCode::ProtocolInvalid.into());
         }
         match method {
+            "thread/tokenUsage/updated" => {
+                if self.stage != 5
+                    || self.result.is_some()
+                    || value.get("id").is_some()
+                    || params["threadId"].as_str() != self.thread.as_deref()
+                    || params["turnId"].as_str() != self.turn.as_deref()
+                {
+                    return Err(ErrorCode::ProtocolInvalid.into());
+                }
+                let usage = &params["tokenUsage"]["total"];
+                let input_tokens = usage["inputTokens"]
+                    .as_u64()
+                    .ok_or(ErrorCode::ProtocolInvalid)?;
+                let output_tokens = usage["outputTokens"]
+                    .as_u64()
+                    .ok_or(ErrorCode::ProtocolInvalid)?;
+                self.spec
+                    .lease()
+                    .report_tokens(input_tokens, output_tokens)?;
+                self.usage_seen = true;
+                Ok(Some(RunnerEvent::Usage {
+                    input_tokens,
+                    output_tokens,
+                }))
+            }
             "item/tool/call" => {
                 if self.stage != 5
                     || self.result.is_some()
@@ -419,6 +446,9 @@ impl Handle<'_> {
                 if turn["status"] != "completed" || !turn["error"].is_null() {
                     return Err(native_error(&turn["error"]));
                 }
+                if !self.usage_seen {
+                    return Err(ErrorCode::RunnerIncomplete.into());
+                }
                 let items = turn["items"]
                     .as_array()
                     .ok_or(ErrorCode::RunnerIncomplete)?;
@@ -467,7 +497,6 @@ impl Handle<'_> {
             }
             "thread/started"
             | "thread/status/changed"
-            | "thread/tokenUsage/updated"
             | "account/rateLimits/updated"
             | "account/updated"
             | "turn/moderationMetadata"
@@ -587,7 +616,11 @@ impl Handle<'_> {
 impl RunHandle for Handle<'_> {
     fn next(&mut self) -> BoxFuture<'_, Result<Option<RunnerEvent>>> {
         Box::pin(async move {
-            let result = self.advance().await;
+            let stopped = self.spec.lease().interrupted();
+            let result = tokio::select! {
+                result = self.advance() => result,
+                error = stopped => Err(error),
+            };
             if let Err(error) = &result {
                 self.error = Some(error.clone());
                 self.stop().await;

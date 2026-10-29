@@ -61,6 +61,8 @@ if scenario == 'denied_tool':
     emit({'type':'tool_execution_start', 'toolName':'bash', 'toolCallId':'forbidden'})
 if scenario == 'forged_args': exchange({'op':'context', 'request':{'operation':'describe', 'session_id':'forged'}})
 if scenario == 'unissued_handle': exchange({'op':'context', 'request':{'operation':'read', 'handle':'forged', 'start':0, 'max_bytes':16}})
+assert exchange({'op':'usage','input_tokens':200000 if scenario == 'token_budget' else 10,'output_tokens':2}) == {'accepted':True}
+if scenario == 'usage_regression': exchange({'op':'usage','input_tokens':9,'output_tokens':2})
 if scenario in ['success', 'retry', 'auth_retry', 'compaction']:
     assert exchange({'op':'context', 'request':{'operation':'describe'}})['kind'] == 'description'
     emit({'type':'tool_execution_start', 'toolName':'context_describe', 'toolCallId':'description'})
@@ -82,6 +84,7 @@ if scenario == 'oversized': print('x' * 131073, flush=True)
 elif scenario == 'stderr': print('x' * 8193, file=sys.stderr, flush=True)
 elif scenario == 'partial': print('{', end='', flush=True); sys.exit(0)
 if scenario != 'no_final':
+    assert exchange({'op':'usage','input_tokens':20,'output_tokens':4}) == {'accepted':True}
     text = 'bad' if scenario == 'malformed_final' else '{"answer":"bounded-context\u2028retained"}'
     message = {'role':'assistant','content':[{'type':'text','text':text}], 'stopReason':'stop'}
     if scenario == 'expired_auth':

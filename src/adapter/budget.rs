@@ -42,6 +42,7 @@ struct BudgetState {
     limits: BudgetLimits,
     deadline: Deadline,
     state: Mutex<Counters>,
+    stopped: tokio::sync::watch::Sender<()>,
 }
 #[derive(Debug, Default)]
 struct Counters {
@@ -82,6 +83,7 @@ impl RunBudget {
             limits,
             deadline,
             state: Mutex::new(Counters::default()),
+            stopped: tokio::sync::watch::channel(()).0,
         })))
     }
     pub fn start(&self) -> Result<RunLease> {
@@ -129,6 +131,7 @@ impl RunBudget {
         // Poisoning already denies every subsequent operation.
         if let Ok(mut state) = self.0.state.lock() {
             state.cancelled = true;
+            self.0.stopped.send_replace(());
         }
     }
     fn check(&self, state: &Counters) -> Result<()> {
@@ -224,7 +227,6 @@ impl RunLease {
             .state
             .lock()
             .map_err(|_| ErrorCode::BudgetExhausted)?;
-        self.budget.check(&state)?;
         let total = state
             .usage
             .tokens
@@ -234,9 +236,29 @@ impl RunLease {
         state.usage.tokens = total.unwrap_or(u64::MAX);
         if total.is_none() || state.usage.tokens > self.budget.0.limits.tokens {
             state.exhausted = true;
-            return Err(ErrorCode::BudgetExhausted.into());
+            self.budget.0.stopped.send_replace(());
         }
-        Ok(())
+        self.budget.check(&state)
+    }
+    pub(super) fn interrupted(&self) -> futures::future::BoxFuture<'static, AdapterError> {
+        let budget = self.budget.clone();
+        Box::pin(async move {
+            let mut stopped = budget.0.stopped.subscribe();
+            loop {
+                let result = budget
+                    .0
+                    .state
+                    .lock()
+                    .map_err(|_| AdapterError::from(ErrorCode::BudgetExhausted))
+                    .and_then(|state| budget.check(&state));
+                if let Err(error) = result {
+                    return error;
+                }
+                if stopped.changed().await.is_err() {
+                    return ErrorCode::Cancelled.into();
+                }
+            }
+        })
     }
     pub fn report_tokens(&self, input: u64, output: u64) -> Result<()> {
         let mut previous = self

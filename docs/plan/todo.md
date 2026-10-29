@@ -642,6 +642,10 @@ links exact identities and preserves the distinct controlled/native results.
   keep current grants, source versions, workspace limits and untrusted content.
 - [ ] Enforce shared token/read/output/start/depth/time/concurrency budgets across
   retries and descendants; retain run lineage and never reset origin or fence.
+- [x] Add cumulative token accounting and real native-protocol usage checks for
+  all four adapters, including cached input, duplicate/decreasing reports,
+  overflow and shared-stop notification during blocked I/O. Focused RED/GREEN
+  receipts are retained; authenticated consult acceptance still remains below.
 - [ ] Delegate with immediate resource refusal; exercise default single worker,
   two simultaneous parent delegates, grandchildren, recursion and branch failures.
 - [ ] Publish concise found/no_hit/incomplete/pending/error results with scope,

@@ -259,6 +259,8 @@ class HermesPlugin(unittest.TestCase):
         class Agent:
             valid_tool_names = names
             session_id = 'native-session'
+            session_prompt_tokens = 12
+            session_output_tokens = 7
             def __init__(self, **kwargs):
                 calls.append(kwargs)
             def run_conversation(self, prompt):
@@ -282,12 +284,14 @@ class HermesPlugin(unittest.TestCase):
             Agent.valid_tool_names = names | ({'terminal'} if widened else set())
             output = io.StringIO()
             with patch.dict('sys.modules', modules), patch('sys.stdout', output), \
-                    patch.object(self.plugin, '_exchange', return_value={'ready': True}), \
+                    patch.object(self.plugin, '_exchange', side_effect=lambda ctx, event, **kw: {'ready': True} if event['op'] == 'ready' else {'accepted': True}), \
                     self.assertRaises(SystemExit) as exited:
                 self.plugin._run_native(self.ctx, names, args)
             self.assertEqual(exited.exception.code, 1 if failed else 0)
             frames = [json.loads(s) for s in output.getvalue().splitlines()]
             self.assertEqual(frames[-1]['exit_code'], 1 if failed else 0)
+            if not failed:
+                self.assertEqual(frames[-1]['tokens'], {'input':12, 'output':7})
             self.assertEqual(calls[-1], 'closed')
             if widened:
                 self.assertNotIn('Read context.', calls)

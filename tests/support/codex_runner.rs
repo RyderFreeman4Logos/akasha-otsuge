@@ -27,6 +27,17 @@ async fn invocation(fixture: &Fixture) -> (Arc<Storage>, Invocation) {
         .await
         .unwrap();
     let (registration, call) = caller::native(fixture);
+    // Runner fixtures start after ingestion; caller tests own the bounded catch-up path.
+    reconcile_transcript(
+        &store,
+        &registration.source,
+        registration.scope.clone(),
+        &registration.transcript,
+        64,
+        1,
+    )
+    .await
+    .unwrap();
     let invocation = CodexCaller::new(store.clone(), registration, call.clone(), 1)
         .bind(&call.tool_call_id)
         .await
@@ -84,9 +95,18 @@ async fn standalone_runner_uses_scoped_native_tools_and_requires_structured_fina
     let mut context = CapturedContext::new(&store, inv).unwrap();
     let mut handle = runner.start(spec, &mut context).await.unwrap();
     let mut collector = RunCollector::new(&lease, 1024);
+    let mut last_usage = None;
     while let Some(event) = handle.next().await.unwrap() {
+        if let RunnerEvent::Usage {
+            input_tokens,
+            output_tokens,
+        } = &event
+        {
+            last_usage = Some((*input_tokens, *output_tokens));
+        }
         collector.push(event).unwrap();
     }
+    assert_eq!(last_usage, Some((20, 4)));
     assert_eq!(
         collector
             .finish(handle.exit_status().await.unwrap())
@@ -105,9 +125,74 @@ async fn standalone_runner_uses_scoped_native_tools_and_requires_structured_fina
 }
 
 #[tokio::test]
+async fn shared_budget_stop_wakes_a_runner_waiting_on_native_output() {
+    for exhausted in [true, false] {
+        let f = Fixture::new();
+        let binary = host(&f, "cancel");
+        let (store, inv) = invocation(&f).await;
+        let budget = RunBudget::new(
+            inv.id(),
+            &inv.fence_hash(),
+            Arc::new(tokio::sync::Semaphore::new(2)),
+            BudgetLimits::default(),
+            Deadline::start(Layer::Workflow, Duration::from_secs(20), None).unwrap(),
+        )
+        .unwrap();
+        let parent = budget.start().unwrap();
+        let plan = RunSpec::new(
+            &inv,
+            RunOptions {
+                job_id: "wake".into(),
+                executor_profile: "codex".into(),
+                instructions_version: "test".into(),
+                runner_timeout: Duration::from_secs(10),
+                args: ConsultArgs::new(None).unwrap(),
+            },
+            ReadCapability::issue(&inv).unwrap(),
+            parent.delegate().unwrap(),
+        )
+        .unwrap();
+        let mut runner = CodexRunner::new(&binary, &f.0, &f.0, "Read context.")
+            .await
+            .unwrap();
+        let mut context = CapturedContext::new(&store, inv).unwrap();
+        let mut handle = runner.start(plan, &mut context).await.unwrap();
+        assert!(matches!(
+            handle.next().await.unwrap(),
+            Some(RunnerEvent::Started)
+        ));
+        let mut next = Box::pin(handle.next());
+        assert!(futures::poll!(next.as_mut()).is_pending());
+        let expected = if exhausted {
+            assert_eq!(
+                parent.charge_tokens(200_000, 0).unwrap_err().code,
+                ErrorCode::BudgetExhausted
+            );
+            ErrorCode::BudgetExhausted
+        } else {
+            budget.cancel();
+            ErrorCode::Cancelled
+        };
+        let result = tokio::time::timeout(Duration::from_secs(2), next).await;
+        drop(handle);
+        drop(context);
+        Arc::try_unwrap(store).ok().unwrap().close().await.unwrap();
+        assert_eq!(
+            result
+                .expect("shared stop did not wake native read")
+                .unwrap_err()
+                .code,
+            expected
+        );
+    }
+}
+
+#[tokio::test]
 async fn native_runner_refuses_protocol_tool_output_and_exit_failures_and_keeps_original_deadline()
 {
     for (scenario, expected) in [
+        ("token_budget", ErrorCode::BudgetExhausted),
+        ("usage_regression", ErrorCode::ProtocolInvalid),
         ("wrong_thread", ErrorCode::ProtocolInvalid),
         ("wrong_turn", ErrorCode::ProtocolInvalid),
         ("forged_args", ErrorCode::InvalidArgument),
