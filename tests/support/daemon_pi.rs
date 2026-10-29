@@ -52,6 +52,25 @@ fn pi_registration_binding_and_backfill_survive_restart_with_current_grants() {
         format!("entry:{}", turn.as_str().unwrap())
     );
     assert!(!bound.to_string().contains(token));
+    let consult =
+        json!({"op":"consult","registration":token,"call":bind["call"],"args":{"hint":"review"}});
+    let submitted = native(&daemon, consult.clone());
+    let consult_id = submitted["data"]["job_id"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{submitted}"));
+    assert_ne!(consult_id, bound["data"]["invocation_id"].as_str().unwrap());
+    assert!(submitted["data"].get("consult_plan").is_none());
+    assert!(submitted["data"]["receipt_id"].is_null());
+    assert_eq!(
+        native(&daemon, consult.clone())["data"]["job_id"],
+        consult_id
+    );
+    let mut conflict = consult.clone();
+    conflict["args"]["hint"] = json!("different intent");
+    assert_eq!(
+        native(&daemon, conflict)["error"]["code"],
+        "IDEMPOTENCY_CONFLICT"
+    );
     let mut bridge = daemon
         .command()
         .args(["adapter", "pi-call"])
@@ -105,6 +124,10 @@ fn pi_registration_binding_and_backfill_survive_restart_with_current_grants() {
     daemon.start();
     assert_eq!(native(&daemon, register)["data"], registered["data"]);
     assert_eq!(native(&daemon, bind.clone())["data"], bound["data"]);
+    assert_eq!(native(&daemon, consult)["data"]["job_id"], consult_id);
+    let public = daemon.cli(&["consult", "show", consult_id]);
+    assert_eq!(public["data"]["status"], "error", "{public}");
+    assert_eq!(public["data"]["error"]["code"], "ADAPTER_UNSUPPORTED");
     let extra = json!({"type":"message","id":"recovered","parentId":manifest["ids"]["tool"],"timestamp":"2026-10-29T00:00:00Z","message":{"role":"user","content":"Recovered after interruption","timestamp":1793232000000_i64}});
     std::fs::write(&transcript, format!("{original}{extra}\n")).unwrap();
     let end = Instant::now() + Duration::from_secs(10);

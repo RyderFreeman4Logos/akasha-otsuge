@@ -25,6 +25,11 @@ pub enum NativeEvent {
         registration: String,
         call: PiCall,
     },
+    Consult {
+        registration: String,
+        call: PiCall,
+        args: super::ConsultArgs,
+    },
     Sync {
         registration: String,
         until_entry: String,

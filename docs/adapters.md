@@ -48,9 +48,12 @@ retained context; unavailable or missing originals must be reported as gaps.
 
 ## Consult results and continuation
 
-A trusted Consult submission creates a durable job handle. The current daemon
-submission path is Codex IPC; connecting the four installed caller tools remains
-part of MVP-016. A binding diagnostic is not a completed Consult.
+A trusted Consult submission creates a durable job handle. Pi and Hermes native
+tools now submit Consult using their automatically verified identity and optional
+hint. Pending results survive the short caller request; use the same daemon socket
+or CLI profile for the commands below. Codex trusted IPC also supports submission;
+its installed hook and the Claude caller entry remain part of MVP-016.
+A binding diagnostic is not a completed Consult.
 
 ```sh
 akasha-otsuge consult show JOB_ID

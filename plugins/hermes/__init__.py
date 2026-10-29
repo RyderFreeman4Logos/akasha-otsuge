@@ -301,17 +301,17 @@ def register(ctx):
                     raise BridgeError('CALLER_AMBIGUOUS')
                 if len(pending) >= 128:
                     raise BridgeError('RESOURCE_BUSY')
-                entry = {'bound': None}
+                entry = {'event': None}
                 pending[key] = entry
             event = _event(ctx, 'bind')
             event['call'] = {'session_id': session_id, 'task_id': task_id, 'turn_id': turn_id,
                              'tool_call_id': tool_call_id, 'profile_home': key[0],
                              'cwd': ctx.session_cwd()}
-            bound = _exchange(ctx, event)
+            _exchange(ctx, event)
             with lock:
                 if pending.get(key) is not entry:
                     raise BridgeError('CALLER_AMBIGUOUS')
-                entry['bound'] = bound
+                entry['event'] = dict(event, op='consult', args=dict(args))
         except BridgeError as error:
             with lock:
                 if entry is not None and pending.get(key) is entry:
@@ -328,9 +328,9 @@ def register(ctx):
                 if pending[key] is None:
                     raise BridgeError('CALLER_AMBIGUOUS')
                 entry = pending.pop(key)
-            if entry['bound'] is None:
+            if entry['event'] is None:
                 raise BridgeError('BINDING_UNAVAILABLE')
-            result = {'schema_version': 1, 'data': entry['bound']}
+            result = {'schema_version': 1, 'data': _exchange(ctx, entry['event'])}
         except BridgeError as error:
             result = {'schema_version': 1, 'error': {'code': str(error)}}
         return json.dumps(result)
@@ -363,7 +363,7 @@ def register(ctx):
         sync(session_id=session_id, **kwargs)
 
     registered = ctx.register_tool(name='akasha_consult', toolset='akasha', handler=consult,
-                      schema={'name': 'akasha_consult', 'description': 'Consult saved user context.',
+                      schema={'name': 'akasha_consult', 'description': 'Consult saved user context. A pending result contains a durable job_id; retrieve it with akasha-otsuge consult show JOB_ID or cancel with akasha-otsuge job cancel JOB_ID.',
                               'parameters': {'type': 'object', 'properties': {
                                   'hint': {'type': ['string', 'null'], 'maxLength': 512,
                                            'description': 'Short optional intent.'}},

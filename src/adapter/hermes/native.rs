@@ -20,6 +20,12 @@ pub enum NativeEvent {
         home: PathBuf,
         call: HermesCall,
     },
+    Consult {
+        binary: PathBuf,
+        home: PathBuf,
+        call: HermesCall,
+        args: crate::adapter::ConsultArgs,
+    },
     Sync {
         binary: PathBuf,
         home: PathBuf,

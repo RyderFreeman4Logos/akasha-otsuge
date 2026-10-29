@@ -115,7 +115,7 @@ function registerCaller(pi, getAgentDir, defaults, parameters) {
     }
   }
   pi.registerTool({name:'akasha_consult', label:'Akasha consult',
-    description:'Consult saved user context.', parameters,
+    description:'Consult saved user context. A pending result contains a durable job_id; retrieve it with akasha-otsuge consult show JOB_ID or cancel with akasha-otsuge job cancel JOB_ID.', parameters,
     async execute(toolCallId, args, signal, _onUpdate, ctx) {
       let result;
       try {
@@ -130,8 +130,8 @@ function registerCaller(pi, getAgentDir, defaults, parameters) {
             block.type === 'toolCall' && block.id === toolCallId && block.name === 'akasha_consult').map(() => entry.id) : []);
         if (matches.length !== 1 || !identifier(matches[0])) throw new Error('CALLER_AMBIGUOUS');
         const token = await registered(native, signal);
-        const data = await exchange(defaults, {op:'bind', registration:token,
-          call:{...native, turn_id:matches[0], tool_call_id:toolCallId}}, signal);
+        const data = await exchange(defaults, {op:'consult', registration:token,
+          call:{...native, turn_id:matches[0], tool_call_id:toolCallId}, args}, signal);
         result = {schema_version:1, data};
       } catch (error) { result = {schema_version:1, error:{code:code(error)}}; }
       return {content:[{type:'text', text:JSON.stringify(result)}], details:{}};

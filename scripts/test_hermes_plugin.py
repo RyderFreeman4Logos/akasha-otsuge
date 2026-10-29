@@ -194,7 +194,9 @@ class HermesPlugin(unittest.TestCase):
                          'turn_id': 'turn-a', 'tool_call_id': 'call-a',
                          'profile_home': str(self.home_a), 'cwd': str(self.root)})
         self.assertEqual(event['binary'], '/native/hermes')
-        self.assertEqual(len(self.server.requests), 2)
+        self.assertEqual([r['command']['event']['op'] for r in self.server.requests],
+                         ['bind', 'bind', 'consult', 'consult'])
+        self.assertEqual(self.server.requests[-1]['command']['event']['args'], {'hint': 'preferences'})
 
     def test_duplicate_pending_calls_fail_closed_and_session_end_recovers(self):
         self.assertIsNone(self.bind())

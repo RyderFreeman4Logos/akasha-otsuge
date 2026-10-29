@@ -649,6 +649,12 @@ links exact identities and preserves the distinct controlled/native results.
   Caller binding and support no hint without caller-built context packages.
   Preserve diagnostic Bind requests; connect each actual native tool to the
   separate Consult operation and durable status/cancel/delivery path.
+  Pi and Hermes tools now submit a durable Consult using the native call identity
+  and optional hint, returning only public status/results. Hermes submits only
+  when its verified tool handler executes. Both daemon entry tests, Node8/Python10
+  plugin checks and Clippy pass, including deduplication and restart recovery.
+  An earlier Hermes first-bind IPC timeout is retained; its isolated case passed.
+  Codex and Claude installed entries, and authenticated Consult acceptance, remain.
 - [ ] Provide progressive context/memory/code reads through shared Rust authority;
   keep current grants, source versions, workspace limits and untrusted content.
   Memory search/get and bound workspace search/read now reuse the existing

@@ -140,6 +140,31 @@ impl Service {
                         .await?;
                     Ok(serde_json::to_value(invocation.diagnostic())?)
                 }
+                NativeEvent::Consult {
+                    registration,
+                    call,
+                    args,
+                } => {
+                    let reg = service.pi_registration(&registration)?;
+                    let native = jobs::consult::NativeExecutor {
+                        host: reg.capability.host,
+                        binary: reg
+                            .capability
+                            .executable
+                            .clone()
+                            .ok_or(Error("EXECUTOR_UNAVAILABLE"))?,
+                        home: reg.agent_dir.clone(),
+                    };
+                    let id = call.tool_call_id.clone();
+                    let invocation = PiCaller::new(service.storage.clone(), reg, call, generation)
+                        .bind(&id)
+                        .await?;
+                    drop(guard);
+                    let job = service.submit_consult(invocation, native, args).await?;
+                    service
+                        .show_consult(job["id"].as_str().ok_or(Error("JOB_CORRUPT"))?)
+                        .await
+                }
                 NativeEvent::Sync {
                     registration,
                     until_entry,

@@ -128,7 +128,8 @@ test('Caller accepts 512 Unicode characters and rejects 513 before binding', asy
   const accepted = JSON.parse((await execute({hint})).content[0].text);
   assert.equal(accepted.error, undefined);
   assert.equal(accepted.data.invocation_id, 'session-a');
-  assert.deepEqual(f.requests().map(r => r.op), ['register', 'bind']);
+  assert.deepEqual(f.requests().map(r => r.op), ['register', 'consult']);
+  assert.equal(f.requests().at(-1).args.hint, hint);
   const refused = JSON.parse((await execute({hint: hint + '😀'})).content[0].text);
   assert.equal(refused.error.code, 'INVALID_ARGUMENT');
   assert.equal(f.requests().length, 2);

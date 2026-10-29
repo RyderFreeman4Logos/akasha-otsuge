@@ -55,8 +55,22 @@ fn hermes_bridge_exports_the_requested_native_home_and_persists_background_histo
     assert_eq!(bound["data"]["requested_cursor"], 4);
     assert_eq!(bound["data"]["caller"]["adapter"], "hermes");
     assert_eq!(
-        bridge(&daemon, "retry-bind", event)["data"]["invocation_id"],
+        bridge(&daemon, "retry-bind", event.clone())["data"]["invocation_id"],
         bound["data"]["invocation_id"]
+    );
+    let mut consult = event;
+    consult["op"] = json!("consult");
+    consult["args"] = json!({"hint":null});
+    let submitted = bridge(&daemon, "consult", consult.clone());
+    let consult_id = submitted["data"]["job_id"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{submitted}"));
+    assert_ne!(consult_id, bound["data"]["invocation_id"].as_str().unwrap());
+    assert!(submitted["data"].get("consult_plan").is_none());
+    assert!(submitted["data"]["receipt_id"].is_null());
+    assert_eq!(
+        bridge(&daemon, "retry-consult", consult)["data"]["job_id"],
+        consult_id
     );
     let synced = bridge(
         &daemon,
@@ -85,6 +99,9 @@ fn hermes_bridge_exports_the_requested_native_home_and_persists_background_histo
     assert!(!text.contains("PRIVATE_REASONING_SENTINEL"));
     assert!(!text.contains("PRIVATE_CONFIG_SENTINEL"));
     assert_eq!(std::fs::metadata(&files[0]).unwrap().mode() & 0o777, 0o600);
+    let public = daemon.cli(&["consult", "show", consult_id]);
+    assert_eq!(public["data"]["status"], "error", "{public}");
+    assert_eq!(public["data"]["error"]["code"], "ADAPTER_UNSUPPORTED");
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
 }
