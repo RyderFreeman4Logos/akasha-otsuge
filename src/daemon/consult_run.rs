@@ -27,37 +27,105 @@ impl Research<'_> {
         args: ConsultArgs,
     ) -> BoxFuture<'b, Result<crate::adapter::ResearchConclusion>> {
         Box::pin(async move {
-            self.authorize(&lease).await?;
-            let index = self.runs.len();
-            let parent = self.current_run.replace(index);
-            let run_id = format!("{}/run/{index}", self.id);
-            self.runs.push(json!({"id":run_id,"parent":parent.map(|p|self.runs[p]["id"].clone()),
-                "origin":lease.origin(),"fence":lease.fence(),"depth":lease.depth(),
-                "config_generation":self.config.generation(),"host":self.native.host,"state":"running",
-                "started_at_ms":ipc::now_ms()?}));
-            self.save_trace().await?;
-            let outcome = self
-                .run_inner(lease, args, &run_id)
-                .await
-                .and_then(|text| self.conclusion(&text));
-            self.current_run = parent;
-            self.runs[index]["state"] = json!(if outcome.is_ok() {
-                "succeeded"
-            } else {
-                "failed"
-            });
-            self.runs[index]["finished_at_ms"] = json!(ipc::now_ms()?);
-            if let Err(error) = &outcome {
-                self.runs[index]["error"] = json!(error.0);
-                for run in &mut self.runs[index + 1..] {
-                    if run["state"] == "running" {
-                        run["state"] = json!("failed");
-                        run["error"] = json!(error.0);
+            let depth = lease.depth();
+            let parent = self.current_run;
+            let first = parent
+                .and_then(|p| self.runs[p]["executor_profile"].as_str())
+                .unwrap_or(&self.config.resolved().config().consult.executor)
+                .to_owned();
+            let mut pending = std::collections::VecDeque::from([first]);
+            let mut visited = std::collections::BTreeSet::new();
+            let mut first_lease = Some(lease);
+            while let Some(profile) = pending.pop_front() {
+                if !visited.insert(profile.clone()) {
+                    continue;
+                }
+                let lease = if let Some(lease) = first_lease.take() {
+                    lease
+                } else {
+                    let _guard = self.service.admission.lock().await;
+                    let max = self
+                        .service
+                        .config
+                        .pin()
+                        .resolved()
+                        .config()
+                        .runtime
+                        .max_concurrent_jobs
+                        .min(MAX_RUNNING);
+                    if MAX_RUNNING - self.service.runner_slots.available_permits() >= max {
+                        return Err(Error("DELEGATION_UNAVAILABLE"));
+                    }
+                    self.budget.reserve(depth)?
+                };
+                self.authorize(&lease).await?;
+                let native = if profile == "caller" {
+                    self.native.clone()
+                } else {
+                    self.executors
+                        .get(&profile)
+                        .ok_or(Error("JOB_CORRUPT"))?
+                        .clone()
+                };
+                let index = self.runs.len();
+                self.current_run = Some(index);
+                let run_id = format!("{}/run/{index}", self.id);
+                self.runs.push(
+                    json!({"id":run_id,"parent":parent.map(|p|self.runs[p]["id"].clone()),
+                    "origin":lease.origin(),"fence":lease.fence(),"depth":depth,
+                    "config_generation":self.config.generation(),"host":native.host,
+                    "executor_profile":profile,"state":"running","started_at_ms":ipc::now_ms()?}),
+                );
+                self.save_trace().await?;
+                let outcome = self
+                    .run_inner(lease, args.clone(), &run_id, &profile, native)
+                    .await
+                    .and_then(|text| self.conclusion(&text));
+                self.current_run = parent;
+                self.runs[index]["state"] = json!(if outcome.is_ok() {
+                    "succeeded"
+                } else {
+                    "failed"
+                });
+                self.runs[index]["finished_at_ms"] = json!(ipc::now_ms()?);
+                if let Err(error) = &outcome {
+                    self.runs[index]["error"] = json!(error.0);
+                    for run in &mut self.runs[index + 1..] {
+                        if run["state"] == "running" {
+                            run["state"] = json!("failed");
+                            run["error"] = json!(error.0);
+                        }
+                    }
+                    if matches!(
+                        error.0,
+                        "EXECUTOR_UNAVAILABLE"
+                            | "ADAPTER_UNSUPPORTED"
+                            | "AUTH_REQUIRED"
+                            | "RUNNER_FAILED"
+                            | "RUNNER_INCOMPLETE"
+                            | "RUNNER_TIMEOUT"
+                            | "PROVIDER_TIMEOUT"
+                    ) {
+                        if let Some(executor) =
+                            self.config.resolved().config().executors.get(&profile)
+                        {
+                            for next in executor.fallback.iter().rev() {
+                                if !visited.contains(next) {
+                                    pending.push_front(next.clone());
+                                }
+                            }
+                        }
+                    } else {
+                        pending.clear();
                     }
                 }
+                self.save_trace().await?;
+                pending.retain(|next| !visited.contains(next));
+                if outcome.is_ok() || pending.is_empty() {
+                    return outcome;
+                }
             }
-            self.save_trace().await?;
-            outcome
+            Err(Error("EXECUTOR_UNAVAILABLE"))
         })
     }
 
@@ -66,16 +134,21 @@ impl Research<'_> {
         lease: RunLease,
         args: ConsultArgs,
         run_id: &str,
+        profile: &str,
+        native: NativeExecutor,
     ) -> Result<String> {
         let service = self.service;
         let id = self.id;
         let workflow = self.workflow;
         let config = self.config.clone();
-        let native = self.native.clone();
         let settings = &config.resolved().config().consult;
+        let executor = config.resolved().config().executors.get(profile);
+        if executor.is_some_and(|e| !e.args.is_empty() || e.model.is_some()) {
+            return Err(Error("ADAPTER_UNSUPPORTED"));
+        }
         {
             let _guard = service.admission.lock().await;
-            service.authorize_native(&native)?;
+            service.authorize_executor(profile, &native)?;
         }
         let directory = config
             .resolved()
@@ -128,9 +201,15 @@ impl Research<'_> {
             &self.invocation,
             RunOptions {
                 job_id: run_id.into(),
-                executor_profile: settings.executor.clone(),
+                executor_profile: profile.into(),
                 instructions_version: settings.instructions_version.clone(),
-                runner_timeout: config.resolved().timeouts().runner,
+                runner_timeout: config
+                    .resolved()
+                    .timeouts()
+                    .executors
+                    .get(profile)
+                    .copied()
+                    .unwrap_or(config.resolved().timeouts().runner),
                 args,
             },
             ReadCapability::issue(&self.invocation)?,
@@ -150,7 +229,7 @@ impl Research<'_> {
             if service.stopping.load(std::sync::atomic::Ordering::Acquire) {
                 return Err(Error("RUNNER_INTERRUPTED"));
             }
-            service.authorize_native(&native)?;
+            service.authorize_executor(profile, &native)?;
             runner.start(spec, self).await?
         };
         let run = async {

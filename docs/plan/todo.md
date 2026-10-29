@@ -675,8 +675,12 @@ links exact identities and preserves the distinct controlled/native results.
   Final return and replay now recheck live code-read policy and the observed
   workspace's durable device/inode identity, including after daemon restart.
   Four failing controls pass after the repair;17 consult cases, the focused
-  workspace case and all-target Clippy pass. Remaining core work: configured executors and
-  explicit fallback routing. The initial daemon path uses the caller executor.
+  workspace case and all-target Clippy pass. Named executors now pin the accepted
+  route and native home, enforce live enable/read policy and follow only explicit
+  ordered fallback. Remaining configuration work: native model and safe argument
+  overrides, followed by real cross-host acceptance. The29 consult and17 config
+  regressions plus Clippy pass. An earlier capture-setup timeout remains recorded;
+  its exact isolated case passed without extending the deadline.
 - [x] Extend all native tool inventories and strict request decoding to the nine
   shared research tools. Focused Rust58, Hermes9 and Pi7 regressions pass; daemon
   research execution and real consult acceptance remain separate work below.
@@ -684,7 +688,9 @@ links exact identities and preserves the distinct controlled/native results.
   retries and descendants; retain run lineage and never reset origin or fence.
   Delegates now reuse one research state and budget; run IDs, parentage, origin,
   fence, configuration, usage and terminal errors are persisted separately from
-  public output. Named executor attempts/fallback remain to be connected.
+  public output. Named fallback attempts share that budget and original clock;
+  descendants inherit the active executor. Live disablement and source-authority
+  failures cannot silently move work onto an unconfigured provider.
 - [x] Add cumulative token accounting and real native-protocol usage checks for
   all four adapters, including cached input, duplicate/decreasing reports,
   overflow and shared-stop notification during blocked I/O. Focused RED/GREEN

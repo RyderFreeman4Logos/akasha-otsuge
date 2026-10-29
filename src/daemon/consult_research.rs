@@ -23,6 +23,7 @@ pub(super) struct Research<'a> {
     searched: bool,
     operations: u64,
     native: NativeExecutor,
+    executors: BTreeMap<String, NativeExecutor>,
     budget: RunBudget,
     runs: Vec<Value>,
     current_run: Option<usize>,
@@ -41,7 +42,7 @@ impl<'a> Research<'a> {
         invocation: Invocation,
         config: Arc<crate::config::Snapshot<()>>,
         workflow: &'a Deadline,
-        native: NativeExecutor,
+        plan: Plan,
         budget: RunBudget,
     ) -> Result<Self> {
         Ok(Self {
@@ -57,7 +58,8 @@ impl<'a> Research<'a> {
             expanded: BTreeMap::new(),
             searched: false,
             operations: 0,
-            native,
+            native: plan.native,
+            executors: plan.executors,
             budget,
             runs: vec![],
             current_run: None,

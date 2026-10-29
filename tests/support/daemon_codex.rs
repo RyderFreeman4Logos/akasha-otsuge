@@ -11,6 +11,13 @@ fn native(daemon: &Daemon, event: Value) -> Value {
 }
 
 fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
+    consult_fixture_with(scenario, |_| String::new())
+}
+
+fn consult_fixture_with(
+    scenario: &str,
+    settings: impl FnOnce(&std::path::Path) -> String,
+) -> (Daemon, Value, Value) {
     let mut daemon = Daemon::new();
     let workspace = daemon.root.join("workspace");
     let home = daemon.root.join("native-home");
@@ -22,7 +29,7 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
         _ => 1,
     };
     let depth = if scenario == "delegate_tree" { 2 } else { 1 };
-    daemon.configure(&format!("[access]\nread_roots=[{workspace:?},{home:?}]\n[runtime]\nmax_concurrent_jobs={concurrency}\n[consult]\nmax_delegation_depth={depth}\n"));
+    daemon.configure(&format!("[access]\nread_roots=[{workspace:?},{home:?}]\n[runtime]\nmax_concurrent_jobs={concurrency}\n[consult]\nmax_delegation_depth={depth}\n{}", settings(&daemon.root)));
     let binary = daemon.root.join("codex");
     let host = include_str!("../fixtures/codex/0.164.0/runner_host.py")
         .replace("scenario = (root / 'scenario').read_text()", "scenario = (root / 'scenario').read_text()\nwith (root / 'starts').open('a') as f: f.write('start\\n')\n(root / 'runner.pid').write_text(str(os.getpid()))");
@@ -101,6 +108,190 @@ fn sync_consult_fixture(daemon: &Daemon, token: &str) {
         );
         std::thread::sleep(Duration::from_millis(10));
     }
+}
+
+fn named_routes(root: &std::path::Path, fallback: bool, failing: bool) -> String {
+    let binary = root.join(if failing { "failed" } else { "codex" });
+    let second = root.join("codex");
+    format!(
+        "executor='primary'\n[executors.primary]\nkind='codex'\nbinary={binary:?}\nfallback={}\n[executors.second]\nkind='codex'\nbinary={second:?}\n",
+        if fallback { "['second']" } else { "[]" }
+    )
+}
+
+fn named_terminal(daemon: &Daemon, event: Value) -> Value {
+    let submitted = native(daemon, event);
+    let id = submitted["data"]["id"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{submitted}"));
+    let end = Instant::now() + Duration::from_secs(20);
+    loop {
+        let job = daemon.cli(&["job", "show", id])["data"].clone();
+        if !matches!(job["state"].as_str(), Some("queued" | "running")) {
+            return job;
+        }
+        assert!(Instant::now() < end, "named executor did not finish: {job}");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+}
+
+#[test]
+fn consult_named_executor_runs_the_pinned_profile() {
+    let (daemon, event, bound) =
+        consult_fixture_with("success", |root| named_routes(root, false, false));
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["state"], "succeeded", "{job}");
+    assert_eq!(job["run_trace"]["runs"][0]["executor_profile"], "primary");
+    assert_eq!(
+        job["run_trace"]["runs"][0]["origin"],
+        bound["data"]["invocation_id"]
+    );
+    assert_eq!(job["run_trace"]["usage"]["starts"], 1);
+}
+
+#[test]
+fn consult_named_fallback_is_explicit_and_shares_origin_budget() {
+    for fallback in [false, true] {
+        let (daemon, event, bound) =
+            consult_fixture_with("success", |root| named_routes(root, fallback, true));
+        let host = std::fs::read_to_string(daemon.root.join("codex"))
+            .unwrap()
+            .replace(
+                "scenario = (root / 'scenario').read_text()",
+                "scenario = 'auth'",
+            );
+        super::executable::write(&daemon.root.join("failed"), &host);
+        let job = named_terminal(&daemon, event);
+        assert_eq!(
+            job["state"],
+            if fallback { "succeeded" } else { "failed" },
+            "{job}"
+        );
+        let runs = job["run_trace"]["runs"].as_array().unwrap();
+        assert_eq!(runs.len(), if fallback { 2 } else { 1 });
+        assert_eq!(runs[0]["error"], "AUTH_REQUIRED");
+        assert!(
+            runs.iter()
+                .all(|r| r["origin"] == bound["data"]["invocation_id"]
+                    && r["parent"].is_null()
+                    && r["depth"] == 0)
+        );
+        assert_eq!(job["run_trace"]["usage"]["starts"], runs.len());
+        assert_eq!(
+            std::fs::read_to_string(daemon.root.join("starts"))
+                .unwrap()
+                .lines()
+                .count(),
+            runs.len()
+        );
+        if fallback {
+            assert_eq!(runs[1]["executor_profile"], "second");
+        }
+    }
+}
+
+#[test]
+fn consult_named_profile_keeps_generation_but_obeys_live_disable() {
+    for disable in [false, true] {
+        let (daemon, event, _) =
+            consult_fixture_with("success", |root| named_routes(root, false, false));
+        let root = &daemon.root;
+        daemon.configure(&format!("[access]\nread_roots=[{:?},{:?}]\n[executors.primary]\nkind='codex'\nbinary={:?}\nenabled={}\n", root.join("workspace"), root.join("native-home"), root.join("absent"), !disable));
+        daemon.cli(&["config", "reload"]);
+        let job = named_terminal(&daemon, event);
+        assert_eq!(job["config_generation"], 1);
+        assert_eq!(
+            job["state"],
+            if disable { "failed" } else { "succeeded" },
+            "{job}"
+        );
+        if disable {
+            assert_eq!(job["error"], "EXECUTOR_UNAVAILABLE");
+            assert!(!root.join("starts").exists());
+        }
+    }
+}
+
+#[test]
+fn consult_named_fallback_stops_at_shared_start_limit() {
+    let (daemon, event, _) = consult_fixture_with("success", |root| {
+        format!(
+            "max_runner_starts=2\nexecutor='primary'\n[executors.primary]\nkind='codex'\nbinary={0:?}\nfallback=['second','third']\n[executors.second]\nkind='codex'\nbinary={0:?}\nfallback=['third']\n[executors.third]\nkind='codex'\nbinary={1:?}\n",
+            root.join("failed"),
+            root.join("codex")
+        )
+    });
+    let host = std::fs::read_to_string(daemon.root.join("codex"))
+        .unwrap()
+        .replace(
+            "scenario = (root / 'scenario').read_text()",
+            "scenario = 'auth'",
+        );
+    super::executable::write(&daemon.root.join("failed"), &host);
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["state"], "failed", "{job}");
+    assert_eq!(job["error"], "BUDGET_EXHAUSTED", "{job}");
+    assert_eq!(job["run_trace"]["usage"]["starts"], 2);
+    assert_eq!(job["run_trace"]["runs"].as_array().unwrap().len(), 2);
+    assert_eq!(
+        std::fs::read_to_string(daemon.root.join("starts"))
+            .unwrap()
+            .lines()
+            .count(),
+        2
+    );
+}
+
+#[test]
+fn consult_named_fallback_never_bypasses_source_authority() {
+    let (daemon, event, _) =
+        consult_fixture_with("conclusion_forged", |root| named_routes(root, true, false));
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["error"], "READ_DENIED", "{job}");
+    assert_eq!(job["run_trace"]["usage"]["starts"], 1);
+    assert_eq!(job["run_trace"]["runs"].as_array().unwrap().len(), 1);
+}
+
+#[test]
+fn consult_named_delegates_inherit_the_active_executor() {
+    let (daemon, event, _) =
+        consult_fixture_with("delegate_failure", |root| named_routes(root, false, false));
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["state"], "succeeded", "{job}");
+    let runs = job["run_trace"]["runs"].as_array().unwrap();
+    assert_eq!(runs.len(), 3);
+    assert!(runs.iter().all(|r| r["executor_profile"] == "primary"));
+    assert!(
+        runs[1..]
+            .iter()
+            .all(|r| r["parent"] == runs[0]["id"] && r["depth"] == 1)
+    );
+    assert_eq!(job["run_trace"]["usage"]["starts"], 3);
+}
+
+#[test]
+fn consult_named_home_is_independent_of_the_caller_profile() {
+    let (daemon, event, _) = consult_fixture_with("success", |root| {
+        format!(
+            "executor='primary'\n[executors.primary]\nkind='codex'\nbinary={:?}\nnative_home={:?}\n",
+            root.join("codex"),
+            root.join("native-home/worker")
+        )
+    });
+    let caller = daemon.root.join("native-home");
+    let worker = caller.join("worker");
+    std::fs::create_dir(&worker).unwrap();
+    std::fs::rename(
+        caller.join("models_cache.json"),
+        worker.join("models_cache.json"),
+    )
+    .unwrap();
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["state"], "succeeded", "{job}");
+    assert_eq!(
+        job["consult_plan"]["executors"]["primary"]["home"],
+        worker.to_str().unwrap()
+    );
 }
 
 #[test]

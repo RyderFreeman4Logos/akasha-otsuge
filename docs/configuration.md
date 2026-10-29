@@ -39,10 +39,25 @@ the corresponding kind. These are configuration contracts; actual requests are
 implemented in MVP-009/010/017.
 
 `executors.NAME` requires `kind` (`claude_code`, `codex`, `hermes`, `pi`) and `binary`.
-Optional fields are `args`, `enabled`, a text `model`, `timeout` and an ordered
-`fallback` list. No other host, fallback or paid API is enabled by default. Resolving
-config does not spawn a binary. The selected host's prepare consumer validates its
-capabilities. `notifiers.NAME` accepts `local` or `stdio`; stdio requires `command`.
+Optional fields are `args`, `enabled`, a text `model`, `timeout`, an absolute
+`native_home` and an ordered `fallback` list. No other host, fallback or paid API
+is enabled by default. Resolving config does not spawn a binary. The selected
+host's prepare consumer validates its capabilities. `notifiers.NAME` accepts
+`local` or `stdio`; stdio requires `command`.
+
+Consult pins the selected profiles and native-home locations before queuing. An
+omitted home uses the bound caller profile for the same host; another host uses
+its daemon environment override (`CODEX_HOME`, `CLAUDE_CONFIG_DIR`, `HERMES_HOME`,
+`PI_CODING_AGENT_DIR`) or its standard directory under `HOME`. Configure
+`native_home` for a different profile, and include that directory in `read_roots`.
+Live path restrictions and executor disablement are checked before startup.
+Fallback follows only the configured ordered lists, depth first, without repeating
+a profile. Every attempt and descendant shares the original invocation, workflow
+clock and start budget. Authority, cancellation and budget failures stop fallback.
+A delegate starts from its parent's active executor. Profile-specific timeouts
+remain bounded by the original workflow. Explicit native model/argument overrides
+are still being connected in MVP-016; until qualified they return
+`ADAPTER_UNSUPPORTED` rather than silently ignoring the configuration.
 
 | Settings | Activation | Accepted/queued jobs |
 | --- | --- | --- |

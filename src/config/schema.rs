@@ -126,6 +126,8 @@ fn enabled() -> bool {
 pub struct Executor {
     pub kind: Host,
     pub binary: PathBuf,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_home: Option<PathBuf>,
     #[serde(default)]
     pub args: Vec<String>,
     #[serde(default = "enabled")]
@@ -413,6 +415,14 @@ impl Config {
                 !executor.binary.as_os_str().is_empty(),
                 "executors.*.binary",
                 "binary must not be empty",
+            )?;
+            require(
+                executor
+                    .native_home
+                    .as_ref()
+                    .is_none_or(|home| home.is_absolute()),
+                "executors.*.native_home",
+                "native home must be absolute",
             )?;
             if let Some(model) = &executor.model {
                 require(

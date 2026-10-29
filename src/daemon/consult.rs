@@ -2,6 +2,7 @@ use super::*;
 use crate::adapter::{BudgetLimits, CapturedContext, ConsultArgs, Invocation, RunBudget};
 use crate::config::{Host, deadline::Deadline};
 use crate::domain::{Coverage, RecallDraft, RecallStatus, RetrievalMode};
+use std::collections::BTreeMap;
 #[path = "consult_delivery.rs"]
 mod delivery;
 #[path = "consult_research.rs"]
@@ -15,6 +16,52 @@ pub(in crate::daemon) struct NativeExecutor {
     pub home: PathBuf,
 }
 
+impl NativeExecutor {
+    fn named(&self, config: &crate::config::Config) -> Result<BTreeMap<String, Self>> {
+        let mut routes = BTreeMap::new();
+        let mut pending = vec![config.consult.executor.clone()];
+        while let Some(name) = pending.pop() {
+            if name == "caller" || routes.contains_key(&name) {
+                continue;
+            }
+            let executor = config.executors.get(&name).ok_or(Error("CONFIG_CORRUPT"))?;
+            let home = if let Some(home) = &executor.native_home {
+                home.clone()
+            } else if executor.kind == self.host {
+                self.home.clone()
+            } else {
+                let (variable, relative) = match executor.kind {
+                    Host::Codex => ("CODEX_HOME", ".codex"),
+                    Host::ClaudeCode => ("CLAUDE_CONFIG_DIR", ".claude"),
+                    Host::Hermes => ("HERMES_HOME", ".hermes"),
+                    Host::Pi => ("PI_CODING_AGENT_DIR", ".pi/agent"),
+                };
+                std::env::var_os(variable)
+                    .map(PathBuf::from)
+                    .or_else(|| {
+                        std::env::var_os("HOME").map(|root| PathBuf::from(root).join(relative))
+                    })
+                    .ok_or(Error("EXECUTOR_UNAVAILABLE"))?
+            };
+            if !home.is_absolute() {
+                return Err(Error("CONFIG_INVALID"));
+            }
+            // Pin an existing profile's canonical location before the job can queue.
+            let home = home.canonicalize().unwrap_or(home);
+            routes.insert(
+                name,
+                Self {
+                    host: executor.kind,
+                    binary: executor.binary.clone(),
+                    home,
+                },
+            );
+            pending.extend(executor.fallback.iter().cloned());
+        }
+        Ok(routes)
+    }
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(super) struct Plan {
@@ -24,6 +71,8 @@ pub(super) struct Plan {
     fence: String,
     pub(super) config_generation: u64,
     native: NativeExecutor,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    executors: BTreeMap<String, NativeExecutor>,
     args: ConsultArgs,
 }
 
@@ -43,6 +92,12 @@ impl Service {
         }
         Ok(())
     }
+    fn authorize_executor(&self, profile: &str, native: &NativeExecutor) -> Result<()> {
+        if profile != "caller" && !self.config.executor_allowed(profile) {
+            return Err(Error("EXECUTOR_UNAVAILABLE"));
+        }
+        self.authorize_native(native)
+    }
     pub(in crate::daemon) async fn submit_consult(
         self: &Arc<Self>,
         invocation: Invocation,
@@ -50,6 +105,8 @@ impl Service {
         args: ConsultArgs,
     ) -> Result<Value> {
         let id = format!("consult/{}", hash(invocation.id().as_bytes()));
+        let config = self.retrieval_snapshot(invocation.diagnostic().config_generation)?;
+        let executors = native.named(config.resolved().config())?;
         let plan = Plan {
             invocation_id: invocation.id().into(),
             principal: invocation.diagnostic().principal.clone(),
@@ -57,6 +114,7 @@ impl Service {
             fence: invocation.fence_hash(),
             config_generation: invocation.diagnostic().config_generation,
             native,
+            executors,
             args: ConsultArgs::new(args.hint)?,
         };
         self.submit_job(id, None, None, None, None, Some(plan))
@@ -104,9 +162,6 @@ impl Service {
             (plan, config, invocation)
         };
         let settings = &config.resolved().config().consult;
-        if settings.executor != "caller" {
-            return Err(Error("EXECUTOR_UNAVAILABLE"));
-        }
         let budget = RunBudget::new(
             invocation.id(),
             &invocation.fence_hash(),
@@ -133,16 +188,17 @@ impl Service {
             }
             budget.start()?
         };
+        let args = plan.args.clone();
         let mut context = research::Research::new(
             self,
             id,
             invocation.clone(),
             config.clone(),
             workflow,
-            plan.native,
+            plan,
             budget.clone(),
         )?;
-        let outcome = context.run(lease, plan.args).await;
+        let outcome = context.run(lease, args).await;
         if outcome.is_err() {
             budget.cancel();
         }

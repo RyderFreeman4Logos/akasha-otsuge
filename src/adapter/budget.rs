@@ -89,7 +89,7 @@ impl RunBudget {
     pub fn start(&self) -> Result<RunLease> {
         self.reserve(0)
     }
-    fn reserve(&self, depth: u32) -> Result<RunLease> {
+    pub(crate) fn reserve(&self, depth: u32) -> Result<RunLease> {
         let mut state = self
             .0
             .state
