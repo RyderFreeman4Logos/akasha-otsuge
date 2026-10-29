@@ -123,27 +123,38 @@ impl Invocation {
         if !valid_id(id) || !valid_id(principal) {
             return Err(ErrorCode::BindingUnavailable.into());
         }
-        let invocation = store
-            .serialized_read(|| {
-                let row = store
-                    .current(&invocation_key(id))?
-                    .ok_or_else(|| StorageError::new("BINDING_UNAVAILABLE"))?;
-                let record: StoredInvocation = serde_json::from_str(&row.content)?;
-                if record.schema_version != 1 || record.binding.invocation_id != id {
-                    return Err(StorageError::new("BINDING_UNAVAILABLE"));
-                }
-                if record.binding.principal != principal {
-                    return Err(StorageError::new("READ_DENIED"));
-                }
-                record.binding.check_anchor(store)?;
-                Ok(Self {
-                    binding: record.binding,
-                    revision: row.commit_seq,
-                })
-            })
-            .await?;
-        invocation.binding.validate()?;
-        Ok(invocation)
+        store
+            .serialized_read(|| Self::load_verified(store, id, principal))
+            .await
+            .map_err(Into::into)
+    }
+    pub(crate) fn load_verified(
+        store: &Storage,
+        id: &str,
+        principal: &str,
+    ) -> crate::storage::Result<Self> {
+        if !valid_id(id) || !valid_id(principal) {
+            return Err(StorageError::new("BINDING_UNAVAILABLE"));
+        }
+        let row = store
+            .current(&invocation_key(id))?
+            .ok_or_else(|| StorageError::new("BINDING_UNAVAILABLE"))?;
+        let record: StoredInvocation = serde_json::from_str(&row.content)?;
+        if record.schema_version != 1 || record.binding.invocation_id != id {
+            return Err(StorageError::new("BINDING_UNAVAILABLE"));
+        }
+        if record.binding.principal != principal {
+            return Err(StorageError::new("READ_DENIED"));
+        }
+        record
+            .binding
+            .validate()
+            .map_err(|_| StorageError::new("BINDING_UNAVAILABLE"))?;
+        record.binding.check_anchor(store)?;
+        Ok(Self {
+            binding: record.binding,
+            revision: row.commit_seq,
+        })
     }
     pub fn id(&self) -> &str {
         &self.binding.invocation_id

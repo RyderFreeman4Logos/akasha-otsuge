@@ -46,6 +46,7 @@ pub(super) fn native(fixture: &Fixture) -> (CodexRegistration, CodexCall) {
         scope: scope(),
         principal: "reader".into(),
         transcript: path,
+        native_home: None,
         workspace: fixture.0.canonicalize().unwrap(),
     };
     let call = CodexCall {

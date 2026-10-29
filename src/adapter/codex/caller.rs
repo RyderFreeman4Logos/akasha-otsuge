@@ -25,6 +25,8 @@ pub struct CodexRegistration {
     pub principal: String,
     pub transcript: PathBuf,
     pub workspace: PathBuf,
+    #[serde(default)]
+    pub native_home: Option<PathBuf>,
 }
 
 /// Actual native hook fields transported outside the model's short hint.
@@ -47,10 +49,17 @@ pub enum NativeEvent {
         session_id: String,
         transcript_path: PathBuf,
         cwd: PathBuf,
+        #[serde(default)]
+        native_home: Option<PathBuf>,
     },
     Bind {
         registration: String,
         call: CodexCall,
+    },
+    Consult {
+        registration: String,
+        call: CodexCall,
+        args: ConsultArgs,
     },
     Sync {
         registration: String,

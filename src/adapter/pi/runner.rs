@@ -133,12 +133,13 @@ impl AgentRunner for PiRunner {
                 return Err(ErrorCode::OutputLimit.into());
             }
             prompt.push(b'\n');
-            let mut command = std::process::Command::new(
+            let mut command = spec.command(
                 self.report
                     .executable
                     .as_ref()
                     .ok_or(ErrorCode::ExecutorUnavailable)?,
-            );
+                &directory,
+            )?;
             command
                 .args([
                     "--mode",

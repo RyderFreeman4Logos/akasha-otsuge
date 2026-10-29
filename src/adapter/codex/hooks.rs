@@ -197,6 +197,9 @@ async fn register(socket: &Path, binary: &Path, hook: &Hook) -> Result<String> {
             session_id: hook.session_id.clone(),
             transcript_path: hook.transcript_path.clone(),
             cwd: hook.cwd.clone(),
+            native_home: std::env::var_os("CODEX_HOME")
+                .map(PathBuf::from)
+                .or_else(|| std::env::var_os("HOME").map(|p| PathBuf::from(p).join(".codex"))),
         },
     )
     .await?;

@@ -121,12 +121,13 @@ impl AgentRunner for CodexRunner {
             )
             .map_err(|_| ErrorCode::SourceUnavailable)?;
             drop(file);
-            let mut command = std::process::Command::new(
+            let mut command = spec.command(
                 self.report
                     .executable
                     .as_ref()
                     .ok_or(ErrorCode::ExecutorUnavailable)?,
-            );
+                &directory,
+            )?;
             command.args(["app-server", "--stdio"]);
             for feature in runner_policy::DISABLED {
                 command.args(["-c", &format!("features.{feature}=false")]);

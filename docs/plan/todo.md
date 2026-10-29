@@ -636,10 +636,19 @@ links exact identities and preserves the distinct controlled/native results.
   adapters and host-specific identity checks. Focused integration:93 passed.
 - [ ] Persist a distinct consult job from the trusted invocation, with durable
   idempotency, original pinned configuration/deadline and terminal-only delivery.
+  Codex's trusted IPC submission and durable receipt path are implemented;
+  idempotency/restart, cancel, shutdown and daemon-crash regressions pass. The
+  affected152-test suite and all-target Clippy pass. Remaining validation
+  includes queued configuration/deadline cases and all native user-facing tools.
 - [ ] Expose optional short hint through CLI and native tools; retain automatic
   Caller binding and support no hint without caller-built context packages.
+  Preserve diagnostic Bind requests; connect each actual native tool to the
+  separate Consult operation and durable status/cancel/delivery path.
 - [ ] Provide progressive context/memory/code reads through shared Rust authority;
   keep current grants, source versions, workspace limits and untrusted content.
+  Remaining core work: memory and code dispatch, structured branch results,
+  evidence selection, final current-state validation, configured executors and
+  explicit fallback routing. The initial daemon path uses the caller executor.
 - [x] Extend all native tool inventories and strict request decoding to the nine
   shared research tools. Focused Rust58, Hermes9 and Pi7 regressions pass; daemon
   research execution and real consult acceptance remain separate work below.

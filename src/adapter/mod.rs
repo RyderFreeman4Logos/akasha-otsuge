@@ -11,8 +11,11 @@ pub use context::*;
 mod code;
 pub use code::*;
 pub mod codex;
+mod guardian;
 pub mod hermes;
 mod native;
+#[doc(hidden)]
+pub use guardian::run_guard;
 pub mod pi;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::io::{BufRead, Read};

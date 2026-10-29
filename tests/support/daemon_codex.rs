@@ -10,6 +10,196 @@ fn native(daemon: &Daemon, event: Value) -> Value {
     receive(&mut stream)
 }
 
+fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
+    let mut daemon = Daemon::new();
+    daemon.configure(&format!("[access]\nread_roots=[{:?}]\n", daemon.root));
+    let binary = daemon.root.join("codex");
+    let host = include_str!("../fixtures/codex/0.164.0/runner_host.py")
+        .replace("scenario = (root / 'scenario').read_text()", "scenario = (root / 'scenario').read_text()\nwith (root / 'starts').open('a') as f: f.write('start\\n')\n(root / 'runner.pid').write_text(str(os.getpid()))");
+    crate::executable::write(&binary, &host);
+    std::fs::write(daemon.root.join("scenario"), scenario).unwrap();
+    std::fs::write(daemon.root.join("models_cache.json"), r#"{"models":[{"slug":"fixture","shell_type":"unified_exec","apply_patch_tool_type":"freeform","experimental_supported_tools":[],"tool_mode":"code_mode"}]}"#).unwrap();
+    let transcript = daemon.root.join("native.jsonl");
+    std::fs::write(
+        &transcript,
+        include_str!("../fixtures/codex/0.164.0/exec-root.jsonl")
+            .replace("/fixture/workspace", daemon.root.to_str().unwrap()),
+    )
+    .unwrap();
+    let hook: Value = serde_json::from_str(include_str!(
+        "../fixtures/codex/0.164.0/exec-pre-tool-use.json"
+    ))
+    .unwrap();
+    daemon.start();
+    let registered = native(
+        &daemon,
+        json!({"op":"register","binary":binary,"session_id":hook["session_id"],"transcript_path":transcript,"cwd":daemon.root,"native_home":daemon.root}),
+    );
+    assert!(registered.get("error").is_none(), "{registered}");
+    let token = registered["data"]["registration"].as_str().unwrap();
+    let call = json!({"session_id":hook["session_id"],"agent_id":null,"turn_id":hook["turn_id"],"tool_call_id":hook["tool_use_id"],"cwd":daemon.root});
+    let bound = native(
+        &daemon,
+        json!({"op":"bind","registration":token,"call":call}),
+    );
+    assert!(bound.get("error").is_none(), "{bound}");
+    let event = json!({"op":"consult","registration":token,"call":call,"args":{"hint":null}});
+    (daemon, event, bound)
+}
+
+#[test]
+fn consult_job_is_distinct_durable_and_deduplicates_native_execution() {
+    let (mut daemon, event, bound) = consult_fixture("success");
+    let submitted = native(&daemon, event.clone());
+    assert!(submitted.get("error").is_none(), "{submitted}");
+    let id = submitted["data"]["id"].as_str().unwrap();
+    assert_ne!(id, bound["data"]["invocation_id"].as_str().unwrap());
+    assert_eq!(native(&daemon, event.clone())["data"]["id"], id);
+    let mut conflicting = event.clone();
+    conflicting["args"]["hint"] = "A different request".into();
+    assert_eq!(
+        native(&daemon, conflicting)["error"]["code"],
+        "IDEMPOTENCY_CONFLICT"
+    );
+    let end = Instant::now() + Duration::from_secs(20);
+    let complete = loop {
+        let job = daemon.cli(&["job", "show", id]);
+        match job["data"]["state"].as_str() {
+            Some("succeeded") => break job["data"].clone(),
+            Some("queued" | "running") if Instant::now() < end => {
+                assert!(job["data"]["result"].is_null());
+                std::thread::sleep(Duration::from_millis(20));
+            }
+            _ => panic!("consult failed: {job}"),
+        }
+    };
+    assert!(complete["result"]["receipt_id"].is_string());
+    assert!(
+        complete["result"]["output"]
+            .as_str()
+            .unwrap()
+            .contains("bounded-context")
+    );
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    assert_eq!(native(&daemon, event)["data"]["id"], id);
+    assert_eq!(
+        daemon.cli(&["job", "show", id])["data"]["result"],
+        complete["result"]
+    );
+    assert_eq!(
+        std::fs::read_to_string(daemon.root.join("starts")).unwrap(),
+        "start\n"
+    );
+    daemon.cli(&["access", "revoke"]);
+    let out = daemon.command().args(["job", "show", id]).output().unwrap();
+    assert!(!out.status.success());
+}
+
+#[test]
+fn consult_cancel_shutdown_and_crash_end_native_processes_without_replaying() {
+    use rustix::process::{Pid, PidfdFlags, Signal, pidfd_open, pidfd_send_signal};
+    struct Cleanup(Vec<rustix::fd::OwnedFd>);
+    impl Drop for Cleanup {
+        fn drop(&mut self) {
+            for fd in &self.0 {
+                let _ = pidfd_send_signal(fd, Signal::KILL);
+            }
+        }
+    }
+    for mode in ["cancel", "shutdown", "crash"] {
+        let (mut daemon, event, _) = consult_fixture("cancel");
+        let submitted = native(&daemon, event.clone());
+        assert!(submitted.get("error").is_none(), "{submitted}");
+        let id = submitted["data"]["id"].as_str().unwrap();
+        let end = Instant::now() + Duration::from_secs(10);
+        while !daemon.root.join("child.pid").exists() {
+            assert!(Instant::now() < end, "native fixture did not start");
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        let mut cleanup = Cleanup(Vec::new());
+        let mut processes = Vec::new();
+        for file in ["runner.pid", "child.pid"] {
+            let pid: i32 = std::fs::read_to_string(daemon.root.join(file))
+                .unwrap()
+                .parse()
+                .unwrap();
+            cleanup
+                .0
+                .push(pidfd_open(Pid::from_raw(pid).unwrap(), PidfdFlags::empty()).unwrap());
+            processes.push(pid);
+        }
+        if mode == "cancel" {
+            daemon.cli(&["job", "cancel", id]);
+        } else if mode == "shutdown" {
+            daemon.cli(&["daemon", "stop"]);
+            daemon.wait();
+        } else {
+            let mut child = daemon.child.take().unwrap();
+            child.kill().unwrap();
+            child.wait().unwrap();
+        }
+        let end = Instant::now() + Duration::from_secs(3);
+        loop {
+            let live = processes
+                .iter()
+                .any(|pid| std::path::Path::new(&format!("/proc/{pid}")).exists());
+            if !live {
+                break;
+            }
+            assert!(
+                Instant::now() < end,
+                "daemon crash left a live native process"
+            );
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        if mode != "cancel" {
+            daemon.start();
+        }
+        let end = Instant::now() + Duration::from_secs(10);
+        let job = loop {
+            let job = daemon.cli(&["job", "show", id]);
+            if matches!(job["data"]["state"].as_str(), Some("failed" | "cancelled")) {
+                break job;
+            }
+            assert!(
+                Instant::now() < end,
+                "terminal state was not persisted: {job}"
+            );
+            std::thread::sleep(Duration::from_millis(10));
+        };
+        assert_eq!(
+            job["data"]["state"],
+            if mode == "cancel" {
+                "cancelled"
+            } else {
+                "failed"
+            }
+        );
+        assert_eq!(
+            job["data"]["error"],
+            if mode == "cancel" {
+                "CANCELLED"
+            } else {
+                "RUNNER_INTERRUPTED"
+            }
+        );
+        assert_eq!(
+            std::fs::read_dir(daemon.root.join("data/runner-work"))
+                .unwrap()
+                .count(),
+            0,
+            "{mode}"
+        );
+        assert_eq!(native(&daemon, event)["data"]["id"], id);
+        assert_eq!(
+            std::fs::read_to_string(daemon.root.join("starts")).unwrap(),
+            "start\n"
+        );
+    }
+}
+
 #[test]
 fn native_hook_uses_private_call_files_without_exposing_registration_credentials() {
     let mut daemon = Daemon::new();

@@ -333,6 +333,7 @@ pub struct RunSpec {
     capability: ReadCapability,
     lease: std::sync::Arc<RunLease>,
     deadline: Deadline,
+    guard: Option<std::path::PathBuf>,
 }
 impl RunSpec {
     pub fn new(
@@ -369,7 +370,22 @@ impl RunSpec {
             capability,
             lease: std::sync::Arc::new(lease),
             deadline,
+            guard: None,
         })
+    }
+    pub(crate) fn with_guard(mut self, binary: std::path::PathBuf) -> Self {
+        self.guard = Some(binary);
+        self
+    }
+    pub(crate) fn command(
+        &self,
+        binary: &std::path::Path,
+        directory: &std::path::Path,
+    ) -> Result<std::process::Command> {
+        match &self.guard {
+            Some(guard) => super::guardian::command(guard, binary, directory),
+            None => Ok(std::process::Command::new(binary)),
+        }
     }
     pub fn options(&self) -> &RunOptions {
         &self.options

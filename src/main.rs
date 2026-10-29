@@ -631,6 +631,9 @@ fn json_file<T: serde::de::DeserializeOwned>(path: &str) -> Result<T> {
 }
 fn run() -> Result<u8> {
     let args: Vec<_> = std::env::args_os().skip(1).collect();
+    if args.first().is_some_and(|s| s == "__native-runner") {
+        return akasha_otsuge::adapter::run_guard(&args[1..]).map_err(Into::into);
+    }
     if args.is_empty()
         || args.len() == 1 && matches!(args[0].to_str(), Some("-h" | "--help" | "help"))
     {

@@ -20,10 +20,14 @@ impl Service {
         plan: RetrievalRequest,
     ) -> Result<Value> {
         plan.validate()?;
-        self.submit_job(id, None, None, None, Some(plan)).await
+        self.submit_job(id, None, None, None, Some(plan), None)
+            .await
     }
 
-    fn retrieval_snapshot(&self, generation: u64) -> Result<Arc<crate::config::Snapshot<()>>> {
+    pub(super) fn retrieval_snapshot(
+        &self,
+        generation: u64,
+    ) -> Result<Arc<crate::config::Snapshot<()>>> {
         let checkpoint = configuration::load(
             &self.storage,
             &format!("daemon/config-generation/{generation:020}"),

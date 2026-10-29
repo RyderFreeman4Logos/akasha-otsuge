@@ -46,6 +46,7 @@ pub struct ClaudeRunner {
     workspace: PathBuf,
     bridge: PathBuf,
     instructions: String,
+    home: Option<PathBuf>,
 }
 impl ClaudeRunner {
     pub async fn new(
@@ -92,7 +93,25 @@ impl ClaudeRunner {
             workspace,
             bridge,
             instructions: instructions.into(),
+            home: None,
         })
+    }
+    pub async fn with_profile(
+        binary: &Path,
+        bridge: &Path,
+        home: &Path,
+        workspace: &Path,
+        instructions: &str,
+    ) -> Result<Self> {
+        let mut runner = Self::new(binary, bridge, workspace, instructions).await?;
+        let home = home
+            .canonicalize()
+            .map_err(|_| ErrorCode::SourceUnavailable)?;
+        if !home.is_dir() {
+            return Err(ErrorCode::SourceUnavailable.into());
+        }
+        runner.home = Some(home);
+        Ok(runner)
     }
 }
 impl AgentRunner for ClaudeRunner {
@@ -135,7 +154,10 @@ impl AgentRunner for ClaudeRunner {
                 .and_then(|_| std::fs::write(plugin.join("hooks/hooks.json"), r#"{"modules":["./register.js"]}"#))
                 .and_then(|_| std::fs::write(plugin.join("hooks/register.js"), include_str!("runner.js")))
                 .map_err(|_| ErrorCode::SourceUnavailable)?;
-            let mut command = std::process::Command::new(binary);
+            let mut command = spec.command(binary, &directory)?;
+            if let Some(home) = &self.home {
+                command.env("CLAUDE_CONFIG_DIR", home);
+            }
             // Native2.1.311 requires a builtin to register plugin tools; the plugin denies ToolSearch calls.
             command
                 .args([

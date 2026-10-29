@@ -139,12 +139,13 @@ impl AgentRunner for HermesRunner {
             file.write_all(prompt.as_bytes())
                 .map_err(|_| ErrorCode::SourceUnavailable)?;
             drop(file);
-            let mut command = std::process::Command::new(
+            let mut command = spec.command(
                 self.report
                     .executable
                     .as_ref()
                     .ok_or(ErrorCode::ExecutorUnavailable)?,
-            );
+                &directory,
+            )?;
             command
                 .args(["akasha-runner", "--request"])
                 .arg(&prompt_path)
