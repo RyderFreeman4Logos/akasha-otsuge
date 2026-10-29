@@ -1,0 +1,29 @@
+{
+  "utc": "2026-10-29T05:15:54.738025+00:00",
+  "kind": "actual_authenticated_native_CLI_Caller",
+  "model": {
+    "default": "gpt-6.1-sol",
+    "provider": "openai-codex",
+    "context_length": 256000
+  },
+  "binding": {
+    "id": "hermes/771fc3169c5223199c2f9352d10f5275454f1e849f380d315c56c600d66a7dfe",
+    "cursor": 3,
+    "profile": "hermes/f9014fac1e8e2121a560c00003c063b484d91486ab38b4b5355fdc8ae71971d8"
+  },
+  "other_clis_absent": true,
+  "native_head": "4960e41cec01de499ab99c4251437bc8039e41db",
+  "head": "2786c7a400e4a831e221028048fb94c308381720",
+  "terminal": {
+    "exit_code": 0,
+    "head": "2786c7a400e4a831e221028048fb94c308381720",
+    "log_sha256": "8cdfec0b3ce9d0497b5dea831db2106e6b058c1d6456527021724df80cec06e9",
+    "seconds": 62.20291393995285,
+    "utc": "2026-10-29T05:15:54.782420+00:00"
+  },
+  "cleanup": {
+    "scratch_removed": true,
+    "profile_removed": true,
+    "launchers_unchanged": true
+  }
+}

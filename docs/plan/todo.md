@@ -528,7 +528,7 @@ checks do not prove host protocol capabilities or an authenticated Runner.
 
 ## MVP-014 acceptance and remaining work
 
-- [ ] Qualify the installed Hermes version against official plugin hooks,
+- [x] Qualify the installed Hermes version against official plugin hooks,
   canonical session/export and stream-json interfaces. Record mode/version limits
   and actual capabilities; keep doctor free of model calls.
 - [x] Parse one session per native JSONL export, retaining stable message UIDs,
@@ -539,14 +539,14 @@ checks do not prove host protocol capabilities or an authenticated Runner.
 - [x] Bind native session/task/turn/call identity and the owning profile before
   tool execution; persist an immutable fence, preserve retry identity, enforce
   current grants and prove simultaneous sessions/profiles cannot cross contexts.
-- [ ] Ship the minimal native plugin and Rust bridge, opt-in install/undo and
+- [x] Ship the minimal native plugin and Rust bridge, opt-in install/undo and
   durable background capture. Verify hooks across real CLI/TUI and interruption,
   rather than assuming gateway-only or successful-turn callbacks cover all work.
-- [ ] Implement independent native plugin CLI Runner with profile selection,
+- [x] Implement independent native plugin CLI Runner with profile selection,
   four scoped context tools, final-result plus exit-status checks, bounded output,
   original deadlines and process-group cancellation/cleanup. Disable unrelated
   native/MCP tools and verify writes, network and outside reads are denied.
-- [ ] Run real authenticated CLI/TUI Caller and Runner with the other three
+- [x] Run real authenticated CLI/TUI Caller and Runner with the other three
   CLIs absent; test at least two profiles, pre-compaction originals, native child
   sources and interrupted recovery. Retain actual export fixtures, source/binary
   hashes and sanitized receipts; distinguish controlled fixtures from model runs.
@@ -583,8 +583,19 @@ Current #14 implementation evidence (overall acceptance remains pending):
   retained failures are not relabelled as acceptance. One broader Codex concurrent
   Caller test returned HistoryGap; its unchanged isolated selector passed0.168s,
   leaving the original broad failure unclassified for final-gate follow-up.
-- Remaining: native denied-tool/cancellation cases, actual
-  authenticated CLI/TUI and recovery acceptance, final gate/review/CI and closure.
+- Actual oneshot CLI Caller passes with an immutable cursor3/profile/session
+  binding. Two simultaneous interactive TUIs also pass in separate `in_process`
+  and `host` profiles, with distinct bindings, final answers, zero exits and two
+  completed capture jobs. The successful TUI harness took71.103s and removed its
+  23,113,728-byte fixture after all consumers exited. Two earlier `-q` startup
+  probes and one scripted-exit failure remain separately recorded.
+- Eight actual native hook denials, a real model's unissued-context request and
+  cancellation after a real context-tool request pass. The native control harness
+  took38.343s and removed163,840bytes of scratch. The final product source remains
+  `2786c7a`; the new explicit authenticated regression selectors are opt-in.
+- Remaining: final canonical gate, independent whole-candidate review, hosted CI,
+  publication and closure. Proceed directly to this boundary without new optional
+  mode probes; retain the historical broader Codex failure as unclassified.
 
 ## Complete Issue queue
 

@@ -1,0 +1,43 @@
+{
+  "utc": "2026-10-29T05:41:34.239406+00:00",
+  "kind": "two_simultaneous_actual_authenticated_native_TUI_Callers",
+  "model": {
+    "default": "gpt-6.1-sol",
+    "provider": "openai-codex",
+    "context_length": 256000
+  },
+  "results": {
+    "in_process": {
+      "session": "local-2395eeed0780d8070af8fd55742f0e9b42a61c18619421bfe78e5923a2ccee1e",
+      "profile": "hermes/ce41af4ed3c0452cc4d00e1671b6afcf48400375867e3e304a67b2fd9fac4065",
+      "invocation": "hermes/cf74f983995853f5ba1eae2f2270fe68324c240c7ea8e3692ccd3119b673412f",
+      "cursor": 3,
+      "public_rows": 4
+    },
+    "host": {
+      "session": "local-9d5f17705f2d430f07bf69c676034370622240990c39d3849ffe82017f12da44",
+      "profile": "hermes/6370e9b8056ae4039d3fcdc9e11aeef43c287ce943ea180a8b02862ce384be18",
+      "invocation": "hermes/32df4fe1adbb55d51d6347bb4de8b3a67cbdb4abd33c38bd24333eabb65bbf50",
+      "cursor": 3,
+      "public_rows": 4
+    }
+  },
+  "capture_jobs": 2,
+  "interactive_pty_input": true,
+  "other_clis_absent": true,
+  "native_head": "4960e41cec01de499ab99c4251437bc8039e41db",
+  "head": "2786c7a400e4a831e221028048fb94c308381720",
+  "allocated_bytes": 23113728,
+  "terminal": {
+    "exit_code": 0,
+    "head": "2786c7a400e4a831e221028048fb94c308381720",
+    "log_sha256": "a1f00cd7df94088a0b73937799fc19583a2b936ea38797ea31ddb2428a15af07",
+    "seconds": 71.10285223647952,
+    "utc": "2026-10-29T05:41:34.291973+00:00"
+  },
+  "cleanup": {
+    "scratch_removed": true,
+    "profiles_removed": true,
+    "launchers_unchanged": true
+  }
+}

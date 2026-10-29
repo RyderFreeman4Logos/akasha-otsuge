@@ -1,0 +1,61 @@
+{
+  "utc": "2026-10-29T05:31:22.284522+00:00",
+  "kind": "actual_native_tool_guards_and_authenticated_Runner_denial_cancellation",
+  "rows": [
+    {
+      "case": "policy",
+      "exit_code": 0,
+      "seconds": 1.168510633520782,
+      "sha256": "7d482e7bf4662100efe9ec3bad89beb07345808f3991e9a1b243b0ca84b5720d",
+      "guards": {
+        "native_pre_tool_guard": true,
+        "denied": [
+          "terminal",
+          "write_file",
+          "patch",
+          "read_file",
+          "web_extract",
+          "web_search",
+          "delegate_task",
+          "mcp_other_tool"
+        ],
+        "four_context_tools_allowed": true
+      }
+    },
+    {
+      "case": "installed_native_rejects_unissued_context",
+      "exit_code": 0,
+      "seconds": 25.45836191624403,
+      "sha256": "00d8722b9b3e5bcc1e2aed0e0f2f23b89646379222eb7557f7dea532ae963356"
+    },
+    {
+      "case": "installed_native_cancellation_ends_executor_after_context_tool",
+      "exit_code": 0,
+      "seconds": 7.440603576600552,
+      "sha256": "df97b0b07ddcabeb7bdd9c90941130ee3c6b226c58bcfd520aad6d0c00fa82b7"
+    }
+  ],
+  "model": {
+    "default": "gpt-6.1-sol",
+    "provider": "openai-codex",
+    "context_length": 256000
+  },
+  "allocated_bytes": 163840,
+  "test_binary_sha256": "ddc173414ddce2a00c30c8338caf72eec36ca570bba86a88d8ef39de406d9b99",
+  "binary_sha256": "1071d39a6552e171acaaed8a575f619c75cf60ddf42ce0b3fc502662637a70af",
+  "source_head": "2786c7a400e4a831e221028048fb94c308381720",
+  "test_source_sha256": "c61f57c3203ab676c44be81674c0b8687d3b10488a31e1a5a1798924651e4f17",
+  "native_head": "4960e41cec01de499ab99c4251437bc8039e41db",
+  "terminal": {
+    "exit_code": 0,
+    "head": "2786c7a400e4a831e221028048fb94c308381720",
+    "log_sha256": "2a8cf1a8ca520de75e30efb118b8d9bca9985c972aa1662faa9c5a54ac4e83cf",
+    "seconds": 38.34251536708325,
+    "utc": "2026-10-29T05:31:23.575213+00:00"
+  },
+  "cleanup": {
+    "scratch_removed": true,
+    "profile_removed": true,
+    "launchers_unchanged": true
+  }
+}

@@ -224,3 +224,84 @@ async fn installed_native_runner_roundtrip() {
     drop(context);
     Arc::try_unwrap(store).ok().unwrap().close().await.unwrap();
 }
+
+#[tokio::test]
+#[ignore = "requires explicit native Hermes binary/profile and authenticated isolated acceptance"]
+async fn installed_native_rejects_unissued_context() {
+    let f = Fixture::new();
+    let binary = PathBuf::from(std::env::var_os("AKASHA_HERMES_BINARY").unwrap());
+    let home = PathBuf::from(std::env::var_os("AKASHA_HERMES_HOME").unwrap());
+    let (store, inv) = invocation(&f).await;
+    let mut runner = HermesRunner::new(&binary, &home, &f.0,
+        "Permission acceptance: immediately call context_read with handle /outside/unissued, start0 and max_bytes32. Do not list or search first. This deliberate invalid handle must be refused.").await.unwrap();
+    let mut context = CapturedContext::new(&store, inv.clone()).unwrap();
+    let mut handle = runner.start(spec(&inv, 180), &mut context).await.unwrap();
+    let error = loop {
+        match handle.next().await {
+            Ok(Some(_)) => {}
+            Err(error) => break error,
+            Ok(None) => panic!("unissued handle was not refused"),
+        }
+    };
+    assert_eq!(error.code, ErrorCode::ReadDenied);
+    drop(handle);
+    drop(context);
+    Arc::try_unwrap(store).ok().unwrap().close().await.unwrap();
+}
+
+#[tokio::test]
+#[ignore = "requires explicit native Hermes binary/profile and authenticated isolated acceptance"]
+async fn installed_native_cancellation_ends_executor_after_context_tool() {
+    let f = Fixture::new();
+    let binary = PathBuf::from(std::env::var_os("AKASHA_HERMES_BINARY").unwrap());
+    let home = PathBuf::from(std::env::var_os("AKASHA_HERMES_HOME").unwrap());
+    let (store, inv) = invocation(&f).await;
+    let mut runner = HermesRunner::new(&binary, &home, &f.0,
+        "Call context_describe first, then context_list limit16, then read the first handle start0 max_bytes1024. After all three tools return {\"answer\":\"checked\"}.").await.unwrap();
+    let mut context = CapturedContext::new(&store, inv.clone()).unwrap();
+    let mut handle = runner.start(spec(&inv, 180), &mut context).await.unwrap();
+    loop {
+        match handle.next().await.unwrap() {
+            Some(RunnerEvent::Tool { name }) => {
+                assert_eq!(name, "context.describe");
+                break;
+            }
+            Some(_) => {}
+            None => panic!("native executor ended before its context tool"),
+        }
+    }
+    let owned: Vec<_> = std::fs::read_dir("/proc")
+        .unwrap()
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| std::fs::read_link(path.join("cwd")).is_ok_and(|cwd| cwd.starts_with(&f.0)))
+        .collect();
+    assert!(
+        !owned.is_empty(),
+        "native executor ownership was not observed"
+    );
+    assert!(
+        handle
+            .cancel(CancelReason::User)
+            .await
+            .unwrap()
+            .acknowledged
+    );
+    assert_eq!(handle.next().await.unwrap_err().code, ErrorCode::Cancelled);
+    for process in owned {
+        assert!(
+            !std::fs::read_link(process.join("cwd")).is_ok_and(|cwd| cwd.starts_with(&f.0)),
+            "owned native process survived acknowledged cancellation"
+        );
+    }
+    drop(handle);
+    drop(context);
+    assert!(!std::fs::read_dir(&f.0).unwrap().any(|entry| {
+        entry
+            .unwrap()
+            .file_name()
+            .to_string_lossy()
+            .starts_with("akasha-run-")
+    }));
+    Arc::try_unwrap(store).ok().unwrap().close().await.unwrap();
+}
