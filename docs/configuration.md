@@ -40,6 +40,13 @@ corresponding kind. `retrieval.extraction` accepts a text profile or
 The latter needs no extra text, embedding or reranker endpoint. Nothing is selected
 or invoked by default.
 
+`review.mode` accepts `manual`, `policy` (selective, default), or `automatic`.
+See the [policy matrix and operator CLI](review.md). Extraction and Auto-Grill
+pin the mode at admission; a reload applies to new operations. Old serialized
+extraction jobs without a mode retain manual behavior. Accepted review retries
+reuse their original receipt; current permissions are always checked. A changed
+configuration between preview and confirmation requires a fresh preview.
+
 `grill.interviewer`, `grill.expert` and `grill.reviewer` select enabled executor
 profiles. Configure all three together; they may share a single CLI/profile.
 Auto-Grill is unconfigured by default. Its finite limits are `max_rounds`

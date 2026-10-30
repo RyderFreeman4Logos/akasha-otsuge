@@ -23,7 +23,8 @@ receive these contexts or call their constructors through an IPC payload.
 
 These component fixtures do not authenticate a real host. #8/#11–#15 integrate
 the real control/host channels and live permissions; #19 owns the operational
-review queue and configuration integration. Same-UID arbitrary shell/native
+review queue and configuration integration via the [review CLI](review.md).
+Same-UID arbitrary shell/native
 library access is not a human-isolation boundary. Raw Storage and Domain reads
 are trusted server APIs, not authorized public IPC endpoints.
 
@@ -85,8 +86,8 @@ This path requires no second per-statement confirmation once the server's
 explicit-decision adoption policy is enabled. Intent is a verified-channel
 assertion; this module does not guess intent from keywords or model confidence.
 
-Automatic proposals cannot replace a human-adopted decision or normative
-preference merely because a technical test failed. That protection follows the
+Automatic proposals cannot replace a human-adopted decision, preference or
+procedure merely because a technical test failed. That protection follows the
 adopted revision across any number of pending proposals. Agent-generated
 conclusions may otherwise be active under policy and retain delegated authority.
 Model consensus never creates human confirmation. Reject operations bind the
@@ -116,8 +117,9 @@ revision; no full database snapshot or original-event replay is involved.
 Writes carry the exact expected latest revision. Validation reads that immutable
 version, not a mutable current head, so an identical retry still returns its
 original receipt after later changes and after restart. A new request against a
-stale revision conflicts. A review targets the latest proposal; broader queue,
-batch-review and current-head retraction workflows remain #19/#22 work.
+stale revision conflicts. The review CLI targets the exact latest proposal and
+persists independent review state; broader incident/current-head retraction
+workflows remain #22 work.
 
 ## Bounds and verification
 

@@ -507,7 +507,10 @@ impl Domain<'_> {
                 let after = after.map(key).transpose()?;
                 let keys = self.storage.head_keys(
                     &key(&"0".repeat(64))?,
-                    &key(&"f".repeat(64))?,
+                    &RecordKey {
+                        kind: RecordKind::State,
+                        id: format!("review/{}", "g".repeat(64)),
+                    },
                     after.as_ref().map(|k| k.id.as_str()),
                     32,
                 )?;

@@ -1,0 +1,154 @@
+{
+  "binary": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/akasha-otsuge",
+  "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886",
+  "data": {
+    "accepted": {
+      "exit_code": 0,
+      "response": {
+        "data": {
+          "commit_seq": 10,
+          "config_generation": 2,
+          "policy_revision": "review-cli/b16b7d67b31de90338c110c70f9ef6575bc4713ab5e4258e1c4737ffb5302894",
+          "request_id": "new-operation",
+          "request_sha256": "a138d95d2718351d21549b11343ff847b8b9e3cb4ff9c0ef5c773d9de6141ffe",
+          "revisions": [
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "source/6014fce23493139f303ff71bb4f197d8c3fd8cd7f612cd80cf4d2e06fa74b6f2",
+                "kind": "evidence"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "recheck",
+                "kind": "memory"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "adoption/a604b80498eb61634e21ba22635d678ea77e57ce839c091ca62edd4bde9a842d",
+                "kind": "state"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "review-decision/0620f920152c688709c8ce269de20dc1f0e7fd73ab3efc32b54b88a12ece1ced",
+                "kind": "state"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "review/afea04e2fdd745eb3edda238103348cff41d8e4edec36f02c7ade696e62625e6",
+                "kind": "state"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "scope/176f0b5c48dc4186b5eb407df09a39068dc18d294c4fcbe61fcfc683836462a2/a604b80498eb61634e21ba22635d678ea77e57ce839c091ca62edd4bde9a842d",
+                "kind": "state"
+              }
+            }
+          ]
+        },
+        "request_id": "cli/1399007/1793321442459",
+        "schema_version": 1,
+        "sequence": 1
+      },
+      "transcript": "{\"action\":\"approve\",\"after\":{\"assumptions\":[],\"claim\":\"The fixture build passed on Linux.\",\"conditions\":[\"Linux\"],\"kind\":\"fact\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8\",\"end\":34,\"event_id\":\"source-recheck\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"before\":{\"previous\":null,\"record\":{\"approval\":null,\"authority\":\"candidate\",\"authorization\":{\"adopt_explicit_decisions\":false,\"mode\":\"manual\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"}},\"config_generation\":1,\"draft\":{\"assumptions\":[],\"claim\":\"The fixture build passed on Linux.\",\"conditions\":[\"Linux\"],\"kind\":\"fact\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8\",\"end\":34,\"event_id\":\"source-recheck\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"lifecycle\":\"candidate\",\"policy_revision\":\"fixture-policy\",\"previous_adoption\":null,\"provenance\":{\"actor\":{\"id\":\"fixture\",\"kind\":\"tool\"},\"binding\":\"build-receipt\",\"generator\":null,\"origin\":\"technical_observation\"},\"schema_version\":1,\"semantic_sha256\":\"3cfc52e7a33bb94b486ada0f8caf2f0a9052b0983cc806816f07b1b88adec7c3\"},\"revision\":{\"commit_seq\":2,\"key\":{\"id\":\"recheck\",\"kind\":\"memory\"}}},\"config_generation\":2,\"preview_sha256\":\"8350144d6d366454f0cd771a5902ac530699f94e1fe3c546e871c1b9a2d03102\",\"reason\":\"Use this exact observation\",\"semantic_sha256\":\"3cfc52e7a33bb94b486ada0f8caf2f0a9052b0983cc806816f07b1b88adec7c3\"}\r\nType confirm 8350144d6d366454f0cd771a5902ac530699f94e1fe3c546e871c1b9a2d03102 to apply: confirm 8350144d6d366454f0cd771a5902ac530699f94e1fe3c546e871c1b9a2d03102\r\n{\"data\":{\"commit_seq\":10,\"config_generation\":2,\"policy_revision\":\"review-cli/b16b7d67b31de90338c110c70f9ef6575bc4713ab5e4258e1c4737ffb5302894\",\"request_id\":\"new-operation\",\"request_sha256\":\"a138d95d2718351d21549b11343ff847b8b9e3cb4ff9c0ef5c773d9de6141ffe\",\"revisions\":[{\"commit_seq\":10,\"key\":{\"id\":\"source/6014fce23493139f303ff71bb4f197d8c3fd8cd7f612cd80cf4d2e06fa74b6f2\",\"kind\":\"evidence\"}},{\"commit_seq\":10,\"key\":{\"id\":\"recheck\",\"kind\":\"memory\"}},{\"commit_seq\":10,\"key\":{\"id\":\"adoption/a604b80498eb61634e21ba22635d678ea77e57ce839c091ca62edd4bde9a842d\",\"kind\":\"state\"}},{\"commit_seq\":10,\"key\":{\"id\":\"review-decision/0620f920152c688709c8ce269de20dc1f0e7fd73ab3efc32b54b88a12ece1ced\",\"kind\":\"state\"}},{\"commit_seq\":10,\"key\":{\"id\":\"review/afea04e2fdd745eb3edda238103348cff41d8e4edec36f02c7ade696e62625e6\",\"kind\":\"state\"}},{\"commit_seq\":10,\"key\":{\"id\":\"scope/176f0b5c48dc4186b5eb407df09a39068dc18d294c4fcbe61fcfc683836462a2/a604b80498eb61634e21ba22635d678ea77e57ce839c091ca62edd4bde9a842d\",\"kind\":\"state\"}}]},\"request_id\":\"cli/1399007/1793321442459\",\"schema_version\":1,\"sequence\":1}\r\n"
+    },
+    "reloaded": {
+      "exit_code": 1,
+      "response": {
+        "error": {
+          "code": "REVIEW_PREVIEW_CHANGED",
+          "message": "The operation could not be completed"
+        },
+        "request_id": "cli/1398986/1793321442384",
+        "schema_version": 1,
+        "sequence": 1
+      },
+      "transcript": "{\"action\":\"approve\",\"after\":{\"assumptions\":[],\"claim\":\"The fixture build passed on Linux.\",\"conditions\":[\"Linux\"],\"kind\":\"fact\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8\",\"end\":34,\"event_id\":\"source-recheck\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"before\":{\"previous\":null,\"record\":{\"approval\":null,\"authority\":\"candidate\",\"authorization\":{\"adopt_explicit_decisions\":false,\"mode\":\"manual\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"}},\"config_generation\":1,\"draft\":{\"assumptions\":[],\"claim\":\"The fixture build passed on Linux.\",\"conditions\":[\"Linux\"],\"kind\":\"fact\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8\",\"end\":34,\"event_id\":\"source-recheck\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"lifecycle\":\"candidate\",\"policy_revision\":\"fixture-policy\",\"previous_adoption\":null,\"provenance\":{\"actor\":{\"id\":\"fixture\",\"kind\":\"tool\"},\"binding\":\"build-receipt\",\"generator\":null,\"origin\":\"technical_observation\"},\"schema_version\":1,\"semantic_sha256\":\"3cfc52e7a33bb94b486ada0f8caf2f0a9052b0983cc806816f07b1b88adec7c3\"},\"revision\":{\"commit_seq\":2,\"key\":{\"id\":\"recheck\",\"kind\":\"memory\"}}},\"config_generation\":1,\"preview_sha256\":\"aa209488ebe9ad4f50fb583ec271b5644c68d13785c6691ef18592909e9e17be\",\"reason\":\"Use this exact observation\",\"semantic_sha256\":\"3cfc52e7a33bb94b486ada0f8caf2f0a9052b0983cc806816f07b1b88adec7c3\"}\r\nType confirm aa209488ebe9ad4f50fb583ec271b5644c68d13785c6691ef18592909e9e17be to apply: confirm aa209488ebe9ad4f50fb583ec271b5644c68d13785c6691ef18592909e9e17be\r\n{\"error\":{\"code\":\"REVIEW_PREVIEW_CHANGED\",\"message\":\"The operation could not be completed\"},\"request_id\":\"cli/1398986/1793321442384\",\"schema_version\":1,\"sequence\":1}\r\n"
+    },
+    "replay": {
+      "exit_code": 0,
+      "response": {
+        "data": {
+          "commit_seq": 10,
+          "config_generation": 2,
+          "policy_revision": "review-cli/b16b7d67b31de90338c110c70f9ef6575bc4713ab5e4258e1c4737ffb5302894",
+          "request_id": "new-operation",
+          "request_sha256": "a138d95d2718351d21549b11343ff847b8b9e3cb4ff9c0ef5c773d9de6141ffe",
+          "revisions": [
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "source/6014fce23493139f303ff71bb4f197d8c3fd8cd7f612cd80cf4d2e06fa74b6f2",
+                "kind": "evidence"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "recheck",
+                "kind": "memory"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "adoption/a604b80498eb61634e21ba22635d678ea77e57ce839c091ca62edd4bde9a842d",
+                "kind": "state"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "review-decision/0620f920152c688709c8ce269de20dc1f0e7fd73ab3efc32b54b88a12ece1ced",
+                "kind": "state"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "review/afea04e2fdd745eb3edda238103348cff41d8e4edec36f02c7ade696e62625e6",
+                "kind": "state"
+              }
+            },
+            {
+              "commit_seq": 10,
+              "key": {
+                "id": "scope/176f0b5c48dc4186b5eb407df09a39068dc18d294c4fcbe61fcfc683836462a2/a604b80498eb61634e21ba22635d678ea77e57ce839c091ca62edd4bde9a842d",
+                "kind": "state"
+              }
+            }
+          ]
+        },
+        "request_id": "cli/1399022/1793321442633",
+        "schema_version": 1,
+        "sequence": 1
+      },
+      "transcript": "{\"action\":\"approve\",\"after\":{\"assumptions\":[],\"claim\":\"The fixture build passed on Linux.\",\"conditions\":[\"Linux\"],\"kind\":\"fact\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8\",\"end\":34,\"event_id\":\"source-recheck\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"before\":{\"previous\":null,\"record\":{\"approval\":null,\"authority\":\"candidate\",\"authorization\":{\"adopt_explicit_decisions\":false,\"mode\":\"manual\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"}},\"config_generation\":1,\"draft\":{\"assumptions\":[],\"claim\":\"The fixture build passed on Linux.\",\"conditions\":[\"Linux\"],\"kind\":\"fact\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8\",\"end\":34,\"event_id\":\"source-recheck\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"lifecycle\":\"candidate\",\"policy_revision\":\"fixture-policy\",\"previous_adoption\":null,\"provenance\":{\"actor\":{\"id\":\"fixture\",\"kind\":\"tool\"},\"binding\":\"build-receipt\",\"generator\":null,\"origin\":\"technical_observation\"},\"schema_version\":1,\"semantic_sha256\":\"3cfc52e7a33bb94b486ada0f8caf2f0a9052b0983cc806816f07b1b88adec7c3\"},\"revision\":{\"commit_seq\":2,\"key\":{\"id\":\"recheck\",\"kind\":\"memory\"}}},\"config_generation\":2,\"preview_sha256\":\"8350144d6d366454f0cd771a5902ac530699f94e1fe3c546e871c1b9a2d03102\",\"reason\":\"Use this exact observation\",\"semantic_sha256\":\"3cfc52e7a33bb94b486ada0f8caf2f0a9052b0983cc806816f07b1b88adec7c3\"}\r\nType confirm 8350144d6d366454f0cd771a5902ac530699f94e1fe3c546e871c1b9a2d03102 to apply: confirm 8350144d6d366454f0cd771a5902ac530699f94e1fe3c546e871c1b9a2d03102\r\n{\"data\":{\"commit_seq\":10,\"config_generation\":2,\"policy_revision\":\"review-cli/b16b7d67b31de90338c110c70f9ef6575bc4713ab5e4258e1c4737ffb5302894\",\"request_id\":\"new-operation\",\"request_sha256\":\"a138d95d2718351d21549b11343ff847b8b9e3cb4ff9c0ef5c773d9de6141ffe\",\"revisions\":[{\"commit_seq\":10,\"key\":{\"id\":\"source/6014fce23493139f303ff71bb4f197d8c3fd8cd7f612cd80cf4d2e06fa74b6f2\",\"kind\":\"evidence\"}},{\"commit_seq\":10,\"key\":{\"id\":\"recheck\",\"kind\":\"memory\"}},{\"commit_seq\":10,\"key\":{\"id\":\"adoption/a604b80498eb61634e21ba22635d678ea77e57ce839c091ca62edd4bde9a842d\",\"kind\":\"state\"}},{\"commit_seq\":10,\"key\":{\"id\":\"review-decision/0620f920152c688709c8ce269de20dc1f0e7fd73ab3efc32b54b88a12ece1ced\",\"kind\":\"state\"}},{\"commit_seq\":10,\"key\":{\"id\":\"review/afea04e2fdd745eb3edda238103348cff41d8e4edec36f02c7ade696e62625e6\",\"kind\":\"state\"}},{\"commit_seq\":10,\"key\":{\"id\":\"scope/176f0b5c48dc4186b5eb407df09a39068dc18d294c4fcbe61fcfc683836462a2/a604b80498eb61634e21ba22635d678ea77e57ce839c091ca62edd4bde9a842d\",\"kind\":\"state\"}}]},\"request_id\":\"cli/1399022/1793321442633\",\"schema_version\":1,\"sequence\":1}\r\n"
+    },
+    "revoked": {
+      "exit_code": 1,
+      "response": {
+        "error": {
+          "code": "READ_DENIED",
+          "message": "The operation could not be completed"
+        },
+        "request_id": "cli/1398953/1793321442251",
+        "schema_version": 1,
+        "sequence": 1
+      },
+      "transcript": "{\"action\":\"approve\",\"after\":{\"assumptions\":[],\"claim\":\"The fixture build passed on Linux.\",\"conditions\":[\"Linux\"],\"kind\":\"fact\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8\",\"end\":34,\"event_id\":\"source-recheck\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"before\":{\"previous\":null,\"record\":{\"approval\":null,\"authority\":\"candidate\",\"authorization\":{\"adopt_explicit_decisions\":false,\"mode\":\"manual\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"}},\"config_generation\":1,\"draft\":{\"assumptions\":[],\"claim\":\"The fixture build passed on Linux.\",\"conditions\":[\"Linux\"],\"kind\":\"fact\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8\",\"end\":34,\"event_id\":\"source-recheck\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"lifecycle\":\"candidate\",\"policy_revision\":\"fixture-policy\",\"previous_adoption\":null,\"provenance\":{\"actor\":{\"id\":\"fixture\",\"kind\":\"tool\"},\"binding\":\"build-receipt\",\"generator\":null,\"origin\":\"technical_observation\"},\"schema_version\":1,\"semantic_sha256\":\"3cfc52e7a33bb94b486ada0f8caf2f0a9052b0983cc806816f07b1b88adec7c3\"},\"revision\":{\"commit_seq\":2,\"key\":{\"id\":\"recheck\",\"kind\":\"memory\"}}},\"config_generation\":1,\"preview_sha256\":\"abc78d6845e8c7a0e9455d29cc6b1c690e3f798886bd8362d1466cf364550665\",\"reason\":\"Use this exact observation\",\"semantic_sha256\":\"3cfc52e7a33bb94b486ada0f8caf2f0a9052b0983cc806816f07b1b88adec7c3\"}\r\nType confirm abc78d6845e8c7a0e9455d29cc6b1c690e3f798886bd8362d1466cf364550665 to apply: confirm abc78d6845e8c7a0e9455d29cc6b1c690e3f798886bd8362d1466cf364550665\r\n{\"error\":{\"code\":\"READ_DENIED\",\"message\":\"The operation could not be completed\"},\"request_id\":\"cli/1398953/1793321442251\",\"schema_version\":1,\"sequence\":1}\r\n"
+    }
+  },
+  "fixture_root": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/akasha-daemon-1398889-0",
+  "schema_version": 1
+}

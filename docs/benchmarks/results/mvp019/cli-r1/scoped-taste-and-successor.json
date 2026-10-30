@@ -1,0 +1,594 @@
+{
+  "binary": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/akasha-otsuge",
+  "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886",
+  "data": {
+    "approvals": [
+      {
+        "exit_code": 0,
+        "response": {
+          "data": {
+            "commit_seq": 8,
+            "config_generation": 1,
+            "policy_revision": "review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288",
+            "request_id": "approve-global-taste",
+            "request_sha256": "e04947ed8f7442916970453166818fc14222c0282d3e46fd90909368740f498b",
+            "revisions": [
+              {
+                "commit_seq": 8,
+                "key": {
+                  "id": "source/dbb170e799f8de42f24bab43161c95f3d3a08116a28942133cba81a36e627be6",
+                  "kind": "evidence"
+                }
+              },
+              {
+                "commit_seq": 8,
+                "key": {
+                  "id": "global-taste",
+                  "kind": "memory"
+                }
+              },
+              {
+                "commit_seq": 8,
+                "key": {
+                  "id": "adoption/f9b22898952fc1426ccd080769c3ac3277e33bf3123716ed335687b71c63b23d",
+                  "kind": "state"
+                }
+              },
+              {
+                "commit_seq": 8,
+                "key": {
+                  "id": "review-decision/fdcb109bdce585c7f9c1f9e73227a5ef16ba5c7db420f20f02184485f83dd89f",
+                  "kind": "state"
+                }
+              },
+              {
+                "commit_seq": 8,
+                "key": {
+                  "id": "review/abd738ffeb5371b02c1b4d1131838f3176bf6a2fbaebf542c8873410c1e2e5eb",
+                  "kind": "state"
+                }
+              },
+              {
+                "commit_seq": 8,
+                "key": {
+                  "id": "scope/fd43662afd78d9dca29b99816c7ac2d9ec0ec5a9269eaacf50f4d0fd65f6744e/f9b22898952fc1426ccd080769c3ac3277e33bf3123716ed335687b71c63b23d",
+                  "kind": "state"
+                }
+              }
+            ]
+          },
+          "request_id": "cli/1398958/1793321442264",
+          "schema_version": 1,
+          "sequence": 1
+        },
+        "transcript": "{\"action\":\"approve\",\"after\":{\"assumptions\":[],\"claim\":\"Prefer offline tools\",\"conditions\":[\"Linux\"],\"kind\":\"preference\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":null,\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"ccb94d22dc230d7b62a7a9a4fa807416faa9258ea73945a974f1cf1784cb7133\",\"end\":20,\"event_id\":\"source-global-taste\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"before\":{\"previous\":null,\"record\":{\"approval\":null,\"authority\":\"candidate\",\"authorization\":{\"adopt_explicit_decisions\":false,\"mode\":\"manual\",\"scope\":{\"branch_or_version\":null,\"project\":null,\"session\":null,\"user\":\"uid:1001\"}},\"config_generation\":1,\"draft\":{\"assumptions\":[],\"claim\":\"Prefer offline tools\",\"conditions\":[\"Linux\"],\"kind\":\"preference\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":null,\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"ccb94d22dc230d7b62a7a9a4fa807416faa9258ea73945a974f1cf1784cb7133\",\"end\":20,\"event_id\":\"source-global-taste\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"lifecycle\":\"candidate\",\"policy_revision\":\"fixture-policy\",\"previous_adoption\":null,\"provenance\":{\"actor\":{\"id\":\"fixture\",\"kind\":\"tool\"},\"binding\":\"build-receipt\",\"generator\":null,\"origin\":\"technical_observation\"},\"schema_version\":1,\"semantic_sha256\":\"f2f8eca5dab0e3f8b9ef507a0ee8a3abc5f711e4e03e32f2560f4c6c94d486c8\"},\"revision\":{\"commit_seq\":2,\"key\":{\"id\":\"global-taste\",\"kind\":\"memory\"}}},\"config_generation\":1,\"preview_sha256\":\"e77f1c901a57880e252338df8095eb8c21ab67ad4b6ed4e093e7f28f0be37ab4\",\"reason\":\"Synthetic operator confirms this exact scoped rule\",\"semantic_sha256\":\"f2f8eca5dab0e3f8b9ef507a0ee8a3abc5f711e4e03e32f2560f4c6c94d486c8\"}\r\nType confirm e77f1c901a57880e252338df8095eb8c21ab67ad4b6ed4e093e7f28f0be37ab4 to apply: confirm e77f1c901a57880e252338df8095eb8c21ab67ad4b6ed4e093e7f28f0be37ab4\r\n{\"data\":{\"commit_seq\":8,\"config_generation\":1,\"policy_revision\":\"review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288\",\"request_id\":\"approve-global-taste\",\"request_sha256\":\"e04947ed8f7442916970453166818fc14222c0282d3e46fd90909368740f498b\",\"revisions\":[{\"commit_seq\":8,\"key\":{\"id\":\"source/dbb170e799f8de42f24bab43161c95f3d3a08116a28942133cba81a36e627be6\",\"kind\":\"evidence\"}},{\"commit_seq\":8,\"key\":{\"id\":\"global-taste\",\"kind\":\"memory\"}},{\"commit_seq\":8,\"key\":{\"id\":\"adoption/f9b22898952fc1426ccd080769c3ac3277e33bf3123716ed335687b71c63b23d\",\"kind\":\"state\"}},{\"commit_seq\":8,\"key\":{\"id\":\"review-decision/fdcb109bdce585c7f9c1f9e73227a5ef16ba5c7db420f20f02184485f83dd89f\",\"kind\":\"state\"}},{\"commit_seq\":8,\"key\":{\"id\":\"review/abd738ffeb5371b02c1b4d1131838f3176bf6a2fbaebf542c8873410c1e2e5eb\",\"kind\":\"state\"}},{\"commit_seq\":8,\"key\":{\"id\":\"scope/fd43662afd78d9dca29b99816c7ac2d9ec0ec5a9269eaacf50f4d0fd65f6744e/f9b22898952fc1426ccd080769c3ac3277e33bf3123716ed335687b71c63b23d\",\"kind\":\"state\"}}]},\"request_id\":\"cli/1398958/1793321442264\",\"schema_version\":1,\"sequence\":1}\r\n"
+      },
+      {
+        "exit_code": 0,
+        "response": {
+          "data": {
+            "commit_seq": 9,
+            "config_generation": 1,
+            "policy_revision": "review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288",
+            "request_id": "approve-local-exception",
+            "request_sha256": "1252123ddea47b11d84c2d2144cbc12c896e2c9a530ff900abe2ee9563955746",
+            "revisions": [
+              {
+                "commit_seq": 9,
+                "key": {
+                  "id": "source/6304bd437b3b8910377786a3aa2d42490c179384dd9a725e976226dd3d9b6394",
+                  "kind": "evidence"
+                }
+              },
+              {
+                "commit_seq": 9,
+                "key": {
+                  "id": "local-exception",
+                  "kind": "memory"
+                }
+              },
+              {
+                "commit_seq": 9,
+                "key": {
+                  "id": "adoption/f91e73c8f83173e7dec4d1a3a8b04da60e831cb8b36143529d32f2a9725faca5",
+                  "kind": "state"
+                }
+              },
+              {
+                "commit_seq": 9,
+                "key": {
+                  "id": "review-decision/ed1d62e573dcf3edd7e185e0999c19474f80e7bce895d28bf9eb71645a3b48b3",
+                  "kind": "state"
+                }
+              },
+              {
+                "commit_seq": 9,
+                "key": {
+                  "id": "review/cd26e1455f226f25365134f5798f6647210564b5992456e151a314e916e69f4f",
+                  "kind": "state"
+                }
+              },
+              {
+                "commit_seq": 9,
+                "key": {
+                  "id": "scope/c9e8c81ff9551edff501920d182480a3e3b5b28c69c3771e57a97285fbea4475/f91e73c8f83173e7dec4d1a3a8b04da60e831cb8b36143529d32f2a9725faca5",
+                  "kind": "state"
+                }
+              }
+            ]
+          },
+          "request_id": "cli/1398981/1793321442348",
+          "schema_version": 1,
+          "sequence": 1
+        },
+        "transcript": "{\"action\":\"approve\",\"after\":{\"assumptions\":[],\"claim\":\"Use the online tool for alpha v2\",\"conditions\":[\"Linux\"],\"kind\":\"preference\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":\"v2\",\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"5d347f553a24d9b1630a6e1194a8f425287cbf9691b5ce81ef27f5bbd02c3797\",\"end\":32,\"event_id\":\"source-local-exception\",\"revision\":3,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"before\":{\"previous\":null,\"record\":{\"approval\":null,\"authority\":\"candidate\",\"authorization\":{\"adopt_explicit_decisions\":false,\"mode\":\"manual\",\"scope\":{\"branch_or_version\":\"v2\",\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"}},\"config_generation\":1,\"draft\":{\"assumptions\":[],\"claim\":\"Use the online tool for alpha v2\",\"conditions\":[\"Linux\"],\"kind\":\"preference\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":\"v2\",\"project\":\"alpha\",\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"5d347f553a24d9b1630a6e1194a8f425287cbf9691b5ce81ef27f5bbd02c3797\",\"end\":32,\"event_id\":\"source-local-exception\",\"revision\":3,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"lifecycle\":\"candidate\",\"policy_revision\":\"fixture-policy\",\"previous_adoption\":null,\"provenance\":{\"actor\":{\"id\":\"fixture\",\"kind\":\"tool\"},\"binding\":\"build-receipt\",\"generator\":null,\"origin\":\"technical_observation\"},\"schema_version\":1,\"semantic_sha256\":\"e9478c3bdfb28a62be81f882c878d66c9cffd931962b0c6101fe00a360cabda9\"},\"revision\":{\"commit_seq\":4,\"key\":{\"id\":\"local-exception\",\"kind\":\"memory\"}}},\"config_generation\":1,\"preview_sha256\":\"f489c78654ace874bf1e4dc8d17a073f3b9499abd866fcdf5597480d2e4f761e\",\"reason\":\"Synthetic operator confirms this exact scoped rule\",\"semantic_sha256\":\"e9478c3bdfb28a62be81f882c878d66c9cffd931962b0c6101fe00a360cabda9\"}\r\nType confirm f489c78654ace874bf1e4dc8d17a073f3b9499abd866fcdf5597480d2e4f761e to apply: confirm f489c78654ace874bf1e4dc8d17a073f3b9499abd866fcdf5597480d2e4f761e\r\n{\"data\":{\"commit_seq\":9,\"config_generation\":1,\"policy_revision\":\"review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288\",\"request_id\":\"approve-local-exception\",\"request_sha256\":\"1252123ddea47b11d84c2d2144cbc12c896e2c9a530ff900abe2ee9563955746\",\"revisions\":[{\"commit_seq\":9,\"key\":{\"id\":\"source/6304bd437b3b8910377786a3aa2d42490c179384dd9a725e976226dd3d9b6394\",\"kind\":\"evidence\"}},{\"commit_seq\":9,\"key\":{\"id\":\"local-exception\",\"kind\":\"memory\"}},{\"commit_seq\":9,\"key\":{\"id\":\"adoption/f91e73c8f83173e7dec4d1a3a8b04da60e831cb8b36143529d32f2a9725faca5\",\"kind\":\"state\"}},{\"commit_seq\":9,\"key\":{\"id\":\"review-decision/ed1d62e573dcf3edd7e185e0999c19474f80e7bce895d28bf9eb71645a3b48b3\",\"kind\":\"state\"}},{\"commit_seq\":9,\"key\":{\"id\":\"review/cd26e1455f226f25365134f5798f6647210564b5992456e151a314e916e69f4f\",\"kind\":\"state\"}},{\"commit_seq\":9,\"key\":{\"id\":\"scope/c9e8c81ff9551edff501920d182480a3e3b5b28c69c3771e57a97285fbea4475/f91e73c8f83173e7dec4d1a3a8b04da60e831cb8b36143529d32f2a9725faca5\",\"kind\":\"state\"}}]},\"request_id\":\"cli/1398981/1793321442348\",\"schema_version\":1,\"sequence\":1}\r\n"
+      },
+      {
+        "exit_code": 0,
+        "response": {
+          "data": {
+            "commit_seq": 11,
+            "config_generation": 1,
+            "policy_revision": "review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288",
+            "request_id": "explicit-successor",
+            "request_sha256": "44bf8e307403ed2f1931dd94963d82a9f022b7507a79b81551f3f18fc4dcf352",
+            "revisions": [
+              {
+                "commit_seq": 11,
+                "key": {
+                  "id": "source/ae8356a21c2ed352789414dfb3194236e828be95043c8015d9c772a8357b4909",
+                  "kind": "evidence"
+                }
+              },
+              {
+                "commit_seq": 11,
+                "key": {
+                  "id": "global-taste",
+                  "kind": "memory"
+                }
+              },
+              {
+                "commit_seq": 11,
+                "key": {
+                  "id": "adoption/f9b22898952fc1426ccd080769c3ac3277e33bf3123716ed335687b71c63b23d",
+                  "kind": "state"
+                }
+              },
+              {
+                "commit_seq": 11,
+                "key": {
+                  "id": "review-decision/c81bf43bf67a8942508e412596aa8e57b8a287986d31eeee0ba0e8c125f29ad1",
+                  "kind": "state"
+                }
+              },
+              {
+                "commit_seq": 11,
+                "key": {
+                  "id": "review/806988b2b2d052228940d8f29c595c12fd2a22c5bfcde372ff493a237e06dc26",
+                  "kind": "state"
+                }
+              },
+              {
+                "commit_seq": 11,
+                "key": {
+                  "id": "scope/fd43662afd78d9dca29b99816c7ac2d9ec0ec5a9269eaacf50f4d0fd65f6744e/f9b22898952fc1426ccd080769c3ac3277e33bf3123716ed335687b71c63b23d",
+                  "kind": "state"
+                }
+              }
+            ]
+          },
+          "request_id": "cli/1399038/1793321442985",
+          "schema_version": 1,
+          "sequence": 1
+        },
+        "transcript": "{\"action\":\"approve\",\"after\":{\"assumptions\":[],\"claim\":\"Prefer offline tools and retain audit receipts\",\"conditions\":[\"Linux\"],\"kind\":\"preference\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":null,\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"ccb94d22dc230d7b62a7a9a4fa807416faa9258ea73945a974f1cf1784cb7133\",\"end\":20,\"event_id\":\"source-global-taste\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"before\":{\"previous\":8,\"record\":{\"approval\":null,\"authority\":\"candidate\",\"authorization\":{\"adopt_explicit_decisions\":false,\"mode\":\"automatic\",\"scope\":{\"branch_or_version\":null,\"project\":null,\"session\":null,\"user\":\"uid:1001\"}},\"config_generation\":1,\"draft\":{\"assumptions\":[],\"claim\":\"Prefer offline tools and retain audit receipts\",\"conditions\":[\"Linux\"],\"kind\":\"preference\",\"rationale\":\"native build receipt\",\"scope\":{\"branch_or_version\":null,\"project\":null,\"session\":null,\"user\":\"uid:1001\"},\"source_spans\":[{\"content_sha256\":\"ccb94d22dc230d7b62a7a9a4fa807416faa9258ea73945a974f1cf1784cb7133\",\"end\":20,\"event_id\":\"source-global-taste\",\"revision\":1,\"start\":0}],\"valid_from_ms\":null,\"valid_until_ms\":null},\"lifecycle\":\"candidate\",\"policy_revision\":\"automatic-proposal\",\"previous_adoption\":8,\"provenance\":{\"actor\":{\"id\":\"later-generator\",\"kind\":\"tool\"},\"binding\":\"later-proposal\",\"generator\":null,\"origin\":\"technical_observation\"},\"schema_version\":1,\"semantic_sha256\":\"94fbba97acc154cd6820600a3d10435020f27df0484c6151cb2fde9e8298c6cf\"},\"revision\":{\"commit_seq\":10,\"key\":{\"id\":\"global-taste\",\"kind\":\"memory\"}}},\"config_generation\":1,\"preview_sha256\":\"4c6ab93f4ce02320a5b5b43766d872f7362d8eb23380c9c133fddbfdf1311975\",\"reason\":\"Synthetic operator confirms this exact scoped rule\",\"semantic_sha256\":\"94fbba97acc154cd6820600a3d10435020f27df0484c6151cb2fde9e8298c6cf\"}\r\nType confirm 4c6ab93f4ce02320a5b5b43766d872f7362d8eb23380c9c133fddbfdf1311975 to apply: confirm 4c6ab93f4ce02320a5b5b43766d872f7362d8eb23380c9c133fddbfdf1311975\r\n{\"data\":{\"commit_seq\":11,\"config_generation\":1,\"policy_revision\":\"review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288\",\"request_id\":\"explicit-successor\",\"request_sha256\":\"44bf8e307403ed2f1931dd94963d82a9f022b7507a79b81551f3f18fc4dcf352\",\"revisions\":[{\"commit_seq\":11,\"key\":{\"id\":\"source/ae8356a21c2ed352789414dfb3194236e828be95043c8015d9c772a8357b4909\",\"kind\":\"evidence\"}},{\"commit_seq\":11,\"key\":{\"id\":\"global-taste\",\"kind\":\"memory\"}},{\"commit_seq\":11,\"key\":{\"id\":\"adoption/f9b22898952fc1426ccd080769c3ac3277e33bf3123716ed335687b71c63b23d\",\"kind\":\"state\"}},{\"commit_seq\":11,\"key\":{\"id\":\"review-decision/c81bf43bf67a8942508e412596aa8e57b8a287986d31eeee0ba0e8c125f29ad1\",\"kind\":\"state\"}},{\"commit_seq\":11,\"key\":{\"id\":\"review/806988b2b2d052228940d8f29c595c12fd2a22c5bfcde372ff493a237e06dc26\",\"kind\":\"state\"}},{\"commit_seq\":11,\"key\":{\"id\":\"scope/fd43662afd78d9dca29b99816c7ac2d9ec0ec5a9269eaacf50f4d0fd65f6744e/f9b22898952fc1426ccd080769c3ac3277e33bf3123716ed335687b71c63b23d\",\"kind\":\"state\"}}]},\"request_id\":\"cli/1399038/1793321442985\",\"schema_version\":1,\"sequence\":1}\r\n"
+      }
+    ],
+    "original_global": {
+      "data": {
+        "data": {
+          "revision": {
+            "memory": {
+              "previous": 2,
+              "record": {
+                "approval": {
+                  "action": "approve",
+                  "proposal_revision": 2,
+                  "reason": "Synthetic operator confirms this exact scoped rule",
+                  "reviewer": {
+                    "id": "uid:1001",
+                    "kind": "human"
+                  },
+                  "semantic_sha256": "f2f8eca5dab0e3f8b9ef507a0ee8a3abc5f711e4e03e32f2560f4c6c94d486c8",
+                  "source": {
+                    "content_sha256": "fadb8898cc58a122f892645c026ec794ac7bfe2ac93e620453a2f6d982ee518d",
+                    "end": 286,
+                    "event_id": "review-operation/fdcb109bdce585c7f9c1f9e73227a5ef16ba5c7db420f20f02184485f83dd89f",
+                    "revision": 8,
+                    "start": 0
+                  }
+                },
+                "authority": "human_confirmed",
+                "authorization": {
+                  "adopt_explicit_decisions": false,
+                  "mode": "policy",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": null,
+                    "session": null,
+                    "user": "uid:1001"
+                  }
+                },
+                "config_generation": 1,
+                "draft": {
+                  "assumptions": [],
+                  "claim": "Prefer offline tools",
+                  "conditions": [
+                    "Linux"
+                  ],
+                  "kind": "preference",
+                  "rationale": "native build receipt",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": null,
+                    "session": null,
+                    "user": "uid:1001"
+                  },
+                  "source_spans": [
+                    {
+                      "content_sha256": "ccb94d22dc230d7b62a7a9a4fa807416faa9258ea73945a974f1cf1784cb7133",
+                      "end": 20,
+                      "event_id": "source-global-taste",
+                      "revision": 1,
+                      "start": 0
+                    }
+                  ],
+                  "valid_from_ms": null,
+                  "valid_until_ms": null
+                },
+                "lifecycle": "active",
+                "policy_revision": "review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288",
+                "previous_adoption": null,
+                "provenance": {
+                  "actor": {
+                    "id": "fixture",
+                    "kind": "tool"
+                  },
+                  "binding": "build-receipt",
+                  "generator": null,
+                  "origin": "technical_observation"
+                },
+                "schema_version": 1,
+                "semantic_sha256": "f2f8eca5dab0e3f8b9ef507a0ee8a3abc5f711e4e03e32f2560f4c6c94d486c8"
+              },
+              "revision": {
+                "commit_seq": 8,
+                "key": {
+                  "id": "global-taste",
+                  "kind": "memory"
+                }
+              }
+            },
+            "recorded_at_ms": 1793321442273
+          },
+          "state": "active"
+        },
+        "read_seq": 9,
+        "retrieval_mode": "current_state",
+        "validated_at_seq": 9
+      },
+      "request_id": "cli/1398991/1793321442410",
+      "schema_version": 1,
+      "sequence": 1
+    },
+    "searches": [
+      {
+        "coverage": {
+          "complete": true,
+          "gaps": []
+        },
+        "index": {
+          "generation": "lexical-icu-v1",
+          "indexed_rows": 2,
+          "lexical_watermark": 11,
+          "vector": null
+        },
+        "items": [],
+        "mode": "keyword",
+        "model_calls": [],
+        "query": "unrelated query",
+        "rules": [
+          {
+            "memory": {
+              "previous": 4,
+              "record": {
+                "approval": {
+                  "action": "approve",
+                  "proposal_revision": 4,
+                  "reason": "Synthetic operator confirms this exact scoped rule",
+                  "reviewer": {
+                    "id": "uid:1001",
+                    "kind": "human"
+                  },
+                  "semantic_sha256": "e9478c3bdfb28a62be81f882c878d66c9cffd931962b0c6101fe00a360cabda9",
+                  "source": {
+                    "content_sha256": "1e85b7dec3ada42092705a9f4475d241fbb65147b6e6e0edaef8f05c30d77169",
+                    "end": 286,
+                    "event_id": "review-operation/ed1d62e573dcf3edd7e185e0999c19474f80e7bce895d28bf9eb71645a3b48b3",
+                    "revision": 9,
+                    "start": 0
+                  }
+                },
+                "authority": "human_confirmed",
+                "authorization": {
+                  "adopt_explicit_decisions": false,
+                  "mode": "policy",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": null,
+                    "session": null,
+                    "user": "uid:1001"
+                  }
+                },
+                "config_generation": 1,
+                "draft": {
+                  "assumptions": [],
+                  "claim": "Use the online tool for alpha v2",
+                  "conditions": [
+                    "Linux"
+                  ],
+                  "kind": "preference",
+                  "rationale": "native build receipt",
+                  "scope": {
+                    "branch_or_version": "v2",
+                    "project": "alpha",
+                    "session": null,
+                    "user": "uid:1001"
+                  },
+                  "source_spans": [
+                    {
+                      "content_sha256": "5d347f553a24d9b1630a6e1194a8f425287cbf9691b5ce81ef27f5bbd02c3797",
+                      "end": 32,
+                      "event_id": "source-local-exception",
+                      "revision": 3,
+                      "start": 0
+                    }
+                  ],
+                  "valid_from_ms": null,
+                  "valid_until_ms": null
+                },
+                "lifecycle": "active",
+                "policy_revision": "review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288",
+                "previous_adoption": null,
+                "provenance": {
+                  "actor": {
+                    "id": "fixture",
+                    "kind": "tool"
+                  },
+                  "binding": "build-receipt",
+                  "generator": null,
+                  "origin": "technical_observation"
+                },
+                "schema_version": 1,
+                "semantic_sha256": "e9478c3bdfb28a62be81f882c878d66c9cffd931962b0c6101fe00a360cabda9"
+              },
+              "revision": {
+                "commit_seq": 9,
+                "key": {
+                  "id": "local-exception",
+                  "kind": "memory"
+                }
+              }
+            },
+            "recorded_at_ms": 1793321442354
+          },
+          {
+            "memory": {
+              "previous": 10,
+              "record": {
+                "approval": {
+                  "action": "approve",
+                  "proposal_revision": 10,
+                  "reason": "Synthetic operator confirms this exact scoped rule",
+                  "reviewer": {
+                    "id": "uid:1001",
+                    "kind": "human"
+                  },
+                  "semantic_sha256": "94fbba97acc154cd6820600a3d10435020f27df0484c6151cb2fde9e8298c6cf",
+                  "source": {
+                    "content_sha256": "589f5605b2a349e572321f286c759fb12975dea664aefb479c956f2040855a2a",
+                    "end": 287,
+                    "event_id": "review-operation/c81bf43bf67a8942508e412596aa8e57b8a287986d31eeee0ba0e8c125f29ad1",
+                    "revision": 11,
+                    "start": 0
+                  }
+                },
+                "authority": "human_confirmed",
+                "authorization": {
+                  "adopt_explicit_decisions": false,
+                  "mode": "policy",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": null,
+                    "session": null,
+                    "user": "uid:1001"
+                  }
+                },
+                "config_generation": 1,
+                "draft": {
+                  "assumptions": [],
+                  "claim": "Prefer offline tools and retain audit receipts",
+                  "conditions": [
+                    "Linux"
+                  ],
+                  "kind": "preference",
+                  "rationale": "native build receipt",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": null,
+                    "session": null,
+                    "user": "uid:1001"
+                  },
+                  "source_spans": [
+                    {
+                      "content_sha256": "ccb94d22dc230d7b62a7a9a4fa807416faa9258ea73945a974f1cf1784cb7133",
+                      "end": 20,
+                      "event_id": "source-global-taste",
+                      "revision": 1,
+                      "start": 0
+                    }
+                  ],
+                  "valid_from_ms": null,
+                  "valid_until_ms": null
+                },
+                "lifecycle": "active",
+                "policy_revision": "review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288",
+                "previous_adoption": 8,
+                "provenance": {
+                  "actor": {
+                    "id": "later-generator",
+                    "kind": "tool"
+                  },
+                  "binding": "later-proposal",
+                  "generator": null,
+                  "origin": "technical_observation"
+                },
+                "schema_version": 1,
+                "semantic_sha256": "94fbba97acc154cd6820600a3d10435020f27df0484c6151cb2fde9e8298c6cf"
+              },
+              "revision": {
+                "commit_seq": 11,
+                "key": {
+                  "id": "global-taste",
+                  "kind": "memory"
+                }
+              }
+            },
+            "recorded_at_ms": 1793321442990
+          }
+        ],
+        "scope": {
+          "branch_or_version": "v2",
+          "project": "alpha",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "searched_content": "active_memories",
+        "status": "found"
+      },
+      {
+        "coverage": {
+          "complete": true,
+          "gaps": []
+        },
+        "index": {
+          "generation": "lexical-icu-v1",
+          "indexed_rows": 2,
+          "lexical_watermark": 11,
+          "vector": null
+        },
+        "items": [],
+        "mode": "keyword",
+        "model_calls": [],
+        "query": "unrelated query",
+        "rules": [
+          {
+            "memory": {
+              "previous": 10,
+              "record": {
+                "approval": {
+                  "action": "approve",
+                  "proposal_revision": 10,
+                  "reason": "Synthetic operator confirms this exact scoped rule",
+                  "reviewer": {
+                    "id": "uid:1001",
+                    "kind": "human"
+                  },
+                  "semantic_sha256": "94fbba97acc154cd6820600a3d10435020f27df0484c6151cb2fde9e8298c6cf",
+                  "source": {
+                    "content_sha256": "589f5605b2a349e572321f286c759fb12975dea664aefb479c956f2040855a2a",
+                    "end": 287,
+                    "event_id": "review-operation/c81bf43bf67a8942508e412596aa8e57b8a287986d31eeee0ba0e8c125f29ad1",
+                    "revision": 11,
+                    "start": 0
+                  }
+                },
+                "authority": "human_confirmed",
+                "authorization": {
+                  "adopt_explicit_decisions": false,
+                  "mode": "policy",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": null,
+                    "session": null,
+                    "user": "uid:1001"
+                  }
+                },
+                "config_generation": 1,
+                "draft": {
+                  "assumptions": [],
+                  "claim": "Prefer offline tools and retain audit receipts",
+                  "conditions": [
+                    "Linux"
+                  ],
+                  "kind": "preference",
+                  "rationale": "native build receipt",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": null,
+                    "session": null,
+                    "user": "uid:1001"
+                  },
+                  "source_spans": [
+                    {
+                      "content_sha256": "ccb94d22dc230d7b62a7a9a4fa807416faa9258ea73945a974f1cf1784cb7133",
+                      "end": 20,
+                      "event_id": "source-global-taste",
+                      "revision": 1,
+                      "start": 0
+                    }
+                  ],
+                  "valid_from_ms": null,
+                  "valid_until_ms": null
+                },
+                "lifecycle": "active",
+                "policy_revision": "review-cli/90e04e563e9c608a11a5a4de3585090a0a98918ed5f517b7c7eaca2a58f76288",
+                "previous_adoption": 8,
+                "provenance": {
+                  "actor": {
+                    "id": "later-generator",
+                    "kind": "tool"
+                  },
+                  "binding": "later-proposal",
+                  "generator": null,
+                  "origin": "technical_observation"
+                },
+                "schema_version": 1,
+                "semantic_sha256": "94fbba97acc154cd6820600a3d10435020f27df0484c6151cb2fde9e8298c6cf"
+              },
+              "revision": {
+                "commit_seq": 11,
+                "key": {
+                  "id": "global-taste",
+                  "kind": "memory"
+                }
+              }
+            },
+            "recorded_at_ms": 1793321442990
+          }
+        ],
+        "scope": {
+          "branch_or_version": "v2",
+          "project": "beta",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "searched_content": "active_memories",
+        "status": "found"
+      }
+    ],
+    "synthetic_operator": true
+  },
+  "fixture_root": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/akasha-daemon-1398889-8",
+  "schema_version": 1
+}

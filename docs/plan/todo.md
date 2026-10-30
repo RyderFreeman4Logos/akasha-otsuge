@@ -798,9 +798,9 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
   lifecycle and notification acknowledgement, with immutable target/version/history.
 - [x] Provide a usable bounded review CLI and trusted operator confirmation path;
   preserve original proposals, exact edited hashes, differences, reasons and sources.
-- [ ] Prove manual/policy/automatic flows and new-operation configuration reload;
+- [x] Prove manual/policy/automatic flows and new-operation configuration reload;
   pending proposals and open reviews must not retire unrelated active decisions.
-- [ ] Prove human taste priority, local scope exceptions, explicit successors,
+- [x] Prove human taste priority, local scope exceptions, explicit successors,
   permission rechecks, stale-version refusal, retries and crash recovery.
 - [ ] Archive compact real CLI examples and policy/state-machine evidence; run the
   canonical gate, independent review, hosted CI, merge and verified closure.

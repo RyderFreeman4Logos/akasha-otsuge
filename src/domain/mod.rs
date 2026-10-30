@@ -3,6 +3,8 @@
 mod history;
 mod recall;
 mod review;
+#[cfg(test)]
+mod review_tests;
 mod schema;
 
 pub use history::*;

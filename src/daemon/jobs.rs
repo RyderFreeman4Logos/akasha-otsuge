@@ -598,6 +598,8 @@ pub(super) struct Job {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     extraction_native: Option<consult::NativeExecutor>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    extraction_review_mode: Option<crate::config::ReviewMode>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     grill_plan: Option<crate::grill::Plan>,
     #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
     grill_natives: std::collections::BTreeMap<String, consult::NativeExecutor>,
@@ -1036,6 +1038,9 @@ impl Service {
                 binding,
                 path,
                 model_plan,
+                extraction_review_mode: extraction_plan
+                    .as_ref()
+                    .map(|_| snapshot.resolved().config().review.mode),
                 extraction_plan,
                 extraction_native,
                 grill_plan,

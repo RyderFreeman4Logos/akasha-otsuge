@@ -1,0 +1,307 @@
+{
+  "binary": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/akasha-otsuge",
+  "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886",
+  "data": {
+    "controlled_model": true,
+    "final_memory": {
+      "data": {
+        "data": {
+          "revision": {
+            "memory": {
+              "previous": 9,
+              "record": {
+                "approval": {
+                  "action": "approve",
+                  "proposal_revision": 9,
+                  "reason": "Approve this scoped conditional result",
+                  "reviewer": {
+                    "id": "uid:1001",
+                    "kind": "human"
+                  },
+                  "semantic_sha256": "0dd93396059650a7be0ab78a51f3940374e5351a5e7e8f3b42bf1b4f2d490be2",
+                  "source": {
+                    "content_sha256": "569b581b32d7970a75691719543dc1c9abb1031d81c16f8317f39fe4cc613497",
+                    "end": 274,
+                    "event_id": "review-operation/54a2fb376eb3a812b11a135b4b903729ada221d53edc01d9ef507ea689fff30c",
+                    "revision": 11,
+                    "start": 0
+                  }
+                },
+                "authority": "human_confirmed",
+                "authorization": {
+                  "adopt_explicit_decisions": false,
+                  "mode": "manual",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": null,
+                    "session": null,
+                    "user": "uid:1001"
+                  }
+                },
+                "config_generation": 1,
+                "draft": {
+                  "assumptions": [],
+                  "claim": "Use keyword search when offline.",
+                  "conditions": [
+                    "offline"
+                  ],
+                  "kind": "decision",
+                  "rationale": "A conditional proposal.",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": "alpha",
+                    "session": null,
+                    "user": "uid:1001"
+                  },
+                  "source_spans": [
+                    {
+                      "content_sha256": "664adf54cf7e3fc08599fef4ce58bd30a1692bd99a574371a752f8e90fcaf972",
+                      "end": 36,
+                      "event_id": "policy-original",
+                      "revision": 1,
+                      "start": 0
+                    }
+                  ],
+                  "valid_from_ms": null,
+                  "valid_until_ms": null
+                },
+                "lifecycle": "active",
+                "policy_revision": "review-cli/29759fbd424eab230d01f3f92513150304b9df5820d5717254a689f23447270c",
+                "previous_adoption": null,
+                "provenance": {
+                  "actor": {
+                    "id": "extractor",
+                    "kind": "agent"
+                  },
+                  "binding": "extract-policy",
+                  "generator": {
+                    "model": "controlled-extractor",
+                    "prompt_version": "extraction-v1",
+                    "runner": "text/extractor"
+                  },
+                  "origin": "extraction"
+                },
+                "schema_version": 1,
+                "semantic_sha256": "0dd93396059650a7be0ab78a51f3940374e5351a5e7e8f3b42bf1b4f2d490be2"
+              },
+              "revision": {
+                "commit_seq": 11,
+                "key": {
+                  "id": "extracted/0d5e2644e7cc73caabe55fb3b4cb422b43a4f6e7b74579a15d5aff159cf8ac05",
+                  "kind": "memory"
+                }
+              }
+            },
+            "recorded_at_ms": 1793321442308
+          },
+          "state": "active"
+        },
+        "read_seq": 11,
+        "retrieval_mode": "current_state",
+        "validated_at_seq": 11
+      },
+      "request_id": "cli/1398985/1793321442373",
+      "schema_version": 1,
+      "sequence": 1
+    },
+    "job": {
+      "accepted_at_ms": 1793321442222,
+      "attempt": 1,
+      "cancel_requested": false,
+      "config_digest": "29759fbd424eab230d01f3f92513150304b9df5820d5717254a689f23447270c",
+      "config_generation": 1,
+      "error": null,
+      "execution_budget_ms": 2010000,
+      "execution_deadline_ms": 1793323452226,
+      "extraction_plan": {
+        "scope": {
+          "branch_or_version": null,
+          "project": "alpha",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "sources": [
+          {
+            "content_sha256": "664adf54cf7e3fc08599fef4ce58bd30a1692bd99a574371a752f8e90fcaf972",
+            "end": 36,
+            "event_id": "policy-original",
+            "revision": 1,
+            "start": 0
+          }
+        ]
+      },
+      "extraction_review_mode": "manual",
+      "id": "extract-policy",
+      "lease_owner": null,
+      "lease_until_ms": null,
+      "queue_deadline_ms": 1793321742222,
+      "request_sha256": "3a86fa165eb3ea131aff71abf7fb58168bf7aac5f026d79866e56d997a887c1b",
+      "result": {
+        "candidates": [
+          {
+            "memory_id": "extracted/0d5e2644e7cc73caabe55fb3b4cb422b43a4f6e7b74579a15d5aff159cf8ac05",
+            "revision": 9,
+            "status": "candidate"
+          }
+        ],
+        "checkpoint": {
+          "bytes": 1310,
+          "parts": [
+            {
+              "commit_seq": 7,
+              "key": {
+                "id": "model-blob/2d42a811cb8703b4b6957ef12899fa360e25878ed6648080bac38b5eacfd3f6f",
+                "kind": "evidence"
+              }
+            }
+          ],
+          "sha256": "2d42a811cb8703b4b6957ef12899fa360e25878ed6648080bac38b5eacfd3f6f"
+        },
+        "generator": {
+          "model": "controlled-extractor",
+          "prompt_version": "extraction-v1",
+          "runner": "text/extractor"
+        },
+        "origin": "extraction",
+        "prompt_version": "extraction-v1",
+        "trace": {
+          "automatic_retries": 0,
+          "connect_ms": 10000,
+          "idle_ms": null,
+          "idle_triggered": false,
+          "local_long_timeout_verified": false,
+          "provider": {
+            "configured_ms": 1700000,
+            "effective_ms": 1700000,
+            "elapsed_ms": 2,
+            "layer": "provider",
+            "limiting_layer": "provider",
+            "remaining_ms": 1699997,
+            "started_at_unix_ms": 1793321442233,
+            "triggered_layer": null
+          },
+          "queue": {
+            "configured_ms": 300000,
+            "effective_ms": 300000,
+            "elapsed_ms": 0,
+            "layer": "queue",
+            "limiting_layer": "queue",
+            "remaining_ms": 299999,
+            "started_at_unix_ms": 1793321442232,
+            "triggered_layer": null
+          },
+          "workflow": {
+            "configured_ms": 2010000,
+            "effective_ms": 2010000,
+            "elapsed_ms": 8,
+            "layer": "workflow",
+            "limiting_layer": "workflow",
+            "remaining_ms": 2009991,
+            "started_at_unix_ms": 1793321442226,
+            "triggered_layer": null
+          }
+        }
+      },
+      "retry_at_ms": 1793321442222,
+      "schema_version": 1,
+      "started_at_ms": 1793321442226,
+      "state": "succeeded"
+    },
+    "mode": "manual",
+    "original_proposal": {
+      "data": {
+        "item": {
+          "id": "2642c0108559a2855bbde862109a669e1879d6400aa8c0a29472174f235bf03a",
+          "memory_id": "extracted/0d5e2644e7cc73caabe55fb3b4cb422b43a4f6e7b74579a15d5aff159cf8ac05",
+          "proposal_revision": 9,
+          "reason": "candidate_requires_review",
+          "revision": 9,
+          "scope": {
+            "branch_or_version": null,
+            "project": "alpha",
+            "session": null,
+            "user": "uid:1001"
+          },
+          "semantic_sha256": "0dd93396059650a7be0ab78a51f3940374e5351a5e7e8f3b42bf1b4f2d490be2",
+          "state": "open"
+        },
+        "proposal": {
+          "previous": null,
+          "record": {
+            "approval": null,
+            "authority": "candidate",
+            "authorization": {
+              "adopt_explicit_decisions": false,
+              "mode": "manual",
+              "scope": {
+                "branch_or_version": null,
+                "project": "alpha",
+                "session": null,
+                "user": "uid:1001"
+              }
+            },
+            "config_generation": 1,
+            "draft": {
+              "assumptions": [],
+              "claim": "Use keyword search when offline.",
+              "conditions": [
+                "offline"
+              ],
+              "kind": "decision",
+              "rationale": "A conditional proposal.",
+              "scope": {
+                "branch_or_version": null,
+                "project": "alpha",
+                "session": null,
+                "user": "uid:1001"
+              },
+              "source_spans": [
+                {
+                  "content_sha256": "664adf54cf7e3fc08599fef4ce58bd30a1692bd99a574371a752f8e90fcaf972",
+                  "end": 36,
+                  "event_id": "policy-original",
+                  "revision": 1,
+                  "start": 0
+                }
+              ],
+              "valid_from_ms": null,
+              "valid_until_ms": null
+            },
+            "lifecycle": "candidate",
+            "policy_revision": "extraction-v1/1",
+            "previous_adoption": null,
+            "provenance": {
+              "actor": {
+                "id": "extractor",
+                "kind": "agent"
+              },
+              "binding": "extract-policy",
+              "generator": {
+                "model": "controlled-extractor",
+                "prompt_version": "extraction-v1",
+                "runner": "text/extractor"
+              },
+              "origin": "extraction"
+            },
+            "schema_version": 1,
+            "semantic_sha256": "0dd93396059650a7be0ab78a51f3940374e5351a5e7e8f3b42bf1b4f2d490be2"
+          },
+          "revision": {
+            "commit_seq": 9,
+            "key": {
+              "id": "extracted/0d5e2644e7cc73caabe55fb3b4cb422b43a4f6e7b74579a15d5aff159cf8ac05",
+              "kind": "memory"
+            }
+          }
+        },
+        "result": null
+      },
+      "request_id": "cli/1398960/1793321442262",
+      "schema_version": 1,
+      "sequence": 1
+    },
+    "synthetic_operator": true
+  },
+  "fixture_root": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/akasha-daemon-1398889-6",
+  "schema_version": 1
+}

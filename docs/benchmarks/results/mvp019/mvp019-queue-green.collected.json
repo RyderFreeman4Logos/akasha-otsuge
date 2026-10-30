@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-30T00:26:19.353805+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "2da9a2ec302b42d6b210210737a27e2dee4728a9",
+    "log_sha256": "a1728598cc57572ababaf384fdca0b8bd1169d2c17d2a7c9b38ccedbfe14fc59",
+    "seconds": 56.26720651984215,
+    "utc": "2026-10-30T00:25:04.362131+00:00"
+  },
+  "process_absent": true,
+  "classification": "queue_state_restart_and_activation_pass"
+}

@@ -1,0 +1,64 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp019)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.73s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 11 tests
+test daemon::jobs::extraction_tests::extraction_crash_child ... ignored, owned subprocess launched by the extraction crash supervisor
+test daemon::jobs::extraction_tests::extraction_rejects_forged_authority_scope_and_citations_before_publication ... ok
+test daemon::jobs::extraction_tests::extraction_internal_origins_cannot_feed_another_extraction ... ok
+test daemon::jobs::extraction_tests::extraction_publication_cannot_start_writes_after_its_workflow_expires ... ok
+test daemon::jobs::extraction_tests::extraction_merges_distinct_sources_once_and_keeps_contradictory_candidates ... ok
+test daemon::jobs::extraction_tests::extraction_model_failure_keeps_originals_and_a_durable_failed_job ... ok
+test daemon::jobs::extraction_tests::legacy_extraction_jobs_keep_their_candidate_only_publication_contract ... ok
+test daemon::jobs::extraction_tests::extraction_interrupted_before_checkpoint_needs_explicit_retry ... ok
+test daemon::jobs::extraction_tests::extraction_does_not_merge_new_sources_into_a_revised_candidate_identity ... ok
+test daemon::jobs::extraction_tests::extraction_response_and_partial_publication_survive_sigkill_without_model_replay ... ok
+test daemon::jobs::extraction_tests::extraction_source_union_limit_fails_the_job_without_losing_old_sources ... ok
+
+test result: ok. 10 passed; 0 failed; 1 ignored; 0 measured; 49 filtered out; finished in 1.46s
+
+{"command": ["cargo", "test", "--locked", "--lib", "daemon::jobs::extraction_tests::", "--", "--nocapture"], "exit_code": 0}
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp019)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 43.48s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 7 tests
+test review_tests::review_state_retries_keep_their_policy_and_permissions_after_reload ... ok
+test review_tests::opening_a_review_does_not_suspend_active_memory_and_explicit_rejection_retires_it ... ok
+test review_tests::extraction_policy_reload_pins_running_jobs_and_reevaluates_new_operations ... ok
+test review_tests::operator_confirmation_rechecks_permissions_and_config_before_committing ... ok
+test review_tests::candidate_review_queue_is_durable_and_separate_from_active_memory ... ok
+test review_tests::review_cli_exact_edit_requires_operator_and_preserves_original ... ok
+test review_tests::extraction_cli_obeys_all_three_policies_for_the_same_candidate ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 94 filtered out; finished in 2.01s
+
+{"command": ["cargo", "test", "--locked", "--test", "daemon", "review_tests::", "--", "--nocapture"], "exit_code": 0}
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 5 tests
+test extraction_tests::native_single_cli_extraction_actual ... ignored, requires an explicitly supplied authenticated Pi profile and receipt path
+test extraction_tests::text_extraction_is_durable_source_backed_candidate_only_and_idempotent ... ok
+test extraction_tests::native_extraction_cannot_expand_its_evidence_with_research_tools ... ok
+test extraction_tests::native_extraction_uses_an_existing_executor_without_extra_model_profiles ... ok
+test extraction_tests::extracted_records_survive_index_pause_resume_rebuild_and_retraction ... ok
+
+test result: ok. 4 passed; 0 failed; 1 ignored; 0 measured; 96 filtered out; finished in 1.53s
+
+{"command": ["cargo", "test", "--locked", "--test", "daemon", "extraction_tests::", "--", "--nocapture"], "exit_code": 0}

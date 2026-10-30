@@ -6,6 +6,7 @@ import pty
 import re
 import select
 import signal
+import subprocess
 import sys
 import time
 
@@ -34,7 +35,15 @@ try:
                 raise RuntimeError("operator output exceeded bound")
             match = re.search(rb"Type (confirm [0-9a-f]{64}) to apply:", data)
             if match and not sent:
-                os.write(fd, (match[1] if sys.argv[4] == "confirm" else b"decline") + b"\n")
+                base = json.loads(sys.argv[1])
+                if sys.argv[4] == "confirm-revoke":
+                    subprocess.run(base + ["access", "revoke"], check=True, capture_output=True)
+                if sys.argv[4] == "confirm-reload":
+                    config = base[base.index("--config") + 1]
+                    with open(config, "a") as target:
+                        target.write("\n[review]\nmode='automatic'\n")
+                    subprocess.run(base + ["config", "reload"], check=True, capture_output=True)
+                os.write(fd, (match[1] if sys.argv[4].startswith("confirm") else b"decline") + b"\n")
                 sent = True
         ended, observed_status = os.waitpid(pid, os.WNOHANG)
         if ended:
