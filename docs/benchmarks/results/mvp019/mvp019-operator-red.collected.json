@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-30T00:27:57.010511+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "2da9a2ec302b42d6b210210737a27e2dee4728a9",
+    "log_sha256": "39761671d1b1934a7310d6beaeffc99ffd641048a805dbb172e12df96105c052",
+    "seconds": 4.057662078179419,
+    "utc": "2026-10-30T00:26:39.649338+00:00"
+  },
+  "process_absent": true,
+  "classification": "inspect_operator_cli_red"
+}

@@ -1,4 +1,4 @@
-//! Untrusted extraction output becomes source-checked candidates, never approval.
+//! Source-checked extraction follows server policy without creating human approval.
 use crate::domain::{
     Authority, Domain, Generator, Ingress, Lifecycle, MemoryDraft, MemoryKind, MemoryWrite, Origin,
     Policy, ReadContext, Scope, SourceRecord, SourceSpan,
@@ -174,7 +174,7 @@ pub(crate) async fn publish(
     storage: &Storage,
     plan: &Plan,
     id: &str,
-    generation: u64,
+    policy: &Policy,
     generator: Generator,
     drafts: Vec<MemoryDraft>,
     workflow: &crate::config::deadline::Deadline,
@@ -187,13 +187,6 @@ pub(crate) async fn publish(
         Origin::Extraction,
         generator,
     )?;
-    let policy = Policy {
-        revision: format!("{PROMPT_VERSION}/{generation}"),
-        config_generation: generation,
-        mode: crate::config::ReviewMode::Manual,
-        scope: plan.scope.clone(),
-        adopt_explicit_decisions: false,
-    };
     let mut published = vec![];
     for mut draft in drafts {
         if workflow.expired().is_some() {
@@ -220,7 +213,7 @@ pub(crate) async fn publish(
             if merged.source_spans.len() > 32 {
                 return Err(StorageError::new("EXTRACTION_SOURCE_LIMIT"));
             }
-            if merged == old.record.draft {
+            if merged == old.record.draft && old.record.authorization.mode == policy.mode {
                 published.push(json!({"memory_id":memory_id,"revision":old.revision.commit_seq,"status":"existing"}));
                 continue;
             }
@@ -243,12 +236,16 @@ pub(crate) async fn publish(
                     draft,
                 },
                 &ingress,
-                &policy,
+                policy,
             )
             .await?;
-        published.push(
-            json!({"memory_id":memory_id,"revision":receipt.commit_seq,"status":"candidate"}),
-        );
+        let lifecycle = domain
+            .revision(&memory_id, receipt.commit_seq)?
+            .ok_or_else(|| StorageError::new("DOMAIN_CORRUPT"))?
+            .record
+            .lifecycle;
+        published
+            .push(json!({"memory_id":memory_id,"revision":receipt.commit_seq,"status":lifecycle}));
         #[cfg(test)]
         crate::storage::crash_tests::checkpoint("extraction-candidate");
     }

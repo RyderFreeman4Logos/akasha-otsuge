@@ -201,7 +201,16 @@ impl Service {
             &self.storage,
             plan,
             &id,
-            job.config_generation,
+            &crate::domain::Policy {
+                revision: format!("{PROMPT_VERSION}/{}", job.config_generation),
+                config_generation: job.config_generation,
+                // Jobs admitted by MVP-017 keep their original candidate-only contract.
+                mode: job
+                    .extraction_review_mode
+                    .unwrap_or(crate::config::ReviewMode::Manual),
+                scope: plan.scope.clone(),
+                adopt_explicit_decisions: false,
+            },
             generator.clone(),
             drafts,
             &workflow,

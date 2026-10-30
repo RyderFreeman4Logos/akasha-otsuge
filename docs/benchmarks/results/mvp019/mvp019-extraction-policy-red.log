@@ -1,0 +1,33 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp019)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.03s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 2 tests
+
+thread 'review_tests::extraction_policy_reload_pins_running_jobs_and_reevaluates_new_operations' (1388890) panicked at tests/support/daemon_review.rs:574:5:
+assertion `left == right` failed: new operation did not apply the new policy: {"data":{"data":{"state":"absent"},"read_seq":17,"retrieval_mode":"current_state","validated_at_seq":17},"request_id":"cli/1388961/1793320840198","schema_version":1,"sequence":1}
+  left: String("absent")
+ right: "active"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test review_tests::extraction_policy_reload_pins_running_jobs_and_reevaluates_new_operations ... FAILED
+
+thread 'review_tests::extraction_cli_obeys_all_three_policies_for_the_same_candidate' (1388889) panicked at tests/support/daemon_review.rs:484:9:
+assertion `left == right` failed
+  left: String("manual")
+ right: "policy"
+test review_tests::extraction_cli_obeys_all_three_policies_for_the_same_candidate ... FAILED
+
+failures:
+
+failures:
+    review_tests::extraction_cli_obeys_all_three_policies_for_the_same_candidate
+    review_tests::extraction_policy_reload_pins_running_jobs_and_reevaluates_new_operations
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 99 filtered out; finished in 5.54s
+
+error: test failed, to rerun pass `--test daemon`

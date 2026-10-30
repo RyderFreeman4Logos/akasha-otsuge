@@ -59,15 +59,21 @@ fields, authority claims, expanded scope, invalid source indices, hashes, ranges
 or UTF-8 boundaries fail validation before publication. Model meaning still needs
 review: schema validation does not prove that a paraphrase is faithful.
 
-Every output has candidate authority/lifecycle and extraction provenance, even
-when the global review policy is automatic. Generator metadata records the text
+Publication follows the review policy pinned at admission: manual keeps candidates,
+policy selectively activates tool-backed facts, and automatic permits delegated
+activation subject to the [adoption rules](domain.md). None creates human approval.
+New candidate and automated-conclusion revisions enter the [review inbox](review.md)
+in the same transaction. Extraction jobs saved before this policy integration
+retain their original manual contract. Generator metadata records the text
 profile/model or executor, plus prompt version. Native profile defaults are
 reported honestly as `native-profile-default`; the host's actual model identity
-belongs in its native acceptance receipt. Review/activation is separate work.
+belongs in its native acceptance receipt.
 
 Exact kind/scope/claim/conditions/assumptions/validity identities share one memory
 ID. Repeated delivery reuses the durable job; repeated exact candidates do not
-create another revision. Distinct source occurrences merge without losing their
+create another revision under the same policy mode. A new operation after a mode
+change can re-evaluate a pending candidate; already adopted or reviewed records
+are preserved. Distinct source occurrences merge without losing their
 individual identities. Conflicting claims remain separate. Revised, reviewed or
 non-extraction records are preserved. A union exceeding 32 sources fails with
 `EXTRACTION_SOURCE_LIMIT`; it does not discard older evidence. This is exact

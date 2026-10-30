@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-30T00:55:00.538741+00:00",
+  "terminal": {
+    "exit_code": 1,
+    "head": "58a839f9315aef43c7651bc10b8cd3781e05bcb7",
+    "log_sha256": "5028161b8f7683feb0fb9c1fd53754b2649da1fce43d25e4c0d4d250d4fb400f",
+    "seconds": 21.62652307935059,
+    "utc": "2026-10-30T00:54:37.971411+00:00"
+  },
+  "process_absent": true,
+  "classification": "failed_acceptance_checks"
+}

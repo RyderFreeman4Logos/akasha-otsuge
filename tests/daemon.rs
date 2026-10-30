@@ -26,6 +26,9 @@ mod extraction_tests;
 #[path = "support/daemon_grill.rs"]
 mod grill_tests;
 
+#[path = "support/daemon_review.rs"]
+mod review_tests;
+
 #[path = "support/daemon_codex.rs"]
 mod codex_tests;
 

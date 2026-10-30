@@ -1,0 +1,41 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import subprocess,json\ncommands=[[\"cargo\",\"test\",\"--locked\",\"--test\",\"domain\",\"an_automatic_proposal_cannot_replace_a_human_confirmed_procedure\",\"--\",\"--exact\",\"--nocapture\"],[\"cargo\",\"test\",\"--locked\",\"--test\",\"daemon\",\"review_tests::\",\"--\",\"--nocapture\"]]\ncodes=[]\nfor cmd in commands:\n r=subprocess.run(cmd);codes.append(r.returncode);print(json.dumps({\"command\":cmd,\"exit_code\":r.returncode}),flush=True)\nraise SystemExit(1 if any(codes) else 0)"
+  ],
+  "dirty_diff_sha256": "5cd4d4b837d773ce8a9affb204b1d89136831d27a52304f4793c1d24772ba90e",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "2da9a2ec302b42d6b210210737a27e2dee4728a9",
+  "process": {
+    "pid": 1378871,
+    "start_ticks": "513825013",
+    "state": "R"
+  },
+  "tree": "98267dd84930b86f0b724383d9bbcfa30b9e8f66",
+  "untracked": [
+    {
+      "path": "src/daemon/review.rs",
+      "sha256": "63a0a1d70ed1da0e86fe7d23878e40c4213220a53587ce8e9d4c9a3ff11da7c0"
+    },
+    {
+      "path": "src/domain/review.rs",
+      "sha256": "86a2ed4f9b2f8a01989870e834cac1ba6420044c29ffe0fe8439f432ca3a3228"
+    },
+    {
+      "path": "tests/fixtures/review_operator.py",
+      "sha256": "e7a431eb88c0a2728e5e36f5f126b384ef88da35f80ed85701e1944e4e131f64"
+    },
+    {
+      "path": "tests/support/daemon_review.rs",
+      "sha256": "024dcdec86d828ad8bd7932771e019de49367de5b2c20133f2d5a5c865df2a15"
+    }
+  ],
+  "utc": "2026-10-30T00:32:40.763174+00:00"
+}

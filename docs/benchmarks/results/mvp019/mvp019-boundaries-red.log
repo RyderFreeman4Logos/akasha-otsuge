@@ -1,0 +1,61 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp019)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.29s
+     Running tests/domain.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/domain-c7cb1219a5e11d63)
+
+running 1 test
+
+thread 'an_automatic_proposal_cannot_replace_a_human_confirmed_procedure' (1379158) panicked at tests/domain.rs:849:5:
+assertion `left == right` failed
+  left: Active
+ right: Candidate
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test an_automatic_proposal_cannot_replace_a_human_confirmed_procedure ... FAILED
+
+failures:
+
+failures:
+    an_automatic_proposal_cannot_replace_a_human_confirmed_procedure
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--test domain`
+{"command": ["cargo", "test", "--locked", "--test", "domain", "an_automatic_proposal_cannot_replace_a_human_confirmed_procedure", "--", "--exact", "--nocapture"], "exit_code": 101}
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp019)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.38s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 4 tests
+
+thread 'review_tests::opening_a_review_does_not_suspend_active_memory_and_explicit_rejection_retires_it' (1379255) panicked at tests/support/daemon_review.rs:326:5:
+{"error":{"code":"INVALID_REQUEST","message":"The operation could not be completed"},"request_id":null,"schema_version":1,"sequence":1}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test review_tests::opening_a_review_does_not_suspend_active_memory_and_explicit_rejection_retires_it ... FAILED
+
+thread 'review_tests::review_state_retries_keep_their_policy_and_permissions_after_reload' (1379257) panicked at tests/support/daemon_review.rs:302:5:
+assertion `left == right` failed: a retry must use the accepted policy and receipt
+  left: Object {"error": Object {"code": String("IDEMPOTENCY_CONFLICT"), "message": String("The operation could not be completed")}, "request_id": String("review-test"), "schema_version": Number(1), "sequence": Number(1)}
+ right: Object {"data": Object {"commit_seq": Number(6), "config_generation": Number(1), "policy_revision": Null, "request_id": String("retry-state"), "request_sha256": String("d9a1ee0270114293c4bf36bdc240a7367640bd528eb7a8ea17fb47314f3c26a7"), "revisions": Array [Object {"commit_seq": Number(6), "key": Object {"id": String("review/91eed08ff9bfd4e47f4c88dd5013b28a49d3674b897f7d37d5a05416a0f92acb"), "kind": String("state")}}]}, "request_id": String("review-test"), "schema_version": Number(1), "sequence": Number(1)}
+test review_tests::review_state_retries_keep_their_policy_and_permissions_after_reload ... FAILED
+test review_tests::candidate_review_queue_is_durable_and_separate_from_active_memory ... ok
+test review_tests::review_cli_exact_edit_requires_operator_and_preserves_original ... ok
+
+failures:
+
+failures:
+    review_tests::opening_a_review_does_not_suspend_active_memory_and_explicit_rejection_retires_it
+    review_tests::review_state_retries_keep_their_policy_and_permissions_after_reload
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 94 filtered out; finished in 0.37s
+
+error: test failed, to rerun pass `--test daemon`
+{"command": ["cargo", "test", "--locked", "--test", "daemon", "review_tests::", "--", "--nocapture"], "exit_code": 101}

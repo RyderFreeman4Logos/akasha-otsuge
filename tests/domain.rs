@@ -811,3 +811,52 @@ async fn selective_policy_accepts_technical_evidence_without_granting_human_auth
     assert!(domain.active("untrusted").unwrap().is_none());
     store.close().await.unwrap();
 }
+
+#[tokio::test]
+async fn an_automatic_proposal_cannot_replace_a_human_confirmed_procedure() {
+    let fixture = Fixture::new();
+    let store = fixture.open().await;
+    let domain = Domain::new(&store);
+    let human = human(StatementIntent::ExplicitDecision);
+    let source = evidence(
+        &domain,
+        &human,
+        "procedure",
+        "Run checks before publishing",
+        scope(),
+    )
+    .await;
+    let mut original = write("procedure", source.clone(), MemoryKind::Procedure);
+    original.draft.claim = "Run checks before publishing".into();
+    original.draft.rationale.clear();
+    let adopted = domain
+        .adopt_statement(&original, &human, &policy(ReviewMode::Automatic), &source)
+        .await
+        .unwrap();
+    let mut proposed = original;
+    proposed.request_id = "automatic-procedure-change".into();
+    proposed.expected_revision = Some(adopted.commit_seq);
+    proposed.draft.claim = "Publish without running checks".into();
+    domain
+        .propose(
+            &proposed,
+            &agent(Origin::Extraction),
+            &policy(ReviewMode::Automatic),
+        )
+        .await
+        .unwrap();
+    let candidate = domain.memory("procedure").unwrap().unwrap();
+    assert_eq!(candidate.record.lifecycle, Lifecycle::Candidate);
+    assert_eq!(candidate.record.authority, Authority::Candidate);
+    assert!(candidate.record.approval.is_none());
+    assert_eq!(
+        domain
+            .active("procedure")
+            .unwrap()
+            .unwrap()
+            .revision
+            .commit_seq,
+        adopted.commit_seq
+    );
+    store.close().await.unwrap();
+}

@@ -1,0 +1,54 @@
+{
+  "artifacts": [
+    {
+      "file": "confirmation-rechecks.json",
+      "bytes": 16219,
+      "sha256": "8c4a8897c11b6afd5d216f0ac0de3ceb0a4dd0abc0a14ee8c1c74f0c1052a903",
+      "fixture_removed": true,
+      "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886"
+    },
+    {
+      "file": "exact-edit.json",
+      "bytes": 26992,
+      "sha256": "b7fefd48f02d59085d4b016beb4b36fcab6ac37738b48900fa888afb2ce3c0dc",
+      "fixture_removed": true,
+      "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886"
+    },
+    {
+      "file": "policy-automatic.json",
+      "bytes": 9805,
+      "sha256": "aca988078353fb6501fb7175900b9edf038aa81fd29d085c0aee9e83428fffa2",
+      "fixture_removed": true,
+      "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886"
+    },
+    {
+      "file": "policy-manual.json",
+      "bytes": 10609,
+      "sha256": "4f5b97bf4a9bdd407f46f77c080e7e37c943ce3ec1273acced0537158f2231d6",
+      "fixture_removed": true,
+      "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886"
+    },
+    {
+      "file": "policy-policy.json",
+      "bytes": 10610,
+      "sha256": "69e7046aa181772dd5a024c0506e25b73af1f5e485c1449288f96e27d4fbeb04",
+      "fixture_removed": true,
+      "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886"
+    },
+    {
+      "file": "running-policy-pinning.json",
+      "bytes": 9948,
+      "sha256": "142183f0077f3ceba648eaca8e817cf3bf7008349c311acec71d12688269b8de",
+      "fixture_removed": true,
+      "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886"
+    },
+    {
+      "file": "scoped-taste-and-successor.json",
+      "bytes": 31448,
+      "sha256": "0dd4c32dc0adb2cefb4fec25a6d04e8aaf9f1847960f6a0234ca884f07718407",
+      "fixture_removed": true,
+      "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886"
+    }
+  ],
+  "all_fixtures_removed": true
+}

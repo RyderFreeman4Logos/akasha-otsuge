@@ -1,0 +1,300 @@
+{
+  "binary": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/akasha-otsuge",
+  "binary_sha256": "eaa9bcb5cf0316b06a35eadca20350c5d0892e26686c3aabeb8d80f815632886",
+  "data": {
+    "active": {
+      "data": {
+        "data": {
+          "revision": {
+            "memory": {
+              "previous": 11,
+              "record": {
+                "approval": null,
+                "authority": "delegated_approved",
+                "authorization": {
+                  "adopt_explicit_decisions": false,
+                  "mode": "automatic",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": "alpha",
+                    "session": null,
+                    "user": "uid:1001"
+                  }
+                },
+                "config_generation": 2,
+                "draft": {
+                  "assumptions": [],
+                  "claim": "Use keyword search when offline.",
+                  "conditions": [
+                    "offline"
+                  ],
+                  "kind": "decision",
+                  "rationale": "A conditional proposal.",
+                  "scope": {
+                    "branch_or_version": null,
+                    "project": "alpha",
+                    "session": null,
+                    "user": "uid:1001"
+                  },
+                  "source_spans": [
+                    {
+                      "content_sha256": "664adf54cf7e3fc08599fef4ce58bd30a1692bd99a574371a752f8e90fcaf972",
+                      "end": 36,
+                      "event_id": "policy-original",
+                      "revision": 1,
+                      "start": 0
+                    }
+                  ],
+                  "valid_from_ms": null,
+                  "valid_until_ms": null
+                },
+                "lifecycle": "active",
+                "policy_revision": "extraction-v1/2",
+                "previous_adoption": null,
+                "provenance": {
+                  "actor": {
+                    "id": "extractor",
+                    "kind": "agent"
+                  },
+                  "binding": "after-reload",
+                  "generator": {
+                    "model": "controlled-extractor",
+                    "prompt_version": "extraction-v1",
+                    "runner": "text/extractor"
+                  },
+                  "origin": "extraction"
+                },
+                "schema_version": 1,
+                "semantic_sha256": "2a7e4c4a2010897335bcd1144893b68e0dc1bdfe8adcf643d7b1b028f0d2f2e2"
+              },
+              "revision": {
+                "commit_seq": 17,
+                "key": {
+                  "id": "extracted/0d5e2644e7cc73caabe55fb3b4cb422b43a4f6e7b74579a15d5aff159cf8ac05",
+                  "kind": "memory"
+                }
+              }
+            },
+            "recorded_at_ms": 1793321442666
+          },
+          "state": "active"
+        },
+        "read_seq": 18,
+        "retrieval_mode": "current_state",
+        "validated_at_seq": 18
+      },
+      "request_id": "cli/1399030/1793321442796",
+      "schema_version": 1,
+      "sequence": 1
+    },
+    "after_reload": {
+      "accepted_at_ms": 1793321442495,
+      "attempt": 1,
+      "cancel_requested": false,
+      "config_digest": "e8a6635717df89369cb9ac6dec7ca8470d1cde94c5f68cd2386d5381c39a4a3e",
+      "config_generation": 2,
+      "error": null,
+      "execution_budget_ms": 2010000,
+      "execution_deadline_ms": 1793323452540,
+      "extraction_plan": {
+        "scope": {
+          "branch_or_version": null,
+          "project": "alpha",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "sources": [
+          {
+            "content_sha256": "664adf54cf7e3fc08599fef4ce58bd30a1692bd99a574371a752f8e90fcaf972",
+            "end": 36,
+            "event_id": "policy-original",
+            "revision": 1,
+            "start": 0
+          }
+        ]
+      },
+      "extraction_review_mode": "automatic",
+      "id": "after-reload",
+      "lease_owner": null,
+      "lease_until_ms": null,
+      "queue_deadline_ms": 1793321742495,
+      "request_sha256": "3a86fa165eb3ea131aff71abf7fb58168bf7aac5f026d79866e56d997a887c1b",
+      "result": {
+        "candidates": [
+          {
+            "memory_id": "extracted/0d5e2644e7cc73caabe55fb3b4cb422b43a4f6e7b74579a15d5aff159cf8ac05",
+            "revision": 17,
+            "status": "active"
+          }
+        ],
+        "checkpoint": {
+          "bytes": 1311,
+          "parts": [
+            {
+              "commit_seq": 15,
+              "key": {
+                "id": "model-blob/91262cb866758cb06ace17cf4f8199172293d7845c7998bf13b9ed2f9798e76e",
+                "kind": "evidence"
+              }
+            }
+          ],
+          "sha256": "91262cb866758cb06ace17cf4f8199172293d7845c7998bf13b9ed2f9798e76e"
+        },
+        "generator": {
+          "model": "controlled-extractor",
+          "prompt_version": "extraction-v1",
+          "runner": "text/extractor"
+        },
+        "origin": "extraction",
+        "prompt_version": "extraction-v1",
+        "trace": {
+          "automatic_retries": 0,
+          "connect_ms": 10000,
+          "idle_ms": null,
+          "idle_triggered": false,
+          "local_long_timeout_verified": false,
+          "provider": {
+            "configured_ms": 1700000,
+            "effective_ms": 1700000,
+            "elapsed_ms": 1,
+            "layer": "provider",
+            "limiting_layer": "provider",
+            "remaining_ms": 1699998,
+            "started_at_unix_ms": 1793321442580,
+            "triggered_layer": null
+          },
+          "queue": {
+            "configured_ms": 300000,
+            "effective_ms": 300000,
+            "elapsed_ms": 0,
+            "layer": "queue",
+            "limiting_layer": "queue",
+            "remaining_ms": 299999,
+            "started_at_unix_ms": 1793321442580,
+            "triggered_layer": null
+          },
+          "workflow": {
+            "configured_ms": 2010000,
+            "effective_ms": 2010000,
+            "elapsed_ms": 41,
+            "layer": "workflow",
+            "limiting_layer": "workflow",
+            "remaining_ms": 2009958,
+            "started_at_unix_ms": 1793321442540,
+            "triggered_layer": null
+          }
+        }
+      },
+      "retry_at_ms": 1793321442495,
+      "schema_version": 1,
+      "started_at_ms": 1793321442540,
+      "state": "succeeded"
+    },
+    "before_reload": {
+      "accepted_at_ms": 1793321442232,
+      "attempt": 1,
+      "cancel_requested": false,
+      "config_digest": "dbd0600d8f6fc68e3a7f244fb1dc9970c13da83d16086a7f00e265ed90b2f1bf",
+      "config_generation": 1,
+      "error": null,
+      "execution_budget_ms": 2010000,
+      "execution_deadline_ms": 1793323452236,
+      "extraction_plan": {
+        "scope": {
+          "branch_or_version": null,
+          "project": "alpha",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "sources": [
+          {
+            "content_sha256": "664adf54cf7e3fc08599fef4ce58bd30a1692bd99a574371a752f8e90fcaf972",
+            "end": 36,
+            "event_id": "policy-original",
+            "revision": 1,
+            "start": 0
+          }
+        ]
+      },
+      "extraction_review_mode": "manual",
+      "id": "before-reload",
+      "lease_owner": null,
+      "lease_until_ms": null,
+      "queue_deadline_ms": 1793321742232,
+      "request_sha256": "3a86fa165eb3ea131aff71abf7fb58168bf7aac5f026d79866e56d997a887c1b",
+      "result": {
+        "candidates": [
+          {
+            "memory_id": "extracted/0d5e2644e7cc73caabe55fb3b4cb422b43a4f6e7b74579a15d5aff159cf8ac05",
+            "revision": 11,
+            "status": "candidate"
+          }
+        ],
+        "checkpoint": {
+          "bytes": 1314,
+          "parts": [
+            {
+              "commit_seq": 9,
+              "key": {
+                "id": "model-blob/96e98dd4b0baf8ed7d3a3a65ef6a6006146342fd7e984812fea3f93bd701fc2a",
+                "kind": "evidence"
+              }
+            }
+          ],
+          "sha256": "96e98dd4b0baf8ed7d3a3a65ef6a6006146342fd7e984812fea3f93bd701fc2a"
+        },
+        "generator": {
+          "model": "controlled-extractor",
+          "prompt_version": "extraction-v1",
+          "runner": "text/extractor"
+        },
+        "origin": "extraction",
+        "prompt_version": "extraction-v1",
+        "trace": {
+          "automatic_retries": 0,
+          "connect_ms": 10000,
+          "idle_ms": null,
+          "idle_triggered": false,
+          "local_long_timeout_verified": false,
+          "provider": {
+            "configured_ms": 1700000,
+            "effective_ms": 1700000,
+            "elapsed_ms": 114,
+            "layer": "provider",
+            "limiting_layer": "provider",
+            "remaining_ms": 1699885,
+            "started_at_unix_ms": 1793321442242,
+            "triggered_layer": null
+          },
+          "queue": {
+            "configured_ms": 300000,
+            "effective_ms": 300000,
+            "elapsed_ms": 0,
+            "layer": "queue",
+            "limiting_layer": "queue",
+            "remaining_ms": 299999,
+            "started_at_unix_ms": 1793321442242,
+            "triggered_layer": null
+          },
+          "workflow": {
+            "configured_ms": 2010000,
+            "effective_ms": 2010000,
+            "elapsed_ms": 121,
+            "layer": "workflow",
+            "limiting_layer": "workflow",
+            "remaining_ms": 2009878,
+            "started_at_unix_ms": 1793321442236,
+            "triggered_layer": null
+          }
+        }
+      },
+      "retry_at_ms": 1793321442232,
+      "schema_version": 1,
+      "started_at_ms": 1793321442236,
+      "state": "succeeded"
+    },
+    "controlled_model": true
+  },
+  "fixture_root": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/akasha-daemon-1398889-5",
+  "schema_version": 1
+}

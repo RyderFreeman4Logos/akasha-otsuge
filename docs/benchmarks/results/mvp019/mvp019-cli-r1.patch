@@ -1,0 +1,777 @@
+diff --git a/src/daemon/extraction.rs b/src/daemon/extraction.rs
+index 274d8ea..6db8d05 100644
+--- a/src/daemon/extraction.rs
++++ b/src/daemon/extraction.rs
+@@ -201,7 +201,16 @@ impl Service {
+             &self.storage,
+             plan,
+             &id,
+-            job.config_generation,
++            &crate::domain::Policy {
++                revision: format!("{PROMPT_VERSION}/{}", job.config_generation),
++                config_generation: job.config_generation,
++                // Jobs admitted by MVP-017 keep their original candidate-only contract.
++                mode: job
++                    .extraction_review_mode
++                    .unwrap_or(crate::config::ReviewMode::Manual),
++                scope: plan.scope.clone(),
++                adopt_explicit_decisions: false,
++            },
+             generator.clone(),
+             drafts,
+             &workflow,
+diff --git a/src/daemon/extraction_tests.rs b/src/daemon/extraction_tests.rs
+index 1602fff..84c2073 100644
+--- a/src/daemon/extraction_tests.rs
++++ b/src/daemon/extraction_tests.rs
+@@ -91,6 +91,61 @@ fn batch(plan: &crate::extraction::Plan, claim: &str) -> Value {
+     json!({"schema_version":1,"candidates":[{"kind":"preference","scope":plan.scope,"claim":claim,"rationale":"Preserve the explicit condition.","conditions":["offline"],"assumptions":[],"sources":[{"source":0,"start":0,"end":plan.sources[0].end}],"valid_from_ms":null,"valid_until_ms":null}]})
+ }
+ 
++fn publication_policy(plan: &crate::extraction::Plan) -> Policy {
++    Policy {
++        revision: "extraction-v1/1".into(),
++        config_generation: 1,
++        mode: crate::config::ReviewMode::Manual,
++        scope: plan.scope.clone(),
++        adopt_explicit_decisions: false,
++    }
++}
++
++#[tokio::test]
++async fn legacy_extraction_jobs_keep_their_candidate_only_publication_contract() {
++    let endpoint = endpoint::Endpoint::extraction();
++    let settings = format!(
++        "[review]\nmode='automatic'\n[retrieval]\nextraction='fixture'\n[models.fixture]\nkind='text'\nendpoint={:?}\nmodel='controlled-extractor'\nlocal=true\n",
++        endpoint.address
++    );
++    let (_fixture, service, _) = tests::fixture("legacy-extraction-policy", &settings).await;
++    let plan = source_plan(
++        &service,
++        "legacy-original",
++        "Only if offline, use keyword search.",
++        None,
++    )
++    .await;
++    service
++        .submit_extraction("legacy".into(), plan)
++        .await
++        .unwrap();
++    let (revision, job) = service.job("legacy").unwrap();
++    let mut old = serde_json::to_value(job).unwrap();
++    assert_eq!(old["extraction_review_mode"], "automatic");
++    old.as_object_mut()
++        .unwrap()
++        .remove("extraction_review_mode");
++    let old: Job = serde_json::from_value(old).unwrap();
++    service
++        .save_job(&old, Some(revision), vec![])
++        .await
++        .unwrap();
++    assert!(service.claim("legacy", 0).await.unwrap());
++    service.clone().execute_job("legacy".into()).await.unwrap();
++    let job = service.job("legacy").unwrap().1;
++    assert_eq!(job.state, "succeeded", "{:?}", job.error);
++    let result = job.result.unwrap();
++    let id = result["candidates"][0]["memory_id"].as_str().unwrap();
++    let memory = Domain::new(&service.storage).memory(id).unwrap().unwrap();
++    assert_eq!(
++        memory.record.authorization.mode,
++        crate::config::ReviewMode::Manual
++    );
++    assert_eq!(memory.record.authority, crate::domain::Authority::Candidate);
++    service.storage.close().await.unwrap();
++}
++
+ async fn publish(
+     service: &Service,
+     plan: &crate::extraction::Plan,
+@@ -103,7 +158,7 @@ async fn publish(
+         &service.storage,
+         plan,
+         id,
+-        1,
++        &publication_policy(plan),
+         generator(),
+         drafts,
+         &workflow(),
+@@ -429,7 +484,7 @@ async fn extraction_source_union_limit_fails_the_job_without_losing_old_sources(
+                 &service.storage,
+                 &plan,
+                 &format!("job-{n}"),
+-                1,
++                &publication_policy(&plan),
+                 generator(),
+                 drafts,
+                 &workflow(),
+@@ -501,7 +556,7 @@ async fn extraction_publication_cannot_start_writes_after_its_workflow_expires()
+         &service.storage,
+         &plan,
+         "expired",
+-        1,
++        &publication_policy(&plan),
+         generator(),
+         drafts,
+         &clock,
+diff --git a/src/daemon/jobs.rs b/src/daemon/jobs.rs
+index e3db10f..6a8cc9c 100644
+--- a/src/daemon/jobs.rs
++++ b/src/daemon/jobs.rs
+@@ -598,6 +598,8 @@ pub(super) struct Job {
+     #[serde(default, skip_serializing_if = "Option::is_none")]
+     extraction_native: Option<consult::NativeExecutor>,
+     #[serde(default, skip_serializing_if = "Option::is_none")]
++    extraction_review_mode: Option<crate::config::ReviewMode>,
++    #[serde(default, skip_serializing_if = "Option::is_none")]
+     grill_plan: Option<crate::grill::Plan>,
+     #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+     grill_natives: std::collections::BTreeMap<String, consult::NativeExecutor>,
+@@ -1036,6 +1038,9 @@ impl Service {
+                 binding,
+                 path,
+                 model_plan,
++                extraction_review_mode: extraction_plan
++                    .as_ref()
++                    .map(|_| snapshot.resolved().config().review.mode),
+                 extraction_plan,
+                 extraction_native,
+                 grill_plan,
+diff --git a/src/domain/mod.rs b/src/domain/mod.rs
+index 16cc261..5b07bf6 100644
+--- a/src/domain/mod.rs
++++ b/src/domain/mod.rs
+@@ -3,6 +3,8 @@
+ mod history;
+ mod recall;
+ mod review;
++#[cfg(test)]
++mod review_tests;
+ mod schema;
+ 
+ pub use history::*;
+diff --git a/src/extraction.rs b/src/extraction.rs
+index a65e048..3c0b6f7 100644
+--- a/src/extraction.rs
++++ b/src/extraction.rs
+@@ -174,7 +174,7 @@ pub(crate) async fn publish(
+     storage: &Storage,
+     plan: &Plan,
+     id: &str,
+-    generation: u64,
++    policy: &Policy,
+     generator: Generator,
+     drafts: Vec<MemoryDraft>,
+     workflow: &crate::config::deadline::Deadline,
+@@ -187,13 +187,6 @@ pub(crate) async fn publish(
+         Origin::Extraction,
+         generator,
+     )?;
+-    let policy = Policy {
+-        revision: format!("{PROMPT_VERSION}/{generation}"),
+-        config_generation: generation,
+-        mode: crate::config::ReviewMode::Manual,
+-        scope: plan.scope.clone(),
+-        adopt_explicit_decisions: false,
+-    };
+     let mut published = vec![];
+     for mut draft in drafts {
+         if workflow.expired().is_some() {
+@@ -220,7 +213,7 @@ pub(crate) async fn publish(
+             if merged.source_spans.len() > 32 {
+                 return Err(StorageError::new("EXTRACTION_SOURCE_LIMIT"));
+             }
+-            if merged == old.record.draft {
++            if merged == old.record.draft && old.record.authorization.mode == policy.mode {
+                 published.push(json!({"memory_id":memory_id,"revision":old.revision.commit_seq,"status":"existing"}));
+                 continue;
+             }
+@@ -243,12 +236,16 @@ pub(crate) async fn publish(
+                     draft,
+                 },
+                 &ingress,
+-                &policy,
++                policy,
+             )
+             .await?;
+-        published.push(
+-            json!({"memory_id":memory_id,"revision":receipt.commit_seq,"status":"candidate"}),
+-        );
++        let lifecycle = domain
++            .revision(&memory_id, receipt.commit_seq)?
++            .ok_or_else(|| StorageError::new("DOMAIN_CORRUPT"))?
++            .record
++            .lifecycle;
++        published
++            .push(json!({"memory_id":memory_id,"revision":receipt.commit_seq,"status":lifecycle}));
+         #[cfg(test)]
+         crate::storage::crash_tests::checkpoint("extraction-candidate");
+     }
+diff --git a/tests/fixtures/review_operator.py b/tests/fixtures/review_operator.py
+index eb1df82..3a31eb0 100644
+--- a/tests/fixtures/review_operator.py
++++ b/tests/fixtures/review_operator.py
+@@ -6,6 +6,7 @@ import pty
+ import re
+ import select
+ import signal
++import subprocess
+ import sys
+ import time
+ 
+@@ -34,7 +35,15 @@ try:
+                 raise RuntimeError("operator output exceeded bound")
+             match = re.search(rb"Type (confirm [0-9a-f]{64}) to apply:", data)
+             if match and not sent:
+-                os.write(fd, (match[1] if sys.argv[4] == "confirm" else b"decline") + b"\n")
++                base = json.loads(sys.argv[1])
++                if sys.argv[4] == "confirm-revoke":
++                    subprocess.run(base + ["access", "revoke"], check=True, capture_output=True)
++                if sys.argv[4] == "confirm-reload":
++                    config = base[base.index("--config") + 1]
++                    with open(config, "a") as target:
++                        target.write("\n[review]\nmode='automatic'\n")
++                    subprocess.run(base + ["config", "reload"], check=True, capture_output=True)
++                os.write(fd, (match[1] if sys.argv[4].startswith("confirm") else b"decline") + b"\n")
+                 sent = True
+         ended, observed_status = os.waitpid(pid, os.WNOHANG)
+         if ended:
+diff --git a/tests/support/daemon_review.rs b/tests/support/daemon_review.rs
+index 320062f..c0c661e 100644
+--- a/tests/support/daemon_review.rs
++++ b/tests/support/daemon_review.rs
+@@ -5,14 +5,31 @@ use akasha_otsuge::domain::*;
+ use akasha_otsuge::storage::Storage;
+ 
+ fn seed(daemon: &Daemon, mode: ReviewMode, name: &str) -> u64 {
++    seed_memory(
++        daemon,
++        mode,
++        name,
++        MemoryKind::Fact,
++        scope(),
++        "The fixture build passed on Linux.",
++    )
++}
++
++fn seed_memory(
++    daemon: &Daemon,
++    mode: ReviewMode,
++    name: &str,
++    kind: MemoryKind,
++    applicability: Scope,
++    text: &str,
++) -> u64 {
+     runtime().block_on(async {
+         let store = Storage::open(&storage_config(daemon)).await.unwrap();
+         let domain = Domain::new(&store);
+-        let ingress = Ingress::tool("fixture", "build-receipt", scope()).unwrap();
+-        let text = "The fixture build passed on Linux.";
++        let ingress = Ingress::tool("fixture", "build-receipt", applicability.clone()).unwrap();
+         let original = SourceDraft {
+             event_id: format!("source-{name}"),
+-            scope: scope(),
++            scope: applicability.clone(),
+             text: text.into(),
+             reported_role: None,
+             event_time_ms: None,
+@@ -27,8 +44,8 @@ fn seed(daemon: &Daemon, mode: ReviewMode, name: &str) -> u64 {
+             memory_id: name.into(),
+             expected_revision: None,
+             draft: MemoryDraft {
+-                kind: MemoryKind::Fact,
+-                scope: scope(),
++                kind,
++                scope: applicability.clone(),
+                 claim: text.into(),
+                 rationale: "native build receipt".into(),
+                 conditions: vec!["Linux".into()],
+@@ -55,7 +72,7 @@ fn seed(daemon: &Daemon, mode: ReviewMode, name: &str) -> u64 {
+                     revision: "fixture-policy".into(),
+                     config_generation: 1,
+                     mode,
+-                    scope: scope(),
++                    scope: applicability.clone(),
+                     adopt_explicit_decisions: false,
+                 },
+             )
+@@ -280,6 +297,11 @@ fn review_cli_exact_edit_requires_operator_and_preserves_original() {
+         assert!(store.outbox(seq).unwrap().unwrap().revisions.len() >= 5);
+         store.close().await.unwrap();
+     });
++    evidence(
++        "exact-edit",
++        &daemon,
++        &json!({"synthetic_operator":true,"original":show,"decision":decision,"preview":preview,"raw_ipc_denial":raw,"declined":declined,"approved":approved,"resolved":resolved,"replay":replay,"stale":stale}),
++    );
+ }
+ 
+ #[test]
+@@ -360,3 +382,468 @@ fn opening_a_review_does_not_suspend_active_memory_and_explicit_rejection_retire
+     let historical = daemon.cli(&["memory", "show", "active-fact", "--at", &active.to_string()]);
+     assert_eq!(historical["data"]["data"]["state"], "active");
+ }
++
++#[test]
++fn operator_confirmation_rechecks_permissions_and_config_before_committing() {
++    let mut daemon = Daemon::new();
++    seed(&daemon, ReviewMode::Manual, "recheck");
++    daemon.start();
++    let page = rpc(
++        &daemon,
++        json!({"op":"review_list","scope":scope(),"after":null}),
++    );
++    let item = &page["data"]["items"][0];
++    let plan = daemon.root.join("approve.json");
++    std::fs::write(
++        &plan,
++        serde_json::to_vec(
++            &json!({"id":item["id"],"expected_revision":item["revision"],
++        "action":"approve","draft":null,"reason":"Use this exact observation"}),
++        )
++        .unwrap(),
++    )
++    .unwrap();
++    let revoked = operator_cli(&daemon, &plan, "revoked", "confirm-revoke");
++    assert_eq!(
++        revoked["response"]["error"]["code"], "READ_DENIED",
++        "{revoked}"
++    );
++    let scope_file = daemon.root.join("scope.json");
++    std::fs::write(&scope_file, serde_json::to_vec(&scope()).unwrap()).unwrap();
++    daemon.cli(&["access", "grant", scope_file.to_str().unwrap()]);
++    let reloaded = operator_cli(&daemon, &plan, "reloaded", "confirm-reload");
++    assert_eq!(
++        reloaded["response"]["error"]["code"], "REVIEW_PREVIEW_CHANGED",
++        "{reloaded}"
++    );
++    let unchanged = daemon.cli(&["review", "show", item["id"].as_str().unwrap()]);
++    assert_eq!(unchanged["data"]["item"], *item);
++    let accepted = operator_cli(&daemon, &plan, "new-operation", "confirm");
++    assert_eq!(accepted["exit_code"], 0, "{accepted}");
++    let applied = daemon.cli(&["review", "show", item["id"].as_str().unwrap()]);
++    assert_eq!(
++        applied["data"]["result"]["record"]["authorization"]["mode"],
++        "automatic"
++    );
++    assert_eq!(applied["data"]["result"]["record"]["config_generation"], 2);
++    daemon.configure("[review]\nmode='manual'\n");
++    daemon.cli(&["config", "reload"]);
++    let replay = operator_cli(&daemon, &plan, "new-operation", "confirm");
++    assert_eq!(replay["response"]["data"], accepted["response"]["data"]);
++    evidence(
++        "confirmation-rechecks",
++        &daemon,
++        &json!({"revoked":revoked,"reloaded":reloaded,"accepted":accepted,"replay":replay}),
++    );
++}
++
++fn tool_original(daemon: &Daemon) -> SourceSpan {
++    runtime().block_on(async {
++        let store = Storage::open(&storage_config(daemon)).await.unwrap();
++        let domain = Domain::new(&store);
++        let text = "Only if offline, use keyword search.";
++        let source = SourceDraft {
++            event_id: "policy-original".into(),
++            scope: scope(),
++            text: text.into(),
++            reported_role: None,
++            event_time_ms: None,
++            observed_time_ms: 1,
++        };
++        let ingress = Ingress::tool("controlled-observation", "policy-matrix", scope()).unwrap();
++        let receipt = domain
++            .record_source("policy-original", &source, &ingress, 1)
++            .await
++            .unwrap();
++        let span = SourceSpan {
++            event_id: source.event_id.clone(),
++            revision: receipt.commit_seq,
++            content_sha256: domain
++                .source(&source.event_id, receipt.commit_seq)
++                .unwrap()
++                .content_sha256,
++            start: 0,
++            end: text.len(),
++        };
++        store.close().await.unwrap();
++        span
++    })
++}
++
++fn extractor_config(endpoint: &str, mode: &str) -> String {
++    format!(
++        "[runtime]\nmax_concurrent_jobs=1\n[retrieval]\nextraction='extractor'\n[review]\nmode='{mode}'\n[models.extractor]\nkind='text'\nendpoint={endpoint:?}\nmodel='controlled-extractor'\nlocal=true\n"
++    )
++}
++
++#[test]
++fn extraction_cli_obeys_all_three_policies_for_the_same_candidate() {
++    for mode in ["manual", "policy", "automatic"] {
++        let endpoint = super::model_tests::Endpoint::extraction();
++        let mut daemon = Daemon::new();
++        let source = tool_original(&daemon);
++        daemon.configure(&extractor_config(&endpoint.address, mode));
++        daemon.start();
++        let file = daemon.root.join("extract.json");
++        std::fs::write(
++            &file,
++            serde_json::to_vec(&json!({"scope":scope(),"sources":[source]})).unwrap(),
++        )
++        .unwrap();
++        daemon.cli(&[
++            "extract",
++            "run",
++            file.to_str().unwrap(),
++            "--idempotency-key",
++            "extract-policy",
++        ]);
++        let job = super::extraction_tests::finished(&daemon, "extract-policy");
++        assert_eq!(job["state"], "succeeded", "{job}");
++        let memory_id = job["result"]["candidates"][0]["memory_id"]
++            .as_str()
++            .unwrap();
++        let list = rpc(
++            &daemon,
++            json!({"op":"review_list","scope":scope(),"after":null}),
++        );
++        let item = &list["data"]["items"][0];
++        let show = daemon.cli(&["review", "show", item["id"].as_str().unwrap()]);
++        assert_eq!(
++            show["data"]["proposal"]["record"]["authorization"]["mode"],
++            mode
++        );
++        assert_eq!(
++            show["data"]["proposal"]["record"]["authority"],
++            if mode == "automatic" {
++                "delegated_approved"
++            } else {
++                "candidate"
++            }
++        );
++        assert_eq!(
++            daemon.cli(&["memory", "show", memory_id])["data"]["data"]["state"],
++            if mode == "automatic" {
++                "active"
++            } else {
++                "absent"
++            }
++        );
++        if mode != "automatic" {
++            let plan = daemon.root.join("approve-policy.json");
++            std::fs::write(
++                &plan,
++                serde_json::to_vec(
++                    &json!({"id":item["id"],"expected_revision":item["revision"],
++                "action":"approve","draft":null,"reason":"Approve this scoped conditional result"}),
++                )
++                .unwrap(),
++            )
++            .unwrap();
++            let approved = operator_cli(&daemon, &plan, "approve-policy", "confirm");
++            assert_eq!(approved["exit_code"], 0, "{approved}");
++            assert_eq!(
++                daemon.cli(&["memory", "show", memory_id])["data"]["data"]["state"],
++                "active"
++            );
++        }
++        evidence(
++            &format!("policy-{mode}"),
++            &daemon,
++            &json!({"controlled_model":true,"synthetic_operator":true,"mode":mode,"job":job,"original_proposal":show,"final_memory":daemon.cli(&["memory","show",memory_id])}),
++        );
++    }
++}
++
++#[test]
++fn extraction_policy_reload_pins_running_jobs_and_reevaluates_new_operations() {
++    let endpoint = super::model_tests::Endpoint::extraction();
++    endpoint.pause();
++    let mut daemon = Daemon::new();
++    let source = tool_original(&daemon);
++    daemon.configure(&extractor_config(&endpoint.address, "manual"));
++    daemon.start();
++    let file = daemon.root.join("extract.json");
++    std::fs::write(
++        &file,
++        serde_json::to_vec(&json!({"scope":scope(),"sources":[source]})).unwrap(),
++    )
++    .unwrap();
++    daemon.cli(&[
++        "extract",
++        "run",
++        file.to_str().unwrap(),
++        "--idempotency-key",
++        "before-reload",
++    ]);
++    let end = Instant::now() + Duration::from_secs(20);
++    while endpoint.requests.lock().unwrap().is_empty() {
++        assert!(Instant::now() < end);
++        std::thread::sleep(Duration::from_millis(10));
++    }
++    daemon.configure(&extractor_config(&endpoint.address, "automatic"));
++    daemon.cli(&["config", "reload"]);
++    endpoint.resume();
++    let old = super::extraction_tests::finished(&daemon, "before-reload");
++    assert_eq!(old["state"], "succeeded", "{old}");
++    let memory_id = old["result"]["candidates"][0]["memory_id"]
++        .as_str()
++        .unwrap();
++    assert_eq!(
++        daemon.cli(&["memory", "show", memory_id])["data"]["data"]["state"],
++        "absent"
++    );
++    daemon.cli(&[
++        "extract",
++        "run",
++        file.to_str().unwrap(),
++        "--idempotency-key",
++        "after-reload",
++    ]);
++    let new = super::extraction_tests::finished(&daemon, "after-reload");
++    assert_eq!(new["state"], "succeeded", "{new}");
++    assert_eq!(new["result"]["candidates"][0]["memory_id"], memory_id);
++    let active = daemon.cli(&["memory", "show", memory_id]);
++    assert_eq!(
++        active["data"]["data"]["state"], "active",
++        "new operation did not apply the new policy: {active}"
++    );
++    assert_eq!(
++        active["data"]["data"]["revision"]["memory"]["record"]["config_generation"],
++        2
++    );
++    assert_eq!(old["config_generation"], 1);
++    assert_eq!(new["config_generation"], 2);
++    evidence(
++        "running-policy-pinning",
++        &daemon,
++        &json!({"controlled_model":true,"before_reload":old,"after_reload":new,"active":active}),
++    );
++}
++
++fn evidence(name: &str, daemon: &Daemon, value: &Value) {
++    use sha2::{Digest, Sha256};
++    if let Some(root) = std::env::var_os("AKASHA_REVIEW_EVIDENCE") {
++        let path = PathBuf::from(root).join(format!("{name}.json"));
++        let binary = std::env::var_os("AKASHA_ACCEPTANCE_BINARY")
++            .map(PathBuf::from)
++            .unwrap_or_else(|| PathBuf::from(BIN));
++        let digest: String = Sha256::digest(std::fs::read(&binary).unwrap())
++            .iter()
++            .map(|b| format!("{b:02x}"))
++            .collect();
++        let receipt = json!({"schema_version":1,"binary":binary,"binary_sha256":digest,"fixture_root":daemon.root,"data":value});
++        std::fs::write(path, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
++    }
++}
++
++fn approve_item(daemon: &Daemon, item: &Value, id: &str) -> Value {
++    let plan = daemon.root.join(format!("{id}.json"));
++    std::fs::write(&plan,serde_json::to_vec(&json!({"id":item["id"],"expected_revision":item["revision"],
++        "action":"approve","draft":null,"reason":"Synthetic operator confirms this exact scoped rule"})).unwrap()).unwrap();
++    let result = operator_cli(daemon, &plan, id, "confirm");
++    assert_eq!(result["exit_code"], 0, "{result}");
++    result
++}
++
++#[test]
++fn scoped_operator_taste_and_explicit_successors_keep_unrelated_rules() {
++    let mut daemon = Daemon::new();
++    let global = Scope {
++        project: None,
++        ..scope()
++    };
++    let local = Scope {
++        branch_or_version: Some("v2".into()),
++        ..scope()
++    };
++    seed_memory(
++        &daemon,
++        ReviewMode::Manual,
++        "global-taste",
++        MemoryKind::Preference,
++        global.clone(),
++        "Prefer offline tools",
++    );
++    seed_memory(
++        &daemon,
++        ReviewMode::Manual,
++        "local-exception",
++        MemoryKind::Preference,
++        local.clone(),
++        "Use the online tool for alpha v2",
++    );
++    daemon.start();
++    let page = rpc(
++        &daemon,
++        json!({"op":"review_list","scope":global,"after":null}),
++    );
++    let mut approvals = Vec::new();
++    for item in page["data"]["items"].as_array().unwrap() {
++        approvals.push(approve_item(
++            &daemon,
++            item,
++            &format!("approve-{}", item["memory_id"].as_str().unwrap()),
++        ));
++    }
++    let global_before = daemon.cli(&["memory", "show", "global-taste"]);
++    daemon.cli(&["daemon", "stop"]);
++    daemon.wait();
++    runtime().block_on(async {
++        let store = Storage::open(&storage_config(&daemon)).await.unwrap();
++        let domain = Domain::new(&store);
++        let old = domain.memory("global-taste").unwrap().unwrap();
++        let mut draft = old.record.draft.clone();
++        draft.claim = "Prefer offline tools and retain audit receipts".into();
++        domain
++            .propose(
++                &MemoryWrite {
++                    request_id: "successor-proposal".into(),
++                    memory_id: "global-taste".into(),
++                    expected_revision: Some(old.revision.commit_seq),
++                    draft,
++                },
++                &Ingress::tool("later-generator", "later-proposal", global.clone()).unwrap(),
++                &Policy {
++                    revision: "automatic-proposal".into(),
++                    config_generation: 1,
++                    mode: ReviewMode::Automatic,
++                    scope: global.clone(),
++                    adopt_explicit_decisions: false,
++                },
++            )
++            .await
++            .unwrap();
++        let candidate = domain.memory("global-taste").unwrap().unwrap();
++        assert_eq!(candidate.record.authority, Authority::Candidate);
++        assert!(candidate.record.approval.is_none());
++        assert_eq!(domain.active("global-taste").unwrap().unwrap(), old);
++        store.close().await.unwrap();
++    });
++    daemon.start();
++    assert_eq!(
++        daemon.cli(&["memory", "show", "global-taste"])["data"]["data"],
++        global_before["data"]["data"]
++    );
++    let queue = rpc(
++        &daemon,
++        json!({"op":"review_list","scope":global,"after":null}),
++    );
++    let next = queue["data"]["items"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .find(|i| i["memory_id"] == "global-taste" && i["state"] == "open")
++        .unwrap();
++    approvals.push(approve_item(&daemon, next, "explicit-successor"));
++    daemon.cli(&["index", "sync", "--idempotency-key", "taste-index"]);
++    assert_eq!(
++        super::extraction_tests::finished(&daemon, "taste-index")["state"],
++        "succeeded"
++    );
++    let mut searches = Vec::new();
++    for (id, query_scope, expected) in [
++        ("local", local, vec!["local-exception", "global-taste"]),
++        (
++            "other",
++            Scope {
++                project: Some("beta".into()),
++                branch_or_version: Some("v2".into()),
++                ..global
++            },
++            vec!["global-taste"],
++        ),
++    ] {
++        let file = daemon.root.join(format!("{id}-scope.json"));
++        std::fs::write(&file, serde_json::to_vec(&query_scope).unwrap()).unwrap();
++        daemon.cli(&[
++            "search",
++            "unrelated query",
++            "--scope",
++            file.to_str().unwrap(),
++            "--idempotency-key",
++            id,
++        ]);
++        let job = super::extraction_tests::finished(&daemon, id);
++        assert_eq!(job["state"], "succeeded", "{job}");
++        let result: Value =
++            serde_json::from_str(job["result"]["output"].as_str().unwrap()).unwrap();
++        let actual: Vec<_> = result["rules"]
++            .as_array()
++            .unwrap()
++            .iter()
++            .map(|r| r["memory"]["revision"]["key"]["id"].as_str().unwrap())
++            .collect();
++        assert_eq!(actual, expected, "{result}");
++        assert!(
++            result["rules"]
++                .as_array()
++                .unwrap()
++                .iter()
++                .any(|r| r["memory"]["record"]["draft"]["claim"]
++                    == "Prefer offline tools and retain audit receipts")
++        );
++        searches.push(result);
++    }
++    evidence(
++        "scoped-taste-and-successor",
++        &daemon,
++        &json!({"synthetic_operator":true,"approvals":approvals,"searches":searches,"original_global":global_before}),
++    );
++}
++
++#[test]
++fn inbox_pages_and_review_state_history_are_bounded_and_cannot_approve() {
++    let mut daemon = Daemon::new();
++    let active = seed(&daemon, ReviewMode::Automatic, "paged");
++    daemon.start();
++    for index in 0..35 {
++        let result = rpc(
++            &daemon,
++            json!({"op":"review_open","memory_id":"paged","expected_revision":active,
++            "reason":format!("Investigation {index}"),"idempotency_key":format!("page-{index}")}),
++        );
++        assert!(result.get("error").is_none(), "{result}");
++    }
++    let first = rpc(
++        &daemon,
++        json!({"op":"review_list","scope":scope(),"after":null}),
++    );
++    assert_eq!(first["data"]["items"].as_array().unwrap().len(), 32);
++    let second = rpc(
++        &daemon,
++        json!({"op":"review_list","scope":scope(),"after":first["data"]["next"]}),
++    );
++    assert_eq!(second["data"]["items"].as_array().unwrap().len(), 3);
++    assert!(second["data"]["next"].is_null());
++    let item = &first["data"]["items"][0];
++    let mut revision = item["revision"].clone();
++    for state in ["investigating", "resolved", "open", "dismissed"] {
++        let changed = rpc(
++            &daemon,
++            json!({"op":"review_state","id":item["id"],"expected_revision":revision,
++            "state":state,"reason":"State alone does not authorize a memory change","idempotency_key":state}),
++        );
++        assert!(changed.get("error").is_none(), "{changed}");
++        revision = changed["data"]["commit_seq"].clone();
++    }
++    let original = rpc(
++        &daemon,
++        json!({"op":"review_show","id":item["id"],"at":item["revision"]}),
++    );
++    assert_eq!(original["data"]["item"], *item);
++    let invalid = rpc(
++        &daemon,
++        json!({"op":"review_state","id":item["id"],"expected_revision":revision,
++        "state":"ack","reason":"Notification acknowledged","idempotency_key":"ack"}),
++    );
++    assert_eq!(invalid["error"]["code"], "INVALID_REQUEST");
++    let current = daemon.cli(&["memory", "show", "paged"]);
++    assert_eq!(
++        current["data"]["data"]["revision"]["memory"]["revision"]["commit_seq"],
++        active
++    );
++    assert_eq!(
++        current["data"]["data"]["revision"]["memory"]["record"]["authority"],
++        "delegated_approved"
++    );
++}

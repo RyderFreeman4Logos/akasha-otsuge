@@ -91,6 +91,61 @@ fn batch(plan: &crate::extraction::Plan, claim: &str) -> Value {
     json!({"schema_version":1,"candidates":[{"kind":"preference","scope":plan.scope,"claim":claim,"rationale":"Preserve the explicit condition.","conditions":["offline"],"assumptions":[],"sources":[{"source":0,"start":0,"end":plan.sources[0].end}],"valid_from_ms":null,"valid_until_ms":null}]})
 }
 
+fn publication_policy(plan: &crate::extraction::Plan) -> Policy {
+    Policy {
+        revision: "extraction-v1/1".into(),
+        config_generation: 1,
+        mode: crate::config::ReviewMode::Manual,
+        scope: plan.scope.clone(),
+        adopt_explicit_decisions: false,
+    }
+}
+
+#[tokio::test]
+async fn legacy_extraction_jobs_keep_their_candidate_only_publication_contract() {
+    let endpoint = endpoint::Endpoint::extraction();
+    let settings = format!(
+        "[review]\nmode='automatic'\n[retrieval]\nextraction='fixture'\n[models.fixture]\nkind='text'\nendpoint={:?}\nmodel='controlled-extractor'\nlocal=true\n",
+        endpoint.address
+    );
+    let (_fixture, service, _) = tests::fixture("legacy-extraction-policy", &settings).await;
+    let plan = source_plan(
+        &service,
+        "legacy-original",
+        "Only if offline, use keyword search.",
+        None,
+    )
+    .await;
+    service
+        .submit_extraction("legacy".into(), plan)
+        .await
+        .unwrap();
+    let (revision, job) = service.job("legacy").unwrap();
+    let mut old = serde_json::to_value(job).unwrap();
+    assert_eq!(old["extraction_review_mode"], "automatic");
+    old.as_object_mut()
+        .unwrap()
+        .remove("extraction_review_mode");
+    let old: Job = serde_json::from_value(old).unwrap();
+    service
+        .save_job(&old, Some(revision), vec![])
+        .await
+        .unwrap();
+    assert!(service.claim("legacy", 0).await.unwrap());
+    service.clone().execute_job("legacy".into()).await.unwrap();
+    let job = service.job("legacy").unwrap().1;
+    assert_eq!(job.state, "succeeded", "{:?}", job.error);
+    let result = job.result.unwrap();
+    let id = result["candidates"][0]["memory_id"].as_str().unwrap();
+    let memory = Domain::new(&service.storage).memory(id).unwrap().unwrap();
+    assert_eq!(
+        memory.record.authorization.mode,
+        crate::config::ReviewMode::Manual
+    );
+    assert_eq!(memory.record.authority, crate::domain::Authority::Candidate);
+    service.storage.close().await.unwrap();
+}
+
 async fn publish(
     service: &Service,
     plan: &crate::extraction::Plan,
@@ -103,7 +158,7 @@ async fn publish(
         &service.storage,
         plan,
         id,
-        1,
+        &publication_policy(plan),
         generator(),
         drafts,
         &workflow(),
@@ -429,7 +484,7 @@ async fn extraction_source_union_limit_fails_the_job_without_losing_old_sources(
                 &service.storage,
                 &plan,
                 &format!("job-{n}"),
-                1,
+                &publication_policy(&plan),
                 generator(),
                 drafts,
                 &workflow(),
@@ -501,7 +556,7 @@ async fn extraction_publication_cannot_start_writes_after_its_workflow_expires()
         &service.storage,
         &plan,
         "expired",
-        1,
+        &publication_policy(&plan),
         generator(),
         drafts,
         &clock,
