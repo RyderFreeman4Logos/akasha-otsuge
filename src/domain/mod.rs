@@ -2,10 +2,12 @@
 
 mod history;
 mod recall;
+mod review;
 mod schema;
 
 pub use history::*;
 pub use recall::*;
+pub use review::*;
 pub use schema::*;
 
 use serde::{Deserialize, Serialize};
@@ -551,7 +553,7 @@ impl<'a> Domain<'a> {
         })
     }
 
-    async fn persist(&self, write: &MemoryWrite, record: MemoryRecord) -> Result<CommitReceipt> {
+    fn memory_changes(&self, write: &MemoryWrite, record: &MemoryRecord) -> Result<Vec<Change>> {
         let mut changes = vec![Change {
             key: memory_key(&write.memory_id),
             expected_revision: write.expected_revision,
@@ -575,12 +577,26 @@ impl<'a> Domain<'a> {
                 });
             }
         }
+        if let Some(change) = review::candidate_change(write, record)? {
+            // Old accepted requests retain their original canonical transaction on replay.
+            if self
+                .storage
+                .receipt(&write.request_id)?
+                .is_none_or(|receipt| receipt.revisions.iter().any(|r| r.key == change.key))
+            {
+                changes.push(change);
+            }
+        }
+        Ok(changes)
+    }
+
+    async fn persist(&self, write: &MemoryWrite, record: MemoryRecord) -> Result<CommitReceipt> {
         self.storage
             .commit(&CommitRequest {
                 request_id: write.request_id.clone(),
                 config_generation: record.config_generation,
-                policy_revision: Some(record.policy_revision),
-                changes,
+                policy_revision: Some(record.policy_revision.clone()),
+                changes: self.memory_changes(write, &record)?,
             })
             .await
     }
@@ -618,13 +634,10 @@ impl<'a> Domain<'a> {
                     .ok_or_else(|| error("DOMAIN_CORRUPT"))
             })
             .transpose()?;
-        let human_norm = previous.iter().chain(adopted.iter()).any(|p| {
-            p.record.authority == Authority::HumanConfirmed
-                && matches!(
-                    p.record.draft.kind,
-                    MemoryKind::Preference | MemoryKind::Decision
-                )
-        });
+        let human_norm = previous
+            .iter()
+            .chain(adopted.iter())
+            .any(|p| p.record.is_rule());
         if delegated
             && !tentative_taste
             && !human_norm
@@ -689,6 +702,17 @@ impl<'a> Domain<'a> {
         ingress: &Ingress,
         policy: &Policy,
     ) -> Result<CommitReceipt> {
+        let record = self.review_record(request, ingress, policy, None)?;
+        self.persist(&request.write, record).await
+    }
+
+    fn review_record(
+        &self,
+        request: &ReviewRequest,
+        ingress: &Ingress,
+        policy: &Policy,
+        original: Option<SourceRecord>,
+    ) -> Result<MemoryRecord> {
         let target = ReviewTarget {
             memory_id: request.write.memory_id.clone(),
             proposal_revision: request.write.expected_revision.unwrap_or(0),
@@ -705,7 +729,10 @@ impl<'a> Domain<'a> {
         }
         let (previous, _) = self.prepare(&request.write, ingress, policy)?;
         let previous = previous.ok_or_else(|| error("REVISION_NOT_FOUND"))?;
-        let source = self.span(&request.source)?;
+        let source = match original {
+            Some(source) => source,
+            None => self.span(&request.source)?,
+        };
         if source.provenance != ingress.provenance
             || source.review_target != ingress.review
             || !source.payload.scope.contains(&request.write.draft.scope)
@@ -742,6 +769,6 @@ impl<'a> Domain<'a> {
             reason: request.reason.clone(),
             action: request.action,
         });
-        self.persist(&request.write, record).await
+        Ok(record)
     }
 }

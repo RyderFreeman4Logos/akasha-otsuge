@@ -18,6 +18,7 @@ mod configuration;
 mod hermes;
 mod jobs;
 mod pi;
+mod review;
 
 pub(crate) fn private_dir(path: &Path) -> Result<()> {
     if !path.is_absolute()
@@ -171,6 +172,11 @@ impl Service {
         command: Command,
     ) -> Result<serde_json::Value> {
         match command {
+            Command::ReviewPreview {
+                decision,
+                idempotency_key,
+            } => self.review_preview(&decision, &idempotency_key).await,
+            Command::ReviewApply { .. } => Err(Error("REVIEW_OPERATOR_REQUIRED")),
             Command::GrillRun {
                 plan,
                 idempotency_key,
@@ -270,6 +276,70 @@ impl Service {
                     .get(&jobs::context()?, &id, at)
                     .await?,
             )?),
+            Command::ReviewList { scope, after } => Ok(serde_json::to_value(
+                crate::domain::Domain::new(&self.storage)
+                    .review_list(&jobs::context()?, &scope, after.as_deref())
+                    .await?,
+            )?),
+            Command::ReviewOpen {
+                memory_id,
+                expected_revision,
+                reason,
+                idempotency_key,
+            } => {
+                let service = self.clone();
+                self.operation(async move {
+                    let _guard = service.admission.lock().await;
+                    Ok(serde_json::to_value(
+                        crate::domain::Domain::new(&service.storage)
+                            .review_open(
+                                &jobs::context()?,
+                                &idempotency_key,
+                                &crate::domain::ReviewOpen {
+                                    memory_id,
+                                    expected_revision,
+                                    reason,
+                                },
+                                service.config.pin().generation(),
+                            )
+                            .await?,
+                    )?)
+                })
+                .await
+            }
+            Command::ReviewShow { id, at } => Ok(serde_json::to_value(
+                crate::domain::Domain::new(&self.storage)
+                    .review_show(&jobs::context()?, &id, at)
+                    .await?,
+            )?),
+            Command::ReviewState {
+                id,
+                expected_revision,
+                state,
+                reason,
+                idempotency_key,
+            } => {
+                let service = self.clone();
+                self.operation(async move {
+                    let _guard = service.admission.lock().await;
+                    Ok(serde_json::to_value(
+                        crate::domain::Domain::new(&service.storage)
+                            .review_update(
+                                &jobs::context()?,
+                                &idempotency_key,
+                                &crate::domain::ReviewUpdate {
+                                    id,
+                                    expected_revision,
+                                    state,
+                                    reason,
+                                },
+                                service.config.pin().generation(),
+                            )
+                            .await?,
+                    )?)
+                })
+                .await
+            }
             Command::MemoryHistory {
                 id,
                 from,
@@ -383,7 +453,20 @@ impl Service {
         {
             Err(Error("REQUEST_EXPIRED"))
         } else {
-            self.dispatch(&request.request_id, request.command).await
+            match request.command {
+                Command::ReviewApply {
+                    decision,
+                    idempotency_key,
+                    preview_sha256,
+                } => match review::operator_binding(stream) {
+                    Ok(binding) => {
+                        self.review_apply(decision, idempotency_key, preview_sha256, binding)
+                            .await
+                    }
+                    Err(error) => Err(error),
+                },
+                command => self.dispatch(&request.request_id, command).await,
+            }
         };
         let reply = ipc::response(Some(&request.request_id), result);
         match ipc::write(stream, &reply).await {

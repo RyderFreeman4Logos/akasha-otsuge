@@ -173,6 +173,36 @@ pub enum Command {
         id: String,
         at: Option<u64>,
     },
+    ReviewList {
+        scope: crate::domain::Scope,
+        after: Option<String>,
+    },
+    ReviewOpen {
+        memory_id: String,
+        expected_revision: u64,
+        reason: String,
+        idempotency_key: String,
+    },
+    ReviewShow {
+        id: String,
+        at: Option<u64>,
+    },
+    ReviewState {
+        id: String,
+        expected_revision: u64,
+        state: crate::domain::ReviewState,
+        reason: String,
+        idempotency_key: String,
+    },
+    ReviewPreview {
+        decision: crate::domain::ReviewDecision,
+        idempotency_key: String,
+    },
+    ReviewApply {
+        decision: crate::domain::ReviewDecision,
+        idempotency_key: String,
+        preview_sha256: String,
+    },
     MemoryHistory {
         id: String,
         from: u64,

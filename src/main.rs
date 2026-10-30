@@ -46,6 +46,11 @@ Commands:
   consult original JOB_ID SOURCE_INDEX [--start BYTE_OFFSET]
   memory show ID [--at COMMIT]
   memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]
+  review list --scope JSON_FILE [--after ID]
+  review open TARGET_JSON --idempotency-key ID
+  review show ID [--at COMMIT]
+  review state UPDATE_JSON --idempotency-key ID
+  review preview|apply DECISION_JSON --idempotency-key ID
   state show --scope JSON_FILE --at COMMIT [--cursor JSON_FILE]
   state diff FROM TO --scope JSON_FILE [--cursor JSON_FILE]
   receipt show|replay ID
@@ -491,6 +496,46 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             id: (*id).into(),
             at: None,
         }),
+        ["review", "list", flags @ ..] => {
+            let flags = options(flags, &["--scope", "--after"])?;
+            Some(Command::ReviewList {
+                scope: json_file(flags.get("--scope").ok_or(Error("INVALID_ARGUMENT"))?)?,
+                after: flags.get("--after").map(|s| (*s).to_owned()),
+            })
+        }
+        ["review", "show", id] => Some(Command::ReviewShow {
+            id: (*id).into(),
+            at: None,
+        }),
+        ["review", "show", id, "--at", at] => Some(Command::ReviewShow {
+            id: (*id).into(),
+            at: Some(number(at)?),
+        }),
+        ["review", "state", path, "--idempotency-key", id] => {
+            let update: akasha_otsuge::domain::ReviewUpdate = json_file(path)?;
+            Some(Command::ReviewState {
+                id: update.id,
+                expected_revision: update.expected_revision,
+                state: update.state,
+                reason: update.reason,
+                idempotency_key: (*id).into(),
+            })
+        }
+        ["review", "open", path, "--idempotency-key", id] => {
+            let target: akasha_otsuge::domain::ReviewOpen = json_file(path)?;
+            Some(Command::ReviewOpen {
+                memory_id: target.memory_id,
+                expected_revision: target.expected_revision,
+                reason: target.reason,
+                idempotency_key: (*id).into(),
+            })
+        }
+        ["review", "preview" | "apply", path, "--idempotency-key", id] => {
+            Some(Command::ReviewPreview {
+                decision: json_file(path)?,
+                idempotency_key: (*id).into(),
+            })
+        }
         ["memory", "show", id, "--at", at] => Some(Command::MemoryShow {
             id: (*id).into(),
             at: Some(number(at)?),
@@ -626,7 +671,9 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             command: operation,
         };
         let replay = matches!(&request.command, Command::ReceiptReplay { .. });
-        let response = if replay {
+        let response = if matches!(command.as_slice(), ["review", "apply", ..]) {
+            review_apply(&socket, request).await?
+        } else if replay {
             ipc::replay(&socket, &request, |bytes| {
                 output(bytes, false)?;
                 io::stdout().lock().flush()?;
@@ -665,6 +712,51 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         akasha_otsuge::daemon::run(resolved, config_path, profile).await?;
         Ok(0)
     }
+}
+
+async fn review_apply(socket: &std::path::Path, mut request: Request) -> Result<serde_json::Value> {
+    use std::io::{BufRead, IsTerminal, Read};
+    if !io::stdin().is_terminal() || !io::stderr().is_terminal() {
+        return Err(Error("REVIEW_OPERATOR_REQUIRED"));
+    }
+    let response = ipc::call(socket, &request).await?;
+    if response.get("error").is_some() {
+        return Ok(response);
+    }
+    let preview = &response["data"];
+    let digest = preview["preview_sha256"]
+        .as_str()
+        .ok_or(Error("PROTOCOL_ERROR"))?
+        .to_owned();
+    if digest.len() != 64 || !digest.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return Err(Error("PROTOCOL_ERROR"));
+    }
+    // JSON escapes source-controlled terminal sequences. The complete before/after is shown.
+    output(&serde_json::to_vec(preview)?, true)?;
+    output(
+        format!("\nType confirm {digest} to apply: ").as_bytes(),
+        true,
+    )?;
+    io::stderr().lock().flush()?;
+    let mut answer = String::new();
+    io::stdin().lock().take(128).read_line(&mut answer)?;
+    if answer.trim() != format!("confirm {digest}") {
+        return Err(Error("REVIEW_CANCELLED"));
+    }
+    let Command::ReviewPreview {
+        decision,
+        idempotency_key,
+    } = request.command
+    else {
+        return Err(Error("INVALID_ARGUMENT"));
+    };
+    request.command = Command::ReviewApply {
+        decision,
+        idempotency_key,
+        preview_sha256: digest,
+    };
+    request.deadline_ms = Some(ipc::now_ms()? + ipc::TRANSPORT_TIMEOUT.as_millis() as u64);
+    ipc::call(socket, &request).await
 }
 fn options<'a>(
     args: &'a [&str],

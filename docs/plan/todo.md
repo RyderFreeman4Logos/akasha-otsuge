@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-29 UTC after PR #46 merged at `d64051e`: **16 completed,
-12 open Issues (#12, #18–#28)**. #18 is the sole active implementation.
+Updated 2026-10-30 UTC after PR #47 merged at `2da9a2e`: **17 completed,
+11 open Issues (#12, #19–#28)**. #19 is the sole active implementation.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -47,8 +47,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-29 audit finds 12 open Issues (#12, #18–#28). #4–#11 and #13–#17 are closed
-with merged PRs #32–#38/#40/#42/#43/#44/#45/#46; no verified implementation waits for closure. #7's
+The 2026-10-30 audit finds 11 open Issues (#12, #19–#28). #4–#11 and #13–#18 are closed
+with merged PRs #32–#38/#40/#42/#43/#44/#45/#46/#47; no verified implementation waits for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -749,7 +749,7 @@ hashes actually cover. #12 alone retains deferred Claude authentication.
   retain separate final and historical native source identities. The finished
   SSD worktree was removed after all consumers exited; shared target retained.
 
-## MVP-018 active acceptance and remaining work
+## MVP-018 completed acceptance
 
 Original task start2026-10-29T22:50:15.286265+00:00; base `d64051e`.
 
@@ -775,8 +775,11 @@ Original task start2026-10-29T22:50:15.286265+00:00; base `d64051e`.
   Codex initial answer and Pi cross-questioning. Prompt ID ambiguity and duplicate
   dependency admission are repaired without weakening evidence validation.
   See [compact evidence](../benchmarks/results/mvp018/README.md).
-- [ ] Finish focused checks, canonical gate, independent review, CI, publication,
-  merge and verified closure before advancing #19.
+- [x] Final clean `196f33e` / tree `98267dd` passed `just check` (192.901s),
+  independent whole-range Hermes/Grok review and hosted CI40977248284.
+  PR #47 merged as `2da9a2e`; #18 closed completed. Original failed gate and
+  native attempts stay archived. SSD worktree removed after exact consumer census,
+  including cleanup of its completed reviewer's orphan Python kernel; target retained.
 
 #17 process correction: the initial overlapping review was provisional only.
 Dispatch paid final review after the free canonical gate passes; collect terminal
@@ -786,6 +789,21 @@ in addition to HEAD, preventing ambiguous historical source claims.
 #28 also owns final remote dependency-index validation: completed dependencies
 are historical links, not active blockers. Reconcile the legacy checker's literal
 `Blocked by` requirement with current Issue status without deleting dependencies.
+
+## MVP-019 active acceptance and remaining work
+
+Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
+
+- [x] Persist review open/investigating/resolved/dismissed independently of memory
+  lifecycle and notification acknowledgement, with immutable target/version/history.
+- [x] Provide a usable bounded review CLI and trusted operator confirmation path;
+  preserve original proposals, exact edited hashes, differences, reasons and sources.
+- [ ] Prove manual/policy/automatic flows and new-operation configuration reload;
+  pending proposals and open reviews must not retire unrelated active decisions.
+- [ ] Prove human taste priority, local scope exceptions, explicit successors,
+  permission rechecks, stale-version refusal, retries and crash recovery.
+- [ ] Archive compact real CLI examples and policy/state-machine evidence; run the
+  canonical gate, independent review, hosted CI, merge and verified closure.
 
 ## Complete Issue queue
 
@@ -806,7 +824,7 @@ are historical links, not active blockers. Reconcile the legacy checker's litera
 - [x] [#15 [MVP-015] pi CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/15) — dependencies: #11.
 - [x] [#16 [MVP-016] consult 可选短 hint、渐进调研与子孙共享预算](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/16) — dependencies: #12, #13, #14, #15.
 - [x] [#17 [MVP-017] 异步提取候选、来源引用与可重建索引作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/17) — dependencies: #5, #7, #9, #10, #16.
-- [ ] [#18 [MVP-018] 单一或组合 Runner 的 Auto-Grill 工作流](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/18) — dependencies: #16, #17.
+- [x] [#18 [MVP-018] 单一或组合 Runner 的 Auto-Grill 工作流](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/18) — dependencies: #16, #17.
 - [ ] [#19 [MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19) — dependencies: #5, #6, #18.
 - [ ] [#20 [MVP-020] 外部 Memory Editor、范围受限 patch 与并发修订](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/20) — dependencies: #16, #19.
 - [ ] [#21 [MVP-021] Run、Git/工作区、build/test 与 incident 证据关联](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21) — dependencies: #6, #11, #16.
