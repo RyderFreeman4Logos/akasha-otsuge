@@ -40,7 +40,7 @@ impl Plan {
                 domain.permission(context, Some(&record.payload.scope))?;
                 if matches!(
                     record.provenance.origin,
-                    Origin::Extraction | Origin::AutoGrill
+                    Origin::Extraction | Origin::AutoGrill | Origin::MemoryEdit
                 ) {
                     return Err(StorageError::new("EXTRACTION_INTERNAL_SOURCE"));
                 }

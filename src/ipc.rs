@@ -173,6 +173,16 @@ pub enum Command {
         id: String,
         at: Option<u64>,
     },
+    MemoryExport {
+        id: String,
+    },
+    PatchApply {
+        patch: crate::domain::MemoryPatch,
+        idempotency_key: String,
+    },
+    PatchShow {
+        id: String,
+    },
     ReviewList {
         scope: crate::domain::Scope,
         after: Option<String>,

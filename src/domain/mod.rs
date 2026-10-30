@@ -1,6 +1,7 @@
 //! Typed provenance and adoption above the internal authority store.
 
 mod history;
+mod patch;
 mod recall;
 mod review;
 #[cfg(test)]
@@ -8,6 +9,7 @@ mod review_tests;
 mod schema;
 
 pub use history::*;
+pub use patch::*;
 pub use recall::*;
 pub use review::*;
 pub use schema::*;
@@ -227,8 +229,10 @@ impl Provenance {
             ),
             Actor::Agent(v) => (
                 v,
-                matches!(self.origin, Origin::Extraction | Origin::AutoGrill)
-                    && self.generator.is_some(),
+                matches!(
+                    self.origin,
+                    Origin::Extraction | Origin::AutoGrill | Origin::MemoryEdit
+                ) && self.generator.is_some(),
             ),
             Actor::Tool(v) => (
                 v,
@@ -609,6 +613,16 @@ impl<'a> Domain<'a> {
         ingress: &Ingress,
         policy: &Policy,
     ) -> Result<CommitReceipt> {
+        self.persist(write, self.proposal_record(write, ingress, policy)?)
+            .await
+    }
+
+    fn proposal_record(
+        &self,
+        write: &MemoryWrite,
+        ingress: &Ingress,
+        policy: &Policy,
+    ) -> Result<MemoryRecord> {
         let (previous, sources) = self.prepare(write, ingress, policy)?;
         let mut record =
             self.record(write, ingress.provenance.clone(), policy, previous.as_ref())?;
@@ -648,7 +662,7 @@ impl<'a> Domain<'a> {
             record.authority = Authority::DelegatedApproved;
             record.lifecycle = Lifecycle::Active;
         }
-        self.persist(write, record).await
+        Ok(record)
     }
 
     pub async fn adopt_statement(

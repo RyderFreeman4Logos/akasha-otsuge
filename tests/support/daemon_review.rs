@@ -4,7 +4,7 @@ use akasha_otsuge::config::ReviewMode;
 use akasha_otsuge::domain::*;
 use akasha_otsuge::storage::Storage;
 
-fn seed(daemon: &Daemon, mode: ReviewMode, name: &str) -> u64 {
+pub(super) fn seed(daemon: &Daemon, mode: ReviewMode, name: &str) -> u64 {
     seed_memory(
         daemon,
         mode,
@@ -15,7 +15,7 @@ fn seed(daemon: &Daemon, mode: ReviewMode, name: &str) -> u64 {
     )
 }
 
-fn seed_memory(
+pub(super) fn seed_memory(
     daemon: &Daemon,
     mode: ReviewMode,
     name: &str,
@@ -636,7 +636,7 @@ fn evidence(name: &str, daemon: &Daemon, value: &Value) {
     }
 }
 
-fn approve_item(daemon: &Daemon, item: &Value, id: &str) -> Value {
+pub(super) fn approve_item(daemon: &Daemon, item: &Value, id: &str) -> Value {
     let plan = daemon.root.join(format!("{id}.json"));
     std::fs::write(&plan,serde_json::to_vec(&json!({"id":item["id"],"expected_revision":item["revision"],
         "action":"approve","draft":null,"reason":"Synthetic operator confirms this exact scoped rule"})).unwrap()).unwrap();

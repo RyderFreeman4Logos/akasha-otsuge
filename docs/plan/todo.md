@@ -1,7 +1,7 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-30 UTC after PR #47 merged at `2da9a2e`: **17 completed,
-11 open Issues (#12, #19–#28)**. #19 is the sole active implementation.
+Updated 2026-10-30 UTC after PR #48 merged at `4609349`: **18 completed,
+10 open Issues (#12, #20–#28)**. #20 is the sole active implementation.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -47,8 +47,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-30 audit finds 11 open Issues (#12, #19–#28). #4–#11 and #13–#18 are closed
-with merged PRs #32–#38/#40/#42/#43/#44/#45/#46/#47; no verified implementation waits for closure. #7's
+The 2026-10-30 audit finds 10 open Issues (#12, #20–#28). #4–#11 and #13–#19 are closed
+with merged PRs #32–#38/#40/#42/#43/#44/#45/#46/#47/#48; no verified implementation waits for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -790,7 +790,7 @@ in addition to HEAD, preventing ambiguous historical source claims.
 are historical links, not active blockers. Reconcile the legacy checker's literal
 `Blocked by` requirement with current Issue status without deleting dependencies.
 
-## MVP-019 active acceptance and remaining work
+## MVP-019 completed acceptance
 
 Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
 
@@ -802,8 +802,30 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
   pending proposals and open reviews must not retire unrelated active decisions.
 - [x] Prove human taste priority, local scope exceptions, explicit successors,
   permission rechecks, stale-version refusal, retries and crash recovery.
-- [ ] Archive compact real CLI examples and policy/state-machine evidence; run the
+- [x] Archive compact real CLI examples and policy/state-machine evidence; run the
   canonical gate, independent review, hosted CI, merge and verified closure.
+  Candidate `ae086e6` passed its227.27-second canonical gate, including98 installed
+  daemon cases. Independent R2 review corrected two R1 report errors on the
+  unchanged tree and passed with no actionable findings. CI40983567511 passed;
+  PR #48 merged as `4609349` and #19 closed completed. Synthetic PTY/controlled
+  extractor evidence is distinct from physical-human or native-model proof.
+
+## MVP-020 active acceptance and remaining work
+
+Original task start 2026-10-30T01:15:59.632765+00:00; base `4609349`.
+
+- [ ] Define bounded feedback/editor and patch inputs with exact expected revisions,
+  evidence, scope and reason; preserve originals and refuse forged human authority.
+- [ ] Apply policy-controlled changes atomically with audit, review/outbox and live
+  permissions; test duplicate, concurrent, stale and expired patches. Scope
+  expansion requires a separate authorization rather than widening a local edit.
+- [ ] Reuse configured Runner and authorized original/code readers for investigation;
+  pin execution policy and keep model work outside the write transaction.
+- [ ] Recheck current authority in search/delivery after correction or withdrawal;
+  old history and actual recall receipts must remain verifiable.
+- [ ] Run one real external Runner through investigation and constrained revision;
+  archive compact evidence, complete the canonical gate, independent review, CI,
+  merge and verified Issue closure.
 
 ## Complete Issue queue
 
@@ -825,7 +847,7 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
 - [x] [#16 [MVP-016] consult 可选短 hint、渐进调研与子孙共享预算](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/16) — dependencies: #12, #13, #14, #15.
 - [x] [#17 [MVP-017] 异步提取候选、来源引用与可重建索引作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/17) — dependencies: #5, #7, #9, #10, #16.
 - [x] [#18 [MVP-018] 单一或组合 Runner 的 Auto-Grill 工作流](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/18) — dependencies: #16, #17.
-- [ ] [#19 [MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19) — dependencies: #5, #6, #18.
+- [x] [#19 [MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19) — dependencies: #5, #6, #18.
 - [ ] [#20 [MVP-020] 外部 Memory Editor、范围受限 patch 与并发修订](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/20) — dependencies: #16, #19.
 - [ ] [#21 [MVP-021] Run、Git/工作区、build/test 与 incident 证据关联](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21) — dependencies: #6, #11, #16.
 - [ ] [#22 [MVP-022] 执行失败触发调查、自动修订或高优 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22) — dependencies: #20, #21.
