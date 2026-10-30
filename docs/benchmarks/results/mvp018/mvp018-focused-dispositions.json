@@ -1,0 +1,100 @@
+[
+  {
+    "name": "mvp018-config-red",
+    "exit_code": 101,
+    "seconds": 15.634294582530856,
+    "collected": true,
+    "classification": "expected_missing_grill_config_red"
+  },
+  {
+    "name": "mvp018-config-green",
+    "exit_code": 101,
+    "seconds": 10.95323643926531,
+    "collected": true,
+    "classification": "failed_inspect_config_tests"
+  },
+  {
+    "name": "mvp018-config-green-r2",
+    "exit_code": 0,
+    "seconds": 67.93960166163743,
+    "collected": true,
+    "classification": "pass_config_and_legacy_checkpoint"
+  },
+  {
+    "name": "mvp018-workflow-red",
+    "exit_code": 101,
+    "seconds": 21.774757479317486,
+    "collected": true,
+    "classification": "expected_missing_grill_ipc"
+  },
+  {
+    "name": "mvp018-workflow-green",
+    "exit_code": 101,
+    "seconds": 6.640005727298558,
+    "collected": true,
+    "classification": "failed_compile_inspect"
+  },
+  {
+    "name": "mvp018-workflow-green-r2",
+    "exit_code": 0,
+    "seconds": 28.974539196118712,
+    "collected": true,
+    "classification": "pass_two_controlled_native_workflows"
+  },
+  {
+    "name": "mvp018-authority-red",
+    "exit_code": 101,
+    "seconds": 10.08083047810942,
+    "collected": true,
+    "classification": "failed_unresolved_answer_authority"
+  },
+  {
+    "name": "mvp018-boundaries-green",
+    "exit_code": 101,
+    "seconds": 15.449732634238899,
+    "collected": true,
+    "classification": "failed_inspect_boundary_suite"
+  },
+  {
+    "name": "mvp018-boundaries-green-r2",
+    "exit_code": 101,
+    "seconds": 38.90950668789446,
+    "collected": true,
+    "classification": "inspected_boundary_result"
+  },
+  {
+    "name": "mvp018-policy-checks",
+    "exit_code": 0,
+    "seconds": 19.642550483345985,
+    "collected": true,
+    "classification": "pass_review_policy_clippy_fmt"
+  },
+  {
+    "name": "mvp018-native-actual-r1",
+    "exit_code": 1,
+    "seconds": 123.2690832298249,
+    "collected": true,
+    "classification": "failed_native_acceptance"
+  },
+  {
+    "name": "mvp018-native-diagnostic-r2",
+    "exit_code": 1,
+    "seconds": 2.641843139193952,
+    "collected": true,
+    "classification": "diagnostic_preexecution_failure"
+  },
+  {
+    "name": "mvp018-native-diagnostic-r3",
+    "exit_code": 1,
+    "seconds": 2.197373596020043,
+    "collected": true,
+    "classification": "diagnostic_preexecution_failure"
+  },
+  {
+    "name": "mvp018-native-diagnostic-r4",
+    "exit_code": 1,
+    "seconds": 87.53081845864654,
+    "collected": true,
+    "classification": "native_schema_rejection_diagnostic"
+  }
+]

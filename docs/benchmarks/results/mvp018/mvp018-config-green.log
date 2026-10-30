@@ -1,0 +1,45 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp018)
+error[E0624]: method `checkpoint` is private
+   --> tests/config.rs:108:10
+    |
+108 |         .checkpoint()
+    |          ^^^^^^^^^^ private method
+    |
+   ::: src/config/manager.rs:152:5
+    |
+152 |     pub(crate) fn checkpoint(&self) -> Result<Value, ConfigError> {
+    |     ------------------------------------------------------------- private method defined here
+
+error[E0624]: associated function `restore` is private
+   --> tests/config.rs:111:35
+    |
+111 |       let restored = ConfigManager::restore(legacy.clone(), |_| Ok(())).unwrap();
+    |                                     ^^^^^^^ private associated function
+    |
+   ::: src/config/manager.rs:161:5
+    |
+161 | /     pub(crate) fn restore(
+162 | |         value: Value,
+163 | |         prepare: impl FnOnce(&ResolvedConfig) -> Result<R, ()>,
+164 | |     ) -> Result<Self, ConfigError> {
+    | |__________________________________- private associated function defined here
+
+error[E0624]: method `checkpoint` is private
+   --> tests/config.rs:112:25
+    |
+112 |     assert_eq!(restored.checkpoint().unwrap(), legacy);
+    |                         ^^^^^^^^^^ private method
+    |
+   ::: src/config/manager.rs:152:5
+    |
+152 |     pub(crate) fn checkpoint(&self) -> Result<Value, ConfigError> {
+    |     ------------------------------------------------------------- private method defined here
+
+For more information about this error, try `rustc --explain E0624`.
+error: could not compile `akasha-otsuge` (test "config") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

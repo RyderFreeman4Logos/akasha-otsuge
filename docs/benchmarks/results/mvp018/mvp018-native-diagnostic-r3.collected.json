@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T23:32:40.559539+00:00",
+  "terminal": {
+    "exit_code": 1,
+    "head": "8becbee8ac52654edffc3667f492522ce752b70e",
+    "log_sha256": "4e8619f639adc51f5c1ee5c73f3bc3a30f8af26db895bc2504cf886838924653",
+    "seconds": 2.197373596020043,
+    "utc": "2026-10-29T23:32:23.967876+00:00"
+  },
+  "process_absent": true,
+  "classification": "diagnostic_preexecution_failure"
+}

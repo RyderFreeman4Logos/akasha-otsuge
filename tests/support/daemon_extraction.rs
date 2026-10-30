@@ -3,7 +3,7 @@ use akasha_otsuge::config::{Paths, resolve};
 use akasha_otsuge::domain::*;
 use akasha_otsuge::storage::Storage;
 
-fn scope() -> Scope {
+pub(super) fn scope() -> Scope {
     Scope {
         user: format!("uid:{}", rustix::process::geteuid().as_raw()),
         project: Some("alpha".into()),
@@ -12,7 +12,7 @@ fn scope() -> Scope {
     }
 }
 
-fn storage_config(daemon: &Daemon) -> akasha_otsuge::config::ResolvedConfig {
+pub(super) fn storage_config(daemon: &Daemon) -> akasha_otsuge::config::ResolvedConfig {
     resolve(
         "",
         None,
@@ -25,14 +25,14 @@ fn storage_config(daemon: &Daemon) -> akasha_otsuge::config::ResolvedConfig {
     .unwrap()
 }
 
-fn runtime() -> tokio::runtime::Runtime {
+pub(super) fn runtime() -> tokio::runtime::Runtime {
     tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
         .unwrap()
 }
 
-fn seed_source(daemon: &Daemon, event_id: &str, text: &str) -> SourceSpan {
+pub(super) fn seed_source(daemon: &Daemon, event_id: &str, text: &str) -> SourceSpan {
     runtime().block_on(async {
         let store = Storage::open(&storage_config(daemon)).await.unwrap();
         let domain = Domain::new(&store);
@@ -85,7 +85,7 @@ fn submit(daemon: &Daemon, id: &str, plan: &Value) -> Value {
     receive(&mut stream)
 }
 
-fn finished(daemon: &Daemon, id: &str) -> Value {
+pub(super) fn finished(daemon: &Daemon, id: &str) -> Value {
     let end = Instant::now() + Duration::from_secs(30);
     loop {
         let job = daemon.cli(&["job", "show", id])["data"].clone();

@@ -1,0 +1,35 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp018)
+error[E0277]: the trait bound `Array<u8, UInt<UInt<UInt<UInt<_, B0>, B0>, B0>, B0>>: LowerHex` is not satisfied
+   --> tests/support/daemon_grill.rs:336:37
+    |
+336 |                     format!("{:x}", Sha256::digest(text.as_bytes())),
+    |                              ----   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `LowerHex` is not implemented for `Array<u8, UInt<UInt<UInt<UInt<UInt<_, B0>, B0>, B0>, B0>, B0>>`
+    |                              |
+    |                              required by this formatting parameter
+    |
+    = help: the following other types implement trait `LowerHex`:
+              &T
+              &mut T
+              AtFlags
+              CreateFlags
+              DupFlags
+              FallocateFlags
+              FdFlags
+              FloatingPointEmulationControl
+            and 218 others
+    = note: the full name for the type has been written to '/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d.long-type-464656566971886258.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `akasha-otsuge` (test "daemon") due to 1 previous error
+{"started_utc": "2026-10-29T23:32:22.080311+00:00", "head": "8becbee8ac52654edffc3667f492522ce752b70e", "dirty_diff_sha256": "a2d618845a955e886faca285490e046aadc91ea0eeb2a4d64b663e3823d52552", "source": "real authenticated Pi and Codex; existing native authentication; no Akasha model profiles", "host_version": "1.4.0", "native_binary": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi", "native_binary_sha256": "2d6702dd4a52461f50f304bcef3aa0261464ea0b921f72ea7ed6d07df16edef0", "provider": "mp-cpi", "model": "grok-4.7", "endpoint_host": "127.0.0.1", "endpoint_port": 48317, "scratch": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a18-native-4fpuy449", "status": "FAILED", "command": ["cargo", "test", "--locked", "--test", "daemon", "grill_tests::native_single_and_mixed_grill_actual", "--", "--exact", "--ignored", "--nocapture"], "exit_code": 101, "binary_sha256": "0277223b5f3447ff9767dffc55f601cb9d52aba935dd5f27e929a1b9b71e83e1", "codex_config_unchanged": true, "codex_version": "codex-cli 0.164.0", "codex_binary_sha256": "b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306", "owned_live_processes": [], "native_settings_unchanged": true, "scratch_allocated_bytes": 2396160, "scratch_removed": true, "ssd_free_bytes_after": 230448087040, "seconds": 1.652809358201921, "finished_utc": "2026-10-29T23:32:23.963555+00:00"}
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp018-native-grill.py", line 32, in <module>
+    assert rc==0 and result.exists()
+           ^^^^^
+AssertionError

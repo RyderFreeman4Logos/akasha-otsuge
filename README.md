@@ -20,6 +20,8 @@ A local, traceable memory system for coding agents, written in Rust.
 
 [异步候选提取](docs/extraction.md)支持配置的文本模型或已有 CLI 认证，保留原文引用、条件和候选权限，并提供持久恢复与索引重建。
 
+[Auto-Grill](docs/grill.md)支持单个或组合 CLI 的独立角色讨论，保存原文、问题依赖与分歧，并在共享预算内停止和续接。
+
 [宿主公共契约](docs/adapters.md)定义持久调用绑定、受限上下文读取、Runner 终态与共享预算；[固定参考集及勘误](docs/evaluation/reference-v1-errata-1/README.md)保存 60 项任务与评测规则。真实四宿主接入和模型质量验收仍待后续 Issues 完成。
 
 公开仓库按用户要求采用 [Apache-2.0](LICENSE)。[来源与许可证核查](docs/provenance.md)记录迁移边界。

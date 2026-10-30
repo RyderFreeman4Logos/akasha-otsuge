@@ -1,0 +1,45 @@
+{
+  "command": [
+    "bash",
+    "-c",
+    "cargo test --locked --lib daemon::jobs::grill_tests::grill_publication_obeys_review_policy_without_claiming_human_approval -- --exact && cargo clippy --locked --all-targets -- -D warnings && cargo fmt --check"
+  ],
+  "dirty_diff_sha256": "f47dc9e40824121a8e8b23bb03c96c92319017282857543cf88c7e3dd6df3be3",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "c0a807c58c8d48fbfaae72cf4880f9fa76529471",
+  "process": {
+    "pid": 1277123,
+    "start_ticks": "513403338",
+    "state": "R"
+  },
+  "tree": "6ce077f79977fec3f72873e61790411fcd19de22",
+  "untracked": [
+    {
+      "path": "docs/grill.md",
+      "sha256": "da9beef06af5f2b03adf25ebb66364f7158468866646e75504c7fc4c611296cf"
+    },
+    {
+      "path": "src/daemon/grill.rs",
+      "sha256": "56ce434a5aed92606f37a41abec7ed839f62936075b97865fcf2b1049eba2cf4"
+    },
+    {
+      "path": "src/daemon/grill_tests.rs",
+      "sha256": "333a04b726aa7f36429c81047068364da3a893b5c3c422abb878fa92a953f127"
+    },
+    {
+      "path": "src/grill.rs",
+      "sha256": "894e13dd0a687a297db26a675a548b0528862fd25d72e65d309b588a0d0cf46b"
+    },
+    {
+      "path": "tests/support/daemon_grill.rs",
+      "sha256": "492059084747e0b2f94da7627811c34cab158befc2d319f7b262fe908d86365c"
+    }
+  ],
+  "utc": "2026-10-29T23:22:16.413553+00:00"
+}

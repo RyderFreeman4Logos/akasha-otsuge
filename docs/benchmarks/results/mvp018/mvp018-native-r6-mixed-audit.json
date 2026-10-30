@@ -1,0 +1,33 @@
+{
+  "case": "pi_codex",
+  "receipt_sha256": "393c9261a8c6a9a3bf75954337c46cf841aa72f39660d984a7f2b686ed2025e3",
+  "candidate_count": 4,
+  "completed_stages": [
+    {
+      "role": "interviewer",
+      "round": 0
+    },
+    {
+      "role": "expert",
+      "round": 0
+    },
+    {
+      "role": "reviewer",
+      "round": 0
+    },
+    {
+      "role": "expert",
+      "round": 1
+    }
+  ],
+  "usage": {
+    "output_bytes": 1048254,
+    "read_bytes": 2423,
+    "reads": 6,
+    "starts": 5,
+    "tokens": 31465
+  },
+  "stop_reason": "resource_budget",
+  "manual_semantics": "Pi round1 critiques Codex fallback wording and proposed rollout gates against original evidence. All four records retain unresolved concerns, role disagreement and valid original/discussion sources. No measured latency or human approval was invented.",
+  "scope_limit": "Small synthetic sample; shared output budget stops before reviewer round1 finishes. Codex model uses its existing native profile; no claim of Claude authentication."
+}

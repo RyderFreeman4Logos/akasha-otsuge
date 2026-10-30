@@ -1481,7 +1481,7 @@ fn concurrent_native_hooks_share_state_without_cross_binding_or_global_lock_cont
         "../fixtures/codex/0.164.0/exec-pre-tool-use.json"
     ))
     .unwrap();
-    let mut children = Vec::new();
+    let mut hooks = Vec::new();
     for n in 0..2 {
         let session = format!("concurrent-session-{n}");
         let path = daemon.root.join(format!("native-{n}.jsonl"));
@@ -1494,6 +1494,21 @@ fn concurrent_native_hooks_share_state_without_cross_binding_or_global_lock_cont
         hook["cwd"] = json!(daemon.root);
         hook["transcript_path"] = json!(path);
         hook["tool_input"]["command"] = "akasha-otsuge consult".into();
+        // Isolate concurrent hook ownership from cold capture's separate two-second budget.
+        let registered = native(
+            &daemon,
+            json!({"op":"register","binary":binary,"session_id":session,"transcript_path":path,"cwd":daemon.root}),
+        );
+        assert!(registered.get("error").is_none(), "{registered}");
+        sync_fixture_until(
+            &daemon,
+            registered["data"]["registration"].as_str().unwrap(),
+            9,
+        );
+        hooks.push((session, hook));
+    }
+    let mut children = Vec::new();
+    for (session, hook) in hooks {
         let mut child = daemon
             .command()
             .args([
@@ -1526,6 +1541,10 @@ fn concurrent_native_hooks_share_state_without_cross_binding_or_global_lock_cont
             String::from_utf8_lossy(&out.stderr)
         );
         let hook: Value = serde_json::from_slice(&out.stdout).unwrap();
+        assert!(
+            hook["hookSpecificOutput"]["updatedInput"]["command"].is_string(),
+            "concurrent hook for {session} did not admit the prepared native call: {hook}"
+        );
         let command = hook["hookSpecificOutput"]["updatedInput"]["command"]
             .as_str()
             .unwrap();

@@ -171,6 +171,14 @@ impl Service {
         command: Command,
     ) -> Result<serde_json::Value> {
         match command {
+            Command::GrillRun {
+                plan,
+                idempotency_key,
+            } => self.submit_grill(idempotency_key, plan).await,
+            Command::GrillResume {
+                job_id,
+                idempotency_key,
+            } => self.resume_grill(idempotency_key, job_id).await,
             Command::Pi { event } => self.pi(event).await,
             Command::Hermes { event } => self.hermes(event).await,
             Command::Codex { event } => self.codex(event).await,

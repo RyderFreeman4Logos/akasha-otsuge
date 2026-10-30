@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-29T22:59:47.784619+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "d64051e2b550bec90b06fd5b20b32f9430570bf0",
+    "log_sha256": "1699d5d4151f05815ce575a0cc3fb69a38a63dfd163297f0288c4db8476c427b",
+    "seconds": 15.634294582530856,
+    "utc": "2026-10-29T22:59:35.322718+00:00"
+  },
+  "process_absent": true,
+  "classification": "expected_missing_grill_config_red"
+}

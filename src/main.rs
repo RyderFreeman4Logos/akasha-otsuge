@@ -32,6 +32,8 @@ Commands:
   capture reconcile|codex|claude BINDING_JSON INPUT_JSONL --idempotency-key ID
   model run PLAN_JSON --idempotency-key ID
   extract run PLAN_JSON --idempotency-key ID
+  grill run PLAN_JSON --idempotency-key ID
+  grill resume JOB_ID --idempotency-key ID
   index sync --idempotency-key ID
   index rebuild --idempotency-key ID
   index status
@@ -395,14 +397,31 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
                 idempotency_key: (*id).into(),
             })
         }
-        ["extract", "run", path, "--idempotency-key", id] => {
+        ["grill", "resume", previous, "--idempotency-key", id] => Some(Command::GrillResume {
+            job_id: (*previous).into(),
+            idempotency_key: (*id).into(),
+        }),
+        [
+            operation @ ("extract" | "grill"),
+            "run",
+            path,
+            "--idempotency-key",
+            id,
+        ] => {
             let input = config::read_file(std::path::Path::new(path))?;
             if input.len() > 16 * 1024 {
                 return Err(Error("MESSAGE_TOO_LARGE"));
             }
-            Some(Command::ExtractionRun {
-                plan: serde_json::from_str(&input)?,
-                idempotency_key: (*id).into(),
+            Some(if *operation == "grill" {
+                Command::GrillRun {
+                    plan: serde_json::from_str(&input)?,
+                    idempotency_key: (*id).into(),
+                }
+            } else {
+                Command::ExtractionRun {
+                    plan: serde_json::from_str(&input)?,
+                    idempotency_key: (*id).into(),
+                }
             })
         }
         ["show", id, "--revision", revision, "--range", start, end] => {

@@ -1,0 +1,18 @@
+{
+  "case": "single_pi",
+  "stage": {
+    "role": "expert",
+    "round": 0
+  },
+  "expected_ids": [
+    "q_offline_search",
+    "q_rollout_check"
+  ],
+  "returned_questions": [
+    "What scoped offline-search decision keeps keyword search available when embeddings are offline and does not send private queries to an external reranker?",
+    "Given that offline-search decision, what rollout check is required while no latency measurements and no human rollout approval have been recorded, without inventing measurements?"
+  ],
+  "question_texts_used": true,
+  "classification": "prompt/schema did not distinguish question id from text; strict parser correctly rejected",
+  "r1_rejected_body": "not exported; exact cause unknown"
+}

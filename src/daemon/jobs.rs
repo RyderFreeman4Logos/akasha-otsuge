@@ -15,6 +15,11 @@ mod extraction;
 #[cfg(test)]
 #[path = "extraction_tests.rs"]
 mod extraction_tests;
+#[path = "grill.rs"]
+mod grill;
+#[cfg(test)]
+#[path = "grill_tests.rs"]
+mod grill_tests;
 #[path = "models.rs"]
 mod models;
 #[path = "retrieval.rs"]
@@ -26,6 +31,7 @@ enum JobInput {
     Retrieval(crate::retrieval::Request),
     Consult(consult::Plan),
     Extraction(crate::extraction::Plan),
+    Grill(crate::grill::Plan),
 }
 
 const MAX_ACTIVE: usize = 256;
@@ -592,6 +598,10 @@ pub(super) struct Job {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     extraction_native: Option<consult::NativeExecutor>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    grill_plan: Option<crate::grill::Plan>,
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    grill_natives: std::collections::BTreeMap<String, consult::NativeExecutor>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     consult_plan: Option<consult::Plan>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     retrieval_plan: Option<crate::retrieval::Request>,
@@ -664,6 +674,7 @@ impl Service {
         if job.schema_version != 1
             || job.id != id
             || job.attempt > MAX_ATTEMPTS
+            || (!job.grill_natives.is_empty() && job.grill_plan.is_none())
             || (job.extraction_native.is_some() && job.extraction_plan.is_none())
             || !matches!(
                 (
@@ -673,12 +684,14 @@ impl Service {
                     &job.retrieval_plan,
                     &job.consult_plan,
                     &job.extraction_plan,
+                    &job.grill_plan,
                 ),
-                (Some(_), Some(_), None, None, None, None)
-                    | (None, None, Some(_), None, None, None)
-                    | (None, None, None, Some(_), None, None)
-                    | (None, None, None, None, Some(_), None)
-                    | (None, None, None, None, None, Some(_))
+                (Some(_), Some(_), None, None, None, None, None)
+                    | (None, None, Some(_), None, None, None, None)
+                    | (None, None, None, Some(_), None, None, None)
+                    | (None, None, None, None, Some(_), None, None)
+                    | (None, None, None, None, None, Some(_), None)
+                    | (None, None, None, None, None, None, Some(_))
             )
             || (matches!(
                 job.retrieval_plan,
@@ -739,6 +752,22 @@ impl Service {
         Ok(())
     }
     fn authorize_job(&self, job: &Job) -> Result<()> {
+        if let Some(plan) = &job.grill_plan {
+            plan.sources(&self.storage, &context()?)?;
+            let snapshot = self.retrieval_snapshot(job.config_generation)?;
+            for role in [
+                crate::grill::Role::Interviewer,
+                crate::grill::Role::Expert,
+                crate::grill::Role::Reviewer,
+            ] {
+                let profile = role.profile(&snapshot.resolved().config().grill)?;
+                self.authorize_executor(
+                    profile,
+                    job.grill_natives.get(profile).ok_or(Error("JOB_CORRUPT"))?,
+                )?;
+            }
+            return Ok(());
+        }
         if let Some(plan) = &job.extraction_plan {
             plan.sources(&self.storage, &context()?)?;
             if let Some(native) = &job.extraction_native {
@@ -817,14 +846,17 @@ impl Service {
         self.submit_job(id, JobInput::Model(plan)).await
     }
     async fn submit_job(self: &Arc<Self>, id: String, input: JobInput) -> Result<Value> {
-        let (binding, path, model_plan, retrieval_plan, consult_plan, extraction_plan) = match input
-        {
-            JobInput::Capture(binding, path) => (Some(binding), Some(path), None, None, None, None),
-            JobInput::Model(plan) => (None, None, Some(plan), None, None, None),
-            JobInput::Retrieval(plan) => (None, None, None, Some(plan), None, None),
-            JobInput::Consult(plan) => (None, None, None, None, Some(plan), None),
-            JobInput::Extraction(plan) => (None, None, None, None, None, Some(plan)),
-        };
+        let (binding, path, model_plan, retrieval_plan, consult_plan, extraction_plan, grill_plan) =
+            match input {
+                JobInput::Capture(binding, path) => {
+                    (Some(binding), Some(path), None, None, None, None, None)
+                }
+                JobInput::Model(plan) => (None, None, Some(plan), None, None, None, None),
+                JobInput::Retrieval(plan) => (None, None, None, Some(plan), None, None, None),
+                JobInput::Consult(plan) => (None, None, None, None, Some(plan), None, None),
+                JobInput::Extraction(plan) => (None, None, None, None, None, Some(plan), None),
+                JobInput::Grill(plan) => (None, None, None, None, None, None, Some(plan)),
+            };
         let service = self.clone();
         self.operation(async move {
             let _guard = service.admission.lock().await;
@@ -846,14 +878,19 @@ impl Service {
                     _ => None,
                 })
                 .unwrap_or_else(owner_scope);
-            if let Some(plan) = &extraction_plan {
+            if let Some(plan) = &grill_plan {
+                plan.sources(&service.storage, &context()?)?;
+                service.initial_grill(plan)?;
+            } else if let Some(plan) = &extraction_plan {
                 plan.sources(&service.storage, &context()?)?;
             } else if let Some(plan) = &consult_plan {
                 service.consult_invocation(plan)?;
             } else {
                 Domain::new(&service.storage).permission(&context()?, Some(&scope))?;
             }
-            let fingerprint = if let Some(plan) = &extraction_plan {
+            let fingerprint = if let Some(plan) = &grill_plan {
+                hash(&serde_json::to_vec(&("grill", plan))?)
+            } else if let Some(plan) = &extraction_plan {
                 hash(&serde_json::to_vec(&("extraction", plan))?)
             } else if let Some(plan) = &consult_plan {
                 hash(&serde_json::to_vec(&("consult", plan))?)
@@ -954,11 +991,31 @@ impl Service {
             } else {
                 None
             };
+            let mut grill_natives = std::collections::BTreeMap::new();
+            if grill_plan.is_some() {
+                for role in [
+                    crate::grill::Role::Interviewer,
+                    crate::grill::Role::Expert,
+                    crate::grill::Role::Reviewer,
+                ] {
+                    let profile = role.profile(&snapshot.resolved().config().grill)?;
+                    let executor = snapshot
+                        .resolved()
+                        .config()
+                        .executors
+                        .get(profile)
+                        .ok_or(Error("CONFIG_CORRUPT"))?;
+                    let native = consult::NativeExecutor::from_profile(executor, None)?;
+                    service.authorize_executor(profile, &native)?;
+                    grill_natives.insert(profile.to_owned(), native);
+                }
+            }
             let budget = match (&model_plan, &retrieval_plan) {
                 (Some(plan), _) => plan.validate(snapshot.resolved()).map_err(|e| Error(e.0))?,
                 (_, Some(plan)) => {
                     plan.workflow_budget(snapshot.resolved(), vector_snapshot.resolved(), pending)?
                 }
+                _ if grill_plan.is_some() => snapshot.resolved().timeouts().workflow,
                 _ if extraction_native.is_some() => snapshot.resolved().timeouts().workflow,
                 _ if extraction_plan.is_some() => {
                     let call = service
@@ -981,6 +1038,8 @@ impl Service {
                 model_plan,
                 extraction_plan,
                 extraction_native,
+                grill_plan,
+                grill_natives,
                 consult_plan,
                 retrieval_plan,
                 retrieval_target_seq,
@@ -1156,6 +1215,8 @@ impl Service {
                 if job.model_plan.is_some()
                     || job.retrieval_plan.is_some()
                     || job.consult_plan.is_some()
+                    || (job.grill_plan.is_some()
+                        && self.grill_checkpoint(&job, revision)?.inflight.is_some())
                     || (job.extraction_plan.is_some()
                         && job
                             .result
@@ -1163,7 +1224,10 @@ impl Service {
                             .and_then(|v| v.get("checkpoint"))
                             .is_none())
                 {
-                    let code = if job.consult_plan.is_some() || job.extraction_native.is_some() {
+                    let code = if job.consult_plan.is_some()
+                        || job.extraction_native.is_some()
+                        || job.grill_plan.is_some()
+                    {
                         "RUNNER_INTERRUPTED"
                     } else {
                         "PROVIDER_INTERRUPTED"
@@ -1234,6 +1298,7 @@ impl Service {
             || job.retrieval_plan.is_some()
             || job.consult_plan.is_some()
             || job.extraction_plan.is_some()
+            || job.grill_plan.is_some()
         {
             let started = job.started_at_ms.ok_or(Error("JOB_CORRUPT"))?;
             if started.checked_add(job.execution_budget_ms) != Some(deadline) {
@@ -1244,7 +1309,9 @@ impl Service {
                 Duration::from_millis(job.execution_budget_ms),
                 started,
             )?;
-            return if job.extraction_plan.is_some() {
+            return if job.grill_plan.is_some() {
+                self.execute_grill(id, workflow).await
+            } else if job.extraction_plan.is_some() {
                 self.execute_extraction(id, workflow).await
             } else if job.consult_plan.is_some() {
                 self.execute_consult(id, workflow).await

@@ -20,6 +20,8 @@ pub struct Config {
     pub schema_version: u32,
     pub paths: Paths,
     pub consult: Consult,
+    #[serde(default, skip_serializing_if = "Grill::is_default")]
+    pub grill: Grill,
     pub timeouts: Timeouts,
     pub runtime: Runtime,
     pub retrieval: Retrieval,
@@ -42,6 +44,39 @@ pub struct Consult {
     pub max_delegation_depth: u32,
     pub max_result_chars: usize,
     pub instructions_version: String,
+}
+
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Grill {
+    pub interviewer: Option<String>,
+    pub expert: Option<String>,
+    pub reviewer: Option<String>,
+    pub max_rounds: u32,
+    pub max_runner_starts: u32,
+    pub max_questions: usize,
+    pub max_tokens: u64,
+}
+
+impl Default for Grill {
+    fn default() -> Self {
+        Self {
+            interviewer: None,
+            expert: None,
+            reviewer: None,
+            max_rounds: 2,
+            max_runner_starts: 8,
+            max_questions: 4,
+            max_tokens: 128_000,
+        }
+    }
+}
+
+impl Grill {
+    // Preserve the digest of archived configurations from before Auto-Grill.
+    fn is_default(&self) -> bool {
+        self == &Self::default()
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -288,6 +323,38 @@ impl Config {
             "consult.instructions_version",
             "must not be empty",
         )?;
+        let grill_roles = [
+            &self.grill.interviewer,
+            &self.grill.expert,
+            &self.grill.reviewer,
+        ];
+        let grill_enabled = grill_roles.iter().any(|role| role.is_some());
+        require(
+            !grill_enabled
+                || grill_roles.iter().all(|role| {
+                    role.as_ref()
+                        .is_some_and(|name| self.executors.get(name).is_some_and(|e| e.enabled))
+                }),
+            "grill",
+            "all three roles must select enabled executors",
+        )?;
+        for (valid, field) in [
+            ((1..=8).contains(&self.grill.max_rounds), "grill.max_rounds"),
+            (
+                (1..=32).contains(&self.grill.max_runner_starts),
+                "grill.max_runner_starts",
+            ),
+            (
+                (1..=8).contains(&self.grill.max_questions),
+                "grill.max_questions",
+            ),
+            (
+                (1..=10_000_000).contains(&self.grill.max_tokens),
+                "grill.max_tokens",
+            ),
+        ] {
+            require(valid, field, "outside the finite workflow budget")?;
+        }
         require(
             self.runtime.max_concurrent_jobs > 0,
             "runtime.max_concurrent_jobs",
@@ -494,13 +561,39 @@ impl Config {
             .tools
             .checked_add(effective.summary)
             .ok_or_else(|| ConfigError::invalid("timeouts.workflow", "deadline overflow"))?;
-        let minimum = one
+        let mut minimum = one
             .checked_add(overhead)
             .ok_or_else(|| ConfigError::invalid("timeouts.workflow", "deadline overflow"))?;
+        let mut automatic = one
+            .checked_mul(self.consult.max_runner_starts)
+            .and_then(|n| n.checked_add(overhead))
+            .ok_or_else(|| ConfigError::invalid("timeouts.workflow", "deadline overflow"))?;
+        if grill_enabled {
+            let slowest = grill_roles
+                .iter()
+                .map(|role| effective.executors[role.as_ref().unwrap()])
+                .max()
+                .unwrap();
+            let grill_one = effective
+                .startup
+                .checked_add(slowest)
+                .and_then(|n| n.checked_add(effective.cleanup))
+                .ok_or_else(|| ConfigError::invalid("timeouts.workflow", "deadline overflow"))?;
+            minimum =
+                minimum.max(grill_one.checked_add(overhead).ok_or_else(|| {
+                    ConfigError::invalid("timeouts.workflow", "deadline overflow")
+                })?);
+            automatic = automatic.max(
+                grill_one
+                    .checked_mul(self.grill.max_runner_starts)
+                    .and_then(|n| n.checked_add(overhead))
+                    .ok_or_else(|| {
+                        ConfigError::invalid("timeouts.workflow", "deadline overflow")
+                    })?,
+            );
+        }
         effective.workflow = if t.workflow == "auto" {
-            one.checked_mul(self.consult.max_runner_starts)
-                .and_then(|n| n.checked_add(overhead))
-                .ok_or_else(|| ConfigError::invalid("timeouts.workflow", "deadline overflow"))?
+            automatic
         } else {
             let requested = duration(&t.workflow, "timeouts.workflow")?;
             require(

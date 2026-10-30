@@ -1,0 +1,27 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp018)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.99s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 2 tests
+
+thread 'grill::tests::unresolved_or_conditionally_different_answers_never_become_an_agreed_decision' (1269275) panicked at src/grill.rs:355:17:
+assertion `left == right` failed: unresolved
+  left: Decision
+ right: Hypothesis
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test grill::tests::unresolved_or_conditionally_different_answers_never_become_an_agreed_decision ... FAILED
+test grill::tests::discussion_schema_rejects_cycles_forged_authority_unread_spans_and_false_resolution ... ok
+
+failures:
+
+failures:
+    grill::tests::unresolved_or_conditionally_different_answers_never_become_an_agreed_decision
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 50 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

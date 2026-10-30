@@ -18,6 +18,22 @@ mod tests {
     use super::*;
 
     #[test]
+    fn pre_grill_checkpoint_restores_without_changing_accepted_config_digest() {
+        let paths = Paths {
+            data_dir: "/test/data".into(),
+            socket_path: "/test/run/socket".into(),
+        };
+        let initial = resolve("", None, "", &paths).unwrap();
+        let digest = initial.digest().to_owned();
+        let manager = ConfigManager::new(1, initial, |_| Ok(())).unwrap();
+        let legacy = manager.checkpoint().unwrap();
+        assert!(legacy["active"]["config"].get("grill").is_none());
+        let restored = ConfigManager::restore(legacy.clone(), |_| Ok(())).unwrap();
+        assert_eq!(restored.pin().resolved().digest(), digest);
+        assert_eq!(restored.checkpoint().unwrap(), legacy);
+    }
+
+    #[test]
     fn failed_durable_commit_keeps_active_pending_history_and_watch_unchanged() {
         let paths = Paths {
             data_dir: "/test/data".into(),
