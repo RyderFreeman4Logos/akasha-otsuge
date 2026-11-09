@@ -307,6 +307,23 @@ impl Service {
             };
             if record.job_id.is_none() {
                 let submitted = async {
+                    // Admission can commit before its incident link; reconcile without renewing it.
+                    let job_id = format!("editor/{}", hash(format!("incident/{id}").as_bytes()));
+                    {
+                        let _guard = self.admission.lock().await;
+                        if self.storage.current(&job_key(&job_id))?.is_some() {
+                            let (_, job) = self.job(&job_id)?;
+                            if job
+                                .consult_plan
+                                .as_ref()
+                                .and_then(|p| p.incident.as_deref())
+                                != Some(&id)
+                            {
+                                return Err(Error("INCIDENT_CORRUPT"));
+                            }
+                            return Ok(json!({"id":job_id}));
+                        }
+                    }
                     self.authorize_incident_execution(&id)?;
                     let config = self.retrieval_snapshot(record.config_generation)?;
                     let queue = u64::try_from(config.resolved().timeouts().queue.as_millis())
@@ -317,6 +334,10 @@ impl Service {
                     self.submit_incident_editor(&record).await
                 }
                 .await;
+                #[cfg(test)]
+                if submitted.is_ok() {
+                    crate::storage::crash_tests::checkpoint("incident-admitted");
+                }
                 if matches!(submitted, Err(Error("RESOURCE_BUSY"))) {
                     continue;
                 }

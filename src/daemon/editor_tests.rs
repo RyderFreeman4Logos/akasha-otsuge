@@ -168,9 +168,83 @@ fn editor_crash_child() {
     runtime().block_on(async {
         let (service, _) = tests::service_at(&root, &settings).await;
         service.recover().await.unwrap();
+        if std::env::var("AKASHA_TEST_CRASH_PHASE").as_deref() == Ok("incident-admitted") {
+            service.advance_incidents().await.unwrap();
+            panic!("incident missed the admission checkpoint");
+        }
         assert!(service.claim(&id(), 0).await.unwrap());
         service.execute_job(id()).await.unwrap();
         panic!("editor missed the requested crash checkpoint");
+    });
+}
+
+#[test]
+fn incident_admitted_job_survives_sigkill_and_keeps_its_original_queue_deadline() {
+    let root =
+        std::env::temp_dir().join(format!("akasha-incident-admission-{}", std::process::id()));
+    private_dir(&root).unwrap();
+    let _cleanup = tests::Fixture(root.clone());
+    let settings = format!(
+        "[timeouts]\nqueue='5s'\n[incidents]\nexecutor='editor'\ntriggers=['user_correction']\n[executors.editor]\nkind='codex'\nbinary='/missing-native-must-not-run'\nnative_home={root:?}\n"
+    );
+    std::fs::write(root.join("settings.toml"), &settings).unwrap();
+    runtime().block_on(async {
+        setup(&root,&settings,false).await;
+        let (service, _) = tests::service_at(&root,&settings).await;
+        service.submit_outcome(serde_json::from_value(json!({
+            "event_id":"admission-gap","invocation_id":"bound","source":"controlled-crash","severity":"warning",
+            "occurred_at_ms":ipc::now_ms().unwrap(),"execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+            "incident":{"kind":"user_correction","key":"crash-window","reason":"Retain the original admitted job across the missing incident link."}
+        })).unwrap()).await.unwrap();
+        service.storage.close().await.unwrap();
+    });
+    crate::storage::crash_tests::kill_at(
+        &root,
+        "incident-admitted",
+        "daemon::jobs::consult::editor_tests::editor_crash_child",
+    );
+    runtime().block_on(async {
+        let (service, _) = tests::service_at(&root, &settings).await;
+        let outcome = service.read_outcome("admission-gap").await.unwrap();
+        let incident_id = outcome.incident.unwrap();
+        let before = service.incident_record(&incident_id).unwrap().1;
+        assert!(before.job_id.is_none());
+        let job_id = format!(
+            "editor/{}",
+            hash(format!("incident/{incident_id}").as_bytes())
+        );
+        let admitted = service.job(&job_id).unwrap().1;
+        assert_eq!(admitted.accepted_at_ms, before.first_report_at_ms);
+        assert_eq!(admitted.queue_deadline_ms, admitted.accepted_at_ms + 5000);
+        tokio::time::sleep(Duration::from_millis(
+            admitted
+                .queue_deadline_ms
+                .saturating_sub(ipc::now_ms().unwrap())
+                + 1,
+        ))
+        .await;
+        service.recover().await.unwrap();
+        assert!(!service.claim(&job_id, 0).await.unwrap());
+        service.advance_incidents().await.unwrap();
+        service.advance_incidents().await.unwrap();
+        let after = service.incident_record(&incident_id).unwrap().1;
+        assert_eq!(
+            after.job_id.as_deref(),
+            Some(job_id.as_str()),
+            "admitted job was orphaned after its queue deadline"
+        );
+        assert_eq!(after.first_report_at_ms, before.first_report_at_ms);
+        assert_eq!(after.expires_at_ms, before.expires_at_ms);
+        assert_eq!(
+            after.investigation,
+            crate::incident::Investigation::Finished
+        );
+        assert_eq!(after.error.as_deref(), Some("QUEUE_TIMEOUT"));
+        let job = service.job(&job_id).unwrap().1;
+        assert_eq!(job.attempt, 0);
+        assert_eq!(job.queue_deadline_ms, admitted.queue_deadline_ms);
+        assert!(service.storage.receipt(&job_id).unwrap().is_none());
+        service.storage.close().await.unwrap();
     });
 }
 
