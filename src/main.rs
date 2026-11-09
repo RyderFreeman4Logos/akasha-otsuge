@@ -42,6 +42,7 @@ Commands:
   job show|cancel ID
   job list [--after KEY]
   consult show JOB_ID
+  editor run FEEDBACK_JSON --idempotency-key ID
   consult receipt JOB_ID [--full]
   consult original JOB_ID SOURCE_INDEX [--start BYTE_OFFSET]
   memory show ID [--at COMMIT]
@@ -500,6 +501,10 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             at: None,
         }),
         ["memory", "export", id] => Some(Command::MemoryExport { id: (*id).into() }),
+        ["editor", "run", path, "--idempotency-key", id] => Some(Command::EditorRun {
+            feedback: json_file(path)?,
+            idempotency_key: (*id).into(),
+        }),
         ["memory", "patch", path, "--idempotency-key", id] => Some(Command::PatchApply {
             patch: json_file(path)?,
             idempotency_key: (*id).into(),

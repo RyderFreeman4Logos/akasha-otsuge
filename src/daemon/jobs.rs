@@ -788,6 +788,7 @@ impl Service {
         }
         if let Some(plan) = &job.consult_plan {
             self.consult_invocation(plan)?;
+            self.authorize_editor(plan)?;
             if plan.config_generation != job.config_generation {
                 return Err(Error("JOB_CORRUPT"));
             }
@@ -1219,7 +1220,7 @@ impl Service {
             if job.state == "running" {
                 if job.model_plan.is_some()
                     || job.retrieval_plan.is_some()
-                    || job.consult_plan.is_some()
+                    || job.consult_plan.is_some() && !self.editor_checkpoint(&job)
                     || (job.grill_plan.is_some()
                         && self.grill_checkpoint(&job, revision)?.inflight.is_some())
                     || (job.extraction_plan.is_some()

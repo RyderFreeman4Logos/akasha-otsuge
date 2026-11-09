@@ -183,6 +183,10 @@ pub enum Command {
     PatchShow {
         id: String,
     },
+    EditorRun {
+        feedback: crate::editor::Feedback,
+        idempotency_key: String,
+    },
     ReviewList {
         scope: crate::domain::Scope,
         after: Option<String>,

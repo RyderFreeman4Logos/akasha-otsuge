@@ -173,6 +173,10 @@ impl Service {
         command: Command,
     ) -> Result<serde_json::Value> {
         match command {
+            Command::EditorRun {
+                feedback,
+                idempotency_key,
+            } => self.submit_editor(idempotency_key, feedback).await,
             Command::PatchApply {
                 patch,
                 idempotency_key,

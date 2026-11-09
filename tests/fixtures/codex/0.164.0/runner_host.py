@@ -130,7 +130,7 @@ result = read()
 assert result['id'] == 10 and result['result']['success'] is True
 assert 'invocation_id' in result['result']['contentItems'][0]['text']
 seen_sources, seen_memories = [], []
-if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 'conclusion_')):
+if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 'conclusion_', 'editor')):
     call_number = 100
     def tool(name, arguments):
         global call_number
@@ -199,6 +199,38 @@ if scenario == 'code_policy':
     while not (root / 'code-read-release').exists():
         assert time.monotonic() < end, 'code policy barrier timed out'
         time.sleep(0.01)
+if scenario.startswith('editor'):
+    instructions = request['params']['baseInstructions']
+    editor = json.loads(instructions.split('\nEditor input: ', 1)[1])
+    scope = json.loads(instructions.split('\nBound scope: ', 1)[1].split('\nEditor input:', 1)[0])
+    target = editor['targets'][0]
+    expanded = tool('memory_get', {'memory_id':target['memory_id'], 'revision':target['expected_revision']})['value']
+    draft = expanded['memory']['data']['revision']['memory']['record']['draft']
+    code = tool('code_read', {'path':'notes.rs','start':0,'max_bytes':4096})['value']
+    assert 'Linux' in code['text']
+    draft['claim'] = 'Only the Linux fixture build passed; other platforms were not tested.'
+    draft['source_spans'].append(code['source'])
+    patch = dict(scope=scope, changes=[dict(target, draft=draft)], reason='Limit the claim to the observed fixture.',
+                 evidence=draft['source_spans'], expires_at_ms=editor['expires_at_ms'])
+    editor_report = dict(classification='memory_error', reason='The fixture does not establish behavior on other platforms.', patch=patch)
+    if scenario == 'editor_environment':
+        editor_report.update(classification='environment', reason='The environment failed; no memory error was established.', patch=None)
+    elif scenario == 'editor_insufficient':
+        editor_report.update(classification='insufficient_evidence', reason='No reproducible contradiction was established.', patch=None)
+    elif scenario == 'editor_unread':
+        patch['evidence'].append(dict(patch['evidence'][0], event_id='unread-evidence'))
+    elif scenario == 'editor_target':
+        patch['changes'][0]['memory_id'] = 'unlisted-target'
+    elif scenario == 'editor_scope':
+        draft['scope']['project'] = None
+    elif scenario == 'editor_forged':
+        draft['approval'] = {'actor':'human'}
+    elif scenario == 'editor_wait':
+        (root / 'editor-ready').touch()
+        end = time.monotonic() + 15
+        while not (root / 'editor-release').exists():
+            assert time.monotonic() < end, 'editor barrier timed out'
+            time.sleep(0.01)
 if scenario == 'research':
     found = tool('memory_search', {'query':'offline'})['value']
     item = next(item for item in found['items'] if item['memory']['revision']['key']['id'] == 'offline')
@@ -228,6 +260,10 @@ if scenario.startswith('conclusion_') or 'status' in turn_request['params']['out
     conclusion = dict(answer=json.loads(final['params']['turn']['items'][0]['text'])['answer'],
         status='found' if seen_sources or seen_memories else 'incomplete', sources=seen_sources,
         memories=seen_memories, conditions=[], conflicts=[], gaps=[] if seen_sources or seen_memories else ['no_evidence'])
+    if scenario.startswith('editor'):
+        conclusion['answer'] = json.dumps(editor_report)
+        if scenario == 'editor_uncertain':
+            conclusion.update(status='incomplete', gaps=['unverified_platform'])
     if scenario == 'conclusion_no_hit':
         tool('context_search', {'cursor':None,'query':'absent-conclusion-query','limit':4})
         conclusion.update(status='no_hit', answer='No reliable relevant result in the searched scope.', sources=[], memories=[], gaps=[])

@@ -3,6 +3,7 @@ pub mod capture;
 pub mod config;
 pub mod daemon;
 pub mod domain;
+pub mod editor;
 pub mod extraction;
 pub mod grill;
 pub mod ipc;

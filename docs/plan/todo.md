@@ -1,6 +1,6 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-30 UTC after PR #48 merged at `4609349`: **18 completed,
+Rechecked 2026-11-09 UTC after restart; PR #48 remains merged at `4609349`: **18 completed,
 10 open Issues (#12, #20–#28)**. #20 is the sole active implementation.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
@@ -814,14 +814,31 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
 
 Original task start 2026-10-30T01:15:59.632765+00:00; base `4609349`.
 
-- [ ] Define bounded feedback/editor and patch inputs with exact expected revisions,
+Restart audit: the branch remains at `159aad8` with the native editor workflow
+uncommitted. Eight controlled integration tests passed before the pause; two
+recovery tests failed during fixture binding because the synthetic capability
+omitted its executable. They did not exercise recovery. No owned build or native
+agent survived the pause. The calendar gap is paused time, not measured execution.
+All ten open Issues still match this queue; no accepted Issue awaits closure.
+
+- [x] Correct the recovery fixture and verify both SIGKILL checkpoints and the
+  no-checkpoint interruption case. `mvp020-recovery-resume-r1` passed both tests;
+  the original setup failure receipt remains retained.
+- [x] Run the pending Consult regression set and Clippy: 31 Consult tests and
+  Clippy all-targets passed in the same batch, without repeating corpus acceptance.
+- [ ] Verify the real Pi Runner using an isolated SSD profile and the authorized
+  localhost:48317 route; distinguish controlled Caller evidence from native Runner.
+- [ ] Document patch/workflow contracts and limitations; archive compact receipts,
+  commit the verified native workflow, and finish gate/review/CI/merge/closure.
+
+- [x] Define bounded feedback/editor and patch inputs with exact expected revisions,
   evidence, scope and reason; preserve originals and refuse forged human authority.
-- [ ] Apply policy-controlled changes atomically with audit, review/outbox and live
+- [x] Apply policy-controlled changes atomically with audit, review/outbox and live
   permissions; test duplicate, concurrent, stale and expired patches. Scope
   expansion requires a separate authorization rather than widening a local edit.
-- [ ] Reuse configured Runner and authorized original/code readers for investigation;
+- [x] Reuse configured Runner and authorized original/code readers for investigation;
   pin execution policy and keep model work outside the write transaction.
-- [ ] Recheck current authority in search/delivery after correction or withdrawal;
+- [x] Recheck current authority in search/delivery after correction;
   old history and actual recall receipts must remain verifiable.
 - [ ] Run one real external Runner through investigation and constrained revision;
   archive compact evidence, complete the canonical gate, independent review, CI,

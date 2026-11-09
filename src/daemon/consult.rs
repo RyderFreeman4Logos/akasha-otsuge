@@ -5,6 +5,11 @@ use crate::domain::{Coverage, RecallDraft, RecallStatus, RetrievalMode};
 use std::collections::BTreeMap;
 #[path = "consult_delivery.rs"]
 mod delivery;
+#[path = "editor_workflow.rs"]
+mod editor;
+#[cfg(test)]
+#[path = "editor_tests.rs"]
+mod editor_tests;
 #[path = "consult_research.rs"]
 mod research;
 
@@ -117,9 +122,9 @@ impl NativeExecutor {
             home,
         })
     }
-    fn named(&self, config: &crate::config::Config) -> Result<BTreeMap<String, Self>> {
+    fn named(&self, config: &crate::config::Config, first: &str) -> Result<BTreeMap<String, Self>> {
         let mut routes = BTreeMap::new();
-        let mut pending = vec![config.consult.executor.clone()];
+        let mut pending = vec![first.to_owned()];
         while let Some(name) = pending.pop() {
             if name == "caller" || routes.contains_key(&name) {
                 continue;
@@ -144,6 +149,8 @@ pub(super) struct Plan {
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     executors: BTreeMap<String, NativeExecutor>,
     args: ConsultArgs,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    editor: Option<crate::editor::Feedback>,
 }
 
 impl Service {
@@ -176,7 +183,10 @@ impl Service {
     ) -> Result<Value> {
         let id = format!("consult/{}", hash(invocation.id().as_bytes()));
         let config = self.retrieval_snapshot(invocation.diagnostic().config_generation)?;
-        let executors = native.named(config.resolved().config())?;
+        let executors = native.named(
+            config.resolved().config(),
+            &config.resolved().config().consult.executor,
+        )?;
         let plan = Plan {
             invocation_id: invocation.id().into(),
             principal: invocation.diagnostic().principal.clone(),
@@ -186,6 +196,7 @@ impl Service {
             native,
             executors,
             args: ConsultArgs::new(args.hint)?,
+            editor: None,
         };
         self.submit_job(id, JobInput::Consult(plan)).await
     }
@@ -195,7 +206,8 @@ impl Service {
             Invocation::load_verified(&self.storage, &plan.invocation_id, &plan.principal)?;
         if invocation.revision() != plan.invocation_revision
             || invocation.fence_hash() != plan.fence
-            || invocation.diagnostic().config_generation != plan.config_generation
+            || plan.editor.is_none()
+                && invocation.diagnostic().config_generation != plan.config_generation
         {
             return Err(Error("BINDING_CONFLICT"));
         }
@@ -217,6 +229,15 @@ impl Service {
     }
 
     async fn consult_result(&self, id: &str, workflow: &Deadline) -> Result<Value> {
+        if self
+            .job(id)?
+            .1
+            .consult_plan
+            .as_ref()
+            .is_some_and(|p| p.editor.is_some())
+        {
+            return self.editor_result(id, workflow).await;
+        }
         let (plan, config, invocation) = {
             let _guard = self.admission.lock().await;
             let (_, job) = self.job(id)?;

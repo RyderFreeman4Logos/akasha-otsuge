@@ -14,7 +14,7 @@ fn consult_fixture(scenario: &str) -> (Daemon, Value, Value) {
     consult_fixture_with(scenario, |_| String::new())
 }
 
-fn consult_fixture_with(
+pub(super) fn consult_fixture_with(
     scenario: &str,
     settings: impl FnOnce(&std::path::Path) -> String,
 ) -> (Daemon, Value, Value) {
@@ -47,6 +47,25 @@ fn consult_fixture_with(
         "../fixtures/codex/0.164.0/exec-pre-tool-use.json"
     ))
     .unwrap();
+    if scenario.starts_with("editor") {
+        super::retrieval_tests::seed_records_with(
+            &daemon,
+            &[(
+                "editable",
+                Some(workspace.to_str().unwrap()),
+                "The fixture build passed on Linux.",
+            )],
+            1,
+            |draft| {
+                draft.claim="The fixture build passed on all platforms, including Linux, macOS and Windows.".into();
+            },
+        );
+        std::fs::write(
+            workspace.join("notes.rs"),
+            "// The Linux fixture passed; other platforms were not tested.\n",
+        )
+        .unwrap();
+    }
     if scenario == "research" {
         super::retrieval_tests::seed_records_with(
             &daemon,

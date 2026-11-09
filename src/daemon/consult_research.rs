@@ -24,6 +24,7 @@ pub(super) struct Research<'a> {
     operations: u64,
     native: NativeExecutor,
     executors: BTreeMap<String, NativeExecutor>,
+    editor: Option<crate::editor::Feedback>,
     budget: RunBudget,
     runs: Vec<Value>,
     current_run: Option<usize>,
@@ -54,12 +55,22 @@ impl<'a> Research<'a> {
             config,
             workflow,
             workspace: None,
-            handles: BTreeMap::new(),
+            handles: plan
+                .editor
+                .as_ref()
+                .map(|e| {
+                    e.targets
+                        .iter()
+                        .map(|t| (t.memory_id.clone(), t.expected_revision))
+                        .collect()
+                })
+                .unwrap_or_default(),
             expanded: BTreeMap::new(),
             searched: false,
             operations: 0,
             native: plan.native,
             executors: plan.executors,
+            editor: plan.editor,
             budget,
             runs: vec![],
             current_run: None,
