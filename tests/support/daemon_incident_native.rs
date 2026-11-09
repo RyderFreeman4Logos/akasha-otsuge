@@ -1,8 +1,8 @@
 use super::*;
 
-fn fixture() -> (Daemon, Value, Value) {
+fn fixture(settings: &str) -> (Daemon, Value, Value) {
     let (mut daemon, call, bound) =
-        super::super::codex_tests::consult_fixture_with("editor_actual", |_| String::new());
+        super::super::codex_tests::consult_fixture_with("editor_actual", |_| settings.to_owned());
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
     let workspace = daemon.root.join("workspace");
@@ -91,7 +91,7 @@ fn compile_failure(daemon: &Daemon, file: &std::path::Path) -> Value {
 
 #[test]
 fn old_api_fixture_has_independent_compile_controls_and_separate_version_history() {
-    let (daemon, _, bound) = fixture();
+    let (daemon, _, bound) = fixture("");
     let original = daemon.cli(&["memory", "export", "api-current"])["data"].clone();
     assert_eq!(
         original["record"]["draft"]["scope"]["branch_or_version"],
@@ -154,13 +154,19 @@ fn native_incident_actual() {
     let home = PathBuf::from(std::env::var_os("AKASHA_NATIVE_INCIDENT_HOME").unwrap());
     let output = PathBuf::from(std::env::var_os("AKASHA_NATIVE_INCIDENT_RECEIPT").unwrap());
     assert!(!output.exists());
-    let (mut daemon, mut call, bound) = fixture();
+    let settings = format!(
+        "[review]\nmode='automatic'\n[consult]\nexecutor='investigator'\nmax_delegation_depth=0\nmax_runner_starts=1\n[incidents]\nexecutor='investigator'\ntriggers=['reproducible_failure']\nauto_repair=true\nmax_runner_starts=1\nmax_tokens=128000\n[executors.investigator]\nkind='codex'\nbinary={binary:?}\nnative_home={home:?}\n"
+    );
+    let (mut daemon, mut call, bound) = fixture(&settings);
     let original = daemon.cli(&["memory", "export", "api-current"])["data"].clone();
     let historical = daemon.cli(&["memory", "export", "api-v1"])["data"].clone();
     let unrelated = daemon.cli(&["memory", "export", "editable"])["data"].clone();
     let mut receipt = json!({"schema_version":1,"status":"RUNNING","source":"controlled Caller and deliberately constructed old-API program; actual authenticated Codex Consult and investigator, actual rustc failure and successful independent control","scratch":daemon.root,"before":original,"historical_before":historical,"unrelated_before":unrelated});
     save(&output, &receipt);
-    daemon.configure(&format!("[access]\nread_roots=[{:?},{home:?}]\n[review]\nmode='automatic'\n[consult]\nexecutor='investigator'\nmax_delegation_depth=0\nmax_runner_starts=1\n[incidents]\nexecutor='investigator'\ntriggers=['reproducible_failure']\nauto_repair=true\nmax_runner_starts=1\nmax_tokens=128000\n[executors.investigator]\nkind='codex'\nbinary={binary:?}\nnative_home={home:?}\n",daemon.root));
+    daemon.configure(&format!(
+        "[access]\nread_roots=[{:?},{home:?}]\n{settings}",
+        daemon.root
+    ));
     daemon.cli(&["config", "reload"]);
     daemon.cli(&[
         "index",
@@ -177,6 +183,11 @@ fn native_incident_actual() {
     );
     let accepted = rpc(&daemon, json!({"op":"codex","event":call}));
     assert!(accepted.get("error").is_none(), "{accepted}");
+    assert_eq!(
+        accepted["data"]["consult_plan"]["executors"]["investigator"]["binary"],
+        json!(binary),
+        "the Caller must pin the intended native profile before recall"
+    );
     let recalled = job(
         &daemon,
         accepted["data"]["id"].as_str().unwrap(),
