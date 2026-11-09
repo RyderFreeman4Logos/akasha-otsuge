@@ -1,0 +1,7 @@
+{
+  "classification": "HARNESS",
+  "cause": "API memories were seeded after the Caller capture_seq. Genuine native Consult correctly returned no selected memory at its frozen read point; outcome retained attached receipt but no memory links.",
+  "root_cause_control": "mvp022-native-fence-red-r1 verifies capture_seq below intended target revision.",
+  "repair": "Prepare API sources/workspace before native registration and binding; nine focused incident tests plus Clippy pass.",
+  "actual_evidence": "Codex 0.164.0 with configured gpt-6.1-sol completed one Consult in 46.8s, usage 123255 tokens including cached input. Investigation handling not verified in r3."
+}

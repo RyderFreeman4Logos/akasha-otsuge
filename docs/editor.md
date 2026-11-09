@@ -75,7 +75,8 @@ read-root and workspace protections. Executor revocation and current permissions
 are checked again before publication, including after restart.
 
 The report distinguishes memory error, stale conditions, retrieval gap,
-execution error, environment, changed requirements and insufficient evidence.
+execution error (Agent misuse), unrelated code defects, environment, changed
+requirements and insufficient evidence.
 Only memory error/stale conditions may carry a patch. Its targets must have been
 expanded, and every cited span must have been read by this investigation. An
 incomplete/conflicting report forces review even in automatic mode. The daemon
@@ -104,8 +105,9 @@ revisions immediately, before the derived index catches up. Pending candidates
 preserve the previous active revision. Historical state and delivered receipt
 bytes remain available under current access checks.
 
-This patch protocol replaces drafts. Incident-triggered suspension, causal
-outcome linking and notification delivery are tracked separately in #21–#23.
+This patch protocol replaces drafts. [Outcomes](outcomes.md) preserve execution
+links and [incidents](incidents.md) admit configured investigations through this
+same Editor. Notification delivery remains the separate MVP-023 scope.
 
 Controlled cases, crash recovery and a real native investigation are described
 in [the acceptance record](benchmarks/editor-acceptance.md).

@@ -4,7 +4,8 @@ Rechecked 2026-11-09 UTC after PR #52 merged: **20 original Issues
 completed, 8 Issues open (#12 and #22–#28)**. #50 is also completed and closed.
 #22 is active. Its scoped ledger, bounded dispatch, lossless outcome/log reads,
 manual/automatic repair policy and configurable grouping/priority have focused
-regression evidence. Final lifecycle/native acceptance and publication remain below.
+regression evidence. Lifecycle and native failure-to-review acceptance pass;
+the exact canonical gate, independent review and publication remain below.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -900,17 +901,28 @@ Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b2
   scoped ledger, dispatch and context phases are committed through `4893aa9`.
   Grouping/priority configuration passes all 21 config tests, four incident
   integrations and all-target Clippy. No final #22 gate or native claim yet.
-- [ ] Reuse the configured Editor/Research path for receipt/run/code/log evidence,
+- [x] Reuse the configured Editor/Research path for receipt/run/code/log evidence,
   compare memory error, stale conditions, missing recall, misuse, code defects,
   environment failures, changed requirements and insufficient evidence.
-- [ ] Enforce incident budgets, current permissions and live disabling; recover
+- [x] Enforce incident budgets, current permissions and live disabling; recover
   checkpoints without replaying ambiguous Runner work or duplicating patches.
-- [ ] Apply only evidence-backed, authorized, exact-scope/version patches;
+  Eight live-policy/budget/restart controls pass. The actual SIGKILL admission-gap
+  RED showed a lost job association after queue expiry; `e67a77f` reconnects that
+  job without renewing clocks. Five Editor recovery tests and six incident
+  integrations passed with Clippy after the repair.
+- [x] Apply only evidence-backed, authorized, exact-scope/version patches;
   reduced coverage, unavailable investigation and manual policy retain review.
-- [ ] Cover old API, network outage, code bug, missing recall, unresolved causality,
+- [x] Cover old API, network outage, code bug, missing recall, unresolved causality,
   all maintenance triggers, duplicate events and independent scope/version cases.
-- [ ] Retain a real command failure through trigger, investigation and handling,
+- [x] Retain a real command failure through trigger, investigation and handling,
   with model/controlled-fixture boundaries and priority evidence made explicit.
+  Native Codex R7 passed on `2f334fa`: actual rustc failure, v2-only correction
+  candidate, retained gaps and previous adoption, high-priority review, unchanged
+  v1/unrelated memories, successful independent compiler control and idempotent
+  replay. Controlled tests cover automatic adoption; no native-auto claim.
+  [Acceptance and failed attempts](../benchmarks/incident-acceptance.md) retain
+  192 compact evidence files (176,664 bytes; manifest
+  `1bd3b9ed0dc698958623af23625784fa2a9f128bfe6c884be49a601128479fd0`).
 - [ ] Archive compact receipts, document policy/limits, pass exact canonical gate,
   independent review and hosted CI, then merge and verify #22 closure.
 

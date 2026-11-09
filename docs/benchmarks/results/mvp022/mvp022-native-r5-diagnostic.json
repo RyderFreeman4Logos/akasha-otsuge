@@ -1,0 +1,13 @@
+{
+  "utc": "2026-11-09T23:30:44.208022+00:00",
+  "classification": "ACCEPTANCE_BUDGET_EXHAUSTED",
+  "observed": {
+    "tokens": 136544,
+    "reads": 17,
+    "read_bytes": 302602,
+    "starts": 1,
+    "elapsed_ms": 27108
+  },
+  "previous_token_limit": 128000,
+  "decision": "Use a finite 512000-token acceptance limit for the evidence-heavy multi-tool investigator, including native cached input accounting. Production defaults, one-start cap, source and authority guards and original workflow deadlines unchanged. One rerun after configuration verification."
+}

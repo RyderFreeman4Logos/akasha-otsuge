@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T22:42:00.887173+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "6a4a51d45bf69bf4218aa99599778d96a22ff865",
+    "log_sha256": "8b2f994ec90930f7968e7923114eac418a74f7e2250d2436f95567daea831df3",
+    "seconds": 1.165128611959517,
+    "utc": "2026-11-09T22:41:30.507899+00:00"
+  },
+  "process_absent": true,
+  "classification": "HARNESS_COMPILE_digest_has_no_LowerHex"
+}

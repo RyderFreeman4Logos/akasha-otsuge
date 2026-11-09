@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T23:36:16.405222+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "2f334fa7dafb048b11ee4d5b105509896ed7b12f",
+    "log_sha256": "d306d81a073aa7301cf2da14562301140f2e65266b6fd3452cf6cb76c52fa149",
+    "seconds": 101.31920095626265,
+    "utc": "2026-11-09T23:36:07.487213+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_real_compiler_to_authenticated_investigator_versioned_candidate_and_replay_controls"
+}

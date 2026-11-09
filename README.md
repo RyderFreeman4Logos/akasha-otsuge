@@ -28,6 +28,8 @@ A local, traceable memory system for coding agents, written in Rust.
 
 [执行结果与命令 wrapper](docs/outcomes.md)关联 run、召回回执、未提交工作区、产物及完整日志，区分曝光、报告和因果证据。
 
+[失败与维护调查](docs/incidents.md)对显式信号去重并计算优先级，通过已有 Runner 读取证据，按授权修订指定版本或保留 review。
+
 [宿主公共契约](docs/adapters.md)定义持久调用绑定、受限上下文读取、Runner 终态与共享预算；[固定参考集及勘误](docs/evaluation/reference-v1-errata-1/README.md)保存 60 项任务与评测规则。真实四宿主接入和模型质量验收仍待后续 Issues 完成。
 
 公开仓库按用户要求采用 [Apache-2.0](LICENSE)。[来源与许可证核查](docs/provenance.md)记录迁移边界。

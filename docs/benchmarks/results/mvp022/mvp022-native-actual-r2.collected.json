@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T23:13:57.274776+00:00",
+  "terminal": {
+    "exit_code": 1,
+    "head": "bfe5d5137e2b31edfce7237b1d12b6669bdfd00f",
+    "log_sha256": "a1b67bf97cd04e25eedd53e0bd0f06136506dce29e21a16e7427a3edf8f3dbd8",
+    "seconds": 1.5245982119813561,
+    "utc": "2026-11-09T23:13:35.814801+00:00"
+  },
+  "process_absent": true,
+  "classification": "failed_fixture_configuration_before_native_call"
+}

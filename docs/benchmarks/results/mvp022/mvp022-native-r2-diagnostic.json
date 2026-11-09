@@ -1,0 +1,7 @@
+{
+  "classification": "HARNESS",
+  "r2_cause": "Fixture already opens [consult]; repeated TOML table rejected before daemon readiness.",
+  "preflight_r3_cause": "One-start policy rejected fixture default depth 1; now this specific fixture uses depth 0.",
+  "repair": "Reuse append-in-consult settings convention; add no-auth actual admission test asserting named executor and pinned generation. Both preflight controls and Clippy pass in r4.",
+  "native_model_calls_in_r2": 0
+}

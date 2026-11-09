@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T22:51:19.965427+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "6a4a51d45bf69bf4218aa99599778d96a22ff865",
+    "log_sha256": "24b39127389391f0649506701d58e670ff4762112d7e429f85c1fa3902f82452",
+    "seconds": 4.315970154479146,
+    "utc": "2026-11-09T22:51:12.748817+00:00"
+  },
+  "process_absent": true,
+  "classification": "failed_after_fixture_source_identity_fix"
+}

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T22:26:16.839709+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "bd2cb8ffa8a9eb625ce23dbaf7307b7751bca3ed",
+    "log_sha256": "1591987f5ecfd5569f5185fa327c895d81b1729ae797f8737100cc4af31235d6",
+    "seconds": 33.38426485750824,
+    "utc": "2026-11-09T22:25:43.611438+00:00"
+  },
+  "process_absent": true,
+  "classification": "BEHAVIORAL_RED_no_automatic_investigator_admission"
+}

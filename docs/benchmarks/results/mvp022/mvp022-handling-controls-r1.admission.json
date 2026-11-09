@@ -1,0 +1,33 @@
+{
+  "command": [
+    "sh",
+    "-c",
+    "cargo test --locked --test daemon incident_tests:: -- --nocapture && cargo clippy --workspace --all-targets --locked -- -D warnings"
+  ],
+  "dirty_diff_sha256": "31b24fb2aeccd24e948154f0e45e7643edd5ccf8a622f1fedaa9ecb036e4baf9",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "d010e1fa708bcf81ecbda977b4e58e693aa0e506",
+  "process": {
+    "pid": 2342908,
+    "start_ticks": "608512992",
+    "state": "R"
+  },
+  "tree": "3b6e6dda16bf21ff026cfb8a4e55415c503a9002",
+  "untracked": [
+    {
+      "path": "docs/benchmarks/incident-acceptance.md",
+      "sha256": "df6d1d63e7e2a0dbef255762f2c983ec7a46c4a022f5626f1ef43c578bd35072"
+    },
+    {
+      "path": "docs/incidents.md",
+      "sha256": "09fe0e458cede3eb92aec26bef9cbc65c67e585343913753cad1eb51959a0fa3"
+    }
+  ],
+  "utc": "2026-11-09T23:33:52.943782+00:00"
+}
