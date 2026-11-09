@@ -45,7 +45,7 @@ fn prepare(daemon: &Daemon) {
 fn executor_settings(binary: &std::path::Path, home: &std::path::Path) -> String {
     // The Caller fixture already opened [consult]; append its executor before other tables.
     format!(
-        "executor='investigator'\nmax_runner_starts=1\n[review]\nmode='automatic'\n[incidents]\nexecutor='investigator'\ntriggers=['reproducible_failure']\nauto_repair=true\nmax_runner_starts=1\nmax_tokens=128000\n[executors.investigator]\nkind='codex'\nbinary={binary:?}\nnative_home={home:?}\n"
+        "executor='investigator'\nmax_runner_starts=1\n[review]\nmode='automatic'\n[incidents]\nexecutor='investigator'\ntriggers=['reproducible_failure']\nauto_repair=true\nmax_runner_starts=1\nmax_tokens=512000\n[executors.investigator]\nkind='codex'\nbinary={binary:?}\nnative_home={home:?}\n"
     )
 }
 
