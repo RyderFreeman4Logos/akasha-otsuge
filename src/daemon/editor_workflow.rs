@@ -181,6 +181,7 @@ impl Service {
             }
             let answer = outcome?;
             report(&answer, input, &invocation.diagnostic().scope)?;
+            let investigation_gaps = research.coverage_gaps(&answer)?;
             let trace = research.trace()?;
             let profile = trace["runs"]
                 .as_array()
@@ -205,7 +206,7 @@ impl Service {
                 model: model.into(),
                 prompt_version: PROMPT_VERSION.into(),
             };
-            let ready = json!({"schema_version":1,"origin":"editor","answer":answer,"trace":trace,"generator":generator,"executor":profile});
+            let ready = json!({"schema_version":1,"origin":"editor","answer":answer,"investigation_gaps":investigation_gaps,"trace":trace,"generator":generator,"executor":profile});
             let _guard = self.admission.lock().await;
             let (revision, mut job) = self.job(id)?;
             self.authorize_job(&job)?;
@@ -232,6 +233,16 @@ impl Service {
         }
         let answer: crate::adapter::ResearchConclusion =
             serde_json::from_value(ready["answer"].clone()).map_err(|_| Error("JOB_CORRUPT"))?;
+        let gaps: Vec<String> = match ready.get("investigation_gaps") {
+            Some(value) => {
+                serde_json::from_value(value.clone()).map_err(|_| Error("JOB_CORRUPT"))?
+            }
+            // Older checkpoints cannot prove that the Runner reported every observed limitation.
+            None => vec!["investigation_coverage_unavailable".into()],
+        };
+        if gaps.len() > 32 || gaps.iter().any(|gap| !ipc::identifier(gap)) {
+            return Err(Error("JOB_CORRUPT"));
+        }
         let report = report(&answer, input, &invocation.diagnostic().scope)?;
         let generator: Generator =
             serde_json::from_value(ready["generator"].clone()).map_err(|_| Error("JOB_CORRUPT"))?;
@@ -257,7 +268,7 @@ impl Service {
         result["evidence"] = json!(answer.sources);
         result["conditions"] = json!(answer.conditions);
         result["conflicts"] = json!(answer.conflicts);
-        result["gaps"] = json!(answer.gaps);
+        result["gaps"] = json!(gaps);
         result["editor_checkpoint"] =
             job.result.as_ref().ok_or(Error("JOB_CORRUPT"))?["editor_checkpoint"].clone();
         if let Some(patch) = &report.patch {
@@ -272,7 +283,7 @@ impl Service {
                 revision: format!("{PROMPT_VERSION}/{}", config.resolved().digest()),
                 config_generation: config.generation(),
                 mode: if answer.status != RecallStatus::Found
-                    || !answer.gaps.is_empty()
+                    || !gaps.is_empty()
                     || !answer.conflicts.is_empty()
                 {
                     crate::config::ReviewMode::Manual

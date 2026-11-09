@@ -78,13 +78,19 @@ The report distinguishes memory error, stale conditions, retrieval gap,
 execution error, environment, changed requirements and insufficient evidence.
 Only memory error/stale conditions may carry a patch. Its targets must have been
 expanded, and every cited span must have been read by this investigation. An
-incomplete/conflicting report forces review even in automatic mode. A report of
+incomplete/conflicting report forces review even in automatic mode. The daemon
+also retains its own tool failures, truncated originals, workspace changes and
+incomplete history coverage; a Runner cannot omit these to gain automatic adoption.
+A report of
 insufficient evidence opens review without inventing a revision; a non-memory
 cause produces a report without changing memory.
 
 Model work runs outside the writer transaction. A durable validated response
 checkpoint permits restart to finish publication without rerunning the model;
 patch receipt reuse prevents duplicate revisions after a crash during commit.
+Investigation gaps survive the checkpoint. An older checkpoint without that
+coverage record requires review for a pending patch; an already committed patch
+still reuses its original immutable receipt.
 The original execution deadline remains in force. An interrupted invocation
 without that checkpoint fails as `RUNNER_INTERRUPTED` and requires an explicit
 new investigation. Inspect both job status and patch audit: a committed effect

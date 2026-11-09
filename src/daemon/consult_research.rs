@@ -116,6 +116,31 @@ impl<'a> Research<'a> {
         }
     }
 
+    pub fn coverage_gaps(
+        &self,
+        answer: &crate::adapter::ResearchConclusion,
+    ) -> Result<Vec<String>> {
+        let mut gaps = self.gaps.clone();
+        for gap in answer
+            .gaps
+            .iter()
+            .map(String::as_str)
+            .chain(
+                (self.invocation.coverage() != crate::adapter::FenceCoverage::CompleteToFence)
+                    .then_some("history_gap"),
+            )
+            .chain((!answer.conflicts.is_empty()).then_some("unresolved_conflict"))
+        {
+            if !gaps.iter().any(|g| g == gap) {
+                if gaps.len() == 32 {
+                    return Err(Error("BUDGET_EXHAUSTED"));
+                }
+                gaps.push(gap.into());
+            }
+        }
+        Ok(gaps)
+    }
+
     async fn memory_search(&mut self, lease: &RunLease, query: String) -> Result<Value> {
         let plan = crate::retrieval::Request::Search {
             query,

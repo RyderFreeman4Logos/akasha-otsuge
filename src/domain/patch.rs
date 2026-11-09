@@ -1,5 +1,7 @@
 use super::*;
 
+pub const MAX_PATCH_BYTES: usize = 64 * 1024;
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct MemoryEdit {
@@ -54,7 +56,7 @@ impl MemoryPatch {
                     || !targets.insert(&change.memory_id)
                     || !self.scope.contains(&change.draft.scope)
             })
-            || serde_json::to_vec(self)?.len() > 64 * 1024
+            || serde_json::to_vec(self)?.len() > MAX_PATCH_BYTES
         {
             return Err(error("INVALID_PATCH"));
         }

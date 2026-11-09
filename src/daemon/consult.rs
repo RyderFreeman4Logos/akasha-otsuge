@@ -301,24 +301,7 @@ impl Service {
                 sources.push(source.clone());
             }
         }
-        let mut gaps = context.gaps;
-        for gap in answer
-            .gaps
-            .iter()
-            .map(String::as_str)
-            .chain(
-                (invocation.coverage() != crate::adapter::FenceCoverage::CompleteToFence)
-                    .then_some("history_gap"),
-            )
-            .chain((!answer.conflicts.is_empty()).then_some("unresolved_conflict"))
-        {
-            if !gaps.iter().any(|g| g == gap) {
-                if gaps.len() == 32 {
-                    return Err(Error("BUDGET_EXHAUSTED"));
-                }
-                gaps.push(gap.into());
-            }
-        }
+        let gaps = context.coverage_gaps(&answer)?;
         let status = if gaps.is_empty() {
             answer.status
         } else {

@@ -1,0 +1,27 @@
+{
+  "head": "77a78c620a8a303b8d98d591f2f9ea57232673bb",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "--",
+    "--test-threads=4"
+  ],
+  "exit_code": 101,
+  "seconds": 108.73443517368287,
+  "editor_tests_listed": [
+    "editor_tests::batch_patches_are_atomic_and_concurrent_editors_do_not_overwrite_each_other: test",
+    "editor_tests::configured_editor_investigates_bound_evidence_and_applies_only_its_pinned_patch: test",
+    "editor_tests::editor_rechecks_live_executor_policy_and_expiry_but_pins_its_adoption_mode: test",
+    "editor_tests::editor_refuses_unread_unlisted_scope_and_forged_changes_and_keeps_nonmemory_failures: test",
+    "editor_tests::exact_editor_patch_uses_policy_and_replays_without_rewriting_history: test",
+    "editor_tests::native_editor_actual: test",
+    "editor_tests::patch_filters_old_search_versions_but_preserves_receipts_and_original_bytes: test",
+    "editor_tests::patch_policy_modes_and_human_procedure_protection_use_the_shared_adoption_rules: test",
+    "editor_tests::patch_rejects_missing_evidence_expiry_forgery_scope_changes_and_revoked_replays: test"
+  ],
+  "log_sha256": "406df73df010a26f7012a5783397477b7e015e1e785443528e38e0672b9a124b",
+  "clean_after": true
+}

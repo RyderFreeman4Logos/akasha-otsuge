@@ -91,6 +91,114 @@ fn input_scope() -> Value {
     json!({"user":format!("uid:{}",rustix::process::geteuid().as_raw()),"project":null,"branch_or_version":null,"session":null})
 }
 
+fn omitted_investigation_gap(scenario: &str, gap: &str) {
+    let (daemon, _, bound) = super::codex_tests::consult_fixture_with(scenario, |root| {
+        let mut settings = editor_config(root, "automatic");
+        if scenario == "editor_original_gap" {
+            settings.push_str("[retrieval]\nmax_original_chars=8\n");
+        }
+        settings
+    });
+    let original = daemon.cli(&["memory", "show", "editable"])["data"]["data"].clone();
+    let input = feedback(
+        &daemon,
+        &bound,
+        akasha_otsuge::ipc::now_ms().unwrap() + 60_000,
+    );
+    let submitted = rpc(
+        &daemon,
+        scenario,
+        json!({"op":"editor_run","feedback":input,"idempotency_key":scenario}),
+    );
+    assert!(submitted.get("error").is_none(), "{submitted}");
+    let done = finished(&daemon, submitted["data"]["id"].as_str().unwrap());
+    assert_eq!(done["state"], "succeeded", "{done}");
+    let model: Value =
+        serde_json::from_slice(&std::fs::read(daemon.root.join("model-coverage.json")).unwrap())
+            .unwrap();
+    assert_eq!(model, json!({"status":"found","gaps":[]}));
+    let changed = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+    assert_eq!(changed["record"]["authority"], "candidate", "{done}");
+    assert!(
+        done["result"]["gaps"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|g| g == gap),
+        "{done}"
+    );
+    assert_eq!(
+        daemon.cli(&["memory", "show", "editable"])["data"]["data"],
+        original
+    );
+}
+
+#[test]
+fn editor_keeps_daemon_tool_gaps_when_the_model_omits_them() {
+    omitted_investigation_gap("editor_tool_gap", "INDEX_NOT_READY");
+}
+
+#[test]
+fn editor_keeps_workspace_changes_when_the_model_omits_them() {
+    omitted_investigation_gap("editor_workspace_gap", "workspace_changed");
+}
+
+#[test]
+fn editor_keeps_original_truncation_when_the_model_omits_it() {
+    omitted_investigation_gap("editor_original_gap", "original_budget");
+}
+
+#[test]
+fn patch_cli_accepts_the_protocol_limit_without_widening_other_inputs() {
+    let mut daemon = Daemon::new();
+    let old = super::review_tests::seed(&daemon, ReviewMode::Automatic, "large");
+    daemon.start();
+    let input = patch(&daemon, "large", old, &"x".repeat(20 * 1024));
+    let mut bytes = serde_json::to_vec(&input).unwrap();
+    assert!(bytes.len() > 16 * 1024 && bytes.len() < 64 * 1024);
+    let path = daemon.root.join("patch.json");
+    std::fs::write(&path, &bytes).unwrap();
+    let args = [
+        "memory",
+        "patch",
+        path.to_str().unwrap(),
+        "--idempotency-key",
+        "large-patch",
+    ];
+    let applied = daemon.cli(&args);
+    bytes.resize(64 * 1024, b' ');
+    std::fs::write(&path, &bytes).unwrap();
+    assert_eq!(daemon.cli(&args)["data"], applied["data"]);
+    let unrelated = daemon
+        .command()
+        .args([
+            "editor",
+            "run",
+            path.to_str().unwrap(),
+            "--idempotency-key",
+            "too-large",
+        ])
+        .output()
+        .unwrap();
+    assert!(!unrelated.status.success());
+    assert_eq!(
+        serde_json::from_slice::<Value>(&unrelated.stderr).unwrap()["error"]["code"],
+        "MESSAGE_TOO_LARGE"
+    );
+    bytes.push(b' ');
+    std::fs::write(&path, &bytes).unwrap();
+    let oversized = daemon.command().args(args).output().unwrap();
+    assert!(!oversized.status.success());
+    assert_eq!(
+        serde_json::from_slice::<Value>(&oversized.stderr).unwrap()["error"]["code"],
+        "MESSAGE_TOO_LARGE"
+    );
+    assert_eq!(
+        daemon.cli(&["memory", "export", "large"])["data"]["record"]["draft"],
+        input["changes"][0]["draft"]
+    );
+}
+
 #[test]
 #[ignore = "requires an explicitly supplied authenticated native profile and receipt path"]
 fn native_editor_actual() {

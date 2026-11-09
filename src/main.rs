@@ -506,7 +506,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             idempotency_key: (*id).into(),
         }),
         ["memory", "patch", path, "--idempotency-key", id] => Some(Command::PatchApply {
-            patch: json_file(path)?,
+            patch: json_file_limit(path, akasha_otsuge::domain::MAX_PATCH_BYTES)?,
             idempotency_key: (*id).into(),
         }),
         ["patch", "show", id] => Some(Command::PatchShow { id: (*id).into() }),
@@ -791,8 +791,11 @@ fn number(value: &str) -> Result<u64> {
     value.parse().map_err(|_| Error("INVALID_ARGUMENT"))
 }
 fn json_file<T: serde::de::DeserializeOwned>(path: &str) -> Result<T> {
+    json_file_limit(path, 16384)
+}
+fn json_file_limit<T: serde::de::DeserializeOwned>(path: &str, limit: usize) -> Result<T> {
     let input = config::read_file(std::path::Path::new(path))?;
-    if input.len() > 16384 {
+    if input.len() > limit {
         return Err(Error("MESSAGE_TOO_LARGE"));
     }
     Ok(serde_json::from_str(&input)?)

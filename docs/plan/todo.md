@@ -814,7 +814,7 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
 
 Original task start 2026-10-30T01:15:59.632765+00:00; base `4609349`.
 
-Restart audit: the branch remains at `159aad8` with the native editor workflow
+Restart audit: the inherited branch was at `159aad8` with the native editor workflow
 uncommitted. Eight controlled integration tests passed before the pause; two
 recovery tests failed during fixture binding because the synthetic capability
 omitted its executable. They did not exercise recovery. No owned build or native
@@ -834,8 +834,15 @@ All ten open Issues still match this queue; no accepted Issue awaits closure.
   failed because localhost:48317 was not listening; retain their receipts.
 - [x] Document patch/workflow contracts and limitations; archive 178,601 bytes of
   compact receipts and commit the verified native workflow at `9b3ce6c`.
-- [ ] Finish the final candidate's canonical gate, independent review, hosted CI,
-  merge and verified Issue closure.
+- [x] Candidate `77a78c6` passed its canonical gate. Independent R2 review found
+  omitted daemon-observed investigation gaps and the CLI's incompatible 16 KiB
+  patch limit. Retain that FAIL and the runtime-only R1 INCOMPLETE result.
+- [x] Reproduce both review findings and the legacy recovery case before repair;
+  share Consult's coverage merge, persist gaps and use the bounded 64 KiB patch
+  input. Twelve editor tests, three recovery tests, 32 Consult-related tests and
+  Clippy passed. Earlier suite-wait failures remain unclassified.
+- [ ] Finish the repaired candidate's canonical gate, independent review, hosted
+  CI on PR #49, merge and verified Issue closure.
 
 - [x] Define bounded feedback/editor and patch inputs with exact expected revisions,
   evidence, scope and reason; preserve originals and refuse forged human authority.
@@ -846,9 +853,9 @@ All ten open Issues still match this queue; no accepted Issue awaits closure.
   pin execution policy and keep model work outside the write transaction.
 - [x] Recheck current authority in search/delivery after correction;
   old history and actual recall receipts must remain verifiable.
-- [ ] Run one real external Runner through investigation and constrained revision;
-  archive compact evidence, complete the canonical gate, independent review, CI,
-  merge and verified Issue closure.
+- [x] Run one real external Runner through investigation and constrained revision;
+  archive compact evidence with its exact historical source identity. Final
+  repaired-head publication remains in the checklist above.
 
 ## Complete Issue queue
 

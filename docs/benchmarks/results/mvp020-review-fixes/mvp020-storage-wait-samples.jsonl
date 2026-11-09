@@ -1,0 +1,7 @@
+{"monotonic": 6066376.693388665, "phase": "fsync_start", "head": "77a78c620a8a303b8d98d591f2f9ea57232673bb", "root": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/a20-io-probe-5ybatxlx"}
+{"monotonic": 6066376.693760582, "phase": "file_fsync_done", "seconds": 0.0002878764644265175}
+{"monotonic": 6066376.694040446, "phase": "directory_fsync_done", "seconds": 0.00025539007037878036}
+{"monotonic": 6066376.694623204, "phase": "selector_started", "pid": 1898237, "command": ["cargo", "test", "--locked", "--test", "daemon", "claude_tests::recorded_native_fork_keeps_copied_history_and_branch_isolation", "--", "--exact", "--nocapture"]}
+{"monotonic": 6066376.694786544, "phase": "sample", "processes": [{"pid": 1898237, "name": "cargo", "threads": []}], "io_pressure": "some avg10=0.23 avg60=0.75 avg300=9.15 total=500611900084\nfull avg10=0.15 avg60=0.67 avg300=8.75 total=439460425335"}
+{"monotonic": 6066376.945288978, "phase": "sample", "processes": [{"pid": 1898237, "name": "cargo", "threads": []}, {"pid": 1898282, "name": "daemon-84aae64f", "threads": [{"tid": "1898283", "state": "S", "wait": "hrtimer_nanosleep"}]}, {"pid": 1898284, "name": "akasha-otsuge", "threads": []}], "io_pressure": "some avg10=0.23 avg60=0.75 avg300=9.15 total=500611912297\nfull avg10=0.15 avg60=0.67 avg300=8.75 total=439460437251"}
+{"monotonic": 6066377.195509314, "phase": "selector_done", "exit_code": 101, "log_sha256": "feef2b77b27048918fb72d86d8b3d0c21f50e7bea8ff98959bb444733702d080"}

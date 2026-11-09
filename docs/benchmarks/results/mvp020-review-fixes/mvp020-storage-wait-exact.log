@@ -1,0 +1,19 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.21s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 1 test
+
+thread 'claude_tests::recorded_native_fork_keeps_copied_history_and_branch_isolation' (1898283) panicked at tests/daemon.rs:123:17:
+daemon exited before readiness: exit status: 1: {"schema_version":1,"error":{"code":"IO_ERROR","message":"Could not complete input or output"}}
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test claude_tests::recorded_native_fork_keeps_copied_history_and_branch_isolation ... FAILED
+
+failures:
+
+failures:
+    claude_tests::recorded_native_fork_keeps_copied_history_and_branch_isolation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 111 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `--test daemon`

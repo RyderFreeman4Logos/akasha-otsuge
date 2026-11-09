@@ -45,6 +45,30 @@ and their source/dirty-tree identities remain in the archive; a later success do
 not replace them. Early dirty-tree receipts do not by themselves reconstruct all
 historical test source bytes.
 
+Independent R2 review of `77a78c6` found two introduced defects despite that
+commit's canonical PASS: editor adoption ignored daemon-observed investigation
+gaps, and the CLI rejected protocol-valid patches above 16 KiB. The
+[repair archive](results/mvp020-review-fixes/manifest.json) preserves that FAIL,
+the earlier INCOMPLETE reviewer-runtime attempt, gate diagnostics and regressions.
+Three controlled investigations reproduced unsafe activation when the model
+omitted a tool failure, original truncation or workspace change. The SIGKILL
+recovery and legacy-checkpoint cases reproduced the same policy failure. The
+public CLI reproduced rejection of a valid 20 KiB patch.
+
+The repair shares Consult's gap union with Editor, checkpoints those gaps and
+requires review when a legacy checkpoint lacks coverage. It uses the protocol's
+64 KiB limit for the patch CLI while preserving other commands' 16 KiB limits.
+`mvp020-review-green-r1` passed 12 editor integration tests, three recovery tests,
+32 Consult-related tests and Clippy. The explicit native-editor and crash-child
+tests were skipped in that focused batch. This is controlled repair evidence;
+the authenticated Codex run above remains historical evidence for the unchanged
+native protocol, rather than a new authenticated run on the repair.
+
+Earlier capture/IPC suite-wait failures remain unclassified; a stale shared-target
+base/candidate comparison is explicitly invalid. The unchanged prior candidate
+passed its one canonical rerun. Neither that PASS nor the later repair identifies
+the historical timeout cause.
+
 The complete canonical gate, independent review and hosted CI are recorded on
 the publication PR for its final immutable candidate. This document alone does
 not assert those later stages passed. Incident suspension and notification remain

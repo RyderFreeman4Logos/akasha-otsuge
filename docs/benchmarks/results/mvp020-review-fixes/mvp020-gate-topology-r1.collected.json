@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T18:13:05.019415+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "77a78c620a8a303b8d98d591f2f9ea57232673bb",
+    "log_sha256": "8ead9d7e11cd7f310fd5522afaaaf7c5166816af9a569305cda52eeb7a13eb6d",
+    "seconds": 139.92906800564378,
+    "utc": "2026-11-09T18:12:54.961692+00:00"
+  },
+  "process_absent": true,
+  "classification": "diagnostic_terminal"
+}

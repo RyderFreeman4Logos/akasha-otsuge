@@ -208,6 +208,16 @@ if scenario.startswith('editor'):
     draft = expanded['memory']['data']['revision']['memory']['record']['draft']
     code = tool('code_read', {'path':'notes.rs','start':0,'max_bytes':4096})['value']
     assert 'Linux' in code['text']
+    if scenario == 'editor_tool_gap':
+        failed = tool('memory_search', {'query':'platform'})
+        assert failed['kind'] == 'error' and failed['value']['source_code'] == 'INDEX_NOT_READY', failed
+    elif scenario == 'editor_workspace_gap':
+        (root / 'workspace' / 'notes.rs').write_text('// The Linux fixture changed during investigation.\n')
+        changed = tool('code_read', {'path':'notes.rs','start':0,'max_bytes':4096})['value']
+        assert changed['changed'] is True
+    elif scenario == 'editor_original_gap':
+        assert expanded['truncated'] is True
+        draft['source_spans'] = [item['reference'] for item in expanded['originals']]
     draft['claim'] = 'Only the Linux fixture build passed; other platforms were not tested.'
     draft['source_spans'].append(code['source'])
     patch = dict(scope=scope, changes=[dict(target, draft=draft)], reason='Limit the claim to the observed fixture.',
@@ -262,6 +272,9 @@ if scenario.startswith('conclusion_') or 'status' in turn_request['params']['out
         memories=seen_memories, conditions=[], conflicts=[], gaps=[] if seen_sources or seen_memories else ['no_evidence'])
     if scenario.startswith('editor'):
         conclusion['answer'] = json.dumps(editor_report)
+        if scenario.endswith('_gap'):
+            assert conclusion['status'] == 'found' and conclusion['gaps'] == []
+            (root / 'model-coverage.json').write_text(json.dumps({'status':conclusion['status'], 'gaps':conclusion['gaps']}))
         if scenario == 'editor_uncertain':
             conclusion.update(status='incomplete', gaps=['unverified_platform'])
     if scenario == 'conclusion_no_hit':

@@ -146,7 +146,7 @@ async fn setup(root: &std::path::Path, settings: &str, checkpoint: bool) {
         };
         let answer = json!({"status":"found","answer":serde_json::to_string(&json!({"classification":"memory_error","reason":"Narrow the claim","patch":patch})).unwrap(),"sources":[span],"memories":[{"memory_id":"editable","revision":memory.commit_seq}],"conditions":[],"conflicts":[],"gaps":[]});
         // Controlled durable-response fixture; the subprocess tests publication, not model quality.
-        let ready = json!({"schema_version":1,"origin":"editor","answer":answer,"trace":{"runs":[],"workspace":null},"executor":"editor","generator":{"runner":"executor/editor","model":"controlled","prompt_version":crate::editor::PROMPT_VERSION}});
+        let ready = json!({"schema_version":1,"origin":"editor","answer":answer,"investigation_gaps":["INDEX_NOT_READY"],"trace":{"runs":[],"workspace":null},"executor":"editor","generator":{"runner":"executor/editor","model":"controlled","prompt_version":crate::editor::PROMPT_VERSION}});
         let pointer = models::save_result(&service.storage, &ready, 1)
             .await
             .unwrap();
@@ -215,6 +215,11 @@ fn editor_checkpoint_and_committed_patch_survive_sigkill_without_runner_replay()
                 .memory("editable")
                 .unwrap()
                 .unwrap();
+            assert_eq!(latest.record.authority, crate::domain::Authority::Candidate);
+            assert_eq!(
+                resumed.result.as_ref().unwrap()["gaps"],
+                json!(["INDEX_NOT_READY"])
+            );
             assert_eq!(latest.revision.commit_seq, receipt.commit_seq);
             let initial = latest.previous.unwrap();
             assert!(
@@ -229,6 +234,51 @@ fn editor_checkpoint_and_committed_patch_survive_sigkill_without_runner_replay()
             service.storage.close().await.unwrap();
         });
     }
+}
+
+#[tokio::test]
+async fn editor_legacy_checkpoint_without_coverage_stays_for_review() {
+    let root = std::env::temp_dir().join(format!("akasha-editor-legacy-{}", std::process::id()));
+    private_dir(&root).unwrap();
+    let _cleanup = tests::Fixture(root.clone());
+    let settings = format!(
+        "[review]\nmode='automatic'\n[executors.editor]\nkind='codex'\nbinary='/missing-native-must-not-run'\nnative_home={root:?}\n"
+    );
+    setup(&root, &settings, true).await;
+    let (service, _) = tests::service_at(&root, &settings).await;
+    let (revision, mut job) = service.job(&id()).unwrap();
+    let pointer = &job.result.as_ref().unwrap()["editor_checkpoint"];
+    let mut ready = models::load_result(&service.storage, pointer, revision).unwrap();
+    ready.as_object_mut().unwrap().remove("investigation_gaps");
+    job.result = Some(
+        json!({"editor_checkpoint":models::save_result(&service.storage, &ready, 1).await.unwrap()}),
+    );
+    service
+        .save_job(&job, Some(revision), vec![])
+        .await
+        .unwrap();
+    service.storage.close().await.unwrap();
+    drop(service);
+    let (service, _) = tests::service_at(&root, &settings).await;
+    service.recover().await.unwrap();
+    assert!(service.claim(&id(), 0).await.unwrap());
+    service.clone().execute_job(id()).await.unwrap();
+    let done = service.job(&id()).unwrap().1;
+    assert_eq!(done.state, "succeeded", "{:?}", done.error);
+    assert_eq!(
+        Domain::new(&service.storage)
+            .memory("editable")
+            .unwrap()
+            .unwrap()
+            .record
+            .authority,
+        crate::domain::Authority::Candidate
+    );
+    assert_eq!(
+        done.result.unwrap()["gaps"],
+        json!(["investigation_coverage_unavailable"])
+    );
+    service.storage.close().await.unwrap();
 }
 
 #[tokio::test]

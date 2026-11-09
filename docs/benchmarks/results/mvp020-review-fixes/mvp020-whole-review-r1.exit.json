@@ -1,0 +1,27 @@
+{
+  "exit_code": 0,
+  "seconds": 26.385080830194056,
+  "events": [
+    {
+      "type": "thread.started",
+      "thread_id": "01a1c19c-1158-7cb2-8ba3-7e5b3fdd6a2c"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 73596,
+        "cached_input_tokens": 49024,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 739,
+        "reasoning_output_tokens": 98
+      }
+    }
+  ],
+  "head": "77a78c620a8a303b8d98d591f2f9ea57232673bb",
+  "tree": "b96d227063086bc82bba800529f6ca3f9c408bda",
+  "clean_after": true,
+  "report_exists": true,
+  "report_sha256": "24d007e20732fe13c2b0cac479f3acf894e682e137c8ebde6c6d386f6ddd043d",
+  "transport": "independent Codex exec; Hermes configured endpoint unavailable",
+  "utc": "2026-11-09T18:40:18.732084+00:00"
+}
