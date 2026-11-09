@@ -392,16 +392,7 @@ impl Service {
         let _guard = self.admission.lock().await;
         let record = self.read_outcome(id).await?;
         let log = record.logs.get(index).ok_or(Error("INVALID_ARGUMENT"))?;
-        let invocation = self.outcome_invocation(&record.event)?;
-        let capture = Capture::new(&self.storage);
-        let event = capture
-            .event(
-                &invocation.capture_binding()?,
-                &log.source.reference,
-                log.revision,
-            )?
-            .ok_or(Error("SOURCE_UNAVAILABLE"))?;
-        let raw = capture.raw(&event)?;
+        let raw = self.outcome_raw(&record, index)?;
         if start > raw.len() {
             return Err(Error("INVALID_ARGUMENT"));
         }
@@ -412,5 +403,19 @@ impl Service {
             "start":start,"raw_hex":crate::capture::encode_hex(&raw[start..end]),
             "next_start":(end < raw.len()).then_some(end)}),
         )
+    }
+
+    pub(super) fn outcome_raw(&self, record: &outcome::Record, index: usize) -> Result<Vec<u8>> {
+        let log = record.logs.get(index).ok_or(Error("INVALID_ARGUMENT"))?;
+        let invocation = self.outcome_invocation(&record.event)?;
+        let capture = Capture::new(&self.storage);
+        let event = capture
+            .event(
+                &invocation.capture_binding()?,
+                &log.source.reference,
+                log.revision,
+            )?
+            .ok_or(Error("SOURCE_UNAVAILABLE"))?;
+        Ok(capture.raw(&event)?)
     }
 }

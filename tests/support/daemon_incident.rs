@@ -105,6 +105,110 @@ fn configured_incident_investigation_runs_once_and_keeps_environment_reports_sep
 }
 
 #[test]
+fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair() {
+    for (auto_repair, completeness, authority) in [
+        (true, "complete", "delegated_approved"),
+        (false, "complete", "candidate"),
+        (true, "partial", "candidate"),
+    ] {
+        let (daemon, _, bound) = super::codex_tests::consult_fixture_with(
+            "editor_incident",
+            |root| {
+                format!(
+                    "[review]\nmode='automatic'\n[timeouts]\nqueue='30s'\n[incidents]\nexecutor='editor'\ntriggers=['reproducible_failure']\nauto_repair={auto_repair}\nmax_runner_starts=1\nmax_tokens=64000\n[executors.editor]\nkind='codex'\nbinary={:?}\nnative_home={:?}\n",
+                    root.join("codex"),
+                    root.join("native-home")
+                )
+            },
+        );
+        let original = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+        let now = akasha_otsuge::ipc::now_ms().unwrap();
+        let raw = "controlled fixture failure: only Linux was verified\n".repeat(1000);
+        let saved = rpc(
+            &daemon,
+            json!({"op":"outcome_log_write","chunk":{
+            "invocation_id":bound["data"]["invocation_id"],"event_id":"platform-failure","stream":"stderr","part":0,
+            "observed_at_ms":now,"raw_hex":akasha_otsuge::capture::encode_hex(raw.as_bytes())}}),
+        );
+        assert!(saved.get("error").is_none(), "{saved}");
+        let snapshot = json!({"base_commit":"a".repeat(40),"index_sha256":"b".repeat(64),"diff_sha256":"c".repeat(64),"tree_sha256":"d".repeat(64),"gaps":[]});
+        let event = json!({"event_id":"platform-failure","invocation_id":bound["data"]["invocation_id"],
+            "source":"controlled-platform-test","severity":"error","occurred_at_ms":now,
+            "execution":{"argv":["controlled-compiler"],"started_at_ms":now,"finished_at_ms":now,"exit_code":1,"signal":null,
+                "workspace":daemon.root.join("workspace"),"before":snapshot,"after":snapshot},
+            "artifacts":[],"logs":[{"stream":"stderr","reference":saved["data"],"completeness":completeness}],"receipt_jobs":[],"claims":[],
+            "incident":{"kind":"reproducible_failure","key":"platform-check","reason":"Check the platform claim against its originals, notes.rs and the recorded outcome/logs.",
+                "targets":[{"memory_id":"editable","expected_revision":original["revision"]["commit_seq"]}]}});
+        let submitted = rpc(&daemon, json!({"op":"outcome_submit","event":event}));
+        assert!(submitted.get("error").is_none(), "{submitted}");
+        let id = daemon.cli(&["outcome", "show", "platform-failure"])["data"]["incident"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let result = investigated(&daemon, &id);
+        let description: Value = serde_json::from_slice(
+            &std::fs::read(daemon.root.join("incident-context.json")).unwrap(),
+        )
+        .unwrap();
+        assert!(
+            description["investigation"].is_object(),
+            "the native context has no admitted outcome handles: {description}"
+        );
+        assert_eq!(
+            result["record"]["classification"], "memory_error",
+            "{result}"
+        );
+        let reads: Value = serde_json::from_slice(
+            &std::fs::read(daemon.root.join("incident-evidence.json")).unwrap(),
+        )
+        .unwrap();
+        let handle = description["investigation"]["logs"][0]["handle"]
+            .as_str()
+            .unwrap();
+        use sha2::Digest;
+        assert_eq!(
+            reads[handle]["sha256"],
+            akasha_otsuge::capture::encode_hex(&sha2::Sha256::digest(raw.as_bytes()))
+        );
+        assert_eq!(reads[handle]["bytes"], raw.len());
+        assert!(reads[handle]["pages"].as_u64().unwrap() > 1);
+        let changed = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+        assert_eq!(changed["record"]["authority"], authority, "{result}");
+        assert_eq!(
+            changed["record"]["draft"]["scope"],
+            original["record"]["draft"]["scope"]
+        );
+        assert_eq!(
+            changed["previous"],
+            original["revision"]["commit_seq"]
+        );
+        let job =
+            daemon.cli(&["job", "show", result["record"]["job_id"].as_str().unwrap()])["data"]
+                .clone();
+        if completeness == "partial" {
+            assert!(
+                job["result"]["gaps"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|g| g == "outcome_log_incomplete"),
+                "{job}"
+            );
+        } else {
+            assert_eq!(job["result"]["gaps"], json!([]), "{job}");
+        }
+        assert_eq!(
+            result["record"]["state"],
+            if authority == "candidate" {
+                "open"
+            } else {
+                "resolved"
+            }
+        );
+    }
+}
+
+#[test]
 fn incident_signals_deduplicate_durably_without_inventing_memory_causality() {
     let (mut daemon, _, bound) = super::codex_tests::consult_fixture_with("editor_ledger", |_| {
         "[incidents]\ntriggers=['user_correction','dependency_changed','expired','contradiction','reproducible_failure']\n".into()

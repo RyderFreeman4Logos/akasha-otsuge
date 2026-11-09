@@ -121,6 +121,8 @@ pub struct ContextDescription {
     pub requested_cursor: u64,
     pub available_cursor: u64,
     pub read_seq: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub investigation: Option<crate::incident::Context>,
 }
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "kind", content = "value", rename_all = "snake_case")]
@@ -370,6 +372,7 @@ impl ContextSource for CapturedContext<'_> {
                             requested_cursor: b.requested_cursor,
                             available_cursor: b.available_cursor,
                             read_seq: b.capture_seq,
+                            investigation: None,
                         }))
                     })
                     .await?

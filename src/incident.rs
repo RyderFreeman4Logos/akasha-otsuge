@@ -82,3 +82,20 @@ pub(crate) struct Event {
     pub event_id: String,
     pub invocation_id: String,
 }
+
+#[derive(Clone, Debug, Serialize)]
+pub struct Context {
+    pub incident_id: String,
+    pub outcome: String,
+    pub logs: Vec<LogContext>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct LogContext {
+    pub handle: String,
+    pub reference: crate::capture::EventRef,
+    pub raw_bytes: usize,
+    pub sha256: String,
+    pub coverage: Option<crate::capture::CoverageLevel>,
+    pub completeness: crate::outcome::LogCompleteness,
+}

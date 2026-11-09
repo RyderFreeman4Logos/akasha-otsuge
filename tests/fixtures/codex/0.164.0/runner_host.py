@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Fault-injectable native protocol fixture; not real-host acceptance."""
-import json, os, pathlib, subprocess, sys, time
+import hashlib, json, os, pathlib, subprocess, sys, time
 
 if '--version' in sys.argv:
     print('codex-cli 0.164.0')
@@ -143,7 +143,8 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
         response = json.loads(reply['result']['contentItems'][0]['text'])
         value = response.get('value', {})
         for span in value.get('sources', []) + ([value['source']] if value.get('source') else []) + [v['reference'] for v in value.get('originals', [])]:
-            if span not in seen_sources: seen_sources.append(span)
+            if 'event_id' in span and 'revision' in span and span not in seen_sources:
+                seen_sources.append(span)
         if name == 'memory_get' and response.get('kind') != 'error':
             seen_memories.append({'memory_id':arguments['memory_id'],'revision':arguments['revision']})
         (root / 'research-checkpoint.json').write_text(json.dumps({
@@ -214,6 +215,31 @@ if scenario.startswith('editor'):
     instructions = request['params']['baseInstructions']
     editor = json.loads(instructions.split('\nEditor input: ', 1)[1])
     scope = json.loads(instructions.split('\nBound scope: ', 1)[1].split('\nEditor input:', 1)[0])
+    if scenario == 'editor_incident':
+        description = tool('context_describe', {})['value']
+        (root / 'incident-context.json').write_text(json.dumps(description))
+        investigation = description.get('investigation')
+        assert investigation is not None, 'missing scoped incident context'
+        evidence = {}
+        for handle in [investigation['outcome']] + [log['handle'] for log in investigation['logs']]:
+            start, text, pages = 0, '', 0
+            while True:
+                part = tool('context_read', {'handle':handle,'start':start,'max_bytes':16384})
+                assert part['kind'] == 'text', part
+                value = part['value']
+                text += value['text']
+                pages += 1
+                if value['end'] == value['total_bytes']:
+                    break
+                assert value['end'] > start, value
+                start = value['end']
+            if handle != investigation['outcome']:
+                log = json.loads(text)
+                raw = log['text'].encode() if log['encoding'] == 'utf8' else bytes.fromhex(log['raw_hex'])
+            else:
+                raw = text.encode()
+            evidence[handle] = dict(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw), pages=pages)
+        (root / 'incident-evidence.json').write_text(json.dumps(evidence))
     target = editor['targets'][0]
     expanded = tool('memory_get', {'memory_id':target['memory_id'], 'revision':target['expected_revision']})['value']
     draft = expanded['memory']['data']['revision']['memory']['record']['draft']
