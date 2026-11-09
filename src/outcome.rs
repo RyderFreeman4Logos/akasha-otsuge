@@ -99,6 +99,22 @@ pub struct Execution {
     pub workspace: PathBuf,
     pub before: Workspace,
     pub after: Workspace,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub artifact_gaps: Vec<ArtifactGap>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ArtifactGapReason {
+    Missing,
+    Unavailable,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ArtifactGap {
+    pub path: String,
+    pub reason: ArtifactGapReason,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -268,6 +284,11 @@ impl Event {
                     .is_some_and(|v| v.is_empty() || v.len() > 4096)
                 || !execution.before.valid()
                 || !execution.after.valid()
+                || execution.artifact_gaps.len() + self.artifacts.len() > 32
+                || execution
+                    .artifact_gaps
+                    .iter()
+                    .any(|gap| !relative_file(&gap.path) || !artifacts.insert(&gap.path))
             {
                 return Err(Error("INVALID_OUTCOME"));
             }

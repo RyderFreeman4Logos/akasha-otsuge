@@ -4,7 +4,8 @@ use akasha_otsuge::{
     capture::EventRef,
     ipc::{self, Command, Error, Request},
     outcome::{
-        self, Artifact, Event, Execution, LogChunk, LogRef, RunContext, RunPlan, Severity, Stream,
+        self, Artifact, ArtifactGap, ArtifactGapReason, Event, Execution, LogChunk, LogRef,
+        RunContext, RunPlan, Severity, Stream,
     },
 };
 use serde_json::{Value, json};
@@ -170,7 +171,7 @@ pub(super) async fn run(socket: &Path, plan: RunPlan, argv: Vec<String>) -> Resu
         ),
         Err(error) => (None, None, Some(error.to_string()), 127),
     };
-    let execution = Execution {
+    let mut execution = Execution {
         argv,
         started_at_ms,
         finished_at_ms,
@@ -180,17 +181,27 @@ pub(super) async fn run(socket: &Path, plan: RunPlan, argv: Vec<String>) -> Resu
         workspace: context.workspace.clone(),
         before,
         after: workspace::observe(&context.workspace, &root),
+        artifact_gaps: Vec::new(),
     };
-    save(&stage.join("execution.json"), &execution)?;
     let mut artifacts = Vec::new();
     for path in &plan.artifacts {
-        let (bytes, sha256, _) = workspace::file(&root, path.as_ref())?;
-        artifacts.push(Artifact {
-            path: path.clone(),
-            bytes,
-            sha256,
-        });
+        match workspace::file(&root, path.as_ref()) {
+            Ok((bytes, sha256, _)) => artifacts.push(Artifact {
+                path: path.clone(),
+                bytes,
+                sha256,
+            }),
+            Err(error) => execution.artifact_gaps.push(ArtifactGap {
+                path: path.clone(),
+                reason: if error.kind() == std::io::ErrorKind::NotFound {
+                    ArtifactGapReason::Missing
+                } else {
+                    ArtifactGapReason::Unavailable
+                },
+            }),
+        }
     }
+    save(&stage.join("execution.json"), &execution)?;
     let mut event = Event {
         event_id: plan.event_id.clone(),
         invocation_id: plan.invocation_id.clone(),

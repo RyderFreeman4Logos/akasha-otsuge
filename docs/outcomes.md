@@ -14,13 +14,17 @@ the run identity and scope, validates each attached Consult job against that
 invocation, and obtains memory revisions from the actual saved RecallReceipt.
 Caller-supplied fields cannot replace scope, receipt membership or human approval.
 Reading or retrying an outcome still requires current access.
+Structured submissions report observations supplied by their caller; the daemon
+does not independently rerun their command or verify their filesystem hashes.
+The bundled wrapper gathers those observations locally. Neither entrypoint
+provides cryptographic execution attestation.
 
 | Relation | What the evidence establishes |
 | --- | --- |
 | `attached` | This outcome attaches the specified receipt and its recorded revisions. |
 | `returned` | The receipt records a delivery acknowledgement; this does not prove use. |
 | `cited_or_claimed_used` | The reporting source explicitly claims use of an attached revision. |
-| `suspected` | The source proposes a causal association and provides evidence. |
+| `suspected` | The source proposes a causal association, with any supplied evidence. |
 | `validated` | The source supplies an explicit validation report and its evidence; attribution remains attached to that source. |
 
 The last three relations remain attributable reports. Validating source hashes
@@ -36,6 +40,8 @@ untracked contents. These are observations, not a filesystem snapshot held for
 the command's lifetime. Missing coverage and changes during execution must stay
 visible. Artifact paths, byte counts and hashes distinguish repeated builds;
 recording a hash does not preserve an overwritten artifact's bytes.
+Expected artifacts that are missing or cannot be safely read appear in
+`execution.artifact_gaps`; they do not discard the command's failure record.
 
 Log previews are bounded. Full retained bytes use the existing immutable Capture
 archive, with exact event/revision/hash references. A truncated preview retains
