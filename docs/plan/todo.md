@@ -815,6 +815,10 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
 - [ ] Finish #50's frozen canonical gate, independent review, CI, merge and
   verified closure. Its focused capture/identity/deadline tests pass. See the
   [diagnostic and scope](../benchmarks/capture-wait-diagnostic.md).
+  Candidate `d672585` passed its canonical gate but failed independent review:
+  queue-to-running observation could renew the supervisor after wall-clock reversal.
+  The new regression failed before repair; all five clock cases now pass. The
+  corrected candidate still requires its own gate and review.
 - [ ] Integrate #50 into PR #49, preserving the Editor coverage-class repair
   at local `3b86282`; run its own exact gate, whole-candidate review and CI,
   then merge and close #20. Its earlier R2/R3 review failures and canonical
