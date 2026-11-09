@@ -1,0 +1,19 @@
+{
+  "source_head": "e596434e716c4de3135eed39e25cdc257500c5c2",
+  "review": "R1 FAIL: one MODERATE introduced coverage-loss defect; canonical and independent three-test check passed on the older tree",
+  "red": "metadata-only zero-byte Capture source accepted by the old API; projection coverage was null instead of metadata_only",
+  "green": "four integrations passed, including all four coverage levels, explicit complete/partial/unknown reports, downgrade, idempotency, restart, legacy projection reads, wrapper and paged-log status",
+  "class_sweep": [
+    "Capture to immutable Log projection",
+    "stored projection integrity and legacy read",
+    "paged log response",
+    "structured LogRef completeness",
+    "wrapper declarations",
+    "documentation"
+  ],
+  "limits": [
+    "Native Caller and acknowledgement remain controlled fixtures.",
+    "Completeness is an attributed observation constrained by source coverage, not a cryptographic execution proof.",
+    "Fresh exact gate and independent whole-range re-review remain required."
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "caller": {
+    "adapter": "codex",
+    "agent": "main",
+    "profile": "default",
+    "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+    "thread": "01a184c7-1cbf-7093-af67-23202f7dceeb"
+  },
+  "config_generation": 1,
+  "event": {
+    "artifacts": [
+      {
+        "bytes": 14,
+        "path": "artifact.txt",
+        "sha256": "69f6245a92f0c902e45cfd6e99297cad3e536598237b6ef3d04fbb59c8a3b095"
+      }
+    ],
+    "claims": [],
+    "event_id": "real-build-one",
+    "execution": {
+      "after": {
+        "base_commit": "252a532be4556cf5008b5c36b052088313e107fc",
+        "diff_sha256": "6d9df607dc6f57ea9d7e48b9715f6762292be269e3e7f95413219965e048df2f",
+        "gaps": [],
+        "index_sha256": "1a8a0ff43b848ef0e4e00a186ffcec198591530a95f90ed339b273b7fae6fc1e",
+        "tree_sha256": "e33396e93eb604daa47fbce9e80a0e2eba11d1abddbfb166908038e2191941a8"
+      },
+      "argv": [
+        "sh",
+        "build.sh",
+        "first artifact",
+        "/mnt/ssd/mirror-rootfs/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc"
+      ],
+      "before": {
+        "base_commit": "252a532be4556cf5008b5c36b052088313e107fc",
+        "diff_sha256": "6d9df607dc6f57ea9d7e48b9715f6762292be269e3e7f95413219965e048df2f",
+        "gaps": [],
+        "index_sha256": "1a8a0ff43b848ef0e4e00a186ffcec198591530a95f90ed339b273b7fae6fc1e",
+        "tree_sha256": "e33396e93eb604daa47fbce9e80a0e2eba11d1abddbfb166908038e2191941a8"
+      },
+      "exit_code": 1,
+      "finished_at_ms": 1794260566122,
+      "signal": null,
+      "started_at_ms": 1794260566095,
+      "workspace": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/akasha-daemon-2216239-1/workspace"
+    },
+    "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+    "logs": [
+      {
+        "completeness": "complete",
+        "reference": {
+          "event_id": "Stdout/0",
+          "source": {
+            "adapter": "outcome-wrapper",
+            "agent": "main",
+            "profile": "default",
+            "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+            "thread": "2dfb77f89dc139b25b8a698d3b68b3ce23a798602b8a0d23df54c14cc43c0eb2"
+          }
+        },
+        "stream": "stdout"
+      },
+      {
+        "completeness": "complete",
+        "reference": {
+          "event_id": "Stderr/0",
+          "source": {
+            "adapter": "outcome-wrapper",
+            "agent": "main",
+            "profile": "default",
+            "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+            "thread": "2dfb77f89dc139b25b8a698d3b68b3ce23a798602b8a0d23df54c14cc43c0eb2"
+          }
+        },
+        "stream": "stderr"
+      }
+    ],
+    "occurred_at_ms": 1794260566122,
+    "receipt_jobs": [
+      "consult/fa70f01f31de8f7d5bdca94fa191133807a0cb66af598984592ac65c3689548e"
+    ],
+    "severity": "info",
+    "source": "command-wrapper"
+  },
+  "invocation_revision": 95,
+  "links": [
+    {
+      "job_id": "consult/fa70f01f31de8f7d5bdca94fa191133807a0cb66af598984592ac65c3689548e",
+      "memory": {
+        "commit_seq": 2,
+        "key": {
+          "id": "offline",
+          "kind": "memory"
+        }
+      },
+      "receipt_id": "consult-result/fdb708b3cfc00c9bdee874f5602a5b0e551440ef2b759fa1f903ad676482168b",
+      "relation": "attached"
+    }
+  ],
+  "logs": [
+    {
+      "bytes": 240000,
+      "completeness": "complete",
+      "coverage": "available_payloads",
+      "preview": "payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payload-log-payl",
+      "preview_encoding": "utf8_lossy",
+      "preview_truncated": true,
+      "revision": 119,
+      "sha256": "25f83a9d05bad98e52dbf5f2ee8cd4dd5a08732ebcb91b4f80f04751f15a9d03",
+      "source": {
+        "completeness": "complete",
+        "reference": {
+          "event_id": "Stdout/0",
+          "source": {
+            "adapter": "outcome-wrapper",
+            "agent": "main",
+            "profile": "default",
+            "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+            "thread": "2dfb77f89dc139b25b8a698d3b68b3ce23a798602b8a0d23df54c14cc43c0eb2"
+          }
+        },
+        "stream": "stdout"
+      }
+    },
+    {
+      "bytes": 289,
+      "completeness": "complete",
+      "coverage": "available_payloads",
+      "preview": "error[E0425]: cannot find function `does_not_exist` in this scope\n --> main.rs:1:13\n  |\n1 | fn main() { does_not_exist(); }\n  |             ^^^^^^^^^^^^^^ not found in this scope\n\nerror: aborting due to 1 previous error\n\nFor more information about this error, try `rustc --explain E0425`.\n",
+      "preview_encoding": "utf8_lossy",
+      "preview_truncated": false,
+      "revision": 123,
+      "sha256": "d291e2b7f8d94ed4e6f4b5f7ba5e8bb4dc757f4c5096c567452c5350d21b1748",
+      "source": {
+        "completeness": "complete",
+        "reference": {
+          "event_id": "Stderr/0",
+          "source": {
+            "adapter": "outcome-wrapper",
+            "agent": "main",
+            "profile": "default",
+            "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+            "thread": "2dfb77f89dc139b25b8a698d3b68b3ce23a798602b8a0d23df54c14cc43c0eb2"
+          }
+        },
+        "stream": "stderr"
+      }
+    }
+  ],
+  "receipts": [
+    {
+      "delivery": {
+        "phase": "prepared"
+      },
+      "job_id": "consult/fa70f01f31de8f7d5bdca94fa191133807a0cb66af598984592ac65c3689548e",
+      "output_sha256": "1429e1284edca8bc53fb98e5b1603f879ae75a433ef65af8cce101fc3f996ab7",
+      "receipt_id": "consult-result/fdb708b3cfc00c9bdee874f5602a5b0e551440ef2b759fa1f903ad676482168b",
+      "revision": 111
+    }
+  ],
+  "run_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+  "schema_version": 1,
+  "scope": {
+    "branch_or_version": null,
+    "project": null,
+    "session": null,
+    "user": "uid:1001"
+  }
+}

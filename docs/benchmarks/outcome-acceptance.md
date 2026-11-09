@@ -1,6 +1,6 @@
 # MVP-021 outcome acceptance
 
-The source commits `9b590b2`, `40e54bb` and `b25c4e0` implement the
+The source commits `9b590b2`, `40e54bb`, `b25c4e0` and `e596434` implement the
 [outcome protocol and command wrapper](../outcomes.md). Final canonical,
 independent review and hosted CI evidence remain separate publication steps.
 
@@ -55,3 +55,33 @@ memories or create incidents; investigation and policy belong to MVP-022.
 The first archived build case passed while another fixture assertion failed.
 The final second case belongs to the complete three-test pass. All earlier
 diagnostics are preserved; passing later tests does not relabel them.
+
+## Independent review and coverage repair
+
+The exact `ee479760` canonical gate passed 461 Rust checks including installed
+repetition. Independent [R1 review](results/mvp021-coverage-fix/mvp021-whole-review-r1.md)
+also reran the original three integrations successfully, but returned FAIL for
+one MODERATE regression: the outcome projection omitted Capture's known reduced
+coverage. A zero-byte metadata-only source looked like a complete empty log.
+
+The causal RED reproduced that omission through the public reconcile and outcome
+APIs. Commit `e596434` preserves Capture coverage and effective
+complete/partial/unknown state in records and pages. A supplied completeness claim
+cannot override reduced source coverage. Legacy projections recover coverage
+from their fixed Capture revision without inventing a completeness assertion.
+The wrapper explicitly reports its observed fully retained parts.
+
+The final focused suite now has **4 passed, 0 failed**, covering all four Capture
+coverage levels, explicit partial/complete reports, unknown defaults, downgrade,
+restart, retry and legacy records. Both the ordinary wrapper response and paged
+logs assert the new status. The [third real compiler case](results/mvp021-coverage-fix/build-case-r3/first.json)
+retains those fields and its complete log bytes.
+
+The separate [repair archive](results/mvp021-coverage-fix/manifest.json) contains
+34 files, 112,198 bytes, SHA-256
+`ce658b23c79c3485d0f54d2128f34be9e18f6ee6e5ed3c13396d202f8dff140d`.
+It preserves the earlier gate, failed review, causal RED and both passing repair
+runs. The final focused log SHA-256 is
+`705e907b8cc7b63e24ee0afd4c6f8ca0fbb5138cc4bc73356a40e048de87d08d`.
+These repair results require a fresh exact-candidate canonical gate and whole-range
+review; the earlier gate is not silently reused for changed code.

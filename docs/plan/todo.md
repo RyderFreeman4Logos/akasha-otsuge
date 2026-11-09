@@ -865,10 +865,14 @@ revoked access, actual receipt membership, rejected causal overclaims and separa
 reported artifacts. The wrapper regression now runs real failed Rust compilations,
 distinguishes dirty tracked/untracked inputs and repeated artifacts, reads back
 240,000 complete log bytes and refuses duplicate execution; all-target Clippy passes.
-Expanded boundary tests now pass all three integrations, including binary log
+Expanded boundary tests initially passed three integrations, including binary log
 parts, artifact gaps and controlled delivery acknowledgement. The byte-verified
 [acceptance archive](../benchmarks/outcome-acceptance.md) preserves all earlier
-failures and two actual compiler cases in 103,858 bytes. Final gates remain.
+failures and two actual compiler cases in 103,858 bytes. The exact initial gate
+passed 461 Rust checks including installed repetition, but independent R1 found
+one MODERATE log-coverage projection defect. Its causal RED and shared
+record/page/legacy/wrapper repair now pass four integrations. A separate 112,198-byte
+archive retains that review and a third compiler case. Fresh final gates remain.
 
 - [x] Add the bounded outcome protocol and immutable, idempotent records with
   verified invocation/scope and current permission checks, including retries.
