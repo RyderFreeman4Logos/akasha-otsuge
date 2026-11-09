@@ -1,8 +1,10 @@
 # Execution outcomes
 
 Implementation in progress for [MVP-021](spec/issues/MVP-021.md). Structured
-submission and the command wrapper pass their first focused regressions.
-Expanded boundary tests and final acceptance remain pending.
+submission, the command wrapper and boundary regressions pass focused tests.
+Final canonical, independent review and publication gates remain pending.
+Focused results and scope limits are recorded in
+[the acceptance evidence](benchmarks/outcome-acceptance.md).
 
 An outcome identifies one execution event. Several builds in one agent run have
 different event IDs, workspace observations, artifact hashes and log sources.

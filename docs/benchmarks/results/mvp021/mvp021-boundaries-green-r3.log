@@ -1,0 +1,28 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp021)
+error[E0422]: cannot find struct, variant or union type `Paths` in this scope
+   --> tests/support/daemon_outcome.rs:148:18
+    |
+148 |                 &Paths {
+    |                  ^^^^^ not found in this scope
+
+error[E0425]: cannot find function `resolve` in this scope
+   --> tests/support/daemon_outcome.rs:144:26
+    |
+144 |             let config = resolve(
+    |                          ^^^^^^^ not found in this scope
+
+error[E0433]: cannot find type `Storage` in this scope
+   --> tests/support/daemon_outcome.rs:154:25
+    |
+154 |             let store = Storage::open(&config).await.unwrap();
+    |                         ^^^^^^^ use of undeclared type `Storage`
+
+error[E0433]: cannot find type `Domain` in this scope
+   --> tests/support/daemon_outcome.rs:169:26
+    |
+169 |             let domain = Domain::new(&store);
+    |                          ^^^^^^ use of undeclared type `Domain`
+
+Some errors have detailed explanations: E0422, E0425, E0433.
+For more information about an error, try `rustc --explain E0422`.
+error: could not compile `akasha-otsuge` (test "daemon") due to 4 previous errors

@@ -1,0 +1,47 @@
+{
+  "source_head": "b25c4e0f15ca587831a135ebe2af635a5b7a84d8",
+  "cases": [
+    {
+      "case": 1,
+      "stdout_bytes": 240000,
+      "compiler_exit": 1,
+      "native_compiler": true,
+      "caller_and_consult": "controlled fixture",
+      "authenticated_model": false
+    },
+    {
+      "case": 2,
+      "stdout_bytes": 240000,
+      "compiler_exit": 1,
+      "native_compiler": true,
+      "caller_and_consult": "controlled fixture",
+      "authenticated_model": false
+    }
+  ],
+  "runs": {
+    "protocol-red-r1": "behavioral RED: unknown outcome_submit after a verified binding and Consult receipt",
+    "protocol-green-r1": "compile-only harness import failure",
+    "protocol-green-r2": "one protocol regression passed",
+    "protocol-clippy-r1": "all-target Clippy passed at the first API implementation",
+    "wrapper-red-r1": "compile-only private helper import failure",
+    "wrapper-red-r2": "compile-only sha2 digest formatting failure",
+    "wrapper-red-r3": "behavioral RED: missing outcome run returned INVALID_ARGUMENT instead of compiler exit 1",
+    "wrapper-green-r1": "compile-only std::io::Write trait mismatch in streaming digest",
+    "wrapper-green-r2": "real compilation wrapper regression passed",
+    "wrapper-clippy-r1": "all-target Clippy passed before artifact-gap expansion",
+    "wrapper-suite-r1": "two protocol/wrapper regressions passed",
+    "artifact-gaps-red-r1": "behavioral RED: missing artifact discarded command failure with IO_ERROR instead of exit 23",
+    "artifact-gaps-green-r1": "artifact and binary-log checks passed; harness expected PERMISSION_DENIED instead of actual READ_DENIED",
+    "boundaries-green-r2": "two wrapper cases passed; harness incorrectly used a generic CLI identity for Caller delivery",
+    "boundaries-green-r3": "compile-only missing fixture imports",
+    "boundaries-green-r4": "two wrapper cases passed; harness incorrectly treated owner-scoped authorized evidence as a sibling-scope denial",
+    "boundaries-green-r5": "three protocol/wrapper boundary cases passed, including controlled binding-specific delivery acknowledgement"
+  },
+  "limitations": [
+    "First archived build case passed while a separate fixture assertion failed in the same suite.",
+    "Second build case belongs to the complete focused suite pass.",
+    "Structured submissions are caller reports, not independent command attestation.",
+    "Delivery acknowledgement is a controlled Domain fixture using the verified Caller binding.",
+    "Focused checks do not replace canonical gate, independent review or CI."
+  ]
+}

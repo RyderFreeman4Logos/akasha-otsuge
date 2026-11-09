@@ -1,0 +1,39 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp021)
+error[E0603]: function `hash` is private
+   --> tests/support/daemon_outcome.rs:202:40
+    |
+202 |     let diff = akasha_otsuge::storage::hash(&git(&[
+    |                                        ^^^^ private function
+    |
+note: the function `hash` is defined here
+   --> src/storage/mod.rs:232:1
+    |
+232 | pub(crate) fn hash(bytes: &[u8]) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `hash` is private
+   --> tests/support/daemon_outcome.rs:256:33
+    |
+256 |         akasha_otsuge::storage::hash(b"first artifact")
+    |                                 ^^^^ private function
+    |
+note: the function `hash` is defined here
+   --> src/storage/mod.rs:232:1
+    |
+232 | pub(crate) fn hash(bytes: &[u8]) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `hash` is private
+   --> tests/support/daemon_outcome.rs:277:33
+    |
+277 |         akasha_otsuge::storage::hash(&expected)
+    |                                 ^^^^ private function
+    |
+note: the function `hash` is defined here
+   --> src/storage/mod.rs:232:1
+    |
+232 | pub(crate) fn hash(bytes: &[u8]) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0603`.
+error: could not compile `akasha-otsuge` (test "daemon") due to 3 previous errors

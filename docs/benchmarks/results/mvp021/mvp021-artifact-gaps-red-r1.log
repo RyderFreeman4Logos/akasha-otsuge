@@ -1,0 +1,22 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp021)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.82s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 1 test
+
+thread 'outcome_tests::outcome_wrapper_retains_failures_with_missing_artifacts_and_binary_log_parts' (2173064) panicked at tests/support/daemon_outcome.rs:399:5:
+assertion `left == right` failed: {"schema_version":1,"error":{"code":"IO_ERROR","message":"Could not complete input or output"}}
+
+  left: Some(1)
+ right: Some(23)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test outcome_tests::outcome_wrapper_retains_failures_with_missing_artifacts_and_binary_log_parts ... FAILED
+
+failures:
+
+failures:
+    outcome_tests::outcome_wrapper_retains_failures_with_missing_artifacts_and_binary_log_parts
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 128 filtered out; finished in 0.35s
+
+error: test failed, to rerun pass `--test daemon`

@@ -3,8 +3,8 @@
 Rechecked 2026-11-09 UTC after PRs #51 and #49 merged: **19 original Issues
 completed, 9 Issues open (#12 and #21–#28)**. #50 is also completed and closed.
 #21 is active: structured outcome submission/show, receipt attribution and the
-command wrapper pass their first regressions and all-target Clippy. Expanded
-boundary tests and the final publication gates remain unfinished.
+command wrapper pass focused regressions, including expanded boundary tests.
+Final canonical, independent review and publication gates remain unfinished.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -865,23 +865,27 @@ revoked access, actual receipt membership, rejected causal overclaims and separa
 reported artifacts. The wrapper regression now runs real failed Rust compilations,
 distinguishes dirty tracked/untracked inputs and repeated artifacts, reads back
 240,000 complete log bytes and refuses duplicate execution; all-target Clippy passes.
-Expanded boundary tests, retained acceptance artifacts and final gates remain.
+Expanded boundary tests now pass all three integrations, including binary log
+parts, artifact gaps and controlled delivery acknowledgement. The byte-verified
+[acceptance archive](../benchmarks/outcome-acceptance.md) preserves all earlier
+failures and two actual compiler cases in 103,858 bytes. Final gates remain.
 
 - [x] Add the bounded outcome protocol and immutable, idempotent records with
   verified invocation/scope and current permission checks, including retries.
-- [ ] Derive receipt/revision attachments from the actual saved receipt; keep
+- [x] Derive receipt/revision attachments from the actual saved receipt; keep
   returned, attached, cited/claimed-used, suspected and validated relations
   distinct. No recall-equals-use or nonzero-exit-equals-incident inference.
 - [x] Provide a usable command wrapper recording argv/exit, run identity,
   base commit, index/diff/tree digests before and after execution, and artifact
   versions. Preserve tracked and nonignored untracked dirty inputs explicitly.
-- [ ] Reuse Capture for complete immutable log sources with bounded previews;
+- [x] Reuse Capture for complete immutable log sources with bounded previews;
   retain precise references when a preview is truncated or capture is incomplete.
-- [ ] Verify dirty-tree failures, repeated builds in one run, unrelated environment
+- [x] Verify dirty-tree failures, repeated builds in one run, unrelated environment
   failures, receipt exposure limits, malformed/forged links and source permissions.
-- [ ] Archive one real build/test failure through the wrapper and document the
-  observation/causality limits; then focused tests, canonical gate, independent
-  review, hosted CI, merge and verified #21 closure.
+- [x] Archive one real build/test failure through the wrapper and document the
+  observation/causality limits; focused tests pass.
+- [ ] Complete the canonical gate, independent review, hosted CI, merge and
+  verified #21 closure.
 
 ## Complete Issue queue
 

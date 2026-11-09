@@ -1,0 +1,19 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp021)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.22s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 1 test
+
+thread 'outcome_tests::outcomes_bind_only_attached_receipt_revisions_and_survive_restart' (2123544) panicked at tests/support/daemon_outcome.rs:49:5:
+outcome entry unavailable: {"error":{"code":"INVALID_REQUEST","message":"The operation could not be completed"},"request_id":null,"schema_version":1,"sequence":1}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test outcome_tests::outcomes_bind_only_attached_receipt_revisions_and_survive_restart ... FAILED
+
+failures:
+
+failures:
+    outcome_tests::outcomes_bind_only_attached_receipt_revisions_and_survive_restart
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 126 filtered out; finished in 51.42s
+
+error: test failed, to rerun pass `--test daemon`

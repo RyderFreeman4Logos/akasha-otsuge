@@ -1,0 +1,9 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp021)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.79s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 1 test
+test outcome_tests::outcome_wrapper_records_dirty_builds_and_retains_full_logs_without_claiming_causality ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 127 filtered out; finished in 2.02s
+

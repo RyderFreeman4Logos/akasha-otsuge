@@ -1,0 +1,21 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp021)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 52.54s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 1 test
+
+thread 'outcome_tests::outcome_wrapper_retains_failures_with_missing_artifacts_and_binary_log_parts' (2174685) panicked at tests/support/daemon_outcome.rs:494:9:
+assertion `left == right` failed
+  left: String("READ_DENIED")
+ right: "PERMISSION_DENIED"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test outcome_tests::outcome_wrapper_retains_failures_with_missing_artifacts_and_binary_log_parts ... FAILED
+
+failures:
+
+failures:
+    outcome_tests::outcome_wrapper_retains_failures_with_missing_artifacts_and_binary_log_parts
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 128 filtered out; finished in 3.12s
+
+error: test failed, to rerun pass `--test daemon`

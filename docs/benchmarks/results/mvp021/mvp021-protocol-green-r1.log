@@ -1,0 +1,16 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp021)
+error[E0433]: cannot find module or crate `fs` in this scope
+   --> tests/support/daemon_outcome.rs:111:5
+    |
+111 |     fs::write(&path, serde_json::to_vec(&second).unwrap()).unwrap();
+    |     ^^ use of unresolved module or unlinked crate `fs`
+    |
+    = help: if you wanted to use a crate named `fs`, use `cargo add fs` to add it to your `Cargo.toml`
+help: consider importing this module
+    |
+  1 + use std::fs;
+    |
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `akasha-otsuge` (test "daemon") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
