@@ -2,9 +2,9 @@
 
 Rechecked 2026-11-09 UTC after PR #52 merged: **20 original Issues
 completed, 8 Issues open (#12 and #22–#28)**. #50 is also completed and closed.
-#22 is active. Its opt-in configuration, bounded budget, executor deadline and
-hot reload pass 20 configuration tests after the missing-policy behavioral RED.
-The durable trigger/investigation flow and all remaining acceptance stay below.
+#22 is active. Its scoped ledger, bounded dispatch, lossless outcome/log reads,
+manual/automatic repair policy and configurable grouping/priority have focused
+regression evidence. Final lifecycle/native acceptance and publication remain below.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -890,11 +890,16 @@ Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b2
 
 - [x] Validate opt-in trigger policy, named executor, finite shared start/token
   budgets and computed deadlines; preserve old configuration digests and hot reload.
-- [ ] Persist authorized outcome/maintenance signals atomically with deduplicated
+- [x] Persist authorized outcome/maintenance signals atomically with deduplicated
   incident state; retain every event reference and recurrence count across restart.
-- [ ] Derive explainable priority and expose a usable scoped incident inbox,
+- [x] Derive explainable priority and expose a usable scoped incident inbox,
   inspection and operator state transitions. Keep investigation state separate
   from memory lifecycle and notification acknowledgement.
+- [x] Read immutable outcome and paginated lossless logs through the existing
+  context tools; complete auto/manual and partial-source controls pass. The
+  scoped ledger, dispatch and context phases are committed through `4893aa9`.
+  Grouping/priority configuration passes all 21 config tests, four incident
+  integrations and all-target Clippy. No final #22 gate or native claim yet.
 - [ ] Reuse the configured Editor/Research path for receipt/run/code/log evidence,
   compare memory error, stale conditions, missing recall, misuse, code defects,
   environment failures, changed requirements and insufficient evidence.

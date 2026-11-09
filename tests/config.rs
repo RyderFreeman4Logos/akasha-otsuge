@@ -157,6 +157,45 @@ fn incident_policy_is_opt_in_bounded_and_uses_the_configured_executor_deadline()
 }
 
 #[test]
+fn incident_grouping_and_priority_rules_reload_with_finite_escalation() {
+    let input = "[incidents]\ntriggers=['expired']\ndeduplicate=false\nescalate_after=2\n[incidents.priorities]\nexpired='urgent'\n";
+    let configured = config(input);
+    let policy = serde_json::to_value(configured.config()).unwrap()["incidents"].clone();
+    assert_eq!(policy["deduplicate"], false);
+    assert_eq!(policy["escalate_after"], 2);
+    assert_eq!(policy["priorities"]["expired"], "urgent");
+    for invalid in [
+        input.replace("escalate_after=2", "escalate_after=0"),
+        input.replace("escalate_after=2", "escalate_after=1000001"),
+        input.replace("expired='urgent'", "unknown='urgent'"),
+        input.replace("expired='urgent'", "expired='panic'"),
+    ] {
+        assert!(resolve(&invalid, None, "", &paths()).is_err());
+    }
+    let manager = manager(input);
+    let pinned = manager.pin();
+    assert_eq!(
+        manager
+            .reload(
+                &input.replace("deduplicate=false", "deduplicate=true"),
+                None,
+                |_| Ok(())
+            )
+            .unwrap()
+            .status,
+        ReloadStatus::Applied
+    );
+    assert_eq!(
+        serde_json::to_value(pinned.resolved().config()).unwrap()["incidents"]["deduplicate"],
+        false
+    );
+    assert_eq!(
+        serde_json::to_value(manager.pin().resolved().config()).unwrap()["incidents"]["deduplicate"],
+        true
+    );
+}
+
+#[test]
 fn defaults_cover_all_local_model_roles_without_an_endpoint_requirement() {
     let empty = config("");
     assert!(empty.config().models.is_empty());

@@ -145,6 +145,11 @@ impl Service {
             &signal.key,
             &signal.targets,
         ))?);
+        let id = if policy.deduplicate {
+            id
+        } else {
+            hash(&serde_json::to_vec(&(id, &outcome.event.event_id))?)
+        };
         let k = key(&id)?;
         let old = self.storage.current(&k)?;
         let mut changes = vec![];
@@ -219,23 +224,33 @@ impl Service {
                 }
             }
         };
-        let (priority, reason) = if record.signal.kind == IncidentTrigger::UserCorrection {
+        let (priority, reason) = if let Some(priority) = policy.priorities.get(&record.signal.kind)
+        {
+            (*priority, "configured_trigger")
+        } else if record.signal.kind == IncidentTrigger::UserCorrection {
             (Priority::Urgent, "reported_correction")
-        } else if outcome.event.severity == crate::outcome::Severity::Critical {
-            (Priority::Urgent, "critical_signal")
         } else if matches!(
             record.signal.kind,
             IncidentTrigger::ReproducibleFailure | IncidentTrigger::Contradiction
         ) {
             (Priority::High, "reported_conflict")
-        } else if record.occurrences >= 3 {
-            (Priority::High, "recurrence")
         } else {
             (Priority::Normal, "maintenance")
         };
-        record.priority = record.priority.max(priority);
-        if !record.priority_reasons.iter().any(|r| r == reason) {
-            record.priority_reasons.push(reason.into());
+        for (priority, reason) in std::iter::once((priority, reason))
+            .chain(
+                (outcome.event.severity == crate::outcome::Severity::Critical)
+                    .then_some((Priority::Urgent, "critical_signal")),
+            )
+            .chain(
+                (record.occurrences >= policy.escalate_after)
+                    .then_some((Priority::High, "recurrence")),
+            )
+        {
+            record.priority = record.priority.max(priority);
+            if !record.priority_reasons.iter().any(|r| r == reason) {
+                record.priority_reasons.push(reason.into());
+            }
         }
         changes.push(Change {
             key: k,

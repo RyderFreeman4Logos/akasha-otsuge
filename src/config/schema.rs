@@ -96,6 +96,9 @@ pub enum IncidentTrigger {
 pub struct Incidents {
     pub executor: Option<String>,
     pub triggers: BTreeSet<IncidentTrigger>,
+    pub deduplicate: bool,
+    pub priorities: BTreeMap<IncidentTrigger, crate::incident::Priority>,
+    pub escalate_after: u64,
     pub auto_repair: bool,
     pub max_runner_starts: u32,
     pub max_tokens: u64,
@@ -106,6 +109,9 @@ impl Default for Incidents {
         Self {
             executor: None,
             triggers: BTreeSet::new(),
+            deduplicate: true,
+            priorities: BTreeMap::new(),
+            escalate_after: 3,
             auto_repair: false,
             max_runner_starts: 2,
             max_tokens: 64_000,
@@ -374,6 +380,10 @@ impl Config {
             "missing or disabled executor",
         )?;
         for (valid, field) in [
+            (
+                (1..=1_000_000).contains(&self.incidents.escalate_after),
+                "incidents.escalate_after",
+            ),
             (
                 (1..=32).contains(&self.incidents.max_runner_starts),
                 "incidents.max_runner_starts",

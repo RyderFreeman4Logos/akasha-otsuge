@@ -178,10 +178,7 @@ fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair(
             changed["record"]["draft"]["scope"],
             original["record"]["draft"]["scope"]
         );
-        assert_eq!(
-            changed["previous"],
-            original["revision"]["commit_seq"]
-        );
+        assert_eq!(changed["previous"], original["revision"]["commit_seq"]);
         let job =
             daemon.cli(&["job", "show", result["record"]["job_id"].as_str().unwrap()])["data"]
                 .clone();
@@ -205,6 +202,76 @@ fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair(
                 "resolved"
             }
         );
+    }
+}
+
+#[test]
+fn incident_grouping_and_priority_follow_policy_without_starting_unconfigured_runners() {
+    for deduplicate in [true, false] {
+        let (daemon, _, bound) = super::codex_tests::consult_fixture_with("editor_ledger", |_| {
+            format!(
+                "[incidents]\ntriggers=['expired','dependency_changed','user_correction']\ndeduplicate={deduplicate}\nescalate_after=2\n[incidents.priorities]\nexpired='urgent'\n"
+            )
+        });
+        let mut ids = Vec::new();
+        for n in 0..3 {
+            let event = json!({"event_id":format!("expiry-{n}"),"invocation_id":bound["data"]["invocation_id"],
+                "source":"maintenance","severity":"info","occurred_at_ms":akasha_otsuge::ipc::now_ms().unwrap(),
+                "execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+                "incident":{"kind":"expired","key":"expiry-group","reason":"The documented validity ended."}});
+            let reply = rpc(&daemon, json!({"op":"outcome_submit","event":event}));
+            assert!(reply.get("error").is_none(), "{reply}");
+            let id = daemon.cli(&["outcome", "show", &format!("expiry-{n}")])["data"]["incident"]
+                .as_str()
+                .unwrap()
+                .to_owned();
+            let incident = daemon.cli(&["incident", "show", &id])["data"].clone();
+            assert_eq!(incident["record"]["priority"], "urgent");
+            assert!(
+                incident["record"]["priority_reasons"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|v| v == "configured_trigger")
+            );
+            assert_eq!(
+                incident["record"]["occurrences"],
+                if deduplicate { n + 1 } else { 1 }
+            );
+            ids.push(id);
+        }
+        assert_eq!(
+            ids.iter().collect::<std::collections::BTreeSet<_>>().len(),
+            if deduplicate { 1 } else { 3 }
+        );
+        for (n, kind, severity, expected) in [
+            (0, "dependency_changed", "info", "normal"),
+            (
+                1,
+                "dependency_changed",
+                "info",
+                if deduplicate { "high" } else { "normal" },
+            ),
+            (2, "dependency_changed", "critical", "urgent"),
+            (3, "user_correction", "info", "urgent"),
+        ] {
+            let event_id = format!("maintenance-{n}");
+            let event = json!({"event_id":event_id,"invocation_id":bound["data"]["invocation_id"],
+                "source":"maintenance","severity":severity,"occurred_at_ms":akasha_otsuge::ipc::now_ms().unwrap(),
+                "execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+                "incident":{"kind":kind,"key":"maintenance-group","reason":"Explicit maintenance signal."}});
+            let reply = rpc(&daemon, json!({"op":"outcome_submit","event":event}));
+            assert!(reply.get("error").is_none(), "{reply}");
+            let outcome = daemon.cli(&["outcome", "show", &event_id]);
+            let incident = daemon.cli(&[
+                "incident",
+                "show",
+                outcome["data"]["incident"].as_str().unwrap(),
+            ]);
+            assert_eq!(incident["data"]["record"]["priority"], expected);
+            assert_eq!(incident["data"]["record"]["state"], "open");
+        }
+        assert!(!daemon.root.join("starts").exists());
     }
 }
 
