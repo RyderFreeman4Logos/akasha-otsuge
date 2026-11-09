@@ -22,8 +22,10 @@ Capture waits now derive a monotonic supervisor boundary from the job's accepted
 absolute queue/execution deadline. They retain the original execution boundary
 across retries/restart and allow the existing bounded IPC interval for terminal
 publication. Polling and wall-clock reversal cannot renew it. Deterministic checks
-cover a partly elapsed execution, queue-to-execution transition, expiry and changed
-execution clocks. Existing content, authority, success and restart assertions remain.
+cover a partly elapsed execution, queue-to-execution transition (including a
+concurrent wall-clock reversal), expiry and changed execution clocks. The mapping
+from wall time to monotonic time is captured once, at the first observation.
+Existing content, authority, success and restart assertions remain.
 
 The first focused run then exposed two positive Claude fixtures relying on cold
 backfill inside the Caller’s two-second bind window. Identity and deduplication
@@ -39,3 +41,10 @@ performance result. Full canonical, independent review and CI identities are
 recorded on the publication PR. The [compact archive](results/issue050/manifest.json)
 retains failed runs, the observer and source-attribution hashes; compressed files
 have both stored and uncompressed SHA-256 values.
+
+The first frozen candidate `d672585` passed the full canonical gate, but independent
+review found that a wall-clock reversal at the queue-to-running transition could
+extend its supervisor. A new regression failed on that candidate before the mapping
+was pinned. All five clock regressions then passed. The
+[review-fix archive](results/issue050-review-fix/manifest.json) retains that failure,
+the historical passing gate and the focused repair; final verification is separate.

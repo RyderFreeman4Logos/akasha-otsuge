@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T20:03:14.537628+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "d672585b960d901905a222231915f6220c62d59c",
+    "log_sha256": "12f0fe5d1cabbc513b3ed5396ad5b706a971549f11889b141dc8dfd244bafadd",
+    "seconds": 284.60160860419273,
+    "utc": "2026-11-09T20:01:36.646196+00:00"
+  },
+  "process_absent": true,
+  "classification": "completed_for_inspection"
+}

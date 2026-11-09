@@ -821,7 +821,8 @@ uncommitted. Eight controlled integration tests passed before the pause; two
 recovery tests failed during fixture binding because the synthetic capability
 omitted its executable. They did not exercise recovery. No owned build or native
 agent survived the pause. The calendar gap is paused time, not measured execution.
-All ten open Issues still match this queue; no accepted Issue awaits closure.
+At resume, ten original Issues remained; #50 was then added as an independent
+gate repair. No accepted Issue awaits closure.
 
 - [x] Correct the recovery fixture and verify both SIGKILL checkpoints and the
   no-checkpoint interruption case. `mvp020-recovery-resume-r1` passed both tests;
@@ -853,9 +854,10 @@ All ten open Issues still match this queue; no accepted Issue awaits closure.
 - [x] Preserve the exact `3b86282` canonical failure and one phase-correlated
   workspace replay. Capture supervisors stopped while work advanced inside its
   accepted deadline; #50 separately repairs those fixture clocks and positive
-  native identity setup. Its source `d672585` passes the full main-based gate.
-- [ ] Integrate the reviewed #50 change and finish the Editor candidate's canonical
-  gate, independent whole-candidate review, hosted
+  native identity setup. Its corrected source `74f726c` passes the full main-based
+  gate and independent R2 review, and is now integrated here.
+- [ ] Finish the integrated Editor candidate's canonical gate, independent
+  whole-candidate review, hosted
   CI on PR #49, merge and verified Issue closure.
 
 - [x] Define bounded feedback/editor and patch inputs with exact expected revisions,
@@ -879,11 +881,15 @@ All ten open Issues still match this queue; no accepted Issue awaits closure.
   retain bounded terminal grace and non-capture/cancellation limits, and prepare
   positive identity fixtures through durable backfill. Deterministic clock checks,
   102 daemon cases and Clippy pass; no production timeout/durability change.
-- [x] Freeze `d672585` / tree `1e4c07e` and pass `just check` in259.072seconds,
-  including102 installed daemon cases and UID boundaries.
-- [ ] Finish independent review and CI on [PR #51](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/51), merge and close #50.
-  Editor integration is prepared locally while that publication proceeds; neither
-  #20 nor #50 is closed based on focused checks alone.
+- [x] Preserve `d672585` canonical PASS and independent R1 FAIL: wall-clock
+  reversal during queue-to-running observation could renew supervision. Reproduce
+  that counterexample before pinning one clock mapping across both phases.
+- [x] Freeze `74f726c` / tree `35ce5d4`; `just check` passes in 155.934 seconds,
+  with 103 daemon cases in both normal and installed vectors and UID boundaries.
+  Independent R2 reviews the whole range and passes all 14 focused cases.
+- [ ] Finish corrected-head CI on [PR #51](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/51), merge and close #50.
+  The first historical CI run is still building; let it publish its cache before
+  pushing the corrected head. Neither #20 nor #50 is closed on local checks alone.
 
 ## Complete Issue queue
 

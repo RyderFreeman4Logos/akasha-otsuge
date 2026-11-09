@@ -5,6 +5,7 @@ use std::time::{Duration, Instant};
 pub(super) struct JobWait {
     queue: Option<u64>,
     execution: Option<u64>,
+    origin: Option<(Instant, u64)>,
     end: Option<Instant>,
 }
 
@@ -14,6 +15,7 @@ impl JobWait {
     }
 
     fn check_at(&mut self, job: &Value, now: Instant, wall_ms: u64) {
+        let (origin, origin_ms) = *self.origin.get_or_insert((now, wall_ms));
         let queue = job["queue_deadline_ms"].as_u64().unwrap();
         assert_eq!(
             *self.queue.get_or_insert(queue),
@@ -45,7 +47,7 @@ impl JobWait {
                         .unwrap(),
                 )
                 .unwrap();
-            self.end = Some(now + Duration::from_millis(cutoff.saturating_sub(wall_ms)));
+            self.end = Some(origin + Duration::from_millis(cutoff.saturating_sub(origin_ms)));
         }
         self.execution = execution;
         assert!(
@@ -103,6 +105,21 @@ mod tests {
         assert!(
             std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 wait.check_at(&job(Some(1_000)), now + Duration::from_secs(130), 0);
+            }))
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn capture_wait_keeps_its_clock_mapping_when_execution_is_first_observed() {
+        let now = Instant::now();
+        let mut wait = JobWait::default();
+        wait.check_at(&job(None), now, 1_000);
+        wait.check_at(&job(Some(5_000)), now + Duration::from_secs(4), 0);
+        wait.check_at(&job(Some(5_000)), now + Duration::from_secs(133), 0);
+        assert!(
+            std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                wait.check_at(&job(Some(5_000)), now + Duration::from_secs(134), 0);
             }))
             .is_err()
         );
