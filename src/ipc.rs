@@ -98,6 +98,12 @@ pub struct Request {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    OutcomeSubmit {
+        event: crate::outcome::Event,
+    },
+    OutcomeShow {
+        id: String,
+    },
     Pi {
         event: crate::adapter::pi::NativeEvent,
     },

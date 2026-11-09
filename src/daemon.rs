@@ -173,6 +173,8 @@ impl Service {
         command: Command,
     ) -> Result<serde_json::Value> {
         match command {
+            Command::OutcomeSubmit { event } => self.submit_outcome(event).await,
+            Command::OutcomeShow { id } => self.show_outcome(&id).await,
             Command::EditorRun {
                 feedback,
                 idempotency_key,

@@ -35,6 +35,9 @@ mod review_tests;
 #[path = "support/daemon_editor.rs"]
 mod editor_tests;
 
+#[path = "support/daemon_outcome.rs"]
+mod outcome_tests;
+
 #[path = "support/daemon_codex.rs"]
 mod codex_tests;
 

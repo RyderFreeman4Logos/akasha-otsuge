@@ -891,6 +891,27 @@ gate repair. No accepted Issue awaits closure.
   The first historical CI run is still building; let it publish its cache before
   pushing the corrected head. Neither #20 nor #50 is closed on local checks alone.
 
+## MVP-021 preparation and remaining acceptance
+
+Prepared in an isolated SSD worktree while the frozen #20 candidate completes
+its gate, review and publication. No #21 implementation or test PASS is claimed.
+
+- [ ] Add the bounded outcome protocol and immutable, idempotent records with
+  verified invocation/scope and current permission checks, including retries.
+- [ ] Derive receipt/revision attachments from the actual saved receipt; keep
+  returned, attached, cited/claimed-used, suspected and validated relations
+  distinct. No recall-equals-use or nonzero-exit-equals-incident inference.
+- [ ] Provide a usable command wrapper recording argv/exit, run identity,
+  base commit, index/diff/tree digests before and after execution, and artifact
+  versions. Preserve tracked and nonignored untracked dirty inputs explicitly.
+- [ ] Reuse Capture for complete immutable log sources with bounded previews;
+  retain precise references when a preview is truncated or capture is incomplete.
+- [ ] Verify dirty-tree failures, repeated builds in one run, unrelated environment
+  failures, receipt exposure limits, malformed/forged links and source permissions.
+- [ ] Archive one real build/test failure through the wrapper and document the
+  observation/causality limits; then focused tests, canonical gate, independent
+  review, hosted CI, merge and verified #21 closure.
+
 ## Complete Issue queue
 
 - [x] [#1 [MVP-001] 建立 Rust/Linux 项目骨架与可执行开发门槛](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/1) — dependencies: none.

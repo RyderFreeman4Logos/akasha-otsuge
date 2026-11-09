@@ -42,6 +42,8 @@ Commands:
   job show|cancel ID
   job list [--after KEY]
   consult show JOB_ID
+  outcome submit EVENT_JSON
+  outcome show EVENT_ID
   editor run FEEDBACK_JSON --idempotency-key ID
   consult receipt JOB_ID [--full]
   consult original JOB_ID SOURCE_INDEX [--start BYTE_OFFSET]
@@ -467,6 +469,10 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             })
         }
         ["job", "show", id] => Some(Command::JobShow { id: (*id).into() }),
+        ["outcome", "submit", path] => Some(Command::OutcomeSubmit {
+            event: json_file_limit(path, akasha_otsuge::outcome::MAX_EVENT_BYTES)?,
+        }),
+        ["outcome", "show", id] => Some(Command::OutcomeShow { id: (*id).into() }),
         ["consult", "show", id] => Some(Command::ConsultShow { id: (*id).into() }),
         ["consult", "receipt", id] => Some(Command::ConsultReceipt {
             id: (*id).into(),
