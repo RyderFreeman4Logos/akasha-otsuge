@@ -79,14 +79,14 @@ fn hermes_bridge_exports_the_requested_native_home_and_persists_background_histo
     );
     assert!(synced["data"]["id"].is_string(), "{synced}");
     let id = synced["data"]["id"].as_str().unwrap();
-    let end = Instant::now() + Duration::from_secs(10);
+    let mut wait = super::job_wait::JobWait::default();
     loop {
         let state = daemon.cli(&["job", "show", id]);
         if state["data"]["state"] == "succeeded" {
             break;
         }
         assert_ne!(state["data"]["state"], "failed", "{state}");
-        assert!(Instant::now() < end, "{state}");
+        wait.check(&state["data"]);
         std::thread::sleep(Duration::from_millis(20));
     }
     let spool = home.join("plugin-data/akasha-otsuge/capture");

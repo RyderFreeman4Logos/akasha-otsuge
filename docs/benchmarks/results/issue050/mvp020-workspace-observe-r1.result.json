@@ -1,0 +1,13 @@
+{
+  "exit_code": 101,
+  "elapsed_s": 62.522372332401574,
+  "command": [
+    "cargo",
+    "test",
+    "--workspace"
+  ],
+  "source_unchanged": true,
+  "log_sha256": "3329626ed86efcf84e4a10581c8fd477d4724d816f4f39d404bfc945d5db904d",
+  "samples_sha256": "6f0de4dfe5470c3dbd503c9d7e3c5907a34dbe116c819f493b3365fdc9c1a647",
+  "limits": "Sampled syscall residency is not proof of uninterrupted calls. No source probes, ptrace, concurrency changes, deadline changes or durability changes. Diagnostic only; canonical R4 remains failed."
+}

@@ -1,7 +1,9 @@
 # Active work and complete remaining checklist
 
-Updated 2026-10-30 UTC after PR #47 merged at `2da9a2e`: **17 completed,
-11 open Issues (#12, #19–#28)**. #19 is the sole active implementation.
+Rechecked 2026-11-09 UTC after PR #48 merged at `4609349`: **18 original Issues
+completed, 11 Issues open (#12, #20–#28 and #50)**. #50 is the active fixture
+repair blocking #20's final gate. PR #49 holds the Editor implementation; #21
+has isolated test/document preparation, with no claimed implementation or acceptance.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -790,7 +792,7 @@ in addition to HEAD, preventing ambiguous historical source claims.
 are historical links, not active blockers. Reconcile the legacy checker's literal
 `Blocked by` requirement with current Issue status without deleting dependencies.
 
-## MVP-019 active acceptance and remaining work
+## MVP-019 completed acceptance
 
 Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
 
@@ -802,8 +804,23 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
   pending proposals and open reviews must not retire unrelated active decisions.
 - [x] Prove human taste priority, local scope exceptions, explicit successors,
   permission rechecks, stale-version refusal, retries and crash recovery.
-- [ ] Archive compact real CLI examples and policy/state-machine evidence; run the
+- [x] Archive compact real CLI examples and policy/state-machine evidence; run the
   canonical gate, independent review, hosted CI, merge and verified closure.
+  Candidate `ae086e6` passed its canonical gate, independent R2 review and
+  CI40983567511. PR #48 merged as `4609349`; #19 closed completed, rechecked live
+  on 2026-11-09. Historical validation is distinct from current work below.
+
+## Current publication blockers
+
+- [ ] Finish #50's frozen canonical gate, independent review, CI, merge and
+  verified closure. Its focused capture/identity/deadline tests pass. See the
+  [diagnostic and scope](../benchmarks/capture-wait-diagnostic.md).
+- [ ] Integrate #50 into PR #49, preserving the Editor coverage-class repair
+  at local `3b86282`; run its own exact gate, whole-candidate review and CI,
+  then merge and close #20. Its earlier R2/R3 review failures and canonical
+  capture-wait failure remain blocking historical evidence until superseded.
+- [ ] Continue #21 through #28 in the queue below. #12 remains explicitly deferred
+  for Claude authentication under the owner's authorized Codex substitution.
 
 ## Complete Issue queue
 
@@ -825,7 +842,7 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
 - [x] [#16 [MVP-016] consult 可选短 hint、渐进调研与子孙共享预算](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/16) — dependencies: #12, #13, #14, #15.
 - [x] [#17 [MVP-017] 异步提取候选、来源引用与可重建索引作业](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/17) — dependencies: #5, #7, #9, #10, #16.
 - [x] [#18 [MVP-018] 单一或组合 Runner 的 Auto-Grill 工作流](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/18) — dependencies: #16, #17.
-- [ ] [#19 [MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19) — dependencies: #5, #6, #18.
+- [x] [#19 [MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19) — dependencies: #5, #6, #18.
 - [ ] [#20 [MVP-020] 外部 Memory Editor、范围受限 patch 与并发修订](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/20) — dependencies: #16, #19.
 - [ ] [#21 [MVP-021] Run、Git/工作区、build/test 与 incident 证据关联](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21) — dependencies: #6, #11, #16.
 - [ ] [#22 [MVP-022] 执行失败触发调查、自动修订或高优 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22) — dependencies: #20, #21.
@@ -835,6 +852,8 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
 - [ ] [#26 [MVP-026] Linux 安装、升级、卸载与四宿主使用文档](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26) — dependencies: #12, #13, #14, #15, #23, #24, #25.
 - [ ] [#27 [MVP-027] 质量评测、主上下文开销与组合回归](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) — dependencies: #16, #18, #19, #20, #22, #24, #26.
 - [ ] [#28 [MVP-028] 需求逐项终验、发布和完成证据归档](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/28) — dependencies: #1, #2, #3, #4, #5, #6, #7, #8, #9, #10, #11, #12, #13, #14, #15, #16, #17, #18, #19, #20, #21, #22, #23, #24, #25, #26, #27.
+
+- [ ] [#50 Capture fixture supervision](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/50) — repairs an existing gate blocker; separate from Editor behavior and production performance acceptance.
 
 Every leaf retains the complete linked acceptance criteria. No local fixture
 substitutes for the real four-host, provider-duration or release acceptance.

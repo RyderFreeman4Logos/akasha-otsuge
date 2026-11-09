@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T19:37:41.235830+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "3b862820b62f189c34f51f45d67b90714aed4ee9",
+    "log_sha256": "099ac6f940b8e088c75c9b00ced80368d9d041bb1d9fa2d46239d242e050a947",
+    "seconds": 62.6345887510106,
+    "utc": "2026-11-09T19:36:49.212413+00:00"
+  },
+  "process_absent": true,
+  "classification": "DIAGNOSTIC FAIL: original workspace vector with bounded procfs observer; analyze correlated waits"
+}

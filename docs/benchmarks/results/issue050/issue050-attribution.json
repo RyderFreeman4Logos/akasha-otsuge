@@ -1,0 +1,20 @@
+[
+  {
+    "path": "tests/daemon.rs",
+    "function": "accepted_reconciliation_survives_process_death_and_pins_configuration",
+    "identical_on_base_and_failed_candidate": true,
+    "sha256": "a4c9f9fef7996e90299d181ac385e5e46db155dc84455bf7f10a72e4e9e1f6bd"
+  },
+  {
+    "path": "tests/support/daemon_claude.rs",
+    "function": "terminal",
+    "identical_on_base_and_failed_candidate": true,
+    "sha256": "bfe3a1e67c7ec7c1622d23df4389201d70f5176d029b408ba674355edadf60ec"
+  },
+  {
+    "path": "tests/support/daemon_codex.rs",
+    "function": "sync_fixture_until",
+    "identical_on_base_and_failed_candidate": true,
+    "sha256": "8a003f71a5a6437378322457d198794be10449d34ee55d9e84774d21e8a8e315"
+  }
+]

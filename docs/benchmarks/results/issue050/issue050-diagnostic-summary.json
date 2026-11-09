@@ -1,0 +1,405 @@
+{
+  "schema_version": 1,
+  "failed_head": "3b862820b62f189c34f51f45d67b90714aed4ee9",
+  "main_base": "460934961009ff41ae1b3def573e81dda4fa7d0e",
+  "failing_pid": 2024083,
+  "sample_count": 125,
+  "max_observer_sample_seconds": 0.027803041972219944,
+  "failed_daemon_wait_samples": [
+    {
+      "elapsed_s": 26.511973010376096,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 27.012088069692254,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 27.512200449593365,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 28.012397575192153,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 28.51247216016054,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 29.01257541961968,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 29.512683014385402,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 30.01279348321259,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 30.51290260348469,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 31.01308699697256,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 31.513260792940855,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 32.01353691983968,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 32.51372389215976,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 33.01385390944779,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 33.51395055837929,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 34.01407031249255,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 35.01441443245858,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 35.514647394418716,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 36.014838493429124,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 36.515024999156594,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 37.01512466836721,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 37.5153004238382,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 38.015502233058214,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 38.51565878931433,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 39.01573189813644,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 39.51586331054568,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 40.01593657489866,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 40.51604972872883,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 41.0163222104311,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 41.5164104513824,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 42.016482022590935,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 42.51655603758991,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 43.516746864654124,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 44.01685409899801,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 44.517004031687975,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 45.01708047837019,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 46.01729707699269,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 46.51747568696737,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 47.017644482664764,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 47.51775058172643,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 48.01793306786567,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 48.51811863668263,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 49.51833735965192,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 50.01852250657976,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 51.018707832321525,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 51.51878457143903,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 52.01895700767636,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    },
+    {
+      "elapsed_s": 52.519136941060424,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 53.019213302992284,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 53.51934378966689,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 54.01952178217471,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 54.51969429757446,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 55.01988485362381,
+      "state": "D",
+      "wchan": "wait_log_commit",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 55.52005581278354,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 56.020238887518644,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000002.wal"
+    },
+    {
+      "elapsed_s": 56.520349136553705,
+      "state": "D",
+      "wchan": "folio_wait_bit_common",
+      "syscall": 74,
+      "fd_basename": "00000000000000000001.vlog"
+    }
+  ],
+  "source_attribution": "Three affected wait bodies are byte-identical on main and the failed candidate; see issue050-attribution.json.",
+  "classification": "The observed replay fails its fixture supervisor while its durable capture cursor advances inside its accepted 120-second budget. Procfs correlates waiting to fsync and Btrfs log/page waits. Underlying filesystem cause and earlier historical failure causes remain unknown.",
+  "scope": "Repair capture test supervision only; keep production deadlines, topology, durability and MVP-024 thresholds."
+}
