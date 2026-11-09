@@ -550,7 +550,7 @@ fn incident_grouping_and_priority_follow_policy_without_starting_unconfigured_ru
     for deduplicate in [true, false] {
         let (daemon, _, bound) = super::codex_tests::consult_fixture_with("editor_ledger", |_| {
             format!(
-                "[incidents]\ntriggers=['expired','dependency_changed','user_correction']\ndeduplicate={deduplicate}\nescalate_after=2\n[incidents.priorities]\nexpired='urgent'\n"
+                "[incidents]\ntriggers=['expired','dependency_changed','user_correction','contradiction']\ndeduplicate={deduplicate}\nescalate_after=2\n[incidents.priorities]\nexpired='urgent'\n"
             )
         });
         let mut ids = Vec::new();
@@ -594,6 +594,7 @@ fn incident_grouping_and_priority_follow_policy_without_starting_unconfigured_ru
             ),
             (2, "dependency_changed", "critical", "urgent"),
             (3, "user_correction", "info", "urgent"),
+            (4, "contradiction", "info", "high"),
         ] {
             let event_id = format!("maintenance-{n}");
             let event = json!({"event_id":event_id,"invocation_id":bound["data"]["invocation_id"],

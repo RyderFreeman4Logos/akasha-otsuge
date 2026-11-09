@@ -289,7 +289,6 @@ fn native_incident_actual() {
     receipt["incident"] = incident.clone();
     receipt["after"] = after.clone();
     save(&output, &receipt);
-    assert_eq!(incident["record"]["state"], "resolved", "{incident}");
     assert!(matches!(
         incident["record"]["classification"].as_str(),
         Some("memory_error" | "stale_conditions")
@@ -299,7 +298,25 @@ fn native_incident_actual() {
         after["record"]["draft"]["scope"],
         original["record"]["draft"]["scope"]
     );
-    assert_eq!(after["record"]["authority"], "delegated_approved");
+    match after["record"]["authority"].as_str() {
+        Some("delegated_approved") => {
+            assert_eq!(incident["record"]["state"], "resolved", "{incident}");
+            assert_eq!(finished["result"]["gaps"], json!([]));
+            assert_eq!(finished["result"]["conflicts"], json!([]));
+            receipt["handling"] = json!("automatic_adoption");
+        }
+        Some("candidate") => {
+            assert_eq!(incident["record"]["state"], "open", "{incident}");
+            assert!(!finished["result"]["gaps"].as_array().unwrap().is_empty());
+            assert_eq!(
+                after["record"]["previous_adoption"],
+                original["revision"]["commit_seq"]
+            );
+            assert_eq!(incident["record"]["priority"], "high");
+            receipt["handling"] = json!("evidence_limited_candidate_for_review");
+        }
+        _ => panic!("unexpected repair authority: {after}"),
+    }
     assert_ne!(
         after["record"]["draft"]["claim"],
         original["record"]["draft"]["claim"]
