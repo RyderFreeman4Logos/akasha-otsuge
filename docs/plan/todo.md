@@ -826,10 +826,16 @@ All ten open Issues still match this queue; no accepted Issue awaits closure.
   the original setup failure receipt remains retained.
 - [x] Run the pending Consult regression set and Clippy: 31 Consult tests and
   Clippy all-targets passed in the same batch, without repeating corpus acceptance.
-- [ ] Verify the real Pi Runner using an isolated SSD profile and the authorized
-  localhost:48317 route; distinguish controlled Caller evidence from native Runner.
-- [ ] Document patch/workflow contracts and limitations; archive compact receipts,
-  commit the verified native workflow, and finish gate/review/CI/merge/closure.
+- [x] Verify one real external Runner: Codex 0.164.0 with the existing profile
+  completed investigation and a constrained candidate revision in 54.9 seconds.
+  `mvp020-native-codex-r1` records original/code citations, one Runner start,
+  immutable scope and no human approval. Temporary data was removed and the
+  existing Codex configuration was unchanged. The two preceding Pi attempts
+  failed because localhost:48317 was not listening; retain their receipts.
+- [x] Document patch/workflow contracts and limitations; archive 178,601 bytes of
+  compact receipts and commit the verified native workflow at `9b3ce6c`.
+- [ ] Finish the final candidate's canonical gate, independent review, hosted CI,
+  merge and verified Issue closure.
 
 - [x] Define bounded feedback/editor and patch inputs with exact expected revisions,
   evidence, scope and reason; preserve originals and refuse forged human authority.

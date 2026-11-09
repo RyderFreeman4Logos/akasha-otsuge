@@ -1,0 +1,51 @@
+# MVP-020 editor acceptance
+
+The source range begins at `460934961009ff41ae1b3def573e81dda4fa7d0e`.
+Core atomic patches are committed in `159aad804c922b2cfd43c29e997321a1fdbfc3ed`;
+native investigation/recovery in `9b3ce6cb794b5fd3ca14c6043df4da6ae7ca5251`.
+The [archive manifest](results/mvp020/manifest.json) hashes 67 compact files
+(178,601 bytes before the manifest). No corpus or build directory is archived.
+
+| Evidence | Result and limit |
+| --- | --- |
+| `mvp020-core-focused-r2` | Four patch tests, 20 domain tests, nine review tests, four extraction tests, formatting and Clippy passed. One opt-in extraction test skipped. |
+| `mvp020-native-workflow-green-r2` | Configured controlled Codex Runner read source/code, produced a patch, preserved provenance and reused the completed job. |
+| `mvp020-native-boundaries-r2` | Eight editor integration tests passed; genuine Runner test skipped. Two library recovery tests failed in binding setup; later chained checks did not run. |
+| `mvp020-recovery-resume-r1` | After supplying the synthetic binding's missing executable: two recovery tests, 31 Consult tests and Clippy passed. A crash after response checkpoint or atomic patch commit resumes without Runner replay or duplicate revision. Missing-checkpoint interruption requires explicit retry. |
+| `mvp020-native-actual-r1`, `mvp020-native-diagnostic-r2` | Pi 1.4.0 could not connect to localhost:48317. The diagnostic retained only error events (`Connection error.`). These are failed native attempts, not model investigation evidence. |
+| `mvp020-native-codex-r1` | Actual authenticated Codex 0.164.0 completed the unchanged public editor workflow against synthetic evidence. The small test-only host-selection patch is archived with its admission digest. |
+
+The [controlled regression source](../../tests/support/daemon_editor.rs) covers
+exact revisions, atomic batches, concurrent writers, stale/expired requests,
+idempotency, scope and evidence rejection, forged authority, live revocation,
+pinned policy, non-memory causes, original-byte preservation and old receipt
+replay. Controlled host processes do not establish native authentication.
+
+The real run used the existing Codex profile (configured `gpt-6.1-sol`, OpenAI),
+one Runner start, and the retained binary SHA-256
+`b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306`.
+The profile selection is recorded separately from observed adapter usage;
+the receipt reports 69,672 tokens and nine budgeted reads, not an independent
+provider billing measurement. Caller identity and the fixture were controlled.
+
+The Runner expanded `editable` revision 2, read the immutable Linux-only original
+and `notes.rs`, and changed “all platforms” to “Linux; other platforms were not
+tested.” The exact scope remained unchanged; patch commit 102 has `memory_edit`
+provenance and no human approval. The report identified the overclaim conflict
+and an unavailable search index; it therefore produced a review candidate even
+though the admitted mode was automatic. This proves conservative policy handling,
+not automatic activation of this particular native result. Automatic activation
+and manual policy are independently covered by controlled tests.
+
+All three native attempts removed their exact scratch directories after owned
+processes ended. Pi settings and the existing Codex configuration were unchanged.
+The [Codex receipt](results/mvp020/mvp020-native-codexr1-result.json) contains the
+before/after drafts, input, citations, job trace and patch audit. Original failures
+and their source/dirty-tree identities remain in the archive; a later success does
+not replace them. Early dirty-tree receipts do not by themselves reconstruct all
+historical test source bytes.
+
+The complete canonical gate, independent review and hosted CI are recorded on
+the publication PR for its final immutable candidate. This document alone does
+not assert those later stages passed. Incident suspension and notification remain
+the separate #21–#23 scope; no Claude authentication is inferred from Codex.

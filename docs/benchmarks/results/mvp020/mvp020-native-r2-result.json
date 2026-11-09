@@ -1,0 +1,262 @@
+{
+  "accepted": {
+    "accepted_at_ms": 1794247143881,
+    "attempt": 0,
+    "cancel_requested": false,
+    "config_digest": "a05e5c3d61e2d00197d3cf15f4dfbda687213541b926f7fe48d52d6e4ee85991",
+    "config_generation": 2,
+    "consult_plan": {
+      "args": {
+        "hint": null
+      },
+      "config_generation": 2,
+      "editor": {
+        "executor": "editor",
+        "expires_at_ms": 1794250743860,
+        "feedback": "The editable memory claims the fixture passed on all platforms. Investigate the original build evidence and notes.rs. If the evidence establishes an overclaim, submit a precise correction limited to what was actually observed; preserve original scope and do not claim unobserved tests. This is synthetic acceptance data, not a human approval.",
+        "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+        "targets": [
+          {
+            "expected_revision": 2,
+            "memory_id": "editable"
+          }
+        ]
+      },
+      "executors": {
+        "editor": {
+          "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-pi-observer.py",
+          "home": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_/profile",
+          "host": "pi"
+        }
+      },
+      "fence": "9089beaeea39a8de9476b6c6db982121f8e05097446abfb8dfd0198629ed2f8e",
+      "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+      "invocation_revision": 91,
+      "native": {
+        "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-pi-observer.py",
+        "home": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_/profile",
+        "host": "pi"
+      },
+      "principal": "uid:1001"
+    },
+    "error": null,
+    "execution_budget_ms": 1920000,
+    "execution_deadline_ms": null,
+    "id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d",
+    "lease_owner": null,
+    "lease_until_ms": null,
+    "queue_deadline_ms": 1794247443881,
+    "request_sha256": "71f25fad2b37abfed1af147d0217fe8e1c03d28b285e9412f3aede6f05e02a5f",
+    "result": null,
+    "retry_at_ms": 1794247143881,
+    "schema_version": 1,
+    "started_at_ms": null,
+    "state": "queued"
+  },
+  "before": {
+    "previous": null,
+    "record": {
+      "approval": null,
+      "authority": "delegated_approved",
+      "authorization": {
+        "adopt_explicit_decisions": false,
+        "mode": "automatic",
+        "scope": {
+          "branch_or_version": null,
+          "project": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_/akasha-daemon-1861854-0/workspace",
+          "session": null,
+          "user": "uid:1001"
+        }
+      },
+      "config_generation": 1,
+      "draft": {
+        "assumptions": [],
+        "claim": "The fixture build passed on all platforms, including Linux, macOS and Windows.",
+        "conditions": [],
+        "kind": "fact",
+        "rationale": "Synthetic retrieval fixture",
+        "scope": {
+          "branch_or_version": null,
+          "project": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_/akasha-daemon-1861854-0/workspace",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "source_spans": [
+          {
+            "content_sha256": "cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8",
+            "end": 34,
+            "event_id": "editable",
+            "revision": 1,
+            "start": 0
+          }
+        ],
+        "valid_from_ms": null,
+        "valid_until_ms": null
+      },
+      "lifecycle": "active",
+      "policy_revision": "fixture",
+      "previous_adoption": null,
+      "provenance": {
+        "actor": {
+          "id": "fixture",
+          "kind": "tool"
+        },
+        "binding": "fixture",
+        "generator": null,
+        "origin": "technical_observation"
+      },
+      "schema_version": 1,
+      "semantic_sha256": "2e6c169d27acaa9ea96f91d381e905a822cd2efe3701e159725fb2bb56a808d9"
+    },
+    "revision": {
+      "commit_seq": 2,
+      "key": {
+        "id": "editable",
+        "kind": "memory"
+      }
+    }
+  },
+  "input": {
+    "executor": "editor",
+    "expires_at_ms": 1794250743860,
+    "feedback": "The editable memory claims the fixture passed on all platforms. Investigate the original build evidence and notes.rs. If the evidence establishes an overclaim, submit a precise correction limited to what was actually observed; preserve original scope and do not claim unobserved tests. This is synthetic acceptance data, not a human approval.",
+    "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+    "targets": [
+      {
+        "expected_revision": 2,
+        "memory_id": "editable"
+      }
+    ]
+  },
+  "job": {
+    "accepted_at_ms": 1794247143881,
+    "attempt": 1,
+    "cancel_requested": false,
+    "config_digest": "a05e5c3d61e2d00197d3cf15f4dfbda687213541b926f7fe48d52d6e4ee85991",
+    "config_generation": 2,
+    "consult_plan": {
+      "args": {
+        "hint": null
+      },
+      "config_generation": 2,
+      "editor": {
+        "executor": "editor",
+        "expires_at_ms": 1794250743860,
+        "feedback": "The editable memory claims the fixture passed on all platforms. Investigate the original build evidence and notes.rs. If the evidence establishes an overclaim, submit a precise correction limited to what was actually observed; preserve original scope and do not claim unobserved tests. This is synthetic acceptance data, not a human approval.",
+        "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+        "targets": [
+          {
+            "expected_revision": 2,
+            "memory_id": "editable"
+          }
+        ]
+      },
+      "executors": {
+        "editor": {
+          "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-pi-observer.py",
+          "home": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_/profile",
+          "host": "pi"
+        }
+      },
+      "fence": "9089beaeea39a8de9476b6c6db982121f8e05097446abfb8dfd0198629ed2f8e",
+      "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+      "invocation_revision": 91,
+      "native": {
+        "binary": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-pi-observer.py",
+        "home": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_/profile",
+        "host": "pi"
+      },
+      "principal": "uid:1001"
+    },
+    "error": "RUNNER_FAILED",
+    "execution_budget_ms": 1920000,
+    "execution_deadline_ms": 1794249063884,
+    "id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d",
+    "lease_owner": null,
+    "lease_until_ms": null,
+    "queue_deadline_ms": 1794247443881,
+    "request_sha256": "71f25fad2b37abfed1af147d0217fe8e1c03d28b285e9412f3aede6f05e02a5f",
+    "result": null,
+    "retry_at_ms": 1794247143881,
+    "run_trace": {
+      "deadline": {
+        "configured_ms": 1920000,
+        "effective_ms": 1920000,
+        "elapsed_ms": 14745,
+        "layer": "workflow",
+        "limiting_layer": "workflow",
+        "remaining_ms": 1905254,
+        "started_at_unix_ms": 1794247143884,
+        "triggered_layer": null
+      },
+      "runs": [
+        {
+          "config_generation": 2,
+          "depth": 0,
+          "error": "RUNNER_FAILED",
+          "executor_profile": "editor",
+          "fence": "9089beaeea39a8de9476b6c6db982121f8e05097446abfb8dfd0198629ed2f8e",
+          "finished_at_ms": 1794247158629,
+          "host": "pi",
+          "id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d/run/0",
+          "origin": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+          "parent": null,
+          "started_at_ms": 1794247143890,
+          "state": "failed"
+        }
+      ],
+      "usage": {
+        "output_bytes": 38818,
+        "read_bytes": 1477,
+        "reads": 5,
+        "starts": 1,
+        "tokens": 0
+      }
+    },
+    "schema_version": 1,
+    "started_at_ms": 1794247143884,
+    "state": "failed"
+  },
+  "progress": {
+    "run_trace": {
+      "deadline": {
+        "configured_ms": 1920000,
+        "effective_ms": 1920000,
+        "elapsed_ms": 14745,
+        "layer": "workflow",
+        "limiting_layer": "workflow",
+        "remaining_ms": 1905254,
+        "started_at_unix_ms": 1794247143884,
+        "triggered_layer": null
+      },
+      "runs": [
+        {
+          "config_generation": 2,
+          "depth": 0,
+          "error": "RUNNER_FAILED",
+          "executor_profile": "editor",
+          "fence": "9089beaeea39a8de9476b6c6db982121f8e05097446abfb8dfd0198629ed2f8e",
+          "finished_at_ms": 1794247158629,
+          "host": "pi",
+          "id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d/run/0",
+          "origin": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+          "parent": null,
+          "started_at_ms": 1794247143890,
+          "state": "failed"
+        }
+      ],
+      "usage": {
+        "output_bytes": 38818,
+        "read_bytes": 1477,
+        "reads": 5,
+        "starts": 1,
+        "tokens": 0
+      }
+    },
+    "state": "failed"
+  },
+  "schema_version": 1,
+  "scratch": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_/akasha-daemon-1861854-0",
+  "source": "controlled caller binding and synthetic fixture; actual authenticated external Pi Runner",
+  "status": "FAILED"
+}

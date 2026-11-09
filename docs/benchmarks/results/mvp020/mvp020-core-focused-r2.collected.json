@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-30T01:36:52.628436+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "460934961009ff41ae1b3def573e81dda4fa7d0e",
+    "log_sha256": "40fa42fd43975604118012c700779ec0d8426706818f0c2f91b7451272f17474",
+    "seconds": 42.30547377374023,
+    "utc": "2026-10-30T01:36:05.961316+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_shared_core"
+}

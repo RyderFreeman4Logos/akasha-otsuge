@@ -98,3 +98,6 @@ bytes remain available under current access checks.
 
 This patch protocol replaces drafts. Incident-triggered suspension, causal
 outcome linking and notification delivery are tracked separately in #21–#23.
+
+Controlled cases, crash recovery and a real native investigation are described
+in [the acceptance record](benchmarks/editor-acceptance.md).

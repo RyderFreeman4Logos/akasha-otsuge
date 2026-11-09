@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-30T01:41:09.874270+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "159aad804c922b2cfd43c29e997321a1fdbfc3ed",
+    "log_sha256": "010ea3d40638a02828198857a4493962eb8078932fe3b202a4b85969069f7c57",
+    "seconds": 3.306788010522723,
+    "utc": "2026-10-30T01:38:36.554650+00:00"
+  },
+  "process_absent": true,
+  "classification": "expected_missing_editor_workflow"
+}

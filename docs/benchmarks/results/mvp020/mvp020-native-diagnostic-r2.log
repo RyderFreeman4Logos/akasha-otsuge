@@ -1,0 +1,26 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.20s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 1 test
+
+thread 'editor_tests::native_editor_actual' (1861855) panicked at tests/support/daemon_editor.rs:159:5:
+assertion `left == right` failed: {"accepted_at_ms":1794247143881,"attempt":1,"cancel_requested":false,"config_digest":"a05e5c3d61e2d00197d3cf15f4dfbda687213541b926f7fe48d52d6e4ee85991","config_generation":2,"consult_plan":{"args":{"hint":null},"config_generation":2,"editor":{"executor":"editor","expires_at_ms":1794250743860,"feedback":"The editable memory claims the fixture passed on all platforms. Investigate the original build evidence and notes.rs. If the evidence establishes an overclaim, submit a precise correction limited to what was actually observed; preserve original scope and do not claim unobserved tests. This is synthetic acceptance data, not a human approval.","invocation_id":"codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4","targets":[{"expected_revision":2,"memory_id":"editable"}]},"executors":{"editor":{"binary":"/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-pi-observer.py","home":"/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_/profile","host":"pi"}},"fence":"9089beaeea39a8de9476b6c6db982121f8e05097446abfb8dfd0198629ed2f8e","invocation_id":"codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4","invocation_revision":91,"native":{"binary":"/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-pi-observer.py","home":"/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_/profile","host":"pi"},"principal":"uid:1001"},"error":"RUNNER_FAILED","execution_budget_ms":1920000,"execution_deadline_ms":1794249063884,"id":"editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d","lease_owner":null,"lease_until_ms":null,"queue_deadline_ms":1794247443881,"request_sha256":"71f25fad2b37abfed1af147d0217fe8e1c03d28b285e9412f3aede6f05e02a5f","result":null,"retry_at_ms":1794247143881,"run_trace":{"deadline":{"configured_ms":1920000,"effective_ms":1920000,"elapsed_ms":14745,"layer":"workflow","limiting_layer":"workflow","remaining_ms":1905254,"started_at_unix_ms":1794247143884,"triggered_layer":null},"runs":[{"config_generation":2,"depth":0,"error":"RUNNER_FAILED","executor_profile":"editor","fence":"9089beaeea39a8de9476b6c6db982121f8e05097446abfb8dfd0198629ed2f8e","finished_at_ms":1794247158629,"host":"pi","id":"editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d/run/0","origin":"codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4","parent":null,"started_at_ms":1794247143890,"state":"failed"}],"usage":{"output_bytes":38818,"read_bytes":1477,"reads":5,"starts":1,"tokens":0}},"schema_version":1,"started_at_ms":1794247143884,"state":"failed"}
+  left: String("failed")
+ right: "succeeded"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test editor_tests::native_editor_actual ... FAILED
+
+failures:
+
+failures:
+    editor_tests::native_editor_actual
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 111 filtered out; finished in 15.54s
+
+error: test failed, to rerun pass `--test daemon`
+{"started_utc": "2026-11-09T17:59:02.865169+00:00", "head": "9b3ce6cb794b5fd3ca14c6043df4da6ae7ca5251", "dirty_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "source": "controlled Caller and synthetic evidence; actual authenticated Pi Runner", "native_binary": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/npm-earendil-works-pi-coding-agent/1.4.0/node_modules/.bin/pi", "native_binary_sha256": "2d6702dd4a52461f50f304bcef3aa0261464ea0b921f72ea7ed6d07df16edef0", "provider": "mp-cpi", "model": "grok-4.7", "endpoint": "http://127.0.0.1:48317/v1", "scratch": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-native-39346f2_", "status": "FAILED", "host_version": "1.4.0", "command": ["cargo", "test", "--locked", "--test", "daemon", "editor_tests::native_editor_actual", "--", "--exact", "--ignored", "--nocapture"], "exit_code": 101, "result_sha256": "dab99179f04b5cebce7affb8899e9cb208f93eb37c5eaafea7b8d18d9f03d319", "binary_sha256": "ce4c5887b50589b219b39df85aad190e261c6ef2d4dca92659a3b4651e835a0c", "owned_live_processes": [], "native_settings_unchanged": true, "scratch_allocated_bytes": 3084288, "scratch_removed": true, "ssd_free_bytes_after": 422543618048, "seconds": 16.686853801831603, "finished_utc": "2026-11-09T17:59:19.557242+00:00"}
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-native-editor.py", line 49, in <module>
+    assert r['exit_code'] == 0 and result.exists()
+           ^^^^^^^^^^^^^^^^^^^
+AssertionError

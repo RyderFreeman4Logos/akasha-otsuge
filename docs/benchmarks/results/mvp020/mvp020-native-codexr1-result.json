@@ -1,0 +1,591 @@
+{
+  "accepted": {
+    "accepted_at_ms": 1794247356022,
+    "attempt": 0,
+    "cancel_requested": false,
+    "config_digest": "e34590c5e0df66486483d467b1ddf4ad0f2a0b25288b5d9d51a8ec7c3e002171",
+    "config_generation": 2,
+    "consult_plan": {
+      "args": {
+        "hint": null
+      },
+      "config_generation": 2,
+      "editor": {
+        "executor": "editor",
+        "expires_at_ms": 1794250956001,
+        "feedback": "The editable memory claims the fixture passed on all platforms. Investigate the original build evidence and notes.rs. If the evidence establishes an overclaim, submit a precise correction limited to what was actually observed; preserve original scope and do not claim unobserved tests. This is synthetic acceptance data, not a human approval.",
+        "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+        "targets": [
+          {
+            "expected_revision": 2,
+            "memory_id": "editable"
+          }
+        ]
+      },
+      "executors": {
+        "editor": {
+          "binary": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a16-codex-pin-hb_jgsqx/codex",
+          "home": "/home/obj/.codex",
+          "host": "codex"
+        }
+      },
+      "fence": "dc35fc0c969a05c8f2830a4895fb526c5272e7d47aebb63b871df3ff31b38286",
+      "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+      "invocation_revision": 91,
+      "native": {
+        "binary": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a16-codex-pin-hb_jgsqx/codex",
+        "home": "/home/obj/.codex",
+        "host": "codex"
+      },
+      "principal": "uid:1001"
+    },
+    "error": null,
+    "execution_budget_ms": 1920000,
+    "execution_deadline_ms": null,
+    "id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d",
+    "lease_owner": null,
+    "lease_until_ms": null,
+    "queue_deadline_ms": 1794247656022,
+    "request_sha256": "54e3d5682f929742bf783c71f2e26cc0e3693ad7e7b079212a28e66126effcaa",
+    "result": null,
+    "retry_at_ms": 1794247356022,
+    "schema_version": 1,
+    "started_at_ms": null,
+    "state": "queued"
+  },
+  "after": {
+    "previous": 2,
+    "record": {
+      "approval": null,
+      "authority": "candidate",
+      "authorization": {
+        "adopt_explicit_decisions": false,
+        "mode": "manual",
+        "scope": {
+          "branch_or_version": null,
+          "project": null,
+          "session": null,
+          "user": "uid:1001"
+        }
+      },
+      "config_generation": 2,
+      "draft": {
+        "assumptions": [],
+        "claim": "The fixture build passed on Linux; other platforms were not tested.",
+        "conditions": [],
+        "kind": "fact",
+        "rationale": "Corrected platform overclaim using the original observation and notes.rs.",
+        "scope": {
+          "branch_or_version": null,
+          "project": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-codex-j8qr4sq_/akasha-daemon-1864852-0/workspace",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "source_spans": [
+          {
+            "content_sha256": "cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8",
+            "end": 34,
+            "event_id": "editable",
+            "revision": 1,
+            "start": 0
+          },
+          {
+            "content_sha256": "48b61a262edd83c3d5a4cbdee3de5d99120924f58c11bed01442674bbd4a88a9",
+            "end": 62,
+            "event_id": "consult-code/d057f289c2754a69c506bd9d9029ded1927a0a9344c77ac0086b9aff96bedc40",
+            "revision": 98,
+            "start": 0
+          }
+        ],
+        "valid_from_ms": null,
+        "valid_until_ms": null
+      },
+      "lifecycle": "candidate",
+      "policy_revision": "memory-editor-v1/e34590c5e0df66486483d467b1ddf4ad0f2a0b25288b5d9d51a8ec7c3e002171",
+      "previous_adoption": 2,
+      "provenance": {
+        "actor": {
+          "id": "external-editor",
+          "kind": "agent"
+        },
+        "binding": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d",
+        "generator": {
+          "model": "native-profile-default",
+          "prompt_version": "memory-editor-v1",
+          "runner": "executor/editor"
+        },
+        "origin": "memory_edit"
+      },
+      "schema_version": 1,
+      "semantic_sha256": "ed062db6386e4a943094341cebe44c849c24ea028b920a90814fa92b19a46062"
+    },
+    "revision": {
+      "commit_seq": 102,
+      "key": {
+        "id": "editable",
+        "kind": "memory"
+      }
+    }
+  },
+  "before": {
+    "previous": null,
+    "record": {
+      "approval": null,
+      "authority": "delegated_approved",
+      "authorization": {
+        "adopt_explicit_decisions": false,
+        "mode": "automatic",
+        "scope": {
+          "branch_or_version": null,
+          "project": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-codex-j8qr4sq_/akasha-daemon-1864852-0/workspace",
+          "session": null,
+          "user": "uid:1001"
+        }
+      },
+      "config_generation": 1,
+      "draft": {
+        "assumptions": [],
+        "claim": "The fixture build passed on all platforms, including Linux, macOS and Windows.",
+        "conditions": [],
+        "kind": "fact",
+        "rationale": "Synthetic retrieval fixture",
+        "scope": {
+          "branch_or_version": null,
+          "project": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-codex-j8qr4sq_/akasha-daemon-1864852-0/workspace",
+          "session": null,
+          "user": "uid:1001"
+        },
+        "source_spans": [
+          {
+            "content_sha256": "cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8",
+            "end": 34,
+            "event_id": "editable",
+            "revision": 1,
+            "start": 0
+          }
+        ],
+        "valid_from_ms": null,
+        "valid_until_ms": null
+      },
+      "lifecycle": "active",
+      "policy_revision": "fixture",
+      "previous_adoption": null,
+      "provenance": {
+        "actor": {
+          "id": "fixture",
+          "kind": "tool"
+        },
+        "binding": "fixture",
+        "generator": null,
+        "origin": "technical_observation"
+      },
+      "schema_version": 1,
+      "semantic_sha256": "f3cc8874b8837476b704e343694bf8519224f3983b4e5ac8447810a52ef48a58"
+    },
+    "revision": {
+      "commit_seq": 2,
+      "key": {
+        "id": "editable",
+        "kind": "memory"
+      }
+    }
+  },
+  "host": "codex",
+  "input": {
+    "executor": "editor",
+    "expires_at_ms": 1794250956001,
+    "feedback": "The editable memory claims the fixture passed on all platforms. Investigate the original build evidence and notes.rs. If the evidence establishes an overclaim, submit a precise correction limited to what was actually observed; preserve original scope and do not claim unobserved tests. This is synthetic acceptance data, not a human approval.",
+    "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+    "targets": [
+      {
+        "expected_revision": 2,
+        "memory_id": "editable"
+      }
+    ]
+  },
+  "job": {
+    "accepted_at_ms": 1794247356022,
+    "attempt": 1,
+    "cancel_requested": false,
+    "config_digest": "e34590c5e0df66486483d467b1ddf4ad0f2a0b25288b5d9d51a8ec7c3e002171",
+    "config_generation": 2,
+    "consult_plan": {
+      "args": {
+        "hint": null
+      },
+      "config_generation": 2,
+      "editor": {
+        "executor": "editor",
+        "expires_at_ms": 1794250956001,
+        "feedback": "The editable memory claims the fixture passed on all platforms. Investigate the original build evidence and notes.rs. If the evidence establishes an overclaim, submit a precise correction limited to what was actually observed; preserve original scope and do not claim unobserved tests. This is synthetic acceptance data, not a human approval.",
+        "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+        "targets": [
+          {
+            "expected_revision": 2,
+            "memory_id": "editable"
+          }
+        ]
+      },
+      "executors": {
+        "editor": {
+          "binary": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a16-codex-pin-hb_jgsqx/codex",
+          "home": "/home/obj/.codex",
+          "host": "codex"
+        }
+      },
+      "fence": "dc35fc0c969a05c8f2830a4895fb526c5272e7d47aebb63b871df3ff31b38286",
+      "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+      "invocation_revision": 91,
+      "native": {
+        "binary": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a16-codex-pin-hb_jgsqx/codex",
+        "home": "/home/obj/.codex",
+        "host": "codex"
+      },
+      "principal": "uid:1001"
+    },
+    "error": null,
+    "execution_budget_ms": 1920000,
+    "execution_deadline_ms": 1794249276024,
+    "id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d",
+    "lease_owner": null,
+    "lease_until_ms": null,
+    "queue_deadline_ms": 1794247656022,
+    "request_sha256": "54e3d5682f929742bf783c71f2e26cc0e3693ad7e7b079212a28e66126effcaa",
+    "result": {
+      "conditions": [
+        "Correction is limited to editable revision 2; no tests were executed."
+      ],
+      "conflicts": [
+        "The memory claims Linux, macOS and Windows success, but its original supports Linux only and notes.rs says other platforms were not tested."
+      ],
+      "deadline": {
+        "configured_ms": 1920000,
+        "effective_ms": 1920000,
+        "elapsed_ms": 48424,
+        "layer": "workflow",
+        "limiting_layer": "workflow",
+        "remaining_ms": 1871575,
+        "started_at_unix_ms": 1794247356024,
+        "triggered_layer": null
+      },
+      "editor": {
+        "classification": "memory_error",
+        "patch": {
+          "changes": [
+            {
+              "draft": {
+                "assumptions": [],
+                "claim": "The fixture build passed on Linux; other platforms were not tested.",
+                "conditions": [],
+                "kind": "fact",
+                "rationale": "Corrected platform overclaim using the original observation and notes.rs.",
+                "scope": {
+                  "branch_or_version": null,
+                  "project": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-codex-j8qr4sq_/akasha-daemon-1864852-0/workspace",
+                  "session": null,
+                  "user": "uid:1001"
+                },
+                "source_spans": [
+                  {
+                    "content_sha256": "cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8",
+                    "end": 34,
+                    "event_id": "editable",
+                    "revision": 1,
+                    "start": 0
+                  },
+                  {
+                    "content_sha256": "48b61a262edd83c3d5a4cbdee3de5d99120924f58c11bed01442674bbd4a88a9",
+                    "end": 62,
+                    "event_id": "consult-code/d057f289c2754a69c506bd9d9029ded1927a0a9344c77ac0086b9aff96bedc40",
+                    "revision": 98,
+                    "start": 0
+                  }
+                ],
+                "valid_from_ms": null,
+                "valid_until_ms": null
+              },
+              "expected_revision": 2,
+              "memory_id": "editable"
+            }
+          ],
+          "evidence": [
+            {
+              "content_sha256": "cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8",
+              "end": 34,
+              "event_id": "editable",
+              "revision": 1,
+              "start": 0
+            },
+            {
+              "content_sha256": "48b61a262edd83c3d5a4cbdee3de5d99120924f58c11bed01442674bbd4a88a9",
+              "end": 62,
+              "event_id": "consult-code/d057f289c2754a69c506bd9d9029ded1927a0a9344c77ac0086b9aff96bedc40",
+              "revision": 98,
+              "start": 0
+            }
+          ],
+          "expires_at_ms": 1794250956001,
+          "reason": "Limit the claim to observed Linux success and explicitly recorded testing limits; preserve the memory's kind and scope.",
+          "scope": {
+            "branch_or_version": null,
+            "project": null,
+            "session": null,
+            "user": "uid:1001"
+          }
+        },
+        "reason": "The original evidence reports only a Linux pass. notes.rs explicitly says other platforms were not tested; the all-platform claim is unsupported."
+      },
+      "editor_checkpoint": {
+        "bytes": 3647,
+        "parts": [
+          {
+            "commit_seq": 100,
+            "key": {
+              "id": "model-blob/09e5e59a1871bb6941f9054d78ab8a2496674b65f5bc9ab12abc7f9f351b938d",
+              "kind": "evidence"
+            }
+          }
+        ],
+        "sha256": "09e5e59a1871bb6941f9054d78ab8a2496674b65f5bc9ab12abc7f9f351b938d"
+      },
+      "evidence": [
+        {
+          "content_sha256": "cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8",
+          "end": 34,
+          "event_id": "editable",
+          "revision": 1,
+          "start": 0
+        },
+        {
+          "content_sha256": "48b61a262edd83c3d5a4cbdee3de5d99120924f58c11bed01442674bbd4a88a9",
+          "end": 62,
+          "event_id": "consult-code/d057f289c2754a69c506bd9d9029ded1927a0a9344c77ac0086b9aff96bedc40",
+          "revision": 98,
+          "start": 0
+        }
+      ],
+      "gaps": [
+        "Memory search was unavailable (INDEX_NOT_READY); the target and its original were retrieved directly."
+      ],
+      "patch_receipt": {
+        "commit_seq": 102,
+        "config_generation": 2,
+        "policy_revision": "memory-editor-v1/e34590c5e0df66486483d467b1ddf4ad0f2a0b25288b5d9d51a8ec7c3e002171",
+        "request_id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d",
+        "request_sha256": "0bc254c5a1d7d86f0ec9fcfa094005a4bb3e2a4109d33364f648bcff3234b716",
+        "revisions": [
+          {
+            "commit_seq": 102,
+            "key": {
+              "id": "editable",
+              "kind": "memory"
+            }
+          },
+          {
+            "commit_seq": 102,
+            "key": {
+              "id": "memory-patch/b9f570092702c5feef54da4da8239aedc423f61b4f934e8d965ec26f09268bae",
+              "kind": "state"
+            }
+          },
+          {
+            "commit_seq": 102,
+            "key": {
+              "id": "review/7c662847da2a322c6ef7db16e51476299892776d05da103635bcfbfbde364cc1",
+              "kind": "state"
+            }
+          }
+        ]
+      },
+      "runs": [
+        {
+          "config_generation": 2,
+          "depth": 0,
+          "executor_profile": "editor",
+          "fence": "dc35fc0c969a05c8f2830a4895fb526c5272e7d47aebb63b871df3ff31b38286",
+          "finished_at_ms": 1794247404444,
+          "host": "codex",
+          "id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d/run/0",
+          "origin": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+          "parent": null,
+          "started_at_ms": 1794247356029,
+          "state": "succeeded"
+        }
+      ],
+      "usage": {
+        "output_bytes": 355735,
+        "read_bytes": 284942,
+        "reads": 9,
+        "starts": 1,
+        "tokens": 69672
+      },
+      "workspace": {
+        "device": 75,
+        "inode": 316309202,
+        "path": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-codex-j8qr4sq_/akasha-daemon-1864852-0/workspace"
+      }
+    },
+    "retry_at_ms": 1794247356022,
+    "run_trace": {
+      "deadline": {
+        "configured_ms": 1920000,
+        "effective_ms": 1920000,
+        "elapsed_ms": 48424,
+        "layer": "workflow",
+        "limiting_layer": "workflow",
+        "remaining_ms": 1871575,
+        "started_at_unix_ms": 1794247356024,
+        "triggered_layer": null
+      },
+      "runs": [
+        {
+          "config_generation": 2,
+          "depth": 0,
+          "executor_profile": "editor",
+          "fence": "dc35fc0c969a05c8f2830a4895fb526c5272e7d47aebb63b871df3ff31b38286",
+          "finished_at_ms": 1794247404444,
+          "host": "codex",
+          "id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d/run/0",
+          "origin": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+          "parent": null,
+          "started_at_ms": 1794247356029,
+          "state": "succeeded"
+        }
+      ],
+      "usage": {
+        "output_bytes": 355735,
+        "read_bytes": 284942,
+        "reads": 9,
+        "starts": 1,
+        "tokens": 69672
+      }
+    },
+    "schema_version": 1,
+    "started_at_ms": 1794247356024,
+    "state": "succeeded"
+  },
+  "patch_audit": {
+    "config_generation": 2,
+    "input_sha256": "8b5e3de29d859d958ba2dd74a42ac83861ea27c33aa11bd82a14d2d07b9fa003",
+    "patch": {
+      "changes": [
+        {
+          "draft": {
+            "assumptions": [],
+            "claim": "The fixture build passed on Linux; other platforms were not tested.",
+            "conditions": [],
+            "kind": "fact",
+            "rationale": "Corrected platform overclaim using the original observation and notes.rs.",
+            "scope": {
+              "branch_or_version": null,
+              "project": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-codex-j8qr4sq_/akasha-daemon-1864852-0/workspace",
+              "session": null,
+              "user": "uid:1001"
+            },
+            "source_spans": [
+              {
+                "content_sha256": "cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8",
+                "end": 34,
+                "event_id": "editable",
+                "revision": 1,
+                "start": 0
+              },
+              {
+                "content_sha256": "48b61a262edd83c3d5a4cbdee3de5d99120924f58c11bed01442674bbd4a88a9",
+                "end": 62,
+                "event_id": "consult-code/d057f289c2754a69c506bd9d9029ded1927a0a9344c77ac0086b9aff96bedc40",
+                "revision": 98,
+                "start": 0
+              }
+            ],
+            "valid_from_ms": null,
+            "valid_until_ms": null
+          },
+          "expected_revision": 2,
+          "memory_id": "editable"
+        }
+      ],
+      "evidence": [
+        {
+          "content_sha256": "cbf4b03d1376ceabcc1b8ccfcc4f2a3abedc5c577167513c3e0e0b44d698d3a8",
+          "end": 34,
+          "event_id": "editable",
+          "revision": 1,
+          "start": 0
+        },
+        {
+          "content_sha256": "48b61a262edd83c3d5a4cbdee3de5d99120924f58c11bed01442674bbd4a88a9",
+          "end": 62,
+          "event_id": "consult-code/d057f289c2754a69c506bd9d9029ded1927a0a9344c77ac0086b9aff96bedc40",
+          "revision": 98,
+          "start": 0
+        }
+      ],
+      "expires_at_ms": 1794250956001,
+      "reason": "Limit the claim to observed Linux success and explicitly recorded testing limits; preserve the memory's kind and scope.",
+      "scope": {
+        "branch_or_version": null,
+        "project": null,
+        "session": null,
+        "user": "uid:1001"
+      }
+    },
+    "policy_revision": "memory-editor-v1/e34590c5e0df66486483d467b1ddf4ad0f2a0b25288b5d9d51a8ec7c3e002171",
+    "principal": "uid:1001",
+    "provenance": {
+      "actor": {
+        "id": "external-editor",
+        "kind": "agent"
+      },
+      "binding": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d",
+      "generator": {
+        "model": "native-profile-default",
+        "prompt_version": "memory-editor-v1",
+        "runner": "executor/editor"
+      },
+      "origin": "memory_edit"
+    },
+    "schema_version": 1
+  },
+  "progress": {
+    "run_trace": {
+      "deadline": {
+        "configured_ms": 1920000,
+        "effective_ms": 1920000,
+        "elapsed_ms": 48424,
+        "layer": "workflow",
+        "limiting_layer": "workflow",
+        "remaining_ms": 1871575,
+        "started_at_unix_ms": 1794247356024,
+        "triggered_layer": null
+      },
+      "runs": [
+        {
+          "config_generation": 2,
+          "depth": 0,
+          "executor_profile": "editor",
+          "fence": "dc35fc0c969a05c8f2830a4895fb526c5272e7d47aebb63b871df3ff31b38286",
+          "finished_at_ms": 1794247404444,
+          "host": "codex",
+          "id": "editor/88f76670c86e6e22e4118c09996c9ebf0dc50cea9a0204f148b5a5ad20c8a66d/run/0",
+          "origin": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+          "parent": null,
+          "started_at_ms": 1794247356029,
+          "state": "succeeded"
+        }
+      ],
+      "usage": {
+        "output_bytes": 355735,
+        "read_bytes": 284942,
+        "reads": 9,
+        "starts": 1,
+        "tokens": 69672
+      }
+    },
+    "state": "succeeded"
+  },
+  "schema_version": 1,
+  "scratch": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a20-codex-j8qr4sq_/akasha-daemon-1864852-0",
+  "source": "controlled caller binding and synthetic fixture; actual authenticated external Runner",
+  "status": "PASS_REAL_NATIVE_EDITOR"
+}

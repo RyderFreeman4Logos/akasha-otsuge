@@ -1,0 +1,66 @@
+diff --git a/tests/support/daemon_editor.rs b/tests/support/daemon_editor.rs
+index ee40395..b9fd243 100644
+--- a/tests/support/daemon_editor.rs
++++ b/tests/support/daemon_editor.rs
+@@ -92,26 +92,30 @@ fn input_scope() -> Value {
+ }
+ 
+ #[test]
+-#[ignore = "requires an explicitly supplied authenticated Pi profile and receipt path"]
++#[ignore = "requires an explicitly supplied authenticated native profile and receipt path"]
+ fn native_editor_actual() {
+-    let binary = PathBuf::from(std::env::var_os("AKASHA_NATIVE_PI_BINARY").unwrap());
+-    let home = PathBuf::from(std::env::var_os("AKASHA_NATIVE_PI_HOME").unwrap());
++    let host = std::env::var("AKASHA_NATIVE_EDITOR_HOST").unwrap();
++    assert!(matches!(host.as_str(), "pi" | "codex"));
++    let binary = PathBuf::from(std::env::var_os("AKASHA_NATIVE_EDITOR_BINARY").unwrap());
++    let home = PathBuf::from(std::env::var_os("AKASHA_NATIVE_EDITOR_HOME").unwrap());
+     let output = PathBuf::from(std::env::var_os("AKASHA_NATIVE_EDITOR_RECEIPT").unwrap());
+     assert!(!output.exists());
+     let (mut daemon, _, bound) =
+         super::codex_tests::consult_fixture_with("editor_actual", |_| String::new());
+     let original = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+-    daemon.configure(&format!("[access]\nread_roots=[{:?},{home:?}]\n[review]\nmode='automatic'\n[consult]\nmax_delegation_depth=0\nmax_runner_starts=1\n[executors.editor]\nkind='pi'\nbinary={binary:?}\nnative_home={home:?}\n",daemon.root));
++    daemon.configure(&format!("[access]\nread_roots=[{:?},{home:?}]\n[review]\nmode='automatic'\n[consult]\nmax_delegation_depth=0\nmax_runner_starts=1\n[executors.editor]\nkind='{host}'\nbinary={binary:?}\nnative_home={home:?}\n",daemon.root));
+     daemon.cli(&["config", "reload"]);
+-    daemon.cli(&[
+-        "adapter",
+-        "install",
+-        "pi",
+-        "--binary",
+-        binary.to_str().unwrap(),
+-        "--agent-dir",
+-        home.to_str().unwrap(),
+-    ]);
++    if host == "pi" {
++        daemon.cli(&[
++            "adapter",
++            "install",
++            "pi",
++            "--binary",
++            binary.to_str().unwrap(),
++            "--agent-dir",
++            home.to_str().unwrap(),
++        ]);
++    }
+     let mut input = feedback(
+         &daemon,
+         &bound,
+@@ -131,7 +135,7 @@ fn native_editor_actual() {
+     ])["data"]
+         .clone();
+     let id = accepted["id"].as_str().unwrap();
+-    let mut receipt = json!({"schema_version":1,"status":"RUNNING","source":"controlled caller binding and synthetic fixture; actual authenticated external Pi Runner","scratch":daemon.root,"input":input,"before":original,"accepted":accepted});
++    let mut receipt = json!({"schema_version":1,"status":"RUNNING","source":"controlled caller binding and synthetic fixture; actual authenticated external Runner","host":host,"scratch":daemon.root,"input":input,"before":original,"accepted":accepted});
+     std::fs::write(&output, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
+     let end = Instant::now()
+         + Duration::from_millis(accepted["execution_budget_ms"].as_u64().unwrap() + 60_000);
+@@ -173,7 +177,7 @@ fn native_editor_actual() {
+     assert_eq!(after["record"]["provenance"]["origin"], "memory_edit");
+     assert!(after["record"]["approval"].is_null());
+     assert_ne!(after["record"]["authority"], "human_confirmed");
+-    assert_eq!(done["run_trace"]["runs"][0]["host"], "pi");
++    assert_eq!(done["run_trace"]["runs"][0]["host"], host);
+     assert_eq!(done["run_trace"]["usage"]["starts"], 1);
+     let patch = daemon.cli(&["patch", "show", id])["data"].clone();
+     assert_eq!(patch["config_generation"], accepted["config_generation"]);

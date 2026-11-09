@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-30T01:42:35.008412+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "159aad804c922b2cfd43c29e997321a1fdbfc3ed",
+    "log_sha256": "f620edc31dbaf2760126bc8713ea5fd52447453e0aafc4f3d785570d6da64597",
+    "seconds": 22.484096691012383,
+    "utc": "2026-10-30T01:42:04.349850+00:00"
+  },
+  "process_absent": true,
+  "classification": "failed_native_workflow"
+}

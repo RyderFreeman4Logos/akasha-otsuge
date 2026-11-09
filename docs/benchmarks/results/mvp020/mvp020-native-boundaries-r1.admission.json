@@ -1,0 +1,37 @@
+{
+  "command": [
+    "/bin/bash",
+    "-c",
+    "cargo test --locked --test daemon editor_tests:: -- --nocapture && cargo test --locked --lib daemon::jobs::consult::editor_tests:: -- --nocapture && cargo test --locked --test daemon codex_tests::consult_ && cargo clippy --locked --all-targets -- -D warnings"
+  ],
+  "dirty_diff_sha256": "226bc541aae577d2cf059bc9757a317dc26ee39fe52a05c916aa11ef66a95393",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "159aad804c922b2cfd43c29e997321a1fdbfc3ed",
+  "process": {
+    "pid": 1469069,
+    "start_ticks": "514271583",
+    "state": "R"
+  },
+  "tree": "9326c665d8fd0495ee47118639ec9e18ba694b17",
+  "untracked": [
+    {
+      "path": "src/daemon/editor_tests.rs",
+      "sha256": "4eb2e038cc14934f3df956c95755d355460e0cd3c790e194f840cec4fc2a921b"
+    },
+    {
+      "path": "src/daemon/editor_workflow.rs",
+      "sha256": "8cea7ce81e43be2b73a5ce07c9697b698222f690df19baf9390c978d3b20a112"
+    },
+    {
+      "path": "src/editor.rs",
+      "sha256": "051848dcc39043da4b62bafad2869dd9353308341f3946f3cec8cc8a1863221d"
+    }
+  ],
+  "utc": "2026-10-30T01:46:59.286656+00:00"
+}
