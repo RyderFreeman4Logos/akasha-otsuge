@@ -7,6 +7,7 @@ pub mod editor;
 pub mod extraction;
 pub mod grill;
 pub mod ipc;
+pub mod outcome;
 pub mod provider;
 pub mod storage;
 

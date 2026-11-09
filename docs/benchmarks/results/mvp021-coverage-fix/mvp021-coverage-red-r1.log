@@ -1,0 +1,21 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp021)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.72s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 1 test
+
+thread 'outcome_tests::outcome_logs_preserve_reduced_and_reported_source_completeness' (2212184) panicked at tests/support/daemon_outcome.rs:750:9:
+assertion `left == right` failed
+  left: Null
+ right: "metadata_only"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test outcome_tests::outcome_logs_preserve_reduced_and_reported_source_completeness ... FAILED
+
+failures:
+
+failures:
+    outcome_tests::outcome_logs_preserve_reduced_and_reported_source_completeness
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 129 filtered out; finished in 0.98s
+
+error: test failed, to rerun pass `--test daemon`

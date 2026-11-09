@@ -393,7 +393,7 @@ impl<'a> Domain<'a> {
         Ok(source)
     }
 
-    fn span(&self, span: &SourceSpan) -> Result<SourceRecord> {
+    pub(crate) fn span(&self, span: &SourceSpan) -> Result<SourceRecord> {
         let source = self.source(&span.event_id, span.revision)?;
         if span.content_sha256 != source.content_sha256
             || span.start >= span.end

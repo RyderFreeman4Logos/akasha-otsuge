@@ -1,0 +1,16 @@
+{
+  "utc": "2026-11-09T21:24:03.274933+00:00",
+  "old_binary_sha256": "c6301d4ec2251812938049e38b3a4bb723cb6f87aba6c53a8916a6a483911403",
+  "command": [
+    "/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+    "clean",
+    "--package",
+    "akasha-otsuge",
+    "--release"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "     Removed 17 files, 564.2MiB total\n",
+  "sole_consumers_absent": true,
+  "scope": "owned package release artifacts only; dependencies and sccache retained"
+}

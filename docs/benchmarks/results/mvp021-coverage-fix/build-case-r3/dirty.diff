@@ -1,0 +1,7 @@
+diff --git a/main.rs b/main.rs
+index f328e4d..2ada3f8 100644
+--- a/main.rs
++++ b/main.rs
+@@ -1 +1 @@
+-fn main() {}
++fn main() { does_not_exist(); }

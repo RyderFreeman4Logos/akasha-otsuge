@@ -1,0 +1,8 @@
+{
+  "base_commit": "62e1a36c1aff3a8979ee920f6dbe7efb494de98f",
+  "diff_sha256": "6d9df607dc6f57ea9d7e48b9715f6762292be269e3e7f95413219965e048df2f",
+  "first_untracked_input": "first uncommitted input",
+  "fixture": "controlled Caller/Consult; actual Rust compiler and command exit; no authenticated model claim",
+  "second_untracked_input": "second uncommitted input",
+  "stdout_sha256": "25f83a9d05bad98e52dbf5f2ee8cd4dd5a08732ebcb91b4f80f04751f15a9d03"
+}

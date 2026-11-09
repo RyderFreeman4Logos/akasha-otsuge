@@ -4,6 +4,7 @@ use std::process::ExitCode;
 
 use akasha_otsuge::config::{self, Paths};
 use akasha_otsuge::ipc::{self, Command, Error, Request, Result};
+mod outcome_command;
 
 const HELP: &str = "akasha-otsuge — local, traceable cross-agent memory
 
@@ -42,6 +43,10 @@ Commands:
   job show|cancel ID
   job list [--after KEY]
   consult show JOB_ID
+  outcome submit EVENT_JSON
+  outcome show EVENT_ID
+  outcome run PLAN_JSON -- COMMAND [ARGS]
+  outcome log EVENT_ID INDEX [--start BYTE_OFFSET]
   editor run FEEDBACK_JSON --idempotency-key ID
   consult receipt JOB_ID [--full]
   consult original JOB_ID SOURCE_INDEX [--start BYTE_OFFSET]
@@ -467,6 +472,26 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             })
         }
         ["job", "show", id] => Some(Command::JobShow { id: (*id).into() }),
+        ["outcome", "run", _, "--", _, ..] => None,
+        ["outcome", "log", id, index, flags @ ..] => {
+            let flags = options(flags, &["--start"])?;
+            Some(Command::OutcomeLog {
+                id: (*id).into(),
+                index: usize::try_from(number(index)?).map_err(|_| Error("INVALID_ARGUMENT"))?,
+                start: usize::try_from(
+                    flags
+                        .get("--start")
+                        .map(|v| number(v))
+                        .transpose()?
+                        .unwrap_or(0),
+                )
+                .map_err(|_| Error("INVALID_ARGUMENT"))?,
+            })
+        }
+        ["outcome", "submit", path] => Some(Command::OutcomeSubmit {
+            event: json_file_limit(path, akasha_otsuge::outcome::MAX_EVENT_BYTES)?,
+        }),
+        ["outcome", "show", id] => Some(Command::OutcomeShow { id: (*id).into() }),
         ["consult", "show", id] => Some(Command::ConsultShow { id: (*id).into() }),
         ["consult", "receipt", id] => Some(Command::ConsultReceipt {
             id: (*id).into(),
@@ -609,6 +634,28 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         "",
         &defaults,
     )?;
+    if let ["outcome", "run", path, "--", argv @ ..] = command.as_slice() {
+        let plan = json_file_limit(path, akasha_otsuge::outcome::MAX_EVENT_BYTES)?;
+        let socket = socket
+            .as_deref()
+            .unwrap_or(&resolved.config().paths.socket_path);
+        let (code, value, failed) =
+            match outcome_command::run(socket, plan, argv.iter().map(|v| (*v).into()).collect())
+                .await
+            {
+                Ok((code, record)) => (
+                    code,
+                    serde_json::json!({"schema_version":1,"data":record}),
+                    false,
+                ),
+                Err(outcome_command::Failure::Local(error)) => return Err(error),
+                Err(outcome_command::Failure::Remote(value)) => (1, value, true),
+            };
+        let mut bytes = serde_json::to_vec(&value)?;
+        bytes.push(b'\n');
+        output(&bytes, failed)?;
+        return Ok(code);
+    }
     if let Some((host, flags)) = install_flags {
         let path = |key| {
             flags

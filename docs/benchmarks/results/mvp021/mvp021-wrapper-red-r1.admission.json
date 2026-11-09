@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--test",
+    "daemon",
+    "outcome_tests::outcome_wrapper_records_dirty_builds_and_retains_full_logs_without_claiming_causality",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "dirty_diff_sha256": "89e08ca23fd57272d13495b21e0531b65156fe596a8b26e9b5ac2b1081d4fbd3",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "393ea9669d635bfb0391349240d6b4c627f82174",
+  "process": {
+    "pid": 2155086,
+    "start_ticks": "607552724",
+    "state": "R"
+  },
+  "tree": "f384d13826baccec6224595b2e0f69c14f014e8d",
+  "untracked": [],
+  "utc": "2026-11-09T20:53:50.254862+00:00"
+}

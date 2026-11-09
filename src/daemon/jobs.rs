@@ -22,6 +22,8 @@ mod grill;
 mod grill_tests;
 #[path = "models.rs"]
 mod models;
+#[path = "outcome.rs"]
+mod outcome;
 #[path = "retrieval.rs"]
 mod retrieval;
 

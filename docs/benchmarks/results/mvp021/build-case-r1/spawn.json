@@ -1,0 +1,153 @@
+{
+  "caller": {
+    "adapter": "codex",
+    "agent": "main",
+    "profile": "default",
+    "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+    "thread": "01a184c7-1cbf-7093-af67-23202f7dceeb"
+  },
+  "config_generation": 1,
+  "event": {
+    "artifacts": [],
+    "claims": [],
+    "event_id": "environment-failure",
+    "execution": {
+      "after": {
+        "base_commit": "6f80b9f643c68b11e113822a3543c3b9b6f43ff5",
+        "diff_sha256": "6d9df607dc6f57ea9d7e48b9715f6762292be269e3e7f95413219965e048df2f",
+        "gaps": [],
+        "index_sha256": "7e84158e5b27fe6bacc5992e1b7693eb2f6251101bcc73874f5dfa8c46145a57",
+        "tree_sha256": "ebcc5b56e55969d9296689bc1c99b9a34133eea764c4409402dbff2b5411d159"
+      },
+      "argv": [
+        "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/akasha-daemon-2179269-2/workspace/missing-executable"
+      ],
+      "before": {
+        "base_commit": "6f80b9f643c68b11e113822a3543c3b9b6f43ff5",
+        "diff_sha256": "6d9df607dc6f57ea9d7e48b9715f6762292be269e3e7f95413219965e048df2f",
+        "gaps": [],
+        "index_sha256": "7e84158e5b27fe6bacc5992e1b7693eb2f6251101bcc73874f5dfa8c46145a57",
+        "tree_sha256": "ebcc5b56e55969d9296689bc1c99b9a34133eea764c4409402dbff2b5411d159"
+      },
+      "exit_code": null,
+      "finished_at_ms": 1794259111558,
+      "signal": null,
+      "spawn_error": "No such file or directory (os error 2)",
+      "started_at_ms": 1794259111558,
+      "workspace": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/akasha-daemon-2179269-2/workspace"
+    },
+    "invocation_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+    "logs": [
+      {
+        "reference": {
+          "event_id": "Stdout/0",
+          "source": {
+            "adapter": "outcome-wrapper",
+            "agent": "main",
+            "profile": "default",
+            "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+            "thread": "13f0a22eb8f572021045edcc228b9910b553ae97e22792450c69ba2bef25607f"
+          }
+        },
+        "stream": "stdout"
+      },
+      {
+        "reference": {
+          "event_id": "Stderr/0",
+          "source": {
+            "adapter": "outcome-wrapper",
+            "agent": "main",
+            "profile": "default",
+            "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+            "thread": "13f0a22eb8f572021045edcc228b9910b553ae97e22792450c69ba2bef25607f"
+          }
+        },
+        "stream": "stderr"
+      }
+    ],
+    "occurred_at_ms": 1794259111558,
+    "receipt_jobs": [
+      "consult/fa70f01f31de8f7d5bdca94fa191133807a0cb66af598984592ac65c3689548e"
+    ],
+    "severity": "info",
+    "source": "command-wrapper"
+  },
+  "invocation_revision": 95,
+  "links": [
+    {
+      "job_id": "consult/fa70f01f31de8f7d5bdca94fa191133807a0cb66af598984592ac65c3689548e",
+      "memory": {
+        "commit_seq": 2,
+        "key": {
+          "id": "offline",
+          "kind": "memory"
+        }
+      },
+      "receipt_id": "consult-result/fdb708b3cfc00c9bdee874f5602a5b0e551440ef2b759fa1f903ad676482168b",
+      "relation": "attached"
+    }
+  ],
+  "logs": [
+    {
+      "bytes": 0,
+      "preview": "",
+      "preview_encoding": "utf8_lossy",
+      "preview_truncated": false,
+      "revision": 133,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": {
+        "reference": {
+          "event_id": "Stdout/0",
+          "source": {
+            "adapter": "outcome-wrapper",
+            "agent": "main",
+            "profile": "default",
+            "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+            "thread": "13f0a22eb8f572021045edcc228b9910b553ae97e22792450c69ba2bef25607f"
+          }
+        },
+        "stream": "stdout"
+      }
+    },
+    {
+      "bytes": 0,
+      "preview": "",
+      "preview_encoding": "utf8_lossy",
+      "preview_truncated": false,
+      "revision": 135,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": {
+        "reference": {
+          "event_id": "Stderr/0",
+          "source": {
+            "adapter": "outcome-wrapper",
+            "agent": "main",
+            "profile": "default",
+            "session": "01a184c7-1cbf-7093-af67-23202f7dceeb",
+            "thread": "13f0a22eb8f572021045edcc228b9910b553ae97e22792450c69ba2bef25607f"
+          }
+        },
+        "stream": "stderr"
+      }
+    }
+  ],
+  "receipts": [
+    {
+      "delivery": {
+        "phase": "prepared"
+      },
+      "job_id": "consult/fa70f01f31de8f7d5bdca94fa191133807a0cb66af598984592ac65c3689548e",
+      "output_sha256": "bd41918cad78a031a10a08e6e18bf9af054fcb3d3bbbc1427322f9ae6f476270",
+      "receipt_id": "consult-result/fdb708b3cfc00c9bdee874f5602a5b0e551440ef2b759fa1f903ad676482168b",
+      "revision": 111
+    }
+  ],
+  "run_id": "codex/b81fb78f698b10bf09e3d6f1371979c6d7fcbece1cf2946fbde9ddf905eda4a4",
+  "schema_version": 1,
+  "scope": {
+    "branch_or_version": null,
+    "project": null,
+    "session": null,
+    "user": "uid:1001"
+  }
+}
