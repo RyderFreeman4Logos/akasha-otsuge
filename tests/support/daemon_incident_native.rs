@@ -34,18 +34,12 @@ fn prepare(daemon: &Daemon) {
     )
     .unwrap();
     std::fs::write(
-        workspace.join("main.rs"),
-        "mod client; fn main() { println!(\"{}\", client::connect_legacy()); }\n",
-    )
-    .unwrap();
-    std::fs::write(
         workspace.join("fixed.rs"),
         "mod client; fn main() { println!(\"{}\", client::connect()); }\n",
     )
     .unwrap();
     std::fs::write(workspace.join("notes.rs"), "// Controlled API v2 fixture. client.rs defines the available API.\n// main.rs is deliberately constructed from the api-current memory's old function name.\n// fixed.rs is an independent compilation control; API v1 history must remain unchanged.\n").unwrap();
     std::fs::write(workspace.join(".gitignore"), "/app\n/fixed-app\n").unwrap();
-    commit_fixture(&workspace);
 }
 
 fn executor_settings(binary: &std::path::Path, home: &std::path::Path) -> String {
@@ -71,6 +65,22 @@ fn native_profile_configuration_precedes_binding_without_authentication() {
 }
 
 fn plan(daemon: &Daemon, bound: &Value, original: &Value) -> PathBuf {
+    let remembered_call = original["record"]["draft"]["claim"]
+        .as_str()
+        .unwrap()
+        .split_once("; call ")
+        .unwrap()
+        .1
+        .strip_suffix(" to connect.")
+        .unwrap();
+    assert_eq!(remembered_call, "client::connect_legacy()");
+    let workspace = daemon.root.join("workspace");
+    std::fs::write(
+        workspace.join("main.rs"),
+        format!("mod client; fn main() {{ println!(\"{{}}\", {remembered_call}); }}\n"),
+    )
+    .unwrap();
+    commit_fixture(&workspace);
     let file = daemon.root.join("old-api.json");
     std::fs::write(&file,serde_json::to_vec(&json!({
         "event_id":"old-api-failure","invocation_id":bound["data"]["invocation_id"],"artifacts":[],
@@ -126,6 +136,7 @@ fn old_api_fixture_has_independent_compile_controls_and_separate_version_history
         original["record"]["draft"]["scope"]["branch_or_version"],
         "v2"
     );
+    scoped_search_preflight(&daemon, &bound, &original);
     let record = compile_failure(&daemon, &plan(&daemon, &bound, &original));
     assert!(record.get("incident").is_none());
     let workspace = daemon.root.join("workspace");
@@ -176,6 +187,54 @@ fn job(daemon: &Daemon, id: &str, output: &std::path::Path, receipt: &mut Value)
     }
 }
 
+fn scoped_search_preflight(daemon: &Daemon, bound: &Value, original: &Value) -> Value {
+    let output = daemon.root.join("scope-preflight.json");
+    let mut receipt = json!({});
+    daemon.cli(&["index", "sync", "--idempotency-key", "scope-index"]);
+    assert_eq!(
+        job(daemon, "scope-index", &output, &mut receipt)["state"],
+        "succeeded"
+    );
+    let historical = daemon.cli(&["memory", "export", "api-v1"])["data"].clone();
+    for (id, scope, expected) in [
+        ("scope-owner", &bound["data"]["scope"], None),
+        (
+            "scope-v2",
+            &original["record"]["draft"]["scope"],
+            Some("api-current"),
+        ),
+        (
+            "scope-v1",
+            &historical["record"]["draft"]["scope"],
+            Some("api-v1"),
+        ),
+    ] {
+        let file = daemon.root.join(format!("{id}.json"));
+        std::fs::write(&file, serde_json::to_vec(scope).unwrap()).unwrap();
+        daemon.cli(&[
+            "search",
+            "connect_legacy",
+            "--scope",
+            file.to_str().unwrap(),
+            "--idempotency-key",
+            id,
+        ]);
+        let finished = job(daemon, id, &output, &mut receipt);
+        assert_eq!(finished["state"], "succeeded", "{finished}");
+        let result: Value =
+            serde_json::from_str(finished["result"]["output"].as_str().unwrap()).unwrap();
+        let ids: Vec<_> = result["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|item| item["memory"]["revision"]["key"]["id"].as_str().unwrap())
+            .collect();
+        assert_eq!(ids, expected.into_iter().collect::<Vec<_>>(), "{result}");
+        receipt[id] = result;
+    }
+    receipt
+}
+
 #[test]
 #[ignore = "requires an explicitly supplied authenticated Codex profile and evidence path"]
 fn native_incident_actual() {
@@ -184,60 +243,25 @@ fn native_incident_actual() {
     let output = PathBuf::from(std::env::var_os("AKASHA_NATIVE_INCIDENT_RECEIPT").unwrap());
     assert!(!output.exists());
     let settings = executor_settings(&binary, &home);
-    let (mut daemon, mut call, bound) = fixture(&settings);
+    let (mut daemon, _, bound) = fixture(&settings);
     let original = daemon.cli(&["memory", "export", "api-current"])["data"].clone();
     let historical = daemon.cli(&["memory", "export", "api-v1"])["data"].clone();
     let unrelated = daemon.cli(&["memory", "export", "editable"])["data"].clone();
-    let mut receipt = json!({"schema_version":1,"status":"RUNNING","source":"controlled Caller and deliberately constructed old-API program; actual authenticated Codex Consult and investigator, actual rustc failure and successful independent control","scratch":daemon.root,"before":original,"historical_before":historical,"unrelated_before":unrelated});
+    let mut receipt = json!({"schema_version":1,"status":"RUNNING","source":"controlled Caller; program built from exported v2 memory; actual authenticated Codex investigator, actual rustc failure and successful independent control; no native recall claim","scratch":daemon.root,"before":original,"historical_before":historical,"unrelated_before":unrelated});
     save(&output, &receipt);
     daemon.configure(&format!(
         "[access]\nread_roots=[{:?},{home:?}]\n[consult]\nmax_delegation_depth=0\n{settings}",
         daemon.root
     ));
     daemon.cli(&["config", "reload"]);
-    daemon.cli(&[
-        "index",
-        "sync",
-        "--idempotency-key",
-        "incident-native-index",
-    ]);
-    assert_eq!(
-        job(&daemon, "incident-native-index", &output, &mut receipt)["state"],
-        "succeeded"
-    );
-    call["args"]["hint"] = json!(
-        "For the controlled fixture API v2 compatibility task, search connect_legacy and expand api-current at its returned revision. Report the remembered claim and original evidence, with that memory in the structured memories list. Keep API v1 and v2 distinct. This is a read-only recall, not approval to change memory. The main request is the synthetic native hook fixture."
-    );
-    let accepted = rpc(&daemon, json!({"op":"codex","event":call}));
-    assert!(accepted.get("error").is_none(), "{accepted}");
-    assert_eq!(
-        accepted["data"]["consult_plan"]["executors"]["investigator"]["binary"],
-        json!(binary),
-        "the Caller must pin the intended native profile before recall"
-    );
-    let recalled = job(
-        &daemon,
-        accepted["data"]["id"].as_str().unwrap(),
-        &output,
-        &mut receipt,
-    );
-    receipt["recall_job"] = recalled.clone();
+    receipt["scope_preflight"] = scoped_search_preflight(&daemon, &bound, &original);
     receipt["status"] = json!("FAILED");
     save(&output, &receipt);
-    assert_eq!(recalled["state"], "succeeded", "{recalled}");
     let file = plan(&daemon, &bound, &original);
     let outcome = compile_failure(&daemon, &file);
     receipt["outcome"] = outcome.clone();
     save(&output, &receipt);
-    assert!(
-        outcome["links"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|link| link["memory"]["key"]["id"] == "api-current"
-                && link["memory"]["commit_seq"] == original["revision"]["commit_seq"]),
-        "{outcome}"
-    );
+    assert!(outcome["links"].as_array().unwrap().is_empty());
     let incident_id = outcome["incident"].as_str().unwrap();
     let end = Instant::now() + Duration::from_secs(300);
     let admitted = loop {
