@@ -33,7 +33,11 @@ pub(super) fn consult_fixture_with(
         | "conclusion_delegate_gap" => 2,
         _ => 1,
     };
-    let depth = if scenario == "delegate_tree" { 2 } else { 1 };
+    let depth = match scenario {
+        "delegate_tree" => 2,
+        "editor_incident_actual" => 0,
+        _ => 1,
+    };
     daemon.configure(&format!("[access]\nread_roots=[{workspace:?},{home:?}]\n[runtime]\nmax_concurrent_jobs={concurrency}\n[consult]\nmax_delegation_depth={depth}\n{}", settings(&daemon.root)));
     let binary = daemon.root.join("codex");
     let host = include_str!("../fixtures/codex/0.164.0/runner_host.py")
