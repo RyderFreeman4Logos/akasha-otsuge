@@ -423,6 +423,8 @@ fn outcome_wrapper_records_dirty_builds_and_retains_full_logs_without_claiming_c
     );
     assert!(first["logs"][0]["preview"].as_str().unwrap().len() <= 4096);
     assert_eq!(first["logs"][0]["preview_truncated"], true);
+    assert!(first["logs"].as_array().unwrap().iter().all(|log|
+        log["coverage"] == "available_payloads" && log["completeness"] == "complete"));
     assert!(
         first["logs"][1]["preview"]
             .as_str()
@@ -443,6 +445,8 @@ fn outcome_wrapper_records_dirty_builds_and_retains_full_logs_without_claiming_c
             &start.to_string(),
         ]);
         let data = &part["data"];
+        assert_eq!(data["coverage"], "available_payloads");
+        assert_eq!(data["completeness"], "complete");
         let raw = data["raw_hex"].as_str().unwrap();
         assert!(raw.len() <= 64 * 1024);
         bytes.extend(
@@ -689,4 +693,156 @@ fn outcome_wrapper_retains_failures_with_missing_artifacts_and_binary_log_parts(
     ] {
         assert_eq!(rpc(&daemon, command)["error"]["code"], "READ_DENIED");
     }
+}
+
+#[test]
+fn outcome_logs_preserve_reduced_and_reported_source_completeness() {
+    let (mut daemon, _, binding) =
+        super::codex_tests::consult_fixture_with("research", |_| String::new());
+    for (index, (coverage, reported, expected)) in [
+        ("metadata_only", None, "partial"),
+        ("unavailable", Some("complete"), "partial"),
+        ("visible_text", Some("complete"), "partial"),
+        ("available_payloads", None, "unknown"),
+        ("available_payloads", Some("partial"), "partial"),
+        ("available_payloads", Some("complete"), "complete"),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let source = json!({"adapter":"coverage-fixture","profile":"test","session":"coverage",
+            "thread":format!("case-{index}"),"agent":"tool"});
+        let capture = json!({"source":source,"scope":{"user":format!("uid:{}",rustix::process::geteuid().as_raw()),
+            "project":null,"branch_or_version":null,"session":null},"stream":"logs","coverage":coverage});
+        let binding_path = daemon.root.join(format!("capture-binding-{index}.json"));
+        std::fs::write(&binding_path, serde_json::to_vec(&capture).unwrap()).unwrap();
+        let raw = if index < 2 {
+            b"".as_slice()
+        } else {
+            b"retained prefix".as_slice()
+        };
+        let input = daemon
+            .root
+            .join("workspace")
+            .join(format!("capture-{index}.jsonl"));
+        let frame = json!({"schema_version":1,"event":{"event_id":"part","source_version":"1",
+            "runtime_instance":"fixture","branch":"main","parent":null,"fork_cutoff":null,
+            "event_time_ms":null,"observed_time_ms":1,"visibility":"tool","kind":{"kind":"execution"},
+            "text":String::from_utf8_lossy(raw)},"raw_hex":akasha_otsuge::capture::encode_hex(raw)});
+        std::fs::write(&input, format!("{frame}\n")).unwrap();
+        let id = format!("coverage-{index}");
+        daemon.cli(&[
+            "capture",
+            "reconcile",
+            binding_path.to_str().unwrap(),
+            input.to_str().unwrap(),
+            "--idempotency-key",
+            &id,
+        ]);
+        finished(&daemon, &id);
+        let mut log = json!({"stream":"stdout","reference":{"source":source,"event_id":"part"}});
+        if let Some(reported) = reported {
+            log["completeness"] = json!(reported);
+        }
+        let event = json!({"event_id":id,"invocation_id":binding["data"]["invocation_id"],"source":"test-framework",
+            "severity":"info","occurred_at_ms":akasha_otsuge::ipc::now_ms().unwrap(),"execution":null,
+            "artifacts":[],"logs":[log],"receipt_jobs":[],"claims":[]});
+        let command = json!({"op":"outcome_submit","event":event});
+        let accepted = rpc(&daemon, command.clone());
+        assert!(accepted.get("error").is_none(), "{accepted}");
+        let shown = daemon.cli(&["outcome", "show", &id])["data"].clone();
+        assert_eq!(shown["logs"][0]["coverage"], coverage);
+        assert_eq!(shown["logs"][0]["completeness"], expected);
+        assert_eq!(shown["logs"][0]["bytes"], raw.len());
+        assert_eq!(shown["logs"][0]["preview_truncated"], false);
+        let page = daemon.cli(&["outcome", "log", &id, "0"]);
+        assert_eq!(page["data"]["coverage"], coverage);
+        assert_eq!(page["data"]["completeness"], expected);
+        assert_eq!(
+            page["data"]["raw_hex"],
+            akasha_otsuge::capture::encode_hex(raw)
+        );
+        assert_eq!(rpc(&daemon, command)["data"], accepted["data"]);
+    }
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    // Seed the older projection shape while the sole daemon writer is stopped.
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            use akasha_otsuge::{
+                config::{Paths, resolve},
+                storage::{Change, CommitRequest, RecordKey, RecordKind, Storage},
+            };
+            use sha2::{Digest, Sha256};
+            let key = |id: &str| RecordKey {
+                kind: RecordKind::Evidence,
+                id: format!(
+                    "outcome/{}",
+                    akasha_otsuge::capture::encode_hex(&Sha256::digest(id.as_bytes()))
+                ),
+            };
+            let config = resolve(
+                "",
+                None,
+                "",
+                &Paths {
+                    data_dir: daemon.root.join("data"),
+                    socket_path: daemon.socket(),
+                },
+            )
+            .unwrap();
+            let store = Storage::open(&config).await.unwrap();
+            for index in [0, 3] {
+                let old = store
+                    .current(&key(&format!("coverage-{index}")))
+                    .unwrap()
+                    .unwrap();
+                let mut record: Value = serde_json::from_str(&old.content).unwrap();
+                record["logs"][0]
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("coverage");
+                record["logs"][0]
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("completeness");
+                let id = format!("legacy-coverage-{index}");
+                record["event"]["event_id"] = json!(id);
+                let key = key(&id);
+                store
+                    .commit(&CommitRequest {
+                        request_id: key.id.clone(),
+                        config_generation: record["config_generation"].as_u64().unwrap(),
+                        policy_revision: None,
+                        changes: vec![Change {
+                            key,
+                            expected_revision: None,
+                            content: serde_json::to_string(&record).unwrap(),
+                        }],
+                    })
+                    .await
+                    .unwrap();
+            }
+            store.close().await.unwrap();
+        });
+    daemon.start();
+    assert_eq!(
+        daemon.cli(&["outcome", "show", "coverage-0"])["data"]["logs"][0]["completeness"],
+        "partial"
+    );
+    assert_eq!(
+        daemon.cli(&["outcome", "show", "legacy-coverage-0"])["data"]["logs"][0]["completeness"],
+        "partial"
+    );
+    assert_eq!(
+        daemon.cli(&["outcome", "log", "legacy-coverage-3", "0"])["data"]["completeness"],
+        "unknown"
+    );
+    assert_eq!(
+        daemon.cli(&["outcome", "log", "coverage-5", "0"])["data"]["completeness"],
+        "complete"
+    );
 }

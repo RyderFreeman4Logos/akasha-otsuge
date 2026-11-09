@@ -1,5 +1,5 @@
 //! Attributed execution observations; a receipt or an exit code is not causal proof.
-use crate::capture::{EventRef, SourceIdentity};
+use crate::capture::{CoverageLevel, EventRef, SourceIdentity};
 use crate::domain::{DeliveryPhase, Scope, SourceSpan};
 use crate::ipc::{Error, Result, identifier};
 use crate::storage::{RecordKind, RevisionRef};
@@ -151,11 +151,36 @@ pub enum Stream {
     Stderr,
 }
 
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LogCompleteness {
+    Complete,
+    Partial,
+    #[default]
+    Unknown,
+}
+
+impl LogCompleteness {
+    fn is_unknown(&self) -> bool {
+        *self == Self::Unknown
+    }
+
+    pub(crate) fn with_coverage(self, coverage: CoverageLevel) -> Self {
+        if coverage == CoverageLevel::AvailablePayloads {
+            self
+        } else {
+            Self::Partial
+        }
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct LogRef {
     pub stream: Stream,
     pub reference: EventRef,
+    #[serde(default, skip_serializing_if = "LogCompleteness::is_unknown")]
+    pub completeness: LogCompleteness,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -209,6 +234,11 @@ pub struct Log {
     pub preview: String,
     pub preview_truncated: bool,
     pub preview_encoding: String,
+    /// Absent only in legacy stored projections; readers recover the pinned Capture value.
+    #[serde(default)]
+    pub coverage: Option<CoverageLevel>,
+    #[serde(default)]
+    pub completeness: LogCompleteness,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

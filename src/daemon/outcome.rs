@@ -199,6 +199,8 @@ impl Service {
                     preview,
                     preview_truncated: truncated,
                     preview_encoding: "utf8_lossy".into(),
+                    coverage: Some(view.event.coverage),
+                    completeness: source.completeness.with_coverage(view.event.coverage),
                 });
             }
             let record = outcome::Record {
@@ -255,7 +257,7 @@ impl Service {
             .storage
             .current(&outcome_key(id)?)?
             .ok_or(Error("OUTCOME_NOT_FOUND"))?;
-        let record: outcome::Record = serde_json::from_str(&row.content)?;
+        let mut record: outcome::Record = serde_json::from_str(&row.content)?;
         if record.schema_version != 1
             || record.event.event_id != id
             || record.run_id != record.event.invocation_id
@@ -275,14 +277,24 @@ impl Service {
             .await?;
         self.outcome_claims(&record.event, &invocation, &receipts)?;
         let events = self.outcome_log_events(&record.event, &invocation)?;
-        if events.len() != record.logs.len()
-            || events.iter().zip(&record.logs).any(|(view, log)| {
-                view.revision != log.revision
-                    || view.event.raw_sha256 != log.sha256
-                    || view.event.raw_bytes != log.bytes
-            })
-        {
+        if events.len() != record.logs.len() {
             return Err(Error("OUTCOME_CORRUPT"));
+        }
+        for ((source, view), log) in record.event.logs.iter().zip(&events).zip(&mut record.logs) {
+            let completeness = source.completeness.with_coverage(view.event.coverage);
+            if log.source != *source
+                || view.revision != log.revision
+                || view.event.raw_sha256 != log.sha256
+                || view.event.raw_bytes != log.bytes
+                || log
+                    .coverage
+                    .is_some_and(|c| c != view.event.coverage || log.completeness != completeness)
+            {
+                return Err(Error("OUTCOME_CORRUPT"));
+            }
+            // Older records never asserted completeness; preserve their uncertainty on read.
+            log.coverage = Some(view.event.coverage);
+            log.completeness = completeness;
         }
         Ok(record)
     }
@@ -392,7 +404,8 @@ impl Service {
         let end = start.saturating_add(32 * 1024).min(raw.len());
         Ok(
             json!({"source":log.source,"revision":log.revision,"sha256":log.sha256,
-            "total_bytes":raw.len(),"start":start,"raw_hex":crate::capture::encode_hex(&raw[start..end]),
+            "total_bytes":raw.len(),"coverage":log.coverage,"completeness":log.completeness,
+            "start":start,"raw_hex":crate::capture::encode_hex(&raw[start..end]),
             "next_start":(end < raw.len()).then_some(end)}),
         )
     }

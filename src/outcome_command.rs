@@ -242,7 +242,11 @@ pub(super) async fn run(socket: &Path, plan: RunPlan, argv: Vec<String>) -> Resu
                 )
                 .await?,
             )?;
-            event.logs.push(LogRef { stream, reference });
+            event.logs.push(LogRef {
+                stream,
+                reference,
+                completeness: outcome::LogCompleteness::Complete,
+            });
             remaining -= bytes.len() as u64;
             part += 1;
             if remaining == 0 {

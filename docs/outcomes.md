@@ -50,6 +50,16 @@ archive, with exact event/revision/hash references. A truncated preview retains
 its complete source locator. If source capture itself is incomplete, the outcome
 must say so; it cannot call the retained prefix a complete log.
 
+Every log and log page includes the immutable Capture `coverage` and effective
+`completeness`. A structured log reference may report `complete`, `partial`
+or `unknown`; omission means unknown. Metadata-only, unavailable and visible-text
+sources always remain partial, even when the caller claims complete. An
+available-payload source keeps the caller's completeness report. Thus an empty
+retained payload does not imply an actually empty complete log. Preview truncation
+is independent of source completeness. The wrapper reports complete only for each
+fully retained part of its observed output. Legacy records recover coverage from
+their pinned Capture event and keep unspecified completeness unknown.
+
 ## Command wrapper
 
 Create a JSON plan with `event_id`, the verified Caller `invocation_id`, and an
