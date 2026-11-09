@@ -421,6 +421,114 @@ async fn research_retains_errors_after_a_successful_dispatch_without_swallowing_
 }
 
 #[tokio::test]
+async fn incident_context_reserves_read_budget_before_outcome_payload_access() {
+    use crate::adapter::{
+        ContextRequest, ContextResponse, ContextSource, ErrorCode, MAX_FRAME_BYTES,
+    };
+    use std::sync::atomic::Ordering;
+    let root = std::env::temp_dir().join(format!("akasha-incident-budget-{}", std::process::id()));
+    private_dir(&root).unwrap();
+    let _cleanup = tests::Fixture(root.clone());
+    let settings = format!(
+        "[incidents]\nexecutor='editor'\ntriggers=['user_correction']\n[executors.editor]\nkind='codex'\nbinary='/unused-native'\nnative_home={root:?}\n"
+    );
+    setup(&root, &settings, false).await;
+    let (service, _) = tests::service_at(&root, &settings).await;
+    service.submit_outcome(serde_json::from_value(json!({
+        "event_id":"budget-probe","invocation_id":"bound","source":"controlled-budget","severity":"warning",
+        "occurred_at_ms":ipc::now_ms().unwrap(),"execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+        "incident":{"kind":"user_correction","key":"budget-probe","reason":"Read only within the admitted budget."}
+    })).unwrap()).await.unwrap();
+    let incident_id = service
+        .read_outcome("budget-probe")
+        .await
+        .unwrap()
+        .incident
+        .unwrap();
+    let incident = service.incident_record(&incident_id).unwrap().1;
+    let accepted = service.submit_incident_editor(&incident).await.unwrap();
+    let job_id = accepted["id"].as_str().unwrap();
+    let plan = service.job(job_id).unwrap().1.consult_plan.unwrap();
+    let invocation = service.consult_invocation(&plan).unwrap();
+    let workflow = Deadline::start(
+        crate::config::deadline::Layer::Workflow,
+        Duration::from_secs(30),
+        None,
+    )
+    .unwrap();
+    for describe in [false, true] {
+        let request = if describe {
+            ContextRequest::Describe {}
+        } else {
+            ContextRequest::Read {
+                handle: "incident:outcome".into(),
+                start: 0,
+                max_bytes: 512,
+            }
+        };
+        for mode in ["read_count", "read_bytes", "permitted"] {
+            let limits = match mode {
+                "read_count" => BudgetLimits {
+                    reads: 1 + u64::from(describe),
+                    ..BudgetLimits::default()
+                },
+                "read_bytes" => BudgetLimits {
+                    read_bytes: MAX_FRAME_BYTES as u64 - 1 + u64::from(describe) * 2048,
+                    ..BudgetLimits::default()
+                },
+                _ => BudgetLimits::default(),
+            };
+            let budget = RunBudget::new(
+                invocation.id(),
+                &invocation.fence_hash(),
+                service.runner_slots.clone(),
+                limits,
+                workflow.clone(),
+            )
+            .unwrap();
+            let lease = budget.start().unwrap();
+            if mode == "read_count" {
+                lease.charge_read(1).unwrap();
+            }
+            let mut research = research::Research::new(
+                &service,
+                job_id,
+                invocation.clone(),
+                service.config.pin(),
+                &workflow,
+                plan.clone(),
+                budget,
+            )
+            .unwrap();
+            let before = service.outcome_payload_reads.load(Ordering::Relaxed);
+            for _ in 0..if mode == "permitted" { 1 } else { 3 } {
+                let response = research.execute(&lease, request.clone()).await.unwrap();
+                if mode == "permitted" {
+                    assert!(
+                        !matches!(response, ContextResponse::Error(_)),
+                        "{response:?}"
+                    );
+                    assert_eq!(
+                        service.outcome_payload_reads.load(Ordering::Relaxed),
+                        before + 1
+                    );
+                } else {
+                    assert_eq!(
+                        service.outcome_payload_reads.load(Ordering::Relaxed),
+                        before,
+                        "{mode}, describe={describe}: denied read accessed outcome payload"
+                    );
+                    assert!(
+                        matches!(response, ContextResponse::Error(error) if error.code == ErrorCode::BudgetExhausted)
+                    );
+                }
+            }
+        }
+    }
+    service.storage.close().await.unwrap();
+}
+
+#[tokio::test]
 async fn editor_legacy_checkpoint_without_coverage_stays_for_review() {
     let root = std::env::temp_dir().join(format!("akasha-editor-legacy-{}", std::process::id()));
     private_dir(&root).unwrap();

@@ -257,6 +257,9 @@ impl Service {
     }
 
     pub(super) async fn read_outcome(&self, id: &str) -> Result<outcome::Record> {
+        #[cfg(test)]
+        self.outcome_payload_reads
+            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
         let row = self
             .storage
             .current(&outcome_key(id)?)?

@@ -95,6 +95,7 @@ mod tests {
             index_builder: Mutex::new(()),
             index_epoch: std::sync::atomic::AtomicU64::new(0),
             batch_gate: Mutex::new(None),
+            outcome_payload_reads: std::sync::atomic::AtomicU64::new(0),
         });
         let scope = owner_scope();
         Domain::new(&service.storage)

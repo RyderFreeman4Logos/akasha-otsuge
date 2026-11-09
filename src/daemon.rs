@@ -128,6 +128,8 @@ struct Service {
     index_epoch: std::sync::atomic::AtomicU64,
     #[cfg(test)]
     batch_gate: Mutex<Option<BatchGate>>,
+    #[cfg(test)]
+    outcome_payload_reads: std::sync::atomic::AtomicU64,
 }
 impl Service {
     fn wake_jobs(&self) {
@@ -665,6 +667,8 @@ pub async fn run(
         index_epoch: std::sync::atomic::AtomicU64::new(0),
         #[cfg(test)]
         batch_gate: Mutex::new(None),
+        #[cfg(test)]
+        outcome_payload_reads: std::sync::atomic::AtomicU64::new(0),
     });
     let initialized = async {
     // Reconcile startup input through the same pipeline, without resetting durable generations.

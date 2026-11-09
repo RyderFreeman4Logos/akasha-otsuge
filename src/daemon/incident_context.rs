@@ -41,8 +41,9 @@ impl Research<'_> {
     ) -> Result<(crate::incident::Record, crate::outcome::Record)> {
         let id = self.incident.as_deref().ok_or(Error("READ_DENIED"))?;
         let incident = self.service.authorize_incident_execution(id)?;
+        // Storage caps each outcome record at one frame; reserve before loading it.
+        lease.charge_read(MAX_FRAME_BYTES as u64)?;
         let outcome = self.service.read_outcome(&incident.first_outcome).await?;
-        lease.charge_read(serde_json::to_vec(&outcome)?.len() as u64)?;
         for (index, log) in outcome.logs.iter().enumerate() {
             self.incident_expected
                 .insert(format!("incident:log:{index}"));
