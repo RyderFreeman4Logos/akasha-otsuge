@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T23:46:41.782287+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "c17c272dbecec55e0db50cd3a7117a4a86bb65d5",
+    "log_sha256": "16946592c356f8f6c644442d21a81223bb1d4fc21c91dd70dedf1e35b558af73",
+    "seconds": 253.22726398520172,
+    "utc": "2026-11-09T23:46:37.236058+00:00"
+  },
+  "process_absent": true,
+  "classification": "transport_completed_awaiting_full_verdict_attestation"
+}

@@ -96,3 +96,30 @@ compressed final result to SHA-256
 `8018e2c77e652a6e3a88c863542e64faefa76630b285ff02b90ed7870efb7495`.
 No native child transcripts or credentials are published. The exact canonical
 gate, independent whole-range review and CI remain separate publication stages.
+
+## Independent review and read-admission repair
+
+The first exact gate on `c17c272` passed in 274.629 seconds: 484 Rust executions
+including the installed repetition, 133 daemon tests per run, 29 Python tests,
+Node checks, release build and installed lifecycle/UID isolation. Independent
+review also passed its nine focused incident cases, then found a MODERATE
+regression by tracing the failure path: outcome data was loaded before reserving
+the read budget. The full [FAIL report](results/mvp022-budget-fix/mvp022-whole-review-r1.md)
+remains immutable; passing gates did not waive the finding.
+
+A new test-only per-Service counter proved that a denied read still accessed the
+outcome payload. Commit `4063f86` reserves the bounded storage-record allowance in
+the shared incident reader before loading. The regression covers both description
+and text entry points, read-count and byte exhaustion, three repeated refusals,
+and permitted-read controls. Six Editor unit tests including recovery, nine
+incident integrations and Clippy pass after the fix. The raw-log branch already
+reserved its bytes before loading and retains its existing lossless-read tests.
+
+The [repair manifest](results/mvp022-budget-fix/manifest.json) preserves 22 files,
+38,520 bytes excluding its manifest; SHA-256
+`4e65ca467d8eb55835340ae20932fe2d9fad6cac981d579f3b37e4463f6ed1e1`.
+R7 remains historical native acceptance; it was not rerun after this admission
+repair. A conservative extra frame for each of its 25 reads totals at most
+3,579,440 charged bytes, below the unchanged 4,194,304-byte limit. This bound is
+not a fresh provider result. Fresh exact-candidate gate, whole-range review and
+CI are required before merge.

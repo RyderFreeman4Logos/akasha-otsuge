@@ -1,0 +1,49 @@
+{
+  "utc": "2026-11-09T23:42:16.624508+00:00",
+  "head": "c17c272dbecec55e0db50cd3a7117a4a86bb65d5",
+  "tree": "dc14dbe2ee6ec08742164f8c752ff522374c9639",
+  "base": "94b22af5dcd367499b013cbdcbe1508eb8123aa1",
+  "clean_before_after": true,
+  "command": [
+    "just",
+    "check"
+  ],
+  "exit_code": 0,
+  "seconds": 274.6290154987946,
+  "rust_result_rows": 20,
+  "rust_passed_including_installed_repeat": 484,
+  "rust_ignored_including_installed_repeat": 31,
+  "daemon_passed_each_run": 133,
+  "daemon_opt_in_ignored_each_run": 7,
+  "installed": {
+    "installed": true,
+    "binary_sha256": "45f6363cc7607555943bd1c99814a7ca71fd39b050f05b83236d5fa964f3f677",
+    "lifecycle": "passed",
+    "private_uid_denial": "passed",
+    "peer_uid_denial": "passed",
+    "tcp_sockets": 0,
+    "kernel_control_uid": 165536
+  },
+  "artifacts": {
+    "mvp022-canonical-r1.admission.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp022-canonical-r1.admission.json",
+      "sha256": "acecd05280789d80dfe1d5f540ceb51de0874757c06da547fd50dcdf9a709140"
+    },
+    "mvp022-canonical-r1.terminal.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp022-canonical-r1.terminal.json",
+      "sha256": "4f00c73b587420440502b9a97d776e89f55ad9a0e893f9cc77be62daf82e8d20"
+    },
+    "mvp022-canonical-r1.collected.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp022-canonical-r1.collected.json",
+      "sha256": "4b24c3174d571699ed954b0000b4c9ad8beb9bad51eed173593ffc3747fb6fdb"
+    },
+    "mvp022-canonical-r1.log": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp022-canonical-r1.log",
+      "sha256": "d1544be2f538660828255d83eb3f6aa3913f4e9a903c065cac2dc6dca0a63a6b"
+    }
+  },
+  "limits": [
+    "Independent frozen review and hosted CI remain separate stages.",
+    "Controlled fixtures and installed smoke checks do not establish new provider authentication or product stress acceptance."
+  ]
+}

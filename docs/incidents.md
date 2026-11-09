@@ -106,6 +106,8 @@ the Runner continues until `end == total_bytes`. Log documents preserve UTF-8
 text or lossless hex, original source references, hashes and coverage. Read
 fragments retain exact offsets and immutable source spans in the investigation
 trace. Reading a preview is insufficient for automatic adoption.
+Each outcome load reserves a 128 KiB record allowance before accessing its
+payload; full log reads reserve their raw byte count separately.
 
 Unread log ranges, partial/unknown source logs, missing execution observations
 for reproducible failures, workspace/artifact gaps and all ordinary Editor

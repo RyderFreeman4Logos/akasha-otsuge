@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T23:50:10.031700+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "c17c272dbecec55e0db50cd3a7117a4a86bb65d5",
+    "log_sha256": "6df6c1c081824413aabe6d5ef13f58532f17f8e72ab341a3f0451502f0abfb33",
+    "seconds": 11.733083778060973,
+    "utc": "2026-11-09T23:49:57.809551+00:00"
+  },
+  "process_absent": true,
+  "classification": "red_denied_incident_read_accessed_outcome_payload"
+}
