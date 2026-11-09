@@ -206,6 +206,60 @@ fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair(
 }
 
 #[test]
+fn incident_classifications_keep_nonmemory_failures_and_missing_recall_out_of_patches() {
+    for (classification, expected_state) in [
+        ("code_bug", "dismissed"),
+        ("environment", "dismissed"),
+        ("execution_error", "dismissed"),
+        ("requirements_changed", "dismissed"),
+        ("retrieval_gap", "open"),
+        ("insufficient_evidence", "open"),
+        ("stale_conditions", "resolved"),
+    ] {
+        let (daemon, _, bound) = super::codex_tests::consult_fixture_with(
+            &format!("editor_incident_{classification}"),
+            |root| {
+                format!(
+                    "[review]\nmode='automatic'\n[timeouts]\nqueue='30s'\n[incidents]\nexecutor='editor'\ntriggers=['user_correction']\nauto_repair=true\nmax_runner_starts=1\n[executors.editor]\nkind='codex'\nbinary={:?}\nnative_home={:?}\n",
+                    root.join("codex"),
+                    root.join("native-home")
+                )
+            },
+        );
+        let original = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+        let targets = if classification == "retrieval_gap" {
+            json!([])
+        } else {
+            json!([{"memory_id":"editable","expected_revision":original["revision"]["commit_seq"]}])
+        };
+        let event = json!({"event_id":"classified","invocation_id":bound["data"]["invocation_id"],
+            "source":"controlled-classification","severity":"warning","occurred_at_ms":akasha_otsuge::ipc::now_ms().unwrap(),
+            "execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+            "incident":{"kind":"user_correction","key":"reported-problem","reason":"Investigate the reported problem without assuming memory is responsible.","targets":targets}});
+        let response = rpc(&daemon, json!({"op":"outcome_submit","event":event}));
+        assert!(response.get("error").is_none(), "{response}");
+        let outcome = daemon.cli(&["outcome", "show", "classified"]);
+        let result = investigated(&daemon, outcome["data"]["incident"].as_str().unwrap());
+        assert_eq!(
+            result["record"]["classification"], classification,
+            "{result}"
+        );
+        assert_eq!(result["record"]["state"], expected_state, "{result}");
+        assert_eq!(result["record"]["priority"], "urgent");
+        let after = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+        if classification == "stale_conditions" {
+            assert_eq!(after["previous"], original["revision"]["commit_seq"]);
+            assert_eq!(
+                after["record"]["draft"]["scope"],
+                original["record"]["draft"]["scope"]
+            );
+        } else {
+            assert_eq!(after, original, "{classification}");
+        }
+    }
+}
+
+#[test]
 fn incident_grouping_and_priority_follow_policy_without_starting_unconfigured_runners() {
     for deduplicate in [true, false] {
         let (daemon, _, bound) = super::codex_tests::consult_fixture_with("editor_ledger", |_| {

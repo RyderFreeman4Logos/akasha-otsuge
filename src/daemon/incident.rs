@@ -386,6 +386,7 @@ impl Service {
                         report.classification,
                         crate::editor::Classification::Environment
                             | crate::editor::Classification::ExecutionError
+                            | crate::editor::Classification::CodeBug
                             | crate::editor::Classification::RequirementsChanged
                     ) {
                         state = ReviewState::Dismissed;

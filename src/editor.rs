@@ -3,7 +3,7 @@ use crate::domain::MemoryPatch;
 use crate::ipc::{Error, Result};
 use serde::{Deserialize, Serialize};
 
-pub(crate) const PROMPT_VERSION: &str = "memory-editor-v1";
+pub(crate) const PROMPT_VERSION: &str = "memory-editor-v2";
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -56,6 +56,7 @@ pub(crate) enum Classification {
     StaleConditions,
     RetrievalGap,
     ExecutionError,
+    CodeBug,
     Environment,
     RequirementsChanged,
     InsufficientEvidence,
