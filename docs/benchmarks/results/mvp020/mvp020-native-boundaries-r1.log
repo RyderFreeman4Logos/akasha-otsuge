@@ -1,0 +1,24 @@
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+mise WARN  Failed to resolve tool version list for pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser: [~/.config/mise/config.toml] pypi:git+https://github.com/RyderFreeman4Logos/audio-condenser@latest: failed rm: ~/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-ebcd5.msgpack.z: No such file or directory (os error 2)
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp020)
+error[E0599]: `akasha_otsuge::domain::Scope` doesn't implement `std::fmt::Display`
+   --> tests/support/daemon_editor.rs:100:41
+    |
+100 |     std::fs::write(&scope_file, scope().to_string()).unwrap();
+    |                                         ^^^^^^^^^ method cannot be called on `akasha_otsuge::domain::Scope` due to unsatisfied trait bounds
+    |
+   ::: src/domain/schema.rs:5:1
+    |
+  5 | pub struct Scope {
+    | ---------------- doesn't satisfy `akasha_otsuge::domain::Scope: ToString` or `akasha_otsuge::domain::Scope: std::fmt::Display`
+    |
+    = note: the following trait bounds were not satisfied:
+            `akasha_otsuge::domain::Scope: std::fmt::Display`
+            which is required by `akasha_otsuge::domain::Scope: ToString`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `akasha-otsuge` (test "daemon") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

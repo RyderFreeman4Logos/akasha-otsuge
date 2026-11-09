@@ -1,0 +1,12 @@
+{"type": "message_start", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "type"]}
+{"type": "message_end", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "type"]}
+{"type": "turn_end", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "toolResults", "type"]}
+{"type": "message_start", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "type"]}
+{"type": "message_end", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "type"]}
+{"type": "turn_end", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "toolResults", "type"]}
+{"type": "message_start", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "type"]}
+{"type": "message_end", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "type"]}
+{"type": "turn_end", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "toolResults", "type"]}
+{"type": "message_start", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "type"]}
+{"type": "message_end", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "type"]}
+{"type": "turn_end", "stop_reason": "error", "error": "Connection error.", "keys": ["message", "toolResults", "type"]}

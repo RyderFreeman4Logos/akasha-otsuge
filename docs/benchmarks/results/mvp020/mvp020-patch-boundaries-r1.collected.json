@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-30T01:34:47.626638+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "460934961009ff41ae1b3def573e81dda4fa7d0e",
+    "log_sha256": "955788471ce20931d40a80553cc3fa973784b73c77cf8dc8cf36de98937f80f7",
+    "seconds": 4.172960572876036,
+    "utc": "2026-10-30T01:34:27.849156+00:00"
+  },
+  "process_absent": true,
+  "classification": "failed_focused_boundaries"
+}

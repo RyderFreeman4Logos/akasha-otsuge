@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-30T01:24:51.295433+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "460934961009ff41ae1b3def573e81dda4fa7d0e",
+    "log_sha256": "a5ff372efc6bb24b990985acdf1fab482f953ec94be0638d1c86c80b106bd614",
+    "seconds": 54.38582663517445,
+    "utc": "2026-10-30T01:24:45.762660+00:00"
+  },
+  "process_absent": true,
+  "classification": "expected_missing_patch_api_red"
+}

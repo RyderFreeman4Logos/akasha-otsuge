@@ -1,0 +1,5 @@
+[feat/mvp-020-editor 159aad8] feat(editor): apply evidence-bound atomic memory patches
+ 12 files changed, 676 insertions(+), 14 deletions(-)
+ create mode 100644 src/daemon/editor.rs
+ create mode 100644 src/domain/patch.rs
+ create mode 100644 tests/support/daemon_editor.rs

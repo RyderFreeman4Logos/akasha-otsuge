@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-review-legacy-red-r1.py"
+  ],
+  "name": "mvp020-review-legacy-red-r1",
+  "process": {
+    "pid": 1951260,
+    "start_ticks": "606818150",
+    "state": "D"
+  },
+  "utc": "2026-11-09T18:51:24.471664+00:00"
+}

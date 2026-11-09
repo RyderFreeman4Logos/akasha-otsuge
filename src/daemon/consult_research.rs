@@ -24,6 +24,7 @@ pub(super) struct Research<'a> {
     operations: u64,
     native: NativeExecutor,
     executors: BTreeMap<String, NativeExecutor>,
+    editor: Option<crate::editor::Feedback>,
     budget: RunBudget,
     runs: Vec<Value>,
     current_run: Option<usize>,
@@ -54,12 +55,22 @@ impl<'a> Research<'a> {
             config,
             workflow,
             workspace: None,
-            handles: BTreeMap::new(),
+            handles: plan
+                .editor
+                .as_ref()
+                .map(|e| {
+                    e.targets
+                        .iter()
+                        .map(|t| (t.memory_id.clone(), t.expected_revision))
+                        .collect()
+                })
+                .unwrap_or_default(),
             expanded: BTreeMap::new(),
             searched: false,
             operations: 0,
             native: plan.native,
             executors: plan.executors,
+            editor: plan.editor,
             budget,
             runs: vec![],
             current_run: None,
@@ -103,6 +114,31 @@ impl<'a> Research<'a> {
         if !self.gaps.iter().any(|g| g == gap) && self.gaps.len() < 32 {
             self.gaps.push(gap.into());
         }
+    }
+
+    pub fn coverage_gaps(
+        &self,
+        answer: &crate::adapter::ResearchConclusion,
+    ) -> Result<Vec<String>> {
+        let mut gaps = self.gaps.clone();
+        for gap in answer
+            .gaps
+            .iter()
+            .map(String::as_str)
+            .chain(
+                (self.invocation.coverage() != crate::adapter::FenceCoverage::CompleteToFence)
+                    .then_some("history_gap"),
+            )
+            .chain((!answer.conflicts.is_empty()).then_some("unresolved_conflict"))
+        {
+            if !gaps.iter().any(|g| g == gap) {
+                if gaps.len() == 32 {
+                    return Err(Error("BUDGET_EXHAUSTED"));
+                }
+                gaps.push(gap.into());
+            }
+        }
+        Ok(gaps)
     }
 
     async fn memory_search(&mut self, lease: &RunLease, query: String) -> Result<Value> {
@@ -384,7 +420,7 @@ impl<'a> Research<'a> {
         Ok(ContextResponse::Research(value))
     }
 
-    fn conclusion(&self, text: &str) -> Result<crate::adapter::ResearchConclusion> {
+    fn conclusion(&mut self, text: &str) -> Result<crate::adapter::ResearchConclusion> {
         let conclusion = crate::adapter::ResearchConclusion::parse(text)?;
         if conclusion.sources.iter().any(|s| !self.sources.contains(s))
             || conclusion.memories.iter().any(|m| {
@@ -399,6 +435,8 @@ impl<'a> Research<'a> {
         if conclusion.status == RecallStatus::NoHit && !self.searched {
             return Err(Error("PROTOCOL_INVALID"));
         }
+        // Descendant limitations survive even when a later parent answer omits them.
+        self.gaps = self.coverage_gaps(&conclusion)?;
         Ok(conclusion)
     }
 
@@ -437,24 +475,47 @@ impl ContextSource for Research<'_> {
         request: ContextRequest,
     ) -> BoxFuture<'b, crate::adapter::Result<ContextResponse>> {
         Box::pin(async move {
-            self.authorize(lease).await.map_err(adapter_error)?;
-            self.operations += 1;
-            let response = match self.dispatch(lease, request).await {
-                Ok(response) => response,
-                Err(error) => {
-                    self.gap(error.0);
-                    ContextResponse::Error(adapter_error(error))
+            let response: crate::adapter::Result<_> = async {
+                self.authorize(lease).await.map_err(adapter_error)?;
+                self.operations += 1;
+                let response = match self.dispatch(lease, request).await {
+                    Ok(response) => response,
+                    Err(error) => {
+                        self.gap(error.0);
+                        ContextResponse::Error(adapter_error(error))
+                    }
+                };
+                match &response {
+                    ContextResponse::Page(page) => {
+                        for code in &page.gaps {
+                            self.gap(Error::from(AdapterError::from(*code)).0);
+                        }
+                    }
+                    ContextResponse::Text(text) if text.truncated => {
+                        self.gap("context_read_budget")
+                    }
+                    _ => (),
                 }
-            };
-            self.authorize(lease).await.map_err(adapter_error)?;
-            let bytes = serde_json::to_vec(&response)
-                .map_err(|_| ErrorCode::ProtocolInvalid)?
-                .len();
-            if bytes > MAX_FRAME_BYTES {
-                return Err(ErrorCode::OutputLimit.into());
+                self.authorize(lease).await.map_err(adapter_error)?;
+                let bytes = serde_json::to_vec(&response)
+                    .map_err(|_| ErrorCode::ProtocolInvalid)?
+                    .len();
+                if bytes > MAX_FRAME_BYTES {
+                    return Err(ErrorCode::OutputLimit.into());
+                }
+                lease.charge_output(bytes as u64)?;
+                Ok(response)
             }
-            lease.charge_output(bytes as u64)?;
-            Ok(response)
+            .await;
+            if let Err(error) = &response {
+                self.gap(
+                    error
+                        .source_code
+                        .as_deref()
+                        .unwrap_or_else(|| Error::from(error.clone()).0),
+                );
+            }
+            response
         })
     }
 }

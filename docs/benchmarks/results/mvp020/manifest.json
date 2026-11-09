@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "scope": "MVP-020 controlled regressions, preserved failures and actual Codex Runner with synthetic evidence",
+  "files": [
+    {
+      "path": "mvp020-core-commit.admission.json",
+      "bytes": 1216,
+      "sha256": "560df9df6fd1d80eb54e3b9457ac87fb96ae8b0ba7b90b93d9dc1cc0d1a13d15"
+    },
+    {
+      "path": "mvp020-core-commit.collected.json",
+      "bytes": 371,
+      "sha256": "d1f19d8c1172aa22418f03f9a38bdb85d013ba8e6acacf74790adbc77d075ea3"
+    },
+    {
+      "path": "mvp020-core-commit.log",
+      "bytes": 273,
+      "sha256": "f0f8aee753ef68c9d0b527065448ae1fbf1dccfd9a4c7592adb81b0340e96658"
+    },
+    {
+      "path": "mvp020-core-commit.terminal.json",
+      "bytes": 238,
+      "sha256": "657f7018dc1e24ad6c51d36bb37ad4cfe3c7e16ba7c8d97bbb3d722a5446f771"
+    },
+    {
+      "path": "mvp020-core-focused-r2.admission.json",
+      "bytes": 1718,
+      "sha256": "277313b6bbdabcae6fd6de0704374d0326814f537549493d17554f1cce1cdfb3"
+    },
+    {
+      "path": "mvp020-core-focused-r2.collected.json",
+      "bytes": 378,
+      "sha256": "2a2ab659df6df64c2b373fa58cd7c25db73ef66289230f71841c7d5da4bbebe9"
+    },
+    {
+      "path": "mvp020-core-focused-r2.log",
+      "bytes": 13900,
+      "sha256": "40fa42fd43975604118012c700779ec0d8426706818f0c2f91b7451272f17474"
+    },
+    {
+      "path": "mvp020-core-focused-r2.terminal.json",
+      "bytes": 236,
+      "sha256": "f9bf6ee44912e0cf303feef484eb0f60aa729a917d5f5ddcb0e578ac11d2ef7b"
+    },
+    {
+      "path": "mvp020-native-actual-r1.admission.json",
+      "bytes": 1142,
+      "sha256": "e715acc06d5cb827bb855e49c7f17614f2edbc5b1530222bf872c28c1299ec89"
+    },
+    {
+      "path": "mvp020-native-actual-r1.collected.json",
+      "bytes": 374,
+      "sha256": "867e56117c3bf20bd4dc9c8f5bf4ab6bf59635ac3566793a130485426b4447b3"
+    },
+    {
+      "path": "mvp020-native-actual-r1.log",
+      "bytes": 5006,
+      "sha256": "4d95c4213eb1c53aa74a73151395dce8cef97ea9bd4fac05958910a23854e263"
+    },
+    {
+      "path": "mvp020-native-actual-r1.terminal.json",
+      "bytes": 237,
+      "sha256": "b569dc5035500dd64246ebd6b24770977a13253a8d59670412d6f159fd73458c"
+    },
+    {
+      "path": "mvp020-native-boundaries-r1.admission.json",
+      "bytes": 1683,
+      "sha256": "077c4b155b75913f1c2dda11bd3cdbf81accc59bc8643ff56153d48de1bb65f9"
+    },
+    {
+      "path": "mvp020-native-boundaries-r1.collected.json",
+      "bytes": 383,
+      "sha256": "a2cf995621030859ab08ef1dea29b505d82ccbc7026c2e524cde8f2836222569"
+    },
+    {
+      "path": "mvp020-native-boundaries-r1.log",
+      "bytes": 2963,
+      "sha256": "720555a87d5bf52bffc7e2817a6f725e3fa1a290c878f0852b9e401821d56d9d"
+    },
+    {
+      "path": "mvp020-native-boundaries-r1.terminal.json",
+      "bytes": 239,
+      "sha256": "00428f091c2cafa0b04f1c541dc4b731707fdc2ed8e92a99170a375e0d59baab"
+    },
+    {
+      "path": "mvp020-native-boundaries-r2.admission.json",
+      "bytes": 1683,
+      "sha256": "74064b3512781b5a9db2bd9b5eeb160b5fba410734766eda3ba1c4733e27d480"
+    },
+    {
+      "path": "mvp020-native-boundaries-r2.collected.json",
+      "bytes": 398,
+      "sha256": "66d84c4818eced49060200419f2ba280c0838ba24493203b2a9b35eb3d104930"
+    },
+    {
+      "path": "mvp020-native-boundaries-r2.log",
+      "bytes": 6982,
+      "sha256": "3f51319db225f1bb58a0d907af90cca65096fb96350bfb49fd9de8a4b0bec3ce"
+    },
+    {
+      "path": "mvp020-native-boundaries-r2.terminal.json",
+      "bytes": 239,
+      "sha256": "f9d787ece9b333bdc45334cb5010790165da396933ba508fcbf1ea8c22ec2c6e"
+    },
+    {
+      "path": "mvp020-native-codex-r1.admission.json",
+      "bytes": 1102,
+      "sha256": "fd8c31de4f588541c79a6f716913c88b15c34bf645c73dc3a9e8f2adedf7c5a5"
+    },
+    {
+      "path": "mvp020-native-codex-r1.collected.json",
+      "bytes": 384,
+      "sha256": "f63ff066963daf5ff7624ca357408073a189b13db745225674e6da0ee41dce28"
+    },
+    {
+      "path": "mvp020-native-codex-r1.log",
+      "bytes": 1773,
+      "sha256": "772d79d288d6644967d2cd50c229843669f334efdcea67804b2d7e898347b5c9"
+    },
+    {
+      "path": "mvp020-native-codex-r1.patch",
+      "bytes": 3712,
+      "sha256": "87aeb47d31f30fad060773803b081559ead99ecda71ba2571820b5f89e3bbd9e"
+    },
+    {
+      "path": "mvp020-native-codex-r1.terminal.json",
+      "bytes": 237,
+      "sha256": "48880ba4c7941cebe037ab83d7284ecf2c1b2d9e86a30e8cdadd2d5efba9a1fe"
+    },
+    {
+      "path": "mvp020-native-codex.py",
+      "bytes": 4095,
+      "sha256": "65d3aa9d9ac4c277b5a477831673146c22462ecffc605ab26062e15eca4c1ac0"
+    },
+    {
+      "path": "mvp020-native-codexr1-result.json",
+      "bytes": 20954,
+      "sha256": "4a1b8c35b773d5a63c0283201a9d6124f69107e3bc7ce7affac1966a1a41b20a"
+    },
+    {
+      "path": "mvp020-native-codexr1.json",
+      "bytes": 1354,
+      "sha256": "034dddf7b435b40746c487c3e9c58359aa81cea436757823eaa6f681cefdaccd"
+    },
+    {
+      "path": "mvp020-native-diagnostic-r2.admission.json",
+      "bytes": 1169,
+      "sha256": "edab694629d21c354725f64bc81f66ae82ef689f93cfb8f1473d0ef09e743e2e"
+    },
+    {
+      "path": "mvp020-native-diagnostic-r2.collected.json",
+      "bytes": 382,
+      "sha256": "52a4291f948fd160f65cae48e1ef1c1f467b3c8932ff0c7954c746fc9521b7d2"
+    },
+    {
+      "path": "mvp020-native-diagnostic-r2.log",
+      "bytes": 4951,
+      "sha256": "3f8c2a4192e9924ec0c4458062869cc5a0e100898fbe478b83bdc0b10f6689fb"
+    },
+    {
+      "path": "mvp020-native-diagnostic-r2.terminal.json",
+      "bytes": 237,
+      "sha256": "b7f5bb027d698daa19d0ca5243ad610957f0ed232d9877bd51342c148591719c"
+    },
+    {
+      "path": "mvp020-native-editor.py",
+      "bytes": 4952,
+      "sha256": "60e0d886db601650eb70746a3d18d6095177a75a7f98f4517e8ae04f612c327a"
+    },
+    {
+      "path": "mvp020-native-r1-result.json",
+      "bytes": 9704,
+      "sha256": "06186e0b3831992030f75b91af52a728c61267e78244cac80fd464e040c6d472"
+    },
+    {
+      "path": "mvp020-native-r1.json",
+      "bytes": 1388,
+      "sha256": "b7131f9c37ca2a6ca4786b97bcb3bef13fb6fb04bdd02146807ddcecf2756504"
+    },
+    {
+      "path": "mvp020-native-r2-errors.jsonl",
+      "bytes": 1340,
+      "sha256": "44325dda531238de35b27116b9561114a956f308fc9caa5f41906774459867d0"
+    },
+    {
+      "path": "mvp020-native-r2-result.json",
+      "bytes": 9592,
+      "sha256": "dab99179f04b5cebce7affb8899e9cb208f93eb37c5eaafea7b8d18d9f03d319"
+    },
+    {
+      "path": "mvp020-native-r2.json",
+      "bytes": 1389,
+      "sha256": "0b88dea479a2995c8c086b3a3347014a821f71d8001fd58be03c1da587cea185"
+    },
+    {
+      "path": "mvp020-native-workflow-green-r1.admission.json",
+      "bytes": 1387,
+      "sha256": "77db8cc369b2c5b520b97393fffd51145197fbed107567a7ef9d21a06e32949b"
+    },
+    {
+      "path": "mvp020-native-workflow-green-r1.collected.json",
+      "bytes": 385,
+      "sha256": "1d45920d388ba12390e4c006a52c4b32769657fe6e5bbb1fe76fb5555d0486e0"
+    },
+    {
+      "path": "mvp020-native-workflow-green-r1.log",
+      "bytes": 3081,
+      "sha256": "f620edc31dbaf2760126bc8713ea5fd52447453e0aafc4f3d785570d6da64597"
+    },
+    {
+      "path": "mvp020-native-workflow-green-r1.terminal.json",
+      "bytes": 239,
+      "sha256": "a4c71911aaf2e334f437885efed6235ebcd1189cb52aaa7bbd84ab650546b599"
+    },
+    {
+      "path": "mvp020-native-workflow-green-r2.admission.json",
+      "bytes": 1387,
+      "sha256": "e7f438f9eff4b502e8d438755ce146e9e81de3c999513284ebca49745a89b60a"
+    },
+    {
+      "path": "mvp020-native-workflow-green-r2.collected.json",
+      "bytes": 391,
+      "sha256": "7ffca1718e42e6f15e4bf225fd36f2e338436a66ebcb001fbf9e420bf8eb8ee5"
+    },
+    {
+      "path": "mvp020-native-workflow-green-r2.log",
+      "bytes": 2445,
+      "sha256": "309dd9d2f9929bfac926f0465c96ebc7aa1a76245d6418292e9e63f50b071892"
+    },
+    {
+      "path": "mvp020-native-workflow-green-r2.terminal.json",
+      "bytes": 236,
+      "sha256": "58ff7800597c70233942ee610c8d549f086d451ffa6cd0c2aedd3ea2aa488c7a"
+    },
+    {
+      "path": "mvp020-native-workflow-red.admission.json",
+      "bytes": 1115,
+      "sha256": "048423e2b4c98d51ef3ebe29c20d9031edf5c1db3fcbd9a9e01ec6188b863e18"
+    },
+    {
+      "path": "mvp020-native-workflow-red.collected.json",
+      "bytes": 394,
+      "sha256": "d18d917064469448741669a5c00cfbae4c58785b4cfdd92cccff747fd48ca3f6"
+    },
+    {
+      "path": "mvp020-native-workflow-red.log",
+      "bytes": 3028,
+      "sha256": "010ea3d40638a02828198857a4493962eb8078932fe3b202a4b85969069f7c57"
+    },
+    {
+      "path": "mvp020-native-workflow-red.terminal.json",
+      "bytes": 238,
+      "sha256": "9d27c702cf027e98d6aab9b025bebf46bf26e6985c26f2a3cac1c16d48d10a1e"
+    },
+    {
+      "path": "mvp020-patch-boundaries-r1.admission.json",
+      "bytes": 1511,
+      "sha256": "fbe03c4b653fe263d67f5e123d7885dafb36690ab3a059090df698b8d174b57b"
+    },
+    {
+      "path": "mvp020-patch-boundaries-r1.collected.json",
+      "bytes": 387,
+      "sha256": "e94268e6fc420919d88afa4756df8655239e26976f64e418074bbbe89851cb4c"
+    },
+    {
+      "path": "mvp020-patch-boundaries-r1.log",
+      "bytes": 6417,
+      "sha256": "955788471ce20931d40a80553cc3fa973784b73c77cf8dc8cf36de98937f80f7"
+    },
+    {
+      "path": "mvp020-patch-boundaries-r1.terminal.json",
+      "bytes": 238,
+      "sha256": "d1cf471fb2b89b70b0b108a72a3874bb5b8666f5673898a575f1e98b515f19d6"
+    },
+    {
+      "path": "mvp020-patch-green.admission.json",
+      "bytes": 1511,
+      "sha256": "6581be1b6d84a7e677192891b5ae865d59be7c4207be5eacb603d143dd4bd270"
+    },
+    {
+      "path": "mvp020-patch-green.collected.json",
+      "bytes": 382,
+      "sha256": "9440113559a3e2201cf1ac0384b59b132db2854fa47e93b37790f22ca633ecb6"
+    },
+    {
+      "path": "mvp020-patch-green.log",
+      "bytes": 2434,
+      "sha256": "ae305daa24cf4874bb683c2affbbfb23549eb1508d222a5e0e0846b6c909c24d"
+    },
+    {
+      "path": "mvp020-patch-green.terminal.json",
+      "bytes": 236,
+      "sha256": "fed9cb7acdb6b8f2327a8c4072dda03394e6d7134c862c6ed55355831826a5e0"
+    },
+    {
+      "path": "mvp020-patch-red.admission.json",
+      "bytes": 1244,
+      "sha256": "8a38d4b0381c9acab91b9d9c346851b2d73a086d392d2d9a1d6e8838579557f4"
+    },
+    {
+      "path": "mvp020-patch-red.collected.json",
+      "bytes": 392,
+      "sha256": "4374a3ccb0ab96de6ef8ce9eb9c46cc9e5b3b361b16e4c87dbe4b3c5732d0198"
+    },
+    {
+      "path": "mvp020-patch-red.log",
+      "bytes": 2993,
+      "sha256": "a5ff372efc6bb24b990985acdf1fab482f953ec94be0638d1c86c80b106bd614"
+    },
+    {
+      "path": "mvp020-patch-red.terminal.json",
+      "bytes": 238,
+      "sha256": "fbd6013b0aea446c948654ffdeea7485aefca0213022fb2961d7bab1a86a29fe"
+    },
+    {
+      "path": "mvp020-pi-observer.py",
+      "bytes": 1515,
+      "sha256": "d83bf4d9638ccf8792e06890b7086824570f489d044df9b1411565b586ffd7e6"
+    },
+    {
+      "path": "mvp020-recovery-resume-r1.admission.json",
+      "bytes": 1611,
+      "sha256": "ae4f96211f1f24966872da9d36a162f8dbbf993af7759cdcdd7f4a51c9219d09"
+    },
+    {
+      "path": "mvp020-recovery-resume-r1.collected.json",
+      "bytes": 373,
+      "sha256": "ef046e0154e6aad684e61349a19ec3838377deadfca2de21dcc12c596087e4fb"
+    },
+    {
+      "path": "mvp020-recovery-resume-r1.log",
+      "bytes": 34182,
+      "sha256": "5913a9ad60f8c2d8676a7df077609c7969ece1e94442fb230dd7cb231fbd1e5a"
+    },
+    {
+      "path": "mvp020-recovery-resume-r1.terminal.json",
+      "bytes": 237,
+      "sha256": "9044d66ef12188d1e51a8f21dfb0d1fbf85f2265750a20cccaffe6119934ab1a"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T18:03:55.829523+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "9b3ce6cb794b5fd3ca14c6043df4da6ae7ca5251",
+    "log_sha256": "772d79d288d6644967d2cd50c229843669f334efdcea67804b2d7e898347b5c9",
+    "seconds": 54.885460377670825,
+    "utc": "2026-11-09T18:03:25.449143+00:00"
+  },
+  "process_absent": true,
+  "classification": "real_native_editor_pass"
+}

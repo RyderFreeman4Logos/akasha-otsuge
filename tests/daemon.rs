@@ -32,6 +32,9 @@ mod grill_tests;
 #[path = "support/daemon_review.rs"]
 mod review_tests;
 
+#[path = "support/daemon_editor.rs"]
+mod editor_tests;
+
 #[path = "support/daemon_codex.rs"]
 mod codex_tests;
 

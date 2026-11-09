@@ -1,0 +1,341 @@
+diff --git a/src/daemon/editor_tests.rs b/src/daemon/editor_tests.rs
+index ab20cb4..5ce51cc 100644
+--- a/src/daemon/editor_tests.rs
++++ b/src/daemon/editor_tests.rs
+@@ -146,7 +146,7 @@ async fn setup(root: &std::path::Path, settings: &str, checkpoint: bool) {
+         };
+         let answer = json!({"status":"found","answer":serde_json::to_string(&json!({"classification":"memory_error","reason":"Narrow the claim","patch":patch})).unwrap(),"sources":[span],"memories":[{"memory_id":"editable","revision":memory.commit_seq}],"conditions":[],"conflicts":[],"gaps":[]});
+         // Controlled durable-response fixture; the subprocess tests publication, not model quality.
+-        let ready = json!({"schema_version":1,"origin":"editor","answer":answer,"investigation_gaps":["INDEX_NOT_READY"],"trace":{"runs":[],"workspace":null},"executor":"editor","generator":{"runner":"executor/editor","model":"controlled","prompt_version":crate::editor::PROMPT_VERSION}});
++        let ready = json!({"schema_version":1,"origin":"editor","answer":answer,"investigation_gaps":["INDEX_NOT_READY", "HISTORY_GAP", "context_read_budget", "child_limit", "unresolved_conflict"],"trace":{"runs":[],"workspace":null},"executor":"editor","generator":{"runner":"executor/editor","model":"controlled","prompt_version":crate::editor::PROMPT_VERSION}});
+         let pointer = models::save_result(&service.storage, &ready, 1)
+             .await
+             .unwrap();
+@@ -218,7 +218,13 @@ fn editor_checkpoint_and_committed_patch_survive_sigkill_without_runner_replay()
+             assert_eq!(latest.record.authority, crate::domain::Authority::Candidate);
+             assert_eq!(
+                 resumed.result.as_ref().unwrap()["gaps"],
+-                json!(["INDEX_NOT_READY"])
++                json!([
++                    "INDEX_NOT_READY",
++                    "HISTORY_GAP",
++                    "context_read_budget",
++                    "child_limit",
++                    "unresolved_conflict"
++                ])
+             );
+             assert_eq!(latest.revision.commit_seq, receipt.commit_seq);
+             let initial = latest.previous.unwrap();
+@@ -236,6 +242,75 @@ fn editor_checkpoint_and_committed_patch_survive_sigkill_without_runner_replay()
+     }
+ }
+ 
++#[tokio::test]
++async fn research_retains_errors_after_a_successful_dispatch_without_swallowing_them() {
++    use crate::adapter::{ContextRequest, ContextSource, ErrorCode};
++    let root = std::env::temp_dir().join(format!("akasha-editor-budget-{}", std::process::id()));
++    private_dir(&root).unwrap();
++    let _cleanup = tests::Fixture(root.clone());
++    let settings = format!(
++        "[executors.editor]\nkind='codex'\nbinary='/unused-native'\nnative_home={root:?}\n"
++    );
++    setup(&root, &settings, false).await;
++    let (service, _) = tests::service_at(&root, &settings).await;
++    let job_id = id();
++    let plan = service.job(&job_id).unwrap().1.consult_plan.unwrap();
++    let invocation = service.consult_invocation(&plan).unwrap();
++    let workflow = Deadline::start(
++        crate::config::deadline::Layer::Workflow,
++        Duration::from_secs(30),
++        None,
++    )
++    .unwrap();
++    let probe = RunBudget::new(
++        invocation.id(),
++        &invocation.fence_hash(),
++        service.runner_slots.clone(),
++        BudgetLimits::default(),
++        workflow.clone(),
++    )
++    .unwrap();
++    let bytes = {
++        let lease = probe.start().unwrap();
++        let mut captured = CapturedContext::new(&service.storage, invocation.clone()).unwrap();
++        let response = captured
++            .execute(&lease, ContextRequest::Describe {})
++            .await
++            .unwrap();
++        serde_json::to_vec(&response).unwrap().len() as u64
++    };
++    let budget = RunBudget::new(
++        invocation.id(),
++        &invocation.fence_hash(),
++        service.runner_slots.clone(),
++        BudgetLimits {
++            output_bytes: bytes,
++            ..BudgetLimits::default()
++        },
++        workflow.clone(),
++    )
++    .unwrap();
++    let lease = budget.start().unwrap();
++    let mut research = research::Research::new(
++        &service,
++        &job_id,
++        invocation,
++        service.config.pin(),
++        &workflow,
++        plan,
++        budget.clone(),
++    )
++    .unwrap();
++    let error = research
++        .execute(&lease, ContextRequest::Describe {})
++        .await
++        .unwrap_err();
++    assert_eq!(error.code, ErrorCode::BudgetExhausted);
++    assert_eq!(budget.usage().unwrap().output_bytes, bytes);
++    assert!(research.gaps.iter().any(|gap| gap == "BUDGET_EXHAUSTED"));
++    service.storage.close().await.unwrap();
++}
++
+ #[tokio::test]
+ async fn editor_legacy_checkpoint_without_coverage_stays_for_review() {
+     let root = std::env::temp_dir().join(format!("akasha-editor-legacy-{}", std::process::id()));
+diff --git a/tests/fixtures/codex/0.164.0/runner_host.py b/tests/fixtures/codex/0.164.0/runner_host.py
+index aaf4fe4..5ee5f21 100644
+--- a/tests/fixtures/codex/0.164.0/runner_host.py
++++ b/tests/fixtures/codex/0.164.0/runner_host.py
+@@ -152,8 +152,19 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_',
+             'items':[item['memory']['revision']['key']['id'] for item in value.get('items', [])],
+             'changed':value.get('changed'),'originals':len(value.get('originals', []))}))
+         return response
+-    page = tool('context_list', {'cursor':None,'limit':4})['value']
+-    assert tool('context_read', {'handle':page['events'][0]['handle'],'start':0,'max_bytes':1024})['kind'] == 'text'
++    if scenario == 'editor_history_search_gap':
++        page = tool('context_search', {'cursor':None,'query':'controlled','limit':4})['value']
++    else:
++        page = tool('context_list', {'cursor':None,'limit':4})['value']
++    if 'history' in scenario:
++        assert page['gaps'] == ['HISTORY_GAP'], page
++    short = scenario in ('editor_context_gap', 'conclusion_context_gap')
++    text = tool('context_read', {'handle':page['events'][0]['handle'],'start':0,'max_bytes':1 if short else 1024})
++    assert text['kind'] == 'text'
++    if short: assert text['value']['truncated'] is True
++if scenario in ('editor_delegate_gap', 'editor_delegate_conflict_gap', 'conclusion_delegate_gap') and not hint:
++    child = tool('delegate', {'hint':'child-with-limitation'})
++    assert child['kind'] == 'research' and child['value']['status'] == 'incomplete', child
+ if scenario.startswith('delegate_'):
+     branch = hint or 'root'
+     if scenario == 'delegate_parents':
+@@ -272,11 +283,16 @@ if scenario.startswith('conclusion_') or 'status' in turn_request['params']['out
+         memories=seen_memories, conditions=[], conflicts=[], gaps=[] if seen_sources or seen_memories else ['no_evidence'])
+     if scenario.startswith('editor'):
+         conclusion['answer'] = json.dumps(editor_report)
+-        if scenario.endswith('_gap'):
++        if scenario.endswith('_gap') and not hint:
+             assert conclusion['status'] == 'found' and conclusion['gaps'] == []
+             (root / 'model-coverage.json').write_text(json.dumps({'status':conclusion['status'], 'gaps':conclusion['gaps']}))
+         if scenario == 'editor_uncertain':
+             conclusion.update(status='incomplete', gaps=['unverified_platform'])
++    if hint == 'child-with-limitation':
++        if scenario == 'editor_delegate_conflict_gap':
++            conclusion.update(status='incomplete', conflicts=['The child found conflicting evidence.'])
++        else:
++            conclusion.update(status='incomplete', gaps=['child_limit'])
+     if scenario == 'conclusion_no_hit':
+         tool('context_search', {'cursor':None,'query':'absent-conclusion-query','limit':4})
+         conclusion.update(status='no_hit', answer='No reliable relevant result in the searched scope.', sources=[], memories=[], gaps=[])
+diff --git a/tests/support/daemon_codex.rs b/tests/support/daemon_codex.rs
+index b0f6212..40bee9f 100644
+--- a/tests/support/daemon_codex.rs
++++ b/tests/support/daemon_codex.rs
+@@ -25,7 +25,12 @@ pub(super) fn consult_fixture_with(
+     std::fs::create_dir(&home).unwrap();
+     let concurrency = match scenario {
+         "delegate_tree" => 4,
+-        "delegate_failure" | "delegate_parents" | "delegate_cancel" => 2,
++        "delegate_failure"
++        | "delegate_parents"
++        | "delegate_cancel"
++        | "editor_delegate_gap"
++        | "editor_delegate_conflict_gap"
++        | "conclusion_delegate_gap" => 2,
+         _ => 1,
+     };
+     let depth = if scenario == "delegate_tree" { 2 } else { 1 };
+@@ -658,6 +663,8 @@ fn consult_conclusions_validate_evidence_no_hit_conditions_and_conflicts() {
+         "conclusion_no_hit",
+         "conclusion_forged",
+         "conclusion_conflict",
++        "conclusion_context_gap",
++        "conclusion_delegate_gap",
+     ] {
+         let (daemon, event, _) = consult_fixture(scenario);
+         let submitted = native(&daemon, event);
+@@ -682,6 +689,22 @@ fn consult_conclusions_validate_evidence_no_hit_conditions_and_conflicts() {
+                 assert!(result["memories"].as_array().unwrap().is_empty());
+             }
+             "conclusion_forged" => assert_eq!(result["error"]["code"], "READ_DENIED", "{result}"),
++            "conclusion_context_gap" | "conclusion_delegate_gap" => {
++                assert_eq!(result["status"], "incomplete", "{result}");
++                let gap = if scenario == "conclusion_context_gap" {
++                    "context_read_budget"
++                } else {
++                    "child_limit"
++                };
++                assert!(
++                    result["gaps"]
++                        .as_array()
++                        .unwrap()
++                        .iter()
++                        .any(|value| value == gap),
++                    "{result}"
++                );
++            }
+             _ => {
+                 assert_eq!(result["status"], "incomplete", "{result}");
+                 assert_eq!(
+diff --git a/tests/support/daemon_editor.rs b/tests/support/daemon_editor.rs
+index 3ab4e4d..615c701 100644
+--- a/tests/support/daemon_editor.rs
++++ b/tests/support/daemon_editor.rs
+@@ -92,13 +92,16 @@ fn input_scope() -> Value {
+ }
+ 
+ fn omitted_investigation_gap(scenario: &str, gap: &str) {
+-    let (daemon, _, bound) = super::codex_tests::consult_fixture_with(scenario, |root| {
++    let (mut daemon, _, mut bound) = super::codex_tests::consult_fixture_with(scenario, |root| {
+         let mut settings = editor_config(root, "automatic");
+         if scenario == "editor_original_gap" {
+             settings.push_str("[retrieval]\nmax_original_chars=8\n");
+         }
+         settings
+     });
++    if scenario.contains("history") {
++        bind_missing_history(&mut daemon, &mut bound);
++    }
+     let original = daemon.cli(&["memory", "show", "editable"])["data"]["data"].clone();
+     let input = feedback(
+         &daemon,
+@@ -133,6 +136,120 @@ fn omitted_investigation_gap(scenario: &str, gap: &str) {
+     );
+ }
+ 
++fn bind_missing_history(daemon: &mut Daemon, bound: &mut Value) {
++    daemon.cli(&["daemon", "stop"]);
++    daemon.wait();
++    tokio::runtime::Builder::new_current_thread()
++        .enable_all()
++        .build()
++        .unwrap()
++        .block_on(async {
++            use akasha_otsuge::{
++                adapter::{FenceCoverage, Invocation},
++                capture::{
++                    Capture, CaptureBinding, CoverageLevel, EventDraft, EventKind, EventRef,
++                    MessagePhase, Visibility,
++                },
++                config::{Paths, resolve},
++                domain::Ingress,
++                storage::Storage,
++            };
++            let config = resolve(
++                "",
++                None,
++                "",
++                &Paths {
++                    data_dir: daemon.root.join("data"),
++                    socket_path: daemon.socket(),
++                },
++            )
++            .unwrap();
++            let store = Storage::open(&config).await.unwrap();
++            let principal = format!("uid:{}", rustix::process::geteuid().as_raw());
++            let old = Invocation::load(
++                &store,
++                bound["data"]["invocation_id"].as_str().unwrap(),
++                &principal,
++            )
++            .await
++            .unwrap();
++            let mut binding = old.diagnostic().clone();
++            let capture = CaptureBinding::from_source(
++                binding.caller.clone(),
++                binding.scope.clone(),
++                "missing-history-fixture",
++                CoverageLevel::VisibleText,
++            )
++            .unwrap();
++            let text = "controlled fixture history";
++            let draft = EventDraft {
++                event_id: "retained-tip".into(),
++                source_version: "1".into(),
++                runtime_instance: binding.runtime_instance.clone(),
++                branch: binding.branch.clone(),
++                parent: Some(EventRef {
++                    source: binding.caller.clone(),
++                    event_id: "missing-parent".into(),
++                }),
++                fork_cutoff: None,
++                event_time_ms: None,
++                observed_time_ms: 1,
++                visibility: Visibility::User,
++                kind: EventKind::Message {
++                    message_id: "tip".into(),
++                    phase: MessagePhase::Final,
++                },
++                text: text.into(),
++            };
++            let tip = Capture::new(&store)
++                .ingest(
++                    &capture,
++                    &draft,
++                    text.as_bytes(),
++                    &Ingress::unverified("fixture", "history-gap", binding.scope.clone()).unwrap(),
++                    None,
++                    binding.config_generation,
++                )
++                .await
++                .unwrap();
++            binding.invocation_id.push_str("/history-gap");
++            binding.tip = Some(tip.event.reference);
++            binding.capture_seq = store.sequence().unwrap();
++            binding.available_cursor = binding.requested_cursor;
++            binding.capability.history = CoverageLevel::VisibleText;
++            let invocation = Invocation::bind(&store, binding).await.unwrap();
++            assert_eq!(invocation.coverage(), FenceCoverage::CompleteToFence);
++            bound["data"]["invocation_id"] = json!(invocation.id());
++            store.close().await.unwrap();
++        });
++    daemon.start();
++}
++
++#[test]
++fn editor_keeps_successful_history_list_gaps_when_the_model_omits_them() {
++    omitted_investigation_gap("editor_history_gap", "HISTORY_GAP");
++}
++
++#[test]
++fn editor_keeps_successful_history_search_gaps_when_the_model_omits_them() {
++    omitted_investigation_gap("editor_history_search_gap", "HISTORY_GAP");
++}
++
++#[test]
++fn editor_keeps_context_read_gaps_when_the_model_omits_them() {
++    omitted_investigation_gap("editor_context_gap", "context_read_budget");
++}
++
++#[test]
++fn editor_keeps_child_gaps_when_the_parent_omits_them() {
++    omitted_investigation_gap("editor_delegate_gap", "child_limit");
++}
++
++#[test]
++fn editor_keeps_child_conflicts_when_the_parent_omits_them() {
++    omitted_investigation_gap("editor_delegate_conflict_gap", "unresolved_conflict");
++}
++
+ #[test]
+ fn editor_keeps_daemon_tool_gaps_when_the_model_omits_them() {
+     omitted_investigation_gap("editor_tool_gap", "INDEX_NOT_READY");

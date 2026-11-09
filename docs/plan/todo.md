@@ -49,8 +49,8 @@ at a time in the specification's dependency order, with focused regressions and
 one final exact-HEAD gate/review per candidate. No speculative parallel writers
 or repeated full-corpus acceptance on unrelated intermediate changes.
 
-The 2026-10-30 audit finds 11 open Issues (#12, #19–#28). #4–#11 and #13–#18 are closed
-with merged PRs #32–#38/#40/#42/#43/#44/#45/#46/#47; no verified implementation waits for closure. #7's
+The 2026-10-30 audit finds 10 open Issues (#12, #20–#28). #4–#11 and #13–#19 are closed
+with merged PRs #32–#38/#40/#42/#43/#44/#45/#46/#47/#48; no verified implementation waits for closure. #7's
 review found an anchor race and its sibling; both have causal regressions, and
 the final candidate passed its own gate, independent R3 review and CI. Finish
 one dependency leaf through publication before merging the next. During a fixed
@@ -806,25 +806,90 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
   permission rechecks, stale-version refusal, retries and crash recovery.
 - [x] Archive compact real CLI examples and policy/state-machine evidence; run the
   canonical gate, independent review, hosted CI, merge and verified closure.
-  Candidate `ae086e6` passed its canonical gate, independent R2 review and
-  CI40983567511. PR #48 merged as `4609349`; #19 closed completed, rechecked live
-  on 2026-11-09. Historical validation is distinct from current work below.
+  Candidate `ae086e6` passed its227.27-second canonical gate, including98 installed
+  daemon cases. Independent R2 review corrected two R1 report errors on the
+  unchanged tree and passed with no actionable findings. CI40983567511 passed;
+  PR #48 merged as `4609349` and #19 closed completed. Synthetic PTY/controlled
+  extractor evidence is distinct from physical-human or native-model proof.
 
-## Current publication blockers
+## MVP-020 active acceptance and remaining work
 
-- [ ] Finish #50's frozen canonical gate, independent review, CI, merge and
-  verified closure. Its focused capture/identity/deadline tests pass. See the
-  [diagnostic and scope](../benchmarks/capture-wait-diagnostic.md).
-  Candidate `d672585` passed its canonical gate but failed independent review:
-  queue-to-running observation could renew the supervisor after wall-clock reversal.
-  The new regression failed before repair; all five clock cases now pass. The
-  corrected candidate still requires its own gate and review.
-- [ ] Integrate #50 into PR #49, preserving the Editor coverage-class repair
-  at local `3b86282`; run its own exact gate, whole-candidate review and CI,
-  then merge and close #20. Its earlier R2/R3 review failures and canonical
-  capture-wait failure remain blocking historical evidence until superseded.
-- [ ] Continue #21 through #28 in the queue below. #12 remains explicitly deferred
-  for Claude authentication under the owner's authorized Codex substitution.
+Original task start 2026-10-30T01:15:59.632765+00:00; base `4609349`.
+
+Restart audit: the inherited branch was at `159aad8` with the native editor workflow
+uncommitted. Eight controlled integration tests passed before the pause; two
+recovery tests failed during fixture binding because the synthetic capability
+omitted its executable. They did not exercise recovery. No owned build or native
+agent survived the pause. The calendar gap is paused time, not measured execution.
+At resume, ten original Issues remained; #50 was then added as an independent
+gate repair. No accepted Issue awaits closure.
+
+- [x] Correct the recovery fixture and verify both SIGKILL checkpoints and the
+  no-checkpoint interruption case. `mvp020-recovery-resume-r1` passed both tests;
+  the original setup failure receipt remains retained.
+- [x] Run the pending Consult regression set and Clippy: 31 Consult tests and
+  Clippy all-targets passed in the same batch, without repeating corpus acceptance.
+- [x] Verify one real external Runner: Codex 0.164.0 with the existing profile
+  completed investigation and a constrained candidate revision in 54.9 seconds.
+  `mvp020-native-codex-r1` records original/code citations, one Runner start,
+  immutable scope and no human approval. Temporary data was removed and the
+  existing Codex configuration was unchanged. The two preceding Pi attempts
+  failed because localhost:48317 was not listening; retain their receipts.
+- [x] Document patch/workflow contracts and limitations; archive 178,601 bytes of
+  compact receipts and commit the verified native workflow at `9b3ce6c`.
+- [x] Candidate `77a78c6` passed its canonical gate. Independent R2 review found
+  omitted daemon-observed investigation gaps and the CLI's incompatible 16 KiB
+  patch limit. Retain that FAIL and the runtime-only R1 INCOMPLETE result.
+- [x] Reproduce both review findings and the legacy recovery case before repair;
+  share Consult's coverage merge, persist gaps and use the bounded 64 KiB patch
+  input. Twelve editor tests, three recovery tests, 32 Consult-related tests and
+  Clippy passed. Earlier suite-wait failures remain unclassified.
+- [x] Preserve the `d9d1e4a` canonical PASS and R3 FAIL. Audit the whole shared
+  response boundary after repeated coverage findings; reproduce missing-parent
+  list/search, context truncation, child gaps/conflicts and combined errors.
+  Retain these observations before response publication and in validated child
+  conclusions. Seventeen editor, four recovery/boundary and 32 Consult-related
+  tests plus Clippy pass in `mvp020-coverage-green-r3`. Old-head CI42675990719
+  passed after a verified Cargo cache miss and saved its cache.
+- [x] Preserve the exact `3b86282` canonical failure and one phase-correlated
+  workspace replay. Capture supervisors stopped while work advanced inside its
+  accepted deadline; #50 separately repairs those fixture clocks and positive
+  native identity setup. Its corrected source `74f726c` passes the full main-based
+  gate and independent R2 review, and is now integrated here.
+- [ ] Finish the integrated Editor candidate's canonical gate, independent
+  whole-candidate review, hosted
+  CI on PR #49, merge and verified Issue closure.
+
+- [x] Define bounded feedback/editor and patch inputs with exact expected revisions,
+  evidence, scope and reason; preserve originals and refuse forged human authority.
+- [x] Apply policy-controlled changes atomically with audit, review/outbox and live
+  permissions; test duplicate, concurrent, stale and expired patches. Scope
+  expansion requires a separate authorization rather than widening a local edit.
+- [x] Reuse configured Runner and authorized original/code readers for investigation;
+  pin execution policy and keep model work outside the write transaction.
+- [x] Recheck current authority in search/delivery after correction;
+  old history and actual recall receipts must remain verifiable.
+- [x] Run one real external Runner through investigation and constrained revision;
+  archive compact evidence with its exact historical source identity. Final
+  repaired-head publication remains in the checklist above.
+
+## Issue #50 active gate repair
+
+- [x] Preserve original failures, unchanged-main attribution and bounded procfs
+  observations; distinguish observed fsync waits from an unknown filesystem cause.
+- [x] Keep capture supervision within original admitted queue/execution clocks,
+  retain bounded terminal grace and non-capture/cancellation limits, and prepare
+  positive identity fixtures through durable backfill. Deterministic clock checks,
+  102 daemon cases and Clippy pass; no production timeout/durability change.
+- [x] Preserve `d672585` canonical PASS and independent R1 FAIL: wall-clock
+  reversal during queue-to-running observation could renew supervision. Reproduce
+  that counterexample before pinning one clock mapping across both phases.
+- [x] Freeze `74f726c` / tree `35ce5d4`; `just check` passes in 155.934 seconds,
+  with 103 daemon cases in both normal and installed vectors and UID boundaries.
+  Independent R2 reviews the whole range and passes all 14 focused cases.
+- [ ] Finish corrected-head CI on [PR #51](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/51), merge and close #50.
+  The first historical CI run is still building; let it publish its cache before
+  pushing the corrected head. Neither #20 nor #50 is closed on local checks alone.
 
 ## Complete Issue queue
 
@@ -857,7 +922,7 @@ Original task start 2026-10-30T00:16:35.991085+00:00; base `2da9a2e`.
 - [ ] [#27 [MVP-027] 质量评测、主上下文开销与组合回归](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) — dependencies: #16, #18, #19, #20, #22, #24, #26.
 - [ ] [#28 [MVP-028] 需求逐项终验、发布和完成证据归档](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/28) — dependencies: #1, #2, #3, #4, #5, #6, #7, #8, #9, #10, #11, #12, #13, #14, #15, #16, #17, #18, #19, #20, #21, #22, #23, #24, #25, #26, #27.
 
-- [ ] [#50 Capture fixture supervision](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/50) — repairs an existing gate blocker; separate from Editor behavior and production performance acceptance.
+- [ ] [#50 Capture fixture supervision](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/50) — existing gate blocker; independent test-only fix.
 
 Every leaf retains the complete linked acceptance criteria. No local fixture
 substitutes for the real four-host, provider-duration or release acceptance.

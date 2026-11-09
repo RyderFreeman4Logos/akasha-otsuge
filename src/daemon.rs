@@ -15,6 +15,7 @@ use crate::storage::Storage;
 mod claude;
 mod codex;
 mod configuration;
+mod editor;
 mod hermes;
 mod jobs;
 mod pi;
@@ -172,6 +173,22 @@ impl Service {
         command: Command,
     ) -> Result<serde_json::Value> {
         match command {
+            Command::EditorRun {
+                feedback,
+                idempotency_key,
+            } => self.submit_editor(idempotency_key, feedback).await,
+            Command::PatchApply {
+                patch,
+                idempotency_key,
+            } => self.apply_patch(patch, idempotency_key).await,
+            Command::PatchShow { id } => Ok(crate::domain::Domain::new(&self.storage)
+                .show_patch(&jobs::context()?, &id)
+                .await?),
+            Command::MemoryExport { id } => Ok(serde_json::to_value(
+                crate::domain::Domain::new(&self.storage)
+                    .export_memory(&jobs::context()?, &id)
+                    .await?,
+            )?),
             Command::ReviewPreview {
                 decision,
                 idempotency_key,

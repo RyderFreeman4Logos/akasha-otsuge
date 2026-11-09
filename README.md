@@ -24,6 +24,8 @@ A local, traceable memory system for coding agents, written in Rust.
 
 [审核队列与人工校准](docs/review.md)提供独立 review 状态、精确版本的确认/修改/否决，以及三种生效策略和 scope 内的 taste 优先规则。
 
+[外部 Memory Editor](docs/editor.md)使用配置的 Runner 调查证据，提交范围受限的版本补丁，并保留原文、修订审计和旧召回回执。
+
 [宿主公共契约](docs/adapters.md)定义持久调用绑定、受限上下文读取、Runner 终态与共享预算；[固定参考集及勘误](docs/evaluation/reference-v1-errata-1/README.md)保存 60 项任务与评测规则。真实四宿主接入和模型质量验收仍待后续 Issues 完成。
 
 公开仓库按用户要求采用 [Apache-2.0](LICENSE)。[来源与许可证核查](docs/provenance.md)记录迁移边界。

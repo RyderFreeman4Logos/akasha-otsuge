@@ -1,0 +1,13 @@
+{
+  "command": [
+    "just",
+    "check"
+  ],
+  "name": "mvp020-canonical-r1",
+  "process": {
+    "pid": 1868284,
+    "start_ticks": "606547853",
+    "state": "R"
+  },
+  "utc": "2026-11-09T18:06:21.501539+00:00"
+}

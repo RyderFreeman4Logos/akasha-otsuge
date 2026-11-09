@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T18:40:34.281674+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "77a78c620a8a303b8d98d591f2f9ea57232673bb",
+    "log_sha256": "2fcd7560882b1a377d8d7f96d67d76389c97812e8d8382cf4b695a0ccc7e79e6",
+    "seconds": 26.95107908733189,
+    "utc": "2026-11-09T18:40:18.737403+00:00"
+  },
+  "process_absent": true,
+  "classification": "review-terminal-verdict-inspection"
+}

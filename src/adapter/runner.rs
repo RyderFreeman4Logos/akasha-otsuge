@@ -420,8 +420,9 @@ impl RunSpec {
         self.guard = Some(binary);
         self
     }
-    pub(crate) fn with_research_result(mut self) -> Self {
+    pub(crate) fn with_research_result(mut self, generation: u64) -> Self {
         self.result_kind = ResultKind::Research;
+        self.config_generation = generation;
         self
     }
     pub(crate) fn uses_structured_result(&self) -> bool {

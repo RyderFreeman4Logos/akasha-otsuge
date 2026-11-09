@@ -83,6 +83,7 @@ pub enum Origin {
     HumanStatement,
     Extraction,
     AutoGrill,
+    MemoryEdit,
     TechnicalObservation,
     Unverified,
 }

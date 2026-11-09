@@ -1,0 +1,17 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--lib",
+    "research_retains_errors_after_a_successful_dispatch_without_swallowing_them",
+    "--",
+    "--nocapture"
+  ],
+  "name": "mvp020-coverage-error-red-r1",
+  "process": {
+    "pid": 2004033,
+    "start_ticks": "607026226",
+    "state": "R"
+  },
+  "utc": "2026-11-09T19:26:05.233330+00:00"
+}

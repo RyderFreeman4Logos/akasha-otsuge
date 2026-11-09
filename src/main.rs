@@ -42,9 +42,13 @@ Commands:
   job show|cancel ID
   job list [--after KEY]
   consult show JOB_ID
+  editor run FEEDBACK_JSON --idempotency-key ID
   consult receipt JOB_ID [--full]
   consult original JOB_ID SOURCE_INDEX [--start BYTE_OFFSET]
   memory show ID [--at COMMIT]
+  memory export ID
+  memory patch PATCH_JSON --idempotency-key ID
+  patch show ID
   memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]
   review list --scope JSON_FILE [--after ID]
   review open TARGET_JSON --idempotency-key ID
@@ -496,6 +500,16 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             id: (*id).into(),
             at: None,
         }),
+        ["memory", "export", id] => Some(Command::MemoryExport { id: (*id).into() }),
+        ["editor", "run", path, "--idempotency-key", id] => Some(Command::EditorRun {
+            feedback: json_file(path)?,
+            idempotency_key: (*id).into(),
+        }),
+        ["memory", "patch", path, "--idempotency-key", id] => Some(Command::PatchApply {
+            patch: json_file_limit(path, akasha_otsuge::domain::MAX_PATCH_BYTES)?,
+            idempotency_key: (*id).into(),
+        }),
+        ["patch", "show", id] => Some(Command::PatchShow { id: (*id).into() }),
         ["review", "list", flags @ ..] => {
             let flags = options(flags, &["--scope", "--after"])?;
             Some(Command::ReviewList {
@@ -777,8 +791,11 @@ fn number(value: &str) -> Result<u64> {
     value.parse().map_err(|_| Error("INVALID_ARGUMENT"))
 }
 fn json_file<T: serde::de::DeserializeOwned>(path: &str) -> Result<T> {
+    json_file_limit(path, 16384)
+}
+fn json_file_limit<T: serde::de::DeserializeOwned>(path: &str, limit: usize) -> Result<T> {
     let input = config::read_file(std::path::Path::new(path))?;
-    if input.len() > 16384 {
+    if input.len() > limit {
         return Err(Error("MESSAGE_TOO_LARGE"));
     }
     Ok(serde_json::from_str(&input)?)

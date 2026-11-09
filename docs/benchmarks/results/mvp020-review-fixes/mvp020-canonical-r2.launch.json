@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-canonical-observer-r2.py"
+  ],
+  "name": "mvp020-canonical-r2",
+  "process": {
+    "pid": 1901872,
+    "start_ticks": "606664062",
+    "state": "R"
+  },
+  "utc": "2026-11-09T18:25:43.589844+00:00"
+}

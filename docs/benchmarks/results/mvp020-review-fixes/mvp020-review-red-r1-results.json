@@ -1,0 +1,29 @@
+{
+  "head": "77a78c620a8a303b8d98d591f2f9ea57232673bb",
+  "test_patch_sha256": "81e971dfdf64edf506802e4a4082a4dea487bd5abcb7bedd3d91fb10295f0ab7",
+  "results": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--test",
+        "daemon",
+        "editor_tests::"
+      ],
+      "exit_code": 101
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--lib",
+        "daemon::jobs::consult::editor_tests::editor_checkpoint_and_committed_patch_survive_sigkill_without_runner_replay",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 101
+    }
+  ]
+}

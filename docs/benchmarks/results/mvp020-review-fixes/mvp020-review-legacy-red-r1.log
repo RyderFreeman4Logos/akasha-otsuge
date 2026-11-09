@@ -1,0 +1,24 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp020)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.97s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 1 test
+test daemon::jobs::consult::editor_tests::editor_legacy_checkpoint_without_coverage_stays_for_review ... FAILED
+
+failures:
+
+---- daemon::jobs::consult::editor_tests::editor_legacy_checkpoint_without_coverage_stays_for_review stdout ----
+
+thread 'daemon::jobs::consult::editor_tests::editor_legacy_checkpoint_without_coverage_stays_for_review' (1951490) panicked at src/daemon/editor_tests.rs:268:5:
+assertion `left == right` failed
+  left: DelegatedApproved
+ right: Candidate
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    daemon::jobs::consult::editor_tests::editor_legacy_checkpoint_without_coverage_stays_for_review
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 63 filtered out; finished in 0.10s
+
+error: test failed, to rerun pass `--lib`
