@@ -47,6 +47,9 @@ Commands:
   outcome show EVENT_ID
   outcome run PLAN_JSON -- COMMAND [ARGS]
   outcome log EVENT_ID INDEX [--start BYTE_OFFSET]
+  incident list --scope JSON_FILE [--after ID]
+  incident show ID [--after EVENT_CURSOR]
+  incident update UPDATE_JSON --idempotency-key ID
   editor run FEEDBACK_JSON --idempotency-key ID
   consult receipt JOB_ID [--full]
   consult original JOB_ID SOURCE_INDEX [--start BYTE_OFFSET]
@@ -492,6 +495,25 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             event: json_file_limit(path, akasha_otsuge::outcome::MAX_EVENT_BYTES)?,
         }),
         ["outcome", "show", id] => Some(Command::OutcomeShow { id: (*id).into() }),
+        ["incident", "list", flags @ ..] => {
+            let flags = options(flags, &["--scope", "--after"])?;
+            Some(Command::IncidentList {
+                scope: json_file(flags.get("--scope").ok_or(Error("INVALID_ARGUMENT"))?)?,
+                after: flags.get("--after").map(|s| (*s).to_owned()),
+            })
+        }
+        ["incident", "show", id] => Some(Command::IncidentShow {
+            id: (*id).into(),
+            after: None,
+        }),
+        ["incident", "show", id, "--after", after] => Some(Command::IncidentShow {
+            id: (*id).into(),
+            after: Some((*after).into()),
+        }),
+        ["incident", "update", path, "--idempotency-key", id] => Some(Command::IncidentUpdate {
+            update: json_file(path)?,
+            idempotency_key: (*id).into(),
+        }),
         ["consult", "show", id] => Some(Command::ConsultShow { id: (*id).into() }),
         ["consult", "receipt", id] => Some(Command::ConsultReceipt {
             id: (*id).into(),

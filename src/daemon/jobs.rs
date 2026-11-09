@@ -20,6 +20,8 @@ mod grill;
 #[cfg(test)]
 #[path = "grill_tests.rs"]
 mod grill_tests;
+#[path = "incident.rs"]
+mod incident;
 #[path = "models.rs"]
 mod models;
 #[path = "outcome.rs"]

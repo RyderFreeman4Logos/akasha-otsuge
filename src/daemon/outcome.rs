@@ -15,7 +15,7 @@ fn outcome_key(id: &str) -> Result<RecordKey> {
 }
 
 impl Service {
-    fn outcome_binding(&self, id: &str) -> Result<Invocation> {
+    pub(super) fn outcome_binding(&self, id: &str) -> Result<Invocation> {
         let invocation = Invocation::load_verified(&self.storage, id, &principal())?;
         let binding = invocation.diagnostic();
         Domain::new(&self.storage).permission(&invocation.read_context()?, Some(&binding.scope))?;
@@ -203,7 +203,8 @@ impl Service {
                     completeness: source.completeness.with_coverage(view.event.coverage),
                 });
             }
-            let record = outcome::Record {
+            let mut record = outcome::Record {
+                incident: None,
                 schema_version: 1,
                 run_id: invocation.id().into(),
                 caller: invocation.diagnostic().caller.clone(),
@@ -226,10 +227,16 @@ impl Service {
                 links,
                 logs,
             };
+            let mut changes = service.incident_changes(&mut record)?;
             let content = serde_json::to_string(&record)?;
             if content.len() > ipc::MAX_MESSAGE / 2 {
                 return Err(Error("RESULT_TOO_LARGE"));
             }
+            changes.push(Change {
+                key: key.clone(),
+                expected_revision: None,
+                content,
+            });
             let receipt = service
                 .storage
                 .commit_or_reuse(|| {
@@ -239,20 +246,17 @@ impl Service {
                         request_id: key.id.clone(),
                         config_generation: record.config_generation,
                         policy_revision: None,
-                        changes: vec![Change {
-                            key: key.clone(),
-                            expected_revision: None,
-                            content: content.clone(),
-                        }],
+                        changes: changes.clone(),
                     }))
                 })
                 .await?;
+            service.wake_jobs();
             Ok(serde_json::to_value(receipt)?)
         })
         .await
     }
 
-    async fn read_outcome(&self, id: &str) -> Result<outcome::Record> {
+    pub(super) async fn read_outcome(&self, id: &str) -> Result<outcome::Record> {
         let row = self
             .storage
             .current(&outcome_key(id)?)?

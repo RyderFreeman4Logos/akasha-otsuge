@@ -206,6 +206,8 @@ pub struct Event {
     pub logs: Vec<LogRef>,
     pub receipt_jobs: Vec<String>,
     pub claims: Vec<Claim>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub incident: Option<Box<crate::incident::Signal>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -243,6 +245,8 @@ pub struct Log {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Record {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub incident: Option<String>,
     pub schema_version: u32,
     pub run_id: String,
     pub caller: SourceIdentity,
@@ -275,6 +279,9 @@ impl Workspace {
 
 impl Event {
     pub fn validate(&self) -> Result<()> {
+        if let Some(signal) = &self.incident {
+            signal.validate()?;
+        }
         let mut jobs = BTreeSet::new();
         let mut artifacts = BTreeSet::new();
         if ![&self.event_id, &self.invocation_id, &self.source]

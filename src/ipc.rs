@@ -98,6 +98,18 @@ pub struct Request {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    IncidentShow {
+        id: String,
+        after: Option<String>,
+    },
+    IncidentList {
+        scope: crate::domain::Scope,
+        after: Option<String>,
+    },
+    IncidentUpdate {
+        update: crate::domain::ReviewUpdate,
+        idempotency_key: String,
+    },
     OutcomeContext {
         invocation_id: String,
     },

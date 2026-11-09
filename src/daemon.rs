@@ -173,6 +173,14 @@ impl Service {
         command: Command,
     ) -> Result<serde_json::Value> {
         match command {
+            Command::IncidentShow { id, after } => self.show_incident(&id, after.as_deref()).await,
+            Command::IncidentList { scope, after } => {
+                self.list_incidents(&scope, after.as_deref()).await
+            }
+            Command::IncidentUpdate {
+                update,
+                idempotency_key,
+            } => self.update_incident(idempotency_key, update).await,
             Command::OutcomeContext { invocation_id } => self.outcome_context(&invocation_id).await,
             Command::OutcomeLogWrite { chunk } => self.write_outcome_log(chunk).await,
             Command::OutcomeLog { id, index, start } => self.outcome_log(&id, index, start).await,
