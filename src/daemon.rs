@@ -173,6 +173,9 @@ impl Service {
         command: Command,
     ) -> Result<serde_json::Value> {
         match command {
+            Command::OutcomeContext { invocation_id } => self.outcome_context(&invocation_id).await,
+            Command::OutcomeLogWrite { chunk } => self.write_outcome_log(chunk).await,
+            Command::OutcomeLog { id, index, start } => self.outcome_log(&id, index, start).await,
             Command::OutcomeSubmit { event } => self.submit_outcome(event).await,
             Command::OutcomeShow { id } => self.show_outcome(&id).await,
             Command::EditorRun {

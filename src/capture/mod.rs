@@ -529,7 +529,7 @@ fn validate_advance(binding: &CaptureBinding, a: &Advance) -> Result<()> {
     }
     Ok(())
 }
-pub(crate) fn encode_hex(bytes: &[u8]) -> String {
+pub fn encode_hex(bytes: &[u8]) -> String {
     const HEX: &[u8] = b"0123456789abcdef";
     let mut out = String::with_capacity(bytes.len() * 2);
     for &b in bytes {

@@ -1,8 +1,8 @@
 # Execution outcomes
 
-Implementation in progress for [MVP-021](spec/issues/MVP-021.md). The structured
-submit/show protocol passes its first persistence, permission and attribution
-regression. Command execution, full log retrieval and final acceptance remain pending.
+Implementation in progress for [MVP-021](spec/issues/MVP-021.md). Structured
+submission and the command wrapper pass their first focused regressions.
+Expanded boundary tests and final acceptance remain pending.
 
 An outcome identifies one execution event. Several builds in one agent run have
 different event IDs, workspace observations, artifact hashes and log sources.
@@ -41,3 +41,40 @@ Log previews are bounded. Full retained bytes use the existing immutable Capture
 archive, with exact event/revision/hash references. A truncated preview retains
 its complete source locator. If source capture itself is incomplete, the outcome
 must say so; it cannot call the retained prefix a complete log.
+
+## Command wrapper
+
+Create a JSON plan with `event_id`, the verified Caller `invocation_id`, and an
+optional `artifacts` array of relative regular-file paths. For example:
+
+```json
+{"event_id":"build-1","invocation_id":"stored-invocation-id","artifacts":["target/app"]}
+```
+
+Run `akasha-otsuge outcome run plan.json -- COMMAND ARGS...`. It uses the bound
+workspace and currently completed Consult receipt. Standard output is an outcome
+JSON envelope even when the child fails. The exit status is the child's code,
+128 plus a terminating signal, or 127 when the executable cannot start. Command
+stdout/stderr are retained separately; they are not mixed into that envelope.
+
+`outcome show EVENT_ID` returns the record. `outcome log EVENT_ID INDEX --start
+BYTE_OFFSET` returns at most 32 KiB as lossless `raw_hex`, its exact source hash
+and a `next_start` cursor. A log index names one contiguous stdout/stderr part.
+Parts are captured in stream order, up to 512 KiB each and 64 parts in total.
+These bounds are explicit failures, never silent capture truncation.
+
+The wrapper creates an exclusive private marker under the daemon's data
+directory before execution. Repeating that event ID refuses to execute, including
+after an interrupted or failed archival attempt. This is local replay prevention,
+not a distributed execution guarantee. Failure retains the execution observation
+and raw spool for diagnosis; it never retries the command. Successful publication
+removes the owned spool and leaves a compact receipt. A final immutable
+`event.json`, when present after a transport failure, can be submitted with
+`outcome submit`; an ambiguous earlier execution must be investigated before
+choosing a new event ID.
+
+Git and file hashes are streamed. Symlinks, submodules, unreadable or changing
+files and unavailable Git metadata produce explicit workspace coverage gaps.
+Ignored build outputs are covered only when explicitly listed as artifacts.
+The wrapper observes the direct child and its output files; it cannot certify
+that escaped descendants have finished producing output.

@@ -9,6 +9,72 @@ use std::path::{Component, Path, PathBuf};
 
 pub const MAX_EVENT_BYTES: usize = 128 * 1024;
 pub const PREVIEW_BYTES: usize = 4096;
+pub const LOG_CHUNK_BYTES: usize = 512 * 1024;
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RunPlan {
+    pub event_id: String,
+    pub invocation_id: String,
+    #[serde(default)]
+    pub artifacts: Vec<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct RunContext {
+    pub run_id: String,
+    pub workspace: PathBuf,
+    pub data_dir: PathBuf,
+    pub receipt_jobs: Vec<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct LogChunk {
+    pub invocation_id: String,
+    pub event_id: String,
+    pub stream: Stream,
+    pub part: u32,
+    pub observed_at_ms: u64,
+    pub raw_hex: String,
+}
+
+fn relative_file(path: &str) -> bool {
+    !path.is_empty()
+        && path.len() <= 4096
+        && !path.contains('\0')
+        && Path::new(path)
+            .components()
+            .all(|c| matches!(c, Component::Normal(_)))
+}
+
+pub fn validate_argv(argv: &[String]) -> Result<()> {
+    if argv.is_empty()
+        || argv.len() > 64
+        || argv[0].is_empty()
+        || argv.iter().any(|v| v.len() > 4096 || v.contains('\0'))
+    {
+        return Err(Error("INVALID_OUTCOME"));
+    }
+    Ok(())
+}
+
+impl RunPlan {
+    pub fn validate(&self) -> Result<()> {
+        let mut paths = BTreeSet::new();
+        if !identifier(&self.event_id)
+            || !identifier(&self.invocation_id)
+            || self.artifacts.len() > 32
+            || self
+                .artifacts
+                .iter()
+                .any(|p| !relative_file(p) || !paths.insert(p))
+        {
+            return Err(Error("INVALID_OUTCOME"));
+        }
+        Ok(())
+    }
+}
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -176,14 +242,7 @@ impl Event {
                 .any(|v| !identifier(v) || !jobs.insert(v))
             || self.artifacts.len() > 32
             || self.artifacts.iter().any(|v| {
-                v.path.is_empty()
-                    || v.path.len() > 4096
-                    || v.path.contains('\0')
-                    || Path::new(&v.path)
-                        .components()
-                        .any(|c| !matches!(c, Component::Normal(_) | Component::CurDir))
-                    || !hex(&v.sha256, &[64])
-                    || !artifacts.insert(&v.path)
+                !relative_file(&v.path) || !hex(&v.sha256, &[64]) || !artifacts.insert(&v.path)
             })
             || !self.artifacts.is_empty() && self.execution.is_none()
             || self.logs.len() > 64
@@ -196,13 +255,7 @@ impl Event {
             let statuses = usize::from(execution.exit_code.is_some())
                 + usize::from(execution.signal.is_some())
                 + usize::from(execution.spawn_error.is_some());
-            if execution.argv.is_empty()
-                || execution.argv.len() > 64
-                || execution.argv[0].is_empty()
-                || execution
-                    .argv
-                    .iter()
-                    .any(|v| v.len() > 4096 || v.contains('\0'))
+            if validate_argv(&execution.argv).is_err()
                 || !execution.workspace.is_absolute()
                 || execution.workspace.as_os_str().len() > 4096
                 || execution.started_at_ms > execution.finished_at_ms
