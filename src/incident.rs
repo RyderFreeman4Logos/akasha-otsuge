@@ -72,6 +72,8 @@ pub(crate) struct Record {
     pub investigation: Investigation,
     pub job_id: Option<String>,
     pub error: Option<String>,
+    #[serde(default)]
+    pub classification: Option<crate::editor::Classification>,
     pub operator_reason: Option<String>,
 }
 

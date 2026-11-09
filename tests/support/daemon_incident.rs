@@ -10,6 +10,100 @@ fn rpc(daemon: &Daemon, command: Value) -> Value {
     receive(&mut stream)
 }
 
+fn investigated(daemon: &Daemon, id: &str) -> Value {
+    let mut wait = super::job_wait::JobWait::default();
+    loop {
+        let item = daemon.cli(&["incident", "show", id])["data"].clone();
+        if item["record"]["investigation"] == "finished" {
+            return item;
+        }
+        if let Some(job_id) = item["record"]["job_id"].as_str() {
+            let job = daemon.cli(&["job", "show", job_id])["data"].clone();
+            if matches!(job["state"].as_str(), Some("queued" | "running")) {
+                wait.check(&job);
+            }
+        }
+        let now = akasha_otsuge::ipc::now_ms().unwrap();
+        let admission_end = item["record"]["first_report_at_ms"].as_u64().unwrap() + 30_000;
+        assert!(
+            item["record"]["job_id"].is_string() || now < admission_end,
+            "automatic investigation was not admitted within the configured queue budget: {item}"
+        );
+        assert!(
+            now < item["record"]["expires_at_ms"].as_u64().unwrap(),
+            "{item}"
+        );
+        std::thread::sleep(Duration::from_millis(20));
+    }
+}
+
+#[test]
+fn configured_incident_investigation_runs_once_and_keeps_environment_reports_separate() {
+    let (daemon, _, bound) = super::codex_tests::consult_fixture_with(
+        "editor_environment",
+        |root| {
+            format!(
+                "[review]\nmode='automatic'\n[timeouts]\nqueue='30s'\n[incidents]\nexecutor='editor'\ntriggers=['reproducible_failure']\nauto_repair=true\nmax_runner_starts=1\nmax_tokens=64000\n[executors.editor]\nkind='codex'\nbinary={:?}\nnative_home={:?}\n",
+                root.join("codex"),
+                root.join("native-home")
+            )
+        },
+    );
+    let original = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+    let mut event = json!({"event_id":"network-report","invocation_id":bound["data"]["invocation_id"],
+        "source":"network-test","severity":"error","occurred_at_ms":akasha_otsuge::ipc::now_ms().unwrap(),
+        "execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+        "incident":{"kind":"reproducible_failure","key":"network-fixture","reason":"Compare the reported failure with the memory, originals and notes.rs; attachment is not causal proof.",
+            "targets":[{"memory_id":"editable","expected_revision":original["revision"]["commit_seq"]}]}});
+    let submitted = rpc(&daemon, json!({"op":"outcome_submit","event":event}));
+    assert!(submitted.get("error").is_none(), "{submitted}");
+    let id = daemon.cli(&["outcome", "show", "network-report"])["data"]["incident"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let result = investigated(&daemon, &id);
+    assert_eq!(
+        result["record"]["classification"], "environment",
+        "{result}"
+    );
+    // The source report has no execution evidence; investigation must keep that uncertainty.
+    assert_eq!(result["record"]["state"], "open");
+    assert!(result["record"]["error"].is_null(), "{result}");
+    let job_id = result["record"]["job_id"].as_str().unwrap();
+    let job = daemon.cli(&["job", "show", job_id])["data"].clone();
+    assert_eq!(job["state"], "succeeded", "{job}");
+    assert_eq!(job["result"]["editor"]["classification"], "environment");
+    assert!(job["result"]["patch_receipt"].is_null());
+    assert_eq!(job["result"]["usage"]["starts"], 1);
+    assert_eq!(
+        std::fs::read_to_string(daemon.root.join("starts"))
+            .unwrap()
+            .lines()
+            .count(),
+        1
+    );
+    event["event_id"] = json!("network-repeat");
+    assert!(
+        rpc(&daemon, json!({"op":"outcome_submit","event":event}))
+            .get("error")
+            .is_none()
+    );
+    let duplicate = investigated(&daemon, &id);
+    assert_eq!(duplicate["record"]["job_id"], result["record"]["job_id"]);
+    assert_eq!(duplicate["record"]["occurrences"], 2);
+    assert_eq!(
+        std::fs::read_to_string(daemon.root.join("starts"))
+            .unwrap()
+            .lines()
+            .count(),
+        1
+    );
+    assert_eq!(
+        daemon.cli(&["memory", "export", "editable"])["data"],
+        original
+    );
+}
+
 #[test]
 fn incident_signals_deduplicate_durably_without_inventing_memory_causality() {
     let (mut daemon, _, bound) = super::codex_tests::consult_fixture_with("editor_ledger", |_| {

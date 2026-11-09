@@ -151,6 +151,8 @@ pub(super) struct Plan {
     args: ConsultArgs,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     editor: Option<crate::editor::Feedback>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub(in crate::daemon::jobs) incident: Option<String>,
 }
 
 impl Service {
@@ -197,6 +199,7 @@ impl Service {
             executors,
             args: ConsultArgs::new(args.hint)?,
             editor: None,
+            incident: None,
         };
         self.submit_job(id, JobInput::Consult(plan)).await
     }

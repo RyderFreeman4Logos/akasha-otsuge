@@ -25,6 +25,7 @@ pub(super) struct Research<'a> {
     native: NativeExecutor,
     executors: BTreeMap<String, NativeExecutor>,
     editor: Option<crate::editor::Feedback>,
+    incident: Option<String>,
     budget: RunBudget,
     runs: Vec<Value>,
     current_run: Option<usize>,
@@ -71,13 +72,18 @@ impl<'a> Research<'a> {
             native: plan.native,
             executors: plan.executors,
             editor: plan.editor,
+            incident: plan.incident.clone(),
             budget,
             runs: vec![],
             current_run: None,
             selected: vec![],
             sources: vec![],
             code: vec![],
-            gaps: vec![],
+            gaps: if plan.incident.is_some() {
+                vec!["outcome_not_read".into()]
+            } else {
+                vec![]
+            },
             index_generation: None,
         })
     }
@@ -90,6 +96,9 @@ impl<'a> Research<'a> {
         let _guard = self.service.admission.lock().await;
         let (_, job) = self.service.job(self.id)?;
         self.service.authorize_job(&job)?;
+        if let Some(id) = &self.incident {
+            self.service.authorize_incident_execution(id)?;
+        }
         if job.cancel_requested {
             return Err(Error("CANCELLED"));
         }

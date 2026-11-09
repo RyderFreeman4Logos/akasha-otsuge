@@ -46,7 +46,7 @@ impl Service {
         Ok((Some(row.commit_seq), ids))
     }
 
-    fn incident_record(&self, id: &str) -> Result<(u64, Record)> {
+    fn incident_row(&self, id: &str) -> Result<(u64, Record)> {
         let row = self
             .storage
             .current(&key(id)?)?
@@ -56,11 +56,38 @@ impl Service {
             return Err(Error("INCIDENT_CORRUPT"));
         }
         record.signal.validate()?;
+        Ok((row.commit_seq, record))
+    }
+
+    pub(in crate::daemon::jobs) fn incident_record(&self, id: &str) -> Result<(u64, Record)> {
+        let (revision, record) = self.incident_row(id)?;
         let invocation = self.outcome_binding(&record.invocation_id)?;
         if record.principal != principal() || record.scope != invocation.diagnostic().scope {
             return Err(Error("READ_DENIED"));
         }
-        Ok((row.commit_seq, record))
+        Ok((revision, record))
+    }
+
+    pub(in crate::daemon::jobs) fn authorize_incident_execution(&self, id: &str) -> Result<Record> {
+        let record = self.incident_record(id)?.1;
+        if !matches!(record.state, ReviewState::Open | ReviewState::Investigating) {
+            return Err(Error("CANCELLED"));
+        }
+        if !self
+            .config
+            .pin()
+            .resolved()
+            .config()
+            .incidents
+            .triggers
+            .contains(&record.signal.kind)
+        {
+            return Err(Error("INCIDENT_DISABLED"));
+        }
+        if record.expires_at_ms <= ipc::now_ms()? {
+            return Err(Error("PATCH_EXPIRED"));
+        }
+        Ok(record)
     }
 
     pub(super) fn incident_changes(
@@ -187,6 +214,7 @@ impl Service {
                     },
                     job_id: None,
                     error: error.map(str::to_owned),
+                    classification: None,
                     operator_reason: None,
                 }
             }
@@ -224,6 +252,142 @@ impl Service {
         });
         outcome.incident = Some(id);
         Ok(changes)
+    }
+
+    async fn save_incident(&self, revision: u64, record: &Record) -> Result<()> {
+        let mut changes = vec![Change {
+            key: key(&record.id)?,
+            expected_revision: Some(revision),
+            content: serde_json::to_string(record)?,
+        }];
+        if record.investigation == Investigation::Finished {
+            let (pending_revision, mut pending) = self.pending_incidents()?;
+            pending.retain(|id| id != &record.id);
+            changes.push(Change {
+                key: pending_key(),
+                expected_revision: pending_revision,
+                content: serde_json::to_string(&pending)?,
+            });
+        }
+        self.storage
+            .commit(&CommitRequest {
+                request_id: format!("incident-state/{}/{revision}", record.id),
+                config_generation: self.config.pin().generation(),
+                policy_revision: None,
+                changes,
+            })
+            .await?;
+        Ok(())
+    }
+
+    pub(super) async fn advance_incidents(self: &Arc<Self>) -> Result<()> {
+        let ids = {
+            let _guard = self.admission.lock().await;
+            self.pending_incidents()?.1
+        };
+        for id in ids {
+            let record = {
+                let _guard = self.admission.lock().await;
+                self.incident_row(&id)?.1
+            };
+            if record.job_id.is_none() {
+                let submitted = async {
+                    self.authorize_incident_execution(&id)?;
+                    let config = self.retrieval_snapshot(record.config_generation)?;
+                    let queue = u64::try_from(config.resolved().timeouts().queue.as_millis())
+                        .map_err(|_| Error("CONFIG_INVALID"))?;
+                    if ipc::now_ms()? >= record.first_report_at_ms.saturating_add(queue) {
+                        return Err(Error("QUEUE_TIMEOUT"));
+                    }
+                    self.submit_incident_editor(&record).await
+                }
+                .await;
+                if matches!(submitted, Err(Error("RESOURCE_BUSY"))) {
+                    continue;
+                }
+                let _guard = self.admission.lock().await;
+                let (revision, mut current) = self.incident_row(&id)?;
+                match submitted {
+                    Ok(job) => {
+                        current.job_id =
+                            Some(job["id"].as_str().ok_or(Error("JOB_CORRUPT"))?.into());
+                        current.investigation = Investigation::Running;
+                        if current.state == ReviewState::Open {
+                            current.state = ReviewState::Investigating;
+                        }
+                    }
+                    Err(error) => {
+                        current.investigation = Investigation::Finished;
+                        current.error = Some(error.0.into());
+                    }
+                }
+                self.save_incident(revision, &current).await?;
+                continue;
+            }
+            let _guard = self.admission.lock().await;
+            let (revision, mut current) = self.incident_row(&id)?;
+            let (_, job) = self.job(current.job_id.as_deref().ok_or(Error("INCIDENT_CORRUPT"))?)?;
+            if job
+                .consult_plan
+                .as_ref()
+                .and_then(|p| p.incident.as_deref())
+                != Some(&id)
+            {
+                return Err(Error("INCIDENT_CORRUPT"));
+            }
+            if !job.terminal() {
+                continue;
+            }
+            current.investigation = Investigation::Finished;
+            let mut state = ReviewState::Open;
+            if job.state == "succeeded" {
+                let result = job.result.as_ref().ok_or(Error("JOB_CORRUPT"))?;
+                let report: crate::editor::Report =
+                    serde_json::from_value(result["editor"].clone())?;
+                current.classification = Some(report.classification.clone());
+                let complete = result["status"] == "found"
+                    && result["gaps"].as_array().is_some_and(Vec::is_empty)
+                    && result["conflicts"].as_array().is_some_and(Vec::is_empty)
+                    && result["evidence"].as_array().is_some_and(|e| !e.is_empty());
+                if complete {
+                    if let Some(patch) = report.patch {
+                        let seq = result["patch_receipt"]["commit_seq"]
+                            .as_u64()
+                            .ok_or(Error("JOB_CORRUPT"))?;
+                        let domain = Domain::new(&self.storage);
+                        let active = patch
+                            .changes
+                            .iter()
+                            .map(|change| domain.active(&change.memory_id))
+                            .collect::<std::result::Result<Vec<_>, _>>()?;
+                        if active.iter().all(|memory| {
+                            memory
+                                .as_ref()
+                                .is_some_and(|m| m.revision.commit_seq == seq)
+                        }) {
+                            state = ReviewState::Resolved;
+                        }
+                    } else if matches!(
+                        report.classification,
+                        crate::editor::Classification::Environment
+                            | crate::editor::Classification::ExecutionError
+                            | crate::editor::Classification::RequirementsChanged
+                    ) {
+                        state = ReviewState::Dismissed;
+                    }
+                }
+            } else {
+                current.error = job.error.clone();
+            }
+            if matches!(
+                current.state,
+                ReviewState::Open | ReviewState::Investigating
+            ) {
+                current.state = state;
+            }
+            self.save_incident(revision, &current).await?;
+        }
+        Ok(())
     }
 
     pub(in crate::daemon) async fn show_incident(
