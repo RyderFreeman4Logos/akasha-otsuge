@@ -1,7 +1,9 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-09 UTC after restart; PR #48 remains merged at `4609349`: **18 completed,
-10 open Issues (#12, #20–#28)**. #20 is the sole active implementation.
+Rechecked 2026-11-09 UTC after PR #48 merged at `4609349`: **18 original Issues
+completed, 11 Issues open (#12, #20–#28 and #50)**. #50 is the active fixture
+repair blocking #20's final gate. PR #49 holds the Editor implementation; #21
+has isolated test/document preparation, with no claimed implementation or acceptance.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -848,7 +850,12 @@ All ten open Issues still match this queue; no accepted Issue awaits closure.
   conclusions. Seventeen editor, four recovery/boundary and 32 Consult-related
   tests plus Clippy pass in `mvp020-coverage-green-r3`. Old-head CI42675990719
   passed after a verified Cargo cache miss and saved its cache.
-- [ ] Finish the final repaired candidate's canonical gate, independent review, hosted
+- [x] Preserve the exact `3b86282` canonical failure and one phase-correlated
+  workspace replay. Capture supervisors stopped while work advanced inside its
+  accepted deadline; #50 separately repairs those fixture clocks and positive
+  native identity setup. Its source `d672585` passes the full main-based gate.
+- [ ] Integrate the reviewed #50 change and finish the Editor candidate's canonical
+  gate, independent whole-candidate review, hosted
   CI on PR #49, merge and verified Issue closure.
 
 - [x] Define bounded feedback/editor and patch inputs with exact expected revisions,
@@ -863,6 +870,20 @@ All ten open Issues still match this queue; no accepted Issue awaits closure.
 - [x] Run one real external Runner through investigation and constrained revision;
   archive compact evidence with its exact historical source identity. Final
   repaired-head publication remains in the checklist above.
+
+## Issue #50 active gate repair
+
+- [x] Preserve original failures, unchanged-main attribution and bounded procfs
+  observations; distinguish observed fsync waits from an unknown filesystem cause.
+- [x] Keep capture supervision within original admitted queue/execution clocks,
+  retain bounded terminal grace and non-capture/cancellation limits, and prepare
+  positive identity fixtures through durable backfill. Deterministic clock checks,
+  102 daemon cases and Clippy pass; no production timeout/durability change.
+- [x] Freeze `d672585` / tree `1e4c07e` and pass `just check` in259.072seconds,
+  including102 installed daemon cases and UID boundaries.
+- [ ] Finish independent review and CI on [PR #51](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/51), merge and close #50.
+  Editor integration is prepared locally while that publication proceeds; neither
+  #20 nor #50 is closed based on focused checks alone.
 
 ## Complete Issue queue
 
@@ -894,6 +915,8 @@ All ten open Issues still match this queue; no accepted Issue awaits closure.
 - [ ] [#26 [MVP-026] Linux 安装、升级、卸载与四宿主使用文档](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26) — dependencies: #12, #13, #14, #15, #23, #24, #25.
 - [ ] [#27 [MVP-027] 质量评测、主上下文开销与组合回归](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) — dependencies: #16, #18, #19, #20, #22, #24, #26.
 - [ ] [#28 [MVP-028] 需求逐项终验、发布和完成证据归档](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/28) — dependencies: #1, #2, #3, #4, #5, #6, #7, #8, #9, #10, #11, #12, #13, #14, #15, #16, #17, #18, #19, #20, #21, #22, #23, #24, #25, #26, #27.
+
+- [ ] [#50 Capture fixture supervision](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/50) — existing gate blocker; independent test-only fix.
 
 Every leaf retains the complete linked acceptance criteria. No local fixture
 substitutes for the real four-host, provider-duration or release acceptance.

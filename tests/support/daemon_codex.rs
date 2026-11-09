@@ -122,7 +122,7 @@ fn sync_fixture_until(daemon: &Daemon, token: &str, ordinal: u64) {
         json!({"op":"sync","registration":token,"until_ordinal":ordinal}),
     );
     assert!(sync.get("error").is_none(), "{sync}");
-    let end = Instant::now() + Duration::from_secs(20);
+    let mut wait = super::job_wait::JobWait::default();
     loop {
         let job =
             daemon.cli(&["job", "show", sync["data"]["id"].as_str().unwrap()])["data"].clone();
@@ -130,10 +130,7 @@ fn sync_fixture_until(daemon: &Daemon, token: &str, ordinal: u64) {
             assert_eq!(job["state"], "succeeded", "{job}");
             break;
         }
-        assert!(
-            Instant::now() < end,
-            "fixture capture did not finish: {job}"
-        );
+        wait.check(&job);
         std::thread::sleep(Duration::from_millis(10));
     }
 }
