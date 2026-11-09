@@ -1,4 +1,6 @@
 use super::*;
+#[path = "daemon_incident_native.rs"]
+mod native;
 
 fn rpc(daemon: &Daemon, command: Value) -> Value {
     let mut stream = daemon.connect();
