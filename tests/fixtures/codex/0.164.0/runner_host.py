@@ -276,13 +276,13 @@ if scenario.startswith('editor'):
         draft['scope']['project'] = None
     elif scenario == 'editor_forged':
         draft['approval'] = {'actor':'human'}
-    elif scenario == 'editor_wait':
+    elif scenario in ('editor_wait', 'editor_incident_wait'):
         (root / 'editor-ready').touch()
         end = time.monotonic() + 15
         while not (root / 'editor-release').exists():
             assert time.monotonic() < end, 'editor barrier timed out'
             time.sleep(0.01)
-    if scenario.startswith('editor_incident_'):
+    if scenario.startswith('editor_incident_') and scenario != 'editor_incident_wait':
         classification = scenario.removeprefix('editor_incident_')
         editor_report.update(classification=classification, reason='Controlled classification fixture: ' + classification)
         if classification not in ('memory_error', 'stale_conditions'):

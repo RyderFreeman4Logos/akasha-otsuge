@@ -206,6 +206,151 @@ fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair(
 }
 
 #[test]
+fn incident_live_policy_budget_and_restart_do_not_replay_or_silently_escalate_authority() {
+    for case in [
+        "auto_off",
+        "auto_on",
+        "trigger_off",
+        "executor_off",
+        "roots_off",
+        "dismissed",
+        "tokens",
+        "restart",
+    ] {
+        let settings = |root: &std::path::Path, changed: bool| {
+            let auto = match case {
+                "auto_on" => changed,
+                "auto_off" => !changed,
+                _ => true,
+            };
+            let executor = if changed && case == "executor_off" {
+                ""
+            } else {
+                "executor='editor'\n"
+            };
+            let triggers = if changed && case == "trigger_off" {
+                "[]"
+            } else {
+                "['user_correction']"
+            };
+            let enabled = !(changed && case == "executor_off");
+            let tokens = if case == "tokens" { 1 } else { 64000 };
+            format!(
+                "[review]\nmode='automatic'\n[timeouts]\nqueue='30s'\n[incidents]\n{executor}triggers={triggers}\nauto_repair={auto}\nmax_runner_starts=1\nmax_tokens={tokens}\n[executors.editor]\nkind='codex'\nbinary={:?}\nnative_home={:?}\nenabled={enabled}\n",
+                root.join("codex"),
+                root.join("native-home")
+            )
+        };
+        let (mut daemon, _, bound) =
+            super::codex_tests::consult_fixture_with("editor_incident_wait", |root| {
+                settings(root, false)
+            });
+        let original = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+        let event = json!({"event_id":"lifecycle","invocation_id":bound["data"]["invocation_id"],
+            "source":"controlled-policy","severity":"warning","occurred_at_ms":akasha_otsuge::ipc::now_ms().unwrap(),
+            "execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+            "incident":{"kind":"user_correction","key":"lifecycle","reason":"Verify the controlled platform claim.","targets":[{"memory_id":"editable","expected_revision":original["revision"]["commit_seq"]}]}});
+        let response = rpc(&daemon, json!({"op":"outcome_submit","event":event}));
+        assert!(response.get("error").is_none(), "{response}");
+        let outcome = daemon.cli(&["outcome", "show", "lifecycle"]);
+        let id = outcome["data"]["incident"].as_str().unwrap();
+        if case != "tokens" {
+            let end = Instant::now() + Duration::from_secs(15);
+            while !daemon.root.join("editor-ready").exists() {
+                assert!(
+                    Instant::now() < end,
+                    "{case}: fixture did not reach its read barrier"
+                );
+                std::thread::sleep(Duration::from_millis(10));
+            }
+            if case == "restart" {
+                daemon.cli(&["daemon", "stop"]);
+                daemon.wait();
+                daemon.start();
+            } else if case == "dismissed" {
+                let current = daemon.cli(&["incident", "show", id]);
+                let changed = rpc(
+                    &daemon,
+                    json!({"op":"incident_update","update":{"id":id,"expected_revision":current["data"]["revision"],"state":"dismissed","reason":"Operator withdrew the investigation."},"idempotency_key":"withdraw"}),
+                );
+                assert!(changed.get("error").is_none(), "{changed}");
+            } else {
+                let roots = if case == "roots_off" {
+                    "[]".to_owned()
+                } else {
+                    format!("[{:?}]", daemon.root)
+                };
+                daemon.configure(&format!(
+                    "[access]\nread_roots={roots}\n{}",
+                    settings(&daemon.root, true)
+                ));
+                daemon.cli(&["config", "reload"]);
+            }
+            std::fs::write(daemon.root.join("editor-release"), "").unwrap();
+        }
+        if case == "roots_off" {
+            let denied = rpc(&daemon, json!({"op":"incident_show","id":id,"after":null}));
+            assert_eq!(denied["error"]["code"], "PATH_DENIED");
+            let pid = std::fs::read_to_string(daemon.root.join("runner.pid")).unwrap();
+            let end = Instant::now() + Duration::from_secs(15);
+            while std::path::Path::new(&format!("/proc/{}", pid.trim())).exists() {
+                assert!(Instant::now() < end, "revoked runner survived");
+                std::thread::sleep(Duration::from_millis(10));
+            }
+            daemon.configure(&format!(
+                "[access]\nread_roots=[{:?}]\n{}",
+                daemon.root,
+                settings(&daemon.root, false)
+            ));
+            daemon.cli(&["config", "reload"]);
+        }
+        let end = Instant::now() + Duration::from_secs(20);
+        let result = loop {
+            let item = daemon.cli(&["incident", "show", id])["data"].clone();
+            if item["record"]["investigation"] == "finished" {
+                break item;
+            }
+            assert!(Instant::now() < end, "{case}: {item}");
+            std::thread::sleep(Duration::from_millis(20));
+        };
+        let after = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+        if matches!(case, "auto_on" | "auto_off") {
+            assert_eq!(
+                after["record"]["authority"], "candidate",
+                "{case}: {result}"
+            );
+            assert!(result["record"]["error"].is_null());
+        } else {
+            assert_eq!(after, original, "{case}: {result}");
+            let error = match case {
+                "trigger_off" => "INCIDENT_DISABLED",
+                "executor_off" => "EXECUTOR_UNAVAILABLE",
+                "roots_off" => "PATH_DENIED",
+                "dismissed" => "CANCELLED",
+                "tokens" => "BUDGET_EXHAUSTED",
+                "restart" => "RUNNER_INTERRUPTED",
+                _ => unreachable!(),
+            };
+            assert_eq!(result["record"]["error"], error, "{case}: {result}");
+        }
+        assert_eq!(
+            std::fs::read_to_string(daemon.root.join("starts"))
+                .unwrap()
+                .lines()
+                .count(),
+            1,
+            "{case}"
+        );
+        let replay = rpc(&daemon, json!({"op":"outcome_submit","event":event}));
+        assert!(replay.get("error").is_none(), "{case}: {replay}");
+        assert_eq!(
+            daemon.cli(&["incident", "show", id])["data"]["record"]["occurrences"],
+            1
+        );
+    }
+}
+
+#[test]
 fn incident_classifications_keep_nonmemory_failures_and_missing_recall_out_of_patches() {
     for (classification, expected_state) in [
         ("code_bug", "dismissed"),
