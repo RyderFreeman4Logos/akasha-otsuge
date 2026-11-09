@@ -18,6 +18,8 @@ pub struct RunPlan {
     pub invocation_id: String,
     #[serde(default)]
     pub artifacts: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub incident: Option<Box<crate::incident::Signal>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -61,6 +63,9 @@ pub fn validate_argv(argv: &[String]) -> Result<()> {
 
 impl RunPlan {
     pub fn validate(&self) -> Result<()> {
+        if let Some(signal) = &self.incident {
+            signal.validate()?;
+        }
         let mut paths = BTreeSet::new();
         if !identifier(&self.event_id)
             || !identifier(&self.invocation_id)

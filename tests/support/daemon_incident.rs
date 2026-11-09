@@ -10,6 +10,55 @@ fn rpc(daemon: &Daemon, command: Value) -> Value {
     receive(&mut stream)
 }
 
+fn fixture_git(workspace: &std::path::Path, args: &[&str]) -> Vec<u8> {
+    let result = Command::new("git")
+        .current_dir(workspace)
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env_remove("GIT_DIR")
+        .env_remove("GIT_WORK_TREE")
+        .env_remove("GIT_INDEX_FILE")
+        .args(args)
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    result.stdout
+}
+
+fn commit_fixture(workspace: &std::path::Path) {
+    fixture_git(workspace, &["init", "--initial-branch=main"]);
+    fixture_git(workspace, &["add", "."]);
+    fixture_git(
+        workspace,
+        &[
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.invalid",
+            "-c",
+            "commit.gpgsign=false",
+            "-c",
+            "core.hooksPath=/dev/null",
+            "commit",
+            "-m",
+            "controlled API fixture",
+        ],
+    );
+}
+
+fn compiler() -> PathBuf {
+    let result = Command::new("rustc")
+        .args(["--print", "sysroot"])
+        .output()
+        .unwrap();
+    assert!(result.status.success());
+    PathBuf::from(String::from_utf8(result.stdout).unwrap().trim()).join("bin/rustc")
+}
+
 fn investigated(daemon: &Daemon, id: &str) -> Value {
     let mut wait = super::job_wait::JobWait::default();
     loop {
@@ -106,10 +155,11 @@ fn configured_incident_investigation_runs_once_and_keeps_environment_reports_sep
 
 #[test]
 fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair() {
-    for (auto_repair, completeness, authority) in [
-        (true, "complete", "delegated_approved"),
-        (false, "complete", "candidate"),
-        (true, "partial", "candidate"),
+    for (auto_repair, completeness, authority, binary) in [
+        (true, "complete", "delegated_approved", false),
+        (false, "complete", "candidate", false),
+        (true, "partial", "candidate", false),
+        (true, "complete", "delegated_approved", true),
     ] {
         let (daemon, _, bound) = super::codex_tests::consult_fixture_with(
             "editor_incident",
@@ -123,12 +173,17 @@ fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair(
         );
         let original = daemon.cli(&["memory", "export", "editable"])["data"].clone();
         let now = akasha_otsuge::ipc::now_ms().unwrap();
-        let raw = "controlled fixture failure: only Linux was verified\n".repeat(1000);
+        let mut raw = "controlled fixture failure: only Linux was verified\n"
+            .repeat(1000)
+            .into_bytes();
+        if binary {
+            raw.extend([0, 255, 254]);
+        }
         let saved = rpc(
             &daemon,
             json!({"op":"outcome_log_write","chunk":{
             "invocation_id":bound["data"]["invocation_id"],"event_id":"platform-failure","stream":"stderr","part":0,
-            "observed_at_ms":now,"raw_hex":akasha_otsuge::capture::encode_hex(raw.as_bytes())}}),
+            "observed_at_ms":now,"raw_hex":akasha_otsuge::capture::encode_hex(&raw)}}),
         );
         assert!(saved.get("error").is_none(), "{saved}");
         let snapshot = json!({"base_commit":"a".repeat(40),"index_sha256":"b".repeat(64),"diff_sha256":"c".repeat(64),"tree_sha256":"d".repeat(64),"gaps":[]});
@@ -168,7 +223,7 @@ fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair(
         use sha2::Digest;
         assert_eq!(
             reads[handle]["sha256"],
-            akasha_otsuge::capture::encode_hex(&sha2::Sha256::digest(raw.as_bytes()))
+            akasha_otsuge::capture::encode_hex(&sha2::Sha256::digest(&raw))
         );
         assert_eq!(reads[handle]["bytes"], raw.len());
         assert!(reads[handle]["pages"].as_u64().unwrap() > 1);
@@ -203,6 +258,90 @@ fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair(
             }
         );
     }
+}
+
+#[test]
+fn incident_wrapper_carries_validated_opt_in_signal_through_a_real_compiler_failure() {
+    let (daemon, _, bound) = super::codex_tests::consult_fixture_with(
+        "editor_incident_code_bug",
+        |root| {
+            format!(
+                "[review]\nmode='automatic'\n[timeouts]\nqueue='30s'\n[incidents]\nexecutor='editor'\ntriggers=['reproducible_failure']\nauto_repair=true\nmax_runner_starts=1\n[executors.editor]\nkind='codex'\nbinary={:?}\nnative_home={:?}\n",
+                root.join("codex"),
+                root.join("native-home")
+            )
+        },
+    );
+    let original = daemon.cli(&["memory", "export", "editable"])["data"].clone();
+    let workspace = daemon.root.join("workspace");
+    std::fs::write(
+        workspace.join("main.rs"),
+        "fn main() { does_not_exist(); }\n",
+    )
+    .unwrap();
+    std::fs::write(workspace.join(".gitignore"), "/app\n").unwrap();
+    commit_fixture(&workspace);
+    let compiler = compiler();
+    let file = daemon.root.join("wrap.json");
+    let mut plan = json!({"event_id":"wrapped","invocation_id":bound["data"]["invocation_id"],"artifacts":[],
+        "incident":{"kind":"reproducible_failure","key":"compile-check","reason":"", "targets":[{"memory_id":"editable","expected_revision":original["revision"]["commit_seq"]}]}});
+    let run = || {
+        daemon
+            .command()
+            .args([
+                "outcome",
+                "run",
+                file.to_str().unwrap(),
+                "--",
+                compiler.to_str().unwrap(),
+                "main.rs",
+                "-o",
+                "app",
+            ])
+            .output()
+            .unwrap()
+    };
+    std::fs::write(&file, serde_json::to_vec(&plan).unwrap()).unwrap();
+    let invalid = run();
+    let error: Value = serde_json::from_slice(&invalid.stderr).unwrap();
+    assert_eq!(error["error"]["code"], "INVALID_INCIDENT");
+    plan["incident"]["reason"] = json!(
+        "Inspect the compiler failure and distinguish the code defect from the memory claim."
+    );
+    std::fs::write(&file, serde_json::to_vec(&plan).unwrap()).unwrap();
+    let result = run();
+    assert_eq!(
+        result.status.code(),
+        Some(1),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let result: Value = serde_json::from_slice(&result.stdout).unwrap();
+    let record = &result["data"];
+    assert_eq!(record["event"]["incident"], plan["incident"]);
+    assert_eq!(record["event"]["execution"]["before"]["gaps"], json!([]));
+    assert!(
+        record["logs"][1]["preview"]
+            .as_str()
+            .unwrap()
+            .contains("does_not_exist")
+    );
+    let investigated = investigated(&daemon, record["incident"].as_str().unwrap());
+    assert_eq!(
+        investigated["record"]["classification"], "code_bug",
+        "{investigated}"
+    );
+    assert_eq!(
+        investigated["record"]["state"], "dismissed",
+        "{investigated}"
+    );
+    assert_eq!(
+        daemon.cli(&["memory", "export", "editable"])["data"],
+        original
+    );
+    let duplicate = run();
+    let error: Value = serde_json::from_slice(&duplicate.stderr).unwrap();
+    assert_eq!(error["error"]["code"], "OUTCOME_ALREADY_STARTED");
 }
 
 #[test]
