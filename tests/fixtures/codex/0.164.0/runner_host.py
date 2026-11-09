@@ -152,8 +152,19 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
             'items':[item['memory']['revision']['key']['id'] for item in value.get('items', [])],
             'changed':value.get('changed'),'originals':len(value.get('originals', []))}))
         return response
-    page = tool('context_list', {'cursor':None,'limit':4})['value']
-    assert tool('context_read', {'handle':page['events'][0]['handle'],'start':0,'max_bytes':1024})['kind'] == 'text'
+    if scenario == 'editor_history_search_gap':
+        page = tool('context_search', {'cursor':None,'query':'controlled','limit':4})['value']
+    else:
+        page = tool('context_list', {'cursor':None,'limit':4})['value']
+    if 'history' in scenario:
+        assert page['gaps'] == ['HISTORY_GAP'], page
+    short = scenario in ('editor_context_gap', 'conclusion_context_gap')
+    text = tool('context_read', {'handle':page['events'][0]['handle'],'start':0,'max_bytes':1 if short else 1024})
+    assert text['kind'] == 'text'
+    if short: assert text['value']['truncated'] is True
+if scenario in ('editor_delegate_gap', 'editor_delegate_conflict_gap', 'conclusion_delegate_gap') and not hint:
+    child = tool('delegate', {'hint':'child-with-limitation'})
+    assert child['kind'] == 'research' and child['value']['status'] == 'incomplete', child
 if scenario.startswith('delegate_'):
     branch = hint or 'root'
     if scenario == 'delegate_parents':
@@ -272,11 +283,16 @@ if scenario.startswith('conclusion_') or 'status' in turn_request['params']['out
         memories=seen_memories, conditions=[], conflicts=[], gaps=[] if seen_sources or seen_memories else ['no_evidence'])
     if scenario.startswith('editor'):
         conclusion['answer'] = json.dumps(editor_report)
-        if scenario.endswith('_gap'):
+        if scenario.endswith('_gap') and not hint:
             assert conclusion['status'] == 'found' and conclusion['gaps'] == []
             (root / 'model-coverage.json').write_text(json.dumps({'status':conclusion['status'], 'gaps':conclusion['gaps']}))
         if scenario == 'editor_uncertain':
             conclusion.update(status='incomplete', gaps=['unverified_platform'])
+    if hint == 'child-with-limitation':
+        if scenario == 'editor_delegate_conflict_gap':
+            conclusion.update(status='incomplete', conflicts=['The child found conflicting evidence.'])
+        else:
+            conclusion.update(status='incomplete', gaps=['child_limit'])
     if scenario == 'conclusion_no_hit':
         tool('context_search', {'cursor':None,'query':'absent-conclusion-query','limit':4})
         conclusion.update(status='no_hit', answer='No reliable relevant result in the searched scope.', sources=[], memories=[], gaps=[])

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T19:26:36.623150+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "d9d1e4a7c8984dcb076022c40e6c31a243d80490",
+    "log_sha256": "a3eb1acd0b49135beb68644806bf78f091ac0ae716c23700b13bde4083aeb65c",
+    "seconds": 10.030026762746274,
+    "utc": "2026-11-09T19:26:15.291496+00:00"
+  },
+  "process_absent": true,
+  "classification": "RED: output-budget error replaces the recorded unissued-memory READ_DENIED warning"
+}

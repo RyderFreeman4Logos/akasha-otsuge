@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-coverage-green-r1.py"
+  ],
+  "name": "mvp020-coverage-green-r1",
+  "process": {
+    "pid": 1998732,
+    "start_ticks": "607011655",
+    "state": "R"
+  },
+  "utc": "2026-11-09T19:23:39.520940+00:00"
+}

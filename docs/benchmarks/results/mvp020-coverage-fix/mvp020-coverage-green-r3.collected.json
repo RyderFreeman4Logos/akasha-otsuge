@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T19:29:26.353986+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "d9d1e4a7c8984dcb076022c40e6c31a243d80490",
+    "log_sha256": "e7e0de47152ad5e5a2e1617ad2bb550bf0f57562c755af3ba42f5945104f6ce3",
+    "seconds": 87.03416659962386,
+    "utc": "2026-11-09T19:28:56.238677+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASS: complete coverage-boundary regression matrix, recovery, ordinary Consult and Clippy"
+}

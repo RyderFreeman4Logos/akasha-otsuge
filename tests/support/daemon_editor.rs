@@ -92,13 +92,16 @@ fn input_scope() -> Value {
 }
 
 fn omitted_investigation_gap(scenario: &str, gap: &str) {
-    let (daemon, _, bound) = super::codex_tests::consult_fixture_with(scenario, |root| {
+    let (mut daemon, _, mut bound) = super::codex_tests::consult_fixture_with(scenario, |root| {
         let mut settings = editor_config(root, "automatic");
         if scenario == "editor_original_gap" {
             settings.push_str("[retrieval]\nmax_original_chars=8\n");
         }
         settings
     });
+    if scenario.contains("history") {
+        bind_missing_history(&mut daemon, &mut bound);
+    }
     let original = daemon.cli(&["memory", "show", "editable"])["data"]["data"].clone();
     let input = feedback(
         &daemon,
@@ -131,6 +134,120 @@ fn omitted_investigation_gap(scenario: &str, gap: &str) {
         daemon.cli(&["memory", "show", "editable"])["data"]["data"],
         original
     );
+}
+
+fn bind_missing_history(daemon: &mut Daemon, bound: &mut Value) {
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            use akasha_otsuge::{
+                adapter::{FenceCoverage, Invocation},
+                capture::{
+                    Capture, CaptureBinding, CoverageLevel, EventDraft, EventKind, EventRef,
+                    MessagePhase, Visibility,
+                },
+                config::{Paths, resolve},
+                domain::Ingress,
+                storage::Storage,
+            };
+            let config = resolve(
+                "",
+                None,
+                "",
+                &Paths {
+                    data_dir: daemon.root.join("data"),
+                    socket_path: daemon.socket(),
+                },
+            )
+            .unwrap();
+            let store = Storage::open(&config).await.unwrap();
+            let principal = format!("uid:{}", rustix::process::geteuid().as_raw());
+            let old = Invocation::load(
+                &store,
+                bound["data"]["invocation_id"].as_str().unwrap(),
+                &principal,
+            )
+            .await
+            .unwrap();
+            let mut binding = old.diagnostic().clone();
+            let capture = CaptureBinding::from_source(
+                binding.caller.clone(),
+                binding.scope.clone(),
+                "missing-history-fixture",
+                CoverageLevel::VisibleText,
+            )
+            .unwrap();
+            let text = "controlled fixture history";
+            let draft = EventDraft {
+                event_id: "retained-tip".into(),
+                source_version: "1".into(),
+                runtime_instance: binding.runtime_instance.clone(),
+                branch: binding.branch.clone(),
+                parent: Some(EventRef {
+                    source: binding.caller.clone(),
+                    event_id: "missing-parent".into(),
+                }),
+                fork_cutoff: None,
+                event_time_ms: None,
+                observed_time_ms: 1,
+                visibility: Visibility::User,
+                kind: EventKind::Message {
+                    message_id: "tip".into(),
+                    phase: MessagePhase::Final,
+                },
+                text: text.into(),
+            };
+            let tip = Capture::new(&store)
+                .ingest(
+                    &capture,
+                    &draft,
+                    text.as_bytes(),
+                    &Ingress::unverified("fixture", "history-gap", binding.scope.clone()).unwrap(),
+                    None,
+                    binding.config_generation,
+                )
+                .await
+                .unwrap();
+            binding.invocation_id.push_str("/history-gap");
+            binding.tip = Some(tip.event.reference);
+            binding.capture_seq = store.sequence().unwrap();
+            binding.available_cursor = binding.requested_cursor;
+            binding.capability.history = CoverageLevel::VisibleText;
+            let invocation = Invocation::bind(&store, binding).await.unwrap();
+            assert_eq!(invocation.coverage(), FenceCoverage::CompleteToFence);
+            bound["data"]["invocation_id"] = json!(invocation.id());
+            store.close().await.unwrap();
+        });
+    daemon.start();
+}
+
+#[test]
+fn editor_keeps_successful_history_list_gaps_when_the_model_omits_them() {
+    omitted_investigation_gap("editor_history_gap", "HISTORY_GAP");
+}
+
+#[test]
+fn editor_keeps_successful_history_search_gaps_when_the_model_omits_them() {
+    omitted_investigation_gap("editor_history_search_gap", "HISTORY_GAP");
+}
+
+#[test]
+fn editor_keeps_context_read_gaps_when_the_model_omits_them() {
+    omitted_investigation_gap("editor_context_gap", "context_read_budget");
+}
+
+#[test]
+fn editor_keeps_child_gaps_when_the_parent_omits_them() {
+    omitted_investigation_gap("editor_delegate_gap", "child_limit");
+}
+
+#[test]
+fn editor_keeps_child_conflicts_when_the_parent_omits_them() {
+    omitted_investigation_gap("editor_delegate_conflict_gap", "unresolved_conflict");
 }
 
 #[test]

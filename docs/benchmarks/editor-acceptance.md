@@ -64,6 +64,27 @@ tests were skipped in that focused batch. This is controlled repair evidence;
 the authenticated Codex run above remains historical evidence for the unchanged
 native protocol, rather than a new authenticated run on the repair.
 
+The next candidate, `d9d1e4a`, passed its canonical gate but R3 review found a
+remaining sibling: a successful history page could report `HISTORY_GAP` while
+the invocation itself was `CompleteToFence`. Research did not retain that page
+warning. The [coverage archive](results/mvp020-coverage-fix/manifest.json) preserves
+R3 FAIL, its exact gate, the complete response-class inventory and new regressions.
+Before repair, five controlled Editor cases wrongly activated corrections:
+missing-parent list/search, truncated context text, and child gaps/conflicts
+omitted by the parent. Ordinary Consult returned `found` for a truncated read.
+A boundary test also reproduced loss of the output-budget warning; a subsequent
+combined-error control reproduced loss of an earlier read denial.
+
+The shared response boundary now retains successful-response warnings before
+output charging, keeps both earlier and later errors, and preserves their original
+return behavior. Validated conclusions retain child limitations before returning
+to the parent. The existing bounded union and checkpoint carry these observations
+into Editor policy and ordinary Consult. `mvp020-coverage-green-r3` passed
+17 editor integrations, four recovery/boundary tests, 32 Consult-related tests and
+Clippy. The preceding compile diagnostic is retained and is not behavioral evidence.
+SIGKILL tests cover publication of the new gap labels from a controlled checkpoint;
+fresh investigation tests independently verify production of those observations.
+
 Earlier capture/IPC suite-wait failures remain unclassified; a stale shared-target
 base/candidate comparison is explicitly invalid. The unchanged prior candidate
 passed its one canonical rerun. Neither that PASS nor the later repair identifies

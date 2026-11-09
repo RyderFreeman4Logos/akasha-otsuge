@@ -841,7 +841,14 @@ All ten open Issues still match this queue; no accepted Issue awaits closure.
   share Consult's coverage merge, persist gaps and use the bounded 64 KiB patch
   input. Twelve editor tests, three recovery tests, 32 Consult-related tests and
   Clippy passed. Earlier suite-wait failures remain unclassified.
-- [ ] Finish the repaired candidate's canonical gate, independent review, hosted
+- [x] Preserve the `d9d1e4a` canonical PASS and R3 FAIL. Audit the whole shared
+  response boundary after repeated coverage findings; reproduce missing-parent
+  list/search, context truncation, child gaps/conflicts and combined errors.
+  Retain these observations before response publication and in validated child
+  conclusions. Seventeen editor, four recovery/boundary and 32 Consult-related
+  tests plus Clippy pass in `mvp020-coverage-green-r3`. Old-head CI42675990719
+  passed after a verified Cargo cache miss and saved its cache.
+- [ ] Finish the final repaired candidate's canonical gate, independent review, hosted
   CI on PR #49, merge and verified Issue closure.
 
 - [x] Define bounded feedback/editor and patch inputs with exact expected revisions,

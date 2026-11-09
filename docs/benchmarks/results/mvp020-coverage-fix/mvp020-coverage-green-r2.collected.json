@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T19:27:19.099878+00:00",
+  "terminal": {
+    "exit_code": 1,
+    "head": "d9d1e4a7c8984dcb076022c40e6c31a243d80490",
+    "log_sha256": "b2c25d939812b9737625c4b86e26f4b80789be6628cf7a4e7a6b4f2eb79dcc9d",
+    "seconds": 5.307349271140993,
+    "utc": "2026-11-09T19:27:00.808768+00:00"
+  },
+  "process_absent": true,
+  "classification": "FAIL: compile diagnostic, no behavioral verdict"
+}

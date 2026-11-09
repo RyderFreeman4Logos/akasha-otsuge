@@ -146,7 +146,7 @@ async fn setup(root: &std::path::Path, settings: &str, checkpoint: bool) {
         };
         let answer = json!({"status":"found","answer":serde_json::to_string(&json!({"classification":"memory_error","reason":"Narrow the claim","patch":patch})).unwrap(),"sources":[span],"memories":[{"memory_id":"editable","revision":memory.commit_seq}],"conditions":[],"conflicts":[],"gaps":[]});
         // Controlled durable-response fixture; the subprocess tests publication, not model quality.
-        let ready = json!({"schema_version":1,"origin":"editor","answer":answer,"investigation_gaps":["INDEX_NOT_READY"],"trace":{"runs":[],"workspace":null},"executor":"editor","generator":{"runner":"executor/editor","model":"controlled","prompt_version":crate::editor::PROMPT_VERSION}});
+        let ready = json!({"schema_version":1,"origin":"editor","answer":answer,"investigation_gaps":["INDEX_NOT_READY", "HISTORY_GAP", "context_read_budget", "child_limit", "unresolved_conflict"],"trace":{"runs":[],"workspace":null},"executor":"editor","generator":{"runner":"executor/editor","model":"controlled","prompt_version":crate::editor::PROMPT_VERSION}});
         let pointer = models::save_result(&service.storage, &ready, 1)
             .await
             .unwrap();
@@ -218,7 +218,13 @@ fn editor_checkpoint_and_committed_patch_survive_sigkill_without_runner_replay()
             assert_eq!(latest.record.authority, crate::domain::Authority::Candidate);
             assert_eq!(
                 resumed.result.as_ref().unwrap()["gaps"],
-                json!(["INDEX_NOT_READY"])
+                json!([
+                    "INDEX_NOT_READY",
+                    "HISTORY_GAP",
+                    "context_read_budget",
+                    "child_limit",
+                    "unresolved_conflict"
+                ])
             );
             assert_eq!(latest.revision.commit_seq, receipt.commit_seq);
             let initial = latest.previous.unwrap();
@@ -234,6 +240,110 @@ fn editor_checkpoint_and_committed_patch_survive_sigkill_without_runner_replay()
             service.storage.close().await.unwrap();
         });
     }
+}
+
+#[tokio::test]
+async fn research_retains_errors_after_a_successful_dispatch_without_swallowing_them() {
+    use crate::adapter::{ContextRequest, ContextSource, ErrorCode};
+    let root = std::env::temp_dir().join(format!("akasha-editor-budget-{}", std::process::id()));
+    private_dir(&root).unwrap();
+    let _cleanup = tests::Fixture(root.clone());
+    let settings = format!(
+        "[executors.editor]\nkind='codex'\nbinary='/unused-native'\nnative_home={root:?}\n"
+    );
+    setup(&root, &settings, false).await;
+    let (service, _) = tests::service_at(&root, &settings).await;
+    let job_id = id();
+    let plan = service.job(&job_id).unwrap().1.consult_plan.unwrap();
+    let invocation = service.consult_invocation(&plan).unwrap();
+    let workflow = Deadline::start(
+        crate::config::deadline::Layer::Workflow,
+        Duration::from_secs(30),
+        None,
+    )
+    .unwrap();
+    let probe = RunBudget::new(
+        invocation.id(),
+        &invocation.fence_hash(),
+        service.runner_slots.clone(),
+        BudgetLimits::default(),
+        workflow.clone(),
+    )
+    .unwrap();
+    let bytes = {
+        let lease = probe.start().unwrap();
+        let mut captured = CapturedContext::new(&service.storage, invocation.clone()).unwrap();
+        let response = captured
+            .execute(&lease, ContextRequest::Describe {})
+            .await
+            .unwrap();
+        serde_json::to_vec(&response).unwrap().len() as u64
+    };
+    let budget = RunBudget::new(
+        invocation.id(),
+        &invocation.fence_hash(),
+        service.runner_slots.clone(),
+        BudgetLimits {
+            output_bytes: bytes,
+            ..BudgetLimits::default()
+        },
+        workflow.clone(),
+    )
+    .unwrap();
+    let lease = budget.start().unwrap();
+    let mut research = research::Research::new(
+        &service,
+        &job_id,
+        invocation.clone(),
+        service.config.pin(),
+        &workflow,
+        plan.clone(),
+        budget.clone(),
+    )
+    .unwrap();
+    let error = research
+        .execute(&lease, ContextRequest::Describe {})
+        .await
+        .unwrap_err();
+    assert_eq!(error.code, ErrorCode::BudgetExhausted);
+    assert_eq!(budget.usage().unwrap().output_bytes, bytes);
+    assert!(research.gaps.iter().any(|gap| gap == "BUDGET_EXHAUSTED"));
+    let budget = RunBudget::new(
+        invocation.id(),
+        &invocation.fence_hash(),
+        service.runner_slots.clone(),
+        BudgetLimits {
+            output_bytes: 1,
+            ..BudgetLimits::default()
+        },
+        workflow.clone(),
+    )
+    .unwrap();
+    let lease = budget.start().unwrap();
+    let mut research = research::Research::new(
+        &service,
+        &job_id,
+        invocation,
+        service.config.pin(),
+        &workflow,
+        plan,
+        budget,
+    )
+    .unwrap();
+    let error = research
+        .execute(
+            &lease,
+            ContextRequest::MemoryGet {
+                memory_id: "unissued".into(),
+                revision: 1,
+            },
+        )
+        .await
+        .unwrap_err();
+    assert_eq!(error.code, ErrorCode::BudgetExhausted);
+    assert!(research.gaps.iter().any(|gap| gap == "BUDGET_EXHAUSTED"));
+    assert!(research.gaps.iter().any(|gap| gap == "READ_DENIED"));
+    service.storage.close().await.unwrap();
 }
 
 #[tokio::test]

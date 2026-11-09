@@ -1,0 +1,19 @@
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp020)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.91s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 1 test
+
+thread 'daemon::jobs::consult::editor_tests::research_retains_errors_after_a_successful_dispatch_without_swallowing_them' (2004253) panicked at src/daemon/editor_tests.rs:345:5:
+assertion failed: research.gaps.iter().any(|gap| gap == "READ_DENIED")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test daemon::jobs::consult::editor_tests::research_retains_errors_after_a_successful_dispatch_without_swallowing_them ... FAILED
+
+failures:
+
+failures:
+    daemon::jobs::consult::editor_tests::research_retains_errors_after_a_successful_dispatch_without_swallowing_them
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `--lib`

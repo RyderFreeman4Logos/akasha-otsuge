@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "base": "460934961009ff41ae1b3def573e81dda4fa7d0e",
+  "reviewed_head": "d9d1e4a7c8984dcb076022c40e6c31a243d80490",
+  "note": "Historical R3 FAIL and exact gate, whole-class discovery, RED and focused repair receipts. Final gate/review/CI remain separate PR receipts. No reviewer transcripts.",
+  "files": {
+    "mvp020-canonical-r3-verified.json": {
+      "bytes": 2072,
+      "sha256": "ad74f5b559343d1aa689ccfd0950b595d58b0d46e17caebe7c05868c29e20365"
+    },
+    "mvp020-canonical-r3.admission.json": {
+      "bytes": 1003,
+      "sha256": "a500566f79475319ba4a853a9392683bd1b02c0d412a94e32d0768b46ba6f54e"
+    },
+    "mvp020-canonical-r3.collected.json": {
+      "bytes": 394,
+      "sha256": "5e2f0324839a17e73deb0654157f894c9a583876e56209b4b5aa168e36600f75"
+    },
+    "mvp020-canonical-r3.launch.json": {
+      "bytes": 214,
+      "sha256": "b848bfcde3a1d5061b76b99ad2482c8bff6f3cc9f922177b64deb1a2a59d4ac3"
+    },
+    "mvp020-canonical-r3.log": {
+      "bytes": 50654,
+      "sha256": "1de34dd528a917b19b4e320d7e29512b070cff310b8e1e1a1e1e9d550914c2a8"
+    },
+    "mvp020-canonical-r3.terminal.json": {
+      "bytes": 237,
+      "sha256": "ec092788e1f9510871618179e09a989aac016e1ea6050847a83377c70ec45123"
+    },
+    "mvp020-coverage-class-discovery.md": {
+      "bytes": 2636,
+      "sha256": "a0ad6f4042bff2537ed0a216c866f5921b6d1822e5a9a81151052f63487c3640"
+    },
+    "mvp020-coverage-error-red-r1.admission.json": {
+      "bytes": 1128,
+      "sha256": "b94973207a0a8779ae4efbc44972a4c7c36991546467db1957904cb33719efc8"
+    },
+    "mvp020-coverage-error-red-r1.collected.json": {
+      "bytes": 445,
+      "sha256": "d37908cdc5be60a1cd36e4347b321af1b6d95fea27eb5f454f00a3e45ec4f754"
+    },
+    "mvp020-coverage-error-red-r1.launch.json": {
+      "bytes": 348,
+      "sha256": "65422f84de680d2bc4be5d802a05c43708fe504f1121b6d5ff8d68111ffadaa7"
+    },
+    "mvp020-coverage-error-red-r1.log": {
+      "bytes": 1116,
+      "sha256": "a3eb1acd0b49135beb68644806bf78f091ac0ae716c23700b13bde4083aeb65c"
+    },
+    "mvp020-coverage-error-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "864389eb3d186720e1d364dbf6857b93c254e09f8611ad0f1ee51c666ce9adc2"
+    },
+    "mvp020-coverage-green-r1.admission.json": {
+      "bytes": 1107,
+      "sha256": "d9420b9bfbea21da25e47f62ec21ef6ed578c128d8137f5e74f2d48be252ffe6"
+    },
+    "mvp020-coverage-green-r1.collected.json": {
+      "bytes": 467,
+      "sha256": "caaa65f433ebcce52fcea6fd3e6d0a3e1580a98e8eccbde51d7bc027afa027a8"
+    },
+    "mvp020-coverage-green-r1.launch.json": {
+      "bytes": 323,
+      "sha256": "b0cf9f23569bf4e5221553d646139f3c53055a9560c76a11ec111c5ccca9ee2a"
+    },
+    "mvp020-coverage-green-r1.log": {
+      "bytes": 6833,
+      "sha256": "c92343b469e7540784bfef671c2dc8e0cc6e860d79dc3ca045146969923bed0a"
+    },
+    "mvp020-coverage-green-r1.py": {
+      "bytes": 399,
+      "sha256": "77415cfc32d02073e7090561735c9ec39d48ce32803540e3b643a15d710876d0"
+    },
+    "mvp020-coverage-green-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "37c52b00bb86c05181b2692ced9131d197cc7e81e4bf9780448fc7fcce77675e"
+    },
+    "mvp020-coverage-green-r2.admission.json": {
+      "bytes": 1107,
+      "sha256": "b1f5a69fdef64d906054990a1b75d321c5dc6b2070ea78fcc25020e595ddd38e"
+    },
+    "mvp020-coverage-green-r2.collected.json": {
+      "bytes": 407,
+      "sha256": "1c08e21d75aed1d43378be7c763d9b75268247fda791783f5547c29df99ac314"
+    },
+    "mvp020-coverage-green-r2.launch.json": {
+      "bytes": 323,
+      "sha256": "c49c7650fae5073bbd7883504e602207b65e75ac4ca9a4ac76852a31ecb4ddde"
+    },
+    "mvp020-coverage-green-r2.log": {
+      "bytes": 1452,
+      "sha256": "b2c25d939812b9737625c4b86e26f4b80789be6628cf7a4e7a6b4f2eb79dcc9d"
+    },
+    "mvp020-coverage-green-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "0b0dcc615c4d58ddcd95e99152fa7ebcdd0c65a324d785a04983f4c0ed26701c"
+    },
+    "mvp020-coverage-green-r3.admission.json": {
+      "bytes": 1107,
+      "sha256": "b3889da2603b846f3db327ee6d5dc08c490772d5eca51edca935b3e06d790635"
+    },
+    "mvp020-coverage-green-r3.collected.json": {
+      "bytes": 449,
+      "sha256": "668f0ee7129ef2117788c3f0578dd4908d9b3278932937385c3616785ab98bbc"
+    },
+    "mvp020-coverage-green-r3.launch.json": {
+      "bytes": 323,
+      "sha256": "546e9005c8a2d227cf8acb315d889fc6fd959bf2c2609510de2e4d804c918817"
+    },
+    "mvp020-coverage-green-r3.log": {
+      "bytes": 6832,
+      "sha256": "e7e0de47152ad5e5a2e1617ad2bb550bf0f57562c755af3ba42f5945104f6ce3"
+    },
+    "mvp020-coverage-green-r3.terminal.json": {
+      "bytes": 236,
+      "sha256": "0f47e27108048215d643691b99a7cd1607281a9168411f2b27a62231bdeb0471"
+    },
+    "mvp020-coverage-red-r1.admission.json": {
+      "bytes": 1105,
+      "sha256": "d8bd68867f5a3c2afec0e489b8af06c54d2d4cf1d5193dde943fbb0f6a2b9f9f"
+    },
+    "mvp020-coverage-red-r1.collected.json": {
+      "bytes": 443,
+      "sha256": "8b8ce41b40fe998717e1c5df98428ca9de533426b5c867590b22753a9464562a"
+    },
+    "mvp020-coverage-red-r1.launch.json": {
+      "bytes": 319,
+      "sha256": "32a044573ae467e6d8e7c5169933fd13ebf0d7c81df6fa8d80589f4b433b8c38"
+    },
+    "mvp020-coverage-red-r1.log": {
+      "bytes": 40763,
+      "sha256": "c90de70a21060d0425578af04720ed417fb709476b0fb963a569dcf617d9d933"
+    },
+    "mvp020-coverage-red-r1.patch": {
+      "bytes": 15530,
+      "sha256": "c3a4b719f3b8e3728cf6c075bd4dbaa1985076b0c43bf70cc955c4ba103e699c"
+    },
+    "mvp020-coverage-red-r1.py": {
+      "bytes": 644,
+      "sha256": "6337812a7da212da0c451c14514382e9ba743926a7213d70e3e3d960358f8ac6"
+    },
+    "mvp020-coverage-red-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "f1bb56387797fc67f26e6d355c6a217fb7448e4e0cb5b85c3e09959d5dba1786"
+    },
+    "mvp020-hosted-ci-77a78c6.json": {
+      "bytes": 3490,
+      "sha256": "27c40809fd8580a99b6052ae2e3253cb120936ae8b012fc6d15ccd883dd2565a"
+    },
+    "mvp020-whole-review-r3-brief.md": {
+      "bytes": 5100,
+      "sha256": "1b63777aa3d988fc762fb4914b026dc0080c2eb15f9a5e09892047331432c1e4"
+    },
+    "mvp020-whole-review-r3.admission.json": {
+      "bytes": 1105,
+      "sha256": "768169ea1f79b68ebddbbe7296a556f6f105bfe039b05802a1bb9e8bfe6f6a8c"
+    },
+    "mvp020-whole-review-r3.collected.json": {
+      "bytes": 394,
+      "sha256": "c33385e81ac9ef8a8a907e2932b1cf88035d7f2a57f7ecfd81e82894d0a861e3"
+    },
+    "mvp020-whole-review-r3.exit.json": {
+      "bytes": 2198,
+      "sha256": "925eb9d239ceb12d290d20132d4621d5e8f12b08e0cb69e50b8108efce7d3fd2"
+    },
+    "mvp020-whole-review-r3.launch.json": {
+      "bytes": 319,
+      "sha256": "efa8658c635ed4b67bbd1963cd9e8a5635c792b4519c41266f8c16cb3d252023"
+    },
+    "mvp020-whole-review-r3.log": {
+      "bytes": 2046,
+      "sha256": "33fc72f2df83598db1ff326495ea1afbb9a153f969169fdf2e4d10a54c04e528"
+    },
+    "mvp020-whole-review-r3.py": {
+      "bytes": 2843,
+      "sha256": "408cf7e0abdd4423b236765df8d91c6accd6796300f2779dc72ea022062c70cc"
+    },
+    "mvp020-whole-review-r3.terminal.json": {
+      "bytes": 236,
+      "sha256": "0ee470e53ba28476f53be997011c917090b6ec211a8f9023d61f1ebeea6ad121"
+    },
+    "mvp020-whole-review-r3.md.gz": {
+      "bytes": 4721,
+      "sha256": "e1d6a6506f1e3f12b17c85299133ea472f6d4d93769a7705075d8c52a83c12f1",
+      "uncompressed_sha256": "a0f4ab75c500222353700e84b70684a629164e2aa108b668344a978c4347e961"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+CASE ["cargo", "test", "--test", "daemon", "editor_tests::", "--", "--nocapture"]
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp020)
+error[E0282]: type annotations needed for `std::result::Result<adapter::context::ContextResponse, _>`
+   --> src/daemon/consult_research.rs:478:17
+    |
+478 |               let response = async {
+    |                   ^^^^^^^^
+...
+512 | /                     error
+513 | |                         .source_code
+    | |____________________________________- type must be known at this point
+    |
+help: consider giving `response` an explicit type, where the type for type parameter `E` is specified
+    |
+478 |             let response: std::result::Result<_, E> = async {
+    |                         +++++++++++++++++++++++++++
+
+For more information about this error, try `rustc --explain E0282`.
+error: could not compile `akasha-otsuge` (lib) due to 1 previous error
+Traceback (most recent call last):
+  File "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp020-coverage-green-r1.py", line 5, in <module>
+    subprocess.run(cmd,check=True)
+  File "/usr/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['cargo', 'test', '--test', 'daemon', 'editor_tests::', '--', '--nocapture']' returned non-zero exit status 101.

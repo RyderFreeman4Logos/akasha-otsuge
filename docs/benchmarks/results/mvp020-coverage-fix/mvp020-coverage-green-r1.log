@@ -1,0 +1,84 @@
+CASE ["cargo", "test", "--test", "daemon", "editor_tests::", "--", "--nocapture"]
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp020)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 03s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 18 tests
+test editor_tests::native_editor_actual ... ignored, requires an explicitly supplied authenticated native profile and receipt path
+test editor_tests::patch_rejects_missing_evidence_expiry_forgery_scope_changes_and_revoked_replays ... ok
+test editor_tests::patch_cli_accepts_the_protocol_limit_without_widening_other_inputs ... ok
+test editor_tests::batch_patches_are_atomic_and_concurrent_editors_do_not_overwrite_each_other ... ok
+test editor_tests::exact_editor_patch_uses_policy_and_replays_without_rewriting_history ... ok
+test editor_tests::patch_filters_old_search_versions_but_preserves_receipts_and_original_bytes ... ok
+test editor_tests::patch_policy_modes_and_human_procedure_protection_use_the_shared_adoption_rules ... ok
+test editor_tests::configured_editor_investigates_bound_evidence_and_applies_only_its_pinned_patch ... ok
+test editor_tests::editor_keeps_original_truncation_when_the_model_omits_it ... ok
+test editor_tests::editor_keeps_context_read_gaps_when_the_model_omits_them ... ok
+test editor_tests::editor_keeps_daemon_tool_gaps_when_the_model_omits_them ... ok
+test editor_tests::editor_keeps_workspace_changes_when_the_model_omits_them ... ok
+test editor_tests::editor_keeps_child_conflicts_when_the_parent_omits_them ... ok
+test editor_tests::editor_keeps_child_gaps_when_the_parent_omits_them ... ok
+test editor_tests::editor_keeps_successful_history_list_gaps_when_the_model_omits_them ... ok
+test editor_tests::editor_keeps_successful_history_search_gaps_when_the_model_omits_them ... ok
+test editor_tests::editor_rechecks_live_executor_policy_and_expiry_but_pins_its_adoption_mode ... ok
+test editor_tests::editor_refuses_unread_unlisted_scope_and_forged_changes_and_keeps_nonmemory_failures ... ok
+
+test result: ok. 17 passed; 0 failed; 1 ignored; 0 measured; 103 filtered out; finished in 21.49s
+
+CASE ["cargo", "test", "--lib", "daemon::jobs::consult::editor_tests::", "--", "--nocapture"]
+   Compiling akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp020)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.17s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 5 tests
+test daemon::jobs::consult::editor_tests::editor_crash_child ... ignored, owned subprocess launched by the editor crash supervisor
+test daemon::jobs::consult::editor_tests::research_retains_errors_after_a_successful_dispatch_without_swallowing_them ... ok
+test daemon::jobs::consult::editor_tests::editor_without_a_response_checkpoint_requires_explicit_retry_after_restart ... ok
+test daemon::jobs::consult::editor_tests::editor_legacy_checkpoint_without_coverage_stays_for_review ... ok
+test daemon::jobs::consult::editor_tests::editor_checkpoint_and_committed_patch_survive_sigkill_without_runner_replay ... ok
+
+test result: ok. 4 passed; 0 failed; 1 ignored; 0 measured; 60 filtered out; finished in 0.29s
+
+CASE ["cargo", "test", "--test", "daemon", "consult", "--", "--nocapture"]
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 32 tests
+test claude_tests::native_claude_consult_returns_public_status_and_deduplicates ... ok
+test codex_tests::consult_code_rechecks_workspace_identity_before_return ... ok
+test codex_tests::consult_delegate_default_capacity_refuses_without_deadlock ... ok
+test codex_tests::consult_named_fallback_never_bypasses_source_authority ... ok
+test codex_tests::consult_named_executor_runs_the_pinned_profile ... ok
+test codex_tests::consult_code_rechecks_read_policy_before_return ... ok
+test codex_tests::consult_code_rechecks_workspace_identity_before_replay ... ok
+test codex_tests::consult_code_rechecks_read_policy_before_replay ... ok
+test codex_tests::consult_job_is_distinct_durable_and_deduplicates_native_execution ... ok
+test codex_tests::consult_delegate_descendants_share_budget_and_origin ... ok
+test codex_tests::consult_delegate_failure_keeps_other_branch_evidence ... ok
+test codex_tests::consult_named_delegates_inherit_the_active_executor ... ok
+test codex_tests::consult_hook_submits_and_expands_durable_results_inside_the_read_only_sandbox ... ok
+test codex_tests::consult_named_fallback_stops_at_shared_start_limit ... ok
+test codex_tests::consult_delegate_two_parents_refuse_without_deadlock ... ok
+test codex_tests::consult_named_model_absent_from_native_catalog_never_starts_a_worker ... ok
+test codex_tests::consult_public_failure_reports_error_without_a_receipt ... ok
+test codex_tests::consult_named_home_is_independent_of_the_caller_profile ... ok
+test codex_tests::consult_named_model_and_safe_options_reach_the_native_process ... ok
+test codex_tests::consult_queued_profile_obeys_current_read_roots ... ok
+test codex_tests::consult_named_fallback_is_explicit_and_shares_origin_budget ... ok
+test codex_tests::consult_reused_profile_obeys_current_read_roots ... ok
+test codex_tests::consult_queued_profile_rejects_path_redirection ... ok
+test codex_tests::consult_reused_profile_rejects_path_redirection ... ok
+test codex_tests::consult_public_large_result_preserves_complete_answer_and_conditions ... ok
+test codex_tests::consult_public_result_expands_receipt_and_originals_without_private_trace ... ok
+test codex_tests::consult_progressive_research_keeps_source_versions_and_workspace_changes ... ok
+test codex_tests::consult_named_profile_keeps_generation_but_obeys_live_disable ... ok
+test codex_tests::consult_detached_descendants_settle_before_cancellation_releases_ownership ... ok
+test codex_tests::consult_cancel_shutdown_and_crash_end_native_processes_without_replaying ... ok
+test codex_tests::consult_delegate_cancellation_and_crash_reap_the_whole_run_tree ... ok
+test codex_tests::consult_conclusions_validate_evidence_no_hit_conditions_and_conflicts ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 89 filtered out; finished in 4.61s
+
+CASE ["cargo", "clippy", "--all-targets", "--", "-D", "warnings"]
+    Checking akasha-otsuge v0.1.0-dev (/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp020)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.86s

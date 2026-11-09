@@ -79,8 +79,10 @@ execution error, environment, changed requirements and insufficient evidence.
 Only memory error/stale conditions may carry a patch. Its targets must have been
 expanded, and every cited span must have been read by this investigation. An
 incomplete/conflicting report forces review even in automatic mode. The daemon
-also retains its own tool failures, truncated originals, workspace changes and
-incomplete history coverage; a Runner cannot omit these to gain automatic adoption.
+also retains its own tool failures, truncated originals/context reads, workspace
+changes and history-page gaps, plus child-investigation gaps and conflicts.
+A Runner cannot omit these to gain automatic adoption. A later output-budget
+failure does not erase a limitation already observed during the operation.
 A report of
 insufficient evidence opens review without inventing a revision; a non-memory
 cause produces a report without changing memory.

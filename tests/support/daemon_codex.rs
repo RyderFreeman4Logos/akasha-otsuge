@@ -25,7 +25,12 @@ pub(super) fn consult_fixture_with(
     std::fs::create_dir(&home).unwrap();
     let concurrency = match scenario {
         "delegate_tree" => 4,
-        "delegate_failure" | "delegate_parents" | "delegate_cancel" => 2,
+        "delegate_failure"
+        | "delegate_parents"
+        | "delegate_cancel"
+        | "editor_delegate_gap"
+        | "editor_delegate_conflict_gap"
+        | "conclusion_delegate_gap" => 2,
         _ => 1,
     };
     let depth = if scenario == "delegate_tree" { 2 } else { 1 };
@@ -658,6 +663,8 @@ fn consult_conclusions_validate_evidence_no_hit_conditions_and_conflicts() {
         "conclusion_no_hit",
         "conclusion_forged",
         "conclusion_conflict",
+        "conclusion_context_gap",
+        "conclusion_delegate_gap",
     ] {
         let (daemon, event, _) = consult_fixture(scenario);
         let submitted = native(&daemon, event);
@@ -682,6 +689,22 @@ fn consult_conclusions_validate_evidence_no_hit_conditions_and_conflicts() {
                 assert!(result["memories"].as_array().unwrap().is_empty());
             }
             "conclusion_forged" => assert_eq!(result["error"]["code"], "READ_DENIED", "{result}"),
+            "conclusion_context_gap" | "conclusion_delegate_gap" => {
+                assert_eq!(result["status"], "incomplete", "{result}");
+                let gap = if scenario == "conclusion_context_gap" {
+                    "context_read_budget"
+                } else {
+                    "child_limit"
+                };
+                assert!(
+                    result["gaps"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .any(|value| value == gap),
+                    "{result}"
+                );
+            }
             _ => {
                 assert_eq!(result["status"], "incomplete", "{result}");
                 assert_eq!(
