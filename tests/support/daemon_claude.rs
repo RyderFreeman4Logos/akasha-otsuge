@@ -8,14 +8,31 @@ use akasha_otsuge::{
 
 fn terminal(daemon: &Daemon, id: &str) -> Value {
     let end = Instant::now() + Duration::from_secs(15);
+    let mut wait = super::job_wait::JobWait::default();
     loop {
         let job = daemon.cli(&["job", "show", id])["data"].clone();
         if !matches!(job["state"].as_str(), Some("queued" | "running")) {
             return job;
         }
-        assert!(Instant::now() < end, "Claude capture did not finish: {job}");
+        if job["binding"].is_object() {
+            wait.check(&job);
+        } else {
+            assert!(Instant::now() < end, "Claude job did not finish: {job}");
+        }
         std::thread::sleep(Duration::from_millis(10));
     }
+}
+
+fn sync_tip(daemon: &Daemon, registration: &Value, tip: &Value) {
+    let sync = native_bridge(
+        daemon,
+        &json!({"op":"sync","registration":registration,"tip":tip}),
+    );
+    let id = sync["data"]["id"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{sync}"));
+    let done = terminal(daemon, id);
+    assert_eq!(done["state"], "succeeded", "{done}");
 }
 
 #[test]
@@ -656,6 +673,7 @@ fn native_child_registration_keeps_parent_identity_and_separate_history() {
     let call = json!({"op":"bind","registration":child["data"]["registration"],"session_id":session,
         "agent_id":agent,"turn_id":"child-turn","tool_call_id":"child-call","cursor":1,
         "tip":"6a101f82-6982-4ac8-b613-07085ed078ce"});
+    sync_tip(&daemon, &call["registration"], &call["tip"]);
     let first = native_bridge(&daemon, &call);
     assert!(first["error"].is_null(), "{first}");
     let binding = &first["data"];
@@ -694,6 +712,7 @@ fn native_child_registration_keeps_parent_identity_and_separate_history() {
     let mut grandcall = call.clone();
     grandcall["registration"] = grandchild["data"]["registration"].clone();
     grandcall["agent_id"] = "grandchild".into();
+    sync_tip(&daemon, &grandcall["registration"], &grandcall["tip"]);
     assert_eq!(
         native_bridge(&daemon, &grandcall)["data"]["proof"]["parent"],
         format!("{session}/{agent}")
@@ -814,6 +833,7 @@ fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() 
     assert_eq!(invalid_start["error"]["code"], "INVALID_REQUEST");
     let call = json!({"op":"bind","registration":token,"session_id":"11111111-1111-4111-8111-111111111111",
         "agent_id":null,"turn_id":"turn-a","tool_call_id":"call-a","cursor":1,"tip":"a7c3b44a-26cd-4a68-9aff-3e98cce20493"});
+    sync_tip(&daemon, &call["registration"], &call["tip"]);
     let first = native_bridge(&daemon, &call);
     assert!(first["error"].is_null(), "{first}");
     let binding = &first["data"];
@@ -906,8 +926,8 @@ fn native_caller_registration_pins_each_call_and_rejects_identity_replacement() 
         std::thread::sleep(Duration::from_millis(500));
         std::fs::write(
             lagged,
-            include_str!("../fixtures/claude/2.1.311/native-root-resume-compact.jsonl")
-                .replace("11111111-1111-4111-8111-111111111111", "lagged-session"),
+            format!("{}\n", json!({"type":"user","uuid":"a7c3b44a-26cd-4a68-9aff-3e98cce20493", "parentUuid":null,
+                "sessionId":"lagged-session","version":"2.1.311","message":{"role":"user","content":"Delayed fixture prompt"}})),
         )
         .unwrap();
     });
@@ -977,6 +997,7 @@ fn native_claude_consult_returns_public_status_and_deduplicates() {
     let call = json!({"registration":token,"session_id":"11111111-1111-4111-8111-111111111111",
         "agent_id":null,"turn_id":"turn-a","tool_call_id":"consult-a","cursor":1,
         "tip":"a7c3b44a-26cd-4a68-9aff-3e98cce20493"});
+    sync_tip(&daemon, &call["registration"], &call["tip"]);
     let event = json!({"op":"consult","call":call,"args":{"hint":null}});
     let submitted = native_bridge(&daemon, &event);
     let id = submitted["data"]["job_id"]

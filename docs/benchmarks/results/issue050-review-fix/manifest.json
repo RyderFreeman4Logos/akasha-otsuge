@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "reviewed_head": "d672585b960d901905a222231915f6220c62d59c",
+  "note": "Historical canonical PASS did not waive independent review FAIL. New queue-to-running clock reversal regression failed before repair. Final candidate gate and review remain separate. The report self-referenced a prior in-memory hash; its actual published bytes are bound by exit.json and this manifest.",
+  "files": {
+    "issue050-canonical-r1-verified.json": {
+      "bytes": 2106,
+      "sha256": "05e8e8a93a9bf2b5c17974884d2ecf87a525e4dee9c63482658149d78be55ce5"
+    },
+    "issue050-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "4acdc6b2f20178c357367eb81139ffbd7b930151354833d29cb6ccc4d022fe68"
+    },
+    "issue050-canonical-r1.collected.json": {
+      "bytes": 447,
+      "sha256": "c5cf336f7c12bcc09f43fd75eb7f73e9c71bb83731e0965840dd2c739658ca59"
+    },
+    "issue050-canonical-r1.log.gz": {
+      "bytes": 10738,
+      "sha256": "4995c151be9b3122918c3a8a412dc6537f939cd21651d986d8d6bd6915dbd72b",
+      "uncompressed_sha256": "73c5292658a067515b46abad207cd91f71b14f237bb468db69282aa9a8b26f38"
+    },
+    "issue050-canonical-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "cf8e9ad144a034c6c2c838676770590cbaf402a2921d7e8c7f7967a318681c66"
+    },
+    "issue050-clock-green-r1.admission.json": {
+      "bytes": 1078,
+      "sha256": "23858a524a5443c759c542b47f0426ed7f43c50ce67fab0540251293b483cb76"
+    },
+    "issue050-clock-green-r1.collected.json": {
+      "bytes": 371,
+      "sha256": "6a34ba101dc6bc9a8159af352110ee11262d006cd0a7a2662be7e5a78e4c794d"
+    },
+    "issue050-clock-green-r1.log.gz": {
+      "bytes": 783,
+      "sha256": "21d3d7941d9e0c232bd700db91e31a07017c684c5208a986c6c45110a007a2eb",
+      "uncompressed_sha256": "8cdac46ded8fea240f09a39be7d27dc0fe6f9cbe626df79cd16dcaae906a88cb"
+    },
+    "issue050-clock-green-r1.terminal.json": {
+      "bytes": 235,
+      "sha256": "c817a97f54875e9dccfac2acca96980a0a12ac34347ab0c9f8acec160921e549"
+    },
+    "issue050-clock-red-r1.admission.json": {
+      "bytes": 1169,
+      "sha256": "fd769608deb733dd07bb206141baf2b9072ddbaae8931064ffc44e1a2bc6892b"
+    },
+    "issue050-clock-red-r1.collected.json": {
+      "bytes": 386,
+      "sha256": "b4b4b32bb42f76049fcddfb0ae1a74d5ff18d7eb43423e3b37a329f435a58d4e"
+    },
+    "issue050-clock-red-r1.log.gz": {
+      "bytes": 622,
+      "sha256": "99f7763b3252d8071c676d39f9f363e7c9e91ff9741b9617021c862213723fdf",
+      "uncompressed_sha256": "851724c64daa78b82b43093746e072ffd728da9531f2a016707aaf3edcc808be"
+    },
+    "issue050-clock-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "52c64a777c4e441a3b2aa6469627a4cf6abfd9fb627c124cbff133e5bae07f4c"
+    },
+    "issue050-review-r1-tests.log.gz": {
+      "bytes": 2054,
+      "sha256": "d63bda997e370d689d1a0f1eb7365c0101c729d8a4fbaaf74b83297c42130fea",
+      "uncompressed_sha256": "fe970a58765bce79888bac0b0079db4519686597a4296f1b917349a651d059f1"
+    },
+    "issue050-review-r1.admission.json": {
+      "bytes": 1101,
+      "sha256": "2ef9e31627a2976c0e22a6f3617fc283019eb977cc98b7330ee90e87732a580d"
+    },
+    "issue050-review-r1.collected.json": {
+      "bytes": 385,
+      "sha256": "dff2333286cd95c1e163001a95e2042739b207965ce74060b793f99dba5d6657"
+    },
+    "issue050-review-r1.exit.json": {
+      "bytes": 2197,
+      "sha256": "6bc8a9f797eb0199d48d1c7bdb59f9da930d6d4fe5c0f3843e6078e184c17da6"
+    },
+    "issue050-review-r1.log.gz": {
+      "bytes": 994,
+      "sha256": "bd59c9c1105bb1dc05c48407e7a34d7e7fb3b7259ae8d71145385fb4f69bb241",
+      "uncompressed_sha256": "12f0fe5d1cabbc513b3ed5396ad5b706a971549f11889b141dc8dfd244bafadd"
+    },
+    "issue050-review-r1.md.gz": {
+      "bytes": 551,
+      "sha256": "6716831a946ca870c1554d2f26aeebb7369162de24ba49b5d4a6aaf57f7276a9",
+      "uncompressed_sha256": "a0896be85f09670090433e2d5cd6c88acdc298671d8b16f42ec0d3f3417570f5"
+    },
+    "issue050-review-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "348b3e030f874c8fd83456d0060bb73073341b63cff26f0010aedc6f813f2436"
+    }
+  }
+}

@@ -130,7 +130,7 @@ fn pi_registration_binding_and_backfill_survive_restart_with_current_grants() {
     assert_eq!(public["data"]["error"]["code"], "ADAPTER_UNSUPPORTED");
     let extra = json!({"type":"message","id":"recovered","parentId":manifest["ids"]["tool"],"timestamp":"2026-10-29T00:00:00Z","message":{"role":"user","content":"Recovered after interruption","timestamp":1793232000000_i64}});
     std::fs::write(&transcript, format!("{original}{extra}\n")).unwrap();
-    let end = Instant::now() + Duration::from_secs(10);
+    let mut wait = super::job_wait::JobWait::default();
     loop {
         let job = daemon.cli(&["job", "show", job_id]);
         assert_eq!(job["data"]["execution_deadline_ms"], deadline);
@@ -138,10 +138,10 @@ fn pi_registration_binding_and_backfill_survive_restart_with_current_grants() {
             break;
         }
         assert!(
-            Instant::now() < end
-                && matches!(job["data"]["state"].as_str(), Some("queued" | "running")),
+            matches!(job["data"]["state"].as_str(), Some("queued" | "running")),
             "{job}"
         );
+        wait.check(&job["data"]);
         std::thread::sleep(Duration::from_millis(20));
     }
     let cancelled = native(

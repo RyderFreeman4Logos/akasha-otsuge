@@ -14,6 +14,9 @@ const BIN: &str = env!("CARGO_BIN_EXE_akasha-otsuge");
 #[path = "support/executable.rs"]
 mod executable;
 
+#[path = "support/job_wait.rs"]
+mod job_wait;
+
 #[path = "support/daemon_models.rs"]
 mod model_tests;
 
@@ -711,7 +714,7 @@ fn accepted_reconciliation_survives_process_death_and_pins_configuration() {
         daemon.root
     ));
     daemon.start();
-    let end = Instant::now() + Duration::from_secs(30);
+    let mut wait = job_wait::JobWait::default();
     let completed = loop {
         let status = daemon.cli(&["job", "show", "durable-capture"]);
         if status["data"]["state"] == "succeeded" {
@@ -724,7 +727,7 @@ fn accepted_reconciliation_survives_process_death_and_pins_configuration() {
             ),
             "{status}"
         );
-        assert!(Instant::now() < end, "recovery did not complete: {status}");
+        wait.check(&status["data"]);
         std::thread::sleep(Duration::from_millis(50));
     };
     assert_eq!(completed["data"]["config_generation"], 1);

@@ -1,0 +1,49 @@
+{
+  "utc": "2026-11-09T19:56:05.853067+00:00",
+  "head": "d672585b960d901905a222231915f6220c62d59c",
+  "tree": "1e4c07e05eae2b8c4b011dec1821b1be4830fb78",
+  "base": "460934961009ff41ae1b3def573e81dda4fa7d0e",
+  "clean_before_after": true,
+  "command": [
+    "just",
+    "check"
+  ],
+  "exit_code": 0,
+  "seconds": 259.0716239605099,
+  "rust_result_rows": 20,
+  "rust_passed_including_installed_repeat": 415,
+  "rust_ignored_including_installed_repeat": 26,
+  "daemon_passed_each_run": 102,
+  "daemon_opt_in_ignored_each_run": 5,
+  "installed": {
+    "installed": true,
+    "binary_sha256": "fd00c1ee7f1598dde2bdec3ecba809eae4c6203226d9d0f6524305eafdd7ff35",
+    "lifecycle": "passed",
+    "private_uid_denial": "passed",
+    "peer_uid_denial": "passed",
+    "tcp_sockets": 0,
+    "kernel_control_uid": 165536
+  },
+  "artifacts": {
+    "issue050-canonical-r1.admission.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/issue050-canonical-r1.admission.json",
+      "sha256": "4acdc6b2f20178c357367eb81139ffbd7b930151354833d29cb6ccc4d022fe68"
+    },
+    "issue050-canonical-r1.terminal.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/issue050-canonical-r1.terminal.json",
+      "sha256": "cf8e9ad144a034c6c2c838676770590cbaf402a2921d7e8c7f7967a318681c66"
+    },
+    "issue050-canonical-r1.collected.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/issue050-canonical-r1.collected.json",
+      "sha256": "c5cf336f7c12bcc09f43fd75eb7f73e9c71bb83731e0965840dd2c739658ca59"
+    },
+    "issue050-canonical-r1.log": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/issue050-canonical-r1.log",
+      "sha256": "73c5292658a067515b46abad207cd91f71b14f237bb468db69282aa9a8b26f38"
+    }
+  },
+  "limits": [
+    "Independent frozen review and hosted CI remain separate stages.",
+    "Controlled fixtures and installed smoke checks do not establish new provider authentication or product stress acceptance."
+  ]
+}
