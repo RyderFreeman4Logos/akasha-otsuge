@@ -106,6 +106,57 @@ fn auto_grill_roles_share_existing_executors_and_keep_finite_pinned_budgets() {
 }
 
 #[test]
+fn incident_policy_is_opt_in_bounded_and_uses_the_configured_executor_deadline() {
+    let empty = config("");
+    assert!(
+        serde_json::to_value(empty.config())
+            .unwrap()
+            .get("incidents")
+            .is_none()
+    );
+    let input = "[incidents]\nexecutor='investigator'\ntriggers=['reproducible_failure','user_correction','dependency_changed','expired','contradiction']\nauto_repair=true\nmax_runner_starts=3\nmax_tokens=64000\n[executors.investigator]\nkind='codex'\nbinary='codex'\ntimeout='2000s'\n";
+    let resolved = config(input);
+    let policy = serde_json::to_value(resolved.config()).unwrap()["incidents"].clone();
+    assert_eq!(policy["executor"], "investigator");
+    assert_eq!(policy["max_runner_starts"], 3);
+    assert!(resolved.timeouts().workflow >= Duration::from_secs(6000));
+    for invalid in [
+        input.replace("executor='investigator'", "executor='missing'"),
+        input.replace("max_runner_starts=3", "max_runner_starts=0"),
+        input.replace("max_runner_starts=3", "max_runner_starts=33"),
+        input.replace("max_tokens=64000", "max_tokens=0"),
+        input.replace("'expired'", "'every_exit'"),
+        format!("{input}enabled=false\n"),
+        format!("{input}\n[timeouts]\nworkflow='2001s'\n"),
+    ] {
+        assert!(resolve(&invalid, None, "", &paths()).is_err(), "{invalid}");
+    }
+    // A trigger without an executor can still retain a review for operator action.
+    config("[incidents]\ntriggers=['user_correction']\n");
+    let manager = manager(input);
+    let pinned = manager.pin();
+    assert_eq!(
+        manager
+            .reload(
+                &input.replace("auto_repair=true", "auto_repair=false"),
+                None,
+                |_| Ok(())
+            )
+            .unwrap()
+            .status,
+        ReloadStatus::Applied
+    );
+    assert_eq!(
+        serde_json::to_value(pinned.resolved().config()).unwrap()["incidents"]["auto_repair"],
+        true
+    );
+    assert_eq!(
+        serde_json::to_value(manager.pin().resolved().config()).unwrap()["incidents"]["auto_repair"],
+        false
+    );
+}
+
+#[test]
 fn defaults_cover_all_local_model_roles_without_an_endpoint_requirement() {
     let empty = config("");
     assert!(empty.config().models.is_empty());
