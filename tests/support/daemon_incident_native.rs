@@ -1,16 +1,18 @@
 use super::*;
 
 fn fixture(settings: &str) -> (Daemon, Value, Value) {
-    let (mut daemon, call, bound) =
-        super::super::codex_tests::consult_fixture_with("editor_incident_actual", |_| {
-            settings.to_owned()
-        });
-    daemon.cli(&["daemon", "stop"]);
-    daemon.wait();
+    super::super::codex_tests::consult_fixture_prepared(
+        "editor_incident_actual",
+        |_| settings.to_owned(),
+        prepare,
+    )
+}
+
+fn prepare(daemon: &Daemon) {
     let workspace = daemon.root.join("workspace");
     for (id, version) in [("api-current", "v2"), ("api-v1", "v1")] {
         super::super::retrieval_tests::seed_records_with(
-            &daemon,
+            daemon,
             &[(
                 id,
                 Some(workspace.to_str().unwrap()),
@@ -44,8 +46,6 @@ fn fixture(settings: &str) -> (Daemon, Value, Value) {
     std::fs::write(workspace.join("notes.rs"), "// Controlled API v2 fixture. client.rs defines the available API.\n// main.rs is deliberately constructed from the api-current memory's old function name.\n// fixed.rs is an independent compilation control; API v1 history must remain unchanged.\n").unwrap();
     std::fs::write(workspace.join(".gitignore"), "/app\n/fixed-app\n").unwrap();
     commit_fixture(&workspace);
-    daemon.start();
-    (daemon, call, bound)
 }
 
 fn executor_settings(binary: &std::path::Path, home: &std::path::Path) -> String {
@@ -117,6 +117,11 @@ fn compile_failure(daemon: &Daemon, file: &std::path::Path) -> Value {
 fn old_api_fixture_has_independent_compile_controls_and_separate_version_history() {
     let (daemon, _, bound) = fixture("");
     let original = daemon.cli(&["memory", "export", "api-current"])["data"].clone();
+    assert!(
+        bound["data"]["capture_seq"].as_u64().unwrap()
+            >= original["revision"]["commit_seq"].as_u64().unwrap(),
+        "the recall fence predates its intended evidence"
+    );
     assert_eq!(
         original["record"]["draft"]["scope"]["branch_or_version"],
         "v2"

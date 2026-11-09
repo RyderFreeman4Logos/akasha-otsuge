@@ -18,6 +18,14 @@ pub(super) fn consult_fixture_with(
     scenario: &str,
     settings: impl FnOnce(&std::path::Path) -> String,
 ) -> (Daemon, Value, Value) {
+    consult_fixture_prepared(scenario, settings, |_| {})
+}
+
+pub(super) fn consult_fixture_prepared(
+    scenario: &str,
+    settings: impl FnOnce(&std::path::Path) -> String,
+    prepare: impl FnOnce(&Daemon),
+) -> (Daemon, Value, Value) {
     let mut daemon = Daemon::new();
     let workspace = daemon.root.join("workspace");
     let home = daemon.root.join("native-home");
@@ -98,6 +106,7 @@ pub(super) fn consult_fixture_with(
     if matches!(scenario, "research" | "code_policy") {
         std::fs::write(workspace.join("notes.rs"), "memory needle\n").unwrap();
     }
+    prepare(&daemon);
     daemon.start();
     let registered = native(
         &daemon,
