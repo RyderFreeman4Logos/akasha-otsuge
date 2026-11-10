@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Write};
+use std::os::fd::AsRawFd;
 use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::path::{Path, PathBuf};
 
@@ -17,7 +18,6 @@ pub(super) struct Writer {
     commits: Sink,
     blobs: Sink,
     source: String,
-    source_inode: (u64, u64),
     pub observed_at_ms: u64,
     sequence: u64,
     revisions: u64,
@@ -82,18 +82,42 @@ fn present(path: &Path) -> Result<bool> {
     }
 }
 
-fn publish(root: &Path, name: &str, bytes: &[u8], source_inode: (u64, u64)) -> Result<()> {
-    let temporary = root.join(format!("{name}.tmp"));
-    let mut file = private_file(&temporary, true, source_inode)?;
-    file.set_len(0)?;
+fn publish(root: &Path, name: &str, bytes: &[u8]) -> Result<()> {
+    let directory = OpenOptions::new()
+        .read(true)
+        .custom_flags((rustix::fs::OFlags::DIRECTORY | rustix::fs::OFlags::NOFOLLOW).bits() as i32)
+        .open(root)?;
+    // Anonymous bytes cannot be replaced through a staging pathname before publication.
+    let mut file = File::from(
+        rustix::fs::openat(
+            &directory,
+            ".",
+            rustix::fs::OFlags::TMPFILE | rustix::fs::OFlags::RDWR | rustix::fs::OFlags::CLOEXEC,
+            rustix::fs::Mode::RUSR | rustix::fs::Mode::WUSR,
+        )
+        .map_err(std::io::Error::from)?,
+    );
     file.write_all(bytes)?;
     file.sync_all()?;
-    fs::rename(temporary, root.join(name))?;
+    rustix::fs::linkat(
+        rustix::fs::CWD,
+        format!("/proc/self/fd/{}", file.as_raw_fd()),
+        &directory,
+        name,
+        rustix::fs::AtFlags::SYMLINK_FOLLOW,
+    )
+    .map_err(|error| {
+        if error == rustix::io::Errno::EXIST {
+            conflict()
+        } else {
+            std::io::Error::from(error).into()
+        }
+    })?;
     #[cfg(test)]
     if name == "manifest.json" {
         crate::storage::crash_tests::checkpoint("mempal-manifest-renamed");
     }
-    layout::sync_dir(root)?;
+    directory.sync_all()?;
     layout::sync_dir(root.parent().ok_or_else(conflict)?)
 }
 
@@ -178,8 +202,9 @@ impl Writer {
         lock.try_lock()
             .map_err(|_| StorageError::new("MEMPAL_CONVERSION_BUSY"))?;
         for entry in fs::read_dir(&destination)? {
+            let entry = entry?;
             if !matches!(
-                entry?.file_name().to_str(),
+                entry.file_name().to_str(),
                 Some(
                     ".mempal-convert.lock"
                         | "conversion.json"
@@ -192,6 +217,7 @@ impl Writer {
             ) {
                 return Err(conflict());
             }
+            private_file(&entry.path(), false, source_inode)?;
         }
         let identity_path = destination.join("conversion.json");
         let identity = if present(&identity_path)? {
@@ -227,7 +253,6 @@ impl Writer {
                 &destination,
                 "conversion.json",
                 &serde_json::to_vec(&identity)?,
-                source_inode,
             )?;
             identity
         };
@@ -249,7 +274,6 @@ impl Writer {
             )?,
             destination,
             source: source.into(),
-            source_inode,
             observed_at_ms: identity.observed_at_ms,
             sequence: 0,
             revisions: 0,
@@ -358,15 +382,62 @@ impl Writer {
                 layout::sync_dir(&self.destination)?;
                 layout::sync_dir(self.destination.parent().ok_or_else(conflict)?)?;
             }
-            None => publish(
-                &self.destination,
-                "manifest.json",
-                &bytes,
-                self.source_inode,
-            )?,
+            None => publish(&self.destination, "manifest.json", &bytes)?,
         }
         #[cfg(test)]
         crate::storage::crash_tests::checkpoint("mempal-published");
         Ok(manifest)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct Fixture(PathBuf);
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            fs::remove_dir_all(&self.0).unwrap();
+        }
+    }
+
+    #[test]
+    fn metadata_publication_preserves_unexpected_final_occupants() {
+        let mut damaged = Vec::new();
+        for name in ["conversion.json", "manifest.json"] {
+            let root = std::env::temp_dir().join(format!(
+                "akasha-mempal-publish-{}-{name}",
+                std::process::id()
+            ));
+            fs::create_dir(&root).unwrap();
+            let _fixture = Fixture(root.clone());
+            let source = root.join("source.db");
+            let db = rusqlite::Connection::open(&source).unwrap();
+            db.execute_batch(include_str!("../../../tests/fixtures/mempal21-28.sql"))
+                .unwrap();
+            db.close().unwrap();
+            let pinned = File::open(&source).unwrap();
+            let identity = pinned.metadata().unwrap();
+            let bytes = fs::read(&source).unwrap();
+            let output = root.join("archive");
+            layout::private_dir(&output, false).unwrap();
+            let moved = output.join(name);
+            fs::rename(&source, &moved).unwrap();
+            let result = publish(&output, name, b"new metadata");
+            let preserved = fs::read(&moved).ok().as_deref() == Some(bytes.as_slice())
+                && fs::metadata(&moved)
+                    .is_ok_and(|m| (m.dev(), m.ino()) == (identity.dev(), identity.ino()));
+            eprintln!(
+                "publication={name} refused={} moved_source_preserved={preserved}",
+                result.is_err()
+            );
+            if result.is_ok() || !preserved {
+                damaged.push(name);
+            }
+        }
+        assert!(
+            damaged.is_empty(),
+            "publication replaced source occupants: {damaged:?}"
+        );
     }
 }

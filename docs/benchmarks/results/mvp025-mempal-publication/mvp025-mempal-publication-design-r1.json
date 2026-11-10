@@ -1,0 +1,19 @@
+{
+  "utc": "2026-11-10T11:07:18.594365+00:00",
+  "protocol": "new anonymous O_TMPFILE descriptor; fsync; linkat from /proc/self/fd with SYMLINK_FOLLOW and no replacement; directory fsync",
+  "platform_probe": "PASS existing name preserved and new name has one link; scratch removed",
+  "scope_inventory": {
+    "writable handles": "private_file validates source device/inode, owner/mode/single link before any data append; apply same ownership predicate to every recognized pre-existing output member",
+    "metadata publication": "replace named temporary open/truncate/rename with new anonymous descriptor and non-replacing link; no temporary pathname cleanup",
+    "source reader": "read-only descriptor and pre/post identity/hash checks; no mutation",
+    "shared Sink": "append only to validated descriptor; never rename or unlink paths",
+    "ordinary neutral archive export": "unchanged prior code, outside this source-snapshot mutation contract"
+  },
+  "why_not_another_path_check": "A checked final path can change before replacement; checked temporary names can also be replaced before rename/unlink. Descriptor-owned anonymous bytes remove both mutable-name operations.",
+  "support_limit": "requires Linux O_TMPFILE and procfs publication support; unsupported filesystem must refuse without a replacing fallback",
+  "references": [
+    "https://man7.org/linux/man-pages/man2/open.2.html",
+    "https://man7.org/linux/man-pages/man2/link.2.html"
+  ],
+  "status": "design and platform capability verified; product fix not implemented yet"
+}

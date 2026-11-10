@@ -8,9 +8,11 @@ import, two full roundtrips and two isolated daemon starts now pass on source
 `4193301` in `feat/mvp-025-mempal-import`. PR #60 is draft. Its first exact
 canonical gate passed, but independent R1 found
 a source/output staging alias that could destroy the snapshot. The FAIL report
-is retained. Causal path/inode regressions, 65 related Rust tests, five crash
-phases, Clippy and baseline-archive replay now pass. The repair needs a fresh
-exact gate and R2 review. Different-source
+is retained. The first repair passed a fresh exact gate, but R2 exposed the
+final replacing-rename sibling. Both FAIL reports remain visible. The shared
+publication protocol now uses a new anonymous file and non-replacing link; 24
+focused Rust tests, five crash phases, Clippy and four controlled concurrent
+source-move cases pass. The final successor needs canonical R3 and full-range R3. Different-source
 incremental application remains next within #25. Offline import (PR #58) and neutral export (PR #57)
 also passed their gates; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
@@ -1205,7 +1207,20 @@ Path admission and the shared writable-file opener now protect the source.
 The corrected fixture, 65 related Rust cases, five crash phases, Clippy and
 old-archive byte-identical replay pass. The fixture setup failure is retained
 separately in [the source-guard archive](../benchmarks/results/mvp025-mempal-source-guard/README.md).
-A fresh exact gate, R2 review and publication remain pending.
+The exact successor gate at `7f89024` passed in 471.379s (576 Rust passes,
+34 ignores), but whole-range R2 found a final rename that could replace the
+moved source. Its full FAIL is retained. After a complete mutation-boundary
+inventory, metadata now uses anonymous descriptors and non-replacing final
+links; the named-temp truncate/rename path is removed. Twenty-one archive and
+three mempal unit tests pass, with one intentional supervisor-child ignore,
+five actual SIGKILL phases, formatting and Clippy. A shared controlled CLI
+interposer reproduced four failures on the frozen old release and verified
+four source-preserving cases on the new debug binary; both normal controls
+passed and scratch was removed. Canonical R3, full-range R3 and publication
+remain pending. The [publication repair archive](../benchmarks/results/mvp025-mempal-publication/README.md)
+retains the full R2 report, ownership inventory and baseline/candidate probes.
+Historical candidate CI42798698625 passed and saved its cache;
+that earlier candidate still has both source-preservation findings.
 Runtime post-merge main CI42779863508 also passed separately.
 
 - [x] Pin the supported mempal source commit and both schema axes; inventory

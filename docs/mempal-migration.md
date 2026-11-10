@@ -24,6 +24,13 @@ The source must be outside that directory, including when its parent is reached
 through a symlink. Writable output handles also reject the retained source inode
 before truncation or append, so moving that inode after reader admission cannot
 turn it into a staging file. Refusal preserves source bytes.
+Identity and manifest publication write a new unnamed temporary file, sync it,
+and create the final name without replacing an existing file. Existing legacy
+`.tmp` members are validated as private files and left untouched. The destination
+filesystem must support Linux `O_TMPFILE` and hard links; unsupported operations
+return an I/O error without a replacing fallback. This uses the Linux
+[unnamed-file publication](https://man7.org/linux/man-pages/man2/open.2.html) and
+[non-replacing link](https://man7.org/linux/man-pages/man2/link.2.html) contracts.
 Invalid source/version/structure is refused before output creation. A later write
 or source-stability failure may leave private incomplete output without a final
 manifest; it is not a completed archive. Repeat the same command to reconcile it.
