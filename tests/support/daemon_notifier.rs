@@ -1081,6 +1081,214 @@ fn crash_plugin_daemon(daemon: &mut Daemon) {
 }
 
 #[test]
+fn stdio_recovery_missing_executable_preserves_envelope_and_exhausts_finite_budget() {
+    for restore in [true, false] {
+        let mut daemon = plugin_fixture("normal");
+        let plugin = daemon.root.join("notifier.py");
+        let backup = daemon.root.join("notifier.saved");
+        std::fs::rename(&plugin, &backup).unwrap();
+        daemon.start();
+        let first = wait_items(&daemon, &extraction_tests::scope(), |items| {
+            items.len() == 1
+                && matches!(
+                    items[0]["deliveries"]["plugin"]["status"].as_str(),
+                    Some("retry_wait" | "failed")
+                )
+        })[0]
+            .clone();
+        let accepted = &first["deliveries"]["plugin"]["attempt"];
+        assert_eq!(first["deliveries"]["plugin"]["status"], "retry_wait");
+        assert_eq!(accepted["error"], "NOTIFIER_UNAVAILABLE");
+        assert_eq!(accepted["transient_failures"], 1);
+        assert!(!daemon.root.join("attempts.jsonl").exists());
+        if restore {
+            daemon.cli(&["daemon", "stop"]);
+            daemon.wait();
+            std::fs::rename(&backup, &plugin).unwrap();
+            daemon.start();
+            let sent = wait_items(&daemon, &extraction_tests::scope(), |items| {
+                items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+            })[0]
+                .clone();
+            let attempt = &sent["deliveries"]["plugin"]["attempt"];
+            assert_eq!(attempt["envelope"], accepted["envelope"]);
+            assert_eq!(
+                attempt["first_started_at_ms"],
+                accepted["first_started_at_ms"]
+            );
+            assert_eq!(attempt["number"], 2);
+            assert_eq!(attempt["transient_failures"], 1);
+            assert_eq!(plugin_rows(&daemon, "received.jsonl").len(), 1);
+        } else {
+            let failed = wait_items(&daemon, &extraction_tests::scope(), |items| {
+                items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "failed"
+            })[0]
+                .clone();
+            assert_eq!(failed["deliveries"]["plugin"]["attempt"]["number"], 5);
+            assert_eq!(
+                failed["deliveries"]["plugin"]["attempt"]["transient_failures"],
+                5
+            );
+            daemon.cli(&["daemon", "stop"]);
+            daemon.wait();
+            std::fs::rename(&backup, &plugin).unwrap();
+            daemon.start();
+            std::thread::sleep(Duration::from_millis(1100));
+            assert_eq!(
+                all(&daemon, &extraction_tests::scope())[0]["deliveries"],
+                failed["deliveries"]
+            );
+            assert!(!daemon.root.join("attempts.jsonl").exists());
+        }
+    }
+}
+
+#[test]
+fn stdio_recovery_destination_rotation_retains_exhausted_budget_and_success() {
+    let mut daemon = plugin_fixture("always-fail");
+    let a = daemon.root.join("notifier.py");
+    let b_root = daemon.root.join("destination-b");
+    std::fs::create_dir(&b_root).unwrap();
+    let b = b_root.join("notifier.py");
+    executable::write(&b, include_str!("../fixtures/notifier/oneshot.py"));
+    std::fs::write(b_root.join("hold-plugin"), "hold destination B").unwrap();
+    let settings =
+        |path: &std::path::Path| format!("[notifiers.plugin]\nkind='stdio'\ncommand=[{path:?}]\n");
+    daemon.start();
+    let failed = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "failed"
+    })[0]
+        .clone();
+    assert_eq!(plugin_rows(&daemon, "attempts.jsonl").len(), 5);
+    daemon.configure(&settings(&b));
+    daemon.cli(&["config", "reload"]);
+    let pending = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1
+            && items[0]["deliveries"]["plugin"]["status"] == "sending"
+            && b_root.join("plugin-started").exists()
+    })[0]
+        .clone();
+    let accepted = pending["deliveries"]["plugin"]["attempt"].clone();
+    assert_ne!(
+        accepted["envelope"]["idempotency_key"],
+        failed["deliveries"]["plugin"]["attempt"]["envelope"]["idempotency_key"]
+    );
+    assert!(accepted["envelope"]["external_message_id"].is_null());
+    assert_eq!(accepted["number"], 1);
+    daemon.configure(&settings(&a));
+    daemon.cli(&["config", "reload"]);
+    wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "blocked"
+    });
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    std::fs::write(daemon.root.join("plugin-mode"), "normal").unwrap();
+    daemon.start();
+    std::thread::sleep(Duration::from_millis(1100));
+    assert_eq!(plugin_rows(&daemon, "attempts.jsonl").len(), 5);
+    assert!(!daemon.root.join("received.jsonl").exists());
+    std::fs::remove_file(b_root.join("hold-plugin")).unwrap();
+    daemon.configure(&settings(&b));
+    daemon.cli(&["config", "reload"]);
+    let sent = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    })[0]
+        .clone();
+    assert_eq!(
+        sent["deliveries"]["plugin"]["attempt"]["envelope"],
+        accepted["envelope"]
+    );
+    assert_eq!(sent["deliveries"]["plugin"]["attempt"]["number"], 2);
+    daemon.configure(&settings(&a));
+    daemon.cli(&["config", "reload"]);
+    std::thread::sleep(Duration::from_millis(1100));
+    assert_eq!(
+        all(&daemon, &extraction_tests::scope())[0]["deliveries"],
+        sent["deliveries"]
+    );
+    assert_eq!(plugin_rows(&daemon, "attempts.jsonl").len(), 5);
+    let review = daemon.cli(&["review", "show", sent["review_id"].as_str().unwrap()]);
+    assert!(rpc(&daemon,json!({"op":"review_state","id":sent["review_id"],"expected_revision":review["data"]["item"]["revision"],"state":"investigating","reason":"New notification generation","idempotency_key":"route-generation"})).get("error").is_none());
+    let next = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1
+            && items[0]["deliveries"]["plugin"]["generation"] == 2
+            && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    })[0]
+        .clone();
+    assert_eq!(next["deliveries"]["plugin"]["attempt"]["number"], 1);
+    assert_eq!(
+        next["deliveries"]["plugin"]["attempt"]["transient_failures"],
+        0
+    );
+    assert_eq!(plugin_rows(&daemon, "received.jsonl").len(), 1);
+}
+
+#[test]
+fn stdio_recovery_returned_destination_replays_old_envelope_before_new_generation() {
+    let mut daemon = plugin_fixture("normal");
+    let a = daemon.root.join("notifier.py");
+    std::fs::write(daemon.root.join("hold-plugin"), "hold A").unwrap();
+    let b_root = daemon.root.join("destination-b");
+    std::fs::create_dir(&b_root).unwrap();
+    let b = b_root.join("notifier.py");
+    executable::write(&b, include_str!("../fixtures/notifier/oneshot.py"));
+    std::fs::write(b_root.join("hold-plugin"), "hold B").unwrap();
+    let settings =
+        |path: &std::path::Path| format!("[notifiers.plugin]\nkind='stdio'\ncommand=[{path:?}]\n");
+    daemon.start();
+    let first = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1
+            && items[0]["deliveries"]["plugin"]["status"] == "sending"
+            && daemon.root.join("plugin-started").exists()
+    })[0]
+        .clone();
+    daemon.configure(&settings(&b));
+    daemon.cli(&["config", "reload"]);
+    wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1
+            && items[0]["deliveries"]["plugin"]["status"] == "sending"
+            && b_root.join("plugin-started").exists()
+    });
+    let review = daemon.cli(&["review", "show", first["review_id"].as_str().unwrap()]);
+    assert!(rpc(&daemon,json!({"op":"review_state","id":first["review_id"],"expected_revision":review["data"]["item"]["revision"],"state":"investigating","reason":"Changed while another destination is active","idempotency_key":"return-route-generation"})).get("error").is_none());
+    wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["generation"] == 2
+    });
+    daemon.configure(&settings(&a));
+    daemon.cli(&["config", "reload"]);
+    let resumed = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1
+            && items[0]["deliveries"]["plugin"]["status"] == "sending"
+            && plugin_rows(&daemon, "attempts.jsonl").len() == 2
+    })[0]
+        .clone();
+    assert_eq!(
+        resumed["deliveries"]["plugin"]["attempt"]["envelope"],
+        first["deliveries"]["plugin"]["attempt"]["envelope"]
+    );
+    assert_eq!(resumed["deliveries"]["plugin"]["attempt"]["number"], 2);
+    assert_eq!(resumed["deliveries"]["plugin"]["generation"], 1);
+    std::fs::remove_file(daemon.root.join("hold-plugin")).unwrap();
+    wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1
+            && items[0]["deliveries"]["plugin"]["generation"] == 2
+            && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    });
+    let received = plugin_rows(&daemon, "received.jsonl");
+    assert_eq!(received.len(), 2);
+    assert_eq!(
+        received[0],
+        first["deliveries"]["plugin"]["attempt"]["envelope"]
+    );
+    assert_eq!(received[1]["action"], "update");
+    assert_ne!(
+        received[0]["idempotency_key"],
+        received[1]["idempotency_key"]
+    );
+    assert!(!b_root.join("received.jsonl").exists());
+}
+
+#[test]
 fn stdio_retry_survives_restart_and_stops_after_five_attempts() {
     let mut daemon = plugin_fixture("fail-once");
     daemon.start();

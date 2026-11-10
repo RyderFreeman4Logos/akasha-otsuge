@@ -27,6 +27,8 @@ struct Notification {
     generation_started_at_ms: u64,
     acknowledged_generation: Option<u64>,
     deliveries: BTreeMap<String, Delivery>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    destination_history: BTreeMap<String, Delivery>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     delivery_error: Option<String>,
 }
@@ -40,6 +42,34 @@ struct Delivery {
     external_message_id: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     attempt: Option<stdio::Attempt>,
+}
+
+impl Notification {
+    fn set_delivery(&mut self, channel: &str, delivery: Delivery) -> Result<Option<&'static str>> {
+        let previous = self.clone();
+        let destination = delivery.destination_key(channel);
+        if let Some(key) = &destination {
+            self.destination_history.remove(key);
+        }
+        if let Some(old) = self.deliveries.insert(channel.into(), delivery)
+            && let Some(key) = old.destination_key(channel)
+            && Some(&key) != destination.as_ref()
+        {
+            self.destination_history.insert(key, old);
+        }
+        let error = if self.destination_history.len() > 64 {
+            Some("DESTINATION_HISTORY_LIMIT")
+        } else if serde_json::to_vec(self)?.len() > 120 * 1024 {
+            // Reserve space for results, later source updates and errors.
+            Some("DELIVERY_RECORD_LIMIT")
+        } else {
+            None
+        };
+        if error.is_some() {
+            *self = previous;
+        }
+        Ok(error)
+    }
 }
 
 fn state_key(id: String) -> RecordKey {
@@ -206,6 +236,7 @@ impl Service {
                             generation_started_at_ms: ipc::now_ms()?,
                             acknowledged_generation: None,
                             deliveries: BTreeMap::new(),
+                            destination_history: BTreeMap::new(),
                             delivery_error: None,
                         },
                     )
@@ -286,7 +317,6 @@ impl Service {
                 if item.deliveries.get(name).is_some_and(|d| {
                     d.generation == item.generation && d.status == "sent"
                         || matches!(d.status.as_str(), "preparing" | "sending")
-                        || d.retry_pending(now)
                 }) {
                     continue;
                 }
@@ -295,11 +325,17 @@ impl Service {
                     continue;
                 }
                 if route.kind == NotifierKind::Stdio {
+                    if item
+                        .destination_delivery(name, &stdio::route_hash(&route)?)
+                        .is_some_and(|d| {
+                            d.retry_pending(now)
+                                || d.generation == item.generation && d.status == "failed"
+                        })
+                    {
+                        continue;
+                    }
                     if allow_stdio
                         && dispatch.is_none()
-                        && !item.deliveries.get(name).is_some_and(|d| {
-                            d.generation == item.generation && d.status == "failed"
-                        })
                         && let Ok(permit) = self.notification_slots.clone().try_acquire_owned()
                     {
                         let claimed = Dispatch::claim(
@@ -310,17 +346,8 @@ impl Service {
                             &self.instance,
                             permit,
                         )?;
-                        let previous = item
-                            .deliveries
-                            .insert(name.clone(), claimed.delivery.clone());
-                        // Keep space for the provider result, later source updates and errors.
-                        if serde_json::to_vec(&item)?.len() > 120 * 1024 {
-                            if let Some(previous) = previous {
-                                item.deliveries.insert(name.clone(), previous);
-                            } else {
-                                item.deliveries.remove(name);
-                            }
-                            delivery_error = Some("DELIVERY_RECORD_LIMIT".into());
+                        if let Some(error) = item.set_delivery(name, claimed.delivery.clone())? {
+                            delivery_error = Some(error.into());
                             continue;
                         }
                         dispatch = Some(claimed);
@@ -328,8 +355,8 @@ impl Service {
                     }
                     continue;
                 }
-                item.deliveries.insert(
-                    name.clone(),
+                if let Some(error) = item.set_delivery(
+                    name,
                     Delivery {
                         status: "sent".into(),
                         generation: item.generation,
@@ -337,7 +364,10 @@ impl Service {
                         external_message_id: format!("local/{name}/{id}"),
                         attempt: None,
                     },
-                );
+                )? {
+                    delivery_error = Some(error.into());
+                    continue;
+                }
                 changed = true;
             }
             if item.delivery_error != delivery_error {

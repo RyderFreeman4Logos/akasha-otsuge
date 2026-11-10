@@ -1,0 +1,20 @@
+{
+  "sample_count": 81,
+  "seconds": 40.307795180007815,
+  "max_owned_processes": 37,
+  "interesting_waits": {
+    "folio_wait_bit_common": 3
+  },
+  "first_pressure": {
+    "cpu": "some avg10=0.00 avg60=0.00 avg300=0.00 total=132130194538\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+    "memory": "some avg10=0.00 avg60=0.00 avg300=0.27 total=228156787754\nfull avg10=0.00 avg60=0.00 avg300=0.25 total=212990167174",
+    "io": "some avg10=0.06 avg60=0.92 avg300=5.58 total=502161810407\nfull avg10=0.06 avg60=0.88 avg300=5.29 total=440929828314"
+  },
+  "last_pressure": {
+    "cpu": "some avg10=0.00 avg60=0.00 avg300=0.00 total=132130337047\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+    "memory": "some avg10=0.00 avg60=0.00 avg300=0.22 total=228156795708\nfull avg10=0.00 avg60=0.00 avg300=0.21 total=212990173861",
+    "io": "some avg10=0.56 avg60=0.75 avg300=4.91 total=502162233381\nfull avg10=0.39 avg60=0.64 avg300=4.63 total=440930221267"
+  },
+  "historical_ipc_failure_cause": "unproven; unchanged full vector passed with observation; no timeout or concurrency changes",
+  "samples_sha256": "2d93f6158d8f2c779bc99dc5d6feb3ba9345c1dd797a0b95a9dd4192b867b094"
+}

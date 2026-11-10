@@ -93,6 +93,22 @@ provider idempotency it explicitly flags possible duplicates. A changed route
 uses a new destination key and does not reuse the previous provider's message
 ID. No mechanism can retract a send completed before cancellation.
 
+Executable resolution, guardian ownership, native pipe reads and child waits
+use the same bounded process-error policy as spawn and exit failures. Missing
+executables can recover after replacement; old terminal records containing the
+native error codes enter that policy once without resetting recorded failures.
+Protocol, output-limit and configuration errors remain terminal.
+
+Failure and backoff apply to the selected destination. Changing the command or
+credential reference can try a new destination after the old one exhausts its
+budget. Returning to a previous destination preserves its accepted envelope,
+provider ID and consumed failures, including across restart or newer source
+generations. A pending older envelope settles before a newer generation is sent.
+Already successful current generations still do not resend on route changes.
+`destination_history` retains displaced stdio attempts under hashes of channel
+and destination; `deliveries` shows the most recently claimed delivery per channel.
+History is never silently evicted to renew an exhausted budget.
+
 ## Current acceptance boundary
 
 Basic send/update, minimal envelopes, nonblocking admission and live cancellation

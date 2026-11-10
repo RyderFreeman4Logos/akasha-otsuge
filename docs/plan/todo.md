@@ -1008,8 +1008,23 @@ could produce false success, and cancellation on attempt five became permanently
 terminal. Both have meaningful REDs and class repairs. New focused verification
 passes 19 daemon cases, four file-plugin cases, three policy units and all-target
 Clippy in 128.895 seconds. Prior receipts and source hashes remain bound to
-`cde76ab`; the repaired candidate still needs its own full gate, complete-range
-R2 review and CI before PR #55 and #23 can close.
+`cde76ab`. R1 repair candidate `03acdcc` passed its own full gate (429.037 seconds,
+528 Rust passes including installed repeat, 152 daemon passes per run) and
+CI42742670727 with restored/hit Cargo cache. Independent [R2 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/55#issuecomment-6757374957)
+confirmed both R1 repairs but found executable/native errors bypassing retries
+and failed destinations blocking new routes. A recovery-class sweep also
+reproduced loss of an accepted envelope after A/B/A routing with source advancement.
+All three new daemon regressions fail behaviorally on `03acdcc`; their repairs
+normalize execution errors at the shared failure boundary and retain bounded
+destination-specific history. Four Python cases, four unit checks and two config
+checks pass. The first complete notifier run had 10 passes and 12 IPC read/timeouts;
+that failed log remains. Three isolated causal regressions then passed, followed
+by all 22 notification cases and Clippy in 50.202 seconds with a content-free
+owned-process observer. The observer did not reproduce the historical failure;
+its cause remains unknown. No timeout, concurrency or source change was made
+between those runs. The [R2 repair archive](../benchmarks/results/mvp023-stdio-r2-fixes/README.md)
+retains this distinction. A fresh exact gate, complete-range R3 review and
+new-head CI remain required before PR #55/#23 close.
 
 - [x] Reuse the existing transactional revision outbox and live notifier config
   to admit scoped notifications with a stable envelope and capability contract.

@@ -67,7 +67,10 @@ Requesting another channel sets visible `delivery_error: CHANNEL_HISTORY_LIMIT`
 for that notification. Existing histories stay intact and new notifications can
 still use the new channel. Reuse a retained channel name for the same logical
 destination; changing configuration alone does not resend a completed generation.
-Stdio claims also reserve space below the storage record's 128 KiB limit. A
+Each item also retains at most 64 displaced stdio destination histories. A
+new destination beyond that bound sets `DESTINATION_HISTORY_LIMIT`; returning to
+a retained destination swaps its history with the current one without eviction.
+Delivery claims reserve space below the storage record's 128 KiB limit. A
 candidate over 120 KiB sets `DELIVERY_RECORD_LIMIT` and leaves its existing
 deliveries intact. This reserves room for results, errors and source updates;
 other notifications continue normally.

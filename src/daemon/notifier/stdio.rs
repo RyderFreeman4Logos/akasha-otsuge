@@ -74,8 +74,17 @@ fn policy_blocked(code: &str) -> bool {
     )
 }
 
+fn execution_error(code: &str) -> &str {
+    match code {
+        "EXECUTOR_UNAVAILABLE" | "SOURCE_UNAVAILABLE" => "NOTIFIER_UNAVAILABLE",
+        "RUNNER_FAILED" => "NOTIFIER_FAILED",
+        "RUNNER_TIMEOUT" => "NOTIFIER_TIMEOUT",
+        _ => code,
+    }
+}
+
 // Delivery policy changes must not change a destination's idempotency identity.
-fn route_hash(route: &Notifier) -> Result<String> {
+pub(super) fn route_hash(route: &Notifier) -> Result<String> {
     #[derive(Serialize)]
     struct Destination<'a> {
         kind: NotifierKind,
@@ -107,12 +116,45 @@ fn policy_does_not_change_existing_destination_fingerprints() {
 }
 
 #[test]
-fn policy_cancellation_keeps_failure_budget_and_recovers_legacy_terminal_controls() {
+fn execution_failures_and_policy_cancellation_keep_distinct_budgets() {
     let original = json!({"status":"sending","generation":1,"config_generation":1,"external_message_id":"",
         "attempt":{"owner":"old","route_sha256":"route","started_at_ms":1,"deadline_ms":30001,
         "number":5,"first_started_at_ms":1,"transient_failures":4,"capabilities":null,"error":null,
         "envelope":{"notification_id":"notice","idempotency_key":"key","review_id":"review","priority":"normal",
         "summary":"review is open","evidence_locator":"review show review","action":"create","external_message_id":null}}});
+    use crate::adapter::ErrorCode::*;
+    for (code, expected, status, failures) in [
+        (ExecutorUnavailable, "NOTIFIER_UNAVAILABLE", "retry_wait", 1),
+        (SourceUnavailable, "NOTIFIER_UNAVAILABLE", "retry_wait", 1),
+        (RunnerFailed, "NOTIFIER_FAILED", "retry_wait", 1),
+        (RunnerTimeout, "NOTIFIER_TIMEOUT", "retry_wait", 1),
+        (OutputLimit, "OUTPUT_LIMIT", "failed", 0),
+        (ProtocolInvalid, "PROTOCOL_INVALID", "failed", 0),
+        (AdapterUnsupported, "ADAPTER_UNSUPPORTED", "failed", 0),
+        (ReadDenied, "READ_DENIED", "blocked", 0),
+        (Cancelled, "CANCELLED", "blocked", 0),
+    ] {
+        let mapped = Error::from(crate::adapter::AdapterError::from(code));
+        let mut value = original.clone();
+        value["attempt"]["number"] = json!(1);
+        value["attempt"]["transient_failures"] = json!(0);
+        let mut delivery: Delivery = serde_json::from_value(value.clone()).unwrap();
+        delivery.fail(mapped.0, 100).unwrap();
+        assert_eq!(delivery.status, status);
+        let attempt = delivery.attempt.as_ref().unwrap();
+        assert_eq!(attempt.error.as_deref(), Some(expected));
+        assert_eq!(attempt.transient_failures, Some(failures));
+        if failures == 1 {
+            assert_eq!(attempt.next_retry_at_ms, Some(1100));
+            value["status"] = json!("failed");
+            value["attempt"]["error"] = json!(mapped.0);
+            let mut legacy: Delivery = serde_json::from_value(value).unwrap();
+            assert!(legacy.recover_interrupted("new", 100).unwrap());
+            assert_eq!(legacy.status, "retry_wait");
+            assert_eq!(legacy.attempt.as_ref().unwrap().transient_failures, Some(1));
+            assert!(!legacy.recover_interrupted("new", 100).unwrap());
+        }
+    }
     for code in [
         "CANCELLED",
         "CHANNEL_DISABLED",
@@ -152,8 +194,79 @@ fn policy_cancellation_keeps_failure_budget_and_recovers_legacy_terminal_control
     }
 }
 
+#[test]
+fn destination_history_is_bounded_without_evicting_accepted_requests() {
+    let mut item: Notification = serde_json::from_value(json!({
+        "schema_version":1,"notification_id":"notice","review_id":"review","source_revision":1,
+        "scope":{"user":"test","project":null,"session":null,"branch_or_version":null},
+        "state":"open","priority":"normal","summary":"summary","evidence_locator":"review show review",
+        "occurrences":1,"generation":1,"acknowledged_generation":null,"deliveries":{}
+    })).unwrap();
+    let delivery = |route: &str| {
+        serde_json::from_value::<Delivery>(json!({
+        "status":"blocked","generation":1,"config_generation":1,"external_message_id":"message",
+        "attempt":{"owner":"old","route_sha256":route,"started_at_ms":1,"deadline_ms":30001,
+        "capabilities":null,"error":"CHANNEL_DISABLED","transient_failures":4,
+        "envelope":{"notification_id":"notice","idempotency_key":route,"review_id":"review","priority":"normal",
+        "summary":"accepted","evidence_locator":"review show review","action":"update","external_message_id":"message"}}
+    })).unwrap()
+    };
+    for n in 0..65 {
+        assert_eq!(
+            item.set_delivery("plugin", delivery(&n.to_string()))
+                .unwrap(),
+            None
+        );
+    }
+    let saved = serde_json::to_value(&item).unwrap();
+    assert_eq!(item.destination_history.len(), 64);
+    assert_eq!(
+        item.set_delivery("plugin", delivery("overflow")).unwrap(),
+        Some("DESTINATION_HISTORY_LIMIT")
+    );
+    assert_eq!(serde_json::to_value(&item).unwrap(), saved);
+    let old = item.destination_delivery("plugin", "0").unwrap().clone();
+    assert_eq!(item.set_delivery("plugin", old).unwrap(), None);
+    assert_eq!(item.destination_history.len(), 64);
+    assert_eq!(
+        item.deliveries["plugin"]
+            .attempt
+            .as_ref()
+            .unwrap()
+            .transient_failures,
+        Some(4)
+    );
+    assert!(
+        item.destination_delivery("different-channel", "0")
+            .is_none()
+    );
+
+    let mut local = item.deliveries["plugin"].clone();
+    local.attempt = None;
+    assert_eq!(
+        item.set_delivery("plugin", local.clone()).unwrap(),
+        Some("DESTINATION_HISTORY_LIMIT")
+    );
+    item.destination_history.clear();
+    assert_eq!(item.set_delivery("plugin", local).unwrap(), None);
+    assert_eq!(item.destination_history.len(), 1);
+    assert_eq!(
+        item.destination_delivery("plugin", "0")
+            .unwrap()
+            .external_message_id,
+        "message"
+    );
+}
+
 impl Delivery {
+    pub(super) fn destination_key(&self, channel: &str) -> Option<String> {
+        self.attempt
+            .as_ref()
+            .map(|a| hash(format!("{channel}/{}", a.route_sha256).as_bytes()))
+    }
+
     fn fail(&mut self, code: &str, now: u64) -> Result<()> {
+        let code = execution_error(code);
         let attempt = self.attempt.as_mut().ok_or(Error("NOTIFICATION_CORRUPT"))?;
         if self.status == "sending" && !attempt.capabilities.as_ref().is_some_and(|c| c.idempotency)
         {
@@ -193,6 +306,13 @@ impl Delivery {
 
     pub(super) fn recover_interrupted(&mut self, owner: &str, now: u64) -> Result<bool> {
         if self.status == "failed"
+            && let Some(code) = self.attempt.as_ref().and_then(|a| a.error.clone())
+            && execution_error(&code) != code
+        {
+            self.fail(&code, now)?;
+            return Ok(true);
+        }
+        if self.status == "failed"
             && let Some(attempt) = self.attempt.as_mut()
             && attempt.transient_failures.is_none()
             && attempt.error.as_deref().is_some_and(policy_blocked)
@@ -217,6 +337,26 @@ impl Delivery {
                 .as_ref()
                 .and_then(|a| a.next_retry_at_ms)
                 .is_some_and(|at| now < at)
+    }
+}
+
+impl Notification {
+    pub(super) fn destination_delivery(
+        &self,
+        channel: &str,
+        route_sha256: &str,
+    ) -> Option<&Delivery> {
+        self.deliveries
+            .get(channel)
+            .filter(|d| {
+                d.attempt
+                    .as_ref()
+                    .is_some_and(|a| a.route_sha256 == route_sha256)
+            })
+            .or_else(|| {
+                self.destination_history
+                    .get(&hash(format!("{channel}/{route_sha256}").as_bytes()))
+            })
     }
 }
 
@@ -245,13 +385,7 @@ impl Dispatch {
             .checked_add(Duration::from_millis(timeout_ms))
             .ok_or(Error("CLOCK_ERROR"))?;
         let previous = item
-            .deliveries
-            .get(channel)
-            .filter(|d| {
-                d.attempt
-                    .as_ref()
-                    .is_some_and(|a| a.route_sha256 == route_sha256)
-            })
+            .destination_delivery(channel, &route_sha256)
             .map(|d| d.external_message_id.clone())
             .filter(|s| !s.is_empty());
         let envelope = Envelope {
@@ -275,16 +409,22 @@ impl Dispatch {
             external_message_id: previous.clone(),
         };
         let started_at_ms = ipc::now_ms()?;
-        if let Some(previous) = item.deliveries.get(channel)
+        if let Some(previous) = item.destination_delivery(channel, &route_sha256)
             && matches!(previous.status.as_str(), "retry_wait" | "blocked")
-            && let Some(prior) = &previous.attempt
-            && prior.route_sha256 == route_sha256
+            && previous.attempt.is_some()
         {
             let mut delivery = previous.clone();
             let attempt = delivery
                 .attempt
                 .as_mut()
                 .ok_or(Error("NOTIFICATION_CORRUPT"))?;
+            attempt.duplicate_risk |= item.deliveries.get(channel).is_some_and(|current| {
+                current.status != "sent"
+                    && current
+                        .attempt
+                        .as_ref()
+                        .is_some_and(|a| a.route_sha256 != route_sha256)
+            });
             // Replay the accepted envelope even if the source has advanced meanwhile.
             attempt
                 .transient_failures
