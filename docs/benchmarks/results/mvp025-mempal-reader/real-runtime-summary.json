@@ -1,0 +1,40 @@
+{
+  "source_head": "41933018a3835538b3fbba33adc40a60b364c2e4",
+  "binary_sha256": "4577f94a820aab625e127dd7a4b39a54b0cc5d040563b2d227924be7ae06a217",
+  "status": "PASS",
+  "rounds": [
+    {
+      "round": 0,
+      "sampled_memories": 3,
+      "historical_records_equal": true,
+      "candidates_remain_inactive": true,
+      "originals_equal": true,
+      "review_candidates_readable": true,
+      "jobs": 0
+    },
+    {
+      "round": 1,
+      "sampled_memories": 3,
+      "historical_records_equal": true,
+      "candidates_remain_inactive": true,
+      "originals_equal": true,
+      "review_candidates_readable": true,
+      "jobs": 0
+    }
+  ],
+  "public_cli_commands": 35,
+  "native_host_or_model_calls": false,
+  "daemon_exit_and_socket_removal_verified": true,
+  "prior_attempt": {
+    "status": "FAIL",
+    "classification": "harness expected Candidate but the existing protocol serializes candidate",
+    "product_code_changed": false,
+    "daemon_exited": true,
+    "source_contract": "src/domain/history.rs:99"
+  },
+  "limits": [
+    "Three distinct candidate records sampled from the real archive",
+    "Full raw rows and all native spans/reviews were checked separately",
+    "History remains historical; candidates were not approved or activated"
+  ]
+}

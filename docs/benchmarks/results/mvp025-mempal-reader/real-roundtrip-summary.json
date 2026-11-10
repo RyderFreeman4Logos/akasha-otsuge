@@ -1,0 +1,67 @@
+{
+  "source_head": "41933018a3835538b3fbba33adc40a60b364c2e4",
+  "binary_sha256": "4577f94a820aab625e127dd7a4b39a54b0cc5d040563b2d227924be7ae06a217",
+  "status": "PASS",
+  "units": {
+    "import_first": {
+      "status": "PASS",
+      "seconds": 240.64016682561487,
+      "commits": 27511,
+      "revisions": 1687022
+    },
+    "export_first": {
+      "status": "PASS",
+      "seconds": 182.42003770917654,
+      "commits": 27511,
+      "revisions": 1687022
+    },
+    "verify_first": {
+      "status": "PASS",
+      "seconds": 6.084911518730223,
+      "commits": 27511,
+      "revisions": 1687022,
+      "all_archive_bytes_match": true
+    },
+    "import_empty": {
+      "status": "PASS",
+      "seconds": 200.00929801445454,
+      "commits": 27511,
+      "revisions": 1687022
+    },
+    "repeat_import": {
+      "status": "PASS",
+      "seconds": 97.76214476954192,
+      "commits": 27511,
+      "revisions": 1687022
+    },
+    "export_empty": {
+      "status": "PASS",
+      "seconds": 159.65827471669763,
+      "commits": 27511,
+      "revisions": 1687022
+    },
+    "verify_empty": {
+      "status": "PASS",
+      "seconds": 10.59789315238595,
+      "commits": 27511,
+      "revisions": 1687022,
+      "all_archive_bytes_match": true
+    },
+    "source_preserved": {
+      "status": "PASS",
+      "seconds": 19.123973549343646,
+      "source_and_input_archive_unchanged": true
+    }
+  },
+  "native_empty_imports": 2,
+  "repeated_imports": 1,
+  "native_exports": 2,
+  "all_exported_bytes_equal": true,
+  "original_source_unchanged": true,
+  "scope": "27,511 original commits and 1,687,022 revisions; identical neutral receipts, clocks, blobs and relations; fresh empty stores",
+  "limitations": [
+    "No incremental application of a different archive in this run",
+    "The two daemon starts are recorded separately",
+    "No power-loss, ENOSPC, or performance-budget claim"
+  ]
+}

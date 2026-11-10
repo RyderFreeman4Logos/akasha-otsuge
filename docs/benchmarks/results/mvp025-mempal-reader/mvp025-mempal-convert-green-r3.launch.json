@@ -1,0 +1,14 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import subprocess; commands=[['cargo','fmt','--all'],['cargo','test','--locked','--test','archive','--test','cli','--test','domain','--test','storage'],['cargo','clippy','--workspace','--all-targets','--locked','--','-D','warnings']]; [(print('RUN '+repr(c),flush=True),subprocess.run(c,check=True)) for c in commands]"
+  ],
+  "name": "mvp025-mempal-convert-green-r3",
+  "process": {
+    "pid": 3022152,
+    "start_ticks": "611730109",
+    "state": "R"
+  },
+  "utc": "2026-11-10T08:30:04.060973+00:00"
+}

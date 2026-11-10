@@ -3,8 +3,11 @@
 Rechecked 2026-11-10 UTC after PR #59 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
 #25's imported runtime merged as `31d4c61` after exact canonical, full-range R1
-and CI passed. Real mempal conversion is next on `feat/mvp-025-mempal-import`
-in the same SSD worktree. Offline import (PR #58) and neutral export (PR #57)
+and CI passed. Real mempal conversion, complete typed-row equivalence, duplicate
+import, two full roundtrips and two isolated daemon starts now pass on source
+`4193301` in `feat/mvp-025-mempal-import`. This reader leaf still needs its final
+canonical gate, full-range review, CI and merge; different-source incremental
+application remains next within #25. Offline import (PR #58) and neutral export (PR #57)
 also passed their gates; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
 PR #56 merged; #24 remains open for enforcement and full production acceptance.
@@ -1175,10 +1178,23 @@ Clippy in 96.732s. Conversion now reconciles completed or interrupted output in
 place under one writer lock, preserving the original observation time. Twenty
 archive tests and the five-phase real SIGKILL supervisor pass, with format and
 all-target Clippy in 47.350s. The dangling-manifest RED and preceding recovery
-failures are retained separately. Real conversion and full gates remain pending.
+failures are retained separately. Real conversion and all-row equivalence then
+passed in 589.933s: 29 tables, 3,525,645 rows, 596,178 source chunks, 503,615
+unapproved candidates and the same number of pending reviews. The archive is
+5,984,986,114 bytes with 27,511 commits and 1,687,022 revisions. Two fresh imports,
+one repeat and two exports passed complete byte/receipt/clock comparison in
+916.921s. The input retained its original hash and identity under a kernel
+read-only mount. Two isolated daemon starts passed 35 CLI commands, checking
+three distinct candidates' historical records, original chunks and open reviews;
+candidates stayed inactive and the job queue stayed empty. The first runtime
+probe's incorrect enum casing is retained as a harness failure, followed by a
+4.514s passing run without a product edit. Both daemons exited. Owned temporary
+stores and duplicate exports were removed after all consumers ended; the single
+source snapshot, converted archive and compact evidence remain. Full gates,
+independent review and publication remain pending.
 Runtime post-merge main CI42779863508 also passed separately.
 
-- [ ] Pin the supported mempal source commit and both schema axes; inventory
+- [x] Pin the supported mempal source commit and both schema axes; inventory
   authoritative text, identity, provenance, timestamps, scope, deletion state,
   relationships and actually retained history. Document derived/operational data
   and unavailable fields; do not invent old content or human approval.
@@ -1203,7 +1219,7 @@ Runtime post-merge main CI42779863508 also passed separately.
   schema, live service, configuration or checkout. Stable origin identities must
   support duplicate/incremental import with explicit conflicts and no duplicate
   logical application. Missing provenance/review facts remain unknown.
-- [ ] Verify a real supported mempal sample against independent counts, hashes,
+- [x] Verify a real supported mempal sample against independent counts, hashes,
   sampled content and relations. Use an isolated source/target and keep private
   content out of committed fixtures/reports. Prove source preservation and safe
   refusal of unknown versions and corrupt records with exact failure evidence.

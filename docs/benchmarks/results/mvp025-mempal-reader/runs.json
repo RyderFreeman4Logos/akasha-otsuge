@@ -1,0 +1,121 @@
+[
+  {
+    "run": "mvp025-mempal-convert-red-r1",
+    "exit_code": 101,
+    "seconds": 21.395358880981803,
+    "log_sha256": "ed1e2050a0c42ad8690354d9077453da283f9ef8ec1d0d885ece90e9edd748d3",
+    "classification": "CAUSAL_RED_PUBLIC_MEMPAL_COMMAND_UNAVAILABLE_FIXTURE_CONSTRUCTED"
+  },
+  {
+    "run": "mvp025-mempal-convert-red-r2",
+    "exit_code": 101,
+    "seconds": 1.8092719502747059,
+    "log_sha256": "af75ec1f86dd08ea5c44edfa8260f3168bb4ca372fd704b8281d72ecdac796a3",
+    "classification": "CAUSAL_RED_MIGRATION_AND_THREE_TYPED_REFUSALS_UNAVAILABLE"
+  },
+  {
+    "run": "mvp025-mempal-convert-green-r1",
+    "exit_code": 101,
+    "seconds": 6.693045383319259,
+    "log_sha256": "adf16775578076b43afafb7106e8bf504ad7faf96d9ec030fe1289ca4778b965",
+    "classification": "COMPILE_FAILURE_UNHANDLED_SQLITE_LIMIT_RESULTS"
+  },
+  {
+    "run": "mvp025-mempal-convert-green-r2",
+    "exit_code": 0,
+    "seconds": 14.417855186387897,
+    "log_sha256": "c3c622ae90c39819d211e6c1cbb36487b5185f857a837719b3e9be2908091d87",
+    "classification": "FOUR_RAW_MIGRATION_AND_REFUSAL_REGRESSIONS_PASS"
+  },
+  {
+    "run": "mvp025-mempal-convert-green-r3",
+    "exit_code": 0,
+    "seconds": 25.99498659092933,
+    "log_sha256": "b0c972e1621dc502b33ae6ce9bda80aef89180c6f0401d4819527f4777bc6a78",
+    "classification": "RAW_CONVERSION_AND_EXISTING_ARCHIVE_CLI_DOMAIN_STORAGE_PLUS_CLIPPY_PASS"
+  },
+  {
+    "run": "mvp025-mempal-projection-red-r1",
+    "exit_code": 101,
+    "seconds": 1.3891216143965721,
+    "log_sha256": "6722355b41805d6ca4b983a4d4a7ad529852ca361ac7b5d16ce63b1537c8ed55",
+    "classification": "CAUSAL_RED_IMPORTED_MEMORY_CANDIDATE_MISSING"
+  },
+  {
+    "run": "mvp025-mempal-projection-red-r2",
+    "exit_code": 101,
+    "seconds": 1.3840182786807418,
+    "log_sha256": "5df6c6e25a175a705b763b6f67041d91ad18df8bda4d47afd99c10797e9cd835",
+    "classification": "CAUSAL_RED_CANDIDATE_MISSING_WITH_REVIEW_LIST_ACCEPTANCE_ADDED"
+  },
+  {
+    "run": "mvp025-mempal-projection-green-r1",
+    "exit_code": 0,
+    "seconds": 45.14695423003286,
+    "log_sha256": "270ad0888b1a7d8563819e643dceaacd317dd64726411cbe166b0727d2348f35",
+    "classification": "FIVE_RAW_AND_DRAWER_PROJECTION_REGRESSIONS_PASS"
+  },
+  {
+    "run": "mvp025-mempal-projection-extended-red-r1",
+    "exit_code": 101,
+    "seconds": 1.4979190295562148,
+    "log_sha256": "23af3c48b335f2695977e69c475f0db2b1f823f997a77175a096831994a06ef7",
+    "classification": "expected_red_missing_card_and_conversation_projections"
+  },
+  {
+    "run": "mvp025-mempal-projection-extended-green-r1",
+    "exit_code": 0,
+    "seconds": 13.815374983474612,
+    "log_sha256": "0fcb0e3ab66e8244f76541460dcc1f3d933d49c1f6c20a57f073b8e08e2e167e",
+    "classification": "passed_seven_focused_mempal_tests"
+  },
+  {
+    "run": "mvp025-mempal-projection-focused-r1",
+    "exit_code": 0,
+    "seconds": 96.7317596366629,
+    "log_sha256": "85065bd6f6f3bb1cc370ef692628f8681c8a3f9b2e4dd3e76c1083bab796692c",
+    "classification": "passed_related_integration_and_domain_unit_tests_fmt_clippy"
+  },
+  {
+    "run": "mvp025-mempal-resume-red-r1",
+    "exit_code": 101,
+    "seconds": 1.5450581861659884,
+    "log_sha256": "c2a21137f5574b8d54ef91fc4db1f9b8543ea98886a8ffafb52cf0e1a3b44355",
+    "classification": "expected_red_repeat_rejected_and_untyped_destination_conflict"
+  },
+  {
+    "run": "mvp025-mempal-resume-green-r1",
+    "exit_code": 0,
+    "seconds": 13.594963208772242,
+    "log_sha256": "e0cd4b324acd9cdb47239556739a51e376b90f7f6a5afd00c44d7f5846b2947a",
+    "classification": "passed_eleven_mempal_tests_completed_replay_partial_prefix_and_conflict_guards"
+  },
+  {
+    "run": "mvp025-mempal-resume-focused-r1",
+    "exit_code": 0,
+    "seconds": 41.30917680170387,
+    "log_sha256": "f41be61666f4f95ef0e7599d5f4ea1314643817afe14bdac571a4fb057ea9881",
+    "classification": "passed_19_archive_tests_and_five_SIGKILL_phases_fmt_clippy"
+  },
+  {
+    "run": "mvp025-mempal-resume-links-red-r1",
+    "exit_code": 101,
+    "seconds": 1.384372528642416,
+    "log_sha256": "e21ac52dea75046c3f632e040d89edd28554fba80cf6a2e5245c4c7591e7a2e8",
+    "classification": "expected_red_dangling_manifest_was_replaced"
+  },
+  {
+    "run": "mvp025-mempal-resume-focused-r2",
+    "exit_code": 0,
+    "seconds": 47.35047576017678,
+    "log_sha256": "e8e9aa96f62e68da5700591bb315b0f1b484b309ee42025a5cb2698c4ef17685",
+    "classification": "passed_20_archive_tests_five_SIGKILL_phases_and_path_guards_fmt_clippy"
+  },
+  {
+    "run": "mvp025-mempal-real-build-r1",
+    "exit_code": 0,
+    "seconds": 38.84584125969559,
+    "log_sha256": "4972a612b7a82e6904bbbd7ca5c28c14d331930b1bb7bfaf14e88fc395af79f5",
+    "classification": "passed_release_build_for_frozen_4193301"
+  }
+]

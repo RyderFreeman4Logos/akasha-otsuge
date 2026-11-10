@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "archive",
+    "mempal::mempal_projects_",
+    "--",
+    "--nocapture"
+  ],
+  "name": "mvp025-mempal-projection-extended-red-r1",
+  "process": {
+    "pid": 3049054,
+    "start_ticks": "611926809",
+    "state": "R"
+  },
+  "utc": "2026-11-10T09:02:51.062833+00:00"
+}

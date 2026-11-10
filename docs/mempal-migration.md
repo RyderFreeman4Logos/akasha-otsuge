@@ -2,8 +2,9 @@
 
 The converter preserves legacy SQL rows as inert evidence in a neutral archive
 and projects original text and unverified memory candidates. Repeated and
-interrupted conversion reuse the same private output directory. Real target
-equivalence and incremental application remain under development in issue #25.
+interrupted conversion reuse the same private output directory. A real supported
+snapshot passed all-row equivalence, native roundtrip and isolated daemon reads.
+Different-source incremental application remains under development in issue #25.
 
 Prepare a consistent, stopped SQLite snapshot independently. Do not copy only
 the main file of a live WAL database. The converter refuses a snapshot with an
@@ -94,5 +95,13 @@ and are counted, while their original fields remain intact. Conversion observati
 time stays distinct from legacy event time. Retained relation/audit rows do not
 establish absent original documents, missing historical versions or approvals.
 
-The structural SQL fixture contains no real rows. Controlled tests are separate
-from the private real-source audit and from future real target-equivalence proof.
+The structural SQL fixture contains no real rows and retains the source
+[MIT notice](licenses/mempal-MIT.txt). Controlled fixtures and real private-data
+acceptance remain separate in the [evidence archive](benchmarks/results/mvp025-mempal-reader/README.md).
+The actual run retained 3,525,645 rows in 29 tables, with matching independent typed
+row digests and an unchanged source file. Its 5,984,986,114-byte archive contains
+27,511 commits and 1,687,022 revisions. Two fresh native imports, one duplicate
+import and two complete exports preserved every archive byte, receipt and clock.
+Two isolated daemon starts then read three distinct candidates' original chunks,
+historical records and pending reviews; none became active and no legacy jobs ran.
+These results do not establish the separate resource/load or model-quality gates.

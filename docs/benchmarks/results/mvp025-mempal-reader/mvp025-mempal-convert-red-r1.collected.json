@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T08:19:33.014578+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "a5e03c518848b9484493658667f898af54f51a1c",
+    "log_sha256": "ed1e2050a0c42ad8690354d9077453da283f9ef8ec1d0d885ece90e9edd748d3",
+    "seconds": 21.395358880981803,
+    "utc": "2026-11-10T08:16:26.612502+00:00"
+  },
+  "process_absent": true,
+  "classification": "CAUSAL_RED_PUBLIC_MEMPAL_COMMAND_UNAVAILABLE_FIXTURE_CONSTRUCTED"
+}

@@ -6,6 +6,11 @@ dependencies are pinned by the root `Cargo.lock`. LanceDB remains the selected
 derived backend; its product integration belongs to MVP-010. No SQLite metadata
 store or alternative authority backend is used.
 
+The offline [mempal converter](mempal-migration.md) uses bundled rusqlite only to
+read an independently prepared immutable legacy snapshot. It writes the neutral
+archive format; importing that archive still uses the same SurrealKV authority
+store. Legacy SQLite is neither a writable backend nor a daemon state store.
+
 `storage::Storage` is a library consumed by the following product modules.
 `open(&ResolvedConfig)` uses `paths.data_dir/authority`, containing `format.json`
 and the native `kv/` directory. Configuration owns the resource profile. Budgets

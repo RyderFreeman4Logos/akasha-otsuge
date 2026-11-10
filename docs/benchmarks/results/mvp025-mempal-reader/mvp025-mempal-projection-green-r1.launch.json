@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--test",
+    "archive",
+    "mempal::",
+    "--",
+    "--nocapture"
+  ],
+  "name": "mvp025-mempal-projection-green-r1",
+  "process": {
+    "pid": 3040282,
+    "start_ticks": "611860241",
+    "state": "R"
+  },
+  "utc": "2026-11-10T08:51:45.388798+00:00"
+}

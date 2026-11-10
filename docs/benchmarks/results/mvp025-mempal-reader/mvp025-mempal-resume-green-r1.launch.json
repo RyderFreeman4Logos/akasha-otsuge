@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "archive",
+    "mempal::",
+    "--",
+    "--nocapture"
+  ],
+  "name": "mvp025-mempal-resume-green-r1",
+  "process": {
+    "pid": 3060171,
+    "start_ticks": "611996909",
+    "state": "R"
+  },
+  "utc": "2026-11-10T09:14:32.066594+00:00"
+}

@@ -1,0 +1,195 @@
+{
+  "source_head": "41933018a3835538b3fbba33adc40a60b364c2e4",
+  "source_tree": "8a7c5efc799a7251cca42422ae358c9d1c62006e",
+  "binary_sha256": "4577f94a820aab625e127dd7a4b39a54b0cc5d040563b2d227924be7ae06a217",
+  "scope": "real immutable mempal snapshot conversion and independent archive equivalence; Storage roundtrip and runtime receipts are separate",
+  "schema_axes": [
+    21,
+    28
+  ],
+  "mapping_version": 2,
+  "mapped_source_commit": "4593a5c5e6a9ea1140256cd42fa5838511a24e14",
+  "installed_source_commit": "unknown",
+  "source_bytes": 11741294592,
+  "source_tables": 29,
+  "source_rows": 3525645,
+  "source_utf8_bytes": 1358141546,
+  "source_blob_bytes": 3031040,
+  "tables": {
+    "consolidation_log": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "conversation_turns": {
+      "rows": 9862,
+      "utf8_bytes": 4383626,
+      "blob_bytes": 0
+    },
+    "design_insights": {
+      "rows": 14,
+      "utf8_bytes": 4797,
+      "blob_bytes": 0
+    },
+    "drawers": {
+      "rows": 580723,
+      "utf8_bytes": 699731559,
+      "blob_bytes": 0
+    },
+    "embed_failure_log": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "failure_events": {
+      "rows": 3922,
+      "utf8_bytes": 624628,
+      "blob_bytes": 0
+    },
+    "foresights": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "fork_ext_meta": {
+      "rows": 1607388,
+      "utf8_bytes": 138824020,
+      "blob_bytes": 0
+    },
+    "gating_audit": {
+      "rows": 73062,
+      "utf8_bytes": 17476589,
+      "blob_bytes": 0
+    },
+    "historical_rejudge_work_items": {
+      "rows": 491857,
+      "utf8_bytes": 124446570,
+      "blob_bytes": 0
+    },
+    "knowledge_cards": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "knowledge_events": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "knowledge_evidence_links": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "leases": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "novelty_audit": {
+      "rows": 86547,
+      "utf8_bytes": 13769410,
+      "blob_bytes": 0
+    },
+    "operation_telemetry": {
+      "rows": 31,
+      "utf8_bytes": 1621,
+      "blob_bytes": 0
+    },
+    "patterns": {
+      "rows": 185,
+      "utf8_bytes": 405403,
+      "blob_bytes": 3031040
+    },
+    "pending_message_completions": {
+      "rows": 638256,
+      "utf8_bytes": 116852450,
+      "blob_bytes": 0
+    },
+    "pending_messages": {
+      "rows": 32780,
+      "utf8_bytes": 241584961,
+      "blob_bytes": 0
+    },
+    "reindex_progress": {
+      "rows": 1010,
+      "utf8_bytes": 35385,
+      "blob_bytes": 0
+    },
+    "runtime_adoption_events": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "runtime_writer_lease_generations": {
+      "rows": 2,
+      "utf8_bytes": 39,
+      "blob_bytes": 0
+    },
+    "runtime_writer_leases": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "skills": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "sleep_log": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "sleep_resolution_log": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "taxonomy": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    },
+    "triples": {
+      "rows": 6,
+      "utf8_bytes": 488,
+      "blob_bytes": 0
+    },
+    "tunnels": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0
+    }
+  },
+  "archive_bytes": 5984986114,
+  "archive_commits": 27511,
+  "archive_revisions": 1687022,
+  "projection": {
+    "source_chunks": 596178,
+    "candidate_memories": 503615,
+    "retired_rows": 72944,
+    "unknown_event_time_rows": 41958,
+    "isolated_scope_rows": 23979,
+    "unmapped_constraints_rows": 42679
+  },
+  "native_pending_reviews": 503615,
+  "sampled_original_fields": 12,
+  "independent_typed_row_digests_match": true,
+  "all_native_candidate_spans_and_open_reviews_checked": true,
+  "source_full_hash_and_stat_unchanged": true,
+  "kernel_read_only_source": true,
+  "seconds": {
+    "conversion": 510.4266643114388,
+    "archive_verification": 68.21523261163384,
+    "source_recheck": 11.00581620912999
+  },
+  "privacy": "private rows, IDs, paths and input/archive digests are retained locally and excluded here",
+  "source_copy_count": 1,
+  "limitations": [
+    "No reconstruction of original documents or histories absent from mempal",
+    "No authentication or inherited human approval from legacy claims",
+    "No vec0 semantic validation",
+    "No incremental source update or performance acceptance claimed by this receipt"
+  ]
+}

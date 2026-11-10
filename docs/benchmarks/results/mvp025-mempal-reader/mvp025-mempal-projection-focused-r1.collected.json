@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T09:09:19.685732+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "35ecda5e57ccfb8e64e8ea10b94823d09d01f81b",
+    "log_sha256": "85065bd6f6f3bb1cc370ef692628f8681c8a3f9b2e4dd3e76c1083bab796692c",
+    "seconds": 96.7317596366629,
+    "utc": "2026-11-10T09:08:32.157638+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_related_integration_and_domain_unit_tests_fmt_clippy"
+}

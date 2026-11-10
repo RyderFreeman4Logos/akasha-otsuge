@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "archive",
+    "mempal::",
+    "--",
+    "--nocapture"
+  ],
+  "name": "mvp025-mempal-convert-green-r1",
+  "process": {
+    "pid": 3018906,
+    "start_ticks": "611708808",
+    "state": "R"
+  },
+  "utc": "2026-11-10T08:26:31.053780+00:00"
+}

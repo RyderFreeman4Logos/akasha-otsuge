@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T09:03:17.554518+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "35ecda5e57ccfb8e64e8ea10b94823d09d01f81b",
+    "log_sha256": "23af3c48b335f2695977e69c475f0db2b1f823f997a77175a096831994a06ef7",
+    "seconds": 1.4979190295562148,
+    "utc": "2026-11-10T09:02:52.593570+00:00"
+  },
+  "process_absent": true,
+  "classification": "expected_red_missing_card_and_conversation_projections"
+}

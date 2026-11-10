@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T09:15:04.803490+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "6ee39a05e13fb2f0e8b633d260e0a5b3f0ce1435",
+    "log_sha256": "e0cd4b324acd9cdb47239556739a51e376b90f7f6a5afd00c44d7f5846b2947a",
+    "seconds": 13.594963208772242,
+    "utc": "2026-11-10T09:14:45.696233+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_eleven_mempal_tests_completed_replay_partial_prefix_and_conflict_guards"
+}
