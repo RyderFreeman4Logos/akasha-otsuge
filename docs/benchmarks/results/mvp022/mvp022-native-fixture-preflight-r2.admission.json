@@ -1,0 +1,24 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import subprocess; commands=[['cargo','fmt','--all'],['cargo','test','--test','daemon','incident_tests::native::old_api_fixture_has_independent_compile_controls_and_separate_version_history','--','--exact','--nocapture'],['cargo','clippy','--all-targets','--','-D','warnings']]; [subprocess.run(c,check=True) for c in commands]"
+  ],
+  "dirty_diff_sha256": "f33b4204e8cde010a754756e282c5cc052ca8b3f2cb02aa29ce6ff1cad2efe1d",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "d5f426af71626cc57217ce1263b294b54789dae0",
+  "process": {
+    "pid": 2321794,
+    "start_ticks": "608387769",
+    "state": "R"
+  },
+  "tree": "8142f620aab9067256d9ed827b7aa981c966f3e3",
+  "untracked": [],
+  "utc": "2026-11-09T23:13:00.711016+00:00"
+}

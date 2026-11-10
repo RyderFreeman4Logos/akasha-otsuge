@@ -207,6 +207,7 @@ pub(super) async fn run(socket: &Path, plan: RunPlan, argv: Vec<String>) -> Resu
         invocation_id: plan.invocation_id.clone(),
         source: "command-wrapper".into(),
         severity: Severity::Info,
+        incident: plan.incident,
         occurred_at_ms: finished_at_ms,
         execution: Some(execution),
         artifacts,

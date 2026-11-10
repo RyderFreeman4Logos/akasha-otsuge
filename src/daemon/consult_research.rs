@@ -7,6 +7,8 @@ use crate::domain::{Ingress, MemoryState, OriginalRange, SourceDraft, SourceSpan
 use crate::storage::RevisionRef;
 use futures::future::BoxFuture;
 use std::collections::BTreeMap;
+#[path = "incident_context.rs"]
+mod incidents;
 #[path = "consult_run.rs"]
 mod runs;
 
@@ -25,6 +27,9 @@ pub(super) struct Research<'a> {
     native: NativeExecutor,
     executors: BTreeMap<String, NativeExecutor>,
     editor: Option<crate::editor::Feedback>,
+    incident: Option<String>,
+    incident_expected: BTreeSet<String>,
+    incident_reads: BTreeMap<String, incidents::ReadEvidence>,
     budget: RunBudget,
     runs: Vec<Value>,
     current_run: Option<usize>,
@@ -71,6 +76,13 @@ impl<'a> Research<'a> {
             native: plan.native,
             executors: plan.executors,
             editor: plan.editor,
+            incident: plan.incident.clone(),
+            incident_expected: plan
+                .incident
+                .as_ref()
+                .map(|_| BTreeSet::from(["incident:outcome".into()]))
+                .unwrap_or_default(),
+            incident_reads: BTreeMap::new(),
             budget,
             runs: vec![],
             current_run: None,
@@ -90,6 +102,9 @@ impl<'a> Research<'a> {
         let _guard = self.service.admission.lock().await;
         let (_, job) = self.service.job(self.id)?;
         self.service.authorize_job(&job)?;
+        if let Some(id) = &self.incident {
+            self.service.authorize_incident_execution(id)?;
+        }
         if job.cancel_requested {
             return Err(Error("CANCELLED"));
         }
@@ -121,6 +136,27 @@ impl<'a> Research<'a> {
         answer: &crate::adapter::ResearchConclusion,
     ) -> Result<Vec<String>> {
         let mut gaps = self.gaps.clone();
+        if self.incident.is_some() {
+            for handle in &self.incident_expected {
+                if !self
+                    .incident_reads
+                    .get(handle)
+                    .is_some_and(incidents::ReadEvidence::complete)
+                {
+                    let gap = if handle == "incident:outcome" {
+                        "outcome_not_read"
+                    } else {
+                        "outcome_log_not_read"
+                    };
+                    if !gaps.iter().any(|g| g == gap) {
+                        if gaps.len() == 32 {
+                            return Err(Error("BUDGET_EXHAUSTED"));
+                        }
+                        gaps.push(gap.into());
+                    }
+                }
+            }
+        }
         for gap in answer
             .gaps
             .iter()
@@ -344,6 +380,25 @@ impl<'a> Research<'a> {
         request: ContextRequest,
     ) -> Result<ContextResponse> {
         let value = match request {
+            ContextRequest::Describe {} if self.incident.is_some() => {
+                let mut response = self
+                    .captured
+                    .execute(lease, ContextRequest::Describe {})
+                    .await?;
+                if let ContextResponse::Description(description) = &mut response {
+                    description.investigation = Some(self.incident_description(lease).await?);
+                }
+                return Ok(response);
+            }
+            ContextRequest::Read {
+                handle,
+                start,
+                max_bytes,
+            } if handle.starts_with("incident:") => {
+                return Ok(ContextResponse::Text(
+                    self.incident_text(lease, &handle, start, max_bytes).await?,
+                ));
+            }
             ContextRequest::Delegate { hint } => {
                 let args = ConsultArgs::new(Some(hint))?;
                 let child = {
@@ -478,6 +533,7 @@ impl ContextSource for Research<'_> {
             let response: crate::adapter::Result<_> = async {
                 self.authorize(lease).await.map_err(adapter_error)?;
                 self.operations += 1;
+                let incident_read = matches!(&request, ContextRequest::Read { handle, .. } if handle.starts_with("incident:"));
                 let response = match self.dispatch(lease, request).await {
                     Ok(response) => response,
                     Err(error) => {
@@ -491,7 +547,7 @@ impl ContextSource for Research<'_> {
                             self.gap(Error::from(AdapterError::from(*code)).0);
                         }
                     }
-                    ContextResponse::Text(text) if text.truncated => {
+                    ContextResponse::Text(text) if text.truncated && !incident_read => {
                         self.gap("context_read_budget")
                     }
                     _ => (),

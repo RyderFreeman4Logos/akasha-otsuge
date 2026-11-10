@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T22:50:05.035078+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "6a4a51d45bf69bf4218aa99599778d96a22ff865",
+    "log_sha256": "ca56af268e8d470725ae94c1f1d79b672faae36d9c9c5db5069866e815782c0e",
+    "seconds": 19.701181910932064,
+    "utc": "2026-11-09T22:46:45.315732+00:00"
+  },
+  "process_absent": true,
+  "classification": "failed_protocol_invalid_after_context_registration"
+}

@@ -1,0 +1,29 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import subprocess; commands=[['cargo','clippy','--all-targets','--','-D','warnings'],['cargo','test','--test','daemon','editor_tests::','--','--nocapture'],['cargo','test','--test','daemon','outcome_tests::','--','--nocapture'],['cargo','test','--test','daemon','codex_tests::consult_progressive_research_keeps_source_versions_and_workspace_changes','--','--exact'],['cargo','test','--test','daemon','codex_tests::consult_conclusions_validate_evidence_no_hit_conditions_and_conflicts','--','--exact']]; [subprocess.run(c,check=True) for c in commands]"
+  ],
+  "dirty_diff_sha256": "e2e264390f5266104b136477c117c95516f78aa28a643e3731b204f7c6c72c45",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "6a4a51d45bf69bf4218aa99599778d96a22ff865",
+  "process": {
+    "pid": 2296494,
+    "start_ticks": "608262448",
+    "state": "R"
+  },
+  "tree": "a0dfa9ecf5d1227dbb0b57ebfa0d4705b4e75320",
+  "untracked": [
+    {
+      "path": "src/daemon/incident_context.rs",
+      "sha256": "75184d015146fce7e503fb0944a2a801b162a066b429c72c26c36a439e2a00ed"
+    }
+  ],
+  "utc": "2026-11-09T22:52:07.504363+00:00"
+}

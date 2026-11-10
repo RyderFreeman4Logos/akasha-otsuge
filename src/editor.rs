@@ -3,7 +3,7 @@ use crate::domain::MemoryPatch;
 use crate::ipc::{Error, Result};
 use serde::{Deserialize, Serialize};
 
-pub(crate) const PROMPT_VERSION: &str = "memory-editor-v1";
+pub(crate) const PROMPT_VERSION: &str = "memory-editor-v2";
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -24,11 +24,15 @@ pub struct Feedback {
 
 impl Feedback {
     pub(crate) fn validate(&self) -> Result<()> {
+        self.validate_targets(false)
+    }
+
+    pub(crate) fn validate_targets(&self, allow_empty: bool) -> Result<()> {
         let mut ids = std::collections::BTreeSet::new();
         if !crate::ipc::identifier(&self.invocation_id)
             || !crate::ipc::identifier(&self.executor)
             || self.executor == "caller"
-            || self.targets.is_empty()
+            || !allow_empty && self.targets.is_empty()
             || self.targets.len() > 8
             || self.feedback.trim().is_empty()
             || self.feedback.len() > 4096
@@ -52,6 +56,7 @@ pub(crate) enum Classification {
     StaleConditions,
     RetrievalGap,
     ExecutionError,
+    CodeBug,
     Environment,
     RequirementsChanged,
     InsufficientEvidence,

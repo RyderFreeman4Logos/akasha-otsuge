@@ -20,6 +20,8 @@ mod grill;
 #[cfg(test)]
 #[path = "grill_tests.rs"]
 mod grill_tests;
+#[path = "incident.rs"]
+mod incident;
 #[path = "models.rs"]
 mod models;
 #[path = "outcome.rs"]
@@ -93,6 +95,7 @@ mod tests {
             index_builder: Mutex::new(()),
             index_epoch: std::sync::atomic::AtomicU64::new(0),
             batch_gate: Mutex::new(None),
+            outcome_payload_reads: std::sync::atomic::AtomicU64::new(0),
         });
         let scope = owner_scope();
         Domain::new(&service.storage)
@@ -1034,6 +1037,10 @@ impl Service {
             };
             let execution_budget_ms =
                 u64::try_from(budget.as_millis()).map_err(|_| Error("CONFIG_INVALID"))?;
+            let accepted_at_ms = match consult_plan.as_ref().and_then(|p| p.incident.as_deref()) {
+                Some(id) => service.incident_record(id)?.1.first_report_at_ms,
+                None => now,
+            };
             let job = Job {
                 schema_version: 1,
                 id: id.clone(),
@@ -1054,8 +1061,10 @@ impl Service {
                 retrieval_vector_config_generation,
                 config_generation: snapshot.generation(),
                 config_digest: snapshot.resolved().digest().into(),
-                accepted_at_ms: now,
-                queue_deadline_ms: now.checked_add(queue_ms).ok_or(Error("CONFIG_INVALID"))?,
+                accepted_at_ms,
+                queue_deadline_ms: accepted_at_ms
+                    .checked_add(queue_ms)
+                    .ok_or(Error("CONFIG_INVALID"))?,
                 execution_budget_ms,
                 started_at_ms: None,
                 execution_deadline_ms: None,
@@ -1502,6 +1511,7 @@ impl Service {
         let outcome = async {
         loop {
             if !self.stopping.load(std::sync::atomic::Ordering::Acquire) {
+                self.advance_incidents().await?;
                 let ids = {
                     let _guard = self.admission.lock().await;
                     self.active()?.1

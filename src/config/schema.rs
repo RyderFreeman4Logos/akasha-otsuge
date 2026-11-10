@@ -22,6 +22,8 @@ pub struct Config {
     pub consult: Consult,
     #[serde(default, skip_serializing_if = "Grill::is_default")]
     pub grill: Grill,
+    #[serde(default, skip_serializing_if = "Incidents::is_default")]
+    pub incidents: Incidents,
     pub timeouts: Timeouts,
     pub runtime: Runtime,
     pub retrieval: Retrieval,
@@ -74,6 +76,51 @@ impl Default for Grill {
 
 impl Grill {
     // Preserve the digest of archived configurations from before Auto-Grill.
+    fn is_default(&self) -> bool {
+        self == &Self::default()
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum IncidentTrigger {
+    ReproducibleFailure,
+    UserCorrection,
+    DependencyChanged,
+    Expired,
+    Contradiction,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct Incidents {
+    pub executor: Option<String>,
+    pub triggers: BTreeSet<IncidentTrigger>,
+    pub deduplicate: bool,
+    pub priorities: BTreeMap<IncidentTrigger, crate::incident::Priority>,
+    pub escalate_after: u64,
+    pub auto_repair: bool,
+    pub max_runner_starts: u32,
+    pub max_tokens: u64,
+}
+
+impl Default for Incidents {
+    fn default() -> Self {
+        Self {
+            executor: None,
+            triggers: BTreeSet::new(),
+            deduplicate: true,
+            priorities: BTreeMap::new(),
+            escalate_after: 3,
+            auto_repair: false,
+            max_runner_starts: 2,
+            max_tokens: 64_000,
+        }
+    }
+}
+
+impl Incidents {
+    // Keep archived configuration digests unchanged until the policy is configured.
     fn is_default(&self) -> bool {
         self == &Self::default()
     }
@@ -323,6 +370,31 @@ impl Config {
             "consult.instructions_version",
             "must not be empty",
         )?;
+        require(
+            self.incidents.executor.as_ref().is_none_or(|name| {
+                self.executors
+                    .get(name)
+                    .is_some_and(|executor| executor.enabled)
+            }),
+            "incidents.executor",
+            "missing or disabled executor",
+        )?;
+        for (valid, field) in [
+            (
+                (1..=1_000_000).contains(&self.incidents.escalate_after),
+                "incidents.escalate_after",
+            ),
+            (
+                (1..=32).contains(&self.incidents.max_runner_starts),
+                "incidents.max_runner_starts",
+            ),
+            (
+                (1..=10_000_000).contains(&self.incidents.max_tokens),
+                "incidents.max_tokens",
+            ),
+        ] {
+            require(valid, field, "outside the finite investigation budget")?;
+        }
         let grill_roles = [
             &self.grill.interviewer,
             &self.grill.expert,
@@ -586,6 +658,32 @@ impl Config {
             automatic = automatic.max(
                 grill_one
                     .checked_mul(self.grill.max_runner_starts)
+                    .and_then(|n| n.checked_add(overhead))
+                    .ok_or_else(|| {
+                        ConfigError::invalid("timeouts.workflow", "deadline overflow")
+                    })?,
+            );
+        }
+        if let Some(profile) = &self.incidents.executor {
+            let mut profiles = BTreeSet::new();
+            self.collect_fallback(profile, &mut profiles);
+            let slowest = profiles
+                .iter()
+                .map(|name| effective.executors[*name])
+                .max()
+                .unwrap();
+            let investigation = effective
+                .startup
+                .checked_add(slowest)
+                .and_then(|n| n.checked_add(effective.cleanup))
+                .ok_or_else(|| ConfigError::invalid("timeouts.workflow", "deadline overflow"))?;
+            minimum =
+                minimum.max(investigation.checked_add(overhead).ok_or_else(|| {
+                    ConfigError::invalid("timeouts.workflow", "deadline overflow")
+                })?);
+            automatic = automatic.max(
+                investigation
+                    .checked_mul(self.incidents.max_runner_starts)
                     .and_then(|n| n.checked_add(overhead))
                     .ok_or_else(|| {
                         ConfigError::invalid("timeouts.workflow", "deadline overflow")

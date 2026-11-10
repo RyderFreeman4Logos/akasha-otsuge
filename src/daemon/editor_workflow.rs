@@ -43,6 +43,42 @@ impl Service {
         feedback: Feedback,
     ) -> Result<Value> {
         feedback.validate()?;
+        self.submit_editor_for(request, feedback, None).await
+    }
+
+    pub(in crate::daemon::jobs) async fn submit_incident_editor(
+        self: &Arc<Self>,
+        record: &crate::incident::Record,
+    ) -> Result<Value> {
+        let snapshot = self.retrieval_snapshot(record.config_generation)?;
+        let feedback = Feedback {
+            invocation_id: record.invocation_id.clone(),
+            executor: snapshot
+                .resolved()
+                .config()
+                .incidents
+                .executor
+                .clone()
+                .ok_or(Error("EXECUTOR_UNAVAILABLE"))?,
+            targets: record.signal.targets.clone(),
+            feedback: record.signal.reason.clone(),
+            expires_at_ms: record.expires_at_ms,
+        };
+        feedback.validate_targets(true)?;
+        self.submit_editor_for(
+            format!("incident/{}", record.id),
+            feedback,
+            Some(record.id.clone()),
+        )
+        .await
+    }
+
+    async fn submit_editor_for(
+        self: &Arc<Self>,
+        request: String,
+        feedback: Feedback,
+        incident: Option<String>,
+    ) -> Result<Value> {
         if !ipc::identifier(&request) {
             return Err(Error("INVALID_REQUEST"));
         }
@@ -52,7 +88,10 @@ impl Service {
             if self.storage.current(&job_key(&id))?.is_some() {
                 let (_, job) = self.job(&id)?;
                 self.authorize_job(&job)?;
-                if job.consult_plan.as_ref().and_then(|p| p.editor.as_ref()) != Some(&feedback) {
+                if job.consult_plan.as_ref().and_then(|p| p.editor.as_ref()) != Some(&feedback)
+                    || job.consult_plan.as_ref().and_then(|p| p.incident.as_ref())
+                        != incident.as_ref()
+                {
                     return Err(Error("IDEMPOTENCY_CONFLICT"));
                 }
                 return Ok(serde_json::to_value(job)?);
@@ -62,7 +101,13 @@ impl Service {
             }
             let invocation =
                 Invocation::load_verified(&self.storage, &feedback.invocation_id, &principal())?;
-            let config = self.config.pin();
+            let config = match &incident {
+                Some(id) => {
+                    let record = self.authorize_incident_execution(id)?;
+                    self.retrieval_snapshot(record.config_generation)?
+                }
+                None => self.config.pin(),
+            };
             let executor = config
                 .resolved()
                 .config()
@@ -74,7 +119,15 @@ impl Service {
             let domain = Domain::new(&self.storage);
             let context = ReadContext::from_verified_binding(&principal(), invocation.id(), &id)?;
             for target in &feedback.targets {
-                let memory = domain.export_memory(&context, &target.memory_id).await?;
+                let memory = if incident.is_some() {
+                    let memory = domain
+                        .revision(&target.memory_id, target.expected_revision)?
+                        .ok_or(Error("REVISION_NOT_FOUND"))?;
+                    domain.permission(&context, Some(&memory.record.draft.scope))?;
+                    memory
+                } else {
+                    domain.export_memory(&context, &target.memory_id).await?
+                };
                 if memory.revision.commit_seq != target.expected_revision {
                     return Err(Error("REVISION_CONFLICT"));
                 }
@@ -96,6 +149,7 @@ impl Service {
                 native,
                 args: ConsultArgs::new(None)?,
                 editor: Some(feedback),
+                incident,
             }
         };
         self.submit_job(id, JobInput::Consult(plan)).await
@@ -104,6 +158,12 @@ impl Service {
     pub(in crate::daemon::jobs) fn authorize_editor(&self, plan: &Plan) -> Result<()> {
         if let Some(feedback) = &plan.editor {
             self.authorize_executor(&feedback.executor, &plan.native)?;
+        }
+        if let Some(id) = &plan.incident {
+            let record = self.incident_record(id)?.1;
+            if record.investigation != crate::incident::Investigation::Finished {
+                self.authorize_incident_execution(id)?;
+            }
         }
         Ok(())
     }
@@ -140,15 +200,28 @@ impl Service {
             models::load_result(&self.storage, pointer, initial_revision)?
         } else {
             let settings = &config.resolved().config().consult;
-            let budget = RunBudget::new(
-                invocation.id(),
-                &invocation.fence_hash(),
-                self.runner_slots.clone(),
+            let limits = if plan.incident.is_some() {
+                let policy = &config.resolved().config().incidents;
+                BudgetLimits {
+                    starts: policy.max_runner_starts,
+                    depth: settings
+                        .max_delegation_depth
+                        .min(policy.max_runner_starts - 1),
+                    tokens: policy.max_tokens,
+                    ..BudgetLimits::default()
+                }
+            } else {
                 BudgetLimits {
                     starts: settings.max_runner_starts,
                     depth: settings.max_delegation_depth,
                     ..BudgetLimits::default()
-                },
+                }
+            };
+            let budget = RunBudget::new(
+                invocation.id(),
+                &invocation.fence_hash(),
+                self.runner_slots.clone(),
+                limits,
                 workflow.clone(),
             )?;
             let lease = {
@@ -263,12 +336,16 @@ impl Service {
         )?;
         let context = self.job_read_context(&job)?;
         let domain = Domain::new(&self.storage);
+        if let Some(id) = &plan.incident {
+            self.authorize_incident_execution(id)?;
+        }
         let mut result = ready["trace"].clone();
         result["editor"] = serde_json::to_value(&report)?;
         result["evidence"] = json!(answer.sources);
         result["conditions"] = json!(answer.conditions);
         result["conflicts"] = json!(answer.conflicts);
         result["gaps"] = json!(gaps);
+        result["status"] = json!(answer.status);
         result["editor_checkpoint"] =
             job.result.as_ref().ok_or(Error("JOB_CORRUPT"))?["editor_checkpoint"].clone();
         if let Some(patch) = &report.patch {
@@ -285,8 +362,20 @@ impl Service {
                 mode: if answer.status != RecallStatus::Found
                     || !gaps.is_empty()
                     || !answer.conflicts.is_empty()
+                    || plan.incident.is_some()
+                        && (!config.resolved().config().incidents.auto_repair
+                            || !self.config.pin().resolved().config().incidents.auto_repair
+                            || self.config.pin().resolved().config().review.mode
+                                == crate::config::ReviewMode::Manual)
                 {
                     crate::config::ReviewMode::Manual
+                } else if plan.incident.is_some()
+                    && self.config.pin().resolved().config().review.mode
+                        == crate::config::ReviewMode::Policy
+                    && config.resolved().config().review.mode
+                        == crate::config::ReviewMode::Automatic
+                {
+                    crate::config::ReviewMode::Policy
                 } else {
                     config.resolved().config().review.mode
                 },

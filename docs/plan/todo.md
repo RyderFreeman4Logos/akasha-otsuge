@@ -1,10 +1,11 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-09 UTC after PRs #51 and #49 merged: **19 original Issues
-completed, 9 Issues open (#12 and #21–#28)**. #50 is also completed and closed.
-#21 is active: structured outcome submission/show, receipt attribution and the
-command wrapper pass focused regressions, including expanded boundary tests.
-Final canonical, independent review and publication gates remain unfinished.
+Rechecked 2026-11-09 UTC after PR #52 merged: **20 original Issues
+completed, 8 Issues open (#12 and #22–#28)**. #50 is also completed and closed.
+#22 is active. Its scoped ledger, bounded dispatch, lossless outcome/log reads,
+manual/automatic repair policy and configurable grouping/priority have focused
+regression evidence. Lifecycle and native failure-to-review acceptance pass;
+the exact canonical gate, independent review and publication remain below.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -857,39 +858,79 @@ clock-transition RED/GREEN remain archived.
 The two finished SSD worktrees were removed after all consumers ended; `dua`
 reported 411.55 MiB combined. Shared target/dependency caches remain.
 
-## MVP-021 active implementation and remaining acceptance
+## MVP-021 completed acceptance
 
-Active on base `dc2134f`. Commit `9b590b2` adds the structured submit/show protocol.
-Its missing-operation RED and first GREEN cover persistence, idempotent replay,
-revoked access, actual receipt membership, rejected causal overclaims and separate
-reported artifacts. The wrapper regression now runs real failed Rust compilations,
-distinguishes dirty tracked/untracked inputs and repeated artifacts, reads back
-240,000 complete log bytes and refuses duplicate execution; all-target Clippy passes.
-Expanded boundary tests initially passed three integrations, including binary log
-parts, artifact gaps and controlled delivery acknowledgement. The byte-verified
-[acceptance archive](../benchmarks/outcome-acceptance.md) preserves all earlier
-failures and two actual compiler cases in 103,858 bytes. The exact initial gate
-passed 461 Rust checks including installed repetition, but independent R1 found
-one MODERATE log-coverage projection defect. Its causal RED and shared
-record/page/legacy/wrapper repair now pass four integrations. A separate 112,198-byte
-archive retains that review and a third compiler case. Fresh final gates remain.
+PR #52 merged as `94b22af`; #21 closed completed on 2026-11-09. The merge tree
+matches frozen `f817c6c` / `4c1c6f3` exactly, and local main is clean.
 
-- [x] Add the bounded outcome protocol and immutable, idempotent records with
-  verified invocation/scope and current permission checks, including retries.
-- [x] Derive receipt/revision attachments from the actual saved receipt; keep
-  returned, attached, cited/claimed-used, suspected and validated relations
-  distinct. No recall-equals-use or nonzero-exit-equals-incident inference.
-- [x] Provide a usable command wrapper recording argv/exit, run identity,
-  base commit, index/diff/tree digests before and after execution, and artifact
-  versions. Preserve tracked and nonignored untracked dirty inputs explicitly.
-- [x] Reuse Capture for complete immutable log sources with bounded previews;
-  retain precise references when a preview is truncated or capture is incomplete.
-- [x] Verify dirty-tree failures, repeated builds in one run, unrelated environment
-  failures, receipt exposure limits, malformed/forged links and source permissions.
-- [x] Archive one real build/test failure through the wrapper and document the
-  observation/causality limits; focused tests pass.
-- [ ] Complete the canonical gate, independent review, hosted CI, merge and
-  verified #21 closure.
+- [x] Bounded immutable outcome submission/show with verified invocation/scope,
+  current permissions, actual receipt membership and separate attributed claims.
+- [x] Command wrapping records argv/exit, dirty tracked/untracked workspace and
+  artifact hashes; missing artifacts and failed execution remain observable.
+- [x] Capture retains lossless paged logs, bounded previews, source coverage and
+  complete/partial/unknown status. Legacy status is recovered without inventing
+  completeness. No nonzero-exit or recalled-memory causal inference.
+- [x] Four focused integrations include real rustc failures, repeated artifacts,
+  240,000 text bytes and 537,600 binary bytes, restart/replay and revoked access.
+  Controlled Caller/Consult/delivery fixtures are not native authentication.
+- [x] Archive original failures and the valid R1 coverage-loss counterexample;
+  causal RED/GREEN and a third real compiler case remain byte-verifiable.
+- [x] Exact repaired `just check`: 463 Rust passes including installed repetition,
+  29 explicit ignores and 124 daemon cases in each vector. Independent R2 passes
+  with zero actionable findings and four independent test passes. Hosted
+  CI42707538943 passes and restores the existing Cargo cache.
+  [Closure and evidence](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21#issuecomment-6752745239).
+
+The finished 190.91 MiB SSD worktree was removed after its processes ended;
+shared dependencies remain. Package-only development/release artifacts were
+cleared before switching to #22, preserving dependency caches and source evidence.
+
+## MVP-022 active implementation and remaining acceptance
+
+Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b22af`.
+
+- [x] Validate opt-in trigger policy, named executor, finite shared start/token
+  budgets and computed deadlines; preserve old configuration digests and hot reload.
+- [x] Persist authorized outcome/maintenance signals atomically with deduplicated
+  incident state; retain every event reference and recurrence count across restart.
+- [x] Derive explainable priority and expose a usable scoped incident inbox,
+  inspection and operator state transitions. Keep investigation state separate
+  from memory lifecycle and notification acknowledgement.
+- [x] Read immutable outcome and paginated lossless logs through the existing
+  context tools; complete auto/manual and partial-source controls pass. The
+  scoped ledger, dispatch and context phases are committed through `4893aa9`.
+  Grouping/priority configuration passes all 21 config tests, four incident
+  integrations and all-target Clippy. No final #22 gate or native claim yet.
+- [x] Reuse the configured Editor/Research path for receipt/run/code/log evidence,
+  compare memory error, stale conditions, missing recall, misuse, code defects,
+  environment failures, changed requirements and insufficient evidence.
+- [x] Enforce incident budgets, current permissions and live disabling; recover
+  checkpoints without replaying ambiguous Runner work or duplicating patches.
+  Eight live-policy/budget/restart controls pass. The actual SIGKILL admission-gap
+  RED showed a lost job association after queue expiry; `e67a77f` reconnects that
+  job without renewing clocks. Five Editor recovery tests and six incident
+  integrations passed with Clippy after the repair.
+- [x] Apply only evidence-backed, authorized, exact-scope/version patches;
+  reduced coverage, unavailable investigation and manual policy retain review.
+- [x] Cover old API, network outage, code bug, missing recall, unresolved causality,
+  all maintenance triggers, duplicate events and independent scope/version cases.
+- [x] Retain a real command failure through trigger, investigation and handling,
+  with model/controlled-fixture boundaries and priority evidence made explicit.
+  Native Codex R7 passed on `2f334fa`: actual rustc failure, v2-only correction
+  candidate, retained gaps and previous adoption, high-priority review, unchanged
+  v1/unrelated memories, successful independent compiler control and idempotent
+  replay. Controlled tests cover automatic adoption; no native-auto claim.
+  [Acceptance and failed attempts](../benchmarks/incident-acceptance.md) retain
+  192 compact evidence files (176,664 bytes; manifest
+  `1bd3b9ed0dc698958623af23625784fa2a9f128bfe6c884be49a601128479fd0`).
+- [ ] Archive compact receipts, document policy/limits, pass exact canonical gate,
+  independent review and hosted CI, then merge and verify #22 closure.
+  First exact gate on `c17c272` passed; independent R1 review found a pre-budget
+  outcome read. A counter-based RED proved it, and `4063f86` repairs the shared
+  description/text admission. Six Editor unit tests, nine incident integrations
+  and Clippy pass. The 22-file repair archive retains the FAIL report and both
+  RED/GREEN receipts. Fresh gate/review/CI are required on the repaired candidate;
+  [PR #53](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/53) remains draft.
 
 ## Complete Issue queue
 
@@ -913,7 +954,7 @@ archive retains that review and a third compiler case. Fresh final gates remain.
 - [x] [#18 [MVP-018] 单一或组合 Runner 的 Auto-Grill 工作流](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/18) — dependencies: #16, #17.
 - [x] [#19 [MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19) — dependencies: #5, #6, #18.
 - [x] [#20 [MVP-020] 外部 Memory Editor、范围受限 patch 与并发修订](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/20) — dependencies: #16, #19.
-- [ ] [#21 [MVP-021] Run、Git/工作区、build/test 与 incident 证据关联](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21) — dependencies: #6, #11, #16.
+- [x] [#21 [MVP-021] Run、Git/工作区、build/test 与 incident 证据关联](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21) — dependencies: #6, #11, #16.
 - [ ] [#22 [MVP-022] 执行失败触发调查、自动修订或高优 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22) — dependencies: #20, #21.
 - [ ] [#23 [MVP-023] Notifier 插件、可用本地/stdio 实现与持久投递](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/23) — dependencies: #8, #19, #22.
 - [ ] [#24 [MVP-024] 50 GB、100 客户端、内存预算与故障恢复压力验收](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/24) — dependencies: #4, #8, #10, #16, #17, #20, #23.

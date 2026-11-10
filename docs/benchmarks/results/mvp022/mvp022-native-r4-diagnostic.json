@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T23:28:58.426330+00:00",
+  "head": "66ca3d32d143c7d04adbf4d12ca9bb5b5d414b5b",
+  "classification": "HARNESS_SCOPE_MISMATCH",
+  "evidence": [
+    "src/daemon/codex.rs registers owner_scope only",
+    "src/retrieval.rs Index::keyword filters exact serialized scope hash",
+    "src/daemon/consult_research.rs memory_search uses immutable Invocation scope",
+    "R4 genuine Consult returned no selected memories despite target revision within capture fence"
+  ],
+  "decision": "No production scope change. Native incident acceptance will construct the program from exported v2 memory, run actual compiler failure and authenticated investigator, preserve v1 and unrelated memory. No native recall claim. Add owner/v1/v2 public retrieval preflight without model before native investigation."
+}

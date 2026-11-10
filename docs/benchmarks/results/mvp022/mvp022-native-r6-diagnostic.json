@@ -1,0 +1,13 @@
+{
+  "utc": "2026-11-09T23:33:49.568075+00:00",
+  "classification": "HARNESS_EXPECTED_UNCONDITIONAL_AUTOMATIC_ADOPTION",
+  "native_result": "Succeeded; memory_error, v2-only candidate patch, high-priority open incident, observed gaps retained",
+  "observed": {
+    "tokens": 201558,
+    "reads": 24,
+    "starts": 1,
+    "elapsed_ms": 89736,
+    "patch_commit_seq": 141
+  },
+  "decision": "Assert either automatic adoption with no gaps/conflicts or candidate with retained gaps and prior adoption. Keep exact-scope/version, v1 and unrelated-memory equality, compiler oracle and replay assertions. No production authority change and no request for the model to suppress uncertainty. R6 remains a failed incomplete harness run."
+}

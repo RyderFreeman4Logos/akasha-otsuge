@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T22:17:16.994870+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "77089b7bdb5cabea956673bf1d4771c48239d2b8",
+    "log_sha256": "f80d099bdf5cbb745fa6c32816ede0f3c4923303d89c1b4ec8621d6e6f7c5f41",
+    "seconds": 45.125157844275236,
+    "utc": "2026-11-09T22:16:39.730579+00:00"
+  },
+  "process_absent": true,
+  "classification": "HARNESS_WRONG_SCOPE_filter_project_excludes_owner_incident"
+}

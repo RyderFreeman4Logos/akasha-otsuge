@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Fault-injectable native protocol fixture; not real-host acceptance."""
-import json, os, pathlib, subprocess, sys, time
+import hashlib, json, os, pathlib, subprocess, sys, time
 
 if '--version' in sys.argv:
     print('codex-cli 0.164.0')
@@ -143,7 +143,8 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
         response = json.loads(reply['result']['contentItems'][0]['text'])
         value = response.get('value', {})
         for span in value.get('sources', []) + ([value['source']] if value.get('source') else []) + [v['reference'] for v in value.get('originals', [])]:
-            if span not in seen_sources: seen_sources.append(span)
+            if 'event_id' in span and 'revision' in span and span not in seen_sources:
+                seen_sources.append(span)
         if name == 'memory_get' and response.get('kind') != 'error':
             seen_memories.append({'memory_id':arguments['memory_id'],'revision':arguments['revision']})
         (root / 'research-checkpoint.json').write_text(json.dumps({
@@ -214,26 +215,55 @@ if scenario.startswith('editor'):
     instructions = request['params']['baseInstructions']
     editor = json.loads(instructions.split('\nEditor input: ', 1)[1])
     scope = json.loads(instructions.split('\nBound scope: ', 1)[1].split('\nEditor input:', 1)[0])
-    target = editor['targets'][0]
-    expanded = tool('memory_get', {'memory_id':target['memory_id'], 'revision':target['expected_revision']})['value']
-    draft = expanded['memory']['data']['revision']['memory']['record']['draft']
-    code = tool('code_read', {'path':'notes.rs','start':0,'max_bytes':4096})['value']
-    assert 'Linux' in code['text']
-    if scenario == 'editor_tool_gap':
-        failed = tool('memory_search', {'query':'platform'})
-        assert failed['kind'] == 'error' and failed['value']['source_code'] == 'INDEX_NOT_READY', failed
-    elif scenario == 'editor_workspace_gap':
-        (root / 'workspace' / 'notes.rs').write_text('// The Linux fixture changed during investigation.\n')
-        changed = tool('code_read', {'path':'notes.rs','start':0,'max_bytes':4096})['value']
-        assert changed['changed'] is True
-    elif scenario == 'editor_original_gap':
-        assert expanded['truncated'] is True
-        draft['source_spans'] = [item['reference'] for item in expanded['originals']]
-    draft['claim'] = 'Only the Linux fixture build passed; other platforms were not tested.'
-    draft['source_spans'].append(code['source'])
-    patch = dict(scope=scope, changes=[dict(target, draft=draft)], reason='Limit the claim to the observed fixture.',
-                 evidence=draft['source_spans'], expires_at_ms=editor['expires_at_ms'])
-    editor_report = dict(classification='memory_error', reason='The fixture does not establish behavior on other platforms.', patch=patch)
+    if scenario.startswith('editor_incident'):
+        description = tool('context_describe', {})['value']
+        (root / 'incident-context.json').write_text(json.dumps(description))
+        investigation = description.get('investigation')
+        assert investigation is not None, 'missing scoped incident context'
+        evidence = {}
+        for handle in [investigation['outcome']] + [log['handle'] for log in investigation['logs']]:
+            start, text, pages = 0, '', 0
+            while True:
+                part = tool('context_read', {'handle':handle,'start':start,'max_bytes':16384})
+                assert part['kind'] == 'text', part
+                value = part['value']
+                text += value['text']
+                pages += 1
+                if value['end'] == value['total_bytes']:
+                    break
+                assert value['end'] > start, value
+                start = value['end']
+            if handle != investigation['outcome']:
+                log = json.loads(text)
+                raw = log['text'].encode() if log['encoding'] == 'utf8' else bytes.fromhex(log['raw_hex'])
+            else:
+                raw = text.encode()
+            evidence[handle] = dict(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw), pages=pages)
+        (root / 'incident-evidence.json').write_text(json.dumps(evidence))
+    if not editor['targets']:
+        tool('code_read', {'path':'notes.rs','start':0,'max_bytes':4096})
+        editor_report = dict(classification='retrieval_gap', reason='No relevant memory was attached to the controlled run.', patch=None)
+    else:
+        target = editor['targets'][0]
+        expanded = tool('memory_get', {'memory_id':target['memory_id'], 'revision':target['expected_revision']})['value']
+        draft = expanded['memory']['data']['revision']['memory']['record']['draft']
+        code = tool('code_read', {'path':'notes.rs','start':0,'max_bytes':4096})['value']
+        assert 'Linux' in code['text']
+        if scenario == 'editor_tool_gap':
+            failed = tool('memory_search', {'query':'platform'})
+            assert failed['kind'] == 'error' and failed['value']['source_code'] == 'INDEX_NOT_READY', failed
+        elif scenario == 'editor_workspace_gap':
+            (root / 'workspace' / 'notes.rs').write_text('// The Linux fixture changed during investigation.\n')
+            changed = tool('code_read', {'path':'notes.rs','start':0,'max_bytes':4096})['value']
+            assert changed['changed'] is True
+        elif scenario == 'editor_original_gap':
+            assert expanded['truncated'] is True
+            draft['source_spans'] = [item['reference'] for item in expanded['originals']]
+        draft['claim'] = 'Only the Linux fixture build passed; other platforms were not tested.'
+        draft['source_spans'].append(code['source'])
+        patch = dict(scope=scope, changes=[dict(target, draft=draft)], reason='Limit the claim to the observed fixture.',
+                     evidence=draft['source_spans'], expires_at_ms=editor['expires_at_ms'])
+        editor_report = dict(classification='memory_error', reason='The fixture does not establish behavior on other platforms.', patch=patch)
     if scenario == 'editor_environment':
         editor_report.update(classification='environment', reason='The environment failed; no memory error was established.', patch=None)
     elif scenario == 'editor_insufficient':
@@ -246,12 +276,17 @@ if scenario.startswith('editor'):
         draft['scope']['project'] = None
     elif scenario == 'editor_forged':
         draft['approval'] = {'actor':'human'}
-    elif scenario == 'editor_wait':
+    elif scenario in ('editor_wait', 'editor_incident_wait'):
         (root / 'editor-ready').touch()
         end = time.monotonic() + 15
         while not (root / 'editor-release').exists():
             assert time.monotonic() < end, 'editor barrier timed out'
             time.sleep(0.01)
+    if scenario.startswith('editor_incident_') and scenario != 'editor_incident_wait':
+        classification = scenario.removeprefix('editor_incident_')
+        editor_report.update(classification=classification, reason='Controlled classification fixture: ' + classification)
+        if classification not in ('memory_error', 'stale_conditions'):
+            editor_report['patch'] = None
 if scenario == 'research':
     found = tool('memory_search', {'query':'offline'})['value']
     item = next(item for item in found['items'] if item['memory']['revision']['key']['id'] == 'offline')

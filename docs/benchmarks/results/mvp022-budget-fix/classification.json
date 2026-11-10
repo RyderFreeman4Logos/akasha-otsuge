@@ -1,0 +1,10 @@
+{
+  "source_head": "4063f8658966fceb3055d389e5a41ba635aba7db",
+  "finding": "MODERATE REGRESSION: outcome payload loaded before read admission",
+  "red": "A per-Service test-only access counter increased after read-count exhaustion; assertion expected no access.",
+  "repair": "Shared incident_view reserves one bounded storage frame before loading. Both context_describe and context_read use this admission; raw log bytes already reserve before outcome_raw.",
+  "green": "Six Editor unit tests including recovery, nine incident integrations, and Clippy pass. New controls cover count and byte exhaustion with three repeated requests, both entry points and permitted reads.",
+  "native_boundary": "R7 remains historical native evidence from 2f334fa; no fresh native run after read-budget repair. Its 25 reads and 302640 charged bytes give a conservative additional-frame upper bound of 3579440 bytes below the existing 4194304-byte limit. This arithmetic is not a fresh provider result.",
+  "publication": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/53#issuecomment-6754624365",
+  "remaining": "Fresh exact full gate, independent whole-range review and CI required."
+}

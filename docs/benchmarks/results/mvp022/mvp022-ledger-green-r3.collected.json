@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T22:18:22.239867+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "77089b7bdb5cabea956673bf1d4771c48239d2b8",
+    "log_sha256": "4fcd5dc38be6beffa46a1590a78d49aef145ec5af57147ffd7613c44074912b9",
+    "seconds": 4.529211942106485,
+    "utc": "2026-11-09T22:17:38.780195+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASS_dedup_100_sources_restart_operator_idempotence"
+}

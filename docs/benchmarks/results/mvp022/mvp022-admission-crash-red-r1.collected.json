@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T23:01:38.566982+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "467cb72e3f5e1e10ab0391e9b73d9b167116ddfe",
+    "log_sha256": "5c2c82e1f7a9ba27a96d0c343fb8c7d4fc02d3d5925e3d5777408f8c75963334",
+    "seconds": 16.659403099678457,
+    "utc": "2026-11-09T23:01:28.874195+00:00"
+  },
+  "process_absent": true,
+  "classification": "red_orphaned_admitted_job_after_crash_and_queue_expiry"
+}

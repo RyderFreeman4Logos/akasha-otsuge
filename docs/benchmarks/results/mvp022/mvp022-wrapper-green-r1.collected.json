@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T23:08:04.427073+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "e67a77fae68c47dfecec7061135264d78a6f56ec",
+    "log_sha256": "238f193823c175f4b1542afa53226f2abe4bbb2e3d9c0c9924db994197226333",
+    "seconds": 30.684503108263016,
+    "utc": "2026-11-09T23:06:42.156898+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_wrapper_real_compiler_and_lossless_binary_logs"
+}

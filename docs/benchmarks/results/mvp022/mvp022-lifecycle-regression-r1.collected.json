@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T22:59:58.167040+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "80894f588ce73b59c867489916c6452d84121f2a",
+    "log_sha256": "f0acb269b684c3e6bc7b40aa89ed539e80f0ba9c1846bb1570fcadc8fc28b191",
+    "seconds": 7.752764234319329,
+    "utc": "2026-11-09T22:59:43.978967+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_eight_existing_policy_budget_restart_controls"
+}

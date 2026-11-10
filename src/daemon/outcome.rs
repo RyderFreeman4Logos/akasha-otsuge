@@ -15,7 +15,7 @@ fn outcome_key(id: &str) -> Result<RecordKey> {
 }
 
 impl Service {
-    fn outcome_binding(&self, id: &str) -> Result<Invocation> {
+    pub(super) fn outcome_binding(&self, id: &str) -> Result<Invocation> {
         let invocation = Invocation::load_verified(&self.storage, id, &principal())?;
         let binding = invocation.diagnostic();
         Domain::new(&self.storage).permission(&invocation.read_context()?, Some(&binding.scope))?;
@@ -203,7 +203,8 @@ impl Service {
                     completeness: source.completeness.with_coverage(view.event.coverage),
                 });
             }
-            let record = outcome::Record {
+            let mut record = outcome::Record {
+                incident: None,
                 schema_version: 1,
                 run_id: invocation.id().into(),
                 caller: invocation.diagnostic().caller.clone(),
@@ -226,10 +227,16 @@ impl Service {
                 links,
                 logs,
             };
+            let mut changes = service.incident_changes(&mut record)?;
             let content = serde_json::to_string(&record)?;
             if content.len() > ipc::MAX_MESSAGE / 2 {
                 return Err(Error("RESULT_TOO_LARGE"));
             }
+            changes.push(Change {
+                key: key.clone(),
+                expected_revision: None,
+                content,
+            });
             let receipt = service
                 .storage
                 .commit_or_reuse(|| {
@@ -239,20 +246,20 @@ impl Service {
                         request_id: key.id.clone(),
                         config_generation: record.config_generation,
                         policy_revision: None,
-                        changes: vec![Change {
-                            key: key.clone(),
-                            expected_revision: None,
-                            content: content.clone(),
-                        }],
+                        changes: changes.clone(),
                     }))
                 })
                 .await?;
+            service.wake_jobs();
             Ok(serde_json::to_value(receipt)?)
         })
         .await
     }
 
-    async fn read_outcome(&self, id: &str) -> Result<outcome::Record> {
+    pub(super) async fn read_outcome(&self, id: &str) -> Result<outcome::Record> {
+        #[cfg(test)]
+        self.outcome_payload_reads
+            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
         let row = self
             .storage
             .current(&outcome_key(id)?)?
@@ -388,16 +395,7 @@ impl Service {
         let _guard = self.admission.lock().await;
         let record = self.read_outcome(id).await?;
         let log = record.logs.get(index).ok_or(Error("INVALID_ARGUMENT"))?;
-        let invocation = self.outcome_invocation(&record.event)?;
-        let capture = Capture::new(&self.storage);
-        let event = capture
-            .event(
-                &invocation.capture_binding()?,
-                &log.source.reference,
-                log.revision,
-            )?
-            .ok_or(Error("SOURCE_UNAVAILABLE"))?;
-        let raw = capture.raw(&event)?;
+        let raw = self.outcome_raw(&record, index)?;
         if start > raw.len() {
             return Err(Error("INVALID_ARGUMENT"));
         }
@@ -408,5 +406,19 @@ impl Service {
             "start":start,"raw_hex":crate::capture::encode_hex(&raw[start..end]),
             "next_start":(end < raw.len()).then_some(end)}),
         )
+    }
+
+    pub(super) fn outcome_raw(&self, record: &outcome::Record, index: usize) -> Result<Vec<u8>> {
+        let log = record.logs.get(index).ok_or(Error("INVALID_ARGUMENT"))?;
+        let invocation = self.outcome_invocation(&record.event)?;
+        let capture = Capture::new(&self.storage);
+        let event = capture
+            .event(
+                &invocation.capture_binding()?,
+                &log.source.reference,
+                log.revision,
+            )?
+            .ok_or(Error("SOURCE_UNAVAILABLE"))?;
+        Ok(capture.raw(&event)?)
     }
 }

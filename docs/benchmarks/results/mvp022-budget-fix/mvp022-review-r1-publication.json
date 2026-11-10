@@ -1,0 +1,10 @@
+{
+  "utc": "2026-11-09T23:50:02.198116+00:00",
+  "head": "c17c272dbecec55e0db50cd3a7117a4a86bb65d5",
+  "verdict": "FAIL",
+  "comment_id": 6754624365,
+  "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/53#issuecomment-6754624365",
+  "report_sha256": "fb43aeeb299e24b02ae0b62043955bfc6c7228e849a92556ce85949832de4fc8",
+  "full_report_readback_verified": true,
+  "source_finding": "Outcome payload read precedes read budget reservation; one shared incident_view called by description and text; raw-log branch already charges before outcome_raw"
+}

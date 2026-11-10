@@ -1,0 +1,7 @@
+{
+  "classification": "HARNESS",
+  "cause": "Caller bound at configuration generation 1 before named native profile was configured; Consult correctly retained caller routing. Controlled editor fixture rejected non-editor request before any actual native model call.",
+  "repair": "Configure named profile before initial Caller binding; retain hot read-root expansion before execution.",
+  "native_model_called": false,
+  "cleanup": "R1 receipt proves config unchanged, no owned live processes, scratch removed."
+}

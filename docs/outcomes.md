@@ -1,8 +1,7 @@
 # Execution outcomes
 
-Implementation in progress for [MVP-021](spec/issues/MVP-021.md). Structured
-submission, the command wrapper and boundary regressions pass focused tests.
-Final canonical, independent review and publication gates remain pending.
+The [MVP-021](spec/issues/MVP-021.md) protocol and wrapper were merged in
+[PR #52](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/52).
 Focused results and scope limits are recorded in
 [the acceptance evidence](benchmarks/outcome-acceptance.md).
 
@@ -32,8 +31,8 @@ provides cryptographic execution attestation.
 The last three relations remain attributable reports. Validating source hashes
 and receipt membership does not establish a causal claim's truth. No relation is
 automatically upgraded, and no outcome operation changes a memory or creates an
-incident merely because a command exits nonzero. Investigation and policy-driven
-handling belong to MVP-022.
+incident merely because a command exits nonzero. Explicit configured
+[investigation signals](incidents.md) can admit policy-controlled handling.
 
 The command wrapper records argv, exit status or signal, time, and workspace
 observations before and after execution. Git evidence includes the base commit,
@@ -63,7 +62,8 @@ their pinned Capture event and keep unspecified completeness unknown.
 ## Command wrapper
 
 Create a JSON plan with `event_id`, the verified Caller `invocation_id`, and an
-optional `artifacts` array of relative regular-file paths. For example:
+optional `artifacts` array of relative regular-file paths. An optional `incident`
+field carries an explicit validated investigation signal. For example:
 
 ```json
 {"event_id":"build-1","invocation_id":"stored-invocation-id","artifacts":["target/app"]}

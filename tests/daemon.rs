@@ -38,6 +38,9 @@ mod editor_tests;
 #[path = "support/daemon_outcome.rs"]
 mod outcome_tests;
 
+#[path = "support/daemon_incident.rs"]
+mod incident_tests;
+
 #[path = "support/daemon_codex.rs"]
 mod codex_tests;
 

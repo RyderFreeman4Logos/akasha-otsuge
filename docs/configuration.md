@@ -59,6 +59,12 @@ An explicit workflow deadline must allow at least one selected role plus overhea
 Token usage includes cached input and stops the workflow when native usage crosses
 the shared limit; it is not a provider-specific currency/cost estimate.
 
+`incidents` configures explicit [outcome-driven investigations](incidents.md).
+It defaults to no triggers/executor and `auto_repair=false`. Trigger types,
+deduplication, per-trigger priority, recurrence escalation and shared start/token
+budgets reload for new groups. Accepted groups retain their original configuration
+and clocks while current revocation and stricter adoption policy still apply.
+
 `executors.NAME` requires `kind` (`claude_code`, `codex`, `hermes`, `pi`) and `binary`.
 Optional fields are `args`, `enabled`, a text `model`, `timeout`, an absolute
 `native_home` and an ordered `fallback` list. No other host, fallback or paid API

@@ -168,9 +168,83 @@ fn editor_crash_child() {
     runtime().block_on(async {
         let (service, _) = tests::service_at(&root, &settings).await;
         service.recover().await.unwrap();
+        if std::env::var("AKASHA_TEST_CRASH_PHASE").as_deref() == Ok("incident-admitted") {
+            service.advance_incidents().await.unwrap();
+            panic!("incident missed the admission checkpoint");
+        }
         assert!(service.claim(&id(), 0).await.unwrap());
         service.execute_job(id()).await.unwrap();
         panic!("editor missed the requested crash checkpoint");
+    });
+}
+
+#[test]
+fn incident_admitted_job_survives_sigkill_and_keeps_its_original_queue_deadline() {
+    let root =
+        std::env::temp_dir().join(format!("akasha-incident-admission-{}", std::process::id()));
+    private_dir(&root).unwrap();
+    let _cleanup = tests::Fixture(root.clone());
+    let settings = format!(
+        "[timeouts]\nqueue='5s'\n[incidents]\nexecutor='editor'\ntriggers=['user_correction']\n[executors.editor]\nkind='codex'\nbinary='/missing-native-must-not-run'\nnative_home={root:?}\n"
+    );
+    std::fs::write(root.join("settings.toml"), &settings).unwrap();
+    runtime().block_on(async {
+        setup(&root,&settings,false).await;
+        let (service, _) = tests::service_at(&root,&settings).await;
+        service.submit_outcome(serde_json::from_value(json!({
+            "event_id":"admission-gap","invocation_id":"bound","source":"controlled-crash","severity":"warning",
+            "occurred_at_ms":ipc::now_ms().unwrap(),"execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+            "incident":{"kind":"user_correction","key":"crash-window","reason":"Retain the original admitted job across the missing incident link."}
+        })).unwrap()).await.unwrap();
+        service.storage.close().await.unwrap();
+    });
+    crate::storage::crash_tests::kill_at(
+        &root,
+        "incident-admitted",
+        "daemon::jobs::consult::editor_tests::editor_crash_child",
+    );
+    runtime().block_on(async {
+        let (service, _) = tests::service_at(&root, &settings).await;
+        let outcome = service.read_outcome("admission-gap").await.unwrap();
+        let incident_id = outcome.incident.unwrap();
+        let before = service.incident_record(&incident_id).unwrap().1;
+        assert!(before.job_id.is_none());
+        let job_id = format!(
+            "editor/{}",
+            hash(format!("incident/{incident_id}").as_bytes())
+        );
+        let admitted = service.job(&job_id).unwrap().1;
+        assert_eq!(admitted.accepted_at_ms, before.first_report_at_ms);
+        assert_eq!(admitted.queue_deadline_ms, admitted.accepted_at_ms + 5000);
+        tokio::time::sleep(Duration::from_millis(
+            admitted
+                .queue_deadline_ms
+                .saturating_sub(ipc::now_ms().unwrap())
+                + 1,
+        ))
+        .await;
+        service.recover().await.unwrap();
+        assert!(!service.claim(&job_id, 0).await.unwrap());
+        service.advance_incidents().await.unwrap();
+        service.advance_incidents().await.unwrap();
+        let after = service.incident_record(&incident_id).unwrap().1;
+        assert_eq!(
+            after.job_id.as_deref(),
+            Some(job_id.as_str()),
+            "admitted job was orphaned after its queue deadline"
+        );
+        assert_eq!(after.first_report_at_ms, before.first_report_at_ms);
+        assert_eq!(after.expires_at_ms, before.expires_at_ms);
+        assert_eq!(
+            after.investigation,
+            crate::incident::Investigation::Finished
+        );
+        assert_eq!(after.error.as_deref(), Some("QUEUE_TIMEOUT"));
+        let job = service.job(&job_id).unwrap().1;
+        assert_eq!(job.attempt, 0);
+        assert_eq!(job.queue_deadline_ms, admitted.queue_deadline_ms);
+        assert!(service.storage.receipt(&job_id).unwrap().is_none());
+        service.storage.close().await.unwrap();
     });
 }
 
@@ -343,6 +417,114 @@ async fn research_retains_errors_after_a_successful_dispatch_without_swallowing_
     assert_eq!(error.code, ErrorCode::BudgetExhausted);
     assert!(research.gaps.iter().any(|gap| gap == "BUDGET_EXHAUSTED"));
     assert!(research.gaps.iter().any(|gap| gap == "READ_DENIED"));
+    service.storage.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn incident_context_reserves_read_budget_before_outcome_payload_access() {
+    use crate::adapter::{
+        ContextRequest, ContextResponse, ContextSource, ErrorCode, MAX_FRAME_BYTES,
+    };
+    use std::sync::atomic::Ordering;
+    let root = std::env::temp_dir().join(format!("akasha-incident-budget-{}", std::process::id()));
+    private_dir(&root).unwrap();
+    let _cleanup = tests::Fixture(root.clone());
+    let settings = format!(
+        "[incidents]\nexecutor='editor'\ntriggers=['user_correction']\n[executors.editor]\nkind='codex'\nbinary='/unused-native'\nnative_home={root:?}\n"
+    );
+    setup(&root, &settings, false).await;
+    let (service, _) = tests::service_at(&root, &settings).await;
+    service.submit_outcome(serde_json::from_value(json!({
+        "event_id":"budget-probe","invocation_id":"bound","source":"controlled-budget","severity":"warning",
+        "occurred_at_ms":ipc::now_ms().unwrap(),"execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+        "incident":{"kind":"user_correction","key":"budget-probe","reason":"Read only within the admitted budget."}
+    })).unwrap()).await.unwrap();
+    let incident_id = service
+        .read_outcome("budget-probe")
+        .await
+        .unwrap()
+        .incident
+        .unwrap();
+    let incident = service.incident_record(&incident_id).unwrap().1;
+    let accepted = service.submit_incident_editor(&incident).await.unwrap();
+    let job_id = accepted["id"].as_str().unwrap();
+    let plan = service.job(job_id).unwrap().1.consult_plan.unwrap();
+    let invocation = service.consult_invocation(&plan).unwrap();
+    let workflow = Deadline::start(
+        crate::config::deadline::Layer::Workflow,
+        Duration::from_secs(30),
+        None,
+    )
+    .unwrap();
+    for describe in [false, true] {
+        let request = if describe {
+            ContextRequest::Describe {}
+        } else {
+            ContextRequest::Read {
+                handle: "incident:outcome".into(),
+                start: 0,
+                max_bytes: 512,
+            }
+        };
+        for mode in ["read_count", "read_bytes", "permitted"] {
+            let limits = match mode {
+                "read_count" => BudgetLimits {
+                    reads: 1 + u64::from(describe),
+                    ..BudgetLimits::default()
+                },
+                "read_bytes" => BudgetLimits {
+                    read_bytes: MAX_FRAME_BYTES as u64 - 1 + u64::from(describe) * 2048,
+                    ..BudgetLimits::default()
+                },
+                _ => BudgetLimits::default(),
+            };
+            let budget = RunBudget::new(
+                invocation.id(),
+                &invocation.fence_hash(),
+                service.runner_slots.clone(),
+                limits,
+                workflow.clone(),
+            )
+            .unwrap();
+            let lease = budget.start().unwrap();
+            if mode == "read_count" {
+                lease.charge_read(1).unwrap();
+            }
+            let mut research = research::Research::new(
+                &service,
+                job_id,
+                invocation.clone(),
+                service.config.pin(),
+                &workflow,
+                plan.clone(),
+                budget,
+            )
+            .unwrap();
+            let before = service.outcome_payload_reads.load(Ordering::Relaxed);
+            for _ in 0..if mode == "permitted" { 1 } else { 3 } {
+                let response = research.execute(&lease, request.clone()).await.unwrap();
+                if mode == "permitted" {
+                    assert!(
+                        !matches!(response, ContextResponse::Error(_)),
+                        "{response:?}"
+                    );
+                    assert_eq!(
+                        service.outcome_payload_reads.load(Ordering::Relaxed),
+                        before + 1
+                    );
+                } else {
+                    assert_eq!(
+                        service.outcome_payload_reads.load(Ordering::Relaxed),
+                        before,
+                        "{mode}, describe={describe}: denied read accessed outcome payload"
+                    );
+                    assert!(
+                        matches!(response, ContextResponse::Error(error) if error.code == ErrorCode::BudgetExhausted)
+                    );
+                }
+            }
+        }
+    }
     service.storage.close().await.unwrap();
 }
 

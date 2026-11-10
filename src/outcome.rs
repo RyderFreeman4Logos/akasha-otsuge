@@ -18,6 +18,8 @@ pub struct RunPlan {
     pub invocation_id: String,
     #[serde(default)]
     pub artifacts: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub incident: Option<Box<crate::incident::Signal>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -61,6 +63,9 @@ pub fn validate_argv(argv: &[String]) -> Result<()> {
 
 impl RunPlan {
     pub fn validate(&self) -> Result<()> {
+        if let Some(signal) = &self.incident {
+            signal.validate()?;
+        }
         let mut paths = BTreeSet::new();
         if !identifier(&self.event_id)
             || !identifier(&self.invocation_id)
@@ -206,6 +211,8 @@ pub struct Event {
     pub logs: Vec<LogRef>,
     pub receipt_jobs: Vec<String>,
     pub claims: Vec<Claim>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub incident: Option<Box<crate::incident::Signal>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -243,6 +250,8 @@ pub struct Log {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Record {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub incident: Option<String>,
     pub schema_version: u32,
     pub run_id: String,
     pub caller: SourceIdentity,
@@ -275,6 +284,9 @@ impl Workspace {
 
 impl Event {
     pub fn validate(&self) -> Result<()> {
+        if let Some(signal) = &self.incident {
+            signal.validate()?;
+        }
         let mut jobs = BTreeSet::new();
         let mut artifacts = BTreeSet::new();
         if ![&self.event_id, &self.invocation_id, &self.source]

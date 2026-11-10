@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-09T22:19:19.832471+00:00",
+  "terminal": {
+    "exit_code": 1,
+    "head": "77089b7bdb5cabea956673bf1d4771c48239d2b8",
+    "log_sha256": "4dbf02ded1a78bb6c0482f264f4d310e2eff84e831a02bc877b214a43672fa75",
+    "seconds": 10.169913176447153,
+    "utc": "2026-11-09T22:18:44.169222+00:00"
+  },
+  "process_absent": true,
+  "classification": "FOUR_OUTCOME_PASS_clippy_large_IPC_enum"
+}
