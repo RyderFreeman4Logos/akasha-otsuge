@@ -1,4 +1,4 @@
-# Local notifications
+# Notifications and stdio plugins
 
 The daemon projects review and incident revisions from the durable storage outbox
 into a local inbox. Source revisions and their outbox entries commit atomically;
@@ -33,7 +33,8 @@ akasha-otsuge notify ack NOTIFICATION_ID --generation 1 --idempotency-key operat
 
 Responses use the normal CLI JSON envelope. List results contain `items` and
 `next`; continue while `next` is non-null, including after an empty filtered page.
-Pages examine at most 32 records. Read, acknowledgement and delivery all check
+Pages examine at most 32 records and return at most 1 MiB of serialized items.
+Read, acknowledgement and delivery all check
 the current local read grant and scope. Revoking access also stops local delivery
 of affected records; restoring access makes them eligible again.
 
@@ -66,10 +67,41 @@ Requesting another channel sets visible `delivery_error: CHANNEL_HISTORY_LIMIT`
 for that notification. Existing histories stay intact and new notifications can
 still use the new channel. Reuse a retained channel name for the same logical
 destination; changing configuration alone does not resend a completed generation.
+Stdio claims also reserve space below the storage record's 128 KiB limit. A
+candidate over 120 KiB sets `DELIVERY_RECORD_LIMIT` and leaves its existing
+deliveries intact. This reserves room for results, errors and source updates;
+other notifications continue normally.
 
 The [stdio protocol](notifier-protocol.md) supports external send/update, live
-cancellation and persistent retry/crash recovery. Its reference plugin and final
-acceptance remain on [MVP-023](spec/issues/MVP-023.md).
+cancellation and persistent retry/crash recovery.
+
+## File plugin example
+
+The executable [file notifier](../examples/notifier-file.py) uses Python's standard
+library and writes a private JSON inbox. Configure absolute paths on the daemon
+host, then reload:
+
+```toml
+[notifiers.file]
+kind = "stdio"
+command = ["/absolute/path/notifier-file.py", "--state", "/absolute/private-dir/inbox.json", "--fail-first"]
+timeout = "30s"
+```
+
+The state directory must be owned by the daemon UID with no group/other access;
+the plugin can create it with mode 0700. It creates mode-0600 state and lock files.
+`--fail-first` persists one demonstration failure before the first message. The
+daemon retries automatically. Remove the option for ordinary use; its marker
+survives subsequent invocations either way.
+
+Inspect `inbox.json`: `messages` contains the latest minimal envelope per provider
+ID, while `receipts` binds each accepted idempotency key to its exact input hash
+and message ID. Reusing a key with different input fails. A process lock plus
+fsynced atomic replacement keeps the effect and receipt together. Concurrent
+replays return the same ID. Updates replace the existing message and retain
+earlier receipts. This is a bounded example inbox: it refuses writes exceeding
+2 MiB and preserves the previous state; it does not expire receipts automatically.
+Plugin acknowledgement remains separate from `notify ack` and review state.
 
 ## Live channel policy
 
@@ -101,3 +133,10 @@ delivery, ack replay and independence, SIGKILL before delivery, restart, live
 disable/re-enable, scope revocation, bounded pagination, channel-history limits,
 idle storage stability, and 100 grouped reports with priority escalation. The
 incident fixture uses a controlled registered Caller; it starts no model Runner.
+It also drives the independent file plugin through one persisted failure,
+100 grouped reports, important upgrades and stable external IDs.
+`python3 scripts/test_notifier_file.py` checks standalone capability/delivery,
+deduplication, update, concurrent replay and invalid-input/state preservation.
+The [focused evidence](benchmarks/results/mvp023-stdio/README.md) preserves passing
+checks and earlier failures; canonical gate, independent review and CI are
+separate publication requirements.

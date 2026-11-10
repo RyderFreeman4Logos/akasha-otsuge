@@ -138,8 +138,13 @@ fn local_notifications_are_durable_and_ack_cannot_approve_or_close_review() {
 
 #[test]
 fn repeated_incidents_merge_counts_but_priority_escalation_remains_unacknowledged() {
-    let (daemon, _, bound) = codex_tests::consult_fixture_with("editor_ledger", |_| {
-        "[incidents]\ntriggers=['dependency_changed']\nescalate_after=50\n[notifiers.inbox]\nkind='local'\n".into()
+    let (daemon, _, bound) = codex_tests::consult_fixture_with("editor_ledger", |root| {
+        let plugin = root.join("notifier.py");
+        executable::write(&plugin, include_str!("../../examples/notifier-file.py"));
+        let state = root.join("notifier-inbox.json");
+        format!(
+            "[incidents]\ntriggers=['dependency_changed']\nescalate_after=50\n[notifiers.inbox]\nkind='local'\n[notifiers.file]\nkind='stdio'\ncommand=[{plugin:?},'--state',{state:?},'--fail-first']\n"
+        )
     });
     let mut owner = extraction_tests::scope();
     owner.project = None;
@@ -155,6 +160,8 @@ fn repeated_incidents_merge_counts_but_priority_escalation_remains_unacknowledge
             if items.len() == 1
                 && items[0]["occurrences"] == count
                 && items[0]["deliveries"]["inbox"]["generation"] == items[0]["generation"]
+                && items[0]["deliveries"]["file"]["generation"] == items[0]["generation"]
+                && items[0]["deliveries"]["file"]["status"] == "sent"
             {
                 return items[0].clone();
             }
@@ -177,6 +184,7 @@ fn repeated_incidents_merge_counts_but_priority_escalation_remains_unacknowledge
     let first = wait(1);
     assert_eq!(first["priority"], "normal");
     assert_eq!(first["generation"], 1);
+    assert_eq!(first["deliveries"]["file"]["attempt"]["number"], 2);
     let id = first["notification_id"].as_str().unwrap();
     daemon.cli(&[
         "notify",
@@ -221,6 +229,20 @@ fn repeated_incidents_merge_counts_but_priority_escalation_remains_unacknowledge
     assert_eq!(incident["data"]["record"]["state"], "open");
     assert_eq!(incident["data"]["record"]["occurrences"], 101);
     assert!(!daemon.root.join("starts").exists());
+    let external: Value =
+        serde_json::from_slice(&std::fs::read(daemon.root.join("notifier-inbox.json")).unwrap())
+            .unwrap();
+    assert_eq!(external["messages"].as_object().unwrap().len(), 1);
+    assert_eq!(external["receipts"].as_object().unwrap().len(), 3);
+    let message = external["messages"]
+        .as_object()
+        .unwrap()
+        .values()
+        .next()
+        .unwrap();
+    assert_eq!(message["priority"], "urgent");
+    assert_eq!(message["action"], "update");
+    assert!(!external.to_string().contains("Private source text"));
 }
 
 #[test]
@@ -646,6 +668,267 @@ fn plugin_rows(daemon: &Daemon, name: &str) -> Vec<Value> {
 }
 
 #[test]
+fn stdio_invalid_responses_are_bounded_terminal_and_do_not_echo_plugin_output() {
+    for (mode, code) in [
+        ("unsupported", "NOTIFIER_UNSUPPORTED"),
+        ("malformed", "NOTIFIER_PROTOCOL_INVALID"),
+        ("bad-id", "NOTIFIER_PROTOCOL_INVALID"),
+        ("oversize", "OUTPUT_LIMIT"),
+    ] {
+        let mut daemon = plugin_fixture(mode);
+        daemon.start();
+        let failed = wait_items(&daemon, &extraction_tests::scope(), |items| {
+            items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "failed"
+        });
+        assert_eq!(failed[0]["deliveries"]["plugin"]["attempt"]["error"], code);
+        assert_eq!(failed[0]["deliveries"]["plugin"]["attempt"]["number"], 1);
+        assert!(
+            !serde_json::to_string(&failed)
+                .unwrap()
+                .contains("DO_NOT_ECHO")
+        );
+        assert_eq!(
+            daemon.cli(&["daemon", "status"])["data"]["state"],
+            "running"
+        );
+    }
+}
+
+#[test]
+fn stdio_provider_without_update_receives_a_new_create_for_escalation() {
+    let mut daemon = plugin_fixture("no-update");
+    daemon.start();
+    let first = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    })[0]
+        .clone();
+    let review = daemon.cli(&["review", "show", first["review_id"].as_str().unwrap()]);
+    assert!(rpc(&daemon,json!({"op":"review_state","id":first["review_id"],"expected_revision":review["data"]["item"]["revision"],"state":"investigating","reason":"Update fallback","idempotency_key":"without-update"})).get("error").is_none());
+    wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1
+            && items[0]["deliveries"]["plugin"]["generation"] == 2
+            && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    });
+    let received = plugin_rows(&daemon, "received.jsonl");
+    assert_eq!(received.len(), 2);
+    assert_eq!(received[1]["action"], "create");
+    assert!(received[1]["external_message_id"].is_null());
+    assert_ne!(
+        received[1]["idempotency_key"],
+        received[0]["idempotency_key"]
+    );
+}
+
+#[test]
+fn stdio_credential_rotation_and_read_revocation_cancel_owned_processes() {
+    let mut daemon = plugin_fixture("normal");
+    let plugin = daemon.root.join("notifier.py");
+    let settings = |credential: &str| {
+        format!("[notifiers.plugin]\nkind='stdio'\ncommand=[{plugin:?}]\n{credential}\n")
+    };
+    // HOME is explicitly isolated by Daemon::command; no real secret is involved.
+    daemon.configure(&settings("credential_ref='env:HOME'"));
+    std::fs::write(daemon.root.join("hold-plugin"), "wait for revocation").unwrap();
+    daemon.start();
+    let wait_attempts = |count| {
+        let end = Instant::now() + Duration::from_secs(15);
+        loop {
+            if daemon.root.join("attempts.jsonl").exists()
+                && plugin_rows(&daemon, "attempts.jsonl").len() >= count
+            {
+                break;
+            }
+            assert!(Instant::now() < end, "plugin did not reach attempt {count}");
+            std::thread::sleep(Duration::from_millis(25));
+        }
+    };
+    wait_attempts(1);
+    let old = std::fs::read_to_string(daemon.root.join("plugin.pid")).unwrap();
+    daemon.configure(&settings(""));
+    daemon.cli(&["config", "reload"]);
+    wait_attempts(2);
+    assert!(!std::path::Path::new(&format!("/proc/{old}")).exists());
+    let current = std::fs::read_to_string(daemon.root.join("plugin.pid")).unwrap();
+    let mut beta = extraction_tests::scope();
+    beta.project = Some("beta".into());
+    assert!(
+        rpc(&daemon, json!({"op":"access_set","scope":beta}))
+            .get("error")
+            .is_none()
+    );
+    let end = Instant::now() + Duration::from_secs(10);
+    while std::path::Path::new(&format!("/proc/{current}")).exists() {
+        assert!(Instant::now() < end, "revoked plugin remained live");
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    assert!(!daemon.root.join("received.jsonl").exists());
+    std::fs::remove_file(daemon.root.join("hold-plugin")).unwrap();
+    assert!(
+        rpc(
+            &daemon,
+            json!({"op":"access_set","scope":extraction_tests::scope()})
+        )
+        .get("error")
+        .is_none()
+    );
+    wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    });
+    let attempts = plugin_rows(&daemon, "attempts.jsonl");
+    assert_eq!(attempts.len(), 3);
+    assert_eq!(attempts[0]["credential_present"], true);
+    assert_eq!(attempts[1]["credential_present"], false);
+    assert_eq!(attempts[2]["credential_present"], false);
+    assert_ne!(
+        attempts[0]["idempotency_key"],
+        attempts[1]["idempotency_key"]
+    );
+    assert_eq!(
+        attempts[1]["idempotency_key"],
+        attempts[2]["idempotency_key"]
+    );
+    assert_eq!(plugin_rows(&daemon, "received.jsonl").len(), 1);
+}
+
+#[test]
+fn notification_pages_bound_serialized_delivery_history_bytes() {
+    use akasha_otsuge::storage::{Change, CommitRequest, RecordKey, RecordKind, Storage};
+    use sha2::Digest;
+    let hash = |bytes: &[u8]| akasha_otsuge::capture::encode_hex(&sha2::Sha256::digest(bytes));
+    let mut daemon = plugin_fixture("normal");
+    daemon.start();
+    let template = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    })[0]
+        .clone();
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.configure("");
+    extraction_tests::runtime().block_on(async {
+        let store = Storage::open(&extraction_tests::storage_config(&daemon))
+            .await
+            .unwrap();
+        for n in 0..34 {
+            let mut item = template.clone();
+            let review = hash(format!("large-review-{n}").as_bytes());
+            let id = hash(format!("review/{review}").as_bytes());
+            item["notification_id"] = json!(id);
+            item["review_id"] = json!(review);
+            let mut delivery = template["deliveries"]["plugin"].clone();
+            delivery["external_message_id"] = json!("x".repeat(256));
+            delivery["attempt"]["envelope"]["notification_id"] = item["notification_id"].clone();
+            delivery["attempt"]["envelope"]["review_id"] = item["review_id"].clone();
+            item["deliveries"] = Value::Object(
+                (0..60)
+                    .map(|channel| (format!("historical-{channel}"), delivery.clone()))
+                    .collect(),
+            );
+            let content = serde_json::to_string(&item).unwrap();
+            assert!(content.len() > 70 * 1024 && content.len() < 128 * 1024);
+            store
+                .commit(&CommitRequest {
+                    request_id: format!("large-notification-{n}"),
+                    config_generation: 1,
+                    policy_revision: None,
+                    changes: vec![Change {
+                        key: RecordKey {
+                            kind: RecordKind::State,
+                            id: format!("notification/item/{id}"),
+                        },
+                        expected_revision: None,
+                        content,
+                    }],
+                })
+                .await
+                .unwrap();
+        }
+        store.close().await.unwrap();
+    });
+    daemon.start();
+    let items = all(&daemon, &extraction_tests::scope());
+    assert_eq!(items.len(), 35);
+    assert_eq!(
+        items
+            .iter()
+            .map(|i| i["notification_id"].as_str().unwrap())
+            .collect::<std::collections::BTreeSet<_>>()
+            .len(),
+        35
+    );
+    assert_eq!(
+        daemon.cli(&["daemon", "status"])["data"]["state"],
+        "running"
+    );
+}
+
+#[test]
+fn notification_record_limit_defers_large_delivery_history_without_stopping_daemon() {
+    use akasha_otsuge::storage::{Change, CommitRequest, RecordKey, RecordKind, Storage};
+    let mut daemon = plugin_fixture("normal");
+    daemon.start();
+    let mut item = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    })[0]
+        .clone();
+    let id = item["notification_id"].as_str().unwrap().to_owned();
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    let plugin = daemon.root.join("notifier.py");
+    daemon.configure(&format!(
+        "[notifiers.new]\nkind='stdio'\ncommand=[{plugin:?}]\n"
+    ));
+    let mut delivery = item["deliveries"]["plugin"].clone();
+    delivery["external_message_id"] = json!("\\".repeat(256));
+    delivery["attempt"]["envelope"]["external_message_id"] = json!("\\".repeat(256));
+    item["deliveries"] = json!({});
+    for n in 0..63 {
+        item["deliveries"][format!("history-{n}-{}", "\\".repeat(100))] = delivery.clone();
+        if serde_json::to_vec(&item).unwrap().len() >= 121 * 1024 {
+            break;
+        }
+    }
+    let size = serde_json::to_vec(&item).unwrap().len();
+    assert!(
+        (121 * 1024..126 * 1024).contains(&size),
+        "fixture byte size {size}"
+    );
+    extraction_tests::runtime().block_on(async {
+        let store = Storage::open(&extraction_tests::storage_config(&daemon))
+            .await
+            .unwrap();
+        let key = RecordKey {
+            kind: RecordKind::State,
+            id: format!("notification/item/{id}"),
+        };
+        let previous = store.current(&key).unwrap().unwrap().commit_seq;
+        store
+            .commit(&CommitRequest {
+                request_id: "notification-capacity-fixture".into(),
+                config_generation: 1,
+                policy_revision: None,
+                changes: vec![Change {
+                    key,
+                    expected_revision: Some(previous),
+                    content: serde_json::to_string(&item).unwrap(),
+                }],
+            })
+            .await
+            .unwrap();
+        store.close().await.unwrap();
+    });
+    daemon.start();
+    let limited = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["delivery_error"] == "DELIVERY_RECORD_LIMIT"
+    });
+    assert_eq!(limited[0]["deliveries"], item["deliveries"]);
+    assert_eq!(plugin_rows(&daemon, "received.jsonl").len(), 1);
+    assert_eq!(
+        daemon.cli(&["daemon", "status"])["data"]["state"],
+        "running"
+    );
+}
+
+#[test]
 fn stdio_live_policy_defers_delivery_and_policy_reload_does_not_replay_success() {
     let mut daemon = plugin_fixture("normal");
     let plugin = daemon.root.join("notifier.py");
@@ -768,7 +1051,10 @@ fn crash_plugin_daemon(daemon: &mut Daemon) {
     child.kill().unwrap();
     assert!(!child.wait().unwrap().success());
     let end = Instant::now() + Duration::from_secs(10);
-    for pid in std::iter::once(plugin).chain(guard) {
+    let grandchild = std::fs::read_to_string(daemon.root.join("grandchild.pid"))
+        .ok()
+        .map(|s| s.parse::<u32>().unwrap());
+    for pid in std::iter::once(plugin).chain(guard).chain(grandchild) {
         loop {
             let live = std::fs::read_to_string(format!("/proc/{pid}/stat")).is_ok_and(|stat| {
                 !matches!(
@@ -862,6 +1148,7 @@ fn stdio_crash_windows_replay_with_idempotency_or_expose_duplicate_risk() {
         ("hold-plugin", "normal", 1),
         ("after-send", "normal", 1),
         ("after-send", "no-idempotency", 2),
+        ("hold-plugin", "grandchild", 1),
     ] {
         let mut daemon = plugin_fixture(mode);
         std::fs::write(daemon.root.join(barrier), "crash barrier").unwrap();

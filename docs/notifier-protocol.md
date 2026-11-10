@@ -92,6 +92,8 @@ are covered by controlled executable-plugin tests. Persistent finite retry,
 restart during backoff, and real SIGKILL before/after the plugin's durable effect
 also pass, including both idempotent replay and exposed duplicate delivery.
 Live priority, quiet-hours, digest and timeout controls also have config and
-daemon tests. The distributable reference plugin and final whole-candidate
-acceptance remain unfinished on MVP-023. Do not interpret a stored
+daemon tests. The [file reference plugin](../examples/notifier-file.py) proves
+independent durable receipt, failure/retry, duplicate handling and update without
+a commercial service. Whole-candidate publication gates remain separate from
+these focused checks. Do not interpret a stored
 idempotency key or capability declaration as universal exactly-once delivery.

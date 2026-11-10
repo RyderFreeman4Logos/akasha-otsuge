@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T01:43:28.394412+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "91cea9964922044cfa8ae158b28df390ca3c251f",
+    "log_sha256": "fdb6e598c7809679fdc9d5a05175aa6b7cb2ef9abe0821d1a93c64ffd672825d",
+    "seconds": 4.201992193236947,
+    "utc": "2026-11-10T01:43:24.162211+00:00"
+  },
+  "process_absent": true,
+  "classification": "expected_missing_byte_bounded_notification_paging"
+}

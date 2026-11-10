@@ -973,8 +973,8 @@ Stdio phase 1: real executable capability/send/update and live cancellation now
 pass alongside all six local cases (8 daemon tests). The first attempt exposed
 an unclosed stdin writer, fixed by moving and dropping it after request output;
 its concurrent pagination timeout did not recur in the complete focused rerun,
-but its historical cause remains unproven. Persistent retries, ambiguous crash
-recovery, routing controls and the distributable reference plugin remain below.
+but its historical cause remains unproven. Subsequent phases below cover durable
+retry/crash recovery, live policy and the distributable reference plugin.
 
 Stdio phase 2: the meaningful retry/crash RED passed after implementing durable
 five-attempt backoff, immutable-envelope replay and duplicate-risk reporting.
@@ -989,23 +989,34 @@ first observes physical delivery under an explicit five-second test budget, then
 proves timeout, process reap and durable retry. That focused case and all-target
 Clippy pass. The earlier failed run remains recorded; product default stays 30s.
 
-- [ ] Reuse the existing transactional revision outbox and live notifier config
+Stdio phase 4: all 18 daemon notification tests, three independent file-plugin
+tests and all-target Clippy pass together in 73.558 seconds. Coverage includes
+100 grouped reports through the real reference executable, invalid/oversize
+protocol output, unsupported update, credential-reference rotation, live access
+revocation, detached-grandchild cleanup, and byte-bounded paging/record admission.
+The paging RED reproduced `RESULT_TOO_LARGE` after two retained fixture compile
+errors were corrected. The record-limit RED lacked the explicit capacity guard;
+the passing guard preserves histories and daemon operation. Focused evidence is
+archived under `docs/benchmarks/results/mvp023-stdio`; exact gate, independent
+review, CI, merge and issue closure are the remaining #23 steps.
+
+- [x] Reuse the existing transactional revision outbox and live notifier config
   to admit scoped notifications with a stable envelope and capability contract.
   Creation must remain atomic with the source review/incident; avoid a cursor
   update causing an endless outbox/checkpoint loop.
 - [x] Provide usable local inbox/list/show/ack commands, bounded paging and
   current read permission checks. Ack must not approve memory or resolve review.
-- [ ] Implement an independent executable stdio reference plugin, with bounded
+- [x] Implement an independent executable stdio reference plugin, with bounded
   input/output, error handling, provider IDs and declared send/update/idempotency
   capabilities. Transmit only minimal summaries and review locators.
 - [x] Persist dispatch attempts, finite retry/backoff, stable idempotency keys,
   selected route/generation, external IDs and visible terminal/uncertain errors.
   Unsupported provider idempotency must expose possible duplicate delivery.
-- [ ] Merge 100 same-group events while preserving count and meaningful priority
+- [x] Merge 100 same-group events while preserving count and meaningful priority
   escalation. Successful delivery must not be repeated merely by configuration reload.
-- [ ] Apply current channel disable/revocation, priority/routing policy and
+- [x] Apply current channel disable/revocation, priority/routing policy and
   credential changes without bypassing permissions or duplicating in-flight sends.
-- [ ] Prove actual local and stdio receipt, failure/retry, duplicate handling and
+- [x] Prove actual local and stdio receipt, failure/retry, duplicate handling and
   ack independence. Inject real crashes after source commit/before send and
   after send/before success recording, then verify durable recovery.
 - [ ] Document protocol, configuration, example usage and boundaries; archive

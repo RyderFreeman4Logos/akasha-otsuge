@@ -1,0 +1,36 @@
+{
+  "head": "2afb8dad02d49ff5375abfad2968bd541e81e45f",
+  "parent": "9b97da0626ecb407b5d100c161f0666d42de9899",
+  "tree": "671db3ad6691b0542deadc101c7d468206fc05f0",
+  "paths": [
+    "src/adapter/guardian.rs",
+    "src/adapter/mod.rs",
+    "src/daemon.rs",
+    "src/daemon/jobs.rs",
+    "src/daemon/notifier.rs",
+    "src/daemon/notifier/stdio.rs",
+    "tests/support/daemon_notifier.rs",
+    "tests/fixtures/notifier/oneshot.py",
+    "docs/notifier-protocol.md",
+    "docs/notifications.md",
+    "docs/plan/todo.md"
+  ],
+  "source_sha256": {
+    "src/adapter/guardian.rs": "677da5ff3ce5dd461b6500f20bb3b4fe634e870d4ffcc0f7bc8e597fe4c74b4d",
+    "src/adapter/mod.rs": "7906dbfb738f053cd86eb840168a617f016d0e5837f5209bc9cabbd04af8ec20",
+    "src/daemon.rs": "9cac1b7b1403029ef6c2c96db905de833a330436ca14b5537f9c9ee92a883127",
+    "src/daemon/jobs.rs": "ce143b37aa6fff478f09627a9444c563e72a7c6d980b8e3cd0e958b59089277a",
+    "src/daemon/notifier.rs": "9a6fb648169ec3f4b6aa35547da7b1495059511b5e2325365635c8fa181c2b05",
+    "src/daemon/notifier/stdio.rs": "7303eb402925a16a876a152fd40b0d579f6c3e9c436dfa35e03636652773e363",
+    "tests/support/daemon_notifier.rs": "aabe5534992921e7614239f329aa64d67d123684af2aaf2e4abf5c6a3e345712",
+    "tests/fixtures/notifier/oneshot.py": "458937c6bd16f7b448e370e210c17d088a216c650382f59bf08bcb893444b0ef",
+    "docs/notifier-protocol.md": "b9a66eac0ddade4ec04e94579a80c4d2fb30d7cff272617b615e0d52f00e1d50",
+    "docs/notifications.md": "2f851b30df7f6a18b4bf929cfccd71eef35ef21a491fbbe02265c4eae9007427",
+    "docs/plan/todo.md": "a43b28defe03c6d9e0056ba7f82dee437be76eaa4e44ac3266156ca76da6a729"
+  },
+  "focused": "mvp023-stdio-green-r2",
+  "lint": "mvp023-stdio-phase1-lint",
+  "clean": true,
+  "hooks_bypassed": false,
+  "previous_failure": "mvp023-stdio-green-r1 retains an unattributed concurrent pagination timeout; identical focused suite passes after the stdin EOF fix, not proof of historical cause."
+}

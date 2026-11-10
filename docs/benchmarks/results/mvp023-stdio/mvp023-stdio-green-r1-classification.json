@@ -1,0 +1,5 @@
+{
+  "run": "mvp023-stdio-green-r1",
+  "stdio_failure": "Capabilities timed out before plugin reply; input writer remained borrowed outside the joined future, keeping pipe write end open after shutdown. Move and drop it after writing.",
+  "other_failure": "Concurrent local pagination read timed out with WouldBlock at five-second socket read; attribution pending the changed-code focused run, not classified as harmless."
+}

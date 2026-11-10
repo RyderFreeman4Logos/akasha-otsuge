@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T01:41:18.015852+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "91cea9964922044cfa8ae158b28df390ca3c251f",
+    "log_sha256": "49daacf42b06a0f29194fe95aff283a9e091f51eeb71711157c522e92ef5f9ee",
+    "seconds": 7.312845507636666,
+    "utc": "2026-11-10T01:40:39.468904+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_reference_cli_and_real_daemon_100_event_escalation"
+}

@@ -310,8 +310,19 @@ impl Service {
                             &self.instance,
                             permit,
                         )?;
-                        item.deliveries
+                        let previous = item
+                            .deliveries
                             .insert(name.clone(), claimed.delivery.clone());
+                        // Keep space for the provider result, later source updates and errors.
+                        if serde_json::to_vec(&item)?.len() > 120 * 1024 {
+                            if let Some(previous) = previous {
+                                item.deliveries.insert(name.clone(), previous);
+                            } else {
+                                item.deliveries.remove(name);
+                            }
+                            delivery_error = Some("DELIVERY_RECORD_LIMIT".into());
+                            continue;
+                        }
                         dispatch = Some(claimed);
                         changed = true;
                     }
@@ -351,7 +362,8 @@ impl Service {
         let _guard = self.admission.lock().await;
         Domain::new(&self.storage).permission(&jobs::context()?, Some(scope))?;
         let keys = self.notification_keys(after)?;
-        let more = keys.len() > 32;
+        let mut more = keys.len() > 32;
+        let mut bytes = 0;
         let mut items = vec![];
         let mut next = None;
         for key in keys.into_iter().take(32) {
@@ -362,6 +374,12 @@ impl Service {
                 .ok_or(Error("NOTIFICATION_CORRUPT"))?;
             let (_, item) = self.notification(id)?;
             if scope.contains(&item.scope) {
+                let size = serde_json::to_vec(&item)?.len();
+                if bytes + size > ipc::MAX_MESSAGE / 2 {
+                    more = true;
+                    break;
+                }
+                bytes += size;
                 items.push(item);
             }
             next = Some(id.to_owned());
