@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T10:38:35.538838+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "5e10a62ea75d7908e00fb8f8568f1bf351c2f35e",
+    "log_sha256": "774dd1033c5fb7eea74e7d0b466daf16915fdcb5a49c8616a820996d1d0f0174",
+    "seconds": 83.18986655957997,
+    "utc": "2026-11-10T10:38:12.701268+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASS_SOURCE_INODE_AND_FIVE_CRASH_PHASES_FMT_CLIPPY"
+}

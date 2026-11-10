@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "archive",
+    "mempal::mempal_projects_sources_and_candidates_without_approving_or_reviving_legacy_rows",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "name": "mvp025-mempal-projection-red-r1",
+  "process": {
+    "pid": 3030034,
+    "start_ticks": "611782973",
+    "state": "R"
+  },
+  "utc": "2026-11-10T08:38:52.703050+00:00"
+}

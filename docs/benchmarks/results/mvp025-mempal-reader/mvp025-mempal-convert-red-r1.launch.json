@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--test",
+    "archive",
+    "mempal::mempal_conversion_preserves_typed_rows_large_fields_and_source_bytes",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "name": "mvp025-mempal-convert-red-r1",
+  "process": {
+    "pid": 3010298,
+    "start_ticks": "611646221",
+    "state": "R"
+  },
+  "utc": "2026-11-10T08:16:05.186407+00:00"
+}

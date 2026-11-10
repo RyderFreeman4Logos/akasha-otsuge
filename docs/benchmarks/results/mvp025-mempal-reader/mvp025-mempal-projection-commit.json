@@ -1,0 +1,39 @@
+{
+  "utc": "2026-11-10T09:09:57.671178+00:00",
+  "base": "35ecda5e57ccfb8e64e8ea10b94823d09d01f81b",
+  "head": "6ee39a05e13fb2f0e8b633d260e0a5b3f0ce1435",
+  "tree": "265be876677e529e6075799d25a9a975cebffb5e",
+  "paths": [
+    "Cargo.toml",
+    "Cargo.lock",
+    "src/domain/mod.rs",
+    "src/domain/review.rs",
+    "src/storage/mempal.rs",
+    "src/storage/mempal/reader.rs",
+    "src/storage/mempal/writer.rs",
+    "src/storage/mempal/projection.rs",
+    "tests/support/mempal.rs",
+    "docs/mempal-migration.md",
+    "docs/plan/todo.md"
+  ],
+  "identities": {
+    "GIT_AUTHOR_IDENT": "RyderFreeman <RyderFreeman4Logos@gmail.com> 1794301797 -0800",
+    "GIT_COMMITTER_IDENT": "RyderFreeman <RyderFreeman4Logos@gmail.com> 1794301797 -0800"
+  },
+  "normal_hooks_enabled": true,
+  "git_configuration_changed": false,
+  "focused_log_sha256": "85065bd6f6f3bb1cc370ef692628f8681c8a3f9b2e4dd3e76c1083bab796692c",
+  "source_sha256": {
+    "Cargo.toml": "bfe7250b28e35d3ea480a4b37e4c78faad2ff9bea1629d09626ef75efda2a576",
+    "Cargo.lock": "8b86d628c432640a5b4911704072b73f8ad16bf8e3d0200cc65984b827436b6b",
+    "src/domain/mod.rs": "5cadae3447c835685eceb8d799d2f5650d263709f4a273c9062f0da0b7d08fad",
+    "src/domain/review.rs": "97ca712f30e971a9076d2d479d91fc478e0e9ac77cf679232c8666bd4c76183e",
+    "src/storage/mempal.rs": "201c35375faf8a1046128a1d4482513ea88be422285eb351cc7b167f7df58156",
+    "src/storage/mempal/reader.rs": "f5e0d0ce316f22f78917c2ee54d9d6e094ca1d5bd555777c66c613063c845542",
+    "src/storage/mempal/writer.rs": "7e1f6ee3bb8864454c8aa049a6d4900662bc2371433e799ed5b17dfdd247753a",
+    "src/storage/mempal/projection.rs": "8cdd76b7ee499aedbe55bdd55ba961f64353384ba02723b731a52776825ee17a",
+    "tests/support/mempal.rs": "435ea1d803ce58cdaa106d6b0cff50fc52dc8bd0c574715c0860b1a592c390e5",
+    "docs/mempal-migration.md": "9c28064b491eb8586beea8e832f69f99972e611941d180595b82f0770914e088",
+    "docs/plan/todo.md": "364c476a69d425aedd82d79c6ca43ae3b90b217b29fd24644186803185aa5466"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "archive",
+    "mempal::",
+    "--",
+    "--nocapture"
+  ],
+  "name": "mvp025-mempal-convert-red-r2",
+  "process": {
+    "pid": 3013572,
+    "start_ticks": "611667535",
+    "state": "D"
+  },
+  "utc": "2026-11-10T08:19:38.323881+00:00"
+}

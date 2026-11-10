@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::fs::{self, File, OpenOptions};
-use std::io::{BufWriter, Write};
+use std::io::{BufReader, BufWriter, Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
@@ -50,14 +50,15 @@ pub(super) struct ArchiveCommit {
     pub(super) revisions: Vec<BlobRevision>,
 }
 
-struct Sink {
+pub(super) struct Sink {
     file: BufWriter<File>,
     digest: Sha256,
-    bytes: u64,
+    pub(super) bytes: u64,
+    prefix: Option<(BufReader<File>, u64, bool)>,
 }
 
 impl Sink {
-    fn new(path: &Path) -> Result<Self> {
+    pub(super) fn new(path: &Path) -> Result<Self> {
         let mut options = OpenOptions::new();
         options.write(true).create_new(true);
         #[cfg(unix)]
@@ -69,20 +70,51 @@ impl Sink {
             file: BufWriter::new(options.open(path)?),
             digest: Sha256::new(),
             bytes: 0,
+            prefix: None,
         })
     }
 
-    fn write(&mut self, bytes: &[u8]) -> Result<()> {
+    pub(super) fn resume(mut file: File, prefix: File, complete: bool) -> Result<Self> {
+        let bytes = prefix.metadata()?.len();
+        file.seek(SeekFrom::End(0))?;
+        Ok(Self {
+            file: BufWriter::new(file),
+            digest: Sha256::new(),
+            bytes: 0,
+            prefix: Some((BufReader::new(prefix), bytes, complete)),
+        })
+    }
+
+    pub(super) fn write(&mut self, bytes: &[u8]) -> Result<()> {
+        let matched = if let Some((prefix, remaining, complete)) = &mut self.prefix {
+            let matched = (*remaining).min(bytes.len() as u64) as usize;
+            let mut stored = vec![0; matched];
+            prefix.read_exact(&mut stored)?;
+            if stored != bytes[..matched] || (*complete && matched != bytes.len()) {
+                return Err(StorageError::new("MEMPAL_CONVERSION_CONFLICT"));
+            }
+            *remaining -= matched as u64;
+            matched
+        } else {
+            0
+        };
         self.bytes = self
             .bytes
             .checked_add(bytes.len() as u64)
             .ok_or_else(corrupt)?;
-        self.file.write_all(bytes)?;
+        self.file.write_all(&bytes[matched..])?;
         self.digest.update(bytes);
         Ok(())
     }
 
-    fn finish(mut self) -> Result<ArchiveFile> {
+    pub(super) fn finish(mut self) -> Result<ArchiveFile> {
+        if self
+            .prefix
+            .as_ref()
+            .is_some_and(|(_, remaining, _)| *remaining != 0)
+        {
+            return Err(StorageError::new("MEMPAL_CONVERSION_CONFLICT"));
+        }
         self.file.flush()?;
         self.file.get_ref().sync_all()?;
         Ok(ArchiveFile {

@@ -7,6 +7,7 @@ pub(crate) mod crash_tests;
 mod history;
 mod import;
 mod layout;
+mod mempal;
 
 use std::collections::BTreeSet;
 use std::fmt;
@@ -23,6 +24,7 @@ use tokio::sync::Mutex;
 use crate::config::ResolvedConfig;
 
 pub use archive::ArchiveManifest;
+pub use mempal::{MempalArchive, migrate_mempal};
 
 #[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(rename_all = "snake_case")]

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "archive",
+    "mempal::mempal_conversion_refuses_unsafe_resume_paths_without_replacing_them",
+    "--",
+    "--nocapture"
+  ],
+  "name": "mvp025-mempal-resume-links-red-r1",
+  "process": {
+    "pid": 3064833,
+    "start_ticks": "612022072",
+    "state": "R"
+  },
+  "utc": "2026-11-10T09:18:43.692911+00:00"
+}

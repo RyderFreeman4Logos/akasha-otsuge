@@ -1,0 +1,11 @@
+{
+  "utc": "2026-11-10T11:03:11.381293+00:00",
+  "head": "7f8902487a0a745cbd63765a9d85ad1adcbbf189",
+  "tree": "3a3d7941c48be09dfd7c73a31eacd2c9c711fb60",
+  "verdict": "FAIL",
+  "introduced_findings": 1,
+  "severity": "HIGH",
+  "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/60#issuecomment-6765654883",
+  "report_sha256": "d6ec7c7bbaa5843aeca2fd42bdc400330bc0c8aa686c2489803d3bfa954d41ce",
+  "note": "R2 is the local successor candidate; remote PR head is still the earlier R1 candidate while its CI completes."
+}

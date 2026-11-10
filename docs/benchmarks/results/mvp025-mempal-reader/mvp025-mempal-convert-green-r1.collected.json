@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T08:27:39.053727+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "a5e03c518848b9484493658667f898af54f51a1c",
+    "log_sha256": "adf16775578076b43afafb7106e8bf504ad7faf96d9ec030fe1289ca4778b965",
+    "seconds": 6.693045383319259,
+    "utc": "2026-11-10T08:26:37.775980+00:00"
+  },
+  "process_absent": true,
+  "classification": "COMPILE_FAILURE_UNHANDLED_SQLITE_LIMIT_RESULTS"
+}

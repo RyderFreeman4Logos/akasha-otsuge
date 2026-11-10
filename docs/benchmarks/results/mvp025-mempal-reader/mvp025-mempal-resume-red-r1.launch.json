@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "archive",
+    "mempal::mempal_conversion_",
+    "--",
+    "--nocapture"
+  ],
+  "name": "mvp025-mempal-resume-red-r1",
+  "process": {
+    "pid": 3057403,
+    "start_ticks": "611976915",
+    "state": "D"
+  },
+  "utc": "2026-11-10T09:11:12.120194+00:00"
+}

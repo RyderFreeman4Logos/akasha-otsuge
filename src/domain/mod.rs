@@ -350,6 +350,41 @@ pub(crate) fn source_change(source: &SourceDraft, ingress: &Ingress) -> Result<C
     })
 }
 
+/// Offline conversion can preserve a claim, but cannot establish approval.
+pub(crate) fn migrated_candidate(
+    write: &MemoryWrite,
+    provenance: Provenance,
+    revision: u64,
+) -> Result<Vec<Change>> {
+    write.draft.validate()?;
+    provenance.validate()?;
+    if !id(&write.memory_id)
+        || !id(&write.request_id)
+        || write.expected_revision.is_some()
+        || revision == 0
+        || !matches!(provenance.actor, Actor::Unverified(_))
+    {
+        return Err(error("INVALID_MEMORY"));
+    }
+    let policy = Policy {
+        revision: "mempal-unverified-v1".into(),
+        config_generation: 1,
+        mode: ReviewMode::Manual,
+        scope: write.draft.scope.clone(),
+        adopt_explicit_decisions: false,
+    };
+    let record = Domain::record(write, provenance, &policy, None)?;
+    let mut changes = vec![Change {
+        key: memory_key(&write.memory_id),
+        expected_revision: None,
+        content: serde_json::to_string(&record)?,
+    }];
+    if let Some(change) = review::candidate_change(write, &record, Some(revision))? {
+        changes.push(change);
+    }
+    Ok(changes)
+}
+
 impl<'a> Domain<'a> {
     pub fn new(storage: &'a Storage) -> Self {
         Self { storage }
@@ -524,7 +559,6 @@ impl<'a> Domain<'a> {
     }
 
     fn record(
-        &self,
         write: &MemoryWrite,
         provenance: Provenance,
         policy: &Policy,
@@ -583,7 +617,7 @@ impl<'a> Domain<'a> {
                 });
             }
         }
-        if let Some(change) = review::candidate_change(write, record)? {
+        if let Some(change) = review::candidate_change(write, record, None)? {
             // Old accepted requests retain their original canonical transaction on replay.
             if self
                 .storage
@@ -625,7 +659,7 @@ impl<'a> Domain<'a> {
     ) -> Result<MemoryRecord> {
         let (previous, sources) = self.prepare(write, ingress, policy)?;
         let mut record =
-            self.record(write, ingress.provenance.clone(), policy, previous.as_ref())?;
+            Self::record(write, ingress.provenance.clone(), policy, previous.as_ref())?;
         let delegated = matches!(ingress.provenance.actor, Actor::Agent(_) | Actor::Tool(_))
             && match policy.mode {
                 ReviewMode::Manual => false,
@@ -698,7 +732,7 @@ impl<'a> Domain<'a> {
             return Err(error("AUTHORITY_DENIED"));
         }
         let mut record =
-            self.record(write, ingress.provenance.clone(), policy, previous.as_ref())?;
+            Self::record(write, ingress.provenance.clone(), policy, previous.as_ref())?;
         record.authority = Authority::HumanConfirmed;
         record.lifecycle = Lifecycle::Active;
         record.approval = Some(Approval {
@@ -755,7 +789,7 @@ impl<'a> Domain<'a> {
         {
             return Err(error("AUTHORITY_DENIED"));
         }
-        let mut record = self.record(
+        let mut record = Self::record(
             &request.write,
             previous.record.provenance.clone(),
             policy,

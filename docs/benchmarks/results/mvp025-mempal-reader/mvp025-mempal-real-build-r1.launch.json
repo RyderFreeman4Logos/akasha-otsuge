@@ -1,0 +1,17 @@
+{
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--release",
+    "--bin",
+    "akasha-otsuge"
+  ],
+  "name": "mvp025-mempal-real-build-r1",
+  "process": {
+    "pid": 3070223,
+    "start_ticks": "612056387",
+    "state": "R"
+  },
+  "utc": "2026-11-10T09:24:26.841738+00:00"
+}

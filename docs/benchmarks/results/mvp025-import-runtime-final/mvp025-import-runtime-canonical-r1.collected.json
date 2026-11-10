@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T07:46:39.848070+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "fa801c91d241582ee8e8d93dddf10f12397076ca",
+    "log_sha256": "780d65e2313648419a288b1e696a2e6dd24845c3c78a27df7700c32d80f6b192",
+    "seconds": 446.89159796293825,
+    "utc": "2026-11-10T07:46:30.102645+00:00"
+  },
+  "process_absent": true,
+  "classification": "EXACT_CANONICAL_PASS"
+}

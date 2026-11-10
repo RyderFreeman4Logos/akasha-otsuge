@@ -132,6 +132,7 @@ fn reason(value: &str) -> Result<()> {
 pub(super) fn candidate_change(
     write: &MemoryWrite,
     record: &MemoryRecord,
+    proposal_revision: Option<u64>,
 ) -> Result<Option<Change>> {
     let needs_review = record.lifecycle == Lifecycle::Candidate
         || (record.authority == Authority::DelegatedApproved
@@ -146,8 +147,12 @@ pub(super) fn candidate_change(
         content: serde_json::to_string(&ReviewRecord {
             schema_version: 1,
             memory_id: write.memory_id.clone(),
-            proposal_request: write.request_id.clone(),
-            proposal_revision: None,
+            proposal_request: if proposal_revision.is_some() {
+                String::new()
+            } else {
+                write.request_id.clone()
+            },
+            proposal_revision,
             semantic_sha256: record.semantic_sha256.clone(),
             scope: record.draft.scope.clone(),
             state: ReviewState::Open,

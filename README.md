@@ -10,7 +10,7 @@ A local, traceable memory system for coding agents, written in Rust.
 
 权威存储库提供原子修订、持久幂等回执和独立备份恢复，格式与验证边界见 [存储说明](docs/storage.md)。[来源与采纳规则](docs/domain.md)区分可信输入、机器候选和精确版本的人审；后续 Issues 接入真实宿主。
 
-[中立归档](docs/neutral-archive.md)可将已停止的库导出为带校验清单的 JSON、原始 blob 和修订关系；导入及往返验收仍在 #25 中开发。
+[中立归档](docs/neutral-archive.md)支持已停止库的导出、空库导入及重复导入，保留 JSON、原始 blob、修订关系和回执。[mempal 只读迁移](docs/mempal-migration.md)将 schema21/fork28 快照转成原文、未验证候选和保留全部字段的证据，支持转换中断恢复；不同归档的增量应用仍在 #25 中开发。
 
 [历史与召回回执](docs/history.md)提供跨重启的 as-of 状态、固定时点分页和实际输出字节归档，并在 CLI/IPC 读取时复核当前权限。
 

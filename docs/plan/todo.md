@@ -1,12 +1,23 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-10 UTC after PR #58 merged: **22 original Issues
+Rechecked 2026-11-10 UTC after PR #59 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
-#25's offline import merged as `b37c613` after exact canonical, full-range R2
-and CI passed. Fresh destination runtime authority is implemented and awaiting
-final gates on
-`feat/mvp-025-import-runtime` in the same SSD worktree. Neutral export also
-passed its gates before PR #57 merged; #25 remains open. #24's first independent
+#25's imported runtime merged as `31d4c61` after exact canonical, full-range R1
+and CI passed. Real mempal conversion, complete typed-row equivalence, duplicate
+import, two full roundtrips and two isolated daemon starts now pass on source
+`4193301` in `feat/mvp-025-mempal-import`. PR #60 is draft. Its first exact
+canonical gate passed, but independent R1 found
+a source/output staging alias that could destroy the snapshot. The FAIL report
+is retained. The first repair passed a fresh exact gate, but R2 exposed the
+final replacing-rename sibling. Both FAIL reports remain visible. The shared
+publication protocol now uses a new anonymous file and non-replacing link; 24
+focused Rust tests, five crash phases, Clippy and four controlled concurrent
+source-move cases pass. Canonical R3 passed, but full-range R3 found directory/lock identity loss.
+A single retained output owner now binds all file operations; seven replacement
+cases and four real-CLI directory interleavings pass, including parked-directory
+recovery and roundtrip. The final successor needs canonical R4 and full-range R4. Different-source
+incremental application remains next within #25. Offline import (PR #58) and neutral export (PR #57)
+also passed their gates; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
 PR #56 merged; #24 remains open for enforcement and full production acceptance.
 #25's lossless production import/export is next so the stress campaign can reuse
@@ -1130,10 +1141,15 @@ import preserving local work. Test-only successor `c93428e` adds same-session Pi
 registration and restart coverage: a new token/binding works while the old token
 remains denied. Both daemon fixtures plus Clippy passed R4 in 7.047s; controlled
 protocol evidence does not establish actual authentication.
-Exact canonical, independent review and CI remain
-pending; this is not yet merged runtime acceptance.
+Frozen `fa801c9` then passed unchanged canonical in 446.892s: 561 Rust passes
+including installed repeat, 159 daemon cases per run, 34 Python tests and
+installed lifecycle/UID isolation. Whole-range R1 passed with zero introduced
+findings and 60 fresh focused passes; exact-head CI42777693037 passed with the
+Cargo cache restored/hit. PR #59 merged as `31d4c61` with the reviewed tree.
 [Focused runtime evidence](../benchmarks/results/mvp025-import-runtime/README.md)
 retains causal failures, fixture/compile failures and their corrections separately.
+[Final runtime evidence](../benchmarks/results/mvp025-import-runtime-final/README.md)
+retains complete gate/review/CI and merge/publication readback.
 
 Two guarded main-file reflink attempts were rejected and their candidates removed.
 The second observed WAL/SHM appearing during the clone. Do not retry that route
@@ -1144,13 +1160,84 @@ schema21/fork28 and 42 schema objects. One event-race CANTOPEN preceded success;
 the source transaction/backup took 225.858s and the whole managed task 288.072s.
 The reader had no writable source mount and no network. The source remained
 live and may have changed independently; do not claim its bytes stayed static.
-The snapshot SHA-256 is recorded locally, but integrity checks, row-level hashes,
-counts, relations and actual migration remain undone. Keep only this one private
-sample; no data contents are committed. The installed `mempal 0.5.0` version
+The separate read-only audit passed 32 units in 367.076s: SQLite quick_check,
+typed row/table hashes and counts for 29 retained tables, seven selected
+relationship checks and final snapshot hash agreement. It found 3,525,645 rows,
+1,358,141,546 UTF-8 bytes and 3,031,040 blob bytes; drawers account for 580,723
+rows. The checked references have no missing targets, but this does not validate
+all logical relations or vec0 semantics. Actual migration and target equivalence
+remain undone. Keep only this one private sample; no data contents, IDs, source
+paths or private hashes are committed. The installed `mempal 0.5.0` version
 string alone does not establish its exact source commit.
 Post-merge import main CI42770214112 also passed with Cargo cache restored/hit.
 
-- [ ] Pin the supported mempal source commit and both schema axes; inventory
+The first [mempal conversion stage](../mempal-migration.md) now streams all
+retained typed SQL rows into bounded inert evidence blocks in a neutral archive.
+Its controlled fixture comes from the actual 21/28 table layout with no real
+rows. The missing CLI and three typed refusals were observed failing before
+implementation; one compile failure from unchecked SQLite limit results is
+retained separately. Four focused cases then passed, followed by 54 related
+archive/CLI/domain/storage tests and all-target Clippy in 25.995s. Mapping version
+2 now projects drawer/card candidates and conversation sources with unverified
+provenance, exact chunk citations, profile isolation and restrictive scope/time
+handling. Missing projections were observed RED before implementation. Nine
+controlled migration cases, the related integration suites and the domain unit
+selector pass (60 passed, 1 pre-existing ignored), with format and all-target
+Clippy in 96.732s. Conversion now reconciles completed or interrupted output in
+place under one writer lock, preserving the original observation time. Twenty
+archive tests and the five-phase real SIGKILL supervisor pass, with format and
+all-target Clippy in 47.350s. The dangling-manifest RED and preceding recovery
+failures are retained separately. Real conversion and all-row equivalence then
+passed in 589.933s: 29 tables, 3,525,645 rows, 596,178 source chunks, 503,615
+unapproved candidates and the same number of pending reviews. The archive is
+5,984,986,114 bytes with 27,511 commits and 1,687,022 revisions. Two fresh imports,
+one repeat and two exports passed complete byte/receipt/clock comparison in
+916.921s. The input retained its original hash and identity under a kernel
+read-only mount. Two isolated daemon starts passed 35 CLI commands, checking
+three distinct candidates' historical records, original chunks and open reviews;
+candidates stayed inactive and the job queue stayed empty. The first runtime
+probe's incorrect enum casing is retained as a harness failure, followed by a
+4.514s passing run without a product edit. Both daemons exited. Owned temporary
+stores and duplicate exports were removed after all consumers ended; the single
+source snapshot, converted archive and compact evidence remain. The first exact
+gate passed in 475.475s (574 Rust passes including installed
+repeat; 34 ignores), followed by independent R1 FAIL at `5e10a62`: a source
+named `conversion.json.tmp` inside its output directory could be truncated and
+renamed. The full report is published on PR #60. Eight public path variants
+reproduced the destructive alias and an accepted source-as-lock sibling. A
+second deterministic reader-to-writer move reproduced the pinned-inode bypass.
+Path admission and the shared writable-file opener now protect the source.
+The corrected fixture, 65 related Rust cases, five crash phases, Clippy and
+old-archive byte-identical replay pass. The fixture setup failure is retained
+separately in [the source-guard archive](../benchmarks/results/mvp025-mempal-source-guard/README.md).
+The exact successor gate at `7f89024` passed in 471.379s (576 Rust passes,
+34 ignores), but whole-range R2 found a final rename that could replace the
+moved source. Its full FAIL is retained. After a complete mutation-boundary
+inventory, metadata now uses anonymous descriptors and non-replacing final
+links; the named-temp truncate/rename path is removed. Twenty-one archive and
+three mempal unit tests pass, with one intentional supervisor-child ignore,
+five actual SIGKILL phases, formatting and Clippy. A shared controlled CLI
+interposer reproduced four failures on the frozen old release and verified
+four source-preserving cases on the new debug binary; both normal controls
+passed and scratch was removed. Canonical R3 passed in 439.891s (577 Rust
+passes, 34 ignores), while full-range R3 found a HIGH directory/lock-identity
+regression. Its complete FAIL is retained. The writer now holds one parent/root
+and every used member descriptor, uses descriptor-relative operations, and keeps
+directory/file locks through buffered cleanup. Seven replacement cases plus
+second-writer admission first failed and now pass. The final focused run passes
+25 Rust tests, five SIGKILL phases and Clippy. Four public directory-swap cases
+reproduce baseline false success and show candidate refusal, untouched replacement
+directories, parked-output recovery, repeat and byte-identical roundtrips.
+[Directory ownership evidence](../benchmarks/results/mvp025-mempal-directory/README.md)
+preserves the original failure and final source pins. Canonical R4, whole-range
+R4 and final publication remain pending. The [publication repair archive](../benchmarks/results/mvp025-mempal-publication/README.md)
+retains the full R2 report, ownership inventory and baseline/candidate probes.
+R3 candidate CI42807738318 passed and actually restored that cache, but does not
+waive its failed review. Historical candidate CI42798698625 passed and saved its cache;
+that earlier candidate still has both source-preservation findings.
+Runtime post-merge main CI42779863508 also passed separately.
+
+- [x] Pin the supported mempal source commit and both schema axes; inventory
   authoritative text, identity, provenance, timestamps, scope, deletion state,
   relationships and actually retained history. Document derived/operational data
   and unavailable fields; do not invent old content or human approval.
@@ -1166,7 +1253,7 @@ Post-merge import main CI42770214112 also passed with Cargo cache restored/hit.
 - [x] Finish the independent offline-import leaf through exact canonical,
   whole-range review, CI and merge; preserve the historical offline-only receipt.
   The following runtime leaf supplies the new activation contract.
-- [ ] Initialize fresh destination configuration, grants, job/incident queues,
+- [x] Initialize fresh destination configuration, grants, job/incident queues,
   notification projection and derived-index namespaces while retaining original
   history. Imported bindings/tokens cannot authorize execution or be laundered
   by incidental updates. Verify two restarts without external activity and
@@ -1175,7 +1262,7 @@ Post-merge import main CI42770214112 also passed with Cargo cache restored/hit.
   schema, live service, configuration or checkout. Stable origin identities must
   support duplicate/incremental import with explicit conflicts and no duplicate
   logical application. Missing provenance/review facts remain unknown.
-- [ ] Verify a real supported mempal sample against independent counts, hashes,
+- [x] Verify a real supported mempal sample against independent counts, hashes,
   sampled content and relations. Use an isolated source/target and keep private
   content out of committed fixtures/reports. Prove source preservation and safe
   refusal of unknown versions and corrupt records with exact failure evidence.

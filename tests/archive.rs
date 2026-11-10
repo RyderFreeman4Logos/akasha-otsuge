@@ -10,6 +10,9 @@ use sha2::{Digest, Sha256};
 #[path = "support/archive_import.rs"]
 mod import;
 
+#[path = "support/mempal.rs"]
+mod mempal;
+
 struct Fixture(PathBuf);
 
 impl Fixture {

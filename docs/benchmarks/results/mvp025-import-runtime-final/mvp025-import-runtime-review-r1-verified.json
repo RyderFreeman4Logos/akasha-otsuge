@@ -1,0 +1,28 @@
+{
+  "utc": "2026-11-10T07:56:44.993829+00:00",
+  "head": "fa801c91d241582ee8e8d93dddf10f12397076ca",
+  "tree": "8ebd432fa7e6719556adccab59c69bbb354dac4e",
+  "base": "b37c6134d98bcce0a3d5b973e95564f62e92d48e",
+  "verdict": "PASS",
+  "introduced_findings": 0,
+  "report_sha256": "308cecf42174801403a63f879c43652c8776a9d78c07bb7528df3626102064bb",
+  "focused_tests_passed": 60,
+  "focused_log_sha256": "3e8fa722b2b934f19f092df36041ba510e565155195c09bed13b1f85a118a381",
+  "canonical_verified_sha256": "63dc6e8458b07301dbafc43e0043c4ac7e0c24d103e05af313dbfce0601bb515",
+  "archives": [
+    {
+      "name": "mvp025-import-runtime",
+      "members": 51,
+      "source_head": "c93428e4f9accfaf3541ab27ca8e764297885934",
+      "manifest_sha256": "8a712cacb144ae59533a9c370058aa2503d118e4b1309062c185f98b4a29b80f"
+    },
+    {
+      "name": "mvp025-neutral-import-final",
+      "members": 16,
+      "source_head": "49aba7fd174a4a97cba6d958f62ed8b8cf5fb910",
+      "manifest_sha256": "79d032fd773475a4e5792816b52ee30b49ec8c3df1e270c22b8f687d4f674e38"
+    }
+  ],
+  "clean_after": true,
+  "changed_files_attested": 93
+}

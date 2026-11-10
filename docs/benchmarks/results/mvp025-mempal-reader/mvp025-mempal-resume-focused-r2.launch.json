@@ -1,0 +1,14 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import subprocess\nfor command in [['cargo','fmt','--all'],['cargo','test','--locked','--test','archive'],['cargo','test','--locked','--lib','storage::mempal::tests::','--','--nocapture'],['cargo','clippy','--locked','--all-targets','--','-D','warnings']]:\n print('RUN',repr(command),flush=True)\n subprocess.run(command,check=True)\n"
+  ],
+  "name": "mvp025-mempal-resume-focused-r2",
+  "process": {
+    "pid": 3065380,
+    "start_ticks": "612025469",
+    "state": "R"
+  },
+  "utc": "2026-11-10T09:19:17.662015+00:00"
+}

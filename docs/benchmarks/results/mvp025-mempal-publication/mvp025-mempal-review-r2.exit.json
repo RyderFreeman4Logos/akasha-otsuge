@@ -1,0 +1,36 @@
+{
+  "exit_code": 0,
+  "seconds": 627.2428362267092,
+  "events": [
+    {
+      "type": "thread.started",
+      "thread_id": "01a1c513-020c-72e1-b1b0-4e26e518e5ff"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 5503681,
+        "cached_input_tokens": 5315456,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 23725,
+        "reasoning_output_tokens": 5532
+      }
+    }
+  ],
+  "head": "7f8902487a0a745cbd63765a9d85ad1adcbbf189",
+  "tree": "3a3d7941c48be09dfd7c73a31eacd2c9c711fb60",
+  "clean_after": true,
+  "report_exists": true,
+  "report_sha256": "d6ec7c7bbaa5843aeca2fd42bdc400330bc0c8aa686c2489803d3bfa954d41ce",
+  "transport": "independent Codex exec; Hermes configured endpoint unavailable",
+  "utc": "2026-11-10T10:59:06.019418+00:00",
+  "runtime": {
+    "binary": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/pnpm/store/v11/links/@openai/codex/0.167.0-linux-x64/c2985c08fa0d1538e91edda3df810f707abe8521071d553e8dc01188513e4ad1/node_modules/@openai/codex/vendor/x86_64-unknown-linux-musl/bin/codex",
+    "binary_sha256": "cdcb45aaa01d0f14e298985e09465aebccd47f64ecd298aea44814af7b62bbda",
+    "version": "codex-cli 0.167.0",
+    "companion": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/pnpm/store/v11/links/@openai/codex/0.167.0-linux-x64/c2985c08fa0d1538e91edda3df810f707abe8521071d553e8dc01188513e4ad1/node_modules/@openai/codex/vendor/x86_64-unknown-linux-musl/bin/codex-code-mode-host",
+    "companion_sha256": "83f3e174c2da2f1ca8655cce686e302509640d34c0f4407c1155056f64536e0f",
+    "companion_help_exit": 0,
+    "companion_help": "Usage: codex-code-mode-host [OPTIONS]\n\nOptions:\n      --listen <URL>               Transport endpoint: `stdio`, `stdio://`, `grpc+stdio://`, or\n                                   `grpc://IP:PORT` [default: stdio]\n      --otel-trace-listen <URL>    Optional WebSocket endpoint that streams only raw OTLP trace\n                                   batches\n      --otel-trace-exporter <URL>  Optional OTLP/HTTP JSON trace exporter endpoint, analogous to\n                                   `otel.trace_exporter` in app-server configuration\n  -h, --help                       Print help\n"
+  }
+}

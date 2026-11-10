@@ -1,0 +1,30 @@
+{
+  "utc": "2026-11-10T11:45:45.845969+00:00",
+  "failed_head": "d3fe10577759570a7746932fe32080886a59eede",
+  "finding": "R3-1 directory/lock ownership and publication class",
+  "inventory": [
+    "Output parent/root creation and validation",
+    "Directory and legacy lock-file exclusion",
+    "Allowlisted member enumeration and ownership",
+    "Identity, manifest and legacy temporary reads",
+    "Paired data append/prefix handles",
+    "Anonymous metadata linking",
+    "Completed and new publication directory/parent sync",
+    "Final requested path/member identity and no false success"
+  ],
+  "shared_boundary": "One output owner retains parent/directory descriptors and every used member descriptor; all creates/opens/stats/publication are relative to the retained directory. Directory flock prevents replacing a lock filename from admitting a second current writer. Keep legacy file lock for old/busy-client compatibility. A shared completion validation checks requested parent/root plus member identities.",
+  "unchanged_contracts": [
+    "O_TMPFILE/no-replace publication",
+    "Source ancestry and retained source inode protection",
+    "Private permissions, link rejection, deterministic byte-prefix replay",
+    "No real-data rewrite or new archive mapping version"
+  ],
+  "new_regressions": [
+    "Directory replacement, including independently locked replacement",
+    "Parent replacement while original directory inode is moved back",
+    "Lock filename replacement and second-writer admission",
+    "Identity and each data member replacement",
+    "Completed manifest replacement",
+    "Public CLI metadata-fsync directory interleavings from immutable R3 report"
+  ]
+}

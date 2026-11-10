@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "utc": "2026-11-10T10:39:38.975167+00:00",
+  "parent": "5e10a62ea75d7908e00fb8f8568f1bf351c2f35e",
+  "files": {
+    "mvp025-mempal-source-alias-red-r1.admission.json": {
+      "bytes": 1178,
+      "sha256": "df988f8eee85afdd7ddf4f3ddd0736446e7a1031d582959c2d5771bfcc12c8b8"
+    },
+    "mvp025-mempal-source-alias-red-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "0e8388dba701dde5c50df250699d756b790fd452a916545940ee982e2c661200"
+    },
+    "mvp025-mempal-source-alias-red-r1.collected.json": {
+      "bytes": 405,
+      "sha256": "1a8bd14a6b8855e8a60b19630094c095a168ac05833cf7702796aeb519416ba1"
+    },
+    "mvp025-mempal-source-alias-red-r1.log.gz": {
+      "bytes": 642,
+      "sha256": "259d8b6d085427ed14ed051c8993a6f5439ab4e99df99f419944a9578e17c944"
+    },
+    "mvp025-mempal-source-inode-red-r1.admission.json": {
+      "bytes": 1184,
+      "sha256": "38efe86d4e921ff61f32481b60a59b5f7100caacfe6f22acba69c3ba838e0e8c"
+    },
+    "mvp025-mempal-source-inode-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "0adf7d7ebd004b1c0c98f26bfd21827a5dcb7d6b2c135afcc71e762c629f01fd"
+    },
+    "mvp025-mempal-source-inode-red-r1.collected.json": {
+      "bytes": 404,
+      "sha256": "9e5fe46a75d228feacc61c2351078f6a763079a7cb590863052ee9f72b80d630"
+    },
+    "mvp025-mempal-source-inode-red-r1.log.gz": {
+      "bytes": 582,
+      "sha256": "baf5096c909448d724a5fc5559420d5065290745816a89bc97cc0a90c19efde0"
+    },
+    "mvp025-mempal-source-guard-focused-r1.admission.json": {
+      "bytes": 1430,
+      "sha256": "55a4abfedb66f9bcd30946e38d792442f55e450bb40601b3c5fb42ea4b5beba4"
+    },
+    "mvp025-mempal-source-guard-focused-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "3bdfe83029be048957410c7ea700c803c41a98fd9db1ae0c34f0f235442361ff"
+    },
+    "mvp025-mempal-source-guard-focused-r1.collected.json": {
+      "bytes": 416,
+      "sha256": "c8e6265df55e67f87f5a42e3f3184392132d1e37cbf05182b2d77c81ee04e028"
+    },
+    "mvp025-mempal-source-guard-focused-r1.log.gz": {
+      "bytes": 2955,
+      "sha256": "85da0925dd2651dfc84698150aaae1b58560aa3413ac1705ea77f0893bc65959"
+    },
+    "mvp025-mempal-source-guard-focused-r2.admission.json": {
+      "bytes": 1319,
+      "sha256": "2ec72f5ff843481469a6be327ac3fd71867131f6474c7329a0cac0bb4fd6b57c"
+    },
+    "mvp025-mempal-source-guard-focused-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "5df6c20d892f2e5acc73845847484c12d22555e29adbec054b798a3249b95de7"
+    },
+    "mvp025-mempal-source-guard-focused-r2.collected.json": {
+      "bytes": 410,
+      "sha256": "3c29cb60b588bb7c71ee90b0fa5ee383c9a03e470fe0f3e8bb9b94c5e73eaf76"
+    },
+    "mvp025-mempal-source-guard-focused-r2.log.gz": {
+      "bytes": 680,
+      "sha256": "c872197f855ac6c0758d1e407138cbc603b639b4b285ba161ab624b62380e3f4"
+    },
+    "mvp025-mempal-review-r1.md": {
+      "bytes": 12839,
+      "sha256": "cfeb7f43c10ac362bcec61b90d38036d9c52f5445a0d78d72ada4221a690478f"
+    },
+    "mvp025-mempal-review-r1.exit.json": {
+      "bytes": 2198,
+      "sha256": "89c9fe599ef916fd076568bc45afb1de12b4b0ca6a6828b1b189a7b216d06935"
+    },
+    "mvp025-mempal-review-r1-publication.json": {
+      "bytes": 409,
+      "sha256": "e2c7cf41df0dae485f5ea657a4e50dbea2ae13a1d5a2e05a18b92bba1e907c34"
+    },
+    "mvp025-mempal-review-r1.collected.json": {
+      "bytes": 401,
+      "sha256": "7c554c115837fa0cff96259d418796bccd7c77bec18e786ea3efd3bfbda62c56"
+    },
+    "mvp025-mempal-source-guard-focused-r1-diagnosis.json": {
+      "bytes": 817,
+      "sha256": "0c3639b8ce37baa79858660a06b269802343fa4d62c9d77bbdec69d910fda260"
+    },
+    "mvp025-mempal-source-guard-compat-r1.json": {
+      "bytes": 4161,
+      "sha256": "fef77e80c2b757ab7951170205cadce8b2e8df2cb14ac97453bc1d6bb4912677"
+    },
+    "mvp025-mempal-review-r1-tests.log.gz": {
+      "bytes": 3858,
+      "sha256": "03475e3bba470b9fbc2fb3c76d723a2ed01db5e87118f468b05683c4a9117cc6"
+    },
+    "mvp025-mempal-source-guard-focused-r1-tests.rs.txt": {
+      "bytes": 5968,
+      "sha256": "c0d67b973cc9f790c6cc41cb82b9b0bff0d4e8b83ee4549889d4589dcdc9f848"
+    },
+    "mvp025-mempal-canonical-r1-verified.json": {
+      "bytes": 2146,
+      "sha256": "bebb2e6597e43f297f4215dc38ab1652d7dfffe76d135fb7ab3726a0b8096fac"
+    },
+    "mvp025-mempal-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "744bb36af78951a7b2ea4977861eef36c21666cfee6e33b8b422e460eb749188"
+    },
+    "mvp025-mempal-canonical-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "f247fe88c9f560f6540e97b67a76b48888f9f6c25f9ccda6464740952c079c1a"
+    },
+    "mvp025-mempal-canonical-r1.collected.json": {
+      "bytes": 386,
+      "sha256": "48a016eab55fc861ca72b74fe1bb663955b7380a502998eac818546aed280a58"
+    },
+    "mvp025-mempal-canonical-r1.log.gz": {
+      "bytes": 13391,
+      "sha256": "55987e4a4abba720767933ee0f8e18ec43098e928a8bcc5da149a79a8c51d3ca"
+    },
+    "README.md": {
+      "bytes": 2141,
+      "sha256": "89d1af828794330be85f72086864fd1195b6548d9e562be468b7fb04c41077ba"
+    }
+  },
+  "candidate_file_sha256": {
+    "src/storage/mempal.rs": "df2875c9824c87ab29f92cf7546d99cf4884cf79235979bad118ce72cf1cb976",
+    "src/storage/mempal/reader.rs": "eb27d6dc566d7fa12981ab7c62a8ae4a064768fc8785296d9b8823ec80b87a39",
+    "src/storage/mempal/writer.rs": "2412aad95bf36f196fa318ccc5d88d21a8e17339e12ebd62c5dbaf7b4f2dbc3e",
+    "src/storage/mempal/tests.rs": "195801f378b070b55c440eab234f6f9263f19a9f921bfd6a46c010a2a65f64ec",
+    "tests/support/mempal.rs": "a18bbf5f1ee4652c6709f041a8130e8ec35fcfd7e842cc606da1e1310d3bc519"
+  },
+  "limits": [
+    "Historical gate/R1 fail retained; final R2 gates pending.",
+    "Real private-data acceptance remains bound to 4193301; this leaf adds source guards."
+  ]
+}

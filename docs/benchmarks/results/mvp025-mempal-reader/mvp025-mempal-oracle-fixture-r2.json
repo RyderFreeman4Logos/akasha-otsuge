@@ -1,0 +1,173 @@
+{
+  "status": "PASS",
+  "result": {
+    "status": "PASS",
+    "tables": {
+      "consolidation_log": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "conversation_turns": {
+        "rows": 1,
+        "utf8_bytes": 47,
+        "blob_bytes": 0
+      },
+      "design_insights": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "drawers": {
+        "rows": 2,
+        "utf8_bytes": 78194,
+        "blob_bytes": 0
+      },
+      "embed_failure_log": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "failure_events": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "foresights": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "fork_ext_meta": {
+        "rows": 1,
+        "utf8_bytes": 18,
+        "blob_bytes": 0
+      },
+      "gating_audit": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "historical_rejudge_work_items": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "knowledge_cards": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "knowledge_events": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "knowledge_evidence_links": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "leases": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "novelty_audit": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "operation_telemetry": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "patterns": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "pending_message_completions": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "pending_messages": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "reindex_progress": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "runtime_adoption_events": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "runtime_writer_lease_generations": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "runtime_writer_leases": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "skills": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "sleep_log": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "sleep_resolution_log": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "taxonomy": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "triples": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      },
+      "tunnels": {
+        "rows": 0,
+        "utf8_bytes": 0,
+        "blob_bytes": 0
+      }
+    },
+    "commits": 1,
+    "revisions": 55,
+    "native_sources": 7,
+    "native_candidates": 6,
+    "native_reviews": 6,
+    "sampled_original_fields": 3,
+    "projection": {
+      "source_chunks": 7,
+      "candidate_memories": 6,
+      "retired_rows": 0,
+      "unknown_event_time_rows": 0,
+      "isolated_scope_rows": 0,
+      "unmapped_constraints_rows": 0
+    },
+    "source_relationship_evidence": "all retained typed rows match the independent SQLite row digests; includes seven previously audited relation categories",
+    "archive_bytes": 387778
+  },
+  "corruption_control": "rejected",
+  "binary_sha256": "4577f94a820aab625e127dd7a4b39a54b0cc5d040563b2d227924be7ae06a217",
+  "oracle_sha256": "b54d88b64ea6fc931c0f1b5bb9a9edb7800da4d53757badb7ae9c37a6b75a991",
+  "owned_fixture_removed_on_return": true
+}

@@ -1,0 +1,83 @@
+{
+  "status": "PASS",
+  "observations": [
+    {
+      "binary": "baseline",
+      "phase": "control",
+      "exit": 0,
+      "moved_source_preserved": true,
+      "fixture_move_observed": false
+    },
+    {
+      "binary": "baseline",
+      "phase": "identity-final",
+      "exit": 1,
+      "moved_source_preserved": false,
+      "fixture_move_observed": true
+    },
+    {
+      "binary": "baseline",
+      "phase": "manifest-final",
+      "exit": 0,
+      "moved_source_preserved": false,
+      "fixture_move_observed": true
+    },
+    {
+      "binary": "baseline",
+      "phase": "identity-temporary",
+      "exit": 1,
+      "moved_source_preserved": false,
+      "fixture_move_observed": true
+    },
+    {
+      "binary": "baseline",
+      "phase": "manifest-temporary",
+      "exit": 0,
+      "moved_source_preserved": false,
+      "fixture_move_observed": true
+    },
+    {
+      "binary": "candidate",
+      "phase": "control",
+      "exit": 0,
+      "moved_source_preserved": true,
+      "fixture_move_observed": false
+    },
+    {
+      "binary": "candidate",
+      "phase": "identity-final",
+      "exit": 1,
+      "moved_source_preserved": true,
+      "fixture_move_observed": true
+    },
+    {
+      "binary": "candidate",
+      "phase": "manifest-final",
+      "exit": 1,
+      "moved_source_preserved": true,
+      "fixture_move_observed": true
+    },
+    {
+      "binary": "candidate",
+      "phase": "identity-temporary",
+      "exit": 1,
+      "moved_source_preserved": true,
+      "fixture_move_observed": true
+    },
+    {
+      "binary": "candidate",
+      "phase": "manifest-temporary",
+      "exit": 0,
+      "moved_source_preserved": true,
+      "fixture_move_observed": true
+    }
+  ],
+  "baseline_binary_sha256": "a5a37f3a8cdc05dea1f7e4d751544a48593e61b8bf9912ce4eb389a2d65c88fe",
+  "candidate_binary_sha256": "efcb9ada27ea1b9c42f4b5d05d05d6748f8397d4429230a510406c3b510db419",
+  "interposer_sha256": "ff2109cabee24761379979a9a5f340d0f0895d4b2a772298305dd18d690074b4",
+  "owned_fixture_removed": true,
+  "limits": [
+    "Controlled tiny structural SQLite fixtures only.",
+    "The fixture performs the source move; production must preserve the moved inode and bytes."
+  ]
+}

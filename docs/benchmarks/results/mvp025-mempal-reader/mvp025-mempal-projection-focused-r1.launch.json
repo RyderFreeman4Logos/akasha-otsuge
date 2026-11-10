@@ -1,0 +1,14 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import subprocess\ncommands=[['cargo','fmt','--all'],['cargo','test','--locked','--test','archive','--test','cli','--test','domain','--test','storage'],['cargo','test','--locked','--lib','domain::'],['cargo','clippy','--locked','--all-targets','--','-D','warnings']]\nfor command in commands:\n print('RUN',repr(command),flush=True)\n subprocess.run(command,check=True)\n"
+  ],
+  "name": "mvp025-mempal-projection-focused-r1",
+  "process": {
+    "pid": 3052899,
+    "start_ticks": "611951242",
+    "state": "R"
+  },
+  "utc": "2026-11-10T09:06:55.396894+00:00"
+}

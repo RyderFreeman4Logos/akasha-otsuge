@@ -1,0 +1,26 @@
+{
+  "utc": "2026-11-10T08:32:40.385965+00:00",
+  "head": "35ecda5e57ccfb8e64e8ea10b94823d09d01f81b",
+  "tree": "139f437cc93e6f38fbc6cc646394e2251a87b02d",
+  "parent": "a5e03c518848b9484493658667f898af54f51a1c",
+  "source_files": {
+    "Cargo.toml": "fc4fc5ece3695e103f41e288f63431e1258233b017cc362950e5c5319c2365ce",
+    "Cargo.lock": "7f9e1b3482b4b30a114e99db1a4cd56e8752489735d3c55155c5e519ed0c81cf",
+    "docs/plan/todo.md": "c43e7a1a738ec66c7dfae0d75f91e5f29b7a1615a9b6a809a923dc763ad396bd",
+    "docs/mempal-migration.md": "7c884ef42c088cd3f63221f2cdfd225e41e442632df019198932f97ff30b4162",
+    "src/main.rs": "b25b05640a13aeb4f53af9ad2f1ed37c629985a9e34765411c9ccc822bbe35f2",
+    "src/storage/archive.rs": "da877fffb78041f7c0d6a56621309d2387add8743cb38566f89f5b87f54c4d30",
+    "src/storage/mod.rs": "64792c7f05c58646c084a2e998b166e329c350d7a3685897dfb43c22769a8828",
+    "src/storage/mempal.rs": "369a06dc4d563aa80a1f1fcc0b3d113ef396b76b030aa1bb4099f5bb0b56b66e",
+    "src/storage/mempal/reader.rs": "f28533cf86bb84ca3c961a0dee8a5f1557a1942dbe842202a764b8bee79e7fac",
+    "src/storage/mempal/schema.json": "b3dcf36fb1f9c769077fc36dc39edfdf393821e60b348e3deee902ebaedfb9c8",
+    "src/storage/mempal/writer.rs": "ece7ff2b41c3e704e3d90a3db462978eeb6431e37f546716160af695ad4fc07c",
+    "tests/archive.rs": "72bdd70b5657fa215c2001cc4acc15e69aeb0906736fbaef24ae995c465a6c8f",
+    "tests/fixtures/mempal21-28.sql": "52a892ff120e5ef308024d4cea35a4371edd58ce627b9810e89f0479688d7d4d",
+    "tests/support/mempal.rs": "db6cefeb3fa6bd377694b8594934299c5cb85615fc56f105b64c14d0c10e5325"
+  },
+  "focused_green": "mvp025-mempal-convert-green-r3",
+  "canonical_review_ci": "pending",
+  "hooks_enabled": true,
+  "scope": "lossless raw conversion only; projections and repeat/recovery remain pending"
+}

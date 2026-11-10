@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "schema_axes": [
+    21,
+    28
+  ],
+  "kernel_source_read_only": true,
+  "source": "one private consistent online-backup snapshot",
+  "units_completed": 32,
+  "seconds": 367.07607644982636,
+  "sqlite_quick_check": "ok",
+  "content_tables": 29,
+  "rows": 3525645,
+  "utf8_bytes": 1358141546,
+  "blob_bytes": 3031040,
+  "tables": {
+    "consolidation_log": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "conversation_turns": {
+      "rows": 9862,
+      "utf8_bytes": 4383626,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 31802,
+      "max_row_text_blob_bytes": 31932
+    },
+    "design_insights": {
+      "rows": 14,
+      "utf8_bytes": 4797,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 297,
+      "max_row_text_blob_bytes": 547
+    },
+    "drawers": {
+      "rows": 580723,
+      "utf8_bytes": 699731559,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 83388,
+      "max_row_text_blob_bytes": 83797
+    },
+    "embed_failure_log": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "failure_events": {
+      "rows": 3922,
+      "utf8_bytes": 624628,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 71,
+      "max_row_text_blob_bytes": 214
+    },
+    "foresights": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "fork_ext_meta": {
+      "rows": 1607388,
+      "utf8_bytes": 138824020,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 692,
+      "max_row_text_blob_bytes": 722
+    },
+    "gating_audit": {
+      "rows": 73062,
+      "utf8_bytes": 17476589,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 987,
+      "max_row_text_blob_bytes": 1224
+    },
+    "historical_rejudge_work_items": {
+      "rows": 491857,
+      "utf8_bytes": 124446570,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 218,
+      "max_row_text_blob_bytes": 488
+    },
+    "knowledge_cards": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "knowledge_events": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "knowledge_evidence_links": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "leases": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "novelty_audit": {
+      "rows": 86547,
+      "utf8_bytes": 13769410,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 74,
+      "max_row_text_blob_bytes": 237
+    },
+    "operation_telemetry": {
+      "rows": 31,
+      "utf8_bytes": 1621,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 36,
+      "max_row_text_blob_bytes": 56
+    },
+    "patterns": {
+      "rows": 185,
+      "utf8_bytes": 405403,
+      "blob_bytes": 3031040,
+      "max_text_cell_bytes": 79875,
+      "max_row_text_blob_bytes": 167371
+    },
+    "pending_message_completions": {
+      "rows": 638256,
+      "utf8_bytes": 116852450,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 10810,
+      "max_row_text_blob_bytes": 11014
+    },
+    "pending_messages": {
+      "rows": 32780,
+      "utf8_bytes": 241584961,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 71217,
+      "max_row_text_blob_bytes": 71354
+    },
+    "reindex_progress": {
+      "rows": 1010,
+      "utf8_bytes": 35385,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 101,
+      "max_row_text_blob_bytes": 118
+    },
+    "runtime_adoption_events": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "runtime_writer_lease_generations": {
+      "rows": 2,
+      "utf8_bytes": 39,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 26,
+      "max_row_text_blob_bytes": 26
+    },
+    "runtime_writer_leases": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "skills": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "sleep_log": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "sleep_resolution_log": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "taxonomy": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    },
+    "triples": {
+      "rows": 6,
+      "utf8_bytes": 488,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 40,
+      "max_row_text_blob_bytes": 93
+    },
+    "tunnels": {
+      "rows": 0,
+      "utf8_bytes": 0,
+      "blob_bytes": 0,
+      "max_text_cell_bytes": 0,
+      "max_row_text_blob_bytes": 0
+    }
+  },
+  "selected_relationships": {
+    "triples.source_drawer->drawers.id": {
+      "present_references": 1,
+      "missing_targets": 0
+    },
+    "knowledge_evidence_links.card_id->knowledge_cards.id": {
+      "present_references": 0,
+      "missing_targets": 0
+    },
+    "knowledge_evidence_links.evidence_drawer_id->drawers.id": {
+      "present_references": 0,
+      "missing_targets": 0
+    },
+    "knowledge_events.card_id->knowledge_cards.id": {
+      "present_references": 0,
+      "missing_targets": 0
+    },
+    "foresights.drawer_id->drawers.id": {
+      "present_references": 0,
+      "missing_targets": 0
+    },
+    "failure_events.drawer_id->drawers.id": {
+      "present_references": 3922,
+      "missing_targets": 0
+    },
+    "pending_message_completions.result_drawer_id->drawers.id": {
+      "present_references": 44977,
+      "missing_targets": 0
+    }
+  },
+  "snapshot_sha256_still_matches_acquisition": true,
+  "private_details": "Database path/hash, row hashes/IDs and all source content remain local.",
+  "limits": [
+    "This is a source audit, not migration acceptance.",
+    "Typed table digests/counts and selected relations only; not all logical relationships or vec0 semantic validation.",
+    "No exact installed mempal source-commit provenance is claimed."
+  ]
+}

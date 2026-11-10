@@ -1,0 +1,48 @@
+{
+  "head": "41933018a3835538b3fbba33adc40a60b364c2e4",
+  "same_uid_fd_consumers": [],
+  "inaccessible_same_uid_processes": 29,
+  "targets": [
+    {
+      "name": "data-first",
+      "files": 184,
+      "logical_bytes": 2795868140,
+      "allocated_bytes": 2796421120
+    },
+    {
+      "name": "data-empty",
+      "files": 182,
+      "logical_bytes": 2787898779,
+      "allocated_bytes": 2788442112
+    },
+    {
+      "name": "export-first",
+      "files": 3,
+      "logical_bytes": 5984986447,
+      "allocated_bytes": 5984993280
+    },
+    {
+      "name": "export-empty",
+      "files": 3,
+      "logical_bytes": 5984986447,
+      "allocated_bytes": 5984993280
+    }
+  ],
+  "free_before": 379930525696,
+  "removed": [
+    "data-first",
+    "data-empty",
+    "export-first",
+    "export-empty"
+  ],
+  "retained": [
+    "private original immutable snapshot",
+    "verified converted archive",
+    "compact metadata/log receipts"
+  ],
+  "free_after": 380376846336,
+  "status": "PASS",
+  "total_logical_bytes": 17553739813,
+  "total_allocated_bytes": 17554849792,
+  "fd_census_scope": "readable same-UID processes; task-owned daemon exits verified separately"
+}

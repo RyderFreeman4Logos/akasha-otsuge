@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T11:12:13.172462+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "7f8902487a0a745cbd63765a9d85ad1adcbbf189",
+    "log_sha256": "3915a13101169fce63880967d764fa0299a10a0fa73c1299407b1c169cc29474",
+    "seconds": 95.36806481610984,
+    "utc": "2026-11-10T11:11:33.642424+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASS_ANONYMOUS_PUBLICATION_ARCHIVE_CRASH_FMT_CLIPPY"
+}
