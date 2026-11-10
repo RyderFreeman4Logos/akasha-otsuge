@@ -1,29 +1,21 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-10 UTC after PR #59 merged: **22 original Issues
+Rechecked 2026-11-10 UTC after PR #60 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
-#25's imported runtime merged as `31d4c61` after exact canonical, full-range R1
-and CI passed. Real mempal conversion, complete typed-row equivalence, duplicate
-import, two full roundtrips and two isolated daemon starts now pass on source
-`4193301` in `feat/mvp-025-mempal-import`. PR #60 is draft. Its first exact
-canonical gate passed, but independent R1 found
-a source/output staging alias that could destroy the snapshot. The FAIL report
-is retained. The first repair passed a fresh exact gate, but R2 exposed the
-final replacing-rename sibling. Both FAIL reports remain visible. The shared
-publication protocol now uses a new anonymous file and non-replacing link; 24
-focused Rust tests, five crash phases, Clippy and four controlled concurrent
-source-move cases pass. Canonical R3 passed, but full-range R3 found directory/lock identity loss.
-A single retained output owner now binds all file operations; seven replacement
-cases and four real-CLI directory interleavings pass, including parked-directory
-recovery and roundtrip. The final successor needs canonical R4 and full-range R4. Different-source
-incremental application remains next within #25. Offline import (PR #58) and neutral export (PR #57)
-also passed their gates; #25 remains open. #24's first independent
-resource-observability leaf passed exact canonical, whole-range R1 and CI before
-PR #56 merged; #24 remains open for enforcement and full production acceptance.
-#25's lossless production import/export is next so the stress campaign can reuse
-its data path. #23 is completed; its post-merge main CI42750140146 also passed.
-Post-merge main CI42755182650 also passed and its complete log/hash was collected;
-it is separate from successful candidate CI42753418883.
+#25's imported runtime merged as 31d4c61. Its mempal reader now merged as
+fe30c78, with the same tree as reviewed b98eec9: exact canonical R4, independent
+whole-range R4 (zero actionable findings) and candidate CI42813077335 passed.
+The [final reader archive](../benchmarks/results/mvp025-mempal-final/README.md)
+retains these results and publication readbacks; R1/R2/R3 failures remain visible.
+Real typed-row conversion and full roundtrips remain historical acceptance at
+4193301; later filesystem fixes have separate controlled regression evidence.
+Post-merge main CI42815108137 is a separate pending result.
+The active branch is feat/mvp-025-incremental, starting at fe30c78.
+Next are neutral-history prefix admission/recovery and changed-mempal-snapshot
+origin/update/deletion semantics. #25 stays open until both contracts pass.
+Offline import (PR #58) and neutral export (PR #57) are already merged.
+#24's resource-observability leaf (PR #56) is merged; enforcement and full
+production acceptance remain unchecked. Reuse #25's data path for that campaign.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -1229,8 +1221,12 @@ second-writer admission first failed and now pass. The final focused run passes
 reproduce baseline false success and show candidate refusal, untouched replacement
 directories, parked-output recovery, repeat and byte-identical roundtrips.
 [Directory ownership evidence](../benchmarks/results/mvp025-mempal-directory/README.md)
-preserves the original failure and final source pins. Canonical R4, whole-range
-R4 and final publication remain pending. The [publication repair archive](../benchmarks/results/mvp025-mempal-publication/README.md)
+preserves the original failure and final source pins. Canonical R4 passed in
+444.337s (578 Rust passes, 34 ignores); whole-range R4 passed with zero actionable
+findings, 67 fresh Rust passes, five SIGKILL phases and 69 actual CLI exits.
+Candidate CI42813077335 passed, and PR #60 merged as fe30c78 with the identical
+reviewed tree. The [final reader archive](../benchmarks/results/mvp025-mempal-final/README.md)
+retains gate, review, CI and merge evidence. Post-merge main CI remains separate. The [publication repair archive](../benchmarks/results/mvp025-mempal-publication/README.md)
 retains the full R2 report, ownership inventory and baseline/candidate probes.
 R3 candidate CI42807738318 passed and actually restored that cache, but does not
 waive its failed review. Historical candidate CI42798698625 passed and saved its cache;
@@ -1258,10 +1254,16 @@ Runtime post-merge main CI42779863508 also passed separately.
   history. Imported bindings/tokens cannot authorize execution or be laundered
   by incidental updates. Verify two restarts without external activity and
   successful new authorized operations before enabling the daemon on imports.
-- [ ] Implement the frozen mempal reader without modifying its source database,
-  schema, live service, configuration or checkout. Stable origin identities must
-  support duplicate/incremental import with explicit conflicts and no duplicate
-  logical application. Missing provenance/review facts remain unknown.
+- [x] Implement and merge the frozen read-only mempal reader without modifying
+  its source database, schema, live service, configuration or checkout. Exact
+  snapshot replay and source/output ownership recovery pass; missing provenance
+  and review facts remain unknown.
+- [ ] Extend neutral import to exact common-history prefixes with crash-safe
+  publication and ordinary-open/restore exclusion. Replaying older archives
+  must preserve newer history; divergence and local writes must remain intact.
+- [ ] Support changed mempal snapshots with explicit stable origin identities,
+  primary-key ambiguity, updates and deletion semantics. Verify duplicate and
+  incremental application without duplicate logical records or forged approval.
 - [x] Verify a real supported mempal sample against independent counts, hashes,
   sampled content and relations. Use an isolated source/target and keep private
   content out of committed fixtures/reports. Prove source preservation and safe

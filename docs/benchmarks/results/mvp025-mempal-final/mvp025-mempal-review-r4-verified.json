@@ -1,0 +1,16 @@
+{
+  "utc": "2026-11-10T12:21:16.055947+00:00",
+  "head": "b98eec93cd2a2d6ca525eaa56d681864280bed05",
+  "tree": "6e1aeea391de14b0a46d4e9fcab7abe41877c6de",
+  "base": "31d4c61ecf6672ae52e3b84bbd00b630bceed3f8",
+  "verdict": "PASS",
+  "introduced_findings": 0,
+  "fresh_rust_passes": 67,
+  "fresh_public_cli_exits": 69,
+  "forced_interleavings": 11,
+  "supervised_sigkills": 5,
+  "report_sha256": "0f4c43beaf52320c511a399fd17a62c00c4ffd361061b35a94c0dde0786b517d",
+  "focused_log_sha256": "1355ec6d944a2ef10ac752a5e12de2ad2edc006af2af33cd642ee214901685db",
+  "canonical": "mvp025-mempal-canonical-r4-verified.json",
+  "clean_after": true
+}
