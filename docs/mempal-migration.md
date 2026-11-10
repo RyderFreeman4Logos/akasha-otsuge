@@ -4,7 +4,9 @@ The converter preserves legacy SQL rows as inert evidence in a neutral archive
 and projects original text and unverified memory candidates. Repeated and
 interrupted conversion reuse the same private output directory. A real supported
 snapshot passed all-row equivalence, native roundtrip and isolated daemon reads.
-Different-source incremental application remains under development in issue #25.
+Mapping version 3 extends a completed conversion with a changed snapshot using
+the supported tables' actual primary keys. Complete issue #25 acceptance remains
+separate from the controlled regression results.
 
 Prepare a consistent, stopped SQLite snapshot independently. Do not copy only
 the main file of a live WAL database. The converter refuses a snapshot with an
@@ -17,6 +19,11 @@ providers, queued work or extension loading.
 akasha-otsuge --config /path/destination.toml \
   migrate mempal /path/private-snapshot.db /path/new-archive
 akasha-otsuge --config /path/destination.toml archive import /path/new-archive
+
+akasha-otsuge --config /path/destination.toml \
+  migrate mempal /path/next-snapshot.db /path/next-archive \
+  --previous /path/new-archive
+akasha-otsuge --config /path/destination.toml archive import /path/next-archive
 ```
 
 The archive destination must be new or an owned private conversion directory.
@@ -53,6 +60,51 @@ suffixes before a later failure, but cannot publish a manifest until the complet
 stream and unchanged source pass. There is no promise of constant-time resume:
 source validation and deterministic prefix comparison run again. A completed
 archive uses the neutral importer's separate repeat/import-recovery contract.
+
+## Changed snapshots
+
+`--previous` requires a complete mempal conversion lineage, or its neutral
+export. It validates that archive through the native importer before extending
+it; a locally edited history is not an incremental conversion baseline. The
+input archive, new output and SQLite snapshot must be disjoint. The destination
+importer still refuses divergent history or a longer archive after local writes.
+
+Existing projected IDs retain the initial snapshot/table/rowid/chunk identity.
+Typed, non-NULL primary keys bind subsequent rows to those IDs, even after rowid
+changes. New keys use the initial lineage identity and a hash of the table and
+typed key. Composite primary keys retain their declared column order. Changed
+primary-key declarations and ambiguous NULL keys are refused; equal text under
+different keys remains distinct. Reappearing keys reconnect to their original
+history instead of creating another logical memory.
+
+Content or scope changes append new immutable source evidence and unverified
+candidate revisions. Their old pending reviews become `withdrawn`. Deletion,
+retirement, newly unmapped constraints, blank claims and removed trailing chunks
+also withdraw the affected candidate and its review. Withdrawal preserves the
+old claim, source spans and event times; it never fabricates human rejection or
+approval. Historical reads expose `withdrawn` explicitly. Such a review cannot
+be reopened; a later eligible source revision creates a new candidate and review.
+Rowid-only changes retain the existing source, memory and review revisions.
+
+Every new archive retains the original receipts and commit clocks. New requests
+sort after all previous conversion requests by a fixed-width commit sequence.
+Delta blocks store changed typed rows and deletion markers with stable origin
+IDs. Their descriptor's `delta` counts/hash cover that delta stream; the table's
+top-level rows/bytes/hash describe all rows in the new snapshot. A generation is
+bound to both the previous archive identity and new snapshot identity, so returning
+to an earlier database's bytes cannot overwrite its historical sources.
+A byte-identical latest snapshot reuses the archive history without new commits.
+
+Conversion uses one disposable native store under the private output directory
+for verified prior history and a batched primary-key index. It does not copy the
+SQLite database or add another formal backend. Allow space for that native store
+and the new complete archive; the native store is closed and removed on normal
+completion and handled conversion errors. Interrupted runs retain an identity-
+bound directory that the next identical invocation reconciles. A close failure
+retains it for retry rather than removing a potentially active store. Resume
+revalidates the previous archive and output prefix; it is not constant-time.
+Lineage headers are limited to 32 MiB in memory; typed JSONL rows are bounded
+to 128 MiB after escaping. Exceeding a bound is an error, never truncation.
 
 Support is restricted to upstream schema **21** and fork extension **28**, with
 the table/column layout mapped from source commit

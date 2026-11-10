@@ -1,5 +1,8 @@
 use super::*;
 
+#[path = "mempal_incremental.rs"]
+mod incremental;
+
 fn convert(fixture: &Fixture, source: &Path, destination: &Path) -> Output {
     Command::new(env!("CARGO_BIN_EXE_akasha-otsuge"))
         .arg("--config")

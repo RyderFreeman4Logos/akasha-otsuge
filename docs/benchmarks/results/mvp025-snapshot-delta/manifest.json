@@ -1,0 +1,203 @@
+{
+  "base_commit": "235c409e8c79766cef84da193d7f6b8338157d58",
+  "development_parent": "8cff5480f058bca4aaa3e8d6bbaae9a595a1ca75",
+  "utc": "2026-11-10T18:31:30.958592+00:00",
+  "files": {
+    "mvp025-delta-update-red-r1.admission.json": {
+      "bytes": 1360,
+      "sha256": "c7e864b404fef75bd700f33034ae76ba9c6fa332bbddb8f457e3f450b1f5c82b"
+    },
+    "mvp025-delta-update-red-r1.terminal.json": {
+      "bytes": 238,
+      "sha256": "2d63bb05e777984bf2e5c68bc2e76c4d2645cea13e6ce83aec19020c5ee17031"
+    },
+    "mvp025-delta-update-red-r1.collected.json": {
+      "bytes": 415,
+      "sha256": "79458b9ae331cc21f78a811831f3bfdf713d699a3aead59823971b1a846c0ad5"
+    },
+    "mvp025-delta-update-red-r1.log.gz": {
+      "bytes": 603,
+      "sha256": "6c8a7ad39a4eb98ae4565002e54923c7fb587902b4f428c7ed8537210cd54724"
+    },
+    "mvp025-delta-update-green-r1.admission.json": {
+      "bytes": 1637,
+      "sha256": "dad4d786e9657e09a5bdb9f1f97f5afdeb7bd1917d52fc1ee470a0ddf8bc5f0d"
+    },
+    "mvp025-delta-update-green-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "39e2a6170f1c74c5f44fb1bfba288c8f5db4fcf70c6c7b3dd213ddead21a02c8"
+    },
+    "mvp025-delta-update-green-r1.collected.json": {
+      "bytes": 390,
+      "sha256": "fa827a31aed6a4ffc22ec0f44033ee7ca1439ba0229c32309ca9aa9ab4fc734c"
+    },
+    "mvp025-delta-update-green-r1.log.gz": {
+      "bytes": 1226,
+      "sha256": "ff560dd50629a67ddc7e82997e1c343194ac390570ba2ddb477355a6b12cd990"
+    },
+    "mvp025-delta-lifecycle-red-r1.admission.json": {
+      "bytes": 1664,
+      "sha256": "f9fbda335b282e2aaec8e3e8d404e202fd2ab6d9c612388e605fb0e81c203279"
+    },
+    "mvp025-delta-lifecycle-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "3beb4a84b06573688005192d17926a6e33027c46ea082cc6f940e9f78ae744a3"
+    },
+    "mvp025-delta-lifecycle-red-r1.collected.json": {
+      "bytes": 405,
+      "sha256": "a0233e08b53d3d66984619aa5a25e3f7b559723e55f09f1a8ae02673b86e5e49"
+    },
+    "mvp025-delta-lifecycle-red-r1.log.gz": {
+      "bytes": 569,
+      "sha256": "9a858f6a234a828268b3c71316c3e7fab804c49dd96b87c51c0be5bce1539556"
+    },
+    "mvp025-delta-lifecycle-green-r1.admission.json": {
+      "bytes": 1597,
+      "sha256": "37b9da9f189cc93b287e1e63dbecd76f3dcd4bbd9cfbd95ac60af6a667b6ac3b"
+    },
+    "mvp025-delta-lifecycle-green-r1.terminal.json": {
+      "bytes": 238,
+      "sha256": "db77c19de583426fa2b3a767b8e686599b37f5ea742a10f8dadc192f5c11d34a"
+    },
+    "mvp025-delta-lifecycle-green-r1.collected.json": {
+      "bytes": 399,
+      "sha256": "02b2d51350c57fc814131a364994070e78f020523e3e5a3f3988a7e630cb527f"
+    },
+    "mvp025-delta-lifecycle-green-r1.log.gz": {
+      "bytes": 628,
+      "sha256": "28f2a2f263b4b29271183615cb64de88ff0cb091806cf68b6bc8d34106c54d7d"
+    },
+    "mvp025-delta-focused-r1.admission.json": {
+      "bytes": 1740,
+      "sha256": "069f945ccf96700048a4bea64b19353fac55aab1916739f00f25c39be07b00cd"
+    },
+    "mvp025-delta-focused-r1.terminal.json": {
+      "bytes": 238,
+      "sha256": "a6d7fb7e2c897709ad252c6f62c3dacb4db2a3a9e7193a534f07ef1c0db0b3ad"
+    },
+    "mvp025-delta-focused-r1.collected.json": {
+      "bytes": 387,
+      "sha256": "6a21c785556091f7bb854158bef2df25311e76657c09ad74eb860483372b2028"
+    },
+    "mvp025-delta-focused-r1.log.gz": {
+      "bytes": 1683,
+      "sha256": "53fda10e923c1e17ddf490ad7c80b3e5e2785b3a1f714fc0fd624e9b53236f4e"
+    },
+    "mvp025-delta-unchanged-red-r1.admission.json": {
+      "bytes": 1668,
+      "sha256": "0f2e68ffd23a6ceacfa388bb27130013e5f4638f19a8c4530412707fcef6bb63"
+    },
+    "mvp025-delta-unchanged-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "b4a360f2462d4ad5c1b1fba2391118d7515d3b8951ab77a1e1aa17812fae9f9c"
+    },
+    "mvp025-delta-unchanged-red-r1.collected.json": {
+      "bytes": 410,
+      "sha256": "b88fdd07eeef8d8057a1b7f75968ba0d1ecf7010cc602420daef628a9bb8e7d5"
+    },
+    "mvp025-delta-unchanged-red-r1.log.gz": {
+      "bytes": 3759,
+      "sha256": "2832affb7b76c7a5cabe3104f84262171fae16def47c03ec81505f37290c5c2b"
+    },
+    "mvp025-delta-focused-r2.admission.json": {
+      "bytes": 1749,
+      "sha256": "9d21e890af312052c7763aee5988fdeb2dc3955c0f41517a54f113de42090160"
+    },
+    "mvp025-delta-focused-r2.terminal.json": {
+      "bytes": 239,
+      "sha256": "57b9ffe54f68f62edeec4f52c0edb8ca848052a9d4f6148e3b5024372c94dd67"
+    },
+    "mvp025-delta-focused-r2.collected.json": {
+      "bytes": 388,
+      "sha256": "f8cd8ef5804df585f083750c2de6ad706d09657c2b4ab38735a4ba33d79165d2"
+    },
+    "mvp025-delta-focused-r2.log.gz": {
+      "bytes": 512,
+      "sha256": "207da9a0be6147a2ed26383a78f3b63ccd11489859b1f24c651887d9be513c34"
+    },
+    "mvp025-delta-focused-r3.admission.json": {
+      "bytes": 1749,
+      "sha256": "2f3c8d58a1146ee0be51bc9c20423874a2ab64bfe5ed9fe77f3c69868888c483"
+    },
+    "mvp025-delta-focused-r3.terminal.json": {
+      "bytes": 236,
+      "sha256": "5e4e1b56f59bed04d885804526f86e562407efdf1f4b74f36be1f302b4888083"
+    },
+    "mvp025-delta-focused-r3.collected.json": {
+      "bytes": 411,
+      "sha256": "143ce2f2f099dfa095a80d574283284b2d83b990a21af2da45440771110af9d4"
+    },
+    "mvp025-delta-focused-r3.log.gz": {
+      "bytes": 1420,
+      "sha256": "05ffad6ca1f025ea0f7c392f0fd7e96cb74683779cf3c559e64473884796060f"
+    },
+    "mvp025-delta-index-bootstrap-red-r1.admission.json": {
+      "bytes": 1676,
+      "sha256": "7511f59ce33c9515c44ed44b435a65dbc95cec85f80a2408b3405c642e991b94"
+    },
+    "mvp025-delta-index-bootstrap-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "597607a0275ea0bf3d7a9d6a18bf6aa0e30eb9ca91d0a0d7ada08328b132f207"
+    },
+    "mvp025-delta-index-bootstrap-red-r1.collected.json": {
+      "bytes": 410,
+      "sha256": "3be0f704fc97ec0345165252a6dd3db6a536948892a4e1dd3db56b31adafc302"
+    },
+    "mvp025-delta-index-bootstrap-red-r1.log.gz": {
+      "bytes": 588,
+      "sha256": "39e4dfcb2aa9dccfa3dd7176ca3ba8cb518bd0394407e3a0f2213e83ef5f332d"
+    },
+    "mvp025-delta-focused-r4.admission.json": {
+      "bytes": 1666,
+      "sha256": "37fd9a9d2746fa6309dc63e91c2a3dc97540cb81188e7652b07e363ca934dad2"
+    },
+    "mvp025-delta-focused-r4.terminal.json": {
+      "bytes": 235,
+      "sha256": "f161464880918650f7af0d88b097dab6c77678aeb14dfc5c6690f1d73d6b0145"
+    },
+    "mvp025-delta-focused-r4.collected.json": {
+      "bytes": 396,
+      "sha256": "85a80195148b6edb2b9812b83574c2150b95068f7f7b05b7abd94e1abf706a11"
+    },
+    "mvp025-delta-focused-r4.log.gz": {
+      "bytes": 482,
+      "sha256": "0c6e6ac919be4a9f0aadc3f248c37b5afed480cd1d8e7d2b5136bcf5c395323f"
+    },
+    "mvp025-legacy-delta-oracle-r1.json": {
+      "bytes": 7505,
+      "sha256": "88bdbd93b06bc448946e165ef121eef70e7eb0eaabd22dd2b3026f70f26b9047"
+    },
+    "mvp025-legacy-incremental-fixture-keys-r1.json": {
+      "bytes": 6339,
+      "sha256": "e389b0494a852fabc83dfc623f5400f6e96ac91a065d5700a013a439ac01d417"
+    },
+    "outcomes.json": {
+      "bytes": 1162,
+      "sha256": "c3e3935de1df560c9c2cee61a2b11d507aef83ff4c3e95866ff13621006ec7cc"
+    },
+    "README.md": {
+      "bytes": 1592,
+      "sha256": "cd6a71e917f59f08eb4fdab754f54bfc8805fbd33b8dd2e2aed668234e114ca6"
+    }
+  },
+  "candidate_file_sha256": {
+    "src/domain/history.rs": "21fbdba4ac7ae0e8054d434f0954c7a26739ba8b632ff56bc3e99c05ab4ab7e6",
+    "src/domain/mod.rs": "1e0ad0a0ba551478720e729b929bccd6b28a9eeb6bcf32857322d33063c63860",
+    "src/domain/review.rs": "f06a1a20c8f1d4fd74fff3dcb0f777f4d0408c31f14318ea283f22c9b6385f27",
+    "src/domain/schema.rs": "23cb8ff607c4bfa9a1b42f828431aded5e8b8166501f389e273bb10fdbf54348",
+    "src/main.rs": "b63278b450ec3b0799562248ea28d86b2a694648987632881f6167002ed4c4d1",
+    "src/storage/archive.rs": "7747caefa9d3ca5ea09f829b7e1e90acfc05ef84f23f65248f6b669b34503b70",
+    "src/storage/import.rs": "dcece00b45581b1b50a40fe83d63c9d61a5a2542ac191a624671f8105c80ab2b",
+    "src/storage/mempal.rs": "232602456375b6d6a725da95fbc975cd7a6ed3baa0c68576313a689ebb97aa9e",
+    "src/storage/mempal/incremental.rs": "53f539fe5864fa0d7f3b7f60b66fbc4166d9ac446632caaba0bcf9933ffe3b6d",
+    "src/storage/mempal/incremental/index.rs": "588ac225e74a651087ab75d22bba2f049217099383f0cd6dc33d22fda9eec124",
+    "src/storage/mempal/projection.rs": "00568521ce4013a5639db9c7432ca61740d8e0369406e9ee5aef361b4c53601a",
+    "src/storage/mempal/reader.rs": "65f8818ca4ca5c3c2f4e33db9005b5bfcf1fd8adcdc010d6f5d6380d60a74d3f",
+    "src/storage/mempal/writer.rs": "d52bfe43c5d3f849637d31b1ef880b19a53841a6d19ddfd109f6170f0a3317b9",
+    "src/storage/mod.rs": "a94f2535608c8dd7fb68047ffdc775084c77b8509ed6789a4415c8872a5b20b1",
+    "tests/support/mempal.rs": "df2b5ffc19b14ce963c0c1beaa1d67c04d019bee8b08c258f24999971f5c2a43",
+    "tests/support/mempal_incremental.rs": "6a11b18021c089f6cae0a5b24717a8dc2d2a1248b86b75463491cb9fa38f5dfb"
+  },
+  "final_focused_run": "mvp025-delta-focused-r4",
+  "red_team_daybreak": "deferred_by_owner"
+}

@@ -220,5 +220,6 @@ fixture re-registers the same imported session with a fresh token and preserves
 the new binding across restart while rejecting the old token. This is not
 actual provider authentication. SIGKILL is not
 power-loss or real ENOSPC evidence. Read-only mempal conversion is implemented
-separately. Stable identities, updates and deletions across changed legacy
-snapshots and full migration acceptance remain in #25.
+separately. Its [mapping version 3](mempal-migration.md#changed-snapshots) preserves
+stable identities and records updates and withdrawals across changed snapshots.
+Full migration acceptance and its exact candidate evidence remain in #25.

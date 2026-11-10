@@ -1,48 +1,39 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-10 UTC after PR #60 merged: **22 original Issues
-completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
-#25's imported runtime merged as 31d4c61. Its mempal reader now merged as
-fe30c78, with the same tree as reviewed b98eec9: exact canonical R4, independent
-whole-range R4 (zero actionable findings) and candidate CI42813077335 passed.
-The [final reader archive](../benchmarks/results/mvp025-mempal-final/README.md)
-retains these results and publication readbacks; R1/R2/R3 failures remain visible.
-Real typed-row conversion and full roundtrips remain historical acceptance at
-4193301; later filesystem fixes have separate controlled regression evidence.
-Post-merge main CI42815108137 passed separately and saved its cache after a cold miss.
-The active branch is feat/mvp-025-incremental, starting at fe30c78.
-Neutral-history prefix admission/recovery is implemented with shared open/restore
-admission, one native stage and atomic directory exchange. Causal REDs reproduced
-prefix rejection, both admission bypasses and premature old-history cleanup.
-The final relevant selectors pass 60 Rust cases, including nine incremental
-SIGKILL phases, runtime inactivity across restarts, malformed markers and
-publication fsync faults. Clippy and plan/reference checks pass. The
-[focused archive](../benchmarks/results/mvp025-incremental/README.md) preserves
-both causal failures and the separately classified fixture failures.
-The first exact canonical failed at the existing incident crash fixture before
-release/installed checks. Isolated and parallel-suite diagnostics did not
-reproduce its historical trigger. A deterministic admitted-but-unlinked fixture
-now preserves the original five-second deadline across restart; its negative
-control fails and the restored production code passes. The
-[gate repair archive](../benchmarks/results/mvp025-incremental-gate-repair/README.md)
-preserves the failure and uncertainty. Successor canonical R3 and CI passed at
-4a542e3, but full-range R2 found a final asynchronous native-close lifetime defect.
-The new repair owns the native runtime through shutdown and explicitly releases
-admission locks; 71 focused Rust cases, formatting and Clippy pass. Its
-[evidence archive](../benchmarks/results/mvp025-incremental-final-drop/README.md)
-retains the causal failures, diagnostics and attribution limits. A successor
-exact canonical, conventional full-range review and publication remain pending.
-Changed-mempal-snapshot origin/update/deletion semantics follow; #25 stays open
-until both contracts pass.
-Offline import (PR #58) and neutral export (PR #57) are already merged.
-#24's resource-observability leaf (PR #56) is merged; enforcement and full
-production acceptance remain unchecked. Reuse #25's data path for that campaign.
-#12's reviewed code is retained, but Claude-native authentication remains deferred.
-The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
-temporary substitute because no Claude subscription is available. This overrides
-the original development-order blocker; it does not turn substitute results
-into Claude-native evidence. All other acceptance and closure requirements remain.
-Every unfinished Issue and its original dependencies are listed below.
+Rechecked 2026-11-10 UTC: **22 original Issues completed, 6 Issues open
+(#12 and #24–#28)**. #50 is also completed and closed. No completed acceptance
+is waiting for issue closure.
+
+Neutral-history incremental import merged in PR #61 as 235c409, with the same
+tree as reviewed e4f973d. Exact canonical R4 passed 595 Rust cases/35 ignores,
+installed lifecycle and UID isolation; independent conventional R3 passed with
+zero actionable findings and 71 fresh cases/six child ignores; CI42866447962
+passed with a verified cache restore and primary-key hit. The
+[final incremental archive](../benchmarks/results/mvp025-incremental-final/README.md)
+preserves those exact identities, reports, logs and publication readbacks.
+Earlier failures and unknown historical triggers remain explicitly recorded.
+
+The active SSD worktree is reused on feat/mvp-025-snapshot-delta, based on 235c409.
+The candidate now implements stable legacy origin identities, updates, source
+withdrawal and reappearance. Public CLI three-generation, unchanged-snapshot,
+recovery and roundtrip regressions pass. The [delta development archive](../benchmarks/results/mvp025-snapshot-delta/README.md)
+preserves failures and final focused evidence. Exact-HEAD gates, real-data
+application, independent review and publication are still being completed.
+#25 stays open until that contract and
+complete roundtrips pass. Offline import (PR #58), neutral export (PR #57),
+imported runtime (PR #59) and the read-only mempal reader (PR #60) are merged.
+The [reader archive](../benchmarks/results/mvp025-mempal-final/README.md) retains
+its distinct real-data and controlled acceptance identities.
+
+After #25, finish #24 resource enforcement and full production acceptance, then
+#26 packaging, #27 fixed-reference quality evaluation and #28 final release.
+#24's observability leaf (PR #56) is already merged.
+
+#12's reviewed implementation is retained, but actual Claude authentication is
+deferred. The owner authorized Codex, or Pi/Hermes through localhost:48317, as a
+temporary substitute; substitute results are not Claude-native evidence.
+mp SSH access remains a separate external blocker. Every unfinished issue and
+its original dependencies is listed below.
 
 ## Session operating rules
 
@@ -1282,7 +1273,7 @@ Runtime post-merge main CI42779863508 also passed separately.
   its source database, schema, live service, configuration or checkout. Exact
   snapshot replay and source/output ownership recovery pass; missing provenance
   and review facts remain unknown.
-- [ ] Extend neutral import to exact common-history prefixes with crash-safe
+- [x] Extend neutral import to exact common-history prefixes with crash-safe
   publication and ordinary-open/restore exclusion. Replaying older archives
   must preserve newer history; divergence and local writes must remain intact.
 - [ ] Support changed mempal snapshots with explicit stable origin identities,
@@ -1305,37 +1296,16 @@ After #25, return to all unchecked #24 enforcement/corpus/load/fault work, then
 packaging (#26), fixed-oracle quality evaluation (#27) and final acceptance (#28).
 Claude authentication (#12) and mp SSH access remain explicit external blockers.
 
-Incremental PR #61 remains open. Canonical R2 at 0856401 passed (588 Rust
-passes, 34 ignores), as did CI42823400965 with an actual restored-cache hit.
-Whole-range review R1 nevertheless found two HIGH regressions: cleanup could
-adopt a substituted old-directory inode, and ordinary opens could bypass failed
-publication durability. Its full report was overwritten by the review wrapper's
-final-message output; the preserved source/probe evidence supports an explicitly
-reconstructed FAIL, published in the PR. The original report bytes are lost.
-The [repair evidence](../benchmarks/results/mvp025-incremental-review-repair/README.md)
-preserves that limitation, all failed attempts and their corrected classifications.
-The repair also prevents ordinary-root substitution and keeps native directory
-descriptors with every shared tree handle. The latter first failed a real native
-checkpoint after its Storage owner was dropped. Final focused validation passes
-68 Rust tests (five supervisor-child ignores), format and Clippy, plus public
-cleanup, fsync, root-substitution and local-tail recovery probes. These are dirty
-candidate results; a successor exact canonical, whole-range review and CI remain
-required before merging this leaf. Changed mempal snapshots remain unfinished.
-
-At 4a542e3, canonical R3 passed 592 Rust cases (34 ignores) and CI42836962444
-passed. Full-range R2 still failed one HIGH final-native-drop finding. Its full
-report is preserved and published in two exact contiguous parts. Native storage
-now owns its runtime and directory through final asynchronous shutdown. The new
-final-drop control failed before the repair; caller-runtime handoff now passes.
-Focused R2 also exposed transient IMPORT_BUSY failures. Targeted diagnostics
-captured contention but no surviving holder; that historical holder stays unknown.
-A separate deterministic descriptor-copy control proved admission could outlive
-its owner. Explicit scoped unlock fixes both lock owners and partial acquisition.
-Final focused R3 passes 71 Rust cases, six supervisor-child ignores, format,
-Clippy and diff checks. The
-[shutdown repair archive](../benchmarks/results/mvp025-incremental-final-drop/README.md)
-keeps all attempts and those limits. Exact committed gates, conventional review
-and publication are still required; Daybreak/red-team work is temporarily deferred.
+Incremental PR #61 is merged as 235c409 (reviewed source e4f973d).
+Canonical R4, conventional whole-range R3 and CI42866447962 all passed.
+The [final archive](../benchmarks/results/mvp025-incremental-final/README.md)
+binds the exact source, gate, independent verdict, cache logs and remote readbacks.
+R1's lost original/reconstructed report distinction, R2's final-drop failure and
+the transient IMPORT_BUSY holder's unknown identity remain in the prior archives.
+Owned native shutdown and explicit admission unlock have separate causal REDs
+and passing regressions. The unchanged historical incident trigger is likewise
+not reclassified by later green runs. Changed mempal snapshots remain unfinished;
+Daybreak/red-team work is temporarily deferred by the owner.
 
 ### Remaining release acceptance
 

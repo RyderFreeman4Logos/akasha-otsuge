@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T18:20:20.511314+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "8cff5480f058bca4aaa3e8d6bbaae9a595a1ca75",
+    "log_sha256": "beae1a30fed04c6300dad9ab78ca434349515bcad146a9b916d3f3dac26fb484",
+    "seconds": 50.10046875011176,
+    "utc": "2026-11-10T18:20:14.583564+00:00"
+  },
+  "process_absent": true,
+  "classification": "LIFECYCLE_REGRESSION_RESULT_COLLECTED"
+}

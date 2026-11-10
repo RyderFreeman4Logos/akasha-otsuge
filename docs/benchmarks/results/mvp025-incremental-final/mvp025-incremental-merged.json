@@ -1,0 +1,11 @@
+{
+  "utc": "2026-11-10T17:50:33.816303+00:00",
+  "previous_main": "fe30c78169fbf87bfa47cf06912b7c64d3a418b3",
+  "reviewed_head": "e4f973de0c963f7cc26d577f735da04739fb682e",
+  "merge": "235c409e8c79766cef84da193d7f6b8338157d58",
+  "tree": "82e8ef59eab12c8bf79c1798c9f567f1da6008cd",
+  "main_clean": true,
+  "worktree_clean": true,
+  "next_branch": "feat/mvp-025-snapshot-delta",
+  "new_target_created": false
+}

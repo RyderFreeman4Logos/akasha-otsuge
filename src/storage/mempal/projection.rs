@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::reader::{Cell, Row};
 use super::writer::Writer;
@@ -8,7 +8,7 @@ use crate::domain::{
 };
 use crate::storage::{Result, StorageError, hash};
 
-#[derive(Default, Serialize)]
+#[derive(Default, Deserialize, Serialize)]
 pub(super) struct Summary {
     pub source_chunks: u64,
     pub candidate_memories: u64,
@@ -125,8 +125,46 @@ impl Projection<'_> {
                 end -= 1;
             }
             let content = &remaining[..end];
-            let memory_id = format!("{}/{part}", self.prefix);
-            let event_id = format!("{memory_id}/source");
+            let memory_id = match &writer.projection {
+                Some(context) => format!(
+                    "{}{}/{part}",
+                    context.origin,
+                    self.prefix
+                        .strip_prefix(&context.from)
+                        .ok_or_else(|| StorageError::new("INVALID_MEMPAL_VALUE"))?
+                ),
+                None => format!("{}/{part}", self.prefix),
+            };
+            let event_id = match &writer.projection {
+                Some(context) => format!(
+                    "mempal/{}/source/{}",
+                    context.generation,
+                    hash(memory_id.as_bytes())
+                ),
+                None => format!("{memory_id}/source"),
+            };
+            let previous = writer
+                .projection
+                .as_ref()
+                .map(|context| crate::domain::Domain::new(&context.store).memory(&memory_id))
+                .transpose()?
+                .flatten();
+            if previous.as_ref().is_some_and(|memory| {
+                memory.record.authority != crate::domain::Authority::Candidate
+                    || memory.record.provenance.actor != Actor::Unverified("mempal".into())
+            }) {
+                return Err(StorageError::new("MEMPAL_CONVERSION_CONFLICT"));
+            }
+            let request_id = writer.projection.as_ref().map_or_else(
+                || memory_id.clone(),
+                |context| {
+                    format!(
+                        "mempal/{}/proposal/{}",
+                        context.generation,
+                        hash(memory_id.as_bytes())
+                    )
+                },
+            );
             let source_draft = SourceDraft {
                 event_id: event_id.clone(),
                 scope: self.scope.clone(),
@@ -141,13 +179,22 @@ impl Projection<'_> {
                 .candidate_kind
                 .as_ref()
                 .filter(|_| !content.trim().is_empty());
+            let withdrawn_reviews = match (&writer.projection, &previous) {
+                (Some(context), Some(memory)) if candidate.is_some() => {
+                    crate::domain::migrated_review_withdrawal(&context.store, memory)?
+                }
+                _ => Vec::new(),
+            };
             writer.group(|revision| {
                 let mut changes = vec![source_change(&source_draft, &ingress)?];
+                changes.extend(withdrawn_reviews.clone());
                 if let Some(kind) = candidate {
                     let write = MemoryWrite {
-                        request_id: memory_id.clone(),
+                        request_id: request_id.clone(),
                         memory_id: memory_id.clone(),
-                        expected_revision: None,
+                        expected_revision: previous
+                            .as_ref()
+                            .map(|memory| memory.revision.commit_seq),
                         draft: MemoryDraft {
                             kind: kind.clone(),
                             scope: self.scope.clone(),
@@ -170,6 +217,11 @@ impl Projection<'_> {
                 }
                 Ok(changes)
             })?;
+            if candidate.is_some()
+                && let Some(context) = &mut writer.projection
+            {
+                context.retained.insert(memory_id);
+            }
             summary.source_chunks += 1;
             summary.candidate_memories += u64::from(candidate.is_some());
             remaining = &remaining[end..];

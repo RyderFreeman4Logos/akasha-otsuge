@@ -136,6 +136,7 @@ pub enum Authority {
 #[serde(rename_all = "snake_case")]
 pub enum Lifecycle {
     Candidate,
+    Withdrawn,
     Active,
     Rejected,
     Retired,

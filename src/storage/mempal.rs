@@ -1,5 +1,6 @@
 //! A one-way legacy reader; imported rows never become execution authority.
 
+mod incremental;
 mod projection;
 mod reader;
 #[cfg(test)]
@@ -10,7 +11,7 @@ use std::collections::BTreeMap;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 use super::{ArchiveManifest, Result, StorageError};
@@ -19,16 +20,19 @@ use writer::Writer;
 
 const MAPPING_VERSION: u32 = 2;
 
+pub use incremental::migrate_mempal_previous;
+
 #[derive(Serialize)]
 pub struct MempalArchive {
     archive: ArchiveManifest,
     migration: Migration,
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 struct Migration {
     mapping_version: u32,
-    source_mapping_commit: &'static str,
+    source_mapping_commit: String,
     schema_axes: [u32; 2],
     source_sha256: String,
     source_bytes: u64,
@@ -36,15 +40,20 @@ struct Migration {
     tables: BTreeMap<String, Table>,
     excluded_derived_tables: Vec<String>,
     projection: projection::Summary,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    incremental: Option<incremental::Lineage>,
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 struct Table {
     columns: Vec<String>,
     rows: u64,
     blocks: u64,
     bytes: u64,
     sha256: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    delta: Option<incremental::Delta>,
 }
 
 #[derive(Serialize)]
@@ -96,6 +105,7 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
             blocks: 0,
             bytes: 0,
             sha256: String::new(),
+            delta: None,
         };
         let prefix = format!("mempal/{}/table/{name}", snapshot.sha256);
         let mut digest = Sha256::new();
@@ -150,7 +160,7 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
     snapshot.verify_unchanged()?;
     let migration = Migration {
         mapping_version: MAPPING_VERSION,
-        source_mapping_commit: "4593a5c5e6a9ea1140256cd42fa5838511a24e14",
+        source_mapping_commit: "4593a5c5e6a9ea1140256cd42fa5838511a24e14".into(),
         schema_axes: [21, 28],
         source_sha256: snapshot.sha256.clone(),
         source_bytes: snapshot.bytes(),
@@ -158,6 +168,7 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
         tables,
         excluded_derived_tables: snapshot.excluded_derived_tables,
         projection,
+        incremental: None,
     };
     writer.push(format!("mempal/{}/migration", snapshot.sha256), &migration)?;
     Ok(MempalArchive {

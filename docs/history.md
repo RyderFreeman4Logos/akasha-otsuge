@@ -24,7 +24,7 @@ is checked against its immutable Memory and adopted pointer at the same point.
 
 `history(context, memory_id, from..=to, cursor, PageBudget)` reads that record's
 ordered immutable revision keys. The inclusive range starts at 1 or later and
-ends at a committed point. It includes candidates, rejection, retirement,
+ends at a committed point. It includes candidates, source withdrawal, rejection, retirement,
 source spans, approvals and previous/adoption links. `status` is evaluated at
 `to`: an older active revision is `superseded` when a later adoption or retirement
 exists. An old raw revision's recorded lifecycle is never rewritten.

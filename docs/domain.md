@@ -77,6 +77,7 @@ different canonical request. It is not a caller-provided authority declaration.
 | Exact trusted approve operation | Human-confirmed active revision; original generator provenance remains visible |
 | Reject a pending/rejected candidate | Rejected revision; prior adopted decision stays active |
 | Reject the latest active revision | Retired revision; adopted pointer becomes inactive |
+| Legacy source removed or no longer eligible | Withdrawn unverified candidate; original evidence remains historical |
 
 Direct statement adoption copies the **complete** original statement, retaining
 its scope. It cannot cut a clause, paraphrase the claim, invent a rationale,

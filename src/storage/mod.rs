@@ -25,7 +25,7 @@ use tokio::sync::Mutex;
 use crate::config::ResolvedConfig;
 
 pub use archive::ArchiveManifest;
-pub use mempal::{MempalArchive, migrate_mempal};
+pub use mempal::{MempalArchive, migrate_mempal, migrate_mempal_previous};
 use native::PinnedTree;
 
 #[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]

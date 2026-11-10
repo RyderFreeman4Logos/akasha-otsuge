@@ -360,7 +360,9 @@ pub(crate) fn migrated_candidate(
     provenance.validate()?;
     if !id(&write.memory_id)
         || !id(&write.request_id)
-        || write.expected_revision.is_some()
+        || write
+            .expected_revision
+            .is_some_and(|previous| previous == 0 || previous >= revision)
         || revision == 0
         || !matches!(provenance.actor, Actor::Unverified(_))
     {
@@ -376,12 +378,42 @@ pub(crate) fn migrated_candidate(
     let record = Domain::record(write, provenance, &policy, None)?;
     let mut changes = vec![Change {
         key: memory_key(&write.memory_id),
-        expected_revision: None,
+        expected_revision: write.expected_revision,
         content: serde_json::to_string(&record)?,
     }];
     if let Some(change) = review::candidate_change(write, &record, Some(revision))? {
         changes.push(change);
     }
+    Ok(changes)
+}
+
+pub(crate) fn migrated_review_withdrawal(
+    storage: &Storage,
+    memory: &MemoryView,
+) -> Result<Vec<Change>> {
+    review::migrated_withdrawal(storage, memory)
+}
+
+pub(crate) fn migrated_withdrawal(storage: &Storage, memory_id: &str) -> Result<Vec<Change>> {
+    let Some(memory) = Domain::new(storage).memory(memory_id)? else {
+        return Ok(Vec::new());
+    };
+    if memory.record.authority != Authority::Candidate
+        || memory.record.provenance.actor != Actor::Unverified("mempal".into())
+    {
+        return Err(error("INVALID_MEMPAL_LINEAGE"));
+    }
+    if memory.record.lifecycle == Lifecycle::Withdrawn {
+        return Ok(Vec::new());
+    }
+    let mut changes = migrated_review_withdrawal(storage, &memory)?;
+    let mut record = memory.record;
+    record.lifecycle = Lifecycle::Withdrawn;
+    changes.push(Change {
+        key: memory.revision.key,
+        expected_revision: Some(memory.revision.commit_seq),
+        content: serde_json::to_string(&record)?,
+    });
     Ok(changes)
 }
 
@@ -460,7 +492,10 @@ impl<'a> Domain<'a> {
                     && matches!(record.provenance.actor, Actor::Agent(_) | Actor::Tool(_))
             }
             Authority::Candidate => {
-                record.approval.is_none() && record.lifecycle == Lifecycle::Candidate
+                record.approval.is_none()
+                    && (record.lifecycle == Lifecycle::Candidate
+                        || (record.lifecycle == Lifecycle::Withdrawn
+                            && record.provenance.actor == Actor::Unverified("mempal".into())))
             }
         };
         if record.schema_version != 1
@@ -567,7 +602,7 @@ impl<'a> Domain<'a> {
         let previous_adoption = previous.and_then(|p| {
             if matches!(
                 p.record.lifecycle,
-                Lifecycle::Candidate | Lifecycle::Rejected
+                Lifecycle::Candidate | Lifecycle::Rejected | Lifecycle::Withdrawn
             ) {
                 p.record.previous_adoption
             } else {
