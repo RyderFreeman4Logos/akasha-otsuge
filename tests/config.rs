@@ -287,6 +287,29 @@ fn invalid_configs_fail_closed_and_errors_never_echo_values() {
 }
 
 #[test]
+fn notifier_channel_names_fit_bounded_durable_delivery_records() {
+    for name in ["x".repeat(129), "bad\nchannel".into(), "   ".into()] {
+        let input = format!(
+            "[notifiers.{}]\nkind='local'\n",
+            serde_json::to_string(&name).unwrap()
+        );
+        assert!(
+            resolve(&input, None, "", &paths()).is_err(),
+            "oversized or invalid notifier channel was accepted"
+        );
+    }
+    assert!(
+        resolve(
+            &format!("[notifiers.{}]\nkind='local'\n", "x".repeat(128)),
+            None,
+            "",
+            &paths()
+        )
+        .is_ok()
+    );
+}
+
+#[test]
 fn fallback_references_cycles_and_slowest_selected_executor_are_checked() {
     let valid = r#"
 [consult]

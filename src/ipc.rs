@@ -216,6 +216,18 @@ pub enum Command {
         feedback: crate::editor::Feedback,
         idempotency_key: String,
     },
+    NotifyList {
+        scope: crate::domain::Scope,
+        after: Option<String>,
+    },
+    NotifyShow {
+        id: String,
+    },
+    NotifyAck {
+        id: String,
+        generation: u64,
+        idempotency_key: String,
+    },
     ReviewList {
         scope: crate::domain::Scope,
         after: Option<String>,

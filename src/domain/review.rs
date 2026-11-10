@@ -475,6 +475,10 @@ impl Domain<'_> {
             .await
     }
 
+    pub(crate) fn review_notification(&self, id: &str, revision: Revision) -> Result<ReviewItem> {
+        Ok(self.review_detail(id, revision)?.item)
+    }
+
     pub async fn review_show(
         &self,
         context: &ReadContext,

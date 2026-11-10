@@ -4,7 +4,8 @@ Rechecked 2026-11-10 UTC after PR #53 merged: **21 original Issues
 completed, 7 Issues open (#12 and #23–#28)**. #50 is also completed and closed.
 #23 is active. #22 passed its repaired exact gate, independent whole-range R2
 review and exact-head CI before merging; its issue is closed completed. The
-post-merge main CI is being collected separately on the identical merge tree.
+post-merge main CI also passed on that identical merge tree (run 42726070270,
+Cargo cache restored and hit).
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -946,14 +947,24 @@ Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b2
 
 ## MVP-023 active notifier implementation and remaining acceptance
 
-Original start2026-11-10T00:11:56Z (earliest local worktree reflog).
+Original start 2026-11-10T00:11:56Z (earliest local worktree reflog).
 Branch `feat/mvp-023-notifier`; base `554796b`. One SSD worktree, shared Cargo target.
+
+First acceptance leaf: usable local notification inbox for reviews/incidents.
+The focused local tests passed after meaningful missing-CLI and missing-incident
+REDs; the two initial fixture corrections retained the active-read/export and
+transport-request-ID distinctions. Additional scope, SIGKILL, reload, paging and
+idle-loop controls passed. Channel bounds also have RED/GREEN evidence. Final
+focused verification: 22 configuration tests, 6 real daemon notification tests,
+Clippy across all targets and diff checks passed in 56.657 seconds. The local
+leaf's exact gate, independent review and PR remain. The stdio delivery leaf follows;
+#23 stays open until both leaves and all acceptance below are complete.
 
 - [ ] Reuse the existing transactional revision outbox and live notifier config
   to admit scoped notifications with a stable envelope and capability contract.
   Creation must remain atomic with the source review/incident; avoid a cursor
   update causing an endless outbox/checkpoint loop.
-- [ ] Provide usable local inbox/list/show/ack commands, bounded paging and
+- [x] Provide usable local inbox/list/show/ack commands, bounded paging and
   current read permission checks. Ack must not approve memory or resolve review.
 - [ ] Implement an independent executable stdio reference plugin, with bounded
   input/output, error handling, provider IDs and declared send/update/idempotency
@@ -961,7 +972,7 @@ Branch `feat/mvp-023-notifier`; base `554796b`. One SSD worktree, shared Cargo t
 - [ ] Persist dispatch attempts, finite retry/backoff, stable idempotency keys,
   selected route/generation, external IDs and visible terminal/uncertain errors.
   Unsupported provider idempotency must expose possible duplicate delivery.
-- [ ] Merge100 same-group events while preserving count and meaningful priority
+- [ ] Merge 100 same-group events while preserving count and meaningful priority
   escalation. Successful delivery must not be repeated merely by configuration reload.
 - [ ] Apply current channel disable/revocation, priority/routing policy and
   credential changes without bypassing permissions or duplicating in-flight sends.

@@ -70,7 +70,9 @@ Optional fields are `args`, `enabled`, a text `model`, `timeout`, an absolute
 `native_home` and an ordered `fallback` list. No other host, fallback or paid API
 is enabled by default. Resolving config does not spawn a binary. The selected
 host's prepare consumer validates its capabilities. `notifiers.NAME` accepts
-`local` or `stdio`; stdio requires `command`.
+`local` or `stdio`; stdio requires `command`. Channel names contain 1–128 bytes
+without control characters. The [local notification inbox](notifications.md)
+uses live enablement and scope permissions when delivering.
 
 Consult pins the selected profiles and native-home locations before queuing. An
 omitted home uses the bound caller profile for the same host; another host uses

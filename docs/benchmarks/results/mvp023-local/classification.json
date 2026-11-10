@@ -1,0 +1,26 @@
+{
+  "runs": {
+    "mvp023-incident-green-r1": "failed",
+    "mvp023-incident-green-r2": "passed",
+    "mvp023-incident-red-r1": "expected_missing_incident_notification",
+    "mvp023-local-controls-r1": "passed",
+    "mvp023-local-focused-r1": "passed",
+    "mvp023-local-green-r1": "failed",
+    "mvp023-local-green-r2": "failed",
+    "mvp023-local-green-r3": "passed",
+    "mvp023-local-red-r1": "pending_classification",
+    "mvp023-route-bounds-red-r1": "expected_channel_bound_missing",
+    "mvp023-route-history-red-r1": "expected_unbounded_channel_history"
+  },
+  "refined_classifications": {
+    "mvp023-local-red-r1": "Expected INVALID_ARGUMENT for missing notify CLI.",
+    "mvp023-incident-green-r1": "Compile failure: Scope.validate is private; used existing validated containment predicate.",
+    "mvp023-local-green-r1": "Harness: active memory read correctly returned absent for an unadopted candidate.",
+    "mvp023-local-green-r2": "Harness: compare durable data, not changing transport request IDs."
+  },
+  "boundaries": [
+    "Local delivery only; stdio protocol, external-send ambiguity and provider retries remain unfinished.",
+    "Controlled Caller and real local daemon processes; no new model authentication claim.",
+    "Focused checks do not replace the exact canonical gate, independent review and hosted CI."
+  ]
+}

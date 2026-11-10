@@ -58,6 +58,9 @@ Commands:
   memory patch PATCH_JSON --idempotency-key ID
   patch show ID
   memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]
+  notify list --scope JSON_FILE [--after ID]
+  notify show ID
+  notify ack ID --generation NUMBER --idempotency-key ID
   review list --scope JSON_FILE [--after ID]
   review open TARGET_JSON --idempotency-key ID
   review show ID [--at COMMIT]
@@ -557,6 +560,27 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             idempotency_key: (*id).into(),
         }),
         ["patch", "show", id] => Some(Command::PatchShow { id: (*id).into() }),
+        ["notify", "list", flags @ ..] => {
+            let flags = options(flags, &["--scope", "--after"])?;
+            Some(Command::NotifyList {
+                scope: json_file(flags.get("--scope").ok_or(Error("INVALID_ARGUMENT"))?)?,
+                after: flags.get("--after").map(|s| (*s).to_owned()),
+            })
+        }
+        ["notify", "show", id] => Some(Command::NotifyShow { id: (*id).into() }),
+        [
+            "notify",
+            "ack",
+            id,
+            "--generation",
+            generation,
+            "--idempotency-key",
+            request,
+        ] => Some(Command::NotifyAck {
+            id: (*id).into(),
+            generation: number(generation)?,
+            idempotency_key: (*request).into(),
+        }),
         ["review", "list", flags @ ..] => {
             let flags = options(flags, &["--scope", "--after"])?;
             Some(Command::ReviewList {
