@@ -1,0 +1,27 @@
+{
+  "utc": "2026-11-10T13:03:02.986049+00:00",
+  "head": "6e692d6dbb0ac329372166a65d3029c913621049",
+  "tree": "9c41c8a7b05037ca52b6fe484c0e7134aad2ea5d",
+  "base": "fe30c78169fbf87bfa47cf06912b7c64d3a418b3",
+  "branch": "feat/mvp-025-incremental",
+  "owner_file": "src/daemon/editor_tests.rs",
+  "owner_hashes": {
+    "base": "aa9d6f8de62c550775c9da3ec9a34e3f2f77c26ff42dc8b064f48cdf971c2b03",
+    "head": "aa9d6f8de62c550775c9da3ec9a34e3f2f77c26ff42dc8b064f48cdf971c2b03",
+    "worktree": "aa9d6f8de62c550775c9da3ec9a34e3f2f77c26ff42dc8b064f48cdf971c2b03"
+  },
+  "clean": true,
+  "index_lock_absent": true,
+  "range_diff_sha256": "a362e9fabcc186c422c6a0bf8ab10cbd4760304cd6ac33d4b46330736a188589",
+  "selector": "daemon::jobs::consult::editor_tests::incident_admitted_job_survives_sigkill_and_keeps_its_original_queue_deadline",
+  "stage": "child returned from advance_incidents without reaching incident-admitted checkpoint; child status failed, enclosing suite failed",
+  "classification": "UNCLASSIFIED",
+  "unreached": [
+    "remaining workspace integration suites",
+    "release build",
+    "capture CLI check",
+    "installed daemon checks",
+    "installed repeat",
+    "final help/version and diff check"
+  ]
+}

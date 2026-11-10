@@ -1,0 +1,23 @@
+{
+  "command": [
+    "python3",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp025-incremental-incident-focused-r2.py"
+  ],
+  "dirty_diff_sha256": "c2139b2215378500ff9486a6acd55538ad8a18529ce545e4fc6785f3e7b7aea1",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "6e692d6dbb0ac329372166a65d3029c913621049",
+  "process": {
+    "pid": 3341958,
+    "start_ticks": "613422139",
+    "state": "R"
+  },
+  "tree": "9c41c8a7b05037ca52b6fe484c0e7134aad2ea5d",
+  "untracked": [],
+  "utc": "2026-11-10T13:12:04.410396+00:00"
+}

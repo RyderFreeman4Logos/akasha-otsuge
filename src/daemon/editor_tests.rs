@@ -196,7 +196,17 @@ fn incident_admitted_job_survives_sigkill_and_keeps_its_original_queue_deadline(
             "occurred_at_ms":ipc::now_ms().unwrap(),"execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
             "incident":{"kind":"user_correction","key":"crash-window","reason":"Retain the original admitted job across the missing incident link."}
         })).unwrap()).await.unwrap();
+        // Persist the admitted-but-unlinked state before restart can outlast its queue window.
+        let outcome = service.read_outcome("admission-gap").await.unwrap();
+        let record = service.incident_record(&outcome.incident.unwrap()).unwrap().1;
+        let accepted = service.submit_incident_editor(&record).await.unwrap();
+        let admitted = service.job(accepted["id"].as_str().unwrap()).unwrap().1;
+        assert_eq!(admitted.accepted_at_ms, record.first_report_at_ms);
+        assert_eq!(admitted.queue_deadline_ms, admitted.accepted_at_ms + 5000);
         service.storage.close().await.unwrap();
+        tokio::time::sleep(Duration::from_millis(
+            admitted.queue_deadline_ms.saturating_sub(ipc::now_ms().unwrap()) + 1,
+        )).await;
     });
     crate::storage::crash_tests::kill_at(
         &root,
@@ -216,13 +226,7 @@ fn incident_admitted_job_survives_sigkill_and_keeps_its_original_queue_deadline(
         let admitted = service.job(&job_id).unwrap().1;
         assert_eq!(admitted.accepted_at_ms, before.first_report_at_ms);
         assert_eq!(admitted.queue_deadline_ms, admitted.accepted_at_ms + 5000);
-        tokio::time::sleep(Duration::from_millis(
-            admitted
-                .queue_deadline_ms
-                .saturating_sub(ipc::now_ms().unwrap())
-                + 1,
-        ))
-        .await;
+        assert!(ipc::now_ms().unwrap() >= admitted.queue_deadline_ms);
         service.recover().await.unwrap();
         assert!(!service.claim(&job_id, 0).await.unwrap());
         service.advance_incidents().await.unwrap();

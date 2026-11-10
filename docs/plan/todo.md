@@ -9,7 +9,7 @@ The [final reader archive](../benchmarks/results/mvp025-mempal-final/README.md)
 retains these results and publication readbacks; R1/R2/R3 failures remain visible.
 Real typed-row conversion and full roundtrips remain historical acceptance at
 4193301; later filesystem fixes have separate controlled regression evidence.
-Post-merge main CI42815108137 is a separate pending result.
+Post-merge main CI42815108137 passed separately and saved its cache after a cold miss.
 The active branch is feat/mvp-025-incremental, starting at fe30c78.
 Neutral-history prefix admission/recovery is implemented with shared open/restore
 admission, one native stage and atomic directory exchange. Causal REDs reproduced
@@ -19,7 +19,14 @@ SIGKILL phases, runtime inactivity across restarts, malformed markers and
 publication fsync faults. Clippy and plan/reference checks pass. The
 [focused archive](../benchmarks/results/mvp025-incremental/README.md) preserves
 both causal failures and the separately classified fixture failures.
-Exact canonical, independent review and publication are still pending.
+The first exact canonical failed at the existing incident crash fixture before
+release/installed checks. Isolated and parallel-suite diagnostics did not
+reproduce its historical trigger. A deterministic admitted-but-unlinked fixture
+now preserves the original five-second deadline across restart; its negative
+control fails and the restored production code passes. The
+[gate repair archive](../benchmarks/results/mvp025-incremental-gate-repair/README.md)
+preserves the failure and uncertainty. A new exact canonical, independent review
+and publication remain pending.
 Changed-mempal-snapshot origin/update/deletion semantics follow; #25 stays open
 until both contracts pass.
 Offline import (PR #58) and neutral export (PR #57) are already merged.

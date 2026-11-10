@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "utc": "2026-11-10T13:14:25.024439+00:00",
+  "parent": "6e692d6dbb0ac329372166a65d3029c913621049",
+  "files": {
+    "README.md": {
+      "bytes": 960,
+      "sha256": "a53466109c6d58c0231bc012528293bd35599deb3482d6d821b3cf5094864aa0"
+    },
+    "mvp025-incident-negative-r1.json": {
+      "bytes": 529,
+      "sha256": "5306b8dd367dc6a4da5a61ff93b211f5d31585fae0b200141c21211b36e9d543"
+    },
+    "mvp025-incident-negative-restored-r1.json": {
+      "bytes": 758,
+      "sha256": "6276580be84505a8d4ed87d58596d348715291a84fb0fa7048bf930fb6ecb2ba"
+    },
+    "mvp025-incident-negative.patch": {
+      "bytes": 930,
+      "sha256": "9d13d8e36c6e4bf3afb73df113f9221d4b7aa4f8d8997072c45bbefeedcc9950"
+    },
+    "mvp025-incremental-canonical-failure-focused-r1.admission.json": {
+      "bytes": 1214,
+      "sha256": "0d354495d34ea953948fb63b0f4e62bd63924ca2c21e7b197498f73d38d6bcb5"
+    },
+    "mvp025-incremental-canonical-failure-focused-r1.collected.json": {
+      "bytes": 397,
+      "sha256": "27ae1c6864702ddbba3444ba8df673244e772a55a5dada11b54b89acbb3a5613"
+    },
+    "mvp025-incremental-canonical-failure-focused-r1.log.gz": {
+      "bytes": 339,
+      "sha256": "f105ea0e0d808d15f73bad9196510772ffa6c0ee26853788c7f0157822e5b039"
+    },
+    "mvp025-incremental-canonical-failure-focused-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "7b1d8c62b3cd97135b101f3f4036c45ea0c607645e6a166645e88459a23ba3f0"
+    },
+    "mvp025-incremental-canonical-failure-suite-r1.admission.json": {
+      "bytes": 1078,
+      "sha256": "741c568665d6b9b791553992ccc01fac5c44308c5522b61b12dd026421bd1d87"
+    },
+    "mvp025-incremental-canonical-failure-suite-r1.collected.json": {
+      "bytes": 395,
+      "sha256": "2eb352ff59272e8685704d1f51bad69e26e69b117a9140c6713f63a00a95e62f"
+    },
+    "mvp025-incremental-canonical-failure-suite-r1.log.gz": {
+      "bytes": 3711,
+      "sha256": "779de998d12d4bae1ef7e6b9bb98433a1f3651c589cae4abaa8446f029b5d84a"
+    },
+    "mvp025-incremental-canonical-failure-suite-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "5714973805d2af3fb0095f77bded68e7b853c4446c1cae76a54d4b9dd168413f"
+    },
+    "mvp025-incremental-canonical-r1-failure-custody.json": {
+      "bytes": 1220,
+      "sha256": "191eb8139e592926f6cc79e7bc6d858d3348c5b149891788f4add898f3393be9"
+    },
+    "mvp025-incremental-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "e4cd06e8cd9f80d10b1af774bc52bbafa2a4239c938bb17f4822201051bb7f63"
+    },
+    "mvp025-incremental-canonical-r1.collected.json": {
+      "bytes": 395,
+      "sha256": "9ef9d74c426ba3ed973072c76a9c0564b3a042fc1ca8ccb258a96e6e02e308d8"
+    },
+    "mvp025-incremental-canonical-r1.log.gz": {
+      "bytes": 4065,
+      "sha256": "7e0d969305d4026a8ada10e39e58afb1bcb309d5df14c2170c770c539162cd61"
+    },
+    "mvp025-incremental-canonical-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "326826204070d2c0b5477daefd1d0e97754fa82583c680b3d3e49ae4590c75cf"
+    },
+    "mvp025-incremental-gate-classification-r1.md": {
+      "bytes": 2772,
+      "sha256": "e3032f44997fa19e3bade92bc1fc331be2f54c908f8bffa9130ad464e8d88ae2"
+    },
+    "mvp025-incremental-incident-focused-r1.admission.json": {
+      "bytes": 1214,
+      "sha256": "9289809564c63b25d24c712276714d30259183f4ac799a0f329668df461afc34"
+    },
+    "mvp025-incremental-incident-focused-r1.collected.json": {
+      "bytes": 398,
+      "sha256": "2322cd524d39b04dad1be57f87056600782cde6c2dd4c033b61fb24c85cbe9a9"
+    },
+    "mvp025-incremental-incident-focused-r1.log.gz": {
+      "bytes": 376,
+      "sha256": "9697401c9db27df042ad315f418bd0c42130d8c8a8470a21e8ee2865b9ae257c"
+    },
+    "mvp025-incremental-incident-focused-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "2bb9e52f8fbb4ed2bcc14a92adb4ebbf4712d5a0290070c67a68a72fd3a32d35"
+    },
+    "mvp025-incremental-incident-focused-r2.admission.json": {
+      "bytes": 1121,
+      "sha256": "bd1a3125e08ab951adb3b486563a4c848a823bb96096e7e39893922040871bef"
+    },
+    "mvp025-incremental-incident-focused-r2.collected.json": {
+      "bytes": 401,
+      "sha256": "0617495d918eeaa5ce4a86a051b9c3b212d07c4d71c1507b5035969bb77cff34"
+    },
+    "mvp025-incremental-incident-focused-r2.log.gz": {
+      "bytes": 513,
+      "sha256": "63b818bf2851f2a99a2950f15f09999da916aaf0389b0baac1cfbf8502d418f7"
+    },
+    "mvp025-incremental-incident-focused-r2.terminal.json": {
+      "bytes": 237,
+      "sha256": "cc77eda8b0bbccaecf02ab3b89db79620d03198cd9dc122b530c6ca782fa91b9"
+    },
+    "mvp025-incremental-incident-negative-r1.admission.json": {
+      "bytes": 1214,
+      "sha256": "0583bad3b1aa4d2962bd9d23361c2f347982fd1d5d65a9e674c0dec46d137a61"
+    },
+    "mvp025-incremental-incident-negative-r1.collected.json": {
+      "bytes": 400,
+      "sha256": "0db4c2baa9884663785ea90c903325212b5ff1b36866c5ebbfa586cd725f1b62"
+    },
+    "mvp025-incremental-incident-negative-r1.log.gz": {
+      "bytes": 631,
+      "sha256": "ed77d8640e7a1c0077b9b919d17a9a0d89e7c6e0f1d6472260cb73519a2e3a8f"
+    },
+    "mvp025-incremental-incident-negative-r1.terminal.json": {
+      "bytes": 238,
+      "sha256": "04bd89e82e5c67e58f38c1061643ded7470ef4d16eff7fe2e8b866de904542d2"
+    },
+    "mvp025-mempal-ci-main-r1.json": {
+      "bytes": 3915,
+      "sha256": "5e14a99d7072080ad064eea52b503424985bae505a3cfb6cb260792e7b281967"
+    },
+    "mvp025-mempal-ci-main-r1.log.gz": {
+      "bytes": 57736,
+      "sha256": "40918cde46c9fdfed97c47e83e07621d2258bc3fde1e4b1ed37607e8fbc08de6"
+    }
+  },
+  "candidate_file_sha256": {
+    "src/daemon/editor_tests.rs": "74c12c4ee445cfc0d996e61777a4914b7f05736a6bfd4b0e079e2f79532cf42b"
+  },
+  "production_unchanged_sha256": {
+    "src/daemon/incident.rs": "da5ea261be3b9eabe2e2322b42a1e70292b619a3d6719082837b2e97adae9ae7"
+  },
+  "limits": [
+    "Original suite failure trigger remains unclassified.",
+    "New exact-HEAD canonical and independent review remain required."
+  ]
+}

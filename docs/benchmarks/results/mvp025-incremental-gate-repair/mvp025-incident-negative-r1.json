@@ -1,0 +1,8 @@
+{
+  "purpose": "Negative control: perform queue-expiry rejection before reconciling a previously admitted durable job. The new regression test must fail at its existing child checkpoint assertion.",
+  "source": "src/daemon/incident.rs",
+  "original_sha256": "da5ea261be3b9eabe2e2322b42a1e70292b619a3d6719082837b2e97adae9ae7",
+  "control_sha256": "9558f6c1b9e2ad7aacaef2aeb5cfe6ad3aed55b9f1b77bbfe95889fbc80539f2",
+  "patch_sha256": "9d13d8e36c6e4bf3afb73df113f9221d4b7aa4f8d8997072c45bbefeedcc9950",
+  "restore_required": true
+}
