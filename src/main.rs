@@ -59,6 +59,8 @@ Commands:
                              Export the stopped store as JSON and original blobs
   archive import ARCHIVE_DIRECTORY
                              Restore history into a fresh offline store
+  migrate mempal SNAPSHOT NEW_ARCHIVE_DIRECTORY
+                             Convert a schema21/fork28 SQLite snapshot to an archive
   memory patch PATCH_JSON --idempotency-key ID
   patch show ID
   memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]
@@ -350,6 +352,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
     }
     let operation = match command.as_slice() {
         ["archive", "export" | "import", _] => None,
+        ["migrate", "mempal", _, _] => None,
         ["adapter", "codex-hook", ..] => None,
         ["adapter", "install", "codex" | "hermes" | "pi", ..] => None,
         [
@@ -685,6 +688,19 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         "",
         &defaults,
     )?;
+    if let ["migrate", "mempal", source, destination] = command.as_slice() {
+        if socket.is_some() {
+            return Err(Error("INVALID_ARGUMENT"));
+        }
+        let result = akasha_otsuge::storage::migrate_mempal(
+            std::path::Path::new(source),
+            std::path::Path::new(destination),
+        )?;
+        let mut bytes = serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":result}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
     if let ["archive", action @ ("export" | "import"), destination] = command.as_slice() {
         if socket.is_some() {
             return Err(Error("INVALID_ARGUMENT"));

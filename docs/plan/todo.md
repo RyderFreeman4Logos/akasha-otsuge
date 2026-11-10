@@ -4,8 +4,8 @@ Rechecked 2026-11-10 UTC after PR #59 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
 #25's imported runtime merged as `31d4c61` after exact canonical, full-range R1
 and CI passed. Real mempal conversion is next on `feat/mvp-025-mempal-import`
-in the same SSD worktree. Offline import and neutral export also
-passed its gates before PR #57 merged; #25 remains open. #24's first independent
+in the same SSD worktree. Offline import (PR #58) and neutral export (PR #57)
+also passed their gates; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
 PR #56 merged; #24 remains open for enforcement and full production acceptance.
 #25's lossless production import/export is next so the stress campaign can reuse
@@ -1158,6 +1158,16 @@ remain undone. Keep only this one private sample; no data contents, IDs, source
 paths or private hashes are committed. The installed `mempal 0.5.0` version
 string alone does not establish its exact source commit.
 Post-merge import main CI42770214112 also passed with Cargo cache restored/hit.
+
+The first [mempal conversion stage](../mempal-migration.md) now streams all
+retained typed SQL rows into bounded inert evidence blocks in a neutral archive.
+Its controlled fixture comes from the actual 21/28 table layout with no real
+rows. The missing CLI and three typed refusals were observed failing before
+implementation; one compile failure from unchecked SQLite limit results is
+retained separately. Four focused cases then passed, followed by 54 related
+archive/CLI/domain/storage tests and all-target Clippy in 25.995s. Memory/source
+projection, repeat/recovery behavior, real conversion and full gates remain
+pending. Runtime post-merge main CI42779863508 also passed separately.
 
 - [ ] Pin the supported mempal source commit and both schema axes; inventory
   authoritative text, identity, provenance, timestamps, scope, deletion state,

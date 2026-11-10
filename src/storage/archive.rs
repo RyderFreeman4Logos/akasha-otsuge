@@ -50,14 +50,14 @@ pub(super) struct ArchiveCommit {
     pub(super) revisions: Vec<BlobRevision>,
 }
 
-struct Sink {
+pub(super) struct Sink {
     file: BufWriter<File>,
     digest: Sha256,
-    bytes: u64,
+    pub(super) bytes: u64,
 }
 
 impl Sink {
-    fn new(path: &Path) -> Result<Self> {
+    pub(super) fn new(path: &Path) -> Result<Self> {
         let mut options = OpenOptions::new();
         options.write(true).create_new(true);
         #[cfg(unix)]
@@ -72,7 +72,7 @@ impl Sink {
         })
     }
 
-    fn write(&mut self, bytes: &[u8]) -> Result<()> {
+    pub(super) fn write(&mut self, bytes: &[u8]) -> Result<()> {
         self.bytes = self
             .bytes
             .checked_add(bytes.len() as u64)
@@ -82,7 +82,7 @@ impl Sink {
         Ok(())
     }
 
-    fn finish(mut self) -> Result<ArchiveFile> {
+    pub(super) fn finish(mut self) -> Result<ArchiveFile> {
         self.file.flush()?;
         self.file.get_ref().sync_all()?;
         Ok(ArchiveFile {

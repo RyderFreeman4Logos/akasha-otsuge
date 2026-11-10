@@ -1,0 +1,1436 @@
+{
+  "consolidation_log": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "wing",
+      "type": "TEXT"
+    },
+    {
+      "name": "room",
+      "type": "TEXT"
+    },
+    {
+      "name": "project_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "cluster_size",
+      "type": "INTEGER"
+    },
+    {
+      "name": "strategy",
+      "type": "TEXT"
+    },
+    {
+      "name": "target_drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "source_drawer_ids",
+      "type": "TEXT"
+    },
+    {
+      "name": "dry_run",
+      "type": "INTEGER"
+    }
+  ],
+  "conversation_turns": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "session_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "tool",
+      "type": "TEXT"
+    },
+    {
+      "name": "turn_index",
+      "type": "INTEGER"
+    },
+    {
+      "name": "role",
+      "type": "TEXT"
+    },
+    {
+      "name": "content",
+      "type": "TEXT"
+    },
+    {
+      "name": "timestamp_epoch",
+      "type": "REAL"
+    },
+    {
+      "name": "token_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "project_path",
+      "type": "TEXT"
+    },
+    {
+      "name": "git_branch",
+      "type": "TEXT"
+    },
+    {
+      "name": "is_csa_delegated",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "provenance",
+      "type": "TEXT"
+    },
+    {
+      "name": "hermes_profile",
+      "type": "TEXT"
+    },
+    {
+      "name": "session_title",
+      "type": "TEXT"
+    },
+    {
+      "name": "session_source",
+      "type": "TEXT"
+    },
+    {
+      "name": "message_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "tool_name",
+      "type": "TEXT"
+    },
+    {
+      "name": "tool_call_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "previous_message_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "next_message_id",
+      "type": "TEXT"
+    }
+  ],
+  "design_insights": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "source",
+      "type": "TEXT"
+    },
+    {
+      "name": "scope",
+      "type": "TEXT"
+    },
+    {
+      "name": "target_artifact",
+      "type": "TEXT"
+    },
+    {
+      "name": "evidence_ref",
+      "type": "TEXT"
+    },
+    {
+      "name": "summary",
+      "type": "TEXT"
+    },
+    {
+      "name": "rule_text",
+      "type": "TEXT"
+    },
+    {
+      "name": "priority",
+      "type": "INTEGER"
+    },
+    {
+      "name": "status",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "resolved_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "resolved_by",
+      "type": "TEXT"
+    },
+    {
+      "name": "resolution_note",
+      "type": "TEXT"
+    },
+    {
+      "name": "redaction_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "project_id",
+      "type": "TEXT"
+    }
+  ],
+  "drawers": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "content",
+      "type": "TEXT"
+    },
+    {
+      "name": "wing",
+      "type": "TEXT"
+    },
+    {
+      "name": "room",
+      "type": "TEXT"
+    },
+    {
+      "name": "source_file",
+      "type": "TEXT"
+    },
+    {
+      "name": "source_type",
+      "type": "TEXT"
+    },
+    {
+      "name": "added_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "chunk_index",
+      "type": "INTEGER"
+    },
+    {
+      "name": "deleted_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "importance",
+      "type": "INTEGER"
+    },
+    {
+      "name": "merge_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "updated_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "project_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "content_hash",
+      "type": "TEXT"
+    },
+    {
+      "name": "normalize_version",
+      "type": "INTEGER"
+    },
+    {
+      "name": "memory_kind",
+      "type": "TEXT"
+    },
+    {
+      "name": "domain",
+      "type": "TEXT"
+    },
+    {
+      "name": "field",
+      "type": "TEXT"
+    },
+    {
+      "name": "anchor_kind",
+      "type": "TEXT"
+    },
+    {
+      "name": "anchor_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "parent_anchor_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "provenance",
+      "type": "TEXT"
+    },
+    {
+      "name": "statement",
+      "type": "TEXT"
+    },
+    {
+      "name": "tier",
+      "type": "TEXT"
+    },
+    {
+      "name": "status",
+      "type": "TEXT"
+    },
+    {
+      "name": "supporting_refs",
+      "type": "TEXT"
+    },
+    {
+      "name": "counterexample_refs",
+      "type": "TEXT"
+    },
+    {
+      "name": "teaching_refs",
+      "type": "TEXT"
+    },
+    {
+      "name": "verification_refs",
+      "type": "TEXT"
+    },
+    {
+      "name": "scope_constraints",
+      "type": "TEXT"
+    },
+    {
+      "name": "trigger_hints",
+      "type": "TEXT"
+    },
+    {
+      "name": "last_accessed_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "access_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "accumulated_boost",
+      "type": "REAL"
+    },
+    {
+      "name": "effective_importance",
+      "type": "REAL"
+    },
+    {
+      "name": "stale_penalty_applied",
+      "type": "REAL"
+    },
+    {
+      "name": "valid_from",
+      "type": "TEXT"
+    },
+    {
+      "name": "valid_until",
+      "type": "TEXT"
+    },
+    {
+      "name": "confidence",
+      "type": "REAL"
+    },
+    {
+      "name": "compacted_into",
+      "type": "TEXT"
+    },
+    {
+      "name": "is_pinned",
+      "type": "INTEGER"
+    },
+    {
+      "name": "pin_order",
+      "type": "INTEGER"
+    },
+    {
+      "name": "supersedes",
+      "type": "TEXT"
+    },
+    {
+      "name": "consolidation_priority",
+      "type": "REAL"
+    },
+    {
+      "name": "last_sleep_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "source_root",
+      "type": "TEXT"
+    },
+    {
+      "name": "admission_owner",
+      "type": "TEXT"
+    },
+    {
+      "name": "creation_operation_id",
+      "type": "TEXT"
+    }
+  ],
+  "embed_failure_log": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "timestamp",
+      "type": "INTEGER"
+    },
+    {
+      "name": "error_message",
+      "type": "TEXT"
+    },
+    {
+      "name": "endpoint",
+      "type": "TEXT"
+    },
+    {
+      "name": "consecutive_failures",
+      "type": "INTEGER"
+    },
+    {
+      "name": "duration_ms",
+      "type": "INTEGER"
+    },
+    {
+      "name": "retained_until",
+      "type": "INTEGER"
+    }
+  ],
+  "failure_events": [
+    {
+      "name": "event_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "wing",
+      "type": "TEXT"
+    },
+    {
+      "name": "room",
+      "type": "TEXT"
+    },
+    {
+      "name": "topic_sig",
+      "type": "TEXT"
+    },
+    {
+      "name": "failure_type",
+      "type": "TEXT"
+    },
+    {
+      "name": "detected_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "project_id",
+      "type": "TEXT"
+    }
+  ],
+  "foresights": [
+    {
+      "name": "drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "statement",
+      "type": "TEXT"
+    },
+    {
+      "name": "reason",
+      "type": "TEXT"
+    },
+    {
+      "name": "trigger_condition",
+      "type": "TEXT"
+    },
+    {
+      "name": "due_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "valid_from",
+      "type": "TEXT"
+    },
+    {
+      "name": "valid_until",
+      "type": "TEXT"
+    },
+    {
+      "name": "resolved_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "resolution_note",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "updated_at",
+      "type": "TEXT"
+    }
+  ],
+  "fork_ext_meta": [
+    {
+      "name": "key",
+      "type": "TEXT"
+    },
+    {
+      "name": "value",
+      "type": "TEXT"
+    }
+  ],
+  "gating_audit": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "candidate_hash",
+      "type": "TEXT"
+    },
+    {
+      "name": "drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "decision",
+      "type": "TEXT"
+    },
+    {
+      "name": "tier",
+      "type": "INTEGER"
+    },
+    {
+      "name": "label",
+      "type": "TEXT"
+    },
+    {
+      "name": "reason",
+      "type": "TEXT"
+    },
+    {
+      "name": "score",
+      "type": "REAL"
+    },
+    {
+      "name": "explain_json",
+      "type": "TEXT"
+    },
+    {
+      "name": "retained_until",
+      "type": "INTEGER"
+    },
+    {
+      "name": "created_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "project_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "llm_verdict",
+      "type": "TEXT"
+    },
+    {
+      "name": "llm_score",
+      "type": "REAL"
+    },
+    {
+      "name": "content_preview",
+      "type": "TEXT"
+    }
+  ],
+  "historical_rejudge_work_items": [
+    {
+      "name": "run_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "drawer_rowid",
+      "type": "INTEGER"
+    },
+    {
+      "name": "drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "snapshot_content_hash",
+      "type": "TEXT"
+    },
+    {
+      "name": "snapshot_added_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "snapshot_wing",
+      "type": "TEXT"
+    },
+    {
+      "name": "snapshot_room",
+      "type": "TEXT"
+    },
+    {
+      "name": "snapshot_source_file",
+      "type": "TEXT"
+    },
+    {
+      "name": "snapshot_source_type",
+      "type": "TEXT"
+    },
+    {
+      "name": "snapshot_project_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "snapshot_chunk_index",
+      "type": "INTEGER"
+    },
+    {
+      "name": "snapshot_normalize_version",
+      "type": "INTEGER"
+    },
+    {
+      "name": "processed_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "decision",
+      "type": "TEXT"
+    },
+    {
+      "name": "mutation",
+      "type": "TEXT"
+    },
+    {
+      "name": "llm_stage",
+      "type": "TEXT"
+    },
+    {
+      "name": "llm_proposal_score",
+      "type": "REAL"
+    }
+  ],
+  "knowledge_cards": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "statement",
+      "type": "TEXT"
+    },
+    {
+      "name": "content",
+      "type": "TEXT"
+    },
+    {
+      "name": "tier",
+      "type": "TEXT"
+    },
+    {
+      "name": "status",
+      "type": "TEXT"
+    },
+    {
+      "name": "domain",
+      "type": "TEXT"
+    },
+    {
+      "name": "field",
+      "type": "TEXT"
+    },
+    {
+      "name": "anchor_kind",
+      "type": "TEXT"
+    },
+    {
+      "name": "anchor_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "parent_anchor_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "scope_constraints",
+      "type": "TEXT"
+    },
+    {
+      "name": "trigger_hints",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "updated_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "auto_generated",
+      "type": "INTEGER"
+    },
+    {
+      "name": "crystallization_score",
+      "type": "REAL"
+    },
+    {
+      "name": "source_drawer_ids",
+      "type": "TEXT"
+    }
+  ],
+  "knowledge_events": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "card_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "event_type",
+      "type": "TEXT"
+    },
+    {
+      "name": "from_status",
+      "type": "TEXT"
+    },
+    {
+      "name": "to_status",
+      "type": "TEXT"
+    },
+    {
+      "name": "reason",
+      "type": "TEXT"
+    },
+    {
+      "name": "actor",
+      "type": "TEXT"
+    },
+    {
+      "name": "metadata",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    }
+  ],
+  "knowledge_evidence_links": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "card_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "evidence_drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "role",
+      "type": "TEXT"
+    },
+    {
+      "name": "note",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    }
+  ],
+  "leases": [
+    {
+      "name": "resource_path",
+      "type": "TEXT"
+    },
+    {
+      "name": "holder_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "acquired_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "expires_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "metadata",
+      "type": "TEXT"
+    }
+  ],
+  "novelty_audit": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "candidate_hash",
+      "type": "TEXT"
+    },
+    {
+      "name": "decision",
+      "type": "TEXT"
+    },
+    {
+      "name": "near_drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "cosine",
+      "type": "REAL"
+    },
+    {
+      "name": "created_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "project_id",
+      "type": "TEXT"
+    }
+  ],
+  "operation_telemetry": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "started_at_unix_ms",
+      "type": "INTEGER"
+    },
+    {
+      "name": "duration_ms",
+      "type": "INTEGER"
+    },
+    {
+      "name": "source",
+      "type": "TEXT"
+    },
+    {
+      "name": "operation",
+      "type": "TEXT"
+    },
+    {
+      "name": "call_site",
+      "type": "TEXT"
+    },
+    {
+      "name": "success",
+      "type": "INTEGER"
+    },
+    {
+      "name": "error_class",
+      "type": "TEXT"
+    },
+    {
+      "name": "sqlite_error_class",
+      "type": "TEXT"
+    },
+    {
+      "name": "rows_scanned",
+      "type": "INTEGER"
+    },
+    {
+      "name": "rows_returned",
+      "type": "INTEGER"
+    },
+    {
+      "name": "rows_changed",
+      "type": "INTEGER"
+    },
+    {
+      "name": "lock_wait_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "retry_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "result_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "physical_read_bytes",
+      "type": "INTEGER"
+    },
+    {
+      "name": "physical_write_bytes",
+      "type": "INTEGER"
+    },
+    {
+      "name": "logical_read_bytes",
+      "type": "INTEGER"
+    },
+    {
+      "name": "logical_write_bytes",
+      "type": "INTEGER"
+    },
+    {
+      "name": "cancelled_write_bytes",
+      "type": "INTEGER"
+    },
+    {
+      "name": "metadata_json",
+      "type": "TEXT"
+    }
+  ],
+  "patterns": [
+    {
+      "name": "pattern_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "signature",
+      "type": "BLOB"
+    },
+    {
+      "name": "exemplar_ids",
+      "type": "TEXT"
+    },
+    {
+      "name": "exemplar_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "session_ids",
+      "type": "TEXT"
+    },
+    {
+      "name": "session_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "topic_tags",
+      "type": "TEXT"
+    },
+    {
+      "name": "model_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "status",
+      "type": "TEXT"
+    },
+    {
+      "name": "first_seen_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "updated_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "project_id",
+      "type": "TEXT"
+    }
+  ],
+  "pending_message_completions": [
+    {
+      "name": "message_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "kind",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "claimed_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "completed_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "processing_ms",
+      "type": "INTEGER"
+    },
+    {
+      "name": "result_drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "op_state",
+      "type": "TEXT"
+    },
+    {
+      "name": "rejected_reason",
+      "type": "TEXT"
+    },
+    {
+      "name": "failure_detail",
+      "type": "TEXT"
+    },
+    {
+      "name": "result_json",
+      "type": "TEXT"
+    },
+    {
+      "name": "source_hash",
+      "type": "TEXT"
+    }
+  ],
+  "pending_messages": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "kind",
+      "type": "TEXT"
+    },
+    {
+      "name": "source_hash",
+      "type": "TEXT"
+    },
+    {
+      "name": "claim_token",
+      "type": "TEXT"
+    },
+    {
+      "name": "claimed_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "heartbeat_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "retry_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "retry_backoff_ms",
+      "type": "INTEGER"
+    },
+    {
+      "name": "next_attempt_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "status",
+      "type": "TEXT"
+    },
+    {
+      "name": "payload",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "last_error",
+      "type": "TEXT"
+    },
+    {
+      "name": "result_drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "op_state",
+      "type": "TEXT"
+    },
+    {
+      "name": "rejected_reason",
+      "type": "TEXT"
+    },
+    {
+      "name": "failure_detail",
+      "type": "TEXT"
+    },
+    {
+      "name": "result_json",
+      "type": "TEXT"
+    },
+    {
+      "name": "failure_class",
+      "type": "TEXT"
+    }
+  ],
+  "reindex_progress": [
+    {
+      "name": "source_path",
+      "type": "TEXT"
+    },
+    {
+      "name": "last_processed_chunk_id",
+      "type": "INTEGER"
+    },
+    {
+      "name": "embedder_name",
+      "type": "TEXT"
+    },
+    {
+      "name": "started_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "updated_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "status",
+      "type": "TEXT"
+    }
+  ],
+  "runtime_adoption_events": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "track",
+      "type": "TEXT"
+    },
+    {
+      "name": "signal",
+      "type": "TEXT"
+    },
+    {
+      "name": "feature",
+      "type": "TEXT"
+    },
+    {
+      "name": "query",
+      "type": "TEXT"
+    },
+    {
+      "name": "context_hash",
+      "type": "TEXT"
+    },
+    {
+      "name": "card_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "evaluator_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "research_report_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "note",
+      "type": "TEXT"
+    },
+    {
+      "name": "metadata",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    }
+  ],
+  "runtime_writer_lease_generations": [
+    {
+      "name": "name",
+      "type": "TEXT"
+    },
+    {
+      "name": "last_generation",
+      "type": "INTEGER"
+    }
+  ],
+  "runtime_writer_leases": [
+    {
+      "name": "name",
+      "type": "TEXT"
+    },
+    {
+      "name": "owner",
+      "type": "TEXT"
+    },
+    {
+      "name": "pid",
+      "type": "INTEGER"
+    },
+    {
+      "name": "boot_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "session_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "acquired_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "expires_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "heartbeat_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "mode",
+      "type": "TEXT"
+    },
+    {
+      "name": "metadata_json",
+      "type": "TEXT"
+    },
+    {
+      "name": "generation",
+      "type": "INTEGER"
+    }
+  ],
+  "skills": [
+    {
+      "name": "skill_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "name",
+      "type": "TEXT"
+    },
+    {
+      "name": "trigger_description",
+      "type": "TEXT"
+    },
+    {
+      "name": "pattern_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "exemplar_ids",
+      "type": "TEXT"
+    },
+    {
+      "name": "adoption_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "rejection_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "status",
+      "type": "TEXT"
+    },
+    {
+      "name": "promoted_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "updated_at",
+      "type": "INTEGER"
+    },
+    {
+      "name": "project_id",
+      "type": "TEXT"
+    }
+  ],
+  "sleep_log": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "phase",
+      "type": "TEXT"
+    },
+    {
+      "name": "processed_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "pruned_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "compacted_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "conflicts_resolved_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "salience_scored_count",
+      "type": "INTEGER"
+    },
+    {
+      "name": "dry_run",
+      "type": "INTEGER"
+    }
+  ],
+  "sleep_resolution_log": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "wing",
+      "type": "TEXT"
+    },
+    {
+      "name": "drawer_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "contradicted_triple_id",
+      "type": "TEXT"
+    },
+    {
+      "name": "contradicted_source_drawer",
+      "type": "TEXT"
+    },
+    {
+      "name": "new_confidence",
+      "type": "REAL"
+    },
+    {
+      "name": "existing_confidence",
+      "type": "REAL"
+    },
+    {
+      "name": "action",
+      "type": "TEXT"
+    },
+    {
+      "name": "dry_run",
+      "type": "INTEGER"
+    }
+  ],
+  "taxonomy": [
+    {
+      "name": "wing",
+      "type": "TEXT"
+    },
+    {
+      "name": "room",
+      "type": "TEXT"
+    },
+    {
+      "name": "display_name",
+      "type": "TEXT"
+    },
+    {
+      "name": "keywords",
+      "type": "TEXT"
+    }
+  ],
+  "triples": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "subject",
+      "type": "TEXT"
+    },
+    {
+      "name": "predicate",
+      "type": "TEXT"
+    },
+    {
+      "name": "object",
+      "type": "TEXT"
+    },
+    {
+      "name": "valid_from",
+      "type": "TEXT"
+    },
+    {
+      "name": "valid_to",
+      "type": "TEXT"
+    },
+    {
+      "name": "confidence",
+      "type": "REAL"
+    },
+    {
+      "name": "source_drawer",
+      "type": "TEXT"
+    },
+    {
+      "name": "project_id",
+      "type": "TEXT"
+    }
+  ],
+  "tunnels": [
+    {
+      "name": "id",
+      "type": "TEXT"
+    },
+    {
+      "name": "left_wing",
+      "type": "TEXT"
+    },
+    {
+      "name": "left_room",
+      "type": "TEXT"
+    },
+    {
+      "name": "right_wing",
+      "type": "TEXT"
+    },
+    {
+      "name": "right_room",
+      "type": "TEXT"
+    },
+    {
+      "name": "label",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_at",
+      "type": "TEXT"
+    },
+    {
+      "name": "created_by",
+      "type": "TEXT"
+    },
+    {
+      "name": "deleted_at",
+      "type": "TEXT"
+    }
+  ]
+}
