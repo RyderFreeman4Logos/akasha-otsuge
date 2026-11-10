@@ -1,0 +1,73 @@
+{"head": "49aba7fd174a4a97cba6d958f62ed8b8cf5fb910", "tree": "3dfe4967065ea8fa236dd5d777b08995af64e24b", "environment": {"CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target", "RUSTUP_TOOLCHAIN": "1.99.1", "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache", "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9", "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s"}}
+COMMAND ["cargo", "test", "--locked", "--test", "archive", "--test", "cli", "--test", "storage"]
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/archive.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/archive-924738f342b0e6d6)
+
+running 9 tests
+test archive_export_accepts_a_relative_new_directory ... ok
+test archive_export_preserves_original_bytes_revisions_relations_clocks_and_receipts ... ok
+test archive_export_does_not_publish_a_manifest_when_a_blob_write_fails ... ok
+test archive_export_requires_existing_exclusive_source_and_disjoint_new_destination ... ok
+test import::archive_import_roundtrip_preserves_all_points_clocks_receipts_and_original_bytes ... ok
+test import::archive_import_replay_must_complete_a_failed_publication_parent_sync ... ok
+test import::archive_import_empty_locked_existing_and_source_symlink_boundaries ... ok
+test import::archive_import_remains_offline_until_runtime_authority_is_reinitialized ... ok
+test import::archive_import_rejects_unknown_corrupt_and_forged_records_without_publishing ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/cli.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/cli-460b9f5c302a52d3)
+
+running 5 tests
+test stdout_write_failure_is_not_reported_as_success ... ok
+test non_utf8_arguments_are_rejected_without_a_panic ... ok
+test daemon_unavailable_is_explicit_and_bounded ... ok
+test invalid_commands_return_stable_errors_without_echoing_input ... ok
+test help_and_version_are_successful_and_keep_stderr_empty ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/storage.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/storage-b62e7ee56941d919)
+
+running 17 tests
+test store_is_private_and_refuses_authority_symlink_aliases ... ok
+test missing_native_data_cannot_silently_become_a_new_empty_store ... ok
+test stale_batches_are_atomic_and_corrections_preserve_history_and_original_evidence ... ok
+test retries_reuse_the_receipt_across_restart_and_conflicting_keys_have_no_effect ... ok
+test commits_the_complete_batch_with_one_receipt_and_durable_outbox ... ok
+test backup_symlinks_are_rejected_and_native_ownership_is_exclusive ... ok
+test committed_as_of_points_survive_later_writes_and_reopen ... ok
+test missing_commit_metadata_is_corruption_and_invalid_lookup_ids_are_bounded ... ok
+test retry_and_close_drain_a_commit_after_its_caller_cancels ... ok
+test malformed_and_oversized_batches_are_rejected_before_any_effect ... ok
+test unsupported_or_missing_format_is_refused_without_touching_database_files ... ok
+test checkpoint_waits_for_a_native_commit_after_its_caller_cancels ... ok
+test native_checkpoint_restores_exact_revisions_hashes_receipts_and_outbox ... ok
+test backup_and_restore_files_do_not_share_writable_inodes_with_each_other ... ok
+test content_hash_and_revision_identity_are_checked_on_read ... ok
+test invalid_backups_and_existing_destinations_never_overwrite_live_data ... ok
+test a_canceled_submission_cannot_publish_an_inconsistent_checkpoint ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+
+EXIT_STATUS 0 SECONDS 1.197452
+COMMAND ["cargo", "test", "--locked", "--lib", "storage::crash_tests::killed_archive_import_resumes_staging_heads_and_publication_without_duplicates", "--", "--exact", "--nocapture"]
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 1 test
+import checkpoint=import-staged signal=9 recovered_seq=3 duplicate_commits=0
+import checkpoint=import-head signal=9 recovered_seq=3 duplicate_commits=0
+import checkpoint=import-before-publish signal=9 recovered_seq=3 duplicate_commits=0
+import checkpoint=import-published signal=9 recovered_seq=3 duplicate_commits=0
+test storage::crash_tests::killed_archive_import_resumes_staging_heads_and_publication_without_duplicates ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 73 filtered out; finished in 0.44s
+
+EXIT_STATUS 0 SECONDS 0.767525

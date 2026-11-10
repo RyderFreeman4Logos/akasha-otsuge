@@ -1,10 +1,11 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-10 UTC after PR #57 merged: **22 original Issues
+Rechecked 2026-11-10 UTC after PR #58 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
-#25's import leaf is active from main `3b6bf74` in the same SSD worktree. Its
-neutral-export leaf passed exact canonical, full-range R1 and CI before PR #57
-merged; #25 remains open. #24's first independent
+#25's offline import merged as `b37c613` after exact canonical, full-range R2
+and CI passed. Fresh destination runtime authority is next on
+`feat/mvp-025-import-runtime` in the same SSD worktree. Neutral export also
+passed its gates before PR #57 merged; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
 PR #56 merged; #24 remains open for enforcement and full production acceptance.
 #25's lossless production import/export is next so the stress campaign can reuse
@@ -1049,8 +1050,9 @@ still need revalidation. Storage/daemon fixture success does not close this issu
 
 Original start 2026-11-10T04:22:08.149789Z (SSD worktree creation/reflog).
 Initial branch `feat/mvp-025-migration`; base `c059fda`. Export merged in PR #57
-as `3b6bf74`; import continues on `feat/mvp-025-neutral-import` from that merge,
-reusing the same worktree and preserving the original issue start. Existing mempal work is read-only:
+as `3b6bf74`; offline import merged in PR #58 as `b37c613`. Fresh runtime
+authority continues on `feat/mvp-025-import-runtime` from that merge, reusing
+the same worktree and preserving the original issue start. Existing mempal work is read-only:
 it has unrelated uncommitted changes. Initial frozen source candidate is
 `4593a5c5e6a9ea1140256cd42fa5838511a24e14`; exact code constants are upstream
 schema **21** and fork extension **28**, not the stale v4 description. The complete
@@ -1061,7 +1063,8 @@ The bounded source explorer finished in 280.956s; all 14 cited frozen source
 blob hashes and the version/open/admission seams were independently checked.
 The ordinary mempal `open_read_only` path writes coordination state, so migration
 must use an independent SQLite reader. Missing old full text and human review
-facts remain unknown. No live database or actual sample has been read yet.
+facts remain unknown. Only live file/header metadata has been read; no actual
+content sample or supported live schema has been acquired.
 
 The first independently shippable leaf is [neutral export](../neutral-archive.md):
 two streamed data files, a final versioned/hash manifest, all original bytes,
@@ -1105,12 +1108,21 @@ remains published. A deterministic public CLI regression failed on the second
 attempt before the repair; parent sync now runs for new and repeated imports.
 The repair passed 32 tests, four SIGKILL phases and Clippy in 108.782s.
 [R1 repair evidence](../benchmarks/results/mvp025-neutral-import-r1-repair/README.md)
-preserves the original verdict and causal test. PR #58 remains draft pending
-fresh exact canonical, whole-range R2 and successor CI; #25 stays open.
+preserves the original verdict and causal test. Repaired source `49aba7f` passed
+unchanged canonical in 441.410s (551 Rust passes including installed repeat),
+whole-range R2 with zero findings and 32 fresh focused passes, and exact-head
+CI 42767489191. PR #58 merged as `b37c613` with the reviewed tree.
+[Final import evidence](../benchmarks/results/mvp025-neutral-import-final/README.md)
+retains complete gate/review/CI and publication readback. #25 stays open.
 Read-only metadata found the live mempal file around 11.7 GB and changing;
 a kernel-enforced read-only SQLite probe could not open it, so no actual content
 sample was acquired. The installed `mempal 0.5.0` version string alone does not
-prove frozen source provenance. No old database, service or sidecar was modified.
+prove frozen source provenance. Two guarded main-file reflink snapshots were
+rejected and removed; the second observed WAL/SHM appearing during the clone.
+Do not retry this route blindly or relax its consistency guard. Next validate
+a read-only SQLite WAL transaction under a read-only filesystem control, then
+acquire a consistent private sample if the live reader protocol permits it.
+No old database, service or sidecar was modified.
 
 - [ ] Pin the supported mempal source commit and both schema axes; inventory
   authoritative text, identity, provenance, timestamps, scope, deletion state,
@@ -1125,7 +1137,7 @@ prove frozen source provenance. No old database, service or sidecar was modified
   corrupt, unknown-version or incomplete archives without replacing valid data.
   Preserve scopes, authority and readable history; do not activate foreign jobs
   or import machine-specific configuration as a side effect.
-- [ ] Finish the independent offline-import leaf through exact canonical,
+- [x] Finish the independent offline-import leaf through exact canonical,
   whole-range review, CI and merge; preserve the explicit daemon activation block.
 - [ ] Initialize fresh destination configuration, grants, job/incident queues,
   notification projection and derived-index namespaces while retaining original
