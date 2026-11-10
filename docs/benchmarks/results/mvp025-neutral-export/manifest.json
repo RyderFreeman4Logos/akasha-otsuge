@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "base": "c059fda030e1c7f5d4ec922f793088450c6bc4f0",
+  "preimplementation_head": "f3d4c9e703df3e8a1333df60851335d3430fb4b0",
+  "source_files": {
+    "src/main.rs": "74a761867443e69d890648eb19ef5da8310c88af31fe04f0e99d5f019fe9e038",
+    "src/storage/mod.rs": "9bd4ea815aede1cc417036494a856a72be80b872295775e46404afb0ace8674d",
+    "src/storage/archive.rs": "7c57596950ef06028b8a4a1515731ee06f2cae6ca90ae9775faf2321b7372c93",
+    "tests/archive.rs": "53914577b136b719b2dd04711d79a22bfefae8df2a812e8a3d82cdae52204b78",
+    "README.md": "4dce16b357597c33ca81499250871186533c95cfb9feab2c4c8fd3f2aac5e52a",
+    "docs/neutral-archive.md": "812fcb566f991c83a754543994cb1b14e4216e08429b32b2b35e6588fcd3fe6c",
+    "docs/plan/todo.md": "75db00066c00f746b2a3586f02655a9b223e5511a5a807ee0e810371005719af"
+  },
+  "files": {
+    "README.md": {
+      "bytes": 1923,
+      "sha256": "6229e541a3b2de423807d25ffb6565202bb852bc8c9e9e145ccd85dfd14ab35b"
+    },
+    "mvp024-observability-ci-main-r1.json": {
+      "bytes": 3943,
+      "sha256": "3e124249e1b60a2d919e0c613e6a5924a3c91b4c09694ac76020fc62da71e5ab"
+    },
+    "mvp024-observability-ci-main-r1.log.gz": {
+      "bytes": 28665,
+      "sha256": "3fdd3d5b005dc476f449f06e48eb3f39cde02d46928818cfc42950de61af230e"
+    },
+    "mvp025-mempal-map-r1-verified.json": {
+      "bytes": 1702,
+      "sha256": "c1076b0a4f68028a87c99770a2f1b4e200051d44fae67c6f7208c6ab9fd32f0e"
+    },
+    "mvp025-mempal-map-r1.md.gz": {
+      "bytes": 8854,
+      "sha256": "f2f3499cbecd42b94021efa3505543c489c23af29e6b756ba8aa8ef73b1b1dd6"
+    },
+    "mvp025-neutral-export-boundaries-red-classification.json": {
+      "bytes": 387,
+      "sha256": "d630b7381cdc9a11b83d1036b27ac13fd6efeb0014b1c82ff63798de3484099c"
+    },
+    "mvp025-neutral-export-boundaries-red.admission.json": {
+      "bytes": 1482,
+      "sha256": "ca29c0c1bddaadc997c4678f84bd0c624747c4aef55bf1aaa42c4f79b887cb44"
+    },
+    "mvp025-neutral-export-boundaries-red.collected.json": {
+      "bytes": 385,
+      "sha256": "44080993362c44f8a01fb1d92a7d928eef2587bb64a0a8d8b8000fbab37a874d"
+    },
+    "mvp025-neutral-export-boundaries-red.log.gz": {
+      "bytes": 657,
+      "sha256": "cb0936ba009075a5ecab24c07040fad65c68eb9adb92fdc7fef060a1407b91bb"
+    },
+    "mvp025-neutral-export-boundaries-red.terminal.json": {
+      "bytes": 239,
+      "sha256": "7c84dbed24d9cded5d927443d3d2771222b85d8526d03fe7aefdde8eab5ef132"
+    },
+    "mvp025-neutral-export-green-r2.admission.json": {
+      "bytes": 1515,
+      "sha256": "25a402d5abdd2d5a3b6382b87b7c35d9c0797b3d53f7d046964e9e6a41c5ac29"
+    },
+    "mvp025-neutral-export-green-r2.collected.json": {
+      "bytes": 401,
+      "sha256": "786c67af6ab40b5aa83171643c24c3cad5a7f11ab343aedfcc62cc606be40cd5"
+    },
+    "mvp025-neutral-export-green-r2.log.gz": {
+      "bytes": 1278,
+      "sha256": "af5e695d8f99d766a02d10e8de4526678487fa79e8dc3fd72c5570194bc1eaba"
+    },
+    "mvp025-neutral-export-green-r2.terminal.json": {
+      "bytes": 237,
+      "sha256": "821c0424414e6fc64235c10ca2dfc71a42be3f2179bf0093545f40faf8f8163a"
+    },
+    "mvp025-neutral-export-green.admission.json": {
+      "bytes": 1378,
+      "sha256": "12f24cf0e73556c7a7b72c084b48bf9790fc185309d3f7482b1acb768c4ce1ef"
+    },
+    "mvp025-neutral-export-green.collected.json": {
+      "bytes": 374,
+      "sha256": "71dd1cd51ea3a7edd141e9b87cf012ab617e0575e410a2cdc13beb57041c0a0f"
+    },
+    "mvp025-neutral-export-green.log.gz": {
+      "bytes": 1233,
+      "sha256": "79ca4ccaccb583f5d8393296a68face5ea8cdb89335083d763ace8c24e4941d8"
+    },
+    "mvp025-neutral-export-green.py": {
+      "bytes": 371,
+      "sha256": "6cba290f6d5a14837398f7d9f3565cbc77bc265335775889ec5b26f454962533"
+    },
+    "mvp025-neutral-export-green.terminal.json": {
+      "bytes": 237,
+      "sha256": "75a950fc5145fd1a6d4a68bce65a0edb25b24ccf5bff93155f05c91d67efc752"
+    },
+    "mvp025-neutral-export-red-classification.json": {
+      "bytes": 395,
+      "sha256": "d8e8497a95643a9106fa75932c70369188e0919eb360787edaa1788d9313cfd4"
+    },
+    "mvp025-neutral-export-red.admission.json": {
+      "bytes": 1209,
+      "sha256": "0263cbba1dfd10c5e256b80da9fbd4241ec539ce635b3afaab4afc3f81e4004e"
+    },
+    "mvp025-neutral-export-red.collected.json": {
+      "bytes": 385,
+      "sha256": "a2b6435089c4766875b3012619275eda874a8b4f9991c8aeee8d24a2aeb46206"
+    },
+    "mvp025-neutral-export-red.log.gz": {
+      "bytes": 690,
+      "sha256": "857fe4335a8fea571c89d5cff93b8a330c81167823fd0535c7b3a12d8621caf6"
+    },
+    "mvp025-neutral-export-red.terminal.json": {
+      "bytes": 239,
+      "sha256": "93c35a30d7adab41b431a21d6c1b6b5eba9fc86e9efe26279f8bd3528bf355ba"
+    }
+  }
+}

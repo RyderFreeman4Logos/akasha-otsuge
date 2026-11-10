@@ -1,5 +1,6 @@
 //! The sole authority store. Domain authorization belongs to its callers.
 
+mod archive;
 mod backup;
 #[cfg(test)]
 pub(crate) mod crash_tests;
@@ -19,6 +20,8 @@ use surrealkv::{
 use tokio::sync::Mutex;
 
 use crate::config::ResolvedConfig;
+
+pub use archive::ArchiveManifest;
 
 #[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(rename_all = "snake_case")]

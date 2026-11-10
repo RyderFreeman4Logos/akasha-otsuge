@@ -7,8 +7,8 @@ resource-observability leaf passed exact canonical, whole-range R1 and CI before
 PR #56 merged; #24 remains open for enforcement and full production acceptance.
 #25's lossless production import/export is next so the stress campaign can reuse
 its data path. #23 is completed; its post-merge main CI42750140146 also passed.
-The new post-merge main CI42755182650 is pending and will be collected at the next
-verification checkpoint; it is separate from successful candidate CI42753418883.
+Post-merge main CI42755182650 also passed and its complete log/hash was collected;
+it is separate from successful candidate CI42753418883.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -1051,6 +1051,25 @@ it has unrelated uncommitted changes. Initial frozen source candidate is
 `4593a5c5e6a9ea1140256cd42fa5838511a24e14`; exact code constants are upstream
 schema **21** and fork extension **28**, not the stale v4 description. The complete
 table/field/history mapping remains to be verified by bounded native discovery.
+
+The bounded source explorer finished in 280.956s; all 14 cited frozen source
+blob hashes and the version/open/admission seams were independently checked.
+The ordinary mempal `open_read_only` path writes coordination state, so migration
+must use an independent SQLite reader. Missing old full text and human review
+facts remain unknown. No live database or actual sample has been read yet.
+
+The first independently shippable leaf is [neutral export](../neutral-archive.md):
+two streamed data files, a final versioned/hash manifest, all original bytes,
+revision relations, clocks and receipts, with exclusive offline source ownership.
+The original two public CLI tests failed because the command did not exist.
+After implementation they and all existing CLI/storage tests passed. Boundary
+checks then found a relative-destination error (preserved causal RED); a real
+EFBIG blob write failed without publishing a manifest and preserved the source.
+The relative-path repair passed four archive, five CLI and 17 storage cases plus
+all-target Clippy in 23.296s. [Focused evidence](../benchmarks/results/mvp025-neutral-export/README.md)
+retains both REDs, both GREEN runs and the source-only mempal discovery. Exact
+canonical gate, independent review and CI remain required. Import and round-trip
+acceptance remain open and this leaf alone cannot close #25.
 
 - [ ] Pin the supported mempal source commit and both schema axes; inventory
   authoritative text, identity, provenance, timestamps, scope, deletion state,
