@@ -7,6 +7,9 @@ use akasha_otsuge::storage::{Change, CommitRequest, RecordKey, RecordKind, Stora
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
+#[path = "support/archive_import.rs"]
+mod import;
+
 struct Fixture(PathBuf);
 
 impl Fixture {

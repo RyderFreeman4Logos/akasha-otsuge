@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T05:30:28.401972+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "415f50c1f727ec06b2f03c633ca235be531d1626",
+    "log_sha256": "188bdea0ba4902ae5d14e32eefd60618352da3512c3483c084771cd158bc9c81",
+    "seconds": 7.639023019000888,
+    "utc": "2026-11-10T05:30:09.648261+00:00"
+  },
+  "process_absent": true,
+  "classification": "compile-failure-unused-import-and-sha2-output-formatting"
+}

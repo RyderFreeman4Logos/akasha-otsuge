@@ -1,0 +1,104 @@
+{
+  "observed_at": "2026-11-10T05:25:55.079028+00:00",
+  "metadata": {
+    "conclusion": "success",
+    "createdAt": "2026-11-10T05:08:03Z",
+    "event": "push",
+    "headSha": "3b6bf74d57b275e154195571700d64406832c2d3",
+    "jobs": [
+      {
+        "completedAt": "2026-11-10T05:18:20Z",
+        "conclusion": "success",
+        "databaseId": 129643770350,
+        "name": "linux",
+        "startedAt": "2026-11-10T05:08:06Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-11-10T05:08:08Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-11-10T05:08:07Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-10T05:08:18Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "startedAt": "2026-11-10T05:08:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-10T05:08:28Z",
+            "conclusion": "success",
+            "name": "Install native build tools",
+            "number": 3,
+            "startedAt": "2026-11-10T05:08:18Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-10T05:08:36Z",
+            "conclusion": "success",
+            "name": "Install pinned Rust",
+            "number": 4,
+            "startedAt": "2026-11-10T05:08:28Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-10T05:09:32Z",
+            "conclusion": "success",
+            "name": "Reuse Cargo dependencies and build artifacts",
+            "number": 5,
+            "startedAt": "2026-11-10T05:08:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-10T05:18:16Z",
+            "conclusion": "success",
+            "name": "Check",
+            "number": 6,
+            "startedAt": "2026-11-10T05:09:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-10T05:18:17Z",
+            "conclusion": "success",
+            "name": "Post Reuse Cargo dependencies and build artifacts",
+            "number": 11,
+            "startedAt": "2026-11-10T05:18:17Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-10T05:18:17Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 12,
+            "startedAt": "2026-11-10T05:18:17Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-10T05:18:17Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "startedAt": "2026-11-10T05:18:17Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/42760179799/job/129643770350"
+      }
+    ],
+    "status": "completed",
+    "updatedAt": "2026-11-10T05:18:20Z",
+    "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/42760179799"
+  },
+  "log_sha256": "1c79163c49ac1845e85caef52f68577b08f4c8183a1d3e2cbf1de183e64e3cc1",
+  "compressed_log_sha256": "815f12e9721d8085671347ec3e436cc5d504b420d4e1368eb3d7fbd66720d115",
+  "compressed_bytes": 28731,
+  "cache_lines": [
+    "linux\tReuse Cargo dependencies and build artifacts\t2026-11-10T05:09:32.4187922Z Cache restored from key: Linux-X64-cargo-v1-1d6407868656247df437c102390090af47e1dd8862a82844eb601670a0a1e1ad",
+    "linux\tPost Reuse Cargo dependencies and build artifacts\t2026-11-10T05:18:17.1500364Z Cache hit occurred on the primary key Linux-X64-cargo-v1-1d6407868656247df437c102390090af47e1dd8862a82844eb601670a0a1e1ad, not saving cache."
+  ]
+}

@@ -75,6 +75,57 @@ source, inspect only the exact failed destination, and use a fresh destination
 for a new attempt. A valid manifest left after a later close/stdout failure does
 not turn that command's nonzero status into success.
 
-This first MVP-025 leaf supplies export only. Import, a validating reader, mempal
-conversion, duplicate/incremental application, interruption recovery and complete
-round-trip acceptance remain pending; issue #25 stays open.
+## Offline import
+
+Select a fresh destination data directory in a separate config, then run:
+
+```sh
+akasha-otsuge --config /path/fresh-config.toml archive import /path/new-archive
+```
+
+The importer validates supported versions, bounded JSON, both complete file
+hashes and lengths, contiguous blob ranges, exact content hashes, request hashes,
+receipt references, unique requests/sequences and complete predecessor chains.
+It preserves original commit numbers, timestamps, all four record kinds and
+every revision, including retired content. It does not normalize UTF-8 or
+regenerate content, vectors, timestamps or approvals. Hashes establish internal
+consistency, not the trustworthiness of a supplied archive.
+
+The manifest is limited to 64 KiB; the existing batch, blob and line limits above
+also apply to input. Import reads one batch at a time and uses the native store
+for staging and sequence-ordered history reconstruction. It does not sort the
+complete archive in memory or make another copy of `blobs.bin`.
+
+The destination's private `.archive-import` directory is bound to the exact
+manifest hash before native staging begins. An exclusive import lock prevents
+concurrent importers. Original receipts/revisions are committed atomically in
+the stage; heads are reconstructed in original commit order. After validation
+and native close, the completed directory is published as `authority` with a
+no-replacement rename and parent sync. A concurrent daemon or existing store
+cannot be overwritten. Unrecognized staging directories are preserved and
+rejected. No application commit is added for the import itself.
+
+Run the same command to resume a recognized stage after interruption. It
+revalidates the input and saved records before resuming incomplete commits or
+head reconstruction. Four real SIGKILL tests cover durable record staging,
+head reconstruction, before publication and after publication; these are not
+power-loss tests. Invalid archives remove only their recognized unpublished
+stage after successful close. I/O failures retain that stage for inspection or
+retry. If even the initial ownership marker is incomplete, import refuses it;
+inspect that exact directory instead of deleting arbitrary staging paths.
+
+An identical completed archive can be imported again without changing later
+local commits. The entire archive and original stored revisions are checked
+again. A different archive or unrelated destination returns `IMPORT_CONFLICT`;
+merging incremental archives into an existing authority store is not implemented
+in this leaf. Successful output describes the imported archive, not the current
+sequence of an existing destination. A later close, publication-sync or output
+failure still returns a nonzero status; rerun the same input to reconcile it.
+
+**Imported stores remain offline in this leaf.** Daemon startup returns
+`IMPORTED_RUNTIME_DISABLED` before configuration recovery, grants, jobs or
+notifications can be activated. The storage API and `archive export` can inspect
+or export the restored history. Retaining historical permissions and host tokens
+does not authorize their use on the destination. Fresh local runtime authority,
+normal daemon/history access, mempal conversion, incremental application and
+complete domain-level round-trip acceptance remain tracked in issue #25.

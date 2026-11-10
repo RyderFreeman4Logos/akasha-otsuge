@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T05:32:07.566580+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "415f50c1f727ec06b2f03c633ca235be531d1626",
+    "log_sha256": "395b8a788c44b9040625f6b0baa8ce6c1625a18483b25c29993d54925e86af3e",
+    "seconds": 4.338049455545843,
+    "utc": "2026-11-10T05:31:27.688708+00:00"
+  },
+  "process_absent": true,
+  "classification": "expected-invalid-stage-retained-and-imported-daemon-activation"
+}

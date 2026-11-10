@@ -1077,14 +1077,27 @@ canonical `just check` passed on `7ad2aab` in 511.619s (545 Rust passes includin
 installed repeat, 157 daemon cases each run); full-range R1 PASS had zero findings
 and 26 fresh focused passes; CI42758677032 passed. PR #57 merged with the exact
 reviewed tree. [Final export evidence](../benchmarks/results/mvp025-neutral-export-final/README.md)
-retains the full review/readback, gate and CI. Post-merge main CI42760179799 is
-pending and will be collected at the next verification checkpoint. Import and
+retains the full review/readback, gate and CI. Post-merge main CI42760179799 also
+passed; its complete log/hash and Cargo cache hit were collected. Import and
 round-trip acceptance remain open and this leaf alone cannot close #25.
 
 The next import leaf must preserve stored revisions/receipts/clocks while keeping
 historical jobs, notifications, machine configuration and access bindings inert.
-A bounded source map will identify startup/recovery consumers before production
-changes. Read-only metadata found the live mempal file around 11.7 GB and changing;
+A bounded source map identified startup configuration, jobs, incidents,
+notifications, grants, host bindings and derived-index consumers. The current
+independent leaf restores the original offline authority/history and blocks
+daemon activation until fresh local runtime authority is implemented separately.
+Public CLI regressions cover all four kinds, every historical point, exact bytes,
+clocks/receipts, repeated imports after local changes, corruption/unknown versions,
+private-stage cleanup, locked/existing destinations and foreign-stage preservation.
+Four actual SIGKILL checkpoints cover staging, heads and publication. Final
+focused R6 passed 31 tests plus all-target Clippy in 49.658s, including private
+resumed-stage permissions and preserved unrelated staging files. The original
+missing-command, unsafe activation/cleanup, stage ownership and permissions REDs
+and one compilation failure remain distinct in
+[focused evidence](../benchmarks/results/mvp025-neutral-import/README.md).
+Final canonical, independent review and publication remain below.
+Read-only metadata found the live mempal file around 11.7 GB and changing;
 a kernel-enforced read-only SQLite probe could not open it, so no actual content
 sample was acquired. The installed `mempal 0.5.0` version string alone does not
 prove frozen source provenance. No old database, service or sidecar was modified.
@@ -1102,6 +1115,13 @@ prove frozen source provenance. No old database, service or sidecar was modified
   corrupt, unknown-version or incomplete archives without replacing valid data.
   Preserve scopes, authority and readable history; do not activate foreign jobs
   or import machine-specific configuration as a side effect.
+- [ ] Finish the independent offline-import leaf through exact canonical,
+  whole-range review, CI and merge; preserve the explicit daemon activation block.
+- [ ] Initialize fresh destination configuration, grants, job/incident queues,
+  notification projection and derived-index namespaces while retaining original
+  history. Imported bindings/tokens cannot authorize execution or be laundered
+  by incidental updates. Verify two restarts without external activity and
+  successful new authorized operations before enabling the daemon on imports.
 - [ ] Implement the frozen mempal reader without modifying its source database,
   schema, live service, configuration or checkout. Stable origin identities must
   support duplicate/incremental import with explicit conflicts and no duplicate
