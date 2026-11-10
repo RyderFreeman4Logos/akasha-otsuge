@@ -1,8 +1,10 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-10 UTC after PR #56 merged: **22 original Issues
+Rechecked 2026-11-10 UTC after PR #57 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
-#25 is active from main `c059fda` in one SSD worktree. #24's first independent
+#25's import leaf is active from main `3b6bf74` in the same SSD worktree. Its
+neutral-export leaf passed exact canonical, full-range R1 and CI before PR #57
+merged; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
 PR #56 merged; #24 remains open for enforcement and full production acceptance.
 #25's lossless production import/export is next so the stress campaign can reuse
@@ -1046,11 +1048,14 @@ still need revalidation. Storage/daemon fixture success does not close this issu
 ## MVP-025 read-only migration and neutral archive acceptance
 
 Original start 2026-11-10T04:22:08.149789Z (SSD worktree creation/reflog).
-Branch `feat/mvp-025-migration`; base `c059fda`. Existing mempal work is read-only:
+Initial branch `feat/mvp-025-migration`; base `c059fda`. Export merged in PR #57
+as `3b6bf74`; import continues on `feat/mvp-025-neutral-import` from that merge,
+reusing the same worktree and preserving the original issue start. Existing mempal work is read-only:
 it has unrelated uncommitted changes. Initial frozen source candidate is
 `4593a5c5e6a9ea1140256cd42fa5838511a24e14`; exact code constants are upstream
 schema **21** and fork extension **28**, not the stale v4 description. The complete
-table/field/history mapping remains to be verified by bounded native discovery.
+table/field/history mapping is recorded by bounded source discovery; actual
+database structure and runtime migration acceptance remain to be verified.
 
 The bounded source explorer finished in 280.956s; all 14 cited frozen source
 blob hashes and the version/open/admission seams were independently checked.
@@ -1068,14 +1073,50 @@ EFBIG blob write failed without publishing a manifest and preserved the source.
 The relative-path repair passed four archive, five CLI and 17 storage cases plus
 all-target Clippy in 23.296s. [Focused evidence](../benchmarks/results/mvp025-neutral-export/README.md)
 retains both REDs, both GREEN runs and the source-only mempal discovery. Exact
-canonical gate, independent review and CI remain required. Import and round-trip
-acceptance remain open and this leaf alone cannot close #25.
+canonical `just check` passed on `7ad2aab` in 511.619s (545 Rust passes including
+installed repeat, 157 daemon cases each run); full-range R1 PASS had zero findings
+and 26 fresh focused passes; CI42758677032 passed. PR #57 merged with the exact
+reviewed tree. [Final export evidence](../benchmarks/results/mvp025-neutral-export-final/README.md)
+retains the full review/readback, gate and CI. Post-merge main CI42760179799 also
+passed; its complete log/hash and Cargo cache hit were collected. Import and
+round-trip acceptance remain open and this leaf alone cannot close #25.
+
+The next import leaf must preserve stored revisions/receipts/clocks while keeping
+historical jobs, notifications, machine configuration and access bindings inert.
+A bounded source map identified startup configuration, jobs, incidents,
+notifications, grants, host bindings and derived-index consumers. The current
+independent leaf restores the original offline authority/history and blocks
+daemon activation until fresh local runtime authority is implemented separately.
+Public CLI regressions cover all four kinds, every historical point, exact bytes,
+clocks/receipts, repeated imports after local changes, corruption/unknown versions,
+private-stage cleanup, locked/existing destinations and foreign-stage preservation.
+Four actual SIGKILL checkpoints cover staging, heads and publication. Final
+focused R6 passed 31 tests plus all-target Clippy in 49.658s, including private
+resumed-stage permissions and preserved unrelated staging files. The original
+missing-command, unsafe activation/cleanup, stage ownership and permissions REDs
+and one compilation failure remain distinct in
+[focused evidence](../benchmarks/results/mvp025-neutral-import/README.md).
+The initial committed candidate `a61acd9` passed exact canonical in 448.063s
+(550 Rust passes including installed repeat, 34 Python tests and installed
+lifecycle/UID checks). Independent whole-range R1 nevertheless found F1: an
+identical replay could skip a failed publication-parent sync. The unchanged
+[FAIL report](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/58#issuecomment-6760298646)
+remains published. A deterministic public CLI regression failed on the second
+attempt before the repair; parent sync now runs for new and repeated imports.
+The repair passed 32 tests, four SIGKILL phases and Clippy in 108.782s.
+[R1 repair evidence](../benchmarks/results/mvp025-neutral-import-r1-repair/README.md)
+preserves the original verdict and causal test. PR #58 remains draft pending
+fresh exact canonical, whole-range R2 and successor CI; #25 stays open.
+Read-only metadata found the live mempal file around 11.7 GB and changing;
+a kernel-enforced read-only SQLite probe could not open it, so no actual content
+sample was acquired. The installed `mempal 0.5.0` version string alone does not
+prove frozen source provenance. No old database, service or sidecar was modified.
 
 - [ ] Pin the supported mempal source commit and both schema axes; inventory
   authoritative text, identity, provenance, timestamps, scope, deletion state,
   relationships and actually retained history. Document derived/operational data
   and unavailable fields; do not invent old content or human approval.
-- [ ] Define a versioned neutral archive with a manifest, content hashes, blobs
+- [x] Define a versioned neutral archive with a manifest, content hashes, blobs
   and explicit relations. Export raw originals, effective state, known history
   and recall receipts without a selected-engine dependency. Bound streaming
   memory and file sizes; preserve exact content and request/result identities.
@@ -1084,6 +1125,13 @@ acceptance remain open and this leaf alone cannot close #25.
   corrupt, unknown-version or incomplete archives without replacing valid data.
   Preserve scopes, authority and readable history; do not activate foreign jobs
   or import machine-specific configuration as a side effect.
+- [ ] Finish the independent offline-import leaf through exact canonical,
+  whole-range review, CI and merge; preserve the explicit daemon activation block.
+- [ ] Initialize fresh destination configuration, grants, job/incident queues,
+  notification projection and derived-index namespaces while retaining original
+  history. Imported bindings/tokens cannot authorize execution or be laundered
+  by incidental updates. Verify two restarts without external activity and
+  successful new authorized operations before enabling the daemon on imports.
 - [ ] Implement the frozen mempal reader without modifying its source database,
   schema, live service, configuration or checkout. Stable origin identities must
   support duplicate/incremental import with explicit conflicts and no duplicate

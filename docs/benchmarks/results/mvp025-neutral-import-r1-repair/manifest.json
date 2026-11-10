@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "base": "3b6bf74d57b275e154195571700d64406832c2d3",
+  "failed_review_head": "a61acd9089c9d16d96f3f863e583c3f2ca5846bc",
+  "original_focused_source_head": "a61acd9089c9d16d96f3f863e583c3f2ca5846bc",
+  "source_files": {
+    "src/storage/import.rs": "32ea473aecdc8002484323ecdeca2d389d2f99ab737b33506b88dae76422aff8",
+    "tests/support/archive_import.rs": "3817d7e5c2a1f4c7936acf873b98bd6425b544eecd12075d42f1bd142281dc92",
+    "docs/plan/todo.md": "f37d686de014f4052291e2f51bddad9b23df9b3356a5ade3607cc351c1bd1be5"
+  },
+  "files": {
+    "README.md": {
+      "bytes": 2604,
+      "sha256": "7723f07987450a11139679d4fc33db87d919d43bc78fc060532ece5541d8eec6"
+    },
+    "mvp025-neutral-import-canonical-r1-verified.json": {
+      "bytes": 2210,
+      "sha256": "d153d2eefa7c83757a1d06a8e64895c81a49cd737eace5e85bd85c92902c56c3"
+    },
+    "mvp025-neutral-import-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "9734f2d7c411524d66034066d82c474b1b64e428d9e5fb5419ac9132bfeb1d8f"
+    },
+    "mvp025-neutral-import-canonical-r1.collected.json": {
+      "bytes": 413,
+      "sha256": "822a13c8d25023146ae7f5e9d014271fa190a83512391e3e9e9a2279b1d0ac0e"
+    },
+    "mvp025-neutral-import-canonical-r1.log.gz": {
+      "bytes": 12920,
+      "sha256": "b18ac47242e10afd1420a1a3b2f85b49cfb0434912e3181a71a0950aac95a790"
+    },
+    "mvp025-neutral-import-canonical-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "a18d5cefbba461963d2fa853ac8d4e6299815f8e1f05cafadeeea307b02ff0a7"
+    },
+    "mvp025-neutral-import-ci-pr-r1.json": {
+      "bytes": 3951,
+      "sha256": "a40e9e26e7cdf0f5be451017a0033e280144a4d5bd67ed489530d6a3bd774ff4"
+    },
+    "mvp025-neutral-import-ci-pr-r1.log.gz": {
+      "bytes": 29302,
+      "sha256": "e812b940123fee57fac56fb076e68d0aa8f5821ac12c49dedb8f621cb5bea3f7"
+    },
+    "mvp025-neutral-import-r1-f1-green.admission.json": {
+      "bytes": 1427,
+      "sha256": "e3f6a9f7f37f3d36a5053f5911764bda44ff0a5355338737259853247ae92ffc"
+    },
+    "mvp025-neutral-import-r1-f1-green.collected.json": {
+      "bytes": 432,
+      "sha256": "ba6d949d667c0f8e3133b9bdf3eec4e8c7d5f2c5277301b4ab6921011146cdc3"
+    },
+    "mvp025-neutral-import-r1-f1-green.log.gz": {
+      "bytes": 1572,
+      "sha256": "e062b35ad6329d4331117693029c2616df5f1c994487dd3178248df32842dd59"
+    },
+    "mvp025-neutral-import-r1-f1-green.terminal.json": {
+      "bytes": 237,
+      "sha256": "e36f65804eb6c7a0dcff64c477d5fd47f596d65a70583cbf914c7d7e528cc537"
+    },
+    "mvp025-neutral-import-r1-f1-red.admission.json": {
+      "bytes": 1176,
+      "sha256": "05467728fcc892a9c41da1562481e2851095adc38ee7f447ab3efe0398307c54"
+    },
+    "mvp025-neutral-import-r1-f1-red.collected.json": {
+      "bytes": 426,
+      "sha256": "0f08374221b884d2492e21dc14d432b077357d528120355310de13a036abf268"
+    },
+    "mvp025-neutral-import-r1-f1-red.log.gz": {
+      "bytes": 517,
+      "sha256": "703ac4dd3e324dc46a1bb75af969b38fc3c72f4ff407072a304d13c46624f3bd"
+    },
+    "mvp025-neutral-import-r1-f1-red.terminal.json": {
+      "bytes": 238,
+      "sha256": "e707a556b8490b08dc2a0e9c1b5962cba71a740faba338dda036a33a6df2e592"
+    },
+    "mvp025-neutral-import-review-r1-cleanup.json": {
+      "bytes": 671,
+      "sha256": "51bcc0147f5e0f7b72ab9b488c6b9cfcabefa714e1096d9be2758ba2a57b21ef"
+    },
+    "mvp025-neutral-import-review-r1-publication.json": {
+      "bytes": 341,
+      "sha256": "e608991dcacdc747658b45a4dd714c5319050782cb9616886e81ed290b64f238"
+    },
+    "mvp025-neutral-import-review-r1-tests.log.gz": {
+      "bytes": 2217,
+      "sha256": "a174ea14074282d75eabbab9aa2c49df87e3e8f6d7db59cfdb0704a490896ecd"
+    },
+    "mvp025-neutral-import-review-r1-verified.json": {
+      "bytes": 736,
+      "sha256": "40972f720b909b92a9c94ce673055bf80138267890d3765294586d88637321c3"
+    },
+    "mvp025-neutral-import-review-r1.exit.json": {
+      "bytes": 2197,
+      "sha256": "073dfe72f8445ac4b6d90a5f74810dc764c78e878fe905ff755037f98d206f16"
+    },
+    "mvp025-neutral-import-review-r1.md.gz": {
+      "bytes": 7781,
+      "sha256": "8a64abb4861190418b01d6e0f07f2989c06390fe1809ce2560bc068fe4e2e69f"
+    }
+  }
+}

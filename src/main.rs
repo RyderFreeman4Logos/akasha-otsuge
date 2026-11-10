@@ -57,6 +57,8 @@ Commands:
   memory export ID
   archive export NEW_DIRECTORY
                              Export the stopped store as JSON and original blobs
+  archive import ARCHIVE_DIRECTORY
+                             Restore history into a fresh offline store
   memory patch PATCH_JSON --idempotency-key ID
   patch show ID
   memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]
@@ -347,7 +349,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         return Ok(u8::from(failed));
     }
     let operation = match command.as_slice() {
-        ["archive", "export", _] => None,
+        ["archive", "export" | "import", _] => None,
         ["adapter", "codex-hook", ..] => None,
         ["adapter", "install", "codex" | "hermes" | "pi", ..] => None,
         [
@@ -683,15 +685,16 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         "",
         &defaults,
     )?;
-    if let ["archive", "export", destination] = command.as_slice() {
+    if let ["archive", action @ ("export" | "import"), destination] = command.as_slice() {
         if socket.is_some() {
             return Err(Error("INVALID_ARGUMENT"));
         }
-        let manifest = akasha_otsuge::storage::Storage::export_archive(
-            &resolved,
-            std::path::Path::new(destination),
-        )
-        .await?;
+        let destination = std::path::Path::new(destination);
+        let manifest = if *action == "export" {
+            akasha_otsuge::storage::Storage::export_archive(&resolved, destination).await?
+        } else {
+            akasha_otsuge::storage::Storage::import_archive(&resolved, destination).await?
+        };
         let mut bytes =
             serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":manifest}))?;
         bytes.push(b'\n');

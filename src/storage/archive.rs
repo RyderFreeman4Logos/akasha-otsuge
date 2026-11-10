@@ -3,7 +3,7 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{BufWriter, Write};
 use std::path::Path;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use surrealkv::LSMIterator;
 
@@ -13,37 +13,41 @@ use super::{
 };
 use crate::config::ResolvedConfig;
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct ArchiveManifest {
-    archive_version: u32,
-    record_format_version: u8,
-    commit_seq: u64,
-    commits: u64,
-    revisions: u64,
-    files: BTreeMap<String, ArchiveFile>,
+    pub(super) archive_version: u32,
+    pub(super) record_format_version: u32,
+    pub(super) commit_seq: u64,
+    pub(super) commits: u64,
+    pub(super) revisions: u64,
+    pub(super) files: BTreeMap<String, ArchiveFile>,
 }
 
-#[derive(Serialize)]
-struct ArchiveFile {
-    bytes: u64,
-    sha256: String,
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct ArchiveFile {
+    pub(super) bytes: u64,
+    pub(super) sha256: String,
 }
 
-#[derive(Serialize)]
-struct BlobRevision {
-    key: RecordKey,
-    commit_seq: u64,
-    previous: Option<u64>,
-    content_sha256: String,
-    blob_offset: u64,
-    blob_bytes: u64,
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct BlobRevision {
+    pub(super) key: RecordKey,
+    pub(super) commit_seq: u64,
+    pub(super) previous: Option<u64>,
+    pub(super) content_sha256: String,
+    pub(super) blob_offset: u64,
+    pub(super) blob_bytes: u64,
 }
 
-#[derive(Serialize)]
-struct ArchiveCommit {
-    receipt: CommitReceipt,
-    recorded_at_ms: u64,
-    revisions: Vec<BlobRevision>,
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct ArchiveCommit {
+    pub(super) receipt: CommitReceipt,
+    pub(super) recorded_at_ms: u64,
+    pub(super) revisions: Vec<BlobRevision>,
 }
 
 struct Sink {
@@ -214,7 +218,7 @@ impl Storage {
         }
         let manifest = ArchiveManifest {
             archive_version: 1,
-            record_format_version: super::FORMAT_VERSION,
+            record_format_version: u32::from(super::FORMAT_VERSION),
             commit_seq,
             commits: count,
             revisions: revision_count,

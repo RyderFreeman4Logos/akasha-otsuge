@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T05:26:01.904523+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "415f50c1f727ec06b2f03c633ca235be531d1626",
+    "log_sha256": "ef24760b6f9005df1a1326bcc0f964d34b20055b1d3ec7c7ab44d30995b2f3f4",
+    "seconds": 4.683593139052391,
+    "utc": "2026-11-10T05:21:17.450215+00:00"
+  },
+  "process_absent": true,
+  "classification": "expected-missing-import-command-after-successful-test-compilation"
+}

@@ -5,6 +5,7 @@ mod backup;
 #[cfg(test)]
 pub(crate) mod crash_tests;
 mod history;
+mod import;
 mod layout;
 
 use std::collections::BTreeSet;
@@ -57,6 +58,7 @@ pub struct CommitRequest {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct RevisionRef {
     pub key: RecordKey,
     pub commit_seq: u64,
@@ -73,6 +75,7 @@ pub struct Revision {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CommitReceipt {
     pub request_id: String,
     pub request_sha256: String,

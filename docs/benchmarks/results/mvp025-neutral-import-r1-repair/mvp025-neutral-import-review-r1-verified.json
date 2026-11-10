@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T06:01:18.422243+00:00",
+  "head": "a61acd9089c9d16d96f3f863e583c3f2ca5846bc",
+  "tree": "ba055fdacb47f3e31ddf16146677c98bcea02587",
+  "verdict": "FAIL",
+  "findings": [
+    "F1: completed replay skips failed publication parent sync"
+  ],
+  "report_sha256": "e1ee890b289fec8c2e1589f58d2877602cdf4f8f8a0ef94418349b6fff964b1c",
+  "focused_log_sha256": "2ec3f16fd8979c55265bdda81b9f5bd2761de6613d15effa04d5f23918a66bb6",
+  "report_identity_note": "Embedded self-reference digest 588a8414 does not identify the final output-last-message report. Exact immutable final report digest verified against runtime receipt is e1ee890b289fec8c2e1589f58d2877602cdf4f8f8a0ef94418349b6fff964b1c. Full report preserved unchanged."
+}

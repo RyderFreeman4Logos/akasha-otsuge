@@ -1,0 +1,13 @@
+{
+  "utc": "2026-11-10T05:26:37.813155+00:00",
+  "head": "415f50c1f727ec06b2f03c633ca235be531d1626",
+  "verified_git_blobs": {
+    "src/daemon.rs": "d8d9ce7dc38e7b29507ca139236ec1f515d24e28",
+    "src/daemon/jobs.rs": "7a7994746cca69021252d9f69928995d605061a9",
+    "src/daemon/notifier.rs": "735b8bc12ae4ce88ba34ce76135f7e5b920f089d",
+    "src/adapter/binding.rs": "8f0ae189a6ddc58261900ce21cd7822a4b2280c4",
+    "src/domain/history.rs": "4f58bc89b195dcd179ef8c9a1f4ec3e25d82c497"
+  },
+  "report_sha256": "df28b13a9b399ce60dd2a8a139e1a20eaf8adee8c723beac533e0cf554f45e6c",
+  "semantic_claims": "recommendations pending parent caller verification"
+}

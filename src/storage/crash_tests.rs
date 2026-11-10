@@ -203,6 +203,110 @@ pub(crate) fn kill_at(root: &Path, phase: &str, test: &str) {
     assert!(!status.success());
 }
 
+#[test]
+#[ignore = "launched only by the import crash supervisor"]
+fn import_crash_child() {
+    let root = PathBuf::from(std::env::var_os("AKASHA_TEST_CRASH_ROOT").unwrap());
+    runtime().block_on(async {
+        Storage::import_archive(&config(&root), &root.join("archive"))
+            .await
+            .unwrap();
+        panic!("requested import checkpoint was not reached");
+    });
+}
+
+#[test]
+fn killed_archive_import_resumes_staging_heads_and_publication_without_duplicates() {
+    for phase in [
+        "import-staged",
+        "import-head",
+        "import-before-publish",
+        "import-published",
+    ] {
+        let root = std::env::temp_dir().join(format!(
+            "akasha-import-crash-{}-{phase}",
+            std::process::id()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        let _fixture = OwnedFixture(root.clone());
+        let original = request("z-original");
+        let memory = original.changes[1].key.clone();
+        let (receipts, clocks, views) = runtime().block_on(async {
+            let source_config = config(&root.join("source"));
+            let source = Storage::open(&source_config).await.unwrap();
+            let mut receipts = vec![source.commit(&original).await.unwrap()];
+            let mut change = original.clone();
+            change.request_id = "a-amendment".into();
+            change.changes.retain(|c| c.key.kind == RecordKind::Memory);
+            change.changes[0].expected_revision = Some(1);
+            change.changes[0].content = "corrected".into();
+            receipts.push(source.commit(&change).await.unwrap());
+            change.request_id = "m-retired".into();
+            change.changes[0].expected_revision = Some(2);
+            change.changes[0].content = "retired".into();
+            receipts.push(source.commit(&change).await.unwrap());
+            let clocks: Vec<_> = (1..=3).map(|s| source.recorded_at_ms(s).unwrap()).collect();
+            let views: Vec<_> = (0..=3).map(|s| source.at(&memory, s).unwrap()).collect();
+            source.close().await.unwrap();
+            Storage::export_archive(&source_config, &root.join("archive"))
+                .await
+                .unwrap();
+            (receipts, clocks, views)
+        });
+        kill_at(&root, phase, "storage::crash_tests::import_crash_child");
+        assert_eq!(
+            root.join("data/authority").exists(),
+            phase == "import-published"
+        );
+        if phase != "import-published" {
+            assert!(root.join("data/.archive-import/kv").is_dir());
+        }
+        runtime().block_on(async {
+            let target = config(&root);
+            if phase == "import-staged" {
+                use std::os::unix::fs::PermissionsExt;
+                let stage = root.join("data/.archive-import");
+                std::fs::set_permissions(&stage, std::fs::Permissions::from_mode(0o755)).unwrap();
+                let error = Storage::import_archive(&target, &root.join("archive"))
+                    .await
+                    .err()
+                    .expect("accepted public staging directory");
+                assert_eq!(error.code, "UNSAFE_STORAGE_PATH");
+                assert!(!root.join("data/authority").exists());
+                std::fs::set_permissions(&stage, std::fs::Permissions::from_mode(0o700)).unwrap();
+            }
+            for _ in 0..2 {
+                Storage::import_archive(&target, &root.join("archive"))
+                    .await
+                    .unwrap();
+                let restored = Storage::open(&target).await.unwrap();
+                assert_eq!(restored.sequence().unwrap(), 3);
+                for (seq, view) in views.iter().enumerate() {
+                    assert_eq!(&restored.at(&memory, seq as u64).unwrap(), view);
+                }
+                for (index, receipt) in receipts.iter().enumerate() {
+                    assert_eq!(
+                        restored.receipt(&receipt.request_id).unwrap().as_ref(),
+                        Some(receipt)
+                    );
+                    assert_eq!(
+                        restored.recorded_at_ms(receipt.commit_seq).unwrap(),
+                        clocks[index]
+                    );
+                }
+                assert_eq!(restored.commit(&original).await.unwrap(), receipts[0]);
+                assert_eq!(
+                    restored.ensure_runtime_ready().unwrap_err().code,
+                    "IMPORTED_RUNTIME_DISABLED"
+                );
+                restored.close().await.unwrap();
+            }
+            assert!(!root.join("data/.archive-import").exists());
+        });
+        println!("import checkpoint={phase} signal=9 recovered_seq=3 duplicate_commits=0");
+    }
+}
+
 fn capture_input() -> (
     crate::capture::CaptureBinding,
     crate::capture::EventDraft,

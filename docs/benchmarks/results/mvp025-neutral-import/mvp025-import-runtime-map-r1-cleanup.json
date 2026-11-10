@@ -1,0 +1,18 @@
+{
+  "utc": "2026-11-10T05:30:16.327626+00:00",
+  "exact_capture_consumers": [],
+  "removed": [
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/tmp/akasha-mvp025-import-runtime-map-r1/stdout.jsonl",
+      "bytes": 347883,
+      "sha256": "bc5f526485a20f2ce267aa4a44c85b77af70a20c7e1b6688fd8c6cc854d66e18"
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/tmp/akasha-mvp025-import-runtime-map-r1/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "report_retained": true,
+  "available_bytes": 419162038272
+}
