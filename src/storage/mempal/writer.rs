@@ -17,6 +17,7 @@ pub(super) struct Writer {
     commits: Sink,
     blobs: Sink,
     source: String,
+    source_inode: (u64, u64),
     pub observed_at_ms: u64,
     sequence: u64,
     revisions: u64,
@@ -39,7 +40,7 @@ fn conflict() -> StorageError {
     StorageError::new("MEMPAL_CONVERSION_CONFLICT")
 }
 
-fn private_file(path: &Path, create: bool) -> Result<File> {
+fn private_file(path: &Path, create: bool, source_inode: (u64, u64)) -> Result<File> {
     let file = OpenOptions::new()
         .read(true)
         .write(true)
@@ -49,6 +50,9 @@ fn private_file(path: &Path, create: bool) -> Result<File> {
         .custom_flags((rustix::fs::OFlags::NOFOLLOW | rustix::fs::OFlags::NONBLOCK).bits() as i32)
         .open(path)?;
     let metadata = file.metadata()?;
+    if (metadata.dev(), metadata.ino()) == source_inode {
+        return Err(StorageError::new("UNSAFE_MEMPAL_SNAPSHOT"));
+    }
     if !metadata.is_file()
         || metadata.nlink() != 1
         || metadata.uid() != rustix::process::geteuid().as_raw()
@@ -59,8 +63,8 @@ fn private_file(path: &Path, create: bool) -> Result<File> {
     Ok(file)
 }
 
-fn small_file(path: &Path) -> Result<Vec<u8>> {
-    let file = private_file(path, false)?;
+fn small_file(path: &Path, source_inode: (u64, u64)) -> Result<Vec<u8>> {
+    let file = private_file(path, false, source_inode)?;
     let mut bytes = Vec::new();
     file.take(64 * 1024 + 1).read_to_end(&mut bytes)?;
     if bytes.len() > 64 * 1024 {
@@ -78,9 +82,9 @@ fn present(path: &Path) -> Result<bool> {
     }
 }
 
-fn publish(root: &Path, name: &str, bytes: &[u8]) -> Result<()> {
+fn publish(root: &Path, name: &str, bytes: &[u8], source_inode: (u64, u64)) -> Result<()> {
     let temporary = root.join(format!("{name}.tmp"));
-    let mut file = private_file(&temporary, true)?;
+    let mut file = private_file(&temporary, true, source_inode)?;
     file.set_len(0)?;
     file.write_all(bytes)?;
     file.sync_all()?;
@@ -93,9 +97,9 @@ fn publish(root: &Path, name: &str, bytes: &[u8]) -> Result<()> {
     layout::sync_dir(root.parent().ok_or_else(conflict)?)
 }
 
-fn sink(path: &Path, complete: bool) -> Result<Sink> {
-    let file = private_file(path, !complete)?;
-    let prefix = private_file(path, false)?;
+fn sink(path: &Path, complete: bool, source_inode: (u64, u64)) -> Result<Sink> {
+    let file = private_file(path, !complete, source_inode)?;
+    let prefix = private_file(path, false, source_inode)?;
     let a = file.metadata()?;
     let b = prefix.metadata()?;
     if (a.dev(), a.ino()) != (b.dev(), b.ino()) {
@@ -132,7 +136,11 @@ impl Writer {
         Ok(())
     }
 
-    pub fn new(destination: &Path, source: &str, observed_at_ms: u64) -> Result<Self> {
+    pub fn new(
+        destination: &Path,
+        source: &super::reader::Snapshot,
+        observed_at_ms: u64,
+    ) -> Result<Self> {
         let parent = destination
             .parent()
             .filter(|path| !path.as_os_str().is_empty())
@@ -143,6 +151,11 @@ impl Writer {
                 .file_name()
                 .ok_or_else(|| StorageError::new("UNSAFE_STORAGE_PATH"))?,
         );
+        if source.path.starts_with(&destination) {
+            return Err(StorageError::new("UNSAFE_MEMPAL_SNAPSHOT"));
+        }
+        let source_inode = source.file_identity();
+        let source = source.sha256.as_str();
         match fs::symlink_metadata(&destination) {
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
                 layout::private_dir(&destination, false)?
@@ -157,7 +170,11 @@ impl Writer {
                 }
             }
         }
-        let lock = private_file(&destination.join(".mempal-convert.lock"), true)?;
+        let lock = private_file(
+            &destination.join(".mempal-convert.lock"),
+            true,
+            source_inode,
+        )?;
         lock.try_lock()
             .map_err(|_| StorageError::new("MEMPAL_CONVERSION_BUSY"))?;
         for entry in fs::read_dir(&destination)? {
@@ -179,7 +196,8 @@ impl Writer {
         let identity_path = destination.join("conversion.json");
         let identity = if present(&identity_path)? {
             let identity: Identity =
-                serde_json::from_slice(&small_file(&identity_path)?).map_err(|_| conflict())?;
+                serde_json::from_slice(&small_file(&identity_path, source_inode)?)
+                    .map_err(|_| conflict())?;
             if identity.mapping_version != super::MAPPING_VERSION
                 || identity.source_sha256 != source
                 || identity.uid != rustix::process::geteuid().as_raw()
@@ -209,11 +227,12 @@ impl Writer {
                 &destination,
                 "conversion.json",
                 &serde_json::to_vec(&identity)?,
+                source_inode,
             )?;
             identity
         };
         let completed_manifest = present(&destination.join("manifest.json"))?
-            .then(|| small_file(&destination.join("manifest.json")))
+            .then(|| small_file(&destination.join("manifest.json"), source_inode))
             .transpose()?;
         #[cfg(test)]
         crate::storage::crash_tests::checkpoint("mempal-identity");
@@ -221,10 +240,16 @@ impl Writer {
             commits: sink(
                 &destination.join("commits.jsonl"),
                 completed_manifest.is_some(),
+                source_inode,
             )?,
-            blobs: sink(&destination.join("blobs.bin"), completed_manifest.is_some())?,
+            blobs: sink(
+                &destination.join("blobs.bin"),
+                completed_manifest.is_some(),
+                source_inode,
+            )?,
             destination,
             source: source.into(),
+            source_inode,
             observed_at_ms: identity.observed_at_ms,
             sequence: 0,
             revisions: 0,
@@ -333,7 +358,12 @@ impl Writer {
                 layout::sync_dir(&self.destination)?;
                 layout::sync_dir(self.destination.parent().ok_or_else(conflict)?)?;
             }
-            None => publish(&self.destination, "manifest.json", &bytes)?,
+            None => publish(
+                &self.destination,
+                "manifest.json",
+                &bytes,
+                self.source_inode,
+            )?,
         }
         #[cfg(test)]
         crate::storage::crash_tests::checkpoint("mempal-published");

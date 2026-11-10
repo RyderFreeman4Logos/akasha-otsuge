@@ -20,6 +20,10 @@ akasha-otsuge --config /path/destination.toml archive import /path/new-archive
 ```
 
 The archive destination must be new or an owned private conversion directory.
+The source must be outside that directory, including when its parent is reached
+through a symlink. Writable output handles also reject the retained source inode
+before truncation or append, so moving that inode after reader admission cannot
+turn it into a staging file. Refusal preserves source bytes.
 Invalid source/version/structure is refused before output creation. A later write
 or source-stability failure may leave private incomplete output without a final
 manifest; it is not a completed archive. Repeat the same command to reconcile it.

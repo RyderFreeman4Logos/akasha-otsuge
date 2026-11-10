@@ -85,7 +85,7 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
         .as_millis()
         .try_into()
         .map_err(|_| StorageError::new("INVALID_CLOCK"))?;
-    let mut writer = Writer::new(destination, &snapshot.sha256, observed_at_ms)?;
+    let mut writer = Writer::new(destination, &snapshot, observed_at_ms)?;
     let observed_at_ms = writer.observed_at_ms;
     let mut tables = BTreeMap::new();
     let mut projection = projection::Summary::default();

@@ -1,0 +1,13 @@
+{
+  "classification": "HARNESS",
+  "failure": "manifest.json.tmp was refused as an unowned incomplete stage before the protected output opener; expected UNSAFE_MEMPAL_SNAPSHOT was unreachable",
+  "change": "Create a legitimate owned incomplete conversion before moving the source into data/manifest/lock paths; conversion.json.tmp remains the pristine identity path",
+  "preserved_assertions": [
+    "typed UNSAFE_MEMPAL_SNAPSHOT error",
+    "source bytes unchanged at moved path"
+  ],
+  "prior_causal_red": "mvp025-mempal-source-inode-red-r1 at conversion.json.tmp remains genuine writer adoption RED",
+  "test_before_sha256": "c0d67b973cc9f790c6cc41cb82b9b0bff0d4e8b83ee4549889d4589dcdc9f848",
+  "test_after_sha256": "195801f378b070b55c440eab234f6f9263f19a9f921bfd6a46c010a2a65f64ec",
+  "product_unchanged": true
+}

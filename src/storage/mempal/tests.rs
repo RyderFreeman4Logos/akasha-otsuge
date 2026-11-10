@@ -111,3 +111,44 @@ fn killed_mempal_conversion_reconciles_output_without_duplicate_candidates() {
         );
     }
 }
+
+#[test]
+fn moved_snapshot_inode_cannot_be_adopted_by_conversion_output() {
+    use std::os::unix::fs::PermissionsExt;
+    for name in [
+        "conversion.json.tmp",
+        "manifest.json.tmp",
+        "blobs.bin",
+        "commits.jsonl",
+        ".mempal-convert.lock",
+    ] {
+        let root =
+            std::env::temp_dir().join(format!("akasha-mempal-moved-{}-{name}", std::process::id()));
+        std::fs::create_dir(&root).unwrap();
+        let _fixture = Fixture(root.clone());
+        let source = root.join("source.db");
+        let db = rusqlite::Connection::open(&source).unwrap();
+        db.execute_batch(include_str!("../../../tests/fixtures/mempal21-28.sql"))
+            .unwrap();
+        db.close().unwrap();
+        std::fs::set_permissions(&source, std::fs::Permissions::from_mode(0o600)).unwrap();
+        let before = std::fs::read(&source).unwrap();
+        let snapshot = Snapshot::open(&source).unwrap();
+        let destination = root.join("archive");
+        std::fs::create_dir(&destination).unwrap();
+        std::fs::set_permissions(&destination, std::fs::Permissions::from_mode(0o700)).unwrap();
+        if name != "conversion.json.tmp" {
+            drop(Writer::new(&destination, &snapshot, 1).unwrap());
+        }
+        let moved = destination.join(name);
+        // Deterministically move the pinned source after reader admission.
+        std::fs::rename(&source, &moved).unwrap();
+        let result = Writer::new(&destination, &snapshot, 1).and_then(Writer::finish);
+        assert_eq!(
+            result.err().map(|error| error.code),
+            Some("UNSAFE_MEMPAL_SNAPSHOT"),
+            "{name}"
+        );
+        assert_eq!(std::fs::read(&moved).unwrap(), before, "{name}");
+    }
+}

@@ -83,6 +83,50 @@ fn archive_payloads(archive: &Path) -> Vec<Vec<u8>> {
 }
 
 #[test]
+fn mempal_conversion_rejects_source_output_aliases_before_mutating_the_snapshot() {
+    use std::os::unix::fs::{MetadataExt, PermissionsExt};
+    let mut damaged = Vec::new();
+    for name in [
+        "conversion.json.tmp",
+        "manifest.json.tmp",
+        "conversion.json",
+        "manifest.json",
+        "blobs.bin",
+        "commits.jsonl",
+        ".mempal-convert.lock",
+        "source.db",
+    ] {
+        let fixture = Fixture::new();
+        let destination = fixture.0.join("archive");
+        std::fs::create_dir(&destination).unwrap();
+        std::fs::set_permissions(&destination, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let source = destination.join(name);
+        legacy_snapshot(&source, "protected original\0原文");
+        std::fs::set_permissions(&source, std::fs::Permissions::from_mode(0o600)).unwrap();
+        let before = std::fs::metadata(&source).unwrap();
+        let bytes = std::fs::read(&source).unwrap();
+        // Resolve the output through a parent alias as well as its ordinary path.
+        let alias = fixture.0.join("alias");
+        std::os::unix::fs::symlink(&fixture.0, &alias).unwrap();
+        let output = convert(&fixture, &source, &alias.join("archive"));
+        let preserved = std::fs::read(&source).ok().as_deref() == Some(bytes.as_slice());
+        let same_inode = std::fs::metadata(&source)
+            .is_ok_and(|after| (after.dev(), after.ino()) == (before.dev(), before.ino()));
+        if !preserved || !same_inode || output.status.success() {
+            damaged.push(name);
+        }
+        eprintln!(
+            "{name}: refused={} source_preserved={preserved} same_inode={same_inode}",
+            !output.status.success()
+        );
+    }
+    assert!(
+        damaged.is_empty(),
+        "source aliases changed or accepted: {damaged:?}"
+    );
+}
+
+#[test]
 fn mempal_conversion_reuses_completed_output_and_recovers_a_partial_prefix() {
     let fixture = Fixture::new();
     let source = fixture.0.join("repeat.db");

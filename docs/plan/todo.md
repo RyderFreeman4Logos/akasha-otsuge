@@ -5,9 +5,13 @@ completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed
 #25's imported runtime merged as `31d4c61` after exact canonical, full-range R1
 and CI passed. Real mempal conversion, complete typed-row equivalence, duplicate
 import, two full roundtrips and two isolated daemon starts now pass on source
-`4193301` in `feat/mvp-025-mempal-import`. This reader leaf still needs its final
-canonical gate, full-range review, CI and merge; different-source incremental
-application remains next within #25. Offline import (PR #58) and neutral export (PR #57)
+`4193301` in `feat/mvp-025-mempal-import`. PR #60 is draft. Its first exact
+canonical gate passed, but independent R1 found
+a source/output staging alias that could destroy the snapshot. The FAIL report
+is retained. Causal path/inode regressions, 65 related Rust tests, five crash
+phases, Clippy and baseline-archive replay now pass. The repair needs a fresh
+exact gate and R2 review. Different-source
+incremental application remains next within #25. Offline import (PR #58) and neutral export (PR #57)
 also passed their gates; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
 PR #56 merged; #24 remains open for enforcement and full production acceptance.
@@ -1190,8 +1194,18 @@ candidates stayed inactive and the job queue stayed empty. The first runtime
 probe's incorrect enum casing is retained as a harness failure, followed by a
 4.514s passing run without a product edit. Both daemons exited. Owned temporary
 stores and duplicate exports were removed after all consumers ended; the single
-source snapshot, converted archive and compact evidence remain. Full gates,
-independent review and publication remain pending.
+source snapshot, converted archive and compact evidence remain. The first exact
+gate passed in 475.475s (574 Rust passes including installed
+repeat; 34 ignores), followed by independent R1 FAIL at `5e10a62`: a source
+named `conversion.json.tmp` inside its output directory could be truncated and
+renamed. The full report is published on PR #60. Eight public path variants
+reproduced the destructive alias and an accepted source-as-lock sibling. A
+second deterministic reader-to-writer move reproduced the pinned-inode bypass.
+Path admission and the shared writable-file opener now protect the source.
+The corrected fixture, 65 related Rust cases, five crash phases, Clippy and
+old-archive byte-identical replay pass. The fixture setup failure is retained
+separately in [the source-guard archive](../benchmarks/results/mvp025-mempal-source-guard/README.md).
+A fresh exact gate, R2 review and publication remain pending.
 Runtime post-merge main CI42779863508 also passed separately.
 
 - [x] Pin the supported mempal source commit and both schema axes; inventory

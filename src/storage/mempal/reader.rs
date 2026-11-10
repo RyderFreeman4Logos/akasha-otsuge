@@ -105,7 +105,7 @@ pub(super) struct Row {
 
 pub(super) struct Snapshot {
     file: File,
-    path: PathBuf,
+    pub(super) path: PathBuf,
     before: Metadata,
     connection: Connection,
     pub sha256: String,
@@ -249,6 +249,10 @@ impl Snapshot {
             tables,
             excluded_derived_tables,
         })
+    }
+
+    pub fn file_identity(&self) -> (u64, u64) {
+        (self.before.dev(), self.before.ino())
     }
 
     pub fn bytes(&self) -> u64 {

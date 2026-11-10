@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T10:36:43.701480+00:00",
+  "terminal": {
+    "exit_code": 1,
+    "head": "5e10a62ea75d7908e00fb8f8568f1bf351c2f35e",
+    "log_sha256": "5d85abe9e43fa043124f6ace33d82d9b12b9c6bc8030b15887a479ded94f0006",
+    "seconds": 64.94452938064933,
+    "utc": "2026-11-10T10:36:02.369192+00:00"
+  },
+  "process_absent": true,
+  "classification": "HARNESS_MOVED_MANIFEST_REJECTED_BEFORE_VALID_STAGE_SETUP"
+}
