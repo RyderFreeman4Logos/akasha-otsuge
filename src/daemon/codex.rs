@@ -26,6 +26,9 @@ impl Service {
             .storage
             .current(&key(token))?
             .ok_or(Error("BINDING_UNAVAILABLE"))?;
+        if !self.storage.locally_written(record.commit_seq)? {
+            return Err(Error("BINDING_UNAVAILABLE"));
+        }
         let reg: CodexRegistration = serde_json::from_str(&record.content)?;
         if reg.scope != jobs::owner_scope()
             || reg.principal != reg.scope.user

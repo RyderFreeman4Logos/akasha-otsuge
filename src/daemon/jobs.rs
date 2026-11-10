@@ -20,6 +20,9 @@ mod grill;
 #[cfg(test)]
 #[path = "grill_tests.rs"]
 mod grill_tests;
+#[cfg(test)]
+#[path = "import_tests.rs"]
+mod import_tests;
 #[path = "incident.rs"]
 mod incident;
 #[path = "models.rs"]
@@ -100,7 +103,7 @@ mod tests {
         });
         let scope = owner_scope();
         Domain::new(&service.storage)
-            .ensure_local_reader(&scope.user, &scope, 1)
+            .ensure_local_reader(&scope.user, &scope, service.config.pin().generation())
             .await
             .unwrap();
         let binding: CaptureInput = serde_json::from_value(json!({
@@ -670,6 +673,13 @@ pub(super) fn owner_scope() -> Scope {
 }
 
 impl Service {
+    fn require_local_job(&self, id: &str) -> Result<()> {
+        if !self.storage.locally_created(&job_key(id))? {
+            return Err(Error("IMPORTED_RUNTIME_AUTHORITY"));
+        }
+        Ok(())
+    }
+
     fn job(&self, id: &str) -> Result<(u64, Job)> {
         if !ipc::identifier(id) {
             return Err(Error("INVALID_REQUEST"));
@@ -872,6 +882,7 @@ impl Service {
             if !ipc::identifier(&id) {
                 return Err(Error("INVALID_REQUEST"));
             }
+            service.require_local_job(&id)?;
             let path = path
                 .as_deref()
                 .map(|p| service.allowed_path(p))
@@ -893,7 +904,9 @@ impl Service {
             } else if let Some(plan) = &extraction_plan {
                 plan.sources(&service.storage, &context()?)?;
             } else if let Some(plan) = &consult_plan {
-                service.consult_invocation(plan)?;
+                service
+                    .consult_invocation(plan)?
+                    .ensure_local(&service.storage)?;
             } else {
                 Domain::new(&service.storage).permission(&context()?, Some(&scope))?;
             }
@@ -1216,6 +1229,7 @@ impl Service {
     pub(super) async fn recover(&self) -> Result<()> {
         let _guard = self.admission.lock().await;
         for id in self.active()?.1 {
+            self.require_local_job(&id)?;
             let (revision, mut job) = self.job(&id)?;
             if job.terminal() {
                 return Err(Error("JOB_CORRUPT"));
@@ -1263,6 +1277,7 @@ impl Service {
     }
     async fn claim(&self, id: &str, running: usize) -> Result<bool> {
         let _guard = self.admission.lock().await;
+        self.require_local_job(id)?;
         let (revision, mut job) = self.job(id)?;
         if job.state != "queued" {
             return Ok(false);
@@ -1307,6 +1322,7 @@ impl Service {
         Ok(true)
     }
     async fn execute_job(self: Arc<Self>, id: String) -> Result<()> {
+        self.require_local_job(&id)?;
         let job = {
             let _guard = self.admission.lock().await;
             self.job(&id)?.1

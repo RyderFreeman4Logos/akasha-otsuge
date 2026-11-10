@@ -145,7 +145,8 @@ impl Service {
             .map(|r| serde_json::from_str::<u64>(&r.content))
             .transpose()?
             .unwrap_or(0)
-            .max(*scan);
+            .max(*scan)
+            .max(self.storage.import_identity()?.map_or(0, |i| i.commit_seq));
         let end = self.storage.sequence()?.min(start.saturating_add(32));
         let mut external = start;
         for seq in start + 1..=end {
@@ -210,7 +211,14 @@ impl Service {
                     if item.scope != scope {
                         return Err(Error("NOTIFICATION_CORRUPT"));
                     }
-                    if item.state != state || item.priority != priority {
+                    let imported = !self.storage.locally_written(item.source_revision)?;
+                    if imported {
+                        item.deliveries.clear();
+                        item.destination_history.clear();
+                        item.acknowledged_generation = None;
+                        item.delivery_error = None;
+                    }
+                    if imported || item.state != state || item.priority != priority {
                         item.generation = item
                             .generation
                             .checked_add(1)
@@ -292,6 +300,9 @@ impl Service {
                 .ok_or(Error("NOTIFICATION_CORRUPT"))?;
             *after = Some(id.into());
             let (revision, mut item) = self.notification(id)?;
+            if !self.storage.locally_written(item.source_revision)? {
+                continue;
+            }
             match Domain::new(&self.storage)
                 .permission(&jobs::context()?, Some(&item.scope))
                 .map_err(Error::from)

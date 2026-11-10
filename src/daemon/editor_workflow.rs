@@ -85,6 +85,7 @@ impl Service {
         let id = format!("editor/{}", hash(request.as_bytes()));
         let plan = {
             let _guard = self.admission.lock().await;
+            self.require_local_job(&id)?;
             if self.storage.current(&job_key(&id))?.is_some() {
                 let (_, job) = self.job(&id)?;
                 self.authorize_job(&job)?;
@@ -101,6 +102,7 @@ impl Service {
             }
             let invocation =
                 Invocation::load_verified(&self.storage, &feedback.invocation_id, &principal())?;
+            invocation.ensure_local(&self.storage)?;
             let config = match &incident {
                 Some(id) => {
                     let record = self.authorize_incident_execution(id)?;

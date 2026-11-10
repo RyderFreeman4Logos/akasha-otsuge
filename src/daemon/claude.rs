@@ -30,7 +30,8 @@ impl Service {
                 kind: RecordKind::Evidence,
                 id: format!(
                     "claude-child/{}",
-                    hash(&serde_json::to_vec(&registration.source)?)
+                    self.storage
+                        .runtime_token(&hash(&serde_json::to_vec(&registration.source)?))?
                 ),
             };
             if let Some(old) = self.storage.current(&identity)? {
@@ -73,6 +74,9 @@ impl Service {
             .storage
             .current(&key(token))?
             .ok_or(Error("BINDING_UNAVAILABLE"))?;
+        if !self.storage.locally_written(record.commit_seq)? {
+            return Err(Error("BINDING_UNAVAILABLE"));
+        }
         let registration: Registration = serde_json::from_str(&record.content)?;
         if registration.scope != jobs::owner_scope()
             || self.allowed_path(&registration.transcript)? != registration.transcript

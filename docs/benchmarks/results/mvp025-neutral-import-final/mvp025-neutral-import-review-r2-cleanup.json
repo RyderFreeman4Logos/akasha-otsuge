@@ -1,0 +1,17 @@
+{
+  "utc": "2026-11-10T06:24:14.774998+00:00",
+  "exact_consumers": [],
+  "removed": [
+    {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp025-neutral-import-review-r2.stdout",
+      "bytes": 662751,
+      "sha256": "902bd0885ebf35e885af451f0430f1366c499d620c995aa29134dd453da869ee"
+    },
+    {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp025-neutral-import-review-r2.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "report_and_focused_log_retained": true
+}

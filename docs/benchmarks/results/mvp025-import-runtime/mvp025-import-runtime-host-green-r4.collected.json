@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T07:32:38.127918+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "9979fe35a8d0fc480bc97aaded82496647e74e62",
+    "log_sha256": "f01c5db6b25af3f8d650384e17006a71a720030730cc35b89752adbd863a0b85",
+    "seconds": 7.047178940847516,
+    "utc": "2026-11-10T07:31:39.156776+00:00"
+  },
+  "process_absent": true,
+  "classification": "TWO_REAL_DAEMON_PROTOCOL_FIXTURES_AND_CLIPPY_PASS"
+}

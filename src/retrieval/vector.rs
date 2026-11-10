@@ -413,10 +413,12 @@ fn active_key(storage: &Storage) -> Result<RecordKey> {
     })
 }
 pub(crate) fn active_vector(storage: &Storage) -> Result<Option<ActiveVector>> {
-    let active = storage
-        .current(&active_key(storage)?)?
-        .map(|r| serde_json::from_str::<ActiveVector>(&r.content))
-        .transpose()?;
+    let active = match storage.current(&active_key(storage)?)? {
+        Some(row) if storage.locally_written(row.commit_seq)? => {
+            Some(serde_json::from_str::<ActiveVector>(&row.content)?)
+        }
+        _ => None,
+    };
     if active.as_ref().is_some_and(|v| {
         v.config_generation == 0
             || v.generation.len() != 64

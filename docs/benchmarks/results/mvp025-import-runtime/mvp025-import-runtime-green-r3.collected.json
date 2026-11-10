@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T07:24:10.067026+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "a4f6996be5902cef7c15ce527b0eadf3f00447b4",
+    "log_sha256": "170819aaa954d483ad14cdface79b55675e73d776e6bc9673c9bbc45a52988a9",
+    "seconds": 126.63542218506336,
+    "utc": "2026-11-10T07:23:24.881115+00:00"
+  },
+  "process_absent": true,
+  "classification": "FOCUSED_59_TESTS_EIGHT_SIGKILL_PHASES_AND_CLIPPY_PASS"
+}

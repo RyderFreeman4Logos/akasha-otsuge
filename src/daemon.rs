@@ -653,10 +653,6 @@ pub async fn run(
     private_dir(&config.config().paths.data_dir)?;
     let (listener, _owner) = listen(&config.config().paths.socket_path)?;
     let storage = Arc::new(Storage::open(&config).await?);
-    if let Err(error) = storage.ensure_runtime_ready() {
-        let _ = storage.close().await;
-        return Err(error.into());
-    }
     let manager = match configuration::open(&storage, config).await {
         Ok(manager) => manager,
         Err(error) => {

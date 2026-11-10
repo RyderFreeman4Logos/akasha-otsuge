@@ -1,0 +1,8 @@
+{
+  "causal_red": [
+    "imported invocation returned as active",
+    "acknowledged imported notice acquired dispatch"
+  ],
+  "fixture_gap": "native registration used non-native thread/agent layout; guard-specific code failed but admission was not proven",
+  "repair": "same session/thread and main agent; repeat token-only causal test before product guard changes"
+}

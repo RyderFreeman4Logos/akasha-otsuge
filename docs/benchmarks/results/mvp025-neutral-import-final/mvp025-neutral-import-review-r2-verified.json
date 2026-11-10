@@ -1,0 +1,32 @@
+{
+  "utc": "2026-11-10T06:24:14.707580+00:00",
+  "head": "49aba7fd174a4a97cba6d958f62ed8b8cf5fb910",
+  "tree": "3dfe4967065ea8fa236dd5d777b08995af64e24b",
+  "verdict": "PASS",
+  "introduced_findings": 0,
+  "report_sha256": "1b3fe5cf8779c1638077ddfc4c3bba7e15926a7d6c89f577620dc27d4b359c39",
+  "focused_tests_passed": 32,
+  "focused_log_sha256": "9902df25fd707a8b7379e0e6f7bf9b2d7b2ebd1a67ac7bf934b13a39021636d8",
+  "canonical_verified_sha256": "eef34766956f080074e460e6b515a498e055e8d1a359b1ac855cd74e69ef8a57",
+  "archives": [
+    {
+      "name": "mvp025-neutral-import",
+      "members": 46,
+      "source_head": "a61acd9089c9d16d96f3f863e583c3f2ca5846bc",
+      "manifest_sha256": "e2af219cc0434e2ec8e4597f33f47519e33b284e4cfc24000241c4bb8a7308ce"
+    },
+    {
+      "name": "mvp025-neutral-export-final",
+      "members": 15,
+      "source_head": "7ad2aab5721a2f840865da8a77d9bb367b6d9909",
+      "manifest_sha256": "946f2cde9bf36ac18a725861659cda39f271f7c3580e8174db5d3d36ae0d3474"
+    },
+    {
+      "name": "mvp025-neutral-import-r1-repair",
+      "members": 22,
+      "source_head": "49aba7fd174a4a97cba6d958f62ed8b8cf5fb910",
+      "manifest_sha256": "2b36ef3f653546e34059f0b0fdfef15f871a9c10f1a1685fb4697bd7abba1538"
+    }
+  ],
+  "clean_after": true
+}

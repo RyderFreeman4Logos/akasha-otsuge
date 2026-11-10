@@ -93,6 +93,9 @@ impl Invocation {
             .commit_or_reuse(|| {
                 binding.check_anchor(store)?;
                 if let Some(old) = store.current(&key)? {
+                    if !store.locally_written(old.commit_seq)? {
+                        return Err(StorageError::new("BINDING_UNAVAILABLE"));
+                    }
                     if old.content != content {
                         return Err(StorageError::new("BINDING_CONFLICT"));
                     }
@@ -124,7 +127,11 @@ impl Invocation {
             return Err(ErrorCode::BindingUnavailable.into());
         }
         store
-            .serialized_read(|| Self::load_verified(store, id, principal))
+            .serialized_read(|| {
+                let invocation = Self::load_verified(store, id, principal)?;
+                invocation.ensure_local(store)?;
+                Ok(invocation)
+            })
             .await
             .map_err(Into::into)
     }
@@ -164,6 +171,12 @@ impl Invocation {
     }
     pub fn revision(&self) -> u64 {
         self.revision
+    }
+    pub(crate) fn ensure_local(&self, store: &Storage) -> crate::storage::Result<()> {
+        if !store.locally_written(self.revision)? {
+            return Err(StorageError::new("BINDING_UNAVAILABLE"));
+        }
+        Ok(())
     }
     pub fn coverage(&self) -> FenceCoverage {
         if self.binding.tip.is_none()

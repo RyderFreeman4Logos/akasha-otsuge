@@ -1,0 +1,7 @@
+{
+  "classification": "fixture-setup-failure-not-causal-RED",
+  "collected_receipt_classification_incorrect": true,
+  "observed": "INVALID_PAGE from history 0..=at; native revision range requires from >= 1",
+  "repair": "both oracle and public history request now start at revision1",
+  "product_changed_for_this_failure": false
+}
