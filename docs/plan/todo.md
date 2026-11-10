@@ -963,11 +963,18 @@ passed in 287.549 seconds (498 Rust passes including installed repeat;
 139 daemon passes per run). Independent [review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/54#issuecomment-6755659738)
 passed with no actionable findings and seven focused checks. Exact-head
 [CI](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/42730893412)
-passed with Cargo cache restored/hit. The merge's main CI run42732148687 is pending
-readback at the next validation checkpoint; it does not replace those receipts.
+passed with Cargo cache restored/hit. The merge's main CI run 42732148687 also
+passed with Cargo cache restored/hit; it does not replace those receipts.
 
 The stdio delivery leaf is active from base `6eb77a1` in the same SSD worktree.
 #23 stays open until both leaves and all acceptance below are complete.
+
+Stdio phase 1: real executable capability/send/update and live cancellation now
+pass alongside all six local cases (8 daemon tests). The first attempt exposed
+an unclosed stdin writer, fixed by moving and dropping it after request output;
+its concurrent pagination timeout did not recur in the complete focused rerun,
+but its historical cause remains unproven. Persistent retries, ambiguous crash
+recovery, routing controls and the distributable reference plugin remain below.
 
 - [ ] Reuse the existing transactional revision outbox and live notifier config
   to admit scoped notifications with a stable envelope and capability contract.

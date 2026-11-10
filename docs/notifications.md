@@ -68,8 +68,9 @@ still use the new channel. Reuse a retained channel name for the same logical
 destination; changing configuration alone does not resend a completed generation.
 
 This implementation covers the local part of [MVP-023](spec/issues/MVP-023.md).
-The independent stdio plugin, external retry/capability protocol and ambiguous
-external-send crash recovery remain on that issue's acceptance checklist.
+The [stdio protocol](notifier-protocol.md) now has basic external send/update and
+live cancellation. Its distributable reference plugin, persistent retries and
+ambiguous external-send crash recovery remain on the issue's acceptance checklist.
 
 ## Verification
 

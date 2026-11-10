@@ -6,6 +6,8 @@ use crate::storage::{Change, CommitRequest, RecordKey, RecordKind, hash};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
+mod stdio;
+pub(super) use stdio::Dispatch;
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -34,6 +36,8 @@ struct Delivery {
     generation: u64,
     config_generation: u64,
     external_message_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    attempt: Option<stdio::Attempt>,
 }
 
 fn state_key(id: String) -> RecordKey {
@@ -238,11 +242,13 @@ impl Service {
         &self,
         scan: &mut u64,
         after: &mut Option<String>,
-    ) -> Result<()> {
+        allow_stdio: bool,
+    ) -> Result<Option<Dispatch>> {
         let _guard = self.admission.lock().await;
         self.project_notifications(scan).await?;
         let keys = self.notification_keys(after.as_deref())?;
         let more = keys.len() > 32;
+        let mut dispatch = None;
         for key in keys.into_iter().take(32) {
             let id = key
                 .id
@@ -266,16 +272,37 @@ impl Service {
                 let Some((generation, route)) = self.config.delivery_route(name) else {
                     continue;
                 };
-                if route.kind != NotifierKind::Local
-                    || item
-                        .deliveries
-                        .get(name)
-                        .is_some_and(|d| d.generation == item.generation)
-                {
+                if item.deliveries.get(name).is_some_and(|d| {
+                    d.generation == item.generation && d.status == "sent"
+                        || matches!(d.status.as_str(), "preparing" | "sending")
+                }) {
                     continue;
                 }
                 if !item.deliveries.contains_key(name) && item.deliveries.len() >= 64 {
                     delivery_error = Some("CHANNEL_HISTORY_LIMIT".into());
+                    continue;
+                }
+                if route.kind == NotifierKind::Stdio {
+                    if allow_stdio
+                        && dispatch.is_none()
+                        && !item.deliveries.get(name).is_some_and(|d| {
+                            d.generation == item.generation && d.status == "failed"
+                        })
+                        && let Ok(permit) = self.notification_slots.clone().try_acquire_owned()
+                    {
+                        let claimed = Dispatch::claim(
+                            &item,
+                            name,
+                            generation,
+                            route,
+                            &self.instance,
+                            permit,
+                        )?;
+                        item.deliveries
+                            .insert(name.clone(), claimed.delivery.clone());
+                        dispatch = Some(claimed);
+                        changed = true;
+                    }
                     continue;
                 }
                 item.deliveries.insert(
@@ -285,6 +312,7 @@ impl Service {
                         generation: item.generation,
                         config_generation: generation,
                         external_message_id: format!("local/{name}/{id}"),
+                        attempt: None,
                     },
                 );
                 changed = true;
@@ -300,7 +328,7 @@ impl Service {
         if !more {
             *after = None;
         }
-        Ok(())
+        Ok(dispatch)
     }
 
     pub(super) async fn list_notifications(

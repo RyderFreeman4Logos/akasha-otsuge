@@ -91,6 +91,7 @@ mod tests {
             instance: "new-daemon".into(),
             providers: crate::provider::Client::new().unwrap(),
             runner_slots: Arc::new(Semaphore::new(16)),
+            notification_slots: Arc::new(Semaphore::new(1)),
             search_index: Mutex::new(None),
             index_builder: Mutex::new(()),
             index_epoch: std::sync::atomic::AtomicU64::new(0),
@@ -1509,11 +1510,15 @@ impl Service {
         let mut owned = BTreeSet::new();
         let mut notification_after = None;
         let mut notification_scan = 0;
+        let mut notifications = JoinSet::new();
         let mut tick = tokio::time::interval(Duration::from_secs(1));
         let outcome = async {
         loop {
             if !self.stopping.load(std::sync::atomic::Ordering::Acquire) {
-                self.advance_notifications(&mut notification_scan, &mut notification_after).await?;
+                if let Some(dispatch) = self.advance_notifications(&mut notification_scan, &mut notification_after, notifications.is_empty()).await? {
+                    let service = self.clone();
+                    notifications.spawn(async move { service.deliver_notification(dispatch).await });
+                }
                 self.advance_incidents().await?;
                 let ids = {
                     let _guard = self.admission.lock().await;
@@ -1529,10 +1534,11 @@ impl Service {
                         });
                     }
                 }
-            } else if running.is_empty() {
+            } else if running.is_empty() && notifications.is_empty() {
                 break;
             }
             tokio::select! {
+                Some(result)=notifications.join_next(),if !notifications.is_empty()=>{result.map_err(|_|Error("JOB_ERROR"))??;},
                 Some(result)=running.join_next(),if !running.is_empty()=>{let (id,result)=result.map_err(|_|Error("JOB_ERROR"))?;owned.remove(&id);result?;},
                 _=self.work.notified()=>{},
                 _=tick.tick()=>{},
@@ -1540,7 +1546,11 @@ impl Service {
         }
         Ok(())
         }.await;
-        self.drain_jobs(running, outcome).await
+        let mut outcome = self.drain_jobs(running, outcome).await;
+        while let Some(result) = notifications.join_next().await {
+            outcome = outcome.and(result.map_err(|_| Error("JOB_ERROR")).and_then(|r| r));
+        }
+        outcome
     }
 
     async fn drain_jobs(

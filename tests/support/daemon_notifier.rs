@@ -472,3 +472,155 @@ fn notification_channel_history_limit_is_visible_without_stopping_new_delivery()
         "running"
     );
 }
+
+#[test]
+fn stdio_notifier_sends_minimal_envelopes_and_updates_the_provider_message() {
+    let mut daemon = Daemon::new();
+    let plugin = daemon.root.join("notifier.py");
+    executable::write(&plugin, include_str!("../fixtures/notifier/oneshot.py"));
+    daemon.configure(&format!(
+        "[notifiers.plugin]\nkind='stdio'\ncommand=[{plugin:?}]\n"
+    ));
+    review_tests::seed(&daemon, ReviewMode::Manual, "external-notice");
+    daemon.start();
+    let scope = extraction_tests::scope();
+    let first = wait_items(&daemon, &scope, |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    })[0]
+        .clone();
+    let id = first["notification_id"].as_str().unwrap();
+    assert_eq!(
+        first["deliveries"]["plugin"]["external_message_id"],
+        format!("fixture-{id}")
+    );
+    let read_received = || -> Vec<Value> {
+        std::fs::read_to_string(daemon.root.join("received.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect()
+    };
+    let received = read_received();
+    assert_eq!(received.len(), 1);
+    let expected = [
+        "notification_id",
+        "idempotency_key",
+        "review_id",
+        "priority",
+        "summary",
+        "evidence_locator",
+        "action",
+        "external_message_id",
+    ];
+    assert_eq!(
+        received[0]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<std::collections::BTreeSet<_>>(),
+        expected.into_iter().collect()
+    );
+    assert_eq!(received[0]["action"], "create");
+    assert_eq!(received[0]["notification_id"], id);
+    assert!(received[0]["external_message_id"].is_null());
+    assert!(!received[0].to_string().contains("fixture build passed"));
+    let review = daemon.cli(&["review", "show", first["review_id"].as_str().unwrap()]);
+    let changed = rpc(
+        &daemon,
+        json!({"op":"review_state","id":first["review_id"],
+        "expected_revision":review["data"]["item"]["revision"],"state":"investigating",
+        "reason":"Private investigation details","idempotency_key":"plugin-update"}),
+    );
+    assert!(changed.get("error").is_none(), "{changed}");
+    let update = wait_items(&daemon, &scope, |items| {
+        items.len() == 1
+            && items[0]["deliveries"]["plugin"]["generation"] == 2
+            && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    })[0]
+        .clone();
+    assert_eq!(
+        update["deliveries"]["plugin"]["external_message_id"],
+        first["deliveries"]["plugin"]["external_message_id"]
+    );
+    let received = read_received();
+    assert_eq!(received.len(), 2);
+    assert_eq!(received[1]["action"], "update");
+    assert_eq!(
+        received[1]["external_message_id"],
+        first["deliveries"]["plugin"]["external_message_id"]
+    );
+    assert_ne!(
+        received[0]["idempotency_key"],
+        received[1]["idempotency_key"]
+    );
+    assert!(!received[1].to_string().contains("Private investigation"));
+}
+
+#[test]
+fn waiting_stdio_plugin_does_not_hold_admission_and_live_disable_cancels_it() {
+    let mut daemon = Daemon::new();
+    let plugin = daemon.root.join("notifier.py");
+    executable::write(&plugin, include_str!("../fixtures/notifier/oneshot.py"));
+    let settings = |enabled: bool| {
+        format!("[notifiers.plugin]\nkind='stdio'\nenabled={enabled}\ncommand=[{plugin:?}]\n")
+    };
+    daemon.configure(&settings(true));
+    let revision = review_tests::seed(&daemon, ReviewMode::Manual, "blocked-plugin");
+    std::fs::write(daemon.root.join("hold-plugin"), "wait for cancellation").unwrap();
+    daemon.start();
+    let end = Instant::now() + Duration::from_secs(15);
+    while !daemon.root.join("plugin-started").exists() {
+        assert!(Instant::now() < end, "stdio plugin never started");
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    let pid: u32 = std::fs::read_to_string(daemon.root.join("plugin.pid"))
+        .unwrap()
+        .parse()
+        .unwrap();
+    let started = Instant::now();
+    let opened = rpc(
+        &daemon,
+        json!({"op":"review_open","memory_id":"blocked-plugin","expected_revision":revision,
+        "reason":"Independent operation while notifier is waiting","idempotency_key":"while-plugin-waits"}),
+    );
+    assert!(opened.get("error").is_none(), "{opened}");
+    assert!(
+        started.elapsed() < Duration::from_secs(5),
+        "plugin held the daemon admission lock"
+    );
+    daemon.configure(&settings(false));
+    assert_eq!(
+        daemon.cli(&["config", "reload"])["data"]["status"],
+        "applied"
+    );
+    let end = Instant::now() + Duration::from_secs(10);
+    while std::path::Path::new(&format!("/proc/{pid}")).exists() {
+        assert!(
+            Instant::now() < end,
+            "disabled notifier child was not reaped"
+        );
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    assert!(!daemon.root.join("received.jsonl").exists());
+    let items = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 2
+            && items
+                .iter()
+                .any(|item| item["deliveries"]["plugin"]["status"] == "blocked")
+    });
+    assert!(
+        items
+            .iter()
+            .all(|item| item["deliveries"]["plugin"]["status"] != "sent")
+    );
+    std::fs::remove_file(daemon.root.join("hold-plugin")).unwrap();
+    daemon.configure(&settings(true));
+    daemon.cli(&["config", "reload"]);
+    wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 2
+            && items
+                .iter()
+                .all(|item| item["deliveries"]["plugin"]["status"] == "sent")
+    });
+}

@@ -27,7 +27,7 @@ fn identity(pid: u32) -> Option<Identity> {
     })
 }
 
-pub(super) fn command(guard: &Path, binary: &Path, directory: &Path) -> Result<Command> {
+pub(crate) fn command(guard: &Path, binary: &Path, directory: &Path) -> Result<Command> {
     let owner = std::process::id();
     let start = identity(owner).ok_or(ErrorCode::SourceUnavailable)?.start;
     let mut command = Command::new(guard);
