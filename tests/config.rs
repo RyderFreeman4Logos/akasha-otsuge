@@ -19,6 +19,55 @@ fn config(input: &str) -> ResolvedConfig {
     resolve(input, None, "", &paths()).unwrap()
 }
 
+#[test]
+fn memory_profiles_expose_targets_peaks_and_separate_service_budget() {
+    for (target, peak) in [(512, 640), (1024, 1280), (2048, 2048)] {
+        let resolved = config(&format!("[runtime]\nmemory_budget_mib={target}\n"));
+        assert_eq!(
+            resolved.diagnostic()["memory_limits"],
+            serde_json::json!({"daemon_memory_target_mib":target,
+                "daemon_peak_limit_mib":peak,"service_total_budget_mib":2048})
+        );
+        // New defaults must not change archived configuration digests.
+        let serialized = serde_json::to_value(resolved.config()).unwrap();
+        assert!(serialized["runtime"].get("daemon_peak_limit_mib").is_none());
+        assert!(
+            serialized["runtime"]
+                .get("service_total_budget_mib")
+                .is_none()
+        );
+    }
+    let manager = manager("");
+    let old = manager.pin();
+    let custom = "[runtime]\nmemory_budget_mib=1024\ndaemon_peak_limit_mib=1152\nservice_total_budget_mib=4096\n";
+    assert_eq!(
+        manager.reload(custom, None, |_| Ok(())).unwrap().status,
+        ReloadStatus::Applied
+    );
+    assert_eq!(
+        old.resolved().diagnostic()["memory_limits"]["daemon_peak_limit_mib"],
+        640
+    );
+    assert_eq!(
+        manager.pin().resolved().diagnostic()["memory_limits"],
+        serde_json::json!({"daemon_memory_target_mib":1024,
+            "daemon_peak_limit_mib":1152,"service_total_budget_mib":4096})
+    );
+    let accepted = manager.pin().resolved().digest().to_owned();
+    for invalid in [
+        "[runtime]\ndaemon_peak_limit_mib=511",
+        "[runtime]\ndaemon_peak_limit_mib=2049",
+        "[runtime]\nservice_total_budget_mib=639",
+        "[runtime]\nservice_total_budget_mib=0",
+    ] {
+        assert_eq!(
+            manager.reload(invalid, None, |_| Ok(())).unwrap().status,
+            ReloadStatus::Rejected
+        );
+        assert_eq!(manager.pin().resolved().digest(), accepted);
+    }
+}
+
 fn manager(input: &str) -> ConfigManager<()> {
     ConfigManager::new(1, config(input), |_| Ok(())).unwrap()
 }

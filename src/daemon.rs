@@ -20,6 +20,7 @@ mod hermes;
 mod jobs;
 mod notifier;
 mod pi;
+mod resources;
 mod review;
 
 pub(crate) fn private_dir(path: &Path) -> Result<()> {
@@ -222,9 +223,8 @@ impl Service {
             Command::Pi { event } => self.pi(event).await,
             Command::Hermes { event } => self.hermes(event).await,
             Command::Codex { event } => self.codex(event).await,
-            Command::Status => Ok(
-                json!({"state":"running","pid":std::process::id(),"storage_seq":self.storage.sequence()?}),
-            ),
+            Command::Status => Ok(json!({"state":"running","pid":std::process::id(),
+                "storage_seq":self.storage.sequence()?,"resources":self.resource_status().await})),
             Command::Doctor => Ok(
                 json!({"transport":"unix","peer_uid":rustix::process::geteuid().as_raw(),"storage_seq":self.storage.sequence()?,"local_long_timeout_verified":false}),
             ),

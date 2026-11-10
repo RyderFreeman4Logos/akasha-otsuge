@@ -146,7 +146,30 @@ pub struct Runtime {
     pub max_concurrent_jobs: usize,
     pub max_queued_jobs: usize,
     pub memory_budget_mib: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub daemon_peak_limit_mib: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub service_total_budget_mib: Option<u32>,
     pub paused: bool,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+pub struct MemoryLimits {
+    pub daemon_memory_target_mib: u32,
+    pub daemon_peak_limit_mib: u32,
+    pub service_total_budget_mib: u32,
+}
+
+impl Runtime {
+    pub fn memory_limits(&self) -> MemoryLimits {
+        MemoryLimits {
+            daemon_memory_target_mib: self.memory_budget_mib,
+            daemon_peak_limit_mib: self
+                .daemon_peak_limit_mib
+                .unwrap_or_else(|| (self.memory_budget_mib.saturating_mul(5) / 4).min(2048)),
+            service_total_budget_mib: self.service_total_budget_mib.unwrap_or(2048),
+        }
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -511,6 +534,17 @@ impl Config {
             (1..=2048).contains(&self.runtime.memory_budget_mib),
             "runtime.memory_budget_mib",
             "must be between 1 and 2048 MiB",
+        )?;
+        let limits = self.runtime.memory_limits();
+        require(
+            (limits.daemon_memory_target_mib..=2048).contains(&limits.daemon_peak_limit_mib),
+            "runtime.daemon_peak_limit_mib",
+            "must be at least the daemon target and at most 2048 MiB",
+        )?;
+        require(
+            limits.service_total_budget_mib >= limits.daemon_peak_limit_mib,
+            "runtime.service_total_budget_mib",
+            "must cover the daemon peak; external workers need additional capacity",
         )?;
         require(
             (1..=32).contains(&self.retrieval.top_k)

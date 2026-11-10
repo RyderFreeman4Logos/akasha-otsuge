@@ -668,6 +668,59 @@ fn plugin_rows(daemon: &Daemon, name: &str) -> Vec<Value> {
 }
 
 #[test]
+fn memory_status_charges_guard_plugin_and_detached_grandchild() {
+    let mut daemon = plugin_fixture("grandchild");
+    std::fs::write(
+        daemon.root.join("hold-plugin"),
+        "memory observation barrier",
+    )
+    .unwrap();
+    daemon.start();
+    let end = Instant::now() + Duration::from_secs(15);
+    while !daemon.root.join("plugin-started").exists() {
+        assert!(Instant::now() < end, "plugin did not reach barrier");
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    let child: u32 = std::fs::read_to_string(daemon.root.join("grandchild.pid"))
+        .unwrap()
+        .parse()
+        .unwrap();
+    let plugin: u32 = std::fs::read_to_string(daemon.root.join("plugin.pid"))
+        .unwrap()
+        .parse()
+        .unwrap();
+    let observed = daemon.cli(&["daemon", "status"]);
+    std::fs::remove_file(daemon.root.join("hold-plugin")).unwrap();
+    wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    });
+    let sample = &observed["data"]["resources"]["measurement"];
+    assert_eq!(sample["complete"], true);
+    let pids = sample["runner_group"]["pids"].as_array().unwrap();
+    assert!(
+        pids.len() >= 3,
+        "guardian and both descendants must be charged"
+    );
+    assert!(pids.contains(&json!(child)) && pids.contains(&json!(plugin)));
+    assert!(!pids.contains(&json!(std::process::id())));
+    for metric in ["rss_bytes", "pss_bytes"] {
+        let daemon = sample["daemon_group"][metric].as_u64().unwrap();
+        let runner = sample["runner_group"][metric].as_u64().unwrap();
+        assert!(runner > 0);
+        assert_eq!(sample["service_total"][metric], daemon + runner);
+    }
+    let end = Instant::now() + Duration::from_secs(5);
+    loop {
+        let current = daemon.cli(&["daemon", "status"]);
+        if current["data"]["resources"]["measurement"]["runner_group"]["pids"] == json!([]) {
+            break;
+        }
+        assert!(Instant::now() < end, "reaped children remained charged");
+        std::thread::sleep(Duration::from_millis(25));
+    }
+}
+
+#[test]
 fn stdio_invalid_responses_are_bounded_terminal_and_do_not_echo_plugin_output() {
     for (mode, code) in [
         ("unsupported", "NOTIFIER_UNSUPPORTED"),

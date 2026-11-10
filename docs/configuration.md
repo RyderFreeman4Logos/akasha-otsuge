@@ -6,6 +6,9 @@ storage are integrated by [MVP-008's daemon](daemon.md). This document describes
 the shared contract; `config validate/reload/status/show --effective` use that
 same manager in the running service.
 
+See [memory budgets and observations](memory-resources.md) for target/peak/total
+configuration, actual process memory samples and the current enforcement boundary.
+
 See [example TOML](../examples/config.toml) and the complete
 [built-in defaults](../src/config/defaults.toml). MVP-003 selected the single
 [production backend](benchmarks/storage-decision.md); there is no backend switch.

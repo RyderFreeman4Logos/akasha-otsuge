@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "base_head": "a0360330566e486d6fd5ced6c55c8a6e9a203a0f",
+  "binding": "final source bytes; focused results before candidate commit",
+  "source_files": {
+    "src/config/mod.rs": "6cd9e7cc42e91566b68e371395316dd057e76dc06c88c87399748ff006dc963c",
+    "src/config/schema.rs": "b74b52635864201e0bc5c3fcc489c63d9b55d1815d04faa50f2b0b17de142360",
+    "src/daemon.rs": "9934c6fc61e870748dc337b6da8a48c5ef01496051f671a7c07d059995299142",
+    "src/daemon/resources.rs": "e20fb8fa8c009471dd66c90f37df27d4a7b81323e25f838758781dff9a418833",
+    "src/storage/mod.rs": "9db3656e8740ff4f7b469a3c27395135fcebe1df2bfebdc32bf372c8ddfccee4",
+    "src/storage/backup.rs": "b4c65b49f0ef54bea50a6f55eb0c42cfa7f394116f7342f4b2f425a821e74259",
+    "tests/config.rs": "ecf3d809821426a555669de6e66f3b5dc0751ec2610e7743bc2131be224c7c0d",
+    "tests/daemon.rs": "dc8af63516a63a19e84712e3b92ec62d0384fd110832b55664dbfe7bf1c509b8",
+    "tests/support/daemon_notifier.rs": "32263319100865aa2aeef47914aa409c9aab48996e7b8e5cd7e6f8fd42300c7b",
+    "docs/memory-resources.md": "435ad304699de429f07ceb312452728a2a41953a53963c662995c17a4fd4c015",
+    "docs/configuration.md": "3f06b74c2bf4658e0f82d6dbdfbbd5cd0f694d9256c02432c9eacdd9dc4df06e"
+  },
+  "files": {
+    "README.md": {
+      "bytes": 1441,
+      "sha256": "5cffa5e2763a1f15f1298494fe5b853302af5b70b7fe15c0105237fe1b26913a"
+    },
+    "mvp023-stdio-ci-main-r4.json": {
+      "bytes": 3943,
+      "sha256": "9ce061482deff5025dd406061ec60a25347dfa46f82a1b556ef6d08a9c3785a1"
+    },
+    "mvp023-stdio-ci-main-r4.log.gz": {
+      "bytes": 28331,
+      "sha256": "292ffba17d0bc484f242f7efb72619fe5a8cced9c2e2d2413e5da72286748659"
+    },
+    "mvp024-resource-descendants-red.admission.json": {
+      "bytes": 1173,
+      "sha256": "f945d354870ad15d392f3ccc18aa7dae2360d141765cc10a3e2dd03315d0411f"
+    },
+    "mvp024-resource-descendants-red.collected.json": {
+      "bytes": 404,
+      "sha256": "565c7e03e8e27b5217cd3c00465d687744cfe466a67c254f3b9674db2f9a537e"
+    },
+    "mvp024-resource-descendants-red.log.gz": {
+      "bytes": 536,
+      "sha256": "d36767df0382cbffac89b05c0ebbc698d80d95369d7e4821593b6f0c9d7fd5ce"
+    },
+    "mvp024-resource-descendants-red.terminal.json": {
+      "bytes": 239,
+      "sha256": "1bcc6626242473dfd8719b65560d9678f4ffcf2a7820ba1902ba41cac518c19c"
+    },
+    "mvp024-resource-observability-green-r2.admission.json": {
+      "bytes": 1749,
+      "sha256": "3f44b72f5ed54258b8d993039feb40f139098d8ae107b19d282c7dc7ee18670e"
+    },
+    "mvp024-resource-observability-green-r2.collected.json": {
+      "bytes": 405,
+      "sha256": "a4dc9ef5f1cffc3240208a9365a18af1e878368f0bfa6ca17fc0c5634c7ee2d5"
+    },
+    "mvp024-resource-observability-green-r2.log.gz": {
+      "bytes": 1429,
+      "sha256": "b55467633030ca4691d296bb304b7c57363c4aa8b30e04edc71b5d8a81ec0f23"
+    },
+    "mvp024-resource-observability-green-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "e65ff679105ab15c009aced46999d05d9dfc9f2d117504cd0514d38ac5dc3063"
+    },
+    "mvp024-resource-observability-green.admission.json": {
+      "bytes": 1611,
+      "sha256": "ed731204b1743d9e4a843c7072644020ff79027924f128480047d2dd86cb9a60"
+    },
+    "mvp024-resource-observability-green.collected.json": {
+      "bytes": 387,
+      "sha256": "ad9511c9617cb141e222d5cd6cf17985125318ded21b49a93b64fc8263814abb"
+    },
+    "mvp024-resource-observability-green.log.gz": {
+      "bytes": 519,
+      "sha256": "6b647eac1bac29428e211dc284c14cb2b684a6aacfca797f6bfbb20faeabb7a6"
+    },
+    "mvp024-resource-observability-green.terminal.json": {
+      "bytes": 237,
+      "sha256": "45691e16548d058ed07c8e5b9be03f79879d50dca135b9f5ef47c8cf36b1c3e3"
+    },
+    "mvp024-resource-observability-red.admission.json": {
+      "bytes": 1409,
+      "sha256": "787ccf93ecfe5f1caca9a39b5194b117ded0e4a632fce2cf4e7a315b10f9cc0f"
+    },
+    "mvp024-resource-observability-red.collected.json": {
+      "bytes": 402,
+      "sha256": "f3cfe0d3a81b344635120dd52898cf4d7c8dee8246f9a48b918454e9ecfd3fc2"
+    },
+    "mvp024-resource-observability-red.log.gz": {
+      "bytes": 725,
+      "sha256": "27990fe0a7d8121a1bea90da1729e2e7093941d5dde2eac2480c0de76ceb9344"
+    },
+    "mvp024-resource-observability-red.terminal.json": {
+      "bytes": 237,
+      "sha256": "3863ff8a3421ec798301c9616d8a3378622845a721fec8398a3e0a7dc3b46384"
+    }
+  }
+}
