@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "utc": "2026-11-10T17:25:29.008148+00:00",
+  "parent": "4a542e3e4f86fc6182c603c7880a75ba5b793299",
+  "files": {
+    "README.md": {
+      "bytes": 3018,
+      "sha256": "48a45d26edcf3744a1e503294cf140c11560f545066bd0642ccbc5e64074e33e"
+    },
+    "mvp025-admission-diag-classification-r1.json": {
+      "bytes": 481,
+      "sha256": "11d0547f222b9f54cdd598ec25b6759b8ab4d671f094f2759f404d837cf0de8a"
+    },
+    "mvp025-admission-diag-r1.json": {
+      "bytes": 465,
+      "sha256": "7248c8d44236710f3250eee8e767e26fcd493c75af1c3a88eec69e15888d0b7e"
+    },
+    "mvp025-admission-diag-repeat-r1.py": {
+      "bytes": 374,
+      "sha256": "b170ba201cba4cba334bd21f20a7b65d4186168c0bfd92d00dbf1ded6f4690d8"
+    },
+    "mvp025-admission-diag-targeted.rs": {
+      "bytes": 8781,
+      "sha256": "0f17009aa7262e5b1bbbc50a2320da6e156a698cb9fc8fe5997941fcd48067cd"
+    },
+    "mvp025-incremental-admission-release-red-r1.admission.json": {
+      "bytes": 1325,
+      "sha256": "963f48a3e25ecbb342537255c9f3054188cfde3c0ffe0f81b816f73e90d5310f"
+    },
+    "mvp025-incremental-admission-release-red-r1.collected.json": {
+      "bytes": 430,
+      "sha256": "2d5ccd54898165e7be6bbb1647d97a3d2ebf8a1f3669bb8c8b9ad56de0dffe91"
+    },
+    "mvp025-incremental-admission-release-red-r1.log.gz": {
+      "bytes": 571,
+      "sha256": "32bd57fde6cb46f489c62833c9636309de650c1a373b5c135a3aef506660462f"
+    },
+    "mvp025-incremental-admission-release-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "22b98e07864287b6d56ec0257bb8e4c11aa45273d30ab12c44b3360a8525db4c"
+    },
+    "mvp025-incremental-canonical-r3-verified.json": {
+      "bytes": 2186,
+      "sha256": "1c061a43c0c3ac25c2e619c15088913282bfdce05d3c93491d057f8241ad585a"
+    },
+    "mvp025-incremental-canonical-r3.admission.json": {
+      "bytes": 1003,
+      "sha256": "8c774f2fa5e81d4034f23ca72cc1b8894806a9af11dc650b079c5a57a4955887"
+    },
+    "mvp025-incremental-canonical-r3.collected.json": {
+      "bytes": 390,
+      "sha256": "c61c75df997375c4f9f0d0bee3cfbc398a20f263edc4b310fe9a364fc29c4307"
+    },
+    "mvp025-incremental-canonical-r3.log.gz": {
+      "bytes": 13846,
+      "sha256": "d098ed602b88046d765fecbdd4407f37284abb8d642f531e6b1dffd0715c4dc4"
+    },
+    "mvp025-incremental-canonical-r3.terminal.json": {
+      "bytes": 236,
+      "sha256": "478b74fff68697030d45ac3fd79d19bc044d42c54b9f77eab6ed4bbd8133f1e5"
+    },
+    "mvp025-incremental-ci-pr-r2.json": {
+      "bytes": 3951,
+      "sha256": "7e5866b90edea87d1c975306fd2a5e3b2a5c08d0c3acab6da96c2a413bd858b1"
+    },
+    "mvp025-incremental-ci-pr-r2.log.gz": {
+      "bytes": 30800,
+      "sha256": "14278441ed57251617fdce13491154c9a4297fa19fba0a5806b663a53cd1d250"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r1.admission.json": {
+      "bytes": 1232,
+      "sha256": "b59c262441f32b9e46f9d1e93ed2414510d5c6c630d76233bb82b9916512becb"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r1.collected.json": {
+      "bytes": 412,
+      "sha256": "b72b2f650eec1a8dbbeb134968efd9aca408b66af061060d1432c0824a0fdc39"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r1.log.gz": {
+      "bytes": 2206,
+      "sha256": "228ebc87fc4ebbdfc48785bd99f728ae3794b93f7ac07e214004522376f9f31f"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "65d3f5f8890ee80b0654a56fbd08c39b0a0e82f175745151604db667c6a34d32"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r2.admission.json": {
+      "bytes": 1251,
+      "sha256": "fce52419bd7ca3fb21bcf412ebed40b8b120960eaca6f7540b7d6863e873338f"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r2.collected.json": {
+      "bytes": 416,
+      "sha256": "8ca1ca24b2deedee3307db6471767cbae09c25109f42e462274760f691e39f22"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r2.log.gz": {
+      "bytes": 6210,
+      "sha256": "47c8182b2f0e2ab946d5c4b733927793d5e6f5f5551064b356b1a93f41c9d2af"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "3629336328c698aec192266d74d920229bdf388548de1c2c50dd8a7116545ac9"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r3.admission.json": {
+      "bytes": 1251,
+      "sha256": "c00f8deb2c05b0d25406ae34c8639e27863a2fc97863e924a1d0f6863a24d5c7"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r3.collected.json": {
+      "bytes": 425,
+      "sha256": "80b8487c4ee5f2a02ad55928605c867bd0cf0fd14a62a04651d59212eed3bea2"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r3.log.gz": {
+      "bytes": 2993,
+      "sha256": "1eade14886b11270c2d0d52d77b69d1497800c0bbbffb2dbabe48b415b59d0a7"
+    },
+    "mvp025-incremental-final-drop-admission-diag-r3.terminal.json": {
+      "bytes": 239,
+      "sha256": "99cc58da89fbcdec8d8ad53a9d74c0062c8dfae28a2e99bd1e7326d46d3c94bc"
+    },
+    "mvp025-incremental-final-drop-focused-r1.admission.json": {
+      "bytes": 1256,
+      "sha256": "6ccd0bded116bc52e68e55139c08bc11576a6fceb6de5242ccfcb43e8b6e937b"
+    },
+    "mvp025-incremental-final-drop-focused-r1.collected.json": {
+      "bytes": 415,
+      "sha256": "5da7253f7593d809aa6088e2ecbc84a836e634ffcc1b934fe966c6a0a0411b83"
+    },
+    "mvp025-incremental-final-drop-focused-r1.log.gz": {
+      "bytes": 4136,
+      "sha256": "5109c7534262462941c44133619dc0d1bda4af82171b7beb4f5f8722da27ef28"
+    },
+    "mvp025-incremental-final-drop-focused-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "07b1eebd43bbcdda87b1f4faf422cf5d3f51546ebb16933cacd8d24708ca21b5"
+    },
+    "mvp025-incremental-final-drop-focused-r2.admission.json": {
+      "bytes": 1256,
+      "sha256": "1ed4bc3e21c96a316aa28a1b7bd93e65748edcb569fde70fe536f7f2e2920629"
+    },
+    "mvp025-incremental-final-drop-focused-r2.collected.json": {
+      "bytes": 411,
+      "sha256": "5a27623f69912fe78df0c10225a9298d2a5a6edc5e9ce898caced8948416481d"
+    },
+    "mvp025-incremental-final-drop-focused-r2.log.gz": {
+      "bytes": 2031,
+      "sha256": "7168d4431508a82550e7e0a3f8f15e640c50cee72f78aa2eb2a4861883aedf99"
+    },
+    "mvp025-incremental-final-drop-focused-r2.terminal.json": {
+      "bytes": 239,
+      "sha256": "330a626cea84902fb1a58da19bc0467cf27bbf1724d683a06f642235a1bfe194"
+    },
+    "mvp025-incremental-final-drop-focused-r3.admission.json": {
+      "bytes": 1256,
+      "sha256": "bd8cf5d887320b744c71d9b4ce145e11385e3b824565b2eaa5cf1c23aed2377b"
+    },
+    "mvp025-incremental-final-drop-focused-r3.collected.json": {
+      "bytes": 403,
+      "sha256": "9b61be10a8d63269eadb7521120eae4899c5eb32f123bc2f8afde337a5951d94"
+    },
+    "mvp025-incremental-final-drop-focused-r3.log.gz": {
+      "bytes": 3901,
+      "sha256": "502006352091092b494b7f79c2e819f2e2746bb7c7027c83c916aacca0ce3dba"
+    },
+    "mvp025-incremental-final-drop-focused-r3.terminal.json": {
+      "bytes": 236,
+      "sha256": "562c3e9b645d0bc49f7f7019b73dfaf22d07dc125ccbf6784d11ec23d5806fb5"
+    },
+    "mvp025-incremental-final-drop-red-r1.admission.json": {
+      "bytes": 1150,
+      "sha256": "da3f19da1317c6d2a2e7bffdcddf291b2a32742b7ac5d49f87f17222a1d79eb3"
+    },
+    "mvp025-incremental-final-drop-red-r1.collected.json": {
+      "bytes": 414,
+      "sha256": "ce24ef137a62b232240df0ff6cda7d6fb49d88281d8590067d53a783e3ac1d19"
+    },
+    "mvp025-incremental-final-drop-red-r1.log.gz": {
+      "bytes": 633,
+      "sha256": "07377fb8daec54e2a5912fb9b40260209c6bd88b61e571e6457ba6d8dda7b892"
+    },
+    "mvp025-incremental-final-drop-red-r1.terminal.json": {
+      "bytes": 238,
+      "sha256": "760d10ccb14e0e0c73803b3bf90f7e359ea347964e73e5e01dd644daecfb7145"
+    },
+    "mvp025-incremental-repair-focused-r2.py": {
+      "bytes": 989,
+      "sha256": "1b0ede0e8654fb18edc66580277b91db69346ba118033553e9890117f0d8bafc"
+    },
+    "mvp025-incremental-review-r2-cleanup.json": {
+      "bytes": 636,
+      "sha256": "35f78d81274d7a9ed8ac6503bebea5afaeed386357e1750d8a6e2660609c5261"
+    },
+    "mvp025-incremental-review-r2-publication.json": {
+      "bytes": 816,
+      "sha256": "49c45e5d6250db7a8f708d477881f19bb6ebb828c96079f523df0b87036f8095"
+    },
+    "mvp025-incremental-review-r2-tests.log.gz": {
+      "bytes": 24650,
+      "sha256": "34fc2310d15d461eed7191eccf63669a5fbae53afc3746c969257c0a191b481f"
+    },
+    "mvp025-incremental-review-r2.admission.json": {
+      "bytes": 1111,
+      "sha256": "7718d17a0a0bf8a13b9ef158e1e9896e77bcbb4fc152e893fc217a722e36e761"
+    },
+    "mvp025-incremental-review-r2.collected.json": {
+      "bytes": 411,
+      "sha256": "e72b6fd158250bf1c0decaeda29a4db56bc372cafb9be74e12bd42bd3a79feb8"
+    },
+    "mvp025-incremental-review-r2.log.gz": {
+      "bytes": 995,
+      "sha256": "5354e698d7ef9060f9ee9dd0db82fd7f84390d81743d3779f1255971c38cc495"
+    },
+    "mvp025-incremental-review-r2.md.gz": {
+      "bytes": 15418,
+      "sha256": "7ae548911473c48889e64a2fd42eedf8b9bb776d7e3b8513859932d10ba66db2"
+    },
+    "mvp025-incremental-review-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "3737736c4085eefd901ccff4e63c0c699a24a16be9dbd49efbb75d0c8c94c3eb"
+    }
+  },
+  "source_file_sha256": {
+    "src/storage/native.rs": "2bc46bc0691f2b1a867df85b9e58e5494ea44e93b6e123e5f0aa8a885d158780",
+    "src/storage/layout.rs": "1fcd1f32d4dc8465d925dbb4b8ef0f1e9abd17155057df03175245641c48f40a",
+    "src/storage/mod.rs": "ba518dda5142f3a0a2f1bdd7037e78b439c95655494cb59a29b9d61d48dc4552",
+    "src/storage/crash_tests.rs": "ab97d6c84a73fffca23821d10d6406094e658e803e31df92d38a410a0156e5f5",
+    "tests/storage.rs": "9942ba088debfd63539589dbebcecdc6e35227906c0ec73a73e9bebbc14fe5ff"
+  },
+  "limits": [
+    "Canonical R3 and CI apply to historical 4a542e3, whose independent R2 review failed.",
+    "Focused R3 is candidate evidence; exact committed gates and review remain separate.",
+    "Transient IMPORT_BUSY holder was not captured; deterministic descriptor-copy causality is separate.",
+    "Daybreak and red-team work temporarily deferred by user."
+  ]
+}

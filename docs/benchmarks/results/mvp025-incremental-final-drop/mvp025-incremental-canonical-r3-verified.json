@@ -1,0 +1,49 @@
+{
+  "utc": "2026-11-10T14:43:03.907545+00:00",
+  "head": "4a542e3e4f86fc6182c603c7880a75ba5b793299",
+  "tree": "819386eed5eb28e4bfd055a20ac246c6a9209710",
+  "base": "fe30c78169fbf87bfa47cf06912b7c64d3a418b3",
+  "clean_before_after": true,
+  "command": [
+    "just",
+    "check"
+  ],
+  "exit_code": 0,
+  "seconds": 502.6290968088433,
+  "rust_result_rows": 21,
+  "rust_passed_including_installed_repeat": 592,
+  "rust_ignored_including_installed_repeat": 34,
+  "daemon_passed_each_run": 159,
+  "daemon_opt_in_ignored_each_run": 7,
+  "installed": {
+    "installed": true,
+    "binary_sha256": "962a36fd707def04b555b83fc3264dcecb7003519c2215127fe698202f1e4a55",
+    "lifecycle": "passed",
+    "private_uid_denial": "passed",
+    "peer_uid_denial": "passed",
+    "tcp_sockets": 0,
+    "kernel_control_uid": 165536
+  },
+  "artifacts": {
+    "mvp025-incremental-canonical-r3.admission.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp025-incremental-canonical-r3.admission.json",
+      "sha256": "8c774f2fa5e81d4034f23ca72cc1b8894806a9af11dc650b079c5a57a4955887"
+    },
+    "mvp025-incremental-canonical-r3.terminal.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp025-incremental-canonical-r3.terminal.json",
+      "sha256": "478b74fff68697030d45ac3fd79d19bc044d42c54b9f77eab6ed4bbd8133f1e5"
+    },
+    "mvp025-incremental-canonical-r3.collected.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp025-incremental-canonical-r3.collected.json",
+      "sha256": "c61c75df997375c4f9f0d0bee3cfbc398a20f263edc4b310fe9a364fc29c4307"
+    },
+    "mvp025-incremental-canonical-r3.log": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp025-incremental-canonical-r3.log",
+      "sha256": "14ec9dc0474e2cf056a53293eb477e4f4a83b0ee8d5280d3c5af0c863d413273"
+    }
+  },
+  "limits": [
+    "Independent frozen review and hosted CI remain separate stages.",
+    "Controlled fixtures and installed smoke checks do not establish new provider authentication or product stress acceptance."
+  ]
+}

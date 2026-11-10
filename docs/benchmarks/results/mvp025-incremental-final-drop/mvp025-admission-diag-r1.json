@@ -1,0 +1,7 @@
+{
+  "utc": "2026-11-10T17:14:52.757658+00:00",
+  "hypothesis": "IMPORT_BUSY originates in admission flock, observe precise error and owning lock before changing semantics",
+  "before_sha256": "9f71ea40a53587330673cc1c410b7505f937b67fbc88b28734d8771fc7f1bd51",
+  "probe_sha256": "a81f7559f320858d3a65ba310775f3c25fbb9691c7bf0b3d6e30128496183554",
+  "scope": "existing synthetic storage regression; temporary test-only diagnostic; no Daybreak or red-team campaign"
+}

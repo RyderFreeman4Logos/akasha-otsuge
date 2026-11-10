@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T17:06:35.339913+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "4a542e3e4f86fc6182c603c7880a75ba5b793299",
+    "log_sha256": "a200498878ef24f2fc9b47dc7f36f588b55f3cb3a33b564d571dff07778b5ad9",
+    "seconds": 16.54281065799296,
+    "utc": "2026-11-10T15:15:23.973099+00:00"
+  },
+  "process_absent": true,
+  "classification": "CAUSAL_RED_FINAL_DROP_DELETES_DISPOSABLE_FOREIGN_WAL"
+}

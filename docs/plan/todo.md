@@ -25,8 +25,13 @@ reproduce its historical trigger. A deterministic admitted-but-unlinked fixture
 now preserves the original five-second deadline across restart; its negative
 control fails and the restored production code passes. The
 [gate repair archive](../benchmarks/results/mvp025-incremental-gate-repair/README.md)
-preserves the failure and uncertainty. A new exact canonical, independent review
-and publication remain pending.
+preserves the failure and uncertainty. Successor canonical R3 and CI passed at
+4a542e3, but full-range R2 found a final asynchronous native-close lifetime defect.
+The new repair owns the native runtime through shutdown and explicitly releases
+admission locks; 71 focused Rust cases, formatting and Clippy pass. Its
+[evidence archive](../benchmarks/results/mvp025-incremental-final-drop/README.md)
+retains the causal failures, diagnostics and attribution limits. A successor
+exact canonical, conventional full-range review and publication remain pending.
 Changed-mempal-snapshot origin/update/deletion semantics follow; #25 stays open
 until both contracts pass.
 Offline import (PR #58) and neutral export (PR #57) are already merged.
@@ -41,6 +46,9 @@ Every unfinished Issue and its original dependencies are listed below.
 
 ## Session operating rules
 
+- Daybreak and red-team work are temporarily deferred by the owner. Continue
+  normal development, existing functional regressions and conventional code
+  review; do not launch new red-team campaigns or claim the deferred work passed.
 - Load `/home/obj/.hermes/skills/software-development/wd/SKILL.md` before every
   non-CSA task expected to exceed 90 seconds, including after compaction.
 - Resolve this session's active provider TTL afresh for each arm; keep one shared
@@ -1313,6 +1321,21 @@ checkpoint after its Storage owner was dropped. Final focused validation passes
 cleanup, fsync, root-substitution and local-tail recovery probes. These are dirty
 candidate results; a successor exact canonical, whole-range review and CI remain
 required before merging this leaf. Changed mempal snapshots remain unfinished.
+
+At 4a542e3, canonical R3 passed 592 Rust cases (34 ignores) and CI42836962444
+passed. Full-range R2 still failed one HIGH final-native-drop finding. Its full
+report is preserved and published in two exact contiguous parts. Native storage
+now owns its runtime and directory through final asynchronous shutdown. The new
+final-drop control failed before the repair; caller-runtime handoff now passes.
+Focused R2 also exposed transient IMPORT_BUSY failures. Targeted diagnostics
+captured contention but no surviving holder; that historical holder stays unknown.
+A separate deterministic descriptor-copy control proved admission could outlive
+its owner. Explicit scoped unlock fixes both lock owners and partial acquisition.
+Final focused R3 passes 71 Rust cases, six supervisor-child ignores, format,
+Clippy and diff checks. The
+[shutdown repair archive](../benchmarks/results/mvp025-incremental-final-drop/README.md)
+keeps all attempts and those limits. Exact committed gates, conventional review
+and publication are still required; Daybreak/red-team work is temporarily deferred.
 
 ### Remaining release acceptance
 

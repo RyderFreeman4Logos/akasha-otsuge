@@ -14,9 +14,32 @@ thread_local! {
 pub(super) const FORMAT: &[u8] = b"{\"application\":\"akasha-otsuge\",\"schema_version\":2,\"engine\":\"surrealkv-1.0.0\",\"engine_revision\":\"4338a790c8edc56ef5ea1e46157427af4815be3c\"}\n";
 
 pub(super) struct Admission {
-    pub(super) directory: File,
+    pub(super) directory: LockedFile,
     path: PathBuf,
-    lock: File,
+    lock: LockedFile,
+}
+
+pub(super) struct LockedFile(File);
+
+impl std::ops::Deref for LockedFile {
+    type Target = File;
+
+    fn deref(&self) -> &File {
+        &self.0
+    }
+}
+
+impl std::os::fd::AsFd for LockedFile {
+    fn as_fd(&self) -> std::os::fd::BorrowedFd<'_> {
+        self.0.as_fd()
+    }
+}
+
+impl Drop for LockedFile {
+    fn drop(&mut self) {
+        // A concurrent fork can retain the open description until its exec.
+        let _ = self.0.unlock();
+    }
 }
 
 impl Admission {
@@ -28,16 +51,18 @@ impl Admission {
                 (rustix::fs::OFlags::DIRECTORY | rustix::fs::OFlags::NOFOLLOW).bits() as i32,
             )
             .open(path)?;
-        let acquire = |file: &File| {
+        let acquire = |file: File| -> Result<LockedFile> {
+            let file = LockedFile(file);
             if exclusive {
                 file.try_lock()
             } else {
                 file.try_lock_shared()
             }
-            .map_err(|_| StorageError::new("IMPORT_BUSY"))
+            .map_err(|_| StorageError::new("IMPORT_BUSY"))?;
+            Ok(file)
         };
         // The directory lock still excludes owners after the compatible lock name is moved.
-        acquire(&directory)?;
+        let directory = acquire(directory)?;
         let lock = File::from(
             rustix::fs::openat(
                 &directory,
@@ -59,7 +84,7 @@ impl Admission {
         {
             return Err(StorageError::new("UNSAFE_STORAGE_PATH"));
         }
-        acquire(&lock)?;
+        let lock = acquire(lock)?;
         let admission = Self {
             directory,
             path: path.to_path_buf(),
@@ -183,6 +208,26 @@ pub(super) fn open_root(admission: &Admission) -> Result<(super::import_publish:
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn admission_release_does_not_wait_for_inherited_descriptor_copies() {
+        let path =
+            std::env::temp_dir().join(format!("akasha-admission-release-{}", std::process::id()));
+        let admission = Admission::acquire(&path, true).unwrap();
+        // fork inherits these same open file descriptions until the child's exec.
+        let directory = admission.directory.try_clone().unwrap();
+        let lock = admission.lock.try_clone().unwrap();
+        assert!(Admission::acquire(&path, false).is_err());
+        drop(admission);
+        let next = Admission::acquire(&path, true);
+        drop((directory, lock));
+        std::fs::remove_dir_all(&path).unwrap();
+        assert!(
+            next.is_ok(),
+            "released admission still excludes its successor: {:?}",
+            next.err()
+        );
+    }
 
     #[tokio::test]
     async fn ordinary_open_does_not_initialize_a_replaced_data_directory() {

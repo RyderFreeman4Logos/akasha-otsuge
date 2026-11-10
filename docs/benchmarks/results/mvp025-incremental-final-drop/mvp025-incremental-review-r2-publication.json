@@ -1,0 +1,21 @@
+{
+  "head": "4a542e3e4f86fc6182c603c7880a75ba5b793299",
+  "report_sha256": "b7fd397a8acc54e22025000426b6fca33b284a72aaf422af0c0bf0326c234b59",
+  "characters": 69503,
+  "reason": "Full report exceeds one GitHub comment body limit; exact contiguous parts concatenate to original bytes.",
+  "parts": [
+    {
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/61#issuecomment-6771073285",
+      "id": 6771073285,
+      "part": 1,
+      "sha256": "cbf18c72d8ac7ef2b226593967dd429a6f8ad1303bd29df59d86120e35258ecc"
+    },
+    {
+      "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/61#issuecomment-6771073902",
+      "id": 6771073902,
+      "part": 2,
+      "sha256": "546cf2ddb2fd41922999a54056ec1f047c78d403cbeba0eea819d6669690c3fb"
+    }
+  ],
+  "full_report_exact_readback": true
+}

@@ -9,6 +9,7 @@ mod import;
 mod import_publish;
 mod layout;
 mod mempal;
+mod native;
 
 use std::collections::BTreeSet;
 use std::fmt;
@@ -17,8 +18,7 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use sha2::{Digest, Sha256};
 use surrealkv::{
-    CompressionType, Durability, Options, Transaction, Tree, TreeBuilder, VLogChecksumLevel,
-    WalRecoveryMode,
+    CompressionType, Durability, Options, Transaction, VLogChecksumLevel, WalRecoveryMode,
 };
 use tokio::sync::Mutex;
 
@@ -26,6 +26,7 @@ use crate::config::ResolvedConfig;
 
 pub use archive::ArchiveManifest;
 pub use mempal::{MempalArchive, migrate_mempal};
+use native::PinnedTree;
 
 #[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -219,20 +220,6 @@ pub struct Storage {
     budget_mib: u32,
 }
 
-struct PinnedTree {
-    // Every background clone retains the directory until the native tree is dropped.
-    tree: Tree,
-    root: import_publish::Root,
-}
-
-impl std::ops::Deref for PinnedTree {
-    type Target = Tree;
-
-    fn deref(&self) -> &Tree {
-        &self.tree
-    }
-}
-
 impl RecordKey {
     fn encoded(&self) -> String {
         let kind = match self.kind {
@@ -375,11 +362,7 @@ impl Storage {
             .with_versioning(true, 0)
             .with_wal_recovery_mode(WalRecoveryMode::AbsoluteConsistency)
             .with_flush_on_close(false);
-        // Tree::drop closes its shared core even when other native Tree clones exist.
-        Ok(Arc::new(PinnedTree {
-            tree: TreeBuilder::with_options(options).build()?,
-            root: root.clone(),
-        }))
+        PinnedTree::open(options, root)
     }
 
     pub async fn commit(&self, request: &CommitRequest) -> Result<CommitReceipt> {
@@ -556,6 +539,6 @@ impl Storage {
 
     pub async fn close(&self) -> Result<()> {
         let _writer = self.writer.lock().await;
-        Ok(self.tree.close().await?)
+        self.tree.close().await
     }
 }

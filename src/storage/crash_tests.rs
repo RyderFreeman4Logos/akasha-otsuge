@@ -90,6 +90,88 @@ fn native_handle_keeps_its_directory_after_storage_owner_is_dropped() {
 }
 
 #[test]
+#[ignore = "launched only by the final-drop supervisor with isolated descriptor numbers"]
+fn native_final_drop_child() {
+    use std::os::fd::AsRawFd;
+    let root = PathBuf::from(std::env::var_os("AKASHA_TEST_CRASH_ROOT").unwrap());
+    runtime().block_on(async {
+        let store = Storage::open(&config(&root)).await.unwrap();
+        store.commit(&request("drop")).await.unwrap();
+        store.checkpoint(&root.join("backup")).await.unwrap();
+        let authority = root.join("data/authority");
+        let descriptors: Vec<i32> = std::fs::read_dir("/proc/self/fd")
+            .unwrap()
+            .filter_map(|entry| {
+                let entry = entry.ok()?;
+                (std::fs::read_link(entry.path()).ok()? == authority)
+                    .then(|| entry.file_name().to_str()?.parse().ok())?
+            })
+            .collect();
+        assert_eq!(descriptors.len(), 1);
+        let fd = descriptors[0];
+        let foreign = root.join("foreign");
+        std::fs::create_dir_all(foreign.join("kv/wal")).unwrap();
+        let victim = foreign.join("kv/wal/00000000000000000000.wal");
+        std::fs::write(&victim, b"foreign WAL").unwrap();
+        let foreign = std::fs::File::open(foreign).unwrap();
+        drop(store);
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while PathBuf::from(format!("/proc/self/fd/{fd}")).exists() {
+            assert!(
+                Instant::now() < deadline,
+                "native close retained its directory indefinitely"
+            );
+            tokio::time::sleep(Duration::from_millis(1)).await;
+        }
+        // Duplicate only into a free number; never replace a live owner's descriptor.
+        let reused = rustix::io::fcntl_dupfd_cloexec(&foreign, fd).unwrap();
+        assert_eq!(reused.as_raw_fd(), fd);
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        assert_eq!(
+            std::fs::read(victim).ok().as_deref(),
+            Some(b"foreign WAL".as_slice())
+        );
+    });
+}
+
+#[test]
+fn final_native_drop_cannot_redirect_cleanup_after_descriptor_reuse() {
+    let root = std::env::temp_dir().join(format!("akasha-final-drop-{}", std::process::id()));
+    std::fs::create_dir(&root).unwrap();
+    let _fixture = OwnedFixture(root.clone());
+    let log = std::fs::File::create(root.join("child.log")).unwrap();
+    let mut child = OwnedChild(
+        Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "storage::crash_tests::native_final_drop_child",
+                "--ignored",
+                "--nocapture",
+                "--test-threads=1",
+            ])
+            .env("AKASHA_TEST_CRASH_ROOT", &root)
+            .stdin(Stdio::null())
+            .stdout(log.try_clone().unwrap())
+            .stderr(log)
+            .spawn()
+            .unwrap(),
+    );
+    let deadline = Instant::now() + Duration::from_secs(15);
+    let status = loop {
+        if let Some(status) = child.0.try_wait().unwrap() {
+            break status;
+        }
+        assert!(Instant::now() < deadline, "final-drop child timed out");
+        std::thread::sleep(Duration::from_millis(10));
+    };
+    assert!(
+        status.success(),
+        "{}",
+        std::fs::read_to_string(root.join("child.log")).unwrap()
+    );
+}
+
+#[test]
 #[ignore = "launched only by the crash supervisor with an isolated database"]
 fn crash_child() {
     let root = PathBuf::from(std::env::var_os("AKASHA_TEST_CRASH_ROOT").unwrap());

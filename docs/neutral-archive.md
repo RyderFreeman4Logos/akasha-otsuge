@@ -160,6 +160,10 @@ Restore refuses a pending replacement. Cleanup checks the opened old directory's
 identity before removing any member. Shared native handles retain their directory
 descriptor through background commits, checkpoints and restores even when their
 caller is cancelled or drops the Storage owner.
+An owned native runtime keeps that descriptor alive through final asynchronous
+shutdown, including after the caller's runtime exits. Explicit close requests
+finish independently of a cancelled waiter. Admission locks explicitly unlock
+at scope exit, so inherited descriptor copies cannot prolong that admission.
 
 Controlled tests cover nine incremental SIGKILL phases, ordinary-open/restore/
 second-import exclusion while publication is paused, malformed markers,

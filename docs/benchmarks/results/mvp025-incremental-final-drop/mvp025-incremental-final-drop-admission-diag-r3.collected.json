@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T17:21:37.220363+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "4a542e3e4f86fc6182c603c7880a75ba5b793299",
+    "log_sha256": "418767f9e87dfd29b40a77cc9b202b6cb22bec66d0dff613c33441dd68b58995",
+    "seconds": 115.45274695754051,
+    "utc": "2026-11-10T17:20:11.831788+00:00"
+  },
+  "process_absent": true,
+  "classification": "DIAGNOSTIC_ATTEMPT_8_IMPORT_BUSY_TRANSIENT_LOCK_ALREADY_ABSENT"
+}

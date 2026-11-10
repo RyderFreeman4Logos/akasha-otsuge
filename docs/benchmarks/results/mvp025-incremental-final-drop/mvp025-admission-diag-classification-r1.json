@@ -1,0 +1,6 @@
+{
+  "utc": "2026-11-10T17:21:37.247206+00:00",
+  "diagnostics_removed_exactly": "9f71ea40a53587330673cc1c410b7505f937b67fbc88b28734d8771fc7f1bd51",
+  "observation": "targeted attempt 8: exclusive data-directory flock returned WouldBlock; immediate /proc/locks inode lookup empty",
+  "classification": "Transient admission failure observed; specific historical holder not captured. Descriptor inheritance is next deterministic hypothesis, not established historical attribution."
+}
