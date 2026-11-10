@@ -624,3 +624,176 @@ fn waiting_stdio_plugin_does_not_hold_admission_and_live_disable_cancels_it() {
                 .all(|item| item["deliveries"]["plugin"]["status"] == "sent")
     });
 }
+
+fn plugin_fixture(mode: &str) -> Daemon {
+    let daemon = Daemon::new();
+    let plugin = daemon.root.join("notifier.py");
+    executable::write(&plugin, include_str!("../fixtures/notifier/oneshot.py"));
+    std::fs::write(daemon.root.join("plugin-mode"), mode).unwrap();
+    daemon.configure(&format!(
+        "[notifiers.plugin]\nkind='stdio'\ncommand=[{plugin:?}]\n"
+    ));
+    review_tests::seed(&daemon, ReviewMode::Manual, "recovery-notice");
+    daemon
+}
+
+fn plugin_rows(daemon: &Daemon, name: &str) -> Vec<Value> {
+    std::fs::read_to_string(daemon.root.join(name))
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect()
+}
+
+fn crash_plugin_daemon(daemon: &mut Daemon) {
+    let plugin: u32 = std::fs::read_to_string(daemon.root.join("plugin.pid"))
+        .unwrap()
+        .parse()
+        .unwrap();
+    let guard = std::fs::read_to_string(format!("/proc/{plugin}/stat"))
+        .ok()
+        .map(|stat| {
+            stat.rsplit_once(") ")
+                .unwrap()
+                .1
+                .split_whitespace()
+                .nth(1)
+                .unwrap()
+                .parse::<u32>()
+                .unwrap()
+        });
+    let directory = guard.map(|pid| std::fs::read_link(format!("/proc/{pid}/cwd")).unwrap());
+    let mut child = daemon.child.take().unwrap();
+    child.kill().unwrap();
+    assert!(!child.wait().unwrap().success());
+    let end = Instant::now() + Duration::from_secs(10);
+    for pid in std::iter::once(plugin).chain(guard) {
+        loop {
+            let live = std::fs::read_to_string(format!("/proc/{pid}/stat")).is_ok_and(|stat| {
+                !matches!(
+                    stat.rsplit_once(") ").unwrap().1.split_whitespace().next(),
+                    Some("Z" | "X")
+                )
+            });
+            if !live {
+                break;
+            }
+            assert!(
+                Instant::now() < end,
+                "orphaned notifier process {pid} survived daemon SIGKILL"
+            );
+            std::thread::sleep(Duration::from_millis(25));
+        }
+    }
+    if let Some(directory) = directory {
+        assert!(
+            !directory.exists(),
+            "guardian left its owned scratch directory: {directory:?}"
+        );
+    }
+}
+
+#[test]
+fn stdio_retry_survives_restart_and_stops_after_five_attempts() {
+    let mut daemon = plugin_fixture("fail-once");
+    daemon.start();
+    let scope = extraction_tests::scope();
+    let waiting = wait_items(&daemon, &scope, |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "retry_wait"
+    })[0]
+        .clone();
+    let planned = waiting["deliveries"]["plugin"]["attempt"]["next_retry_at_ms"]
+        .as_u64()
+        .unwrap();
+    let first_started = waiting["deliveries"]["plugin"]["attempt"]["first_started_at_ms"].clone();
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    let sent = wait_items(&daemon, &scope, |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    })[0]
+        .clone();
+    assert_eq!(sent["deliveries"]["plugin"]["attempt"]["number"], 2);
+    assert_eq!(
+        sent["deliveries"]["plugin"]["attempt"]["first_started_at_ms"],
+        first_started
+    );
+    let attempts = plugin_rows(&daemon, "attempts.jsonl");
+    assert_eq!(attempts.len(), 2);
+    assert_eq!(
+        attempts[0]["idempotency_key"],
+        attempts[1]["idempotency_key"]
+    );
+    assert!(attempts[1]["at_ms"].as_u64().unwrap() >= planned);
+    assert_eq!(plugin_rows(&daemon, "received.jsonl").len(), 1);
+
+    let mut failing = plugin_fixture("always-fail");
+    failing.start();
+    let end = Instant::now() + Duration::from_secs(60);
+    loop {
+        let items = all(&failing, &scope);
+        if items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "failed" {
+            assert_eq!(items[0]["deliveries"]["plugin"]["attempt"]["number"], 5);
+            assert_eq!(
+                items[0]["deliveries"]["plugin"]["attempt"]["error"],
+                "NOTIFIER_FAILED"
+            );
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "finite retry budget never settled: {items:?}"
+        );
+        std::thread::sleep(Duration::from_millis(100));
+    }
+    assert_eq!(plugin_rows(&failing, "attempts.jsonl").len(), 5);
+    failing.cli(&["daemon", "stop"]);
+    failing.wait();
+    failing.start();
+    let state = all(&failing, &scope);
+    assert_eq!(state[0]["deliveries"]["plugin"]["status"], "failed");
+    assert_eq!(plugin_rows(&failing, "attempts.jsonl").len(), 5);
+}
+
+#[test]
+fn stdio_crash_windows_replay_with_idempotency_or_expose_duplicate_risk() {
+    for (barrier, mode, expected_deliveries) in [
+        ("hold-plugin", "normal", 1),
+        ("after-send", "normal", 1),
+        ("after-send", "no-idempotency", 2),
+    ] {
+        let mut daemon = plugin_fixture(mode);
+        std::fs::write(daemon.root.join(barrier), "crash barrier").unwrap();
+        daemon.start();
+        let marker = if barrier == "after-send" {
+            "plugin-sent"
+        } else {
+            "plugin-started"
+        };
+        let end = Instant::now() + Duration::from_secs(15);
+        while !daemon.root.join(marker).exists() {
+            assert!(Instant::now() < end, "plugin did not reach {barrier}");
+            std::thread::sleep(Duration::from_millis(25));
+        }
+        let before = all(&daemon, &extraction_tests::scope())[0].clone();
+        assert_eq!(before["deliveries"]["plugin"]["status"], "sending");
+        let first_key =
+            before["deliveries"]["plugin"]["attempt"]["envelope"]["idempotency_key"].clone();
+        crash_plugin_daemon(&mut daemon);
+        std::fs::remove_file(daemon.root.join(barrier)).unwrap();
+        daemon.start();
+        let recovered = wait_items(&daemon, &extraction_tests::scope(), |items| {
+            items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+        })[0]
+            .clone();
+        let attempt = &recovered["deliveries"]["plugin"]["attempt"];
+        assert_eq!(attempt["number"], 2);
+        assert_eq!(attempt["envelope"]["idempotency_key"], first_key);
+        assert_eq!(attempt["duplicate_risk"], mode == "no-idempotency");
+        assert_eq!(
+            plugin_rows(&daemon, "received.jsonl").len(),
+            expected_deliveries
+        );
+        assert_eq!(plugin_rows(&daemon, "attempts.jsonl").len(), 2);
+    }
+}

@@ -51,6 +51,75 @@ pub(super) struct Attempt {
     envelope: Envelope,
     capabilities: Option<Capabilities>,
     error: Option<String>,
+    #[serde(default = "first_attempt")]
+    number: u32,
+    #[serde(default)]
+    first_started_at_ms: u64,
+    #[serde(default)]
+    next_retry_at_ms: Option<u64>,
+    #[serde(default)]
+    duplicate_risk: bool,
+}
+
+fn first_attempt() -> u32 {
+    1
+}
+
+impl Delivery {
+    fn fail(&mut self, code: &str, now: u64) -> Result<()> {
+        let attempt = self.attempt.as_mut().ok_or(Error("NOTIFICATION_CORRUPT"))?;
+        if self.status == "sending" && !attempt.capabilities.as_ref().is_some_and(|c| c.idempotency)
+        {
+            attempt.duplicate_risk = true;
+        }
+        let blocked = attempt.number < 5
+            && matches!(
+                code,
+                "CANCELLED" | "CHANNEL_DISABLED" | "NOTIFIER_ROUTE_CHANGED" | "READ_DENIED"
+            );
+        let retryable = matches!(
+            code,
+            "NOTIFIER_FAILED"
+                | "NOTIFIER_TIMEOUT"
+                | "NOTIFIER_UNAVAILABLE"
+                | "NOTIFIER_INTERRUPTED"
+                | "IO_ERROR"
+        );
+        attempt.next_retry_at_ms = if retryable && attempt.number < 5 {
+            Some(now.saturating_add(1000 * (1 << attempt.number.saturating_sub(1))))
+        } else {
+            None
+        };
+        self.status = if blocked {
+            "blocked"
+        } else if attempt.next_retry_at_ms.is_some() {
+            "retry_wait"
+        } else {
+            "failed"
+        }
+        .into();
+        attempt.error = Some(code.into());
+        Ok(())
+    }
+
+    pub(super) fn recover_interrupted(&mut self, owner: &str, now: u64) -> Result<bool> {
+        if matches!(self.status.as_str(), "preparing" | "sending")
+            && self.attempt.as_ref().is_some_and(|a| a.owner != owner)
+        {
+            self.fail("NOTIFIER_INTERRUPTED", now)?;
+            return Ok(true);
+        }
+        Ok(false)
+    }
+
+    pub(super) fn retry_pending(&self, now: u64) -> bool {
+        self.status == "retry_wait"
+            && self
+                .attempt
+                .as_ref()
+                .and_then(|a| a.next_retry_at_ms)
+                .is_some_and(|at| now < at)
+    }
 }
 
 pub(in crate::daemon) struct Dispatch {
@@ -75,6 +144,11 @@ impl Dispatch {
         let previous = item
             .deliveries
             .get(channel)
+            .filter(|d| {
+                d.attempt
+                    .as_ref()
+                    .is_some_and(|a| a.route_sha256 == route_sha256)
+            })
             .map(|d| d.external_message_id.clone())
             .filter(|s| !s.is_empty());
         let envelope = Envelope {
@@ -98,6 +172,48 @@ impl Dispatch {
             external_message_id: previous.clone(),
         };
         let started_at_ms = ipc::now_ms()?;
+        if let Some(previous) = item.deliveries.get(channel)
+            && matches!(previous.status.as_str(), "retry_wait" | "blocked")
+            && let Some(prior) = &previous.attempt
+            && prior.route_sha256 == route_sha256
+        {
+            let mut delivery = previous.clone();
+            let attempt = delivery
+                .attempt
+                .as_mut()
+                .ok_or(Error("NOTIFICATION_CORRUPT"))?;
+            // Replay the accepted envelope even if the source has advanced meanwhile.
+            attempt.number = attempt.number.saturating_add(1);
+            if attempt.first_started_at_ms == 0 {
+                attempt.first_started_at_ms = attempt.started_at_ms;
+            }
+            attempt.owner = owner.into();
+            attempt.started_at_ms = started_at_ms;
+            attempt.deadline_ms = started_at_ms
+                .checked_add(30_000)
+                .ok_or(Error("CLOCK_ERROR"))?;
+            attempt.next_retry_at_ms = None;
+            attempt.error = None;
+            delivery.status = "preparing".into();
+            delivery.config_generation = config_generation;
+            return Ok(Self {
+                id: item.notification_id.clone(),
+                channel: channel.into(),
+                scope: item.scope.clone(),
+                route,
+                delivery,
+                permit: Arc::new(permit),
+            });
+        }
+        let duplicate_risk = item
+            .deliveries
+            .get(channel)
+            .and_then(|d| {
+                d.attempt
+                    .as_ref()
+                    .map(|a| a.duplicate_risk || d.status != "sent")
+            })
+            .unwrap_or(false);
         Ok(Self {
             id: item.notification_id.clone(),
             channel: channel.into(),
@@ -118,6 +234,10 @@ impl Dispatch {
                     envelope,
                     capabilities: None,
                     error: None,
+                    number: 1,
+                    first_started_at_ms: started_at_ms,
+                    next_retry_at_ms: None,
+                    duplicate_risk,
                 }),
             },
             permit: Arc::new(permit),
@@ -294,14 +414,14 @@ impl Service {
         mut dispatch: Dispatch,
     ) -> Result<()> {
         let sent = async {
-            let caps: Capabilities = serde_json::from_slice(&self.call_notifier(&dispatch, json!({"schema_version":1,"op":"capabilities"})).await?)?;
+            let caps: Capabilities = if let Some(caps) = dispatch.attempt()?.capabilities.clone() { caps } else { serde_json::from_slice(&self.call_notifier(&dispatch, json!({"schema_version":1,"op":"capabilities"})).await?).map_err(|_| Error("NOTIFIER_PROTOCOL_INVALID"))? };
             if caps.schema_version != 1 || !caps.send { return Err(Error("NOTIFIER_UNSUPPORTED")); }
             let attempt = dispatch.delivery.attempt.as_mut().ok_or(Error("NOTIFICATION_CORRUPT"))?;
             if !caps.update { attempt.envelope.action = "create".into(); attempt.envelope.external_message_id = None; }
             attempt.capabilities = Some(caps);
             dispatch.delivery.status = "sending".into();
             self.save_notification_dispatch(&dispatch).await?;
-            let result: Delivered = serde_json::from_slice(&self.call_notifier(&dispatch, json!({"schema_version":1,"op":"deliver","notification":dispatch.attempt()?.envelope})).await?)?;
+            let result: Delivered = serde_json::from_slice(&self.call_notifier(&dispatch, json!({"schema_version":1,"op":"deliver","notification":dispatch.attempt()?.envelope})).await?).map_err(|_| Error("NOTIFIER_PROTOCOL_INVALID"))?;
             if result.schema_version != 1 || !ipc::identifier(&result.external_message_id) {
                 return Err(Error("NOTIFIER_PROTOCOL_INVALID"));
             }
@@ -313,21 +433,7 @@ impl Service {
                 dispatch.delivery.external_message_id = id;
             }
             Err(error) => {
-                dispatch.delivery.status = if matches!(
-                    error.0,
-                    "CANCELLED" | "CHANNEL_DISABLED" | "NOTIFIER_ROUTE_CHANGED" | "READ_DENIED"
-                ) {
-                    "blocked"
-                } else {
-                    "failed"
-                }
-                .into();
-                dispatch
-                    .delivery
-                    .attempt
-                    .as_mut()
-                    .ok_or(Error("NOTIFICATION_CORRUPT"))?
-                    .error = Some(error.0.into());
+                dispatch.delivery.fail(error.0, ipc::now_ms()?)?;
             }
         }
         self.save_notification_dispatch(&dispatch).await?;

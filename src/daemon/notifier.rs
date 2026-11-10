@@ -272,9 +272,14 @@ impl Service {
                 let Some((generation, route)) = self.config.delivery_route(name) else {
                     continue;
                 };
+                let now = ipc::now_ms()?;
+                if let Some(delivery) = item.deliveries.get_mut(name) {
+                    changed |= delivery.recover_interrupted(&self.instance, now)?;
+                }
                 if item.deliveries.get(name).is_some_and(|d| {
                     d.generation == item.generation && d.status == "sent"
                         || matches!(d.status.as_str(), "preparing" | "sending")
+                        || d.retry_pending(now)
                 }) {
                     continue;
                 }

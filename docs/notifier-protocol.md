@@ -66,11 +66,29 @@ cleans up descendants and its private scratch directory. A configured
 `credential_ref = "env:NAME"` supplies that value to the child as
 `AKASHA_NOTIFIER_CREDENTIAL`; records retain neither the value nor command text.
 
+## Retries and recovery
+
+Transient process, I/O and timeout failures persist a retry deadline with 1, 2,
+4 and 8 second delays, stopping after five attempts. Restart preserves the
+original start, retry schedule, accepted envelope and idempotency key. An
+interrupted `preparing` or `sending` attempt enters the same bounded recovery
+path. Protocol errors are terminal; disable, revocation and shutdown block the
+attempt until current policy permits another claim. Each attempt shares one
+30-second capability/send deadline.
+
+The inbox exposes the attempt number, original start, next retry time, last
+error and `duplicate_risk`. A send interrupted before its response may already
+have reached the provider. Recovery replays the same key; without declared
+provider idempotency it explicitly flags possible duplicates. A changed route
+uses a new destination key and does not reuse the previous provider's message
+ID. No mechanism can retract a send completed before cancellation.
+
 ## Current acceptance boundary
 
 Basic send/update, minimal envelopes, nonblocking admission and live cancellation
-are covered by controlled executable-plugin tests. Each capability/send attempt
-currently shares one 30-second deadline. Persistent retry/backoff, recovery of
-ambiguous `sending` records, configurable routing controls and the distributable
-reference plugin remain unfinished on MVP-023. Do not interpret a stored
+are covered by controlled executable-plugin tests. Persistent finite retry,
+restart during backoff, and real SIGKILL before/after the plugin's durable effect
+also pass, including both idempotent replay and exposed duplicate delivery.
+Configurable routing controls and the distributable reference plugin remain
+unfinished on MVP-023. Do not interpret a stored
 idempotency key or capability declaration as universal exactly-once delivery.

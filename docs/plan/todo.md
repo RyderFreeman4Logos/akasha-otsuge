@@ -976,6 +976,12 @@ its concurrent pagination timeout did not recur in the complete focused rerun,
 but its historical cause remains unproven. Persistent retries, ambiguous crash
 recovery, routing controls and the distributable reference plugin remain below.
 
+Stdio phase 2: the meaningful retry/crash RED passed after implementing durable
+five-attempt backoff, immutable-envelope replay and duplicate-risk reporting.
+All ten notification tests passed in 36.161 seconds, including restart during
+backoff and SIGKILL before/after the provider effect. This is focused evidence;
+the completed stdio candidate still needs the full gate and independent review.
+
 - [ ] Reuse the existing transactional revision outbox and live notifier config
   to admit scoped notifications with a stable envelope and capability contract.
   Creation must remain atomic with the source review/incident; avoid a cursor
@@ -985,7 +991,7 @@ recovery, routing controls and the distributable reference plugin remain below.
 - [ ] Implement an independent executable stdio reference plugin, with bounded
   input/output, error handling, provider IDs and declared send/update/idempotency
   capabilities. Transmit only minimal summaries and review locators.
-- [ ] Persist dispatch attempts, finite retry/backoff, stable idempotency keys,
+- [x] Persist dispatch attempts, finite retry/backoff, stable idempotency keys,
   selected route/generation, external IDs and visible terminal/uncertain errors.
   Unsupported provider idempotency must expose possible duplicate delivery.
 - [ ] Merge 100 same-group events while preserving count and meaningful priority
