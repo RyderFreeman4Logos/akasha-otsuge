@@ -22,6 +22,86 @@ fn archive(daemon: &Daemon, operation: &str, directory: &std::path::Path) {
 }
 
 #[test]
+fn imported_pi_session_can_register_fresh_without_reusing_its_old_token() {
+    let mut source = Daemon::new();
+    source.configure(&format!("[access]\nread_roots=[{:?}]\n", source.root));
+    let binary = source.root.join("pi");
+    executable::write(&binary, "#!/bin/sh\nprintf '1.4.0\\n'\n");
+    let agent_dir = source.root.join("agent");
+    std::fs::create_dir(&agent_dir).unwrap();
+    let transcript = agent_dir.join("native.jsonl");
+    let mut rows: Vec<Value> = include_str!("../fixtures/pi/1.4.0/root-before.jsonl")
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    rows[0]["cwd"] = json!(source.root);
+    let session = rows[0]["id"].clone();
+    let manifest: Value =
+        serde_json::from_str(include_str!("../fixtures/pi/1.4.0/manifest.json")).unwrap();
+    let turn = manifest["ids"]["assistant"].clone();
+    let row = rows.iter_mut().find(|row| row["id"] == turn).unwrap();
+    row["message"]["content"][2]["name"] = json!("akasha_consult");
+    row["message"]["content"][2]["arguments"] = json!({"hint":"review"});
+    std::fs::write(
+        &transcript,
+        rows.iter()
+            .map(|row| format!("{row}\n"))
+            .collect::<String>(),
+    )
+    .unwrap();
+    let register = json!({"op":"register","binary":binary,"agent_dir":agent_dir,"session_id":session,"transcript_path":transcript,"cwd":source.root});
+    let native = |daemon: &Daemon, event: Value| rpc(daemon, json!({"op":"pi","event":event}));
+    source.start();
+    let old = native(&source, register.clone());
+    let old_token = old["data"]["registration"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{old}"));
+    source.cli(&["daemon", "stop"]);
+    source.wait();
+    let exported = source.root.join("archive");
+    archive(&source, "export", &exported);
+    let mut target = Daemon::new();
+    // The destination owner explicitly authorizes this existing native session path.
+    target.configure(&format!(
+        "[access]\nread_roots=[{:?},{:?}]\n",
+        target.root, source.root
+    ));
+    archive(&target, "import", &exported);
+    target.start();
+    assert_eq!(
+        native(
+            &target,
+            json!({"op":"sync","registration":old_token,"until_entry":"anything"})
+        )["error"]["code"],
+        "BINDING_UNAVAILABLE"
+    );
+    let fresh = native(&target, register.clone());
+    let token = fresh["data"]["registration"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{fresh}"));
+    assert_ne!(token, old_token);
+    assert_eq!(native(&target, register.clone())["data"], fresh["data"]);
+    let bind = json!({"op":"bind","registration":token,"call":{"session_id":session,"leaf_id":manifest["ids"]["tool"],"turn_id":turn,"tool_call_id":"call_fixture","agent_dir":agent_dir,"transcript":transcript,"cwd":source.root}});
+    let bound = native(&target, bind.clone());
+    assert!(bound.get("error").is_none(), "{bound}");
+    assert_eq!(bound["data"]["requested_cursor"], 5);
+    target.cli(&["daemon", "stop"]);
+    target.wait();
+    target.start();
+    assert_eq!(native(&target, register)["data"], fresh["data"]);
+    assert_eq!(native(&target, bind)["data"], bound["data"]);
+    assert_eq!(
+        native(
+            &target,
+            json!({"op":"sync","registration":old_token,"until_entry":"anything"})
+        )["error"]["code"],
+        "BINDING_UNAVAILABLE"
+    );
+    target.cli(&["daemon", "stop"]);
+    target.wait();
+}
+
+#[test]
 fn imported_daemon_keeps_history_inert_across_restarts_and_accepts_fresh_work() {
     let mut source = Daemon::new();
     source.configure("[notifiers.inbox]\nkind='local'\n");
