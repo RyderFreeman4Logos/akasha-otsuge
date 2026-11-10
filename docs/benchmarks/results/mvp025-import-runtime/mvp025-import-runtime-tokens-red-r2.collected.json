@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T07:07:48.559382+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "a5d49702e10472c995cc93268ff7470a2e849c51",
+    "log_sha256": "1b47b0fc3c878d538d240a04f9324a19d715f4f44ac32d8c67d0551228d17a47",
+    "seconds": 12.694824208505452,
+    "utc": "2026-11-10T07:07:39.546860+00:00"
+  },
+  "process_absent": true,
+  "classification": "CAUSAL_RED_IMPORTED_CODEX_TOKEN_ADMITTED_JOB"
+}

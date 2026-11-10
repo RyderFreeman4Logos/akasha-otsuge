@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T07:17:53.274776+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "a4f6996be5902cef7c15ce527b0eadf3f00447b4",
+    "log_sha256": "94bce41748b0a13e5988f4213cde812c71095cf8fc96c68ad1e9ea88ccca2295",
+    "seconds": 4.1492699440568686,
+    "utc": "2026-11-10T07:17:13.514755+00:00"
+  },
+  "process_absent": true,
+  "classification": "CAUSAL_RED_IMPORTED_DAEMON_STILL_DISABLED"
+}

@@ -1,0 +1,25 @@
+{
+  "status": "real sample acquired; migration and integrity acceptance not run",
+  "schema_version": 21,
+  "fork_extension": 28,
+  "schema_objects": 42,
+  "snapshot_bytes": 11741294592,
+  "source_mode": "mode=ro on kernel read-only mount; immutable absent",
+  "consistency": "SQLite online backup from one explicit read transaction",
+  "backup_seconds": 225.85750816669315,
+  "managed_seconds": 288.07178009767085,
+  "attempts": [
+    {
+      "status": "FAIL",
+      "sqlite_errorname": "SQLITE_CANTOPEN"
+    },
+    {
+      "status": "PASS",
+      "sqlite_errorname": null
+    }
+  ],
+  "privacy": "content and private snapshot paths/hash retained only in local evidence",
+  "source_bytes_static": false,
+  "source_writes_by_reader": "prevented by kernel read-only mount",
+  "network_isolated": true
+}

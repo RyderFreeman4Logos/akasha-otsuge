@@ -122,10 +122,48 @@ in this leaf. Successful output describes the imported archive, not the current
 sequence of an existing destination. A later close, publication-sync or output
 failure still returns a nonzero status; rerun the same input to reconcile it.
 
-**Imported stores remain offline in this leaf.** Daemon startup returns
-`IMPORTED_RUNTIME_DISABLED` before configuration recovery, grants, jobs or
-notifications can be activated. The storage API and `archive export` can inspect
-or export the restored history. Retaining historical permissions and host tokens
-does not authorize their use on the destination. Fresh local runtime authority,
-normal daemon/history access, mempal conversion, incremental application and
-complete domain-level round-trip acceptance remain tracked in issue #25.
+## Starting the imported store
+
+Use a local destination config and start the daemon after import completes:
+
+```sh
+akasha-otsuge --config /path/fresh-config.toml daemon start
+```
+
+Startup appends fresh local configuration and a local-owner read grant. It picks
+a configuration generation above every archived generation, empties the runtime
+job/incident queues, starts notification projection after the import boundary,
+and selects a fresh search generation with zero progress. These initialization
+commits are separate from the original imported commits. An interrupted startup
+resumes initialization; completed initialization is not repeated on restart.
+Search rebuilding and configured model calls require subsequent authorized work.
+
+Historical configurations, grants, jobs, tokens and notification deliveries remain
+readable records. They do not become current execution authority. Imported job
+IDs return `IMPORTED_RUNTIME_AUTHORITY` on admission or claim, even if their
+mutable records were later updated. Use a new local job ID and a freshly
+validated plan. Imported invocation IDs and registration tokens return
+`BINDING_UNAVAILABLE` on active use; register the host locally and use a new
+invocation. Pi session and Claude child registration identities receive a local
+import namespace, retaining the original immutable records.
+
+Acknowledging an old notification does not make it eligible for delivery. A new
+authorized review/incident change can create a new notification generation with
+fresh delivery state. Original delivery history remains available in historical
+revisions; old external message IDs are not reused for a new destination.
+
+Memory authority, source spans, scopes, revisions, commit clocks and recall
+outputs retain their original values. Current read grants still control access,
+including history and receipt replay. Import does not rewrite another user's
+scope or manufacture approval, and it does not remap a different operating-system
+UID automatically. The integration fixture verifies the same local owner.
+
+Controlled tests cover two real daemon starts without an external notifier call,
+fresh capture and notification work, state/history/receipt comparisons and
+identical archive replay after local changes. Four additional SIGKILL points
+cover configuration, queue, index and grant initialization. A controlled Pi
+fixture re-registers the same imported session with a fresh token and preserves
+the new binding across restart while rejecting the old token. This is not
+actual provider authentication. SIGKILL is not
+power-loss or real ENOSPC evidence. Actual mempal conversion, incremental
+application of different archives and full migration acceptance remain in #25.

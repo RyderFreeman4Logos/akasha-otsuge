@@ -1,0 +1,217 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import subprocess; commands=[['cargo','fmt','--all'],['cargo','test','--locked','--test','daemon','import_tests::','--','--nocapture'],['cargo','clippy','--workspace','--all-targets','--locked','--','-D','warnings']]; [(print('RUN '+repr(c),flush=True),subprocess.run(c,check=True)) for c in commands]"
+  ],
+  "dirty_diff_sha256": "90a0e8414a4c856e94c53feeede07af67ae2ac7f2ae0449566b010c57d2e3bcd",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "9979fe35a8d0fc480bc97aaded82496647e74e62",
+  "process": {
+    "pid": 2955051,
+    "start_ticks": "611378911",
+    "state": "R"
+  },
+  "tree": "d64f89805334bbce8dd82abb014a062ebf5d081c",
+  "untracked": [
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/README.md",
+      "sha256": "1b8eab560e824ad685f4436fd12c1bb0ef1d30135363205da618ed6e4e2c5173"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/manifest.json",
+      "sha256": "c0ade2743fd16b12093deeff39d18010517062c6d741d2de7f1b66ebe7a3049b"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-capabilities-green-r1.admission.json",
+      "sha256": "d833a48ee60ae3b02005f4b7faf570d0279a99159ad90707df07f63bad0536b5"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-capabilities-green-r1.collected.json",
+      "sha256": "8ce0d5a2223e192069d4b85d5bebbe1c8483c2a178b4f53e664b33eb0d720d77"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-capabilities-green-r1.log.gz",
+      "sha256": "d704de415670a87b05643bd753bf9b8083ed8f13766cdf756d5f90a365abcb5c"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-capabilities-green-r1.terminal.json",
+      "sha256": "f2b48725eebd25249d0330c38f8085318cf8a807aa3dd98fc583ad046718f6b0"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-capabilities-red-r1-diagnosis.json",
+      "sha256": "ee6b5faab16017508c6a08249179870a983dc0de108a37c3b6f8268bf8f73cc9"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-capabilities-red-r1.admission.json",
+      "sha256": "58df82d2b53fe756f6fd4c5f47dab07688f1e3d157d884750080e4e9555c0d2f"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-capabilities-red-r1.collected.json",
+      "sha256": "2f2de9fae94a967bb634165494343c1a18107772f4bac445c7c9a3574c6e3470"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-capabilities-red-r1.log.gz",
+      "sha256": "a9e4713063cb81d69ef6f427511e6520861073d97964a6527370b962b1bb4291"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-capabilities-red-r1.terminal.json",
+      "sha256": "7e4d97176a2756cbb758d419ba62087b9959a9eb9cf00f8b8a5034ae27e1a60f"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-daemon-red-r1-diagnosis.json",
+      "sha256": "a28a8309192a5f9c2b079df437ce5a18580c8e9672d13e4ebd1b39b58e1242a0"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-daemon-red-r1.admission.json",
+      "sha256": "70b0fecb6ab3b0c9c1d9d92b0ecc19517705846b06efdb530cf29a6afbac3451"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-daemon-red-r1.collected.json",
+      "sha256": "55e1fd4cfefa5ee32e4de7cb879d8901b2f5c4c3b30abc51c26d61f7b5b9a5d5"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-daemon-red-r1.log.gz",
+      "sha256": "9f745a46ec3fa3252e7180c439c4226bf8f67b0aed1907673c2c729803c15cfb"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-daemon-red-r1.terminal.json",
+      "sha256": "90b0ff09abb5093973a791cc51afcd9d7890ae4ce0bf4435cc4a87208f6dd779"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-daemon-red-r2.admission.json",
+      "sha256": "f6132eb63e6f148a184cddd15de4786b27f1ce19c7ff7a7590c714e2760bb361"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-daemon-red-r2.collected.json",
+      "sha256": "701b3548223ca75a83e5e7197a173338eea48f36898bc73429d248903d8cbd21"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-daemon-red-r2.log.gz",
+      "sha256": "052098c092d4a371db7ebec4b32ef2d00e7d8ddf89bad2e30d8fc1c63d3192ef"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-daemon-red-r2.terminal.json",
+      "sha256": "41901ea3bdf9957105deae5e3ead1e78cc195a366c289f4a1f245c46b56c78f8"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r1.admission.json",
+      "sha256": "b61bceb158ea1a0e5dcb6e72481bf5103a0361c0016a173ed0726a8ad94dd400"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r1.collected.json",
+      "sha256": "4313f2dda7f2f4fdca97869b4144de526ab144de6671a77b3669101efc907847"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r1.log.gz",
+      "sha256": "402f2fcec19fdfa651ad26be20b0004d70c3792cbaec66528a9d0f5bacaff39a"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r1.terminal.json",
+      "sha256": "1dfc5ac861bd5f148adde6c4a0a3dc0f16481170c3cf67958f43edf8e483002b"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r2.admission.json",
+      "sha256": "45deffe2f841115488b25fb57e76e44d086ca71975f70241c204012e76c0aa5f"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r2.collected.json",
+      "sha256": "16662bc2ca448a3697f6020ae90f71c6c3bc6f66aac301569ae81c150f40a786"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r2.log.gz",
+      "sha256": "dc3d4a0453947b63a5c9b6f15be27bd0f783574721ffbc144471df611f9dd606"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r2.terminal.json",
+      "sha256": "d6db3690671d1c794fa0f8ea25ff1c9298a1c496def535a86d34727613e886cc"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r3.admission.json",
+      "sha256": "2f97859a3fe7c2e9fe81c068eafe976493a55f05752d44d8b7b9aec4763faa9f"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r3.collected.json",
+      "sha256": "702bbc1b35198f051646b4428a1c1664ffdeed36b09488ac20d09407c6e26755"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r3.log.gz",
+      "sha256": "a205cc6a5666cf438da612ef63a62f37c2db80de9877007b2bd19f66fc595874"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-green-r3.terminal.json",
+      "sha256": "6d67ad0f41af0bbafcd9738457d505d17386b2bd82ae8b60f3eabe838436f0af"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-red-r1-diagnosis.json",
+      "sha256": "5d17ed9ab460920e032cc12715941aa4301cb6efbeacbc42f98555b52779b15f"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-red-r1.admission.json",
+      "sha256": "87ad1189b49e823ea857783ccfa789fbd0397b455b7bf82d28803cda9b2b14da"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-red-r1.collected.json",
+      "sha256": "a786bb009c4aba463258ab2420f63fd385695200edaf683b021e326a880d411b"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-red-r1.log.gz",
+      "sha256": "4db099f15eb80baa704c1267387c90ff62506207c37a860a82cc5f93607bd773"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-red-r1.terminal.json",
+      "sha256": "50dca8ffddaeac3ae35f3c4bb666da11cba5d3009b847945a910185a59cfef03"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-red-r2.admission.json",
+      "sha256": "1318108daa7aed6b7f71bc3d62b158b433ea8ed5719f8019d7d6a958efba0419"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-red-r2.collected.json",
+      "sha256": "91111e5ebc79305e654c616fccd34a9f4d866c108d6e49afc3fab0674b3c916f"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-red-r2.log.gz",
+      "sha256": "0136c9b1af9b84651a8395584ff6f95ff5cd1f226175ab9f1b35e545668650e0"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-red-r2.terminal.json",
+      "sha256": "9c82bd790cc4632988a36a6d068ffc52b7dbaf29db0e2a67ab15aca4214225fb"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-tokens-red-r2.admission.json",
+      "sha256": "70323ea5bdb54611e0d5a3f6d6d2935446dfdfab5966c27662c822a5bafe6f4d"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-tokens-red-r2.collected.json",
+      "sha256": "eb1e3c44de741af1aaaf8954cfa9b0a2e90246592f37662efd00d0d626b59692"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-tokens-red-r2.log.gz",
+      "sha256": "8c31565ba472e1f63c7ef7357ddad6003676476053bb6a2cb569d9b881dd5780"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-import-runtime-tokens-red-r2.terminal.json",
+      "sha256": "342a0b8330d866ebf0e3e1a267f07f217aeec017bee2dd47d85b09b32be36e2d"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-neutral-import-ci-main-r2.json",
+      "sha256": "4aceb6499f0c7b9c154b5f94e530802ef43c56fff4414d858d2e823192bce940"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/mvp025-neutral-import-ci-main-r2.log.gz",
+      "sha256": "bbaebbfea642a28e1b922996bce2bba46ad04b6d6ed30a774732abde71380fc4"
+    },
+    {
+      "path": "docs/benchmarks/results/mvp025-import-runtime/real-sample-preparation.json",
+      "sha256": "957de6fddf728432660863ca82e62040839a7db4583ef3603bd6654a64f380a0"
+    }
+  ],
+  "utc": "2026-11-10T07:31:32.129595+00:00"
+}

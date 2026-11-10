@@ -1,0 +1,29 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import subprocess; commands=[['cargo','fmt','--all'],['cargo','test','--locked','--lib','daemon::jobs::import_tests','--','--nocapture'],['cargo','test','--locked','--lib','storage::crash_tests::import_runtime_boundary_rejects_invalid_metadata','--','--exact'],['cargo','test','--locked','--lib','storage::crash_tests::killed_archive_import_resumes_staging_heads_and_publication_without_duplicates','--','--exact','--nocapture'],['cargo','test','--locked','--test','daemon','import_tests::','--','--nocapture'],['cargo','test','--locked','--test','archive','--test','domain','--test','cli','--test','storage'],['cargo','clippy','--workspace','--all-targets','--locked','--','-D','warnings']]; [(print('RUN '+repr(c),flush=True),subprocess.run(c,check=True)) for c in commands]"
+  ],
+  "dirty_diff_sha256": "46a52f533dbbae5e5be0b4f41344a0c9984f5cc5f9b52b3976b838e8d754b485",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "a4f6996be5902cef7c15ce527b0eadf3f00447b4",
+  "process": {
+    "pid": 2945852,
+    "start_ticks": "611317524",
+    "state": "R"
+  },
+  "tree": "fe50f9dd3faf7e2cc2e99b92a274806d5cd0f3e4",
+  "untracked": [
+    {
+      "path": "tests/support/daemon_import.rs",
+      "sha256": "7330130d020387c7602fe28d93c818a7cced32da96f351aa43e61b606ceb9d78"
+    }
+  ],
+  "utc": "2026-11-10T07:21:18.266377+00:00"
+}

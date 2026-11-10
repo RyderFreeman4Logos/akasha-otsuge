@@ -1,0 +1,6 @@
+{
+  "classification": "fixture-setup-failure-not-causal-RED",
+  "observed": "RESOURCE_BUSY admitting source job while source runtime paused",
+  "repair": "admit source job before pausing through existing public reload; no scheduler exists in this fixture",
+  "product_changed": false
+}

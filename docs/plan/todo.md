@@ -3,7 +3,8 @@
 Rechecked 2026-11-10 UTC after PR #58 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
 #25's offline import merged as `b37c613` after exact canonical, full-range R2
-and CI passed. Fresh destination runtime authority is next on
+and CI passed. Fresh destination runtime authority is implemented and awaiting
+final gates on
 `feat/mvp-025-import-runtime` in the same SSD worktree. Neutral export also
 passed its gates before PR #57 merged; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
@@ -1056,15 +1057,16 @@ the same worktree and preserving the original issue start. Existing mempal work 
 it has unrelated uncommitted changes. Initial frozen source candidate is
 `4593a5c5e6a9ea1140256cd42fa5838511a24e14`; exact code constants are upstream
 schema **21** and fork extension **28**, not the stale v4 description. The complete
-table/field/history mapping is recorded by bounded source discovery; actual
-database structure and runtime migration acceptance remain to be verified.
+table/field/history mapping is recorded by bounded source discovery; a read-only
+real snapshot now confirms both schema axes and inventories 42
+schema objects. Full field/content mapping and migration acceptance remain open.
 
 The bounded source explorer finished in 280.956s; all 14 cited frozen source
 blob hashes and the version/open/admission seams were independently checked.
 The ordinary mempal `open_read_only` path writes coordination state, so migration
 must use an independent SQLite reader. Missing old full text and human review
-facts remain unknown. Only live file/header metadata has been read; no actual
-content sample or supported live schema has been acquired.
+facts remain unknown. The independent read-only snapshot described below now
+provides a real sample; installed source-commit provenance is still unverified.
 
 The first independently shippable leaf is [neutral export](../neutral-archive.md):
 two streamed data files, a final versioned/hash manifest, all original bytes,
@@ -1087,9 +1089,9 @@ round-trip acceptance remain open and this leaf alone cannot close #25.
 The next import leaf must preserve stored revisions/receipts/clocks while keeping
 historical jobs, notifications, machine configuration and access bindings inert.
 A bounded source map identified startup configuration, jobs, incidents,
-notifications, grants, host bindings and derived-index consumers. The current
-independent leaf restores the original offline authority/history and blocks
-daemon activation until fresh local runtime authority is implemented separately.
+notifications, grants, host bindings and derived-index consumers. PR #58 restored
+the original offline authority/history and blocked daemon activation at that
+commit; the current runtime follow-up implements fresh local authority.
 Public CLI regressions cover all four kinds, every historical point, exact bytes,
 clocks/receipts, repeated imports after local changes, corruption/unknown versions,
 private-stage cleanup, locked/existing destinations and foreign-stage preservation.
@@ -1114,15 +1116,39 @@ whole-range R2 with zero findings and 32 fresh focused passes, and exact-head
 CI 42767489191. PR #58 merged as `b37c613` with the reviewed tree.
 [Final import evidence](../benchmarks/results/mvp025-neutral-import-final/README.md)
 retains complete gate/review/CI and publication readback. #25 stays open.
-Read-only metadata found the live mempal file around 11.7 GB and changing;
-a kernel-enforced read-only SQLite probe could not open it, so no actual content
-sample was acquired. The installed `mempal 0.5.0` version string alone does not
-prove frozen source provenance. Two guarded main-file reflink snapshots were
-rejected and removed; the second observed WAL/SHM appearing during the clone.
-Do not retry this route blindly or relax its consistency guard. Next validate
-a read-only SQLite WAL transaction under a read-only filesystem control, then
-acquire a consistent private sample if the live reader protocol permits it.
-No old database, service or sidecar was modified.
+Runtime product changes through `9979fe3` preserve a durable import boundary.
+Fresh local config generations, current grants, queues and search namespaces do
+not hide historical heads. Jobs are checked against their original identity;
+old native tokens/invocations cannot authorize new capture, consult or execution.
+Notification dispatch checks its source revision, so acknowledgement cannot
+rearm imported delivery. New authorized updates reset foreign delivery state.
+Focused R3 passes 59 tests plus Clippy in 126.635s, including eight actual SIGKILL
+phases (four import and four initialization). The real CLI/daemon fixture checks
+two starts, unchanged memory/state/history/receipt output, fresh capture,
+zero old external notification calls, a successful new notification and repeated
+import preserving local work. Test-only successor `c93428e` adds same-session Pi
+registration and restart coverage: a new token/binding works while the old token
+remains denied. Both daemon fixtures plus Clippy passed R4 in 7.047s; controlled
+protocol evidence does not establish actual authentication.
+Exact canonical, independent review and CI remain
+pending; this is not yet merged runtime acceptance.
+[Focused runtime evidence](../benchmarks/results/mvp025-import-runtime/README.md)
+retains causal failures, fixture/compile failures and their corrections separately.
+
+Two guarded main-file reflink attempts were rejected and their candidates removed.
+The second observed WAL/SHM appearing during the clone. Do not retry that route
+blindly or weaken its guard. Independent controls verified read-only WAL reads
+and online backup under a read-only root mount. An event-triggered reader then
+acquired one consistent private SQLite snapshot on SSD: 11,741,294,592 bytes,
+schema21/fork28 and 42 schema objects. One event-race CANTOPEN preceded success;
+the source transaction/backup took 225.858s and the whole managed task 288.072s.
+The reader had no writable source mount and no network. The source remained
+live and may have changed independently; do not claim its bytes stayed static.
+The snapshot SHA-256 is recorded locally, but integrity checks, row-level hashes,
+counts, relations and actual migration remain undone. Keep only this one private
+sample; no data contents are committed. The installed `mempal 0.5.0` version
+string alone does not establish its exact source commit.
+Post-merge import main CI42770214112 also passed with Cargo cache restored/hit.
 
 - [ ] Pin the supported mempal source commit and both schema axes; inventory
   authoritative text, identity, provenance, timestamps, scope, deletion state,
@@ -1138,7 +1164,8 @@ No old database, service or sidecar was modified.
   Preserve scopes, authority and readable history; do not activate foreign jobs
   or import machine-specific configuration as a side effect.
 - [x] Finish the independent offline-import leaf through exact canonical,
-  whole-range review, CI and merge; preserve the explicit daemon activation block.
+  whole-range review, CI and merge; preserve the historical offline-only receipt.
+  The following runtime leaf supplies the new activation contract.
 - [ ] Initialize fresh destination configuration, grants, job/incident queues,
   notification projection and derived-index namespaces while retaining original
   history. Imported bindings/tokens cannot authorize execution or be laundered
