@@ -1,0 +1,49 @@
+{
+  "utc": "2026-11-10T04:03:10.925397+00:00",
+  "head": "ffc279fe7aaf7aa1ac9e6d3160926b90c17abaca",
+  "tree": "5d697d798ebf180c929b33bb81634c73b2c4b57f",
+  "base": "37d4d77ec4517d9a35eff7eb85704de6a656d739",
+  "clean_before_after": true,
+  "command": [
+    "just",
+    "check"
+  ],
+  "exit_code": 0,
+  "seconds": 453.47827878408134,
+  "rust_result_rows": 20,
+  "rust_passed_including_installed_repeat": 541,
+  "rust_ignored_including_installed_repeat": 31,
+  "daemon_passed_each_run": 157,
+  "daemon_opt_in_ignored_each_run": 7,
+  "installed": {
+    "installed": true,
+    "binary_sha256": "66fc9ec78e86d768d2f1391d8bbd5d25b74132f74fb20f09d33e29617df8d88c",
+    "lifecycle": "passed",
+    "private_uid_denial": "passed",
+    "peer_uid_denial": "passed",
+    "tcp_sockets": 0,
+    "kernel_control_uid": 165536
+  },
+  "artifacts": {
+    "mvp024-observability-canonical-r1.admission.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp024-observability-canonical-r1.admission.json",
+      "sha256": "ee3783d24179ac25c3e1f943ba2e06d887ffc09a93303ee9aa8612542b679a44"
+    },
+    "mvp024-observability-canonical-r1.terminal.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp024-observability-canonical-r1.terminal.json",
+      "sha256": "4ae58c71182d1d1278f641cb2174c871e4b411c9c33047a4875903c9aca9db4c"
+    },
+    "mvp024-observability-canonical-r1.collected.json": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp024-observability-canonical-r1.collected.json",
+      "sha256": "1c6a9fc5bb40571d4d67b3e739275981d449722ae104673a9920a1d0034a7710"
+    },
+    "mvp024-observability-canonical-r1.log": {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp024-observability-canonical-r1.log",
+      "sha256": "b92a6b4ea32c327f6072b7569f1f6e581ba6c71a21579af29e5461a7becbcaa9"
+    }
+  },
+  "limits": [
+    "Independent frozen review and hosted CI remain separate stages.",
+    "Controlled fixtures and installed smoke checks do not establish new provider authentication or product stress acceptance."
+  ]
+}

@@ -1,11 +1,14 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-10 UTC after PR #55 merged: **22 original Issues
+Rechecked 2026-11-10 UTC after PR #56 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
-#24 is active from main `37d4d77` in one SSD worktree. #23 passed its exact full
-gate, independent whole-range R4 and CI42748687256 before closing. The merge tree
-matches the reviewed candidate. Post-merge main CI42750140146 also passed with
-Cargo cache restored/hit; its independent receipt was collected after merge.
+#25 is active from main `c059fda` in one SSD worktree. #24's first independent
+resource-observability leaf passed exact canonical, whole-range R1 and CI before
+PR #56 merged; #24 remains open for enforcement and full production acceptance.
+#25's lossless production import/export is next so the stress campaign can reuse
+its data path. #23 is completed; its post-merge main CI42750140146 also passed.
+The new post-merge main CI42755182650 is pending and will be collected at the next
+verification checkpoint; it is separate from successful candidate CI42753418883.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -986,7 +989,12 @@ backup-restore constructors; that failed attempt is retained, not counted as GRE
 The repaired focused run passed 24 config, three unit, two real daemon cases and
 all-target Clippy in 40.735 seconds. [Its compact evidence](../benchmarks/results/mvp024-observability/README.md)
 binds the final source bytes; the exact canonical gate and independent review
-remain required before this leaf is published.
+have now passed on `ffc279f`. PR #56 merged as `c059fda` with the identical tree:
+`just check` 453.478s, 541 Rust passes including installed repeat, 157 daemon per
+run; independent R1 PASS with zero introduced findings; CI42753418883 SUCCESS.
+[Final evidence](../benchmarks/results/mvp024-observability-final/README.md) retains
+the full report/public readback, gate and CI. The finished worktree was removed
+after zero consumers were found; shared target and corpus inputs remain.
 Memory admission/draining and dedicated cgroups follow as a separate leaf; neither
 observability nor focused fixtures satisfy the full production stress acceptance.
 
@@ -1034,6 +1042,49 @@ Original #24 start: 2026-11-10T03:34:44.812218Z (SSD worktree creation/reflog).
 Branch `feat/mvp-024-stress`; base `37d4d77`. No full-data product acceptance
 has run yet. Retained raw shards total 43,986,181,099 bytes; current shard hashes
 still need revalidation. Storage/daemon fixture success does not close this issue.
+
+## MVP-025 read-only migration and neutral archive acceptance
+
+Original start 2026-11-10T04:22:08.149789Z (SSD worktree creation/reflog).
+Branch `feat/mvp-025-migration`; base `c059fda`. Existing mempal work is read-only:
+it has unrelated uncommitted changes. Initial frozen source candidate is
+`4593a5c5e6a9ea1140256cd42fa5838511a24e14`; exact code constants are upstream
+schema **21** and fork extension **28**, not the stale v4 description. The complete
+table/field/history mapping remains to be verified by bounded native discovery.
+
+- [ ] Pin the supported mempal source commit and both schema axes; inventory
+  authoritative text, identity, provenance, timestamps, scope, deletion state,
+  relationships and actually retained history. Document derived/operational data
+  and unavailable fields; do not invent old content or human approval.
+- [ ] Define a versioned neutral archive with a manifest, content hashes, blobs
+  and explicit relations. Export raw originals, effective state, known history
+  and recall receipts without a selected-engine dependency. Bound streaming
+  memory and file sizes; preserve exact content and request/result identities.
+- [ ] Implement public production export/import commands. Verify all identities,
+  hashes, lengths, versions and references before publication; reject malformed,
+  corrupt, unknown-version or incomplete archives without replacing valid data.
+  Preserve scopes, authority and readable history; do not activate foreign jobs
+  or import machine-specific configuration as a side effect.
+- [ ] Implement the frozen mempal reader without modifying its source database,
+  schema, live service, configuration or checkout. Stable origin identities must
+  support duplicate/incremental import with explicit conflicts and no duplicate
+  logical application. Missing provenance/review facts remain unknown.
+- [ ] Verify a real supported mempal sample against independent counts, hashes,
+  sampled content and relations. Use an isolated source/target and keep private
+  content out of committed fixtures/reports. Prove source preservation and safe
+  refusal of unknown versions and corrupt records with exact failure evidence.
+- [ ] Exercise neutral export → empty import through public commands; compare
+  effective state, historical views, source bytes, receipt identities and outputs.
+  Cover idempotency, incremental changes, interrupted import/resume, scope,
+  deletion/retraction, malformed references, bounded oversize input and disk errors.
+- [ ] Publish supported-version/field mapping, usage, limitations and compact
+  real acceptance evidence. Complete focused causal tests, exact canonical gate,
+  independent review and CI for each safe leaf; merge and verify issue #25 closure
+  only after the whole migration/round-trip contract is satisfied.
+
+After #25, return to all unchecked #24 enforcement/corpus/load/fault work, then
+packaging (#26), fixed-oracle quality evaluation (#27) and final acceptance (#28).
+Claude authentication (#12) and mp SSH access remain explicit external blockers.
 
 ## Complete Issue queue
 
