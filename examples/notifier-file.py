@@ -115,13 +115,13 @@ def deliver(path, notice, fail_first):
             receipt = state["receipts"][key]
             check(receipt["sha256"] == fingerprint and receipt["external_message_id"] == message_id(notice))
             return receipt["external_message_id"]
+        target = message_id(notice)
+        if notice["action"] == "update":
+            check(external == target and external in state["messages"])
         if fail_first and not state["failed_once"]:
             state["failed_once"] = True
             save_state(path, state)
             raise OSError("demonstration transient failure")
-        target = message_id(notice)
-        if notice["action"] == "update":
-            check(external == target and external in state["messages"])
         state["messages"][target] = notice
         state["receipts"][key] = dict(sha256=fingerprint, external_message_id=target)
         save_state(path, state)

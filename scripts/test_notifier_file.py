@@ -84,6 +84,26 @@ class FileNotifierTests(unittest.TestCase):
         self.assertEqual(len(state["messages"]), 1)
         self.assertEqual(len(state["receipts"]), 1)
 
+    def test_invalid_update_cannot_consume_fail_first_or_mutate_state(self):
+        target = "file-" + hashlib.sha256(self.notice["notification_id"].encode()).hexdigest()
+        invalid = self.notice | dict(action="update", external_message_id=target)
+        empty = dict(schema_version=1, messages={}, receipts={}, failed_once=False)
+        self.state.write_text(json.dumps(empty))
+        self.state.chmod(0o600)
+        before = self.state.read_bytes()
+        result = self.deliver(invalid, "--fail-first")
+        self.assertEqual(result.returncode, 75)
+        self.assertEqual(result.stdout, b"")
+        self.assertEqual(self.state.read_bytes(), before)
+        sent = self.deliver()
+        self.assertEqual(sent.returncode, 0, sent.stderr)
+        before = self.state.read_bytes()
+        wrong = invalid | dict(idempotency_key="notice-1:2:route", external_message_id="another-message")
+        self.assertEqual(self.deliver(wrong, "--fail-first").returncode, 75)
+        self.assertEqual(self.state.read_bytes(), before)
+        self.assertEqual(self.deliver(None, "--fail-first").stdout, sent.stdout)
+        self.assertEqual(self.state.read_bytes(), before)
+
     def test_nested_corrupt_state_and_dangling_receipts_are_rejected_unchanged(self):
         self.assertEqual(self.deliver().returncode, 0)
         valid = json.loads(self.state.read_text())

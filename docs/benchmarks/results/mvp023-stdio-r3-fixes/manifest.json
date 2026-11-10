@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "prior_candidate": "24ca2818d4ada599f6d91409cf38d85a84acd47d",
+  "source_files": {
+    "src/adapter/mod.rs": "7906dbfb738f053cd86eb840168a617f016d0e5837f5209bc9cabbd04af8ec20",
+    "src/adapter/guardian.rs": "677da5ff3ce5dd461b6500f20bb3b4fe634e870d4ffcc0f7bc8e597fe4c74b4d",
+    "src/daemon.rs": "9cac1b7b1403029ef6c2c96db905de833a330436ca14b5537f9c9ee92a883127",
+    "src/daemon/jobs.rs": "ce143b37aa6fff478f09627a9444c563e72a7c6d980b8e3cd0e958b59089277a",
+    "src/daemon/notifier.rs": "afbb26603adc233850c751d45e0a09f2af1991ddfc210f273f8f519fb210962f",
+    "src/daemon/notifier/stdio.rs": "648904e374c6a263b022a2be68701faf42f756df87168881153be4409cf72558",
+    "src/config/schema.rs": "f8c6ed9747825132f4cde27f5d9e123b975888cc277246778daaf382bad56ef4",
+    "tests/config.rs": "44595bff8566a2f06515f412711e007df3ea7678963f6cf82086113ed4f746d0",
+    "tests/support/daemon_notifier.rs": "5e9e8e4f0f5dca33a6e8a6ddd87a75a801a52b387c71e902fceeda8ffd7911b3",
+    "tests/fixtures/notifier/oneshot.py": "b576d281ddddd4c41f5567632455c53b90f8c5de6183acfb71a6164f1c2b1d81",
+    "examples/notifier-file.py": "59d60ae3b5ed4f8c9968f0f24fe2811e58e7e6441cb942e5569a87a39cc8299f",
+    "scripts/test_notifier_file.py": "7100d6e0bc93df55f25f91d201b7225b7cdf15059c5cc2c250871195332ce9bc"
+  },
+  "files": {
+    "README.md": {
+      "bytes": 1467,
+      "sha256": "1da5a96e448cd06766786ca7ed37590353eea9ecd724b2b9c32e292c166aae9d"
+    },
+    "mvp023-review-r3-invalid-update-green.admission.json": {
+      "bytes": 1220,
+      "sha256": "bdc5328d0be901d333b3461d21d25e56e6cf4d618393d0eb0d4af50d81f7e5b1"
+    },
+    "mvp023-review-r3-invalid-update-green.collected.json": {
+      "bytes": 416,
+      "sha256": "eabfa6843c46c63a6da320ede39f70bd1265069a517d5bf92be8e22f21db3be2"
+    },
+    "mvp023-review-r3-invalid-update-green.log.gz": {
+      "bytes": 386,
+      "sha256": "937d86394e7c00b12293052cd6133261f273bb42868d09c395f3c584dccdc192"
+    },
+    "mvp023-review-r3-invalid-update-green.terminal.json": {
+      "bytes": 237,
+      "sha256": "93e18a919e11ce178091253c6bbb16c2c8f8f0aef7b058b77bd5d1ab0677f1de"
+    },
+    "mvp023-review-r3-invalid-update-red.admission.json": {
+      "bytes": 1117,
+      "sha256": "c689649b95834107ce930e4e8ee1c59cadf9055a7d0db446d8e556e1c6e1a3f3"
+    },
+    "mvp023-review-r3-invalid-update-red.collected.json": {
+      "bytes": 410,
+      "sha256": "f08aaffadafbb65c7b1cd4aeaa7407879d81f48de08d6ce875704fc02936923a"
+    },
+    "mvp023-review-r3-invalid-update-red.log.gz": {
+      "bytes": 404,
+      "sha256": "17669123f791040c3a251f686eaf3999993ab9c572cc3750139ec1a23366c8b7"
+    },
+    "mvp023-review-r3-invalid-update-red.terminal.json": {
+      "bytes": 238,
+      "sha256": "fdd2a0c8b21bef2a9df9faee90eb4343663fb3d44a87384ac3fb72ba9cb13336"
+    },
+    "mvp023-stdio-canonical-r3-verified.json": {
+      "bytes": 2139,
+      "sha256": "35d9fa313295858314bb8d68b2511600c30437e8fe514b992c75df5a839fb50b"
+    },
+    "mvp023-stdio-canonical-r3.admission.json": {
+      "bytes": 1003,
+      "sha256": "fb17d15ab0e61bac32ae1fc7597c28fe6bca35f40312e3adeb4a99c617e240af"
+    },
+    "mvp023-stdio-canonical-r3.collected.json": {
+      "bytes": 411,
+      "sha256": "1e9a8372557e202221e33712639c2f400f498e60064b02cb0ec054afef0d4768"
+    },
+    "mvp023-stdio-canonical-r3.log.gz": {
+      "bytes": 12565,
+      "sha256": "fdd68b5d84fcf442473ea0916bf87da1ee7aa903764f843d7f273ff7c4de7490"
+    },
+    "mvp023-stdio-canonical-r3.terminal.json": {
+      "bytes": 237,
+      "sha256": "542e9c3d828778df341e2f0991c4f561043e7716c3d4b35df6ca49c10a1f6b0a"
+    },
+    "mvp023-stdio-review-r3-publication.json": {
+      "bytes": 320,
+      "sha256": "176e7c8c404f2325bb81738c0f8090eacb43e5fbc8b82771f26ee43539d40574"
+    },
+    "mvp023-stdio-review-r3-tests.log": {
+      "bytes": 5863,
+      "sha256": "e6751670df83af107acb12ed47874d2ba0cf488eac47c008b4fb05647264412a"
+    },
+    "mvp023-stdio-review-r3.md": {
+      "bytes": 13774,
+      "sha256": "2336ab31e12ceccdb82a6321f91b09be3d15738dfbb8afe587002b1c84e17882"
+    }
+  }
+}

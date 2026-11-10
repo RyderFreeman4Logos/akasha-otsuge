@@ -1026,6 +1026,19 @@ between those runs. The [R2 repair archive](../benchmarks/results/mvp023-stdio-r
 retains this distinction. A fresh exact gate, complete-range R3 review and
 new-head CI remain required before PR #55/#23 close.
 
+R2 repair candidate `24ca281` passed its exact canonical gate in 418.027 seconds
+(535 Rust passes including installed repeat, 155 daemon passes per run).
+Independent [R3 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/55#issuecomment-6757865244)
+confirmed the recovery repairs and all focused checks, but found one LOW reference
+plugin defect: `--fail-first` persisted its marker before validating an update
+target. A causal RED proves byte changes for a missing target. Moving that
+semantic validation before marker persistence passes five standalone cases plus
+the real daemon's 100-event grouping/reference-plugin case. Invalid/mismatched
+targets now preserve bytes; accepted receipt replay still skips the demonstration
+failure. [R3 repair evidence](../benchmarks/results/mvp023-stdio-r3-fixes/README.md)
+preserves the prior gate, full FAIL and RED/GREEN. Fresh exact canonical, whole-range
+R4 review and new-head CI remain required; #23 and PR #55 are still open/draft.
+
 - [x] Reuse the existing transactional revision outbox and live notifier config
   to admit scoped notifications with a stable envelope and capability contract.
   Creation must remain atomic with the source review/incident; avoid a cursor

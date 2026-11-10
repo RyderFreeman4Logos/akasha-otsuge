@@ -1,0 +1,79 @@
+
+COMMAND: python3 scripts/test_notifier_file.py
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.427s
+
+OK
+
+EXIT_CODE: 0
+
+COMMAND: cargo test --locked --test config notifier -- --nocapture
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/config.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/config-145d8f02a9e918c7)
+
+running 2 tests
+test notifier_channel_names_fit_bounded_durable_delivery_records ... ok
+test notifier_policy_is_bounded_and_hot_reloadable ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.00s
+
+
+EXIT_CODE: 0
+
+COMMAND: cargo test --locked --lib notifier -- --nocapture
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 4 tests
+test config::schema::notifier_hours_wrap_at_midnight_and_escalation_bypasses_digest ... ok
+test daemon::notifier::stdio::execution_failures_and_policy_cancellation_keep_distinct_budgets ... ok
+test daemon::notifier::stdio::policy_does_not_change_existing_destination_fingerprints ... ok
+test daemon::notifier::stdio::destination_history_is_bounded_without_evicting_accepted_requests ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 67 filtered out; finished in 0.06s
+
+
+EXIT_CODE: 0
+
+COMMAND: cargo test --locked --test daemon notifier_tests:: -- --nocapture
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 22 tests
+test notifier_tests::local_notifications_are_durable_and_ack_cannot_approve_or_close_review ... ok
+test notifier_tests::stdio_credential_rotation_and_read_revocation_cancel_owned_processes ... ok
+test notifier_tests::notification_record_limit_defers_large_delivery_history_without_stopping_daemon ... ok
+test notifier_tests::stdio_timeout_is_pinned_and_policy_only_reload_does_not_cancel_inflight_send ... ok
+test notifier_tests::stdio_invalid_responses_are_bounded_terminal_and_do_not_echo_plugin_output ... ok
+test notifier_tests::notification_pages_bound_serialized_delivery_history_bytes ... ok
+test notifier_tests::notification_reads_ack_and_dispatch_follow_live_scope ... ok
+test notifier_tests::stdio_provider_without_update_receives_a_new_create_for_escalation ... ok
+test notifier_tests::stdio_notifier_sends_minimal_envelopes_and_updates_the_provider_message ... ok
+test notifier_tests::stdio_recovery_returned_destination_replays_old_envelope_before_new_generation ... ok
+test notifier_tests::waiting_stdio_plugin_does_not_hold_admission_and_live_disable_cancels_it ... ok
+test notifier_tests::notification_channel_history_limit_is_visible_without_stopping_new_delivery ... ok
+test notifier_tests::repeated_incidents_merge_counts_but_priority_escalation_remains_unacknowledged ... ok
+test notifier_tests::disabled_local_channel_survives_sigkill_and_reload_does_not_resend_success ... ok
+test notifier_tests::stdio_live_policy_defers_delivery_and_policy_reload_does_not_replay_success ... ok
+test notifier_tests::stdio_crash_windows_replay_with_idempotency_or_expose_duplicate_risk ... ok
+test notifier_tests::stdio_timeout_reaps_the_plugin_and_persists_retry ... ok
+test notifier_tests::notification_pages_and_ack_backlog_do_not_create_an_idle_outbox_loop ... ok
+test notifier_tests::stdio_recovery_missing_executable_preserves_envelope_and_exhausts_finite_budget ... ok
+test notifier_tests::stdio_retry_survives_restart_and_stops_after_five_attempts ... ok
+test notifier_tests::stdio_recovery_destination_rotation_retains_exhausted_budget_and_success ... ok
+test notifier_tests::stdio_fifth_attempt_policy_cancellation_can_resume_without_renewing_failure_budget ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 140 filtered out; finished in 40.55s
+
+
+EXIT_CODE: 0
