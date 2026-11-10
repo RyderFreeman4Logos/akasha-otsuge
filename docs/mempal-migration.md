@@ -1,8 +1,9 @@
 # Read-only mempal conversion
 
-The first conversion stage preserves legacy SQL rows as inert evidence in a
-neutral archive. Memory/source projection, repeated conversion and interrupted
-conversion recovery are still under development in issue #25.
+The converter preserves legacy SQL rows as inert evidence in a neutral archive
+and projects original text and unverified memory candidates. Repeated conversion,
+interrupted conversion recovery and real target equivalence remain under
+development in issue #25.
 
 Prepare a consistent, stopped SQLite snapshot independently. Do not copy only
 the main file of a live WAL database. The converter refuses a snapshot with an
@@ -49,6 +50,37 @@ identity, supported version axes, per-table descriptors and derived exclusions.
 New archive commit clocks record conversion observation time, not fabricated
 legacy commit times. This stage does not manufacture memory authority, approval,
 original documents or historical revisions that the old database never saved.
+
+Mapping version 2 also creates native source records for drawer content, knowledge
+card statements/content and conversation turns. Text is split at UTF-8 boundaries
+into at most 16 KiB chunks; every candidate cites the exact source chunk hash,
+range and revision. Source, candidate and pending review share one atomic archive
+commit even at batch boundaries. Original row IDs and all other fields remain in
+the typed table evidence; projected IDs include the snapshot hash, table, rowid
+and chunk number.
+
+Drawer claims and card statements become manual-review candidates, never active
+or human-approved memories. Deleted, compacted, retired, superseded or demoted
+rows retain sources without creating candidates. Nonempty scope constraints or
+invalid validity intervals also retain sources only, counted in the migration
+report. Parseable validity bounds remain on candidates, including expired ones.
+Drawer kinds map decision/profile_trait/skill/foresight to
+decision/preference/procedure/hypothesis; other supported kinds and cards map to
+fact. Conversation turns create sources without manufacturing memory claims.
+
+Valid drawer project IDs and conversation project/branch fields are preserved.
+An explicit global domain/global anchor permits a global drawer/card; missing or
+unrepresentable project scopes otherwise use an isolated namespace. Worktree
+anchors add a restrictive branch namespace. Conversation session scope includes
+tool, Hermes profile and native session ID, so shared IDs do not merge profiles.
+All projected records use the importing user's UID and unverified provenance.
+Legacy role/provenance strings never authenticate a human or grant access.
+
+RFC3339 and SQLite UTC timestamps are recognized; finite conversation epoch
+seconds are converted to milliseconds. Unrecognized event dates remain unknown
+and are counted, while their original fields remain intact. Conversion observation
+time stays distinct from legacy event time. Retained relation/audit rows do not
+establish absent original documents, missing historical versions or approvals.
 
 The structural SQL fixture contains no real rows. Controlled tests are separate
 from the private real-source audit and from future real target-equivalence proof.

@@ -1165,8 +1165,13 @@ Its controlled fixture comes from the actual 21/28 table layout with no real
 rows. The missing CLI and three typed refusals were observed failing before
 implementation; one compile failure from unchecked SQLite limit results is
 retained separately. Four focused cases then passed, followed by 54 related
-archive/CLI/domain/storage tests and all-target Clippy in 25.995s. Memory/source
-projection, repeat/recovery behavior, real conversion and full gates remain
+archive/CLI/domain/storage tests and all-target Clippy in 25.995s. Mapping version
+2 now projects drawer/card candidates and conversation sources with unverified
+provenance, exact chunk citations, profile isolation and restrictive scope/time
+handling. Missing projections were observed RED before implementation. Nine
+controlled migration cases, the related integration suites and the domain unit
+selector pass (60 passed, 1 pre-existing ignored), with format and all-target
+Clippy in 96.732s. Repeat/recovery behavior, real conversion and full gates remain
 pending. Runtime post-merge main CI42779863508 also passed separately.
 
 - [ ] Pin the supported mempal source commit and both schema axes; inventory

@@ -21,6 +21,33 @@ pub(super) struct Writer {
 }
 
 impl Writer {
+    pub fn group(&mut self, build: impl Fn(u64) -> Result<Vec<Change>>) -> Result<()> {
+        let next = self
+            .sequence
+            .checked_add(1)
+            .ok_or_else(|| StorageError::new("INVALID_STORAGE_REQUEST"))?;
+        let mut changes = build(next)?;
+        let mut bytes = changes
+            .iter()
+            .map(|change| change.content.len())
+            .sum::<usize>();
+        if self.pending.len() + changes.len() > 64 || self.pending_bytes + bytes > 1024 * 1024 {
+            self.flush()?;
+            changes = build(
+                self.sequence
+                    .checked_add(1)
+                    .ok_or_else(|| StorageError::new("INVALID_STORAGE_REQUEST"))?,
+            )?;
+            bytes = changes.iter().map(|change| change.content.len()).sum();
+        }
+        if changes.len() > 64 || bytes > 1024 * 1024 {
+            return Err(StorageError::new("INVALID_STORAGE_REQUEST"));
+        }
+        self.pending_bytes += bytes;
+        self.pending.extend(changes);
+        Ok(())
+    }
+
     pub fn new(destination: &Path, source: &str, observed_at_ms: u64) -> Result<Self> {
         let parent = destination
             .parent()
@@ -74,7 +101,7 @@ impl Writer {
         let mut request = CommitRequest {
             request_id: format!("mempal/{}/commit/{:020}", self.source, self.sequence),
             config_generation: 1,
-            policy_revision: Some("mempal-schema21-fork28/raw-v1".into()),
+            policy_revision: Some("mempal-unverified-v1".into()),
             changes: std::mem::take(&mut self.pending),
         };
         request.validate()?;

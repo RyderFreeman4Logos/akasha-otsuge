@@ -1,5 +1,6 @@
 //! A one-way legacy reader; imported rows never become execution authority.
 
+mod projection;
 mod reader;
 mod writer;
 
@@ -30,6 +31,7 @@ struct Migration {
     observed_at_ms: u64,
     tables: BTreeMap<String, Table>,
     excluded_derived_tables: Vec<String>,
+    projection: projection::Summary,
 }
 
 #[derive(Serialize)]
@@ -48,6 +50,28 @@ struct Block<'a> {
     data: &'a str,
 }
 
+fn emit_block(
+    writer: &mut Writer,
+    prefix: &str,
+    name: &str,
+    data: &str,
+    table: &mut Table,
+    digest: &mut Sha256,
+) -> Result<()> {
+    writer.push(
+        format!("{prefix}/{:020}", table.blocks),
+        &Block {
+            table: name,
+            start_byte: table.bytes,
+            data,
+        },
+    )?;
+    digest.update(data.as_bytes());
+    table.bytes += data.len() as u64;
+    table.blocks += 1;
+    Ok(())
+}
+
 /// Convert an independently prepared immutable SQLite snapshot to a neutral archive.
 pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive> {
     let mut snapshot = Snapshot::open(source)?;
@@ -59,6 +83,7 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
         .map_err(|_| StorageError::new("INVALID_CLOCK"))?;
     let mut writer = Writer::new(destination, &snapshot.sha256, observed_at_ms)?;
     let mut tables = BTreeMap::new();
+    let mut projection = projection::Summary::default();
     for (name, columns) in &snapshot.tables {
         let mut table = Table {
             columns: columns.clone(),
@@ -70,20 +95,6 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
         let prefix = format!("mempal/{}/table/{name}", snapshot.sha256);
         let mut digest = Sha256::new();
         let mut pending = String::new();
-        let mut emit = |data: &str, table: &mut Table| -> Result<()> {
-            writer.push(
-                format!("{prefix}/{:020}", table.blocks),
-                &Block {
-                    table: name,
-                    start_byte: table.bytes,
-                    data,
-                },
-            )?;
-            digest.update(data.as_bytes());
-            table.bytes += data.len() as u64;
-            table.blocks += 1;
-            Ok(())
-        };
         snapshot.rows(name, |row| {
             let mut line = serde_json::to_string(&row)?;
             line.push('\n');
@@ -94,15 +105,38 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
                 while !pending.is_char_boundary(end) {
                     end -= 1;
                 }
-                emit(&pending[consumed..end], &mut table)?;
+                emit_block(
+                    &mut writer,
+                    &prefix,
+                    name,
+                    &pending[consumed..end],
+                    &mut table,
+                    &mut digest,
+                )?;
                 consumed = end;
             }
             pending.drain(..consumed);
+            projection::row(
+                name,
+                &row,
+                columns,
+                &snapshot.sha256,
+                observed_at_ms,
+                &mut writer,
+                &mut projection,
+            )?;
             table.rows += 1;
             Ok(())
         })?;
         if !pending.is_empty() {
-            emit(&pending, &mut table)?;
+            emit_block(
+                &mut writer,
+                &prefix,
+                name,
+                &pending,
+                &mut table,
+                &mut digest,
+            )?;
         }
         table.sha256 = reader::hex(&digest.finalize());
         writer.push(prefix, &table)?;
@@ -110,7 +144,7 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
     }
     snapshot.verify_unchanged()?;
     let migration = Migration {
-        mapping_version: 1,
+        mapping_version: 2,
         source_mapping_commit: "4593a5c5e6a9ea1140256cd42fa5838511a24e14",
         schema_axes: [21, 28],
         source_sha256: snapshot.sha256.clone(),
@@ -118,6 +152,7 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
         observed_at_ms,
         tables,
         excluded_derived_tables: snapshot.excluded_derived_tables,
+        projection,
     };
     writer.push(format!("mempal/{}/migration", snapshot.sha256), &migration)?;
     Ok(MempalArchive {

@@ -89,6 +89,7 @@ version = "0.1.0-dev"
 dependencies = [
  "arrow-array",
  "arrow-schema",
+ "chrono",
  "futures",
  "lance-index",
  "lance-io",

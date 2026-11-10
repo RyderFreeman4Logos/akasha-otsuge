@@ -99,8 +99,8 @@ pub(super) enum Cell {
 
 #[derive(Serialize)]
 pub(super) struct Row {
-    rowid: i64,
-    values: Vec<Cell>,
+    pub rowid: i64,
+    pub values: Vec<Cell>,
 }
 
 pub(super) struct Snapshot {
