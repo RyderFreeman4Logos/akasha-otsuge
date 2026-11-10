@@ -1,0 +1,89 @@
+
+COMMAND: cargo test --locked --test config
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/config.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/config-145d8f02a9e918c7)
+
+running 24 tests
+test accepted_tasks_pin_resources_and_subscribers_see_complete_generations ... ok
+test channel_routes_executor_permissions_and_global_limits_use_live_config ... ok
+test diagnostics_redact_credentials_endpoints_and_command_arguments ... ok
+test queue_time_does_not_shorten_1700_seconds_or_enable_an_idle_watchdog ... ok
+test concurrent_reload_commits_unique_complete_versions ... ok
+test notifier_channel_names_fit_bounded_durable_delivery_records ... ok
+test fallback_references_cycles_and_slowest_selected_executor_are_checked ... ok
+test extraction_executor_needs_no_model_and_contributes_its_original_timeout ... ok
+test defaults_cover_all_local_model_roles_without_an_endpoint_requirement ... ok
+test profile_and_management_precedence_have_auditable_field_sources ... ok
+test workflow_covers_three_starts_and_reports_the_actual_limiting_layer ... ok
+test removing_an_explicit_path_restores_startup_defaults_as_pending ... ok
+test reload_does_not_change_existing_deadlines ... ok
+test embedding_preparation_failure_preserves_the_whole_old_bundle ... ok
+test incident_grouping_and_priority_rules_reload_with_finite_escalation ... ok
+test rejected_or_mixed_restart_changes_never_partially_apply ... ok
+test retrieval_fingerprint_ignores_log_only_changes_but_tracks_model_semantics ... ok
+test notifier_policy_is_bounded_and_hot_reloadable ... ok
+test auto_grill_roles_share_existing_executors_and_keep_finite_pinned_budgets ... ok
+test memory_profiles_expose_targets_peaks_and_separate_service_budget ... ok
+test bounded_file_reads_handle_partial_writes_and_atomic_replacement ... ok
+test incident_policy_is_opt_in_bounded_and_uses_the_configured_executor_deadline ... ok
+test invalid_configs_fail_closed_and_errors_never_echo_values ... ok
+test profile_count_and_revision_history_are_bounded ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+NUMERIC_EXIT: 0
+SECONDS: 0.252
+
+COMMAND: cargo test --locked --lib daemon::resources::tests
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 1 test
+test daemon::resources::tests::memory_samples_refuse_unknown_processes_and_malformed_or_overflowing_units ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 71 filtered out; finished in 0.00s
+
+
+NUMERIC_EXIT: 0
+SECONDS: 0.239
+
+COMMAND: cargo test --locked --lib config::manager::tests
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running unittests src/lib.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/akasha_otsuge-64e3dc016ad3b8a6)
+
+running 2 tests
+test config::manager::tests::pre_grill_checkpoint_restores_without_changing_accepted_config_digest ... ok
+test config::manager::tests::failed_durable_commit_keeps_active_pending_history_and_watch_unchanged ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 70 filtered out; finished in 0.00s
+
+
+NUMERIC_EXIT: 0
+SECONDS: 0.236
+
+COMMAND: cargo test --locked --test daemon memory_status_ -- --nocapture
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+mise WARN  failed to write cache file: /home/obj/.cache/mise/pypi-git-https-github-com-ryder-freeman4-logos-audio-condenser/remote_versions-e6f24.msgpack.z Read-only file system (os error 30)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running tests/daemon.rs (/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target/debug/deps/daemon-84aae64f3956fc3d)
+
+running 2 tests
+test memory_status_reports_actual_groups_and_keeps_open_storage_budget_on_reload ... ok
+test notifier_tests::memory_status_charges_guard_plugin_and_detached_grandchild ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.30s
+
+
+NUMERIC_EXIT: 0
+SECONDS: 0.520

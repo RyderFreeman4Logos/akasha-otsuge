@@ -1,0 +1,36 @@
+{
+  "command": [
+    "python3",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp025-neutral-export-green.py"
+  ],
+  "dirty_diff_sha256": "4fd6bce646dadbc0f983c99330ecf3f93f127ed27ca5e4bd44f1888b267c2c17",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "f3d4c9e703df3e8a1333df60851335d3430fb4b0",
+  "process": {
+    "pid": 2754979,
+    "start_ticks": "610352191",
+    "state": "R"
+  },
+  "tree": "d4a842be1d8e5c0327cb95cb886dbe9881163c36",
+  "untracked": [
+    {
+      "path": "docs/neutral-archive.md",
+      "sha256": "812fcb566f991c83a754543994cb1b14e4216e08429b32b2b35e6588fcd3fe6c"
+    },
+    {
+      "path": "src/storage/archive.rs",
+      "sha256": "7c57596950ef06028b8a4a1515731ee06f2cae6ca90ae9775faf2321b7372c93"
+    },
+    {
+      "path": "tests/archive.rs",
+      "sha256": "53914577b136b719b2dd04711d79a22bfefae8df2a812e8a3d82cdae52204b78"
+    }
+  ],
+  "utc": "2026-11-10T04:40:24.937266+00:00"
+}

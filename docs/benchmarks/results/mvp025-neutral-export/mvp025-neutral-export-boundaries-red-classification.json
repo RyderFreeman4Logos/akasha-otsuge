@@ -1,0 +1,6 @@
+{
+  "classification": "causal RED: relative NEW_DIRECTORY fails with STORAGE_IO; three other archive tests pass, including real EFBIG blob write and source preservation",
+  "log_sha256": "ff7dcd7d1d70834ba588d1b53c7d144365fa0c95d8f59dd9f716d99f8c32c725",
+  "tests_sha256": "53914577b136b719b2dd04711d79a22bfefae8df2a812e8a3d82cdae52204b78",
+  "utc": "2026-11-10T04:40:21.518011+00:00"
+}

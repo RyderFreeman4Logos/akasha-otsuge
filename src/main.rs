@@ -55,6 +55,8 @@ Commands:
   consult original JOB_ID SOURCE_INDEX [--start BYTE_OFFSET]
   memory show ID [--at COMMIT]
   memory export ID
+  archive export NEW_DIRECTORY
+                             Export the stopped store as JSON and original blobs
   memory patch PATCH_JSON --idempotency-key ID
   patch show ID
   memory history ID [--from COMMIT] [--to COMMIT] [--cursor JSON_FILE]
@@ -345,6 +347,7 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         return Ok(u8::from(failed));
     }
     let operation = match command.as_slice() {
+        ["archive", "export", _] => None,
         ["adapter", "codex-hook", ..] => None,
         ["adapter", "install", "codex" | "hermes" | "pi", ..] => None,
         [
@@ -680,6 +683,21 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
         "",
         &defaults,
     )?;
+    if let ["archive", "export", destination] = command.as_slice() {
+        if socket.is_some() {
+            return Err(Error("INVALID_ARGUMENT"));
+        }
+        let manifest = akasha_otsuge::storage::Storage::export_archive(
+            &resolved,
+            std::path::Path::new(destination),
+        )
+        .await?;
+        let mut bytes =
+            serde_json::to_vec(&serde_json::json!({"schema_version":1,"data":manifest}))?;
+        bytes.push(b'\n');
+        output(&bytes, false)?;
+        return Ok(0);
+    }
     if let ["outcome", "run", path, "--", argv @ ..] = command.as_slice() {
         let plan = json_file_limit(path, akasha_otsuge::outcome::MAX_EVENT_BYTES)?;
         let socket = socket

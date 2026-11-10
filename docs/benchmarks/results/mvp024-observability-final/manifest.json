@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "candidate_head": "ffc279fe7aaf7aa1ac9e6d3160926b90c17abaca",
+  "candidate_tree": "5d697d798ebf180c929b33bb81634c73b2c4b57f",
+  "merge_head": "c059fda030e1c7f5d4ec922f793088450c6bc4f0",
+  "source_files": {
+    "src/config/mod.rs": "6cd9e7cc42e91566b68e371395316dd057e76dc06c88c87399748ff006dc963c",
+    "src/config/schema.rs": "b74b52635864201e0bc5c3fcc489c63d9b55d1815d04faa50f2b0b17de142360",
+    "src/daemon.rs": "9934c6fc61e870748dc337b6da8a48c5ef01496051f671a7c07d059995299142",
+    "src/daemon/resources.rs": "e20fb8fa8c009471dd66c90f37df27d4a7b81323e25f838758781dff9a418833",
+    "src/storage/mod.rs": "9db3656e8740ff4f7b469a3c27395135fcebe1df2bfebdc32bf372c8ddfccee4",
+    "src/storage/backup.rs": "b4c65b49f0ef54bea50a6f55eb0c42cfa7f394116f7342f4b2f425a821e74259",
+    "tests/config.rs": "ecf3d809821426a555669de6e66f3b5dc0751ec2610e7743bc2131be224c7c0d",
+    "tests/daemon.rs": "dc8af63516a63a19e84712e3b92ec62d0384fd110832b55664dbfe7bf1c509b8",
+    "tests/support/daemon_notifier.rs": "32263319100865aa2aeef47914aa409c9aab48996e7b8e5cd7e6f8fd42300c7b",
+    "docs/memory-resources.md": "435ad304699de429f07ceb312452728a2a41953a53963c662995c17a4fd4c015",
+    "docs/configuration.md": "3f06b74c2bf4658e0f82d6dbdfbbd5cd0f694d9256c02432c9eacdd9dc4df06e"
+  },
+  "files": {
+    "README.md": {
+      "bytes": 1556,
+      "sha256": "dadf556d971a159613b50555a0363bb1bd951d718a82f9f4e5c48f188f109489"
+    },
+    "mvp024-observability-canonical-r1-verified.json": {
+      "bytes": 2203,
+      "sha256": "04543813c473486f817e9a444dd500c8fe5061231e5a1428d83b2a8240cb7d98"
+    },
+    "mvp024-observability-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "ee3783d24179ac25c3e1f943ba2e06d887ffc09a93303ee9aa8612542b679a44"
+    },
+    "mvp024-observability-canonical-r1.collected.json": {
+      "bytes": 375,
+      "sha256": "1c6a9fc5bb40571d4d67b3e739275981d449722ae104673a9920a1d0034a7710"
+    },
+    "mvp024-observability-canonical-r1.log.gz": {
+      "bytes": 12633,
+      "sha256": "8ca2cd7dec21a330c05992d7c8df298b44817488e6e20fefb1054dc7146c682f"
+    },
+    "mvp024-observability-canonical-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "4ae58c71182d1d1278f641cb2174c871e4b411c9c33047a4875903c9aca9db4c"
+    },
+    "mvp024-observability-ci-pr-r1.json": {
+      "bytes": 3951,
+      "sha256": "588e8602a65d8f8e7e7a7cd6500e4b2e6d9142d5f937b9f17bcf0b481d696550"
+    },
+    "mvp024-observability-ci-pr-r1.log.gz": {
+      "bytes": 29127,
+      "sha256": "9a2f950cdec269acd4749cca82b7914c64646f1b168770fba3e255c45dda02f0"
+    },
+    "mvp024-observability-merged.json": {
+      "bytes": 752,
+      "sha256": "1ea79bc908ddc4107afe53d9aa473655b2c6e3a5de75e33b5731db60140d6508"
+    },
+    "mvp024-observability-progress-comment.md": {
+      "bytes": 1795,
+      "sha256": "3cf8c5b4a3ac3e21a3d5b5ad1ce60c82853197abe6a8c073e07b140c0b7b375a"
+    },
+    "mvp024-observability-review-r1-cleanup.json": {
+      "bytes": 575,
+      "sha256": "f5a2a5595aa38521f55d5d08ebe50809bfa19cad3ff06b44a61bce3ea89d42dd"
+    },
+    "mvp024-observability-review-r1-publication.json": {
+      "bytes": 382,
+      "sha256": "ea99cfd4b11cef9d43e8a508bfa5272be20e994b0def3d81fee40e9bd4ca85a3"
+    },
+    "mvp024-observability-review-r1-tests.log": {
+      "bytes": 6341,
+      "sha256": "121a31bbab3f020e381b1fd92e1a8acaa6ef372b30f474411d0058f08d2f201d"
+    },
+    "mvp024-observability-review-r1.md": {
+      "bytes": 19109,
+      "sha256": "2e5b9daea95a6d9589ba3a1e77417d58cc4dcc281cf1eaa86c681a142eb7318d"
+    },
+    "mvp024-observability-worktree-cleanup.json": {
+      "bytes": 467,
+      "sha256": "b247753f93931a1129c7da2c96999b966ea854b147b72e2b455802301fefcc87"
+    }
+  }
+}

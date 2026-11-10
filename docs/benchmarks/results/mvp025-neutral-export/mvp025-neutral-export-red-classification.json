@@ -1,0 +1,6 @@
+{
+  "classification": "causal RED: two public CLI tests fail because archive export is not implemented; INVALID_ARGUMENT instead of successful export/unsafe-path classification",
+  "log_sha256": "81b2c2176531dcac8cd62bc62dedfd48f901c9a24f4a8592e88fa5c454661036",
+  "tests_sha256": "20272f2b9a709463227a6ee675c34d6fc387e2e6be919112d1222afecffe1391",
+  "utc": "2026-11-10T04:36:17.093284+00:00"
+}

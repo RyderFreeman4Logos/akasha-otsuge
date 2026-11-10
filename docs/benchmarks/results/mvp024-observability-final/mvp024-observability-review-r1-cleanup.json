@@ -1,0 +1,21 @@
+{
+  "utc": "2026-11-10T04:12:37.215212+00:00",
+  "files": [
+    {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp024-observability-review-r1.stdout",
+      "bytes": 475588
+    },
+    {
+      "path": "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/.git/akasha-evidence/mvp024-observability-review-r1.stderr",
+      "bytes": 0
+    }
+  ],
+  "open_consumers": [],
+  "content_inspected": false,
+  "preserved": [
+    "full report",
+    "focused test log",
+    "exit metadata",
+    "published full report readback"
+  ]
+}

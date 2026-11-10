@@ -1,0 +1,22 @@
+{
+  "frozen_pin": "4593a5c5e6a9ea1140256cd42fa5838511a24e14",
+  "source_files_verified": {
+    "src/core/db.rs": "e0d74766aeeeff40efe4faf8371f0b19485f99573e7ef8f2c9273101852fe8a8",
+    "src/core/db_fork_ext.rs": "93b7f9e801161d96d585002cb66dd61ff2b51903ec0264a91ea1c2a2ef3cf578",
+    "src/core/db_fork_ext_v26.rs": "429f1d2e6acc59294b9f6328f43f44773688c3f848df9f5bb3b2238734aec8c3",
+    "src/core/db_fork_ext_v27.rs": "14b40d836d36bb583807f73c30ee6840c304e0310348132e10618cb5985e0d82",
+    "src/core/db_fork_ext_v28.rs": "9e2b686899e4db25b6cf3620f4e5d624692279a9c4e0b63ef29566c861691382",
+    "src/core/db_open.rs": "a86e5373a28fa4d7ac7e7587059ee9f46bab792da4cf9690c804414fbb9d8cee",
+    "src/core/db_connection.rs": "edff04e39ae906f3e06b5b3117a922202dc71b3c747a42bea09e789b7eece670",
+    "src/core/db_admission.rs": "491548882381cb78360c9209d7baa05d4261c6e8e8dcda2d5b4791678dcadcad",
+    "src/core/types.rs": "c467720f585bba908ac3fd5ba32aad359601932a0619b794a608ab3f09a4bce0",
+    "src/core/utils.rs": "dae409b469a0b09cc3e30e3a9519578e6523ec0462b90a5601ede5d18aab9188",
+    "src/core/mod.rs": "f111af66918523b5adefeb99c3214bb8cd4a264e552bfedcbfea47d4c25b04c5",
+    "src/lib.rs": "9656d3e431b779d472f9612e2c62551d6cd4150a4662a7915422e5c166576171",
+    "src/main.rs": "ca5f7103624d877b53c08e77d577f3cba636efcb50330e0fc9661517cda03e58",
+    "Cargo.toml": "a5f9c35139aab1416c19bf2f9a5e7bc90ceae5d1de80e15a87643067b73a172c"
+  },
+  "report_sha256": "12cf1cb11509e1cbd5c20466617b9e695be2b67af22697dd8a506299845e00c4",
+  "scope": "source-only; exact hashes and bounded decision-driving source excerpts verified; runtime sample and database integrity not tested",
+  "utc": "2026-11-10T04:34:26.288573+00:00"
+}
