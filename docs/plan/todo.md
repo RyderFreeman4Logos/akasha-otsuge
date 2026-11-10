@@ -1,11 +1,10 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-10 UTC after PR #58 merged: **22 original Issues
+Rechecked 2026-11-10 UTC after PR #59 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
-#25's offline import merged as `b37c613` after exact canonical, full-range R2
-and CI passed. Fresh destination runtime authority is implemented and awaiting
-final gates on
-`feat/mvp-025-import-runtime` in the same SSD worktree. Neutral export also
+#25's imported runtime merged as `31d4c61` after exact canonical, full-range R1
+and CI passed. Real mempal conversion is next on `feat/mvp-025-mempal-import`
+in the same SSD worktree. Offline import and neutral export also
 passed its gates before PR #57 merged; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
 PR #56 merged; #24 remains open for enforcement and full production acceptance.
@@ -1130,10 +1129,15 @@ import preserving local work. Test-only successor `c93428e` adds same-session Pi
 registration and restart coverage: a new token/binding works while the old token
 remains denied. Both daemon fixtures plus Clippy passed R4 in 7.047s; controlled
 protocol evidence does not establish actual authentication.
-Exact canonical, independent review and CI remain
-pending; this is not yet merged runtime acceptance.
+Frozen `fa801c9` then passed unchanged canonical in 446.892s: 561 Rust passes
+including installed repeat, 159 daemon cases per run, 34 Python tests and
+installed lifecycle/UID isolation. Whole-range R1 passed with zero introduced
+findings and 60 fresh focused passes; exact-head CI42777693037 passed with the
+Cargo cache restored/hit. PR #59 merged as `31d4c61` with the reviewed tree.
 [Focused runtime evidence](../benchmarks/results/mvp025-import-runtime/README.md)
 retains causal failures, fixture/compile failures and their corrections separately.
+[Final runtime evidence](../benchmarks/results/mvp025-import-runtime-final/README.md)
+retains complete gate/review/CI and merge/publication readback.
 
 Two guarded main-file reflink attempts were rejected and their candidates removed.
 The second observed WAL/SHM appearing during the clone. Do not retry that route
@@ -1144,9 +1148,14 @@ schema21/fork28 and 42 schema objects. One event-race CANTOPEN preceded success;
 the source transaction/backup took 225.858s and the whole managed task 288.072s.
 The reader had no writable source mount and no network. The source remained
 live and may have changed independently; do not claim its bytes stayed static.
-The snapshot SHA-256 is recorded locally, but integrity checks, row-level hashes,
-counts, relations and actual migration remain undone. Keep only this one private
-sample; no data contents are committed. The installed `mempal 0.5.0` version
+The separate read-only audit passed 32 units in 367.076s: SQLite quick_check,
+typed row/table hashes and counts for 29 retained tables, seven selected
+relationship checks and final snapshot hash agreement. It found 3,525,645 rows,
+1,358,141,546 UTF-8 bytes and 3,031,040 blob bytes; drawers account for 580,723
+rows. The checked references have no missing targets, but this does not validate
+all logical relations or vec0 semantics. Actual migration and target equivalence
+remain undone. Keep only this one private sample; no data contents, IDs, source
+paths or private hashes are committed. The installed `mempal 0.5.0` version
 string alone does not establish its exact source commit.
 Post-merge import main CI42770214112 also passed with Cargo cache restored/hit.
 
@@ -1166,7 +1175,7 @@ Post-merge import main CI42770214112 also passed with Cargo cache restored/hit.
 - [x] Finish the independent offline-import leaf through exact canonical,
   whole-range review, CI and merge; preserve the historical offline-only receipt.
   The following runtime leaf supplies the new activation contract.
-- [ ] Initialize fresh destination configuration, grants, job/incident queues,
+- [x] Initialize fresh destination configuration, grants, job/incident queues,
   notification projection and derived-index namespaces while retaining original
   history. Imported bindings/tokens cannot authorize execution or be laundered
   by incidental updates. Verify two restarts without external activity and
