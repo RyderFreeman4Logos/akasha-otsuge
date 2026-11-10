@@ -950,14 +950,23 @@ Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b2
 Original start 2026-11-10T00:11:56Z (earliest local worktree reflog).
 Branch `feat/mvp-023-notifier`; base `554796b`. One SSD worktree, shared Cargo target.
 
-First acceptance leaf: usable local notification inbox for reviews/incidents.
+First acceptance leaf completed: usable local notification inbox for reviews/incidents.
 The focused local tests passed after meaningful missing-CLI and missing-incident
 REDs; the two initial fixture corrections retained the active-read/export and
 transport-request-ID distinctions. Additional scope, SIGKILL, reload, paging and
 idle-loop controls passed. Channel bounds also have RED/GREEN evidence. Final
 focused verification: 22 configuration tests, 6 real daemon notification tests,
-Clippy across all targets and diff checks passed in 56.657 seconds. The local
-leaf's exact gate, independent review and PR remain. The stdio delivery leaf follows;
+Clippy across all targets and diff checks passed in 56.657 seconds.
+PR [#54](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/54) merged as
+`6eb77a1`; its tree matches reviewed candidate `cd57352`. The exact `just check`
+passed in 287.549 seconds (498 Rust passes including installed repeat;
+139 daemon passes per run). Independent [review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/54#issuecomment-6755659738)
+passed with no actionable findings and seven focused checks. Exact-head
+[CI](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/42730893412)
+passed with Cargo cache restored/hit. The merge's main CI run42732148687 is pending
+readback at the next validation checkpoint; it does not replace those receipts.
+
+The stdio delivery leaf is active from base `6eb77a1` in the same SSD worktree.
 #23 stays open until both leaves and all acceptance below are complete.
 
 - [ ] Reuse the existing transactional revision outbox and live notifier config
