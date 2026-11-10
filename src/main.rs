@@ -59,7 +59,7 @@ Commands:
                              Export the stopped store as JSON and original blobs
   archive import ARCHIVE_DIRECTORY
                              Restore history into a fresh offline store
-  migrate mempal SNAPSHOT NEW_ARCHIVE_DIRECTORY
+  migrate mempal SNAPSHOT ARCHIVE_DIRECTORY
                              Convert a schema21/fork28 SQLite snapshot to an archive
   memory patch PATCH_JSON --idempotency-key ID
   patch show ID

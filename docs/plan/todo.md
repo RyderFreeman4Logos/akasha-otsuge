@@ -1171,8 +1171,12 @@ provenance, exact chunk citations, profile isolation and restrictive scope/time
 handling. Missing projections were observed RED before implementation. Nine
 controlled migration cases, the related integration suites and the domain unit
 selector pass (60 passed, 1 pre-existing ignored), with format and all-target
-Clippy in 96.732s. Repeat/recovery behavior, real conversion and full gates remain
-pending. Runtime post-merge main CI42779863508 also passed separately.
+Clippy in 96.732s. Conversion now reconciles completed or interrupted output in
+place under one writer lock, preserving the original observation time. Twenty
+archive tests and the five-phase real SIGKILL supervisor pass, with format and
+all-target Clippy in 47.350s. The dangling-manifest RED and preceding recovery
+failures are retained separately. Real conversion and full gates remain pending.
+Runtime post-merge main CI42779863508 also passed separately.
 
 - [ ] Pin the supported mempal source commit and both schema axes; inventory
   authoritative text, identity, provenance, timestamps, scope, deletion state,

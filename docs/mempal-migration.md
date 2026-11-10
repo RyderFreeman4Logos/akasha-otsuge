@@ -1,9 +1,9 @@
 # Read-only mempal conversion
 
 The converter preserves legacy SQL rows as inert evidence in a neutral archive
-and projects original text and unverified memory candidates. Repeated conversion,
-interrupted conversion recovery and real target equivalence remain under
-development in issue #25.
+and projects original text and unverified memory candidates. Repeated and
+interrupted conversion reuse the same private output directory. Real target
+equivalence and incremental application remain under development in issue #25.
 
 Prepare a consistent, stopped SQLite snapshot independently. Do not copy only
 the main file of a live WAL database. The converter refuses a snapshot with an
@@ -18,11 +18,23 @@ akasha-otsuge --config /path/destination.toml \
 akasha-otsuge --config /path/destination.toml archive import /path/new-archive
 ```
 
-The archive destination must be new. Invalid source/version/structure is refused
-before output creation. A later write or source-stability failure may leave a
-private incomplete output without a final manifest; it is not a completed archive.
-Current conversion does not resume such output. A completed archive uses the
-existing neutral importer and its repeat/import-recovery contract.
+The archive destination must be new or an owned private conversion directory.
+Invalid source/version/structure is refused before output creation. A later write
+or source-stability failure may leave private incomplete output without a final
+manifest; it is not a completed archive. Repeat the same command to reconcile it.
+The converter pins the source hash, mapping version, importing UID and first
+observation time in `conversion.json`, holds one output lock, and regenerates the
+deterministic stream. Existing bytes must match exactly before missing suffixes
+can be appended. It does not duplicate existing records or copy the input database.
+
+Completed output is checked in full without appending or changing its observation
+time. A different source or conflicting bytes returns `MEMPAL_CONVERSION_CONFLICT`;
+a held writer lock returns `MEMPAL_CONVERSION_BUSY`. Invalid private file ownership,
+permissions and links are refused. Incomplete reconciliation can append verified
+suffixes before a later failure, but cannot publish a manifest until the complete
+stream and unchanged source pass. There is no promise of constant-time resume:
+source validation and deterministic prefix comparison run again. A completed
+archive uses the neutral importer's separate repeat/import-recovery contract.
 
 Support is restricted to upstream schema **21** and fork extension **28**, with
 the table/column layout mapped from source commit

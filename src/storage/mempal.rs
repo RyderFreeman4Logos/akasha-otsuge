@@ -2,6 +2,8 @@
 
 mod projection;
 mod reader;
+#[cfg(test)]
+mod tests;
 mod writer;
 
 use std::collections::BTreeMap;
@@ -14,6 +16,8 @@ use sha2::{Digest, Sha256};
 use super::{ArchiveManifest, Result, StorageError};
 use reader::Snapshot;
 use writer::Writer;
+
+const MAPPING_VERSION: u32 = 2;
 
 #[derive(Serialize)]
 pub struct MempalArchive {
@@ -82,6 +86,7 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
         .try_into()
         .map_err(|_| StorageError::new("INVALID_CLOCK"))?;
     let mut writer = Writer::new(destination, &snapshot.sha256, observed_at_ms)?;
+    let observed_at_ms = writer.observed_at_ms;
     let mut tables = BTreeMap::new();
     let mut projection = projection::Summary::default();
     for (name, columns) in &snapshot.tables {
@@ -144,7 +149,7 @@ pub fn migrate_mempal(source: &Path, destination: &Path) -> Result<MempalArchive
     }
     snapshot.verify_unchanged()?;
     let migration = Migration {
-        mapping_version: 2,
+        mapping_version: MAPPING_VERSION,
         source_mapping_commit: "4593a5c5e6a9ea1140256cd42fa5838511a24e14",
         schema_axes: [21, 28],
         source_sha256: snapshot.sha256.clone(),

@@ -76,6 +76,140 @@ fn refused(fixture: &Fixture, source: &Path, code: &str) {
     assert_eq!(std::fs::read(source).unwrap(), original);
 }
 
+fn archive_payloads(archive: &Path) -> Vec<Vec<u8>> {
+    ["blobs.bin", "commits.jsonl", "manifest.json"]
+        .map(|name| std::fs::read(archive.join(name)).unwrap())
+        .to_vec()
+}
+
+#[test]
+fn mempal_conversion_reuses_completed_output_and_recovers_a_partial_prefix() {
+    let fixture = Fixture::new();
+    let source = fixture.0.join("repeat.db");
+    legacy_snapshot(&source, &"original\0原文".repeat(3000));
+    let archive = fixture.0.join("repeat-archive");
+    let first = convert(&fixture, &source, &archive);
+    assert!(first.status.success());
+    let original = archive_payloads(&archive);
+    let second = convert(&fixture, &source, &archive);
+    assert!(
+        second.status.success(),
+        "{}",
+        String::from_utf8_lossy(&second.stderr)
+    );
+    assert_eq!(first.stdout, second.stdout);
+    assert_eq!(archive_payloads(&archive), original);
+    std::fs::remove_file(archive.join("manifest.json")).unwrap();
+    for (index, name) in ["blobs.bin", "commits.jsonl"].iter().enumerate() {
+        std::fs::OpenOptions::new()
+            .write(true)
+            .open(archive.join(name))
+            .unwrap()
+            .set_len((original[index].len() / 2 + 7) as u64)
+            .unwrap();
+    }
+    let resumed = convert(&fixture, &source, &archive);
+    assert!(
+        resumed.status.success(),
+        "{}",
+        String::from_utf8_lossy(&resumed.stderr)
+    );
+    assert_eq!(resumed.stdout, first.stdout);
+    assert_eq!(archive_payloads(&archive), original);
+}
+
+#[test]
+fn mempal_conversion_rejects_different_sources_corrupt_output_and_busy_writers() {
+    let fixture = Fixture::new();
+    let source = fixture.0.join("source.db");
+    legacy_snapshot(&source, "retained text");
+    let archive = fixture.0.join("conflict-archive");
+    assert!(convert(&fixture, &source, &archive).status.success());
+    let original = archive_payloads(&archive);
+    let different = fixture.0.join("different.db");
+    legacy_snapshot(&different, "different source");
+    let output = convert(&fixture, &different, &archive);
+    let error: Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(error["error"]["code"], "MEMPAL_CONVERSION_CONFLICT");
+    assert_eq!(archive_payloads(&archive), original);
+    let lock = std::fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(archive.join(".mempal-convert.lock"))
+        .unwrap();
+    lock.lock().unwrap();
+    let output = convert(&fixture, &source, &archive);
+    let error: Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(error["error"]["code"], "MEMPAL_CONVERSION_BUSY");
+    assert_eq!(archive_payloads(&archive), original);
+    drop(lock);
+    let mut corrupted = original[0].clone();
+    corrupted[0] ^= 1;
+    std::fs::write(archive.join("blobs.bin"), &corrupted).unwrap();
+    let before = archive_payloads(&archive);
+    let output = convert(&fixture, &source, &archive);
+    let error: Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(error["error"]["code"], "MEMPAL_CONVERSION_CONFLICT");
+    assert_eq!(archive_payloads(&archive), before);
+}
+
+#[test]
+fn mempal_conversion_refuses_unsafe_resume_paths_without_replacing_them() {
+    use std::os::unix::fs::{PermissionsExt, symlink};
+    for mutation in [
+        "dangling-manifest",
+        "symlink-blob",
+        "hardlink-blob",
+        "public-directory",
+        "public-file",
+    ] {
+        let fixture = Fixture::new();
+        let source = fixture.0.join("source.db");
+        legacy_snapshot(&source, "retained text");
+        let source_before = std::fs::read(&source).unwrap();
+        let archive = fixture.0.join("archive");
+        assert!(convert(&fixture, &source, &archive).status.success());
+        let external = fixture.0.join("external");
+        let original_blob = std::fs::read(archive.join("blobs.bin")).unwrap();
+        match mutation {
+            "dangling-manifest" => {
+                std::fs::remove_file(archive.join("manifest.json")).unwrap();
+                symlink(&external, archive.join("manifest.json")).unwrap();
+            }
+            "symlink-blob" | "hardlink-blob" => {
+                std::fs::rename(archive.join("blobs.bin"), &external).unwrap();
+                if mutation == "symlink-blob" {
+                    symlink(&external, archive.join("blobs.bin")).unwrap();
+                } else {
+                    std::fs::hard_link(&external, archive.join("blobs.bin")).unwrap();
+                }
+            }
+            "public-directory" => {
+                std::fs::set_permissions(&archive, std::fs::Permissions::from_mode(0o755)).unwrap()
+            }
+            "public-file" => std::fs::set_permissions(
+                archive.join("blobs.bin"),
+                std::fs::Permissions::from_mode(0o644),
+            )
+            .unwrap(),
+            _ => unreachable!(),
+        }
+        let output = convert(&fixture, &source, &archive);
+        assert!(!output.status.success(), "accepted {mutation}");
+        assert_eq!(std::fs::read(&source).unwrap(), source_before);
+        assert_eq!(
+            std::fs::read(archive.join("blobs.bin")).unwrap(),
+            original_blob
+        );
+        if mutation == "dangling-manifest" {
+            assert!(archive.join("manifest.json").is_symlink());
+            assert!(!external.exists());
+        } else if mutation.ends_with("-blob") {
+            assert_eq!(std::fs::read(external).unwrap(), original_blob);
+        }
+    }
+}
+
 #[test]
 fn mempal_refuses_unknown_source_versions() {
     let fixture = Fixture::new();
