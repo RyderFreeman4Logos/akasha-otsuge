@@ -192,6 +192,9 @@ impl Domain<'_> {
             .storage
             .current(&grant_key(&context.principal))?
             .ok_or_else(|| error("READ_DENIED"))?;
+        if !self.storage.locally_written(revision.commit_seq)? {
+            return Err(error("READ_DENIED"));
+        }
         let grant: ReadGrant = serde_json::from_str(&revision.content)?;
         if grant.schema_version != 1
             || grant.principal != context.principal
@@ -212,12 +215,17 @@ impl Domain<'_> {
         scope: &Scope,
         config: u64,
     ) -> Result<()> {
-        if self.storage.current(&grant_key(principal))?.is_none() {
+        let current = self.storage.current(&grant_key(principal))?;
+        if !self
+            .storage
+            .locally_written(current.as_ref().map_or(0, |r| r.commit_seq))?
+        {
+            let token = self.storage.runtime_token(&hash(principal.as_bytes()))?;
             self.set_read_grant(
-                &format!("local-reader/{}", hash(principal.as_bytes())),
+                &format!("local-reader/{token}"),
                 principal,
                 Some(scope),
-                None,
+                current.map(|r| r.commit_seq),
                 config,
             )
             .await?;

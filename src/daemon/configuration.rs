@@ -186,17 +186,103 @@ impl Service {
 }
 
 pub(super) async fn open(storage: &Storage, initial: ResolvedConfig) -> Result<ConfigManager<()>> {
-    if let Some(checkpoint) = load(storage, "daemon/config")? {
+    let imported_root = storage.import_identity()?.is_some()
+        && !storage.locally_written(
+            storage
+                .current(&key("daemon/config"))?
+                .map_or(0, |r| r.commit_seq),
+        )?;
+    let manager = if imported_root {
+        let mut generation = 1_u64;
+        let mut after = None;
+        loop {
+            let keys = storage.head_keys(
+                &key("daemon/config-generation/00000000000000000000"),
+                &key("daemon/config-generation/zzzzzzzzzzzzzzzzzzzz"),
+                after.as_deref(),
+                32,
+            )?;
+            for key in keys.iter().take(32) {
+                let value: u64 = key
+                    .id
+                    .rsplit('/')
+                    .next()
+                    .ok_or(Error("CONFIG_CORRUPT"))?
+                    .parse()
+                    .map_err(|_| Error("CONFIG_CORRUPT"))?;
+                generation = generation.max(value.checked_add(1).ok_or(Error("CONFIG_CORRUPT"))?);
+                after = Some(key.id.clone());
+            }
+            if keys.len() <= 32 {
+                break;
+            }
+        }
+        let manager = ConfigManager::new(generation, initial, |_| Ok(()))?;
+        save(storage, &manager.checkpoint()?).await?;
+        manager
+    } else if let Some(checkpoint) = load(storage, "daemon/config")? {
         let manager = ConfigManager::restore(checkpoint, |_| Ok(()))?;
         let generation = manager.pin().generation();
         let manager = manager.restarted(initial, |_| Ok(()))?;
         if manager.pin().generation() != generation {
             save(storage, &manager.checkpoint()?).await?;
         }
-        Ok(manager)
+        manager
     } else {
         let manager = ConfigManager::new(1, initial, |_| Ok(()))?;
         save(storage, &manager.checkpoint()?).await?;
-        Ok(manager)
+        manager
+    };
+    initialize_imported_controls(storage, manager.pin().generation()).await?;
+    Ok(manager)
+}
+
+async fn initialize_imported_controls(storage: &Storage, generation: u64) -> Result<()> {
+    let Some(identity) = storage.import_identity()? else {
+        return Ok(());
+    };
+    let mut changes = Vec::new();
+    for (id, content) in [
+        ("daemon/active-jobs", "[]".into()),
+        ("daemon/incidents", "[]".into()),
+        ("notification/cursor", identity.commit_seq.to_string()),
+    ] {
+        let key = key(id);
+        let current = storage.current(&key)?;
+        if !storage.locally_written(current.as_ref().map_or(0, |r| r.commit_seq))? {
+            changes.push(Change {
+                key,
+                expected_revision: current.map(|r| r.commit_seq),
+                content,
+            });
+        }
     }
+    if !changes.is_empty() {
+        storage
+            .commit(&CommitRequest {
+                request_id: format!(
+                    "import-runtime/{}/{}",
+                    identity.archive_sha256,
+                    hash(&serde_json::to_vec(&changes)?)
+                ),
+                config_generation: generation,
+                policy_revision: None,
+                changes,
+            })
+            .await?;
+    }
+    if !storage.locally_written(
+        storage
+            .current(&key("search/lexical-v1"))?
+            .map_or(0, |r| r.commit_seq),
+    )? {
+        crate::retrieval::Index::begin_rebuild(
+            storage,
+            &format!("import/{}", identity.archive_sha256),
+            generation,
+            &|| Ok(()),
+        )
+        .await?;
+    }
+    Ok(())
 }

@@ -4,7 +4,7 @@ use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::path::Path;
 use std::sync::Arc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use surrealkv::Durability;
 use tokio::sync::Mutex;
@@ -18,10 +18,11 @@ use crate::config::ResolvedConfig;
 
 const IMPORT: &[u8] = b"meta/archive_import";
 
-#[derive(Serialize)]
-struct ImportIdentity {
-    archive_sha256: String,
-    commit_seq: u64,
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct ImportIdentity {
+    pub(crate) archive_sha256: String,
+    pub(crate) commit_seq: u64,
 }
 
 fn invalid() -> StorageError {
@@ -114,6 +115,41 @@ impl Input {
 }
 
 impl Storage {
+    pub(crate) fn import_identity(&self) -> Result<Option<ImportIdentity>> {
+        let Some(bytes) = self.tree.begin()?.get(IMPORT)? else {
+            return Ok(None);
+        };
+        let identity: ImportIdentity = serde_json::from_slice(&bytes).map_err(|_| invalid())?;
+        if identity.commit_seq > self.sequence()?
+            || identity.archive_sha256.len() != 64
+            || !identity
+                .archive_sha256
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        {
+            return Err(invalid());
+        }
+        Ok(Some(identity))
+    }
+
+    pub(crate) fn locally_written(&self, revision: u64) -> Result<bool> {
+        Ok(revision > self.import_identity()?.map_or(0, |i| i.commit_seq))
+    }
+
+    pub(crate) fn locally_created(&self, key: &super::RecordKey) -> Result<bool> {
+        match self.import_identity()? {
+            Some(identity) => Ok(self.at(key, identity.commit_seq)?.is_none()),
+            None => Ok(true),
+        }
+    }
+
+    pub(crate) fn runtime_token(&self, token: &str) -> Result<String> {
+        Ok(match self.import_identity()? {
+            Some(identity) => hash(format!("{}/{token}", identity.archive_sha256).as_bytes()),
+            None => token.into(),
+        })
+    }
+
     pub(crate) fn ensure_runtime_ready(&self) -> Result<()> {
         // Imported capabilities need fresh local initialization before daemon recovery.
         if self.tree.begin()?.get(IMPORT)?.is_some() {
