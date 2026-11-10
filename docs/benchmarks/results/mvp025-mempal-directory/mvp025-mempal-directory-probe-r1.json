@@ -1,0 +1,92 @@
+{
+  "utc": "2026-11-10T11:54:53.430113+00:00",
+  "status": "PASS",
+  "baseline_binary_sha256": "35a2e2eab97b753dd4d200e7d27e45dffd996f2627c7a865e96917f706ec4bc2",
+  "candidate_binary_sha256": "c993b2044b491ae4d1dbefcef8cdd1365ea62186ee2900f2418cda2cd00d821c",
+  "candidate_writer_sha256": "9d63182b0c9fd2b0e2d4bbb560d1db100c5f276cb548dc1a49b835bcd1fbdecd",
+  "interposer_sha256": "f5ff61408b78b74adf9c079162ce707be4d30bcdc037aaacdd2cc7c7d39db54a",
+  "observations": [
+    {
+      "phase": "baseline_archive_candidate_replay",
+      "exit": 0,
+      "all_four_files_unchanged": true
+    },
+    {
+      "binary": "baseline",
+      "phase": "identity-directory",
+      "exit": 0,
+      "move_observed": true,
+      "source_preserved": true,
+      "replacement_untouched": false
+    },
+    {
+      "binary": "baseline",
+      "phase": "manifest-directory",
+      "exit": 0,
+      "move_observed": true,
+      "source_preserved": true,
+      "replacement_untouched": true
+    },
+    {
+      "binary": "baseline",
+      "phase": "identity-locked-directory",
+      "exit": 0,
+      "move_observed": true,
+      "source_preserved": true,
+      "replacement_untouched": false,
+      "independent_lock_busy_control": true
+    },
+    {
+      "binary": "baseline",
+      "phase": "manifest-locked-directory",
+      "exit": 0,
+      "move_observed": true,
+      "source_preserved": true,
+      "replacement_untouched": true,
+      "independent_lock_busy_control": true
+    },
+    {
+      "binary": "candidate",
+      "phase": "identity-directory",
+      "exit": 1,
+      "move_observed": true,
+      "source_preserved": true,
+      "replacement_untouched": true,
+      "parked_recovery_repeat_roundtrip": true
+    },
+    {
+      "binary": "candidate",
+      "phase": "manifest-directory",
+      "exit": 1,
+      "move_observed": true,
+      "source_preserved": true,
+      "replacement_untouched": true,
+      "parked_recovery_repeat_roundtrip": true
+    },
+    {
+      "binary": "candidate",
+      "phase": "identity-locked-directory",
+      "exit": 1,
+      "move_observed": true,
+      "source_preserved": true,
+      "replacement_untouched": true,
+      "independent_lock_busy_control": true,
+      "parked_recovery_repeat_roundtrip": true
+    },
+    {
+      "binary": "candidate",
+      "phase": "manifest-locked-directory",
+      "exit": 1,
+      "move_observed": true,
+      "source_preserved": true,
+      "replacement_untouched": true,
+      "independent_lock_busy_control": true,
+      "parked_recovery_repeat_roundtrip": true
+    }
+  ],
+  "owned_fixture_removed": true,
+  "limits": [
+    "Tiny public structural fixtures; no full private data or live hosts.",
+    "The controlled actor renames the directory; the converter must preserve output ownership and refuse false success."
+  ]
+}

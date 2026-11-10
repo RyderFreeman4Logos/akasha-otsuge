@@ -1,0 +1,20 @@
+{
+  "utc": "2026-11-10T11:41:02.189372+00:00",
+  "known_child_wait_returned": true,
+  "wrapper_absent": true,
+  "observed_fd_consumers": [],
+  "same_uid_processes_uninspectable": 29,
+  "removed": [
+    {
+      "name": "mvp025-mempal-review-r3.stdout",
+      "bytes": 839078,
+      "sha256": "dcecf47da6164def8cc55a9e361f50ef35a84ba8b525fd46f826a2c1175728c1"
+    },
+    {
+      "name": "mvp025-mempal-review-r3.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "scratch_removed_by_reviewer": true
+}

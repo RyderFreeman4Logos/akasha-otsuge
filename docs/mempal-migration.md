@@ -24,6 +24,12 @@ The source must be outside that directory, including when its parent is reached
 through a symlink. Writable output handles also reject the retained source inode
 before truncation or append, so moving that inode after reader admission cannot
 turn it into a staging file. Refusal preserves source bytes.
+The writer retains its parent, output directory and used file descriptors through
+completion and buffered-file cleanup. Directory and file locks exclude competing
+converters; opens and publication stay relative to that same directory. Replacing
+the requested directory, parent or a used member causes refusal. A directory
+renamed by another process can retain incomplete output; retrying its explicit
+new location checks the same conversion identity and byte prefix.
 Identity and manifest publication write a new unnamed temporary file, sync it,
 and create the final name without replacing an existing file. Existing legacy
 `.tmp` members are validated as private files and left untouched. The destination

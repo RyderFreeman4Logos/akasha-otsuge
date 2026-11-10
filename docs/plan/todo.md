@@ -12,7 +12,10 @@ is retained. The first repair passed a fresh exact gate, but R2 exposed the
 final replacing-rename sibling. Both FAIL reports remain visible. The shared
 publication protocol now uses a new anonymous file and non-replacing link; 24
 focused Rust tests, five crash phases, Clippy and four controlled concurrent
-source-move cases pass. The final successor needs canonical R3 and full-range R3. Different-source
+source-move cases pass. Canonical R3 passed, but full-range R3 found directory/lock identity loss.
+A single retained output owner now binds all file operations; seven replacement
+cases and four real-CLI directory interleavings pass, including parked-directory
+recovery and roundtrip. The final successor needs canonical R4 and full-range R4. Different-source
 incremental application remains next within #25. Offline import (PR #58) and neutral export (PR #57)
 also passed their gates; #25 remains open. #24's first independent
 resource-observability leaf passed exact canonical, whole-range R1 and CI before
@@ -1216,10 +1219,21 @@ three mempal unit tests pass, with one intentional supervisor-child ignore,
 five actual SIGKILL phases, formatting and Clippy. A shared controlled CLI
 interposer reproduced four failures on the frozen old release and verified
 four source-preserving cases on the new debug binary; both normal controls
-passed and scratch was removed. Canonical R3, full-range R3 and publication
-remain pending. The [publication repair archive](../benchmarks/results/mvp025-mempal-publication/README.md)
+passed and scratch was removed. Canonical R3 passed in 439.891s (577 Rust
+passes, 34 ignores), while full-range R3 found a HIGH directory/lock-identity
+regression. Its complete FAIL is retained. The writer now holds one parent/root
+and every used member descriptor, uses descriptor-relative operations, and keeps
+directory/file locks through buffered cleanup. Seven replacement cases plus
+second-writer admission first failed and now pass. The final focused run passes
+25 Rust tests, five SIGKILL phases and Clippy. Four public directory-swap cases
+reproduce baseline false success and show candidate refusal, untouched replacement
+directories, parked-output recovery, repeat and byte-identical roundtrips.
+[Directory ownership evidence](../benchmarks/results/mvp025-mempal-directory/README.md)
+preserves the original failure and final source pins. Canonical R4, whole-range
+R4 and final publication remain pending. The [publication repair archive](../benchmarks/results/mvp025-mempal-publication/README.md)
 retains the full R2 report, ownership inventory and baseline/candidate probes.
-Historical candidate CI42798698625 passed and saved its cache;
+R3 candidate CI42807738318 passed and actually restored that cache, but does not
+waive its failed review. Historical candidate CI42798698625 passed and saved its cache;
 that earlier candidate still has both source-preservation findings.
 Runtime post-merge main CI42779863508 also passed separately.
 
