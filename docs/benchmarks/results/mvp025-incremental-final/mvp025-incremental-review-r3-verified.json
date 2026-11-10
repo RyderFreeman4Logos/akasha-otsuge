@@ -1,0 +1,15 @@
+{
+  "utc": "2026-11-10T17:42:56.343153+00:00",
+  "head": "e4f973de0c963f7cc26d577f735da04739fb682e",
+  "tree": "82e8ef59eab12c8bf79c1798c9f567f1da6008cd",
+  "base": "fe30c78169fbf87bfa47cf06912b7c64d3a418b3",
+  "verdict": "PASS",
+  "actionable_count": 0,
+  "report_sha256": "303b0d3fb60a5869218e6529f1de0a5a3fee6ccf87ea4241eeafb660195303bf",
+  "report_bytes": 18172,
+  "tests_log_sha256": "f0a0610b3d7debc6162c8af78efaf3a45558ab6c7f2fda7189bf8eb440fcc4e0",
+  "fresh_rust_passed": 71,
+  "fresh_rust_ignored": 6,
+  "scope": "conventional full-range review; Daybreak/red-team deferred",
+  "clean_after": true
+}

@@ -1,0 +1,13 @@
+{
+  "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/61",
+  "head": "e4f973de0c963f7cc26d577f735da04739fb682e",
+  "merge": "235c409e8c79766cef84da193d7f6b8338157d58",
+  "merged_at": "2026-11-10T17:49:14Z",
+  "state": "closed",
+  "merged": true,
+  "method": "merge",
+  "expected_head_guard": true,
+  "transport": "GitHub connector merge and independent PR fetch readback",
+  "utc": "2026-11-10T17:50:01.454874+00:00",
+  "body_sha256": "d029f437a51f512cfad8b7453583ff664e57412b46cbafe1eff8b040b2e12e0b"
+}

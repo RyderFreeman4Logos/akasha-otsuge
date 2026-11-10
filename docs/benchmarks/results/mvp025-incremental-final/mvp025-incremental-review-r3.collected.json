@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T17:42:56.274188+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "e4f973de0c963f7cc26d577f735da04739fb682e",
+    "log_sha256": "49dcee151ede7dcf5bbe57d42e0ccfe168d35c962871f99a42dac35564acb575",
+    "seconds": 431.72536179982126,
+    "utc": "2026-11-10T17:42:33.068143+00:00"
+  },
+  "process_absent": true,
+  "classification": "REVIEW_PASS_ZERO_ACTIONABLE_FRESH_71_PASS_6_IGNORED"
+}
