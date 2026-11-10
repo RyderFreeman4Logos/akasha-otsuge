@@ -262,10 +262,11 @@ impl Storage {
                 rustix::fs::RenameFlags::NOREPLACE,
             )
             .map_err(std::io::Error::from)?;
-            layout::sync_dir(&data)?;
-            #[cfg(test)]
-            super::crash_tests::checkpoint("import-published");
         }
+        // A visible destination can follow a failed post-rename sync; replay must finish it.
+        layout::sync_dir(&data)?;
+        #[cfg(test)]
+        super::crash_tests::checkpoint("import-published");
         Ok(manifest)
     }
 

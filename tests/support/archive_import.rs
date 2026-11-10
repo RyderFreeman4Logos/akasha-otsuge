@@ -37,6 +37,55 @@ fn request() -> CommitRequest {
 }
 
 #[tokio::test]
+async fn archive_import_replay_must_complete_a_failed_publication_parent_sync() {
+    use std::os::unix::fs::PermissionsExt;
+    struct RestoreMode(PathBuf);
+    impl Drop for RestoreMode {
+        fn drop(&mut self) {
+            let _ = std::fs::set_permissions(&self.0, std::fs::Permissions::from_mode(0o700));
+        }
+    }
+    let source = Fixture::new();
+    let store = Storage::open(&source.config()).await.unwrap();
+    store.commit(&request()).await.unwrap();
+    store.close().await.unwrap();
+    let archive = source.0.join("archive");
+    assert!(source.export(&archive).status.success());
+    let target = Fixture::new();
+    assert!(target.import(&archive).status.success());
+    let data = target.0.join("data");
+    // Recreate a fully written unpublished stage without racing the native writer.
+    std::fs::rename(data.join("authority"), data.join(".archive-import")).unwrap();
+    let _restore = RestoreMode(data.clone());
+    // Traversal and rename work, but opening the publication parent for fsync fails.
+    std::fs::set_permissions(&data, std::fs::Permissions::from_mode(0o300)).unwrap();
+    assert!(
+        std::fs::File::open(&data).is_err(),
+        "fault requires an unprivileged test user"
+    );
+    for attempt in 0..2 {
+        let output = target.import(&archive);
+        assert!(
+            !output.status.success(),
+            "attempt {attempt} skipped the outstanding parent sync"
+        );
+        assert!(output.stdout.is_empty());
+        assert_eq!(
+            serde_json::from_slice::<Value>(&output.stderr).unwrap()["error"]["code"],
+            "STORAGE_IO"
+        );
+        assert!(data.join("authority").is_dir());
+        assert!(!data.join(".archive-import").exists());
+    }
+    std::fs::set_permissions(&data, std::fs::Permissions::from_mode(0o700)).unwrap();
+    assert!(target.import(&archive).status.success());
+    let store = Storage::open(&target.config()).await.unwrap();
+    assert_eq!(store.sequence().unwrap(), 1);
+    assert_eq!(store.commit(&request()).await.unwrap().commit_seq, 1);
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
 async fn archive_import_empty_locked_existing_and_source_symlink_boundaries() {
     let source = Fixture::new();
     let store = Storage::open(&source.config()).await.unwrap();

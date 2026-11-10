@@ -1096,7 +1096,17 @@ resumed-stage permissions and preserved unrelated staging files. The original
 missing-command, unsafe activation/cleanup, stage ownership and permissions REDs
 and one compilation failure remain distinct in
 [focused evidence](../benchmarks/results/mvp025-neutral-import/README.md).
-Final canonical, independent review and publication remain below.
+The initial committed candidate `a61acd9` passed exact canonical in 448.063s
+(550 Rust passes including installed repeat, 34 Python tests and installed
+lifecycle/UID checks). Independent whole-range R1 nevertheless found F1: an
+identical replay could skip a failed publication-parent sync. The unchanged
+[FAIL report](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/58#issuecomment-6760298646)
+remains published. A deterministic public CLI regression failed on the second
+attempt before the repair; parent sync now runs for new and repeated imports.
+The repair passed 32 tests, four SIGKILL phases and Clippy in 108.782s.
+[R1 repair evidence](../benchmarks/results/mvp025-neutral-import-r1-repair/README.md)
+preserves the original verdict and causal test. PR #58 remains draft pending
+fresh exact canonical, whole-range R2 and successor CI; #25 stays open.
 Read-only metadata found the live mempal file around 11.7 GB and changing;
 a kernel-enforced read-only SQLite probe could not open it, so no actual content
 sample was acquired. The installed `mempal 0.5.0` version string alone does not
