@@ -44,6 +44,59 @@ mod incident_tests;
 #[path = "support/daemon_notifier.rs"]
 mod notifier_tests;
 
+#[test]
+fn memory_status_reports_actual_groups_and_keeps_open_storage_budget_on_reload() {
+    let mut daemon = Daemon::new();
+    daemon.configure("[runtime]\nmemory_budget_mib=2048\n");
+    daemon.start();
+    let before = daemon.cli(&["daemon", "status"]);
+    let resource = &before["data"]["resources"];
+    assert_eq!(resource["requested"]["daemon_memory_target_mib"], 2048);
+    assert_eq!(resource["requested"]["daemon_peak_limit_mib"], 2048);
+    assert_eq!(resource["storage_open_budget_mib"], 2048);
+    assert_eq!(resource["storage_reopen_required"], false);
+    let sample = &resource["measurement"];
+    assert_eq!(sample["complete"], true);
+    assert_eq!(sample["kind"], "on_demand_procfs");
+    assert!(sample["daemon_group"]["rss_bytes"].as_u64().unwrap() > 0);
+    assert!(sample["daemon_group"]["pss_bytes"].as_u64().unwrap() > 0);
+    assert_eq!(
+        sample["daemon_group"]["pids"],
+        json!([daemon.child.as_ref().unwrap().id()])
+    );
+    assert_eq!(sample["runner_group"]["pids"], json!([]));
+    assert_eq!(
+        sample["service_total"]["rss_bytes"],
+        sample["daemon_group"]["rss_bytes"]
+    );
+    assert_eq!(resource["enforcement"]["managed_cgroup_limits"], false);
+    assert_eq!(resource["enforcement"]["software_memory_admission"], false);
+    daemon.configure("[runtime]\nmemory_budget_mib=512\nservice_total_budget_mib=3072\n");
+    assert_eq!(
+        daemon.cli(&["config", "reload"])["data"]["status"],
+        "applied"
+    );
+    let after = daemon.cli(&["daemon", "status"]);
+    let resource = &after["data"]["resources"];
+    assert_eq!(resource["requested"]["daemon_memory_target_mib"], 512);
+    assert_eq!(resource["requested"]["daemon_peak_limit_mib"], 640);
+    assert_eq!(resource["requested"]["service_total_budget_mib"], 3072);
+    assert_eq!(resource["storage_open_budget_mib"], 2048);
+    assert_eq!(resource["storage_reopen_required"], true);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    let reopened = daemon.cli(&["daemon", "status"]);
+    assert_eq!(
+        reopened["data"]["resources"]["storage_open_budget_mib"],
+        512
+    );
+    assert_eq!(
+        reopened["data"]["resources"]["storage_reopen_required"],
+        false
+    );
+}
+
 #[path = "support/daemon_codex.rs"]
 mod codex_tests;
 

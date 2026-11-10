@@ -4,8 +4,8 @@ Rechecked 2026-11-10 UTC after PR #55 merged: **22 original Issues
 completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
 #24 is active from main `37d4d77` in one SSD worktree. #23 passed its exact full
 gate, independent whole-range R4 and CI42748687256 before closing. The merge tree
-matches the reviewed candidate. Post-merge main CI42750140146 is pending and
-will be collected at the next verification checkpoint.
+matches the reviewed candidate. Post-merge main CI42750140146 also passed with
+Cargo cache restored/hit; its independent receipt was collected after merge.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -976,6 +976,19 @@ Implement against the merged notifier candidate. Keep #24 open until the full
 production acceptance below passes; #3 spike receipts remain historical evidence.
 Use the existing 42 SSD parquet shards and deterministic streaming preparation.
 Measure a small import before admitting full storage; retain no second raw JSONL.
+
+The first independent leaf adds backward-compatible target/peak/total configuration
+and on-demand process-tree RSS/PSS reporting, including guarded external children.
+It truthfully reports current enforcement as absent and retains the budget used
+to open storage across reload. Three public behavioral REDs reproduced the missing
+contracts. The initial implementation check stopped at a compile error in two
+backup-restore constructors; that failed attempt is retained, not counted as GREEN.
+The repaired focused run passed 24 config, three unit, two real daemon cases and
+all-target Clippy in 40.735 seconds. [Its compact evidence](../benchmarks/results/mvp024-observability/README.md)
+binds the final source bytes; the exact canonical gate and independent review
+remain required before this leaf is published.
+Memory admission/draining and dedicated cgroups follow as a separate leaf; neither
+observability nor focused fixtures satisfy the full production stress acceptance.
 
 - [ ] Freeze source/binary, machine/filesystem/cgroup state, corpus manifest,
   source licenses/hash/seed, actual UTF-8 bytes, document/partition identities,

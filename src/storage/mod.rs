@@ -207,6 +207,7 @@ pub struct Storage {
     tree: Arc<Tree>,
     writer: Arc<Mutex<()>>,
     root: std::path::PathBuf,
+    budget_mib: u32,
 }
 
 impl RecordKey {
@@ -275,12 +276,17 @@ fn read_revision(tx: &Transaction, key: &RecordKey, seq: u64) -> Result<Option<R
 }
 
 impl Storage {
+    pub(crate) fn budget_mib(&self) -> u32 {
+        self.budget_mib
+    }
+
     pub async fn open(config: &ResolvedConfig) -> Result<Self> {
         let (root, created) = layout::open_root(&config.config().paths.data_dir)?;
         let store = Self {
             tree: Self::open_tree(config, &root)?,
             writer: Arc::new(Mutex::new(())),
             root,
+            budget_mib: config.config().runtime.memory_budget_mib,
         };
         let result = async {
             let mut tx = store.tree.begin()?;

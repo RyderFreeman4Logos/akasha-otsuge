@@ -121,6 +121,7 @@ impl ResolvedConfig {
             "config": config,
             "sources": self.sources,
             "effective_timeouts": self.timeouts,
+            "memory_limits": self.config.runtime.memory_limits(),
             "retrieval_fingerprint": self.retrieval_fingerprint,
             "local_long_timeout_verified": false,
         })
@@ -273,6 +274,8 @@ const SAFE_FIELDS: &[&str] = &[
     "max_concurrent_jobs",
     "max_queued_jobs",
     "memory_budget_mib",
+    "daemon_peak_limit_mib",
+    "service_total_budget_mib",
     "paused",
     "retrieval",
     "top_k",

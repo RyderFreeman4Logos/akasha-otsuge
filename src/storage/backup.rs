@@ -202,6 +202,7 @@ impl Storage {
             tree: Self::open_tree(config, &root)?,
             writer: Arc::new(Mutex::new(())),
             root,
+            budget_mib: config.config().runtime.memory_budget_mib,
         };
         let tree = store.tree.clone();
         let native = backup.join("kv");
@@ -215,6 +216,7 @@ impl Storage {
             tree: Self::open_tree(config, &store.root)?,
             writer: Arc::new(Mutex::new(())),
             root: store.root,
+            budget_mib: config.config().runtime.memory_budget_mib,
         };
         let result = (|| -> Result<()> {
             // Check both sides of the native copy; published backups are immutable.
