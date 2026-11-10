@@ -511,6 +511,12 @@ impl Service {
         if self.stopping.load(std::sync::atomic::Ordering::Acquire) {
             return Err(Error("CANCELLED"));
         }
+        if !self
+            .storage
+            .locally_written(self.notification(&dispatch.id)?.1.source_revision)?
+        {
+            return Err(Error("IMPORTED_RUNTIME_AUTHORITY"));
+        }
         Domain::new(&self.storage).permission(&jobs::context()?, Some(&dispatch.scope))?;
         let (_, route) = self
             .config

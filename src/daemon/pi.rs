@@ -26,6 +26,9 @@ impl Service {
             .storage
             .current(&token_key(token))?
             .ok_or(Error("BINDING_UNAVAILABLE"))?;
+        if !self.storage.locally_written(record.commit_seq)? {
+            return Err(Error("BINDING_UNAVAILABLE"));
+        }
         let reg: PiRegistration = serde_json::from_str(&record.content)?;
         if reg.scope != jobs::owner_scope()
             || reg.principal != reg.scope.user
@@ -82,7 +85,9 @@ impl Service {
                         kind: RecordKind::Evidence,
                         id: format!(
                             "pi-session-registration/{}",
-                            hash(&serde_json::to_vec(&source)?)
+                            service
+                                .storage
+                                .runtime_token(&hash(&serde_json::to_vec(&source)?))?
                         ),
                     };
                     if let Some(prior) = service.storage.current(&identity)? {

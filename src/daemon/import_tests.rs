@@ -1,4 +1,142 @@
 use super::*;
+use crate::adapter::{
+    BindingLevel, CallerProof, CapabilityReport, Invocation, RuntimeBinding, SelfTest,
+};
+
+fn capability(host: crate::config::Host) -> CapabilityReport {
+    CapabilityReport {
+        host,
+        version: Some("controlled".into()),
+        executable: Some(std::env::current_exe().unwrap()),
+        adapter_version: "1".into(),
+        binding: BindingLevel::ExactTurn,
+        native_children: false,
+        history: crate::capture::CoverageLevel::Unavailable,
+        machine_protocol: None,
+        cancellation: true,
+        outer_timeout: true,
+        capabilities: BTreeSet::new(),
+        self_test: SelfTest::NotRun,
+    }
+}
+
+async fn seed_capabilities(service: &Service, target: &std::path::Path) {
+    private_dir(target).unwrap();
+    let source = crate::capture::SourceIdentity {
+        adapter: "fixture".into(),
+        profile: "default".into(),
+        session: "session".into(),
+        thread: "session".into(),
+        agent: "main".into(),
+    };
+    Invocation::bind(
+        &service.storage,
+        RuntimeBinding {
+            invocation_id: "old-invocation".into(),
+            runtime_instance: "source".into(),
+            capability: capability(crate::config::Host::Codex),
+            caller: source.clone(),
+            principal: principal(),
+            scope: owner_scope(),
+            proof: CallerProof::RegisteredRoot {
+                thread: source.thread.clone(),
+            },
+            branch: "branch".into(),
+            turn_id: Some("turn".into()),
+            tool_call_id: Some("tool".into()),
+            requested_cursor: 0,
+            available_cursor: 0,
+            tip: None,
+            capture_seq: service.storage.sequence().unwrap(),
+            workspace: target.into(),
+            config_generation: service.config.pin().generation(),
+        },
+    )
+    .await
+    .unwrap();
+    let transcript = target.join("transcript.jsonl");
+    std::fs::write(&transcript, b"").unwrap();
+    let codex = crate::adapter::codex::CodexRegistration {
+        capability: capability(crate::config::Host::Codex),
+        source: crate::capture::SourceIdentity {
+            adapter: "codex".into(),
+            ..source.clone()
+        },
+        scope: owner_scope(),
+        principal: principal(),
+        transcript: transcript.clone(),
+        workspace: target.into(),
+        native_home: Some(target.into()),
+    };
+    let pi = crate::adapter::pi::PiRegistration {
+        capability: capability(crate::config::Host::Pi),
+        source: crate::capture::SourceIdentity {
+            adapter: "pi".into(),
+            profile: crate::adapter::pi::profile_key(target),
+            ..source.clone()
+        },
+        scope: owner_scope(),
+        principal: principal(),
+        transcript: transcript.clone(),
+        workspace: target.into(),
+        agent_dir: target.into(),
+    };
+    let claude = crate::adapter::claude::caller::Registration {
+        capability: capability(crate::config::Host::ClaudeCode),
+        source: crate::capture::SourceIdentity {
+            adapter: "claude_code".into(),
+            ..source
+        },
+        scope: owner_scope(),
+        transcript,
+        workspace: target.into(),
+        parent: None,
+        start_kind: None,
+        native_home: Some(target.into()),
+    };
+    let token = "a".repeat(64);
+    let mut changes: Vec<_> = [
+        ("codex-registration", serde_json::to_string(&codex).unwrap()),
+        ("pi-registration", serde_json::to_string(&pi).unwrap()),
+        (
+            "claude-registration",
+            serde_json::to_string(&claude).unwrap(),
+        ),
+    ]
+    .into_iter()
+    .map(|(prefix, content)| Change {
+        key: RecordKey {
+            kind: RecordKind::Evidence,
+            id: format!("{prefix}/{}", hash(token.as_bytes())),
+        },
+        expected_revision: None,
+        content,
+    })
+    .collect();
+    changes.push(Change {
+        key: RecordKey {
+            kind: RecordKind::State,
+            id: format!("notification/item/{}", "b".repeat(64)),
+        },
+        expected_revision: None,
+        content:
+            json!({"schema_version":1,"notification_id":"b".repeat(64),"review_id":"old-review",
+            "source_revision":1,"scope":owner_scope(),"state":"open","priority":"normal",
+            "summary":"old notice","evidence_locator":"old","occurrences":1,"generation":1,
+            "generation_started_at_ms":1,"acknowledged_generation":null,"deliveries":{}})
+            .to_string(),
+    });
+    service
+        .storage
+        .commit(&CommitRequest {
+            request_id: "old-capabilities".into(),
+            config_generation: 1,
+            policy_revision: None,
+            changes,
+        })
+        .await
+        .unwrap();
+}
 
 async fn imported_fixture(name: &str) -> (tests::Fixture, PathBuf, u64, CommitRequest) {
     let (fixture, source, binding) = tests::fixture(name, "").await;
@@ -15,6 +153,7 @@ async fn imported_fixture(name: &str) -> (tests::Fixture, PathBuf, u64, CommitRe
     )
     .unwrap();
     source.reload().await.unwrap();
+    seed_capabilities(&source, &fixture.0.join("target")).await;
     source
         .storage
         .commit(&CommitRequest {
@@ -177,5 +316,173 @@ async fn imported_job_identity_cannot_be_rearmed_by_a_local_revision() {
         .await
         .unwrap();
     assert!(service.claim("fresh-job", 0).await.unwrap());
+    service.storage.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn imported_invocation_is_history_only_and_fresh_binding_works() {
+    let (_fixture, target, _, _) = imported_fixture("import-binding").await;
+    let (service, _) = tests::service_at(&target, "").await;
+    let old = Invocation::load_verified(&service.storage, "old-invocation", &principal()).unwrap();
+    service.outcome_binding("old-invocation").unwrap();
+    assert_eq!(
+        service
+            .outcome_context("old-invocation")
+            .await
+            .unwrap_err()
+            .0,
+        "BINDING_UNAVAILABLE"
+    );
+    assert_eq!(
+        Invocation::load(&service.storage, "old-invocation", &principal())
+            .await
+            .unwrap_err()
+            .code,
+        crate::adapter::ErrorCode::BindingUnavailable
+    );
+    assert_eq!(
+        Invocation::bind(&service.storage, old.diagnostic().clone())
+            .await
+            .unwrap_err()
+            .code,
+        crate::adapter::ErrorCode::BindingUnavailable
+    );
+    let mut fresh = old.diagnostic().clone();
+    fresh.invocation_id = "new-invocation".into();
+    fresh.runtime_instance = "destination".into();
+    fresh.capture_seq = service.storage.sequence().unwrap();
+    fresh.config_generation = service.config.pin().generation();
+    Invocation::bind(&service.storage, fresh).await.unwrap();
+    Invocation::load(&service.storage, "new-invocation", &principal())
+        .await
+        .unwrap();
+    service.storage.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn imported_native_tokens_cannot_admit_capture_jobs() {
+    let (_fixture, target, _, _) = imported_fixture("import-tokens").await;
+    let (service, _) = tests::service_at(&target, "").await;
+    let commands = |token: &str| {
+        [
+            Command::Codex {
+                event: crate::adapter::codex::NativeEvent::Sync {
+                    registration: token.into(),
+                    until_ordinal: 1,
+                },
+            },
+            Command::Pi {
+                event: crate::adapter::pi::NativeEvent::Sync {
+                    registration: token.into(),
+                    until_entry: "entry".into(),
+                },
+            },
+            Command::Claude {
+                event: crate::adapter::claude::NativeEvent::Sync {
+                    registration: token.into(),
+                    tip: "tip".into(),
+                },
+            },
+        ]
+    };
+    for command in commands(&"a".repeat(64)) {
+        assert_eq!(
+            service.dispatch("old-token", command).await.unwrap_err().0,
+            "BINDING_UNAVAILABLE"
+        );
+    }
+    assert!(service.active().unwrap().1.is_empty());
+    let changes = [
+        "codex-registration",
+        "pi-registration",
+        "claude-registration",
+    ]
+    .into_iter()
+    .map(|prefix| {
+        let old_key = RecordKey {
+            kind: RecordKind::Evidence,
+            id: format!("{prefix}/{}", hash("a".repeat(64).as_bytes())),
+        };
+        Change {
+            key: RecordKey {
+                kind: RecordKind::Evidence,
+                id: format!("{prefix}/{}", hash("d".repeat(64).as_bytes())),
+            },
+            expected_revision: None,
+            content: service.storage.current(&old_key).unwrap().unwrap().content,
+        }
+    })
+    .collect();
+    service
+        .storage
+        .commit(&CommitRequest {
+            request_id: "fresh-tokens".into(),
+            config_generation: service.config.pin().generation(),
+            policy_revision: None,
+            changes,
+        })
+        .await
+        .unwrap();
+    for command in commands(&"d".repeat(64)) {
+        service.dispatch("fresh-token", command).await.unwrap();
+    }
+    assert_eq!(service.active().unwrap().1.len(), 3);
+    service.storage.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn acknowledging_imported_notification_does_not_rearm_delivery() {
+    let (_fixture, target, boundary, _) = imported_fixture("import-notice").await;
+    let (service, _) = tests::service_at(
+        &target,
+        "[notifiers.fixture]\nkind='stdio'\ncommand=['/bin/false']\n",
+    )
+    .await;
+    service
+        .ack_notification(&"b".repeat(64), 1, "local-ack")
+        .await
+        .unwrap();
+    assert!(service.storage.sequence().unwrap() > boundary);
+    let mut scan = 0;
+    let mut after = None;
+    assert!(
+        service
+            .advance_notifications(&mut scan, &mut after, true)
+            .await
+            .unwrap()
+            .is_none(),
+        "old source acquired a fresh dispatch"
+    );
+    let old = service.show_notification(&"b".repeat(64)).await.unwrap();
+    assert_eq!(old["deliveries"], json!({}));
+    let mut fresh = old;
+    fresh["notification_id"] = json!("c".repeat(64));
+    fresh["source_revision"] = json!(service.storage.sequence().unwrap());
+    fresh["acknowledged_generation"] = Value::Null;
+    service
+        .storage
+        .commit(&CommitRequest {
+            request_id: "fresh-notice".into(),
+            config_generation: service.config.pin().generation(),
+            policy_revision: None,
+            changes: vec![Change {
+                key: RecordKey {
+                    kind: RecordKind::State,
+                    id: format!("notification/item/{}", "c".repeat(64)),
+                },
+                expected_revision: None,
+                content: fresh.to_string(),
+            }],
+        })
+        .await
+        .unwrap();
+    assert!(
+        service
+            .advance_notifications(&mut scan, &mut after, true)
+            .await
+            .unwrap()
+            .is_some(),
+        "fresh local notification was blocked"
+    );
     service.storage.close().await.unwrap();
 }

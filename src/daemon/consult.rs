@@ -183,6 +183,7 @@ impl Service {
         native: NativeExecutor,
         args: ConsultArgs,
     ) -> Result<Value> {
+        invocation.ensure_local(&self.storage)?;
         let id = format!("consult/{}", hash(invocation.id().as_bytes()));
         let config = self.retrieval_snapshot(invocation.diagnostic().config_generation)?;
         let executors = native.named(

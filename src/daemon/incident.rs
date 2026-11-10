@@ -69,6 +69,9 @@ impl Service {
     }
 
     pub(in crate::daemon::jobs) fn authorize_incident_execution(&self, id: &str) -> Result<Record> {
+        if !self.storage.locally_created(&key(id)?)? {
+            return Err(Error("IMPORTED_RUNTIME_AUTHORITY"));
+        }
         let record = self.incident_record(id)?.1;
         if !matches!(record.state, ReviewState::Open | ReviewState::Investigating) {
             return Err(Error("CANCELLED"));
@@ -150,6 +153,7 @@ impl Service {
         } else {
             hash(&serde_json::to_vec(&(id, &outcome.event.event_id))?)
         };
+        let id = self.storage.runtime_token(&id)?;
         let k = key(&id)?;
         let old = self.storage.current(&k)?;
         let mut changes = vec![];
@@ -301,6 +305,9 @@ impl Service {
             self.pending_incidents()?.1
         };
         for id in ids {
+            if !self.storage.locally_created(&key(&id)?)? {
+                return Err(Error("IMPORTED_RUNTIME_AUTHORITY"));
+            }
             let record = {
                 let _guard = self.admission.lock().await;
                 self.incident_row(&id)?.1

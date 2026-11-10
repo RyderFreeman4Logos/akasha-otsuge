@@ -904,7 +904,9 @@ impl Service {
             } else if let Some(plan) = &extraction_plan {
                 plan.sources(&service.storage, &context()?)?;
             } else if let Some(plan) = &consult_plan {
-                service.consult_invocation(plan)?;
+                service
+                    .consult_invocation(plan)?
+                    .ensure_local(&service.storage)?;
             } else {
                 Domain::new(&service.storage).permission(&context()?, Some(&scope))?;
             }

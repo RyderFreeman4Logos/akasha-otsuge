@@ -19,7 +19,9 @@ impl Service {
         let invocation = Invocation::load_verified(&self.storage, id, &principal())?;
         let binding = invocation.diagnostic();
         Domain::new(&self.storage).permission(&invocation.read_context()?, Some(&binding.scope))?;
-        if self.allowed_path(&binding.workspace)? != binding.workspace {
+        if self.storage.locally_written(invocation.revision())?
+            && self.allowed_path(&binding.workspace)? != binding.workspace
+        {
             return Err(Error("SCOPE_DENIED"));
         }
         Ok(invocation)
@@ -129,6 +131,7 @@ impl Service {
         self.operation(async move {
             let _guard = service.admission.lock().await;
             let invocation = service.outcome_invocation(&event)?;
+            invocation.ensure_local(&service.storage)?;
             let receipts = service
                 .outcome_receipts(&event.receipt_jobs, &invocation)
                 .await?;
@@ -314,6 +317,7 @@ impl Service {
     pub(in crate::daemon) async fn outcome_context(&self, id: &str) -> Result<Value> {
         let _guard = self.admission.lock().await;
         let invocation = self.outcome_binding(id)?;
+        invocation.ensure_local(&self.storage)?;
         let job_id = format!("consult/{}", hash(id.as_bytes()));
         let receipt_jobs = match self.job(&job_id) {
             Ok((_, job)) if job.state == "succeeded" => vec![job_id],
@@ -346,6 +350,7 @@ impl Service {
         self.operation(async move {
             let _guard = service.admission.lock().await;
             let invocation = service.outcome_binding(&chunk.invocation_id)?;
+            invocation.ensure_local(&service.storage)?;
             let mut source = invocation.diagnostic().caller.clone();
             source.adapter = "outcome-wrapper".into();
             source.thread =
