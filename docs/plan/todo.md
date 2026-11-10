@@ -11,8 +11,17 @@ Real typed-row conversion and full roundtrips remain historical acceptance at
 4193301; later filesystem fixes have separate controlled regression evidence.
 Post-merge main CI42815108137 is a separate pending result.
 The active branch is feat/mvp-025-incremental, starting at fe30c78.
-Next are neutral-history prefix admission/recovery and changed-mempal-snapshot
-origin/update/deletion semantics. #25 stays open until both contracts pass.
+Neutral-history prefix admission/recovery is implemented with shared open/restore
+admission, one native stage and atomic directory exchange. Causal REDs reproduced
+prefix rejection, both admission bypasses and premature old-history cleanup.
+The final relevant selectors pass 60 Rust cases, including nine incremental
+SIGKILL phases, runtime inactivity across restarts, malformed markers and
+publication fsync faults. Clippy and plan/reference checks pass. The
+[focused archive](../benchmarks/results/mvp025-incremental/README.md) preserves
+both causal failures and the separately classified fixture failures.
+Exact canonical, independent review and publication are still pending.
+Changed-mempal-snapshot origin/update/deletion semantics follow; #25 stays open
+until both contracts pass.
 Offline import (PR #58) and neutral export (PR #57) are already merged.
 #24's resource-observability leaf (PR #56) is merged; enforcement and full
 production acceptance remain unchecked. Reuse #25's data path for that campaign.

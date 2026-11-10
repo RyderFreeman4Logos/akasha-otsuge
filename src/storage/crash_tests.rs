@@ -5,6 +5,8 @@ use std::time::{Duration, Instant};
 use super::*;
 use crate::config::{Paths, resolve};
 
+mod incremental;
+
 pub(crate) fn checkpoint(phase: &str) {
     if std::env::var("AKASHA_TEST_CRASH_PHASE").as_deref() != Ok(phase) {
         return;
@@ -161,6 +163,10 @@ fn killed_transactions_recover_whole_batches_and_retry_exactly_once() {
 }
 
 pub(crate) fn kill_at(root: &Path, phase: &str, test: &str) {
+    kill_at_with(root, phase, test, || ());
+}
+
+fn kill_at_with(root: &Path, phase: &str, test: &str, before_kill: impl FnOnce()) {
     let log = std::fs::File::create(root.join("child.log")).unwrap();
     let mut child = OwnedChild(
         Command::new(std::env::current_exe().unwrap())
@@ -193,6 +199,7 @@ pub(crate) fn kill_at(root: &Path, phase: &str, test: &str) {
         std::fs::read_to_string(root.join("reached")).unwrap(),
         phase
     );
+    before_kill();
     child.0.kill().unwrap();
     let status = child.0.wait().unwrap();
     #[cfg(unix)]
@@ -438,4 +445,65 @@ fn killed_capture_reuses_staged_chunks_and_publishes_checkpoint_atomically() {
             store.close().await.unwrap();println!("capture checkpoint={phase} SIGKILL_recovered=true checkpoint_atomic=true retry_unchanged=true");
         });
     }
+}
+
+#[test]
+fn import_publication_admission_excludes_open_and_restore_before_authority_creation() {
+    use std::os::unix::fs::OpenOptionsExt;
+    let root = std::env::temp_dir().join(format!("akasha-import-admission-{}", std::process::id()));
+    std::fs::create_dir(&root).unwrap();
+    let _fixture = OwnedFixture(root.clone());
+    runtime().block_on(async {
+        let source = Storage::open(&config(&root.join("source"))).await.unwrap();
+        source.commit(&request("original")).await.unwrap();
+        let backup = root.join("backup");
+        source.checkpoint(&backup).await.unwrap();
+        source.close().await.unwrap();
+        let mut missed = Vec::new();
+        for entry in ["open", "restore"] {
+            let target = root.join(entry);
+            let cfg = config(&target);
+            let data = target.join("data");
+            layout::private_dir(&data, true).unwrap();
+            let guard = std::fs::OpenOptions::new()
+                .read(true)
+                .write(true)
+                .create_new(true)
+                .mode(0o600)
+                .open(data.join(".archive-import.lock"))
+                .unwrap();
+            guard.try_lock().unwrap();
+            let result = if entry == "open" {
+                Storage::open(&cfg).await
+            } else {
+                Storage::restore(&cfg, &backup).await
+            };
+            let denied = match result {
+                Ok(store) => {
+                    store.close().await.unwrap();
+                    false
+                }
+                Err(error) => error.code == "IMPORT_BUSY",
+            };
+            let untouched = !data.join("authority").exists();
+            eprintln!("entry={entry} denied={denied} authority_untouched={untouched}");
+            if !denied || !untouched {
+                missed.push(entry);
+            }
+            guard.unlock().unwrap();
+            if denied && untouched {
+                let store = if entry == "open" {
+                    Storage::open(&cfg).await
+                } else {
+                    Storage::restore(&cfg, &backup).await
+                }
+                .unwrap();
+                store.close().await.unwrap();
+            }
+        }
+        assert!(
+            missed.is_empty(),
+            "publication admission bypassed: {missed:?}"
+        );
+    });
 }

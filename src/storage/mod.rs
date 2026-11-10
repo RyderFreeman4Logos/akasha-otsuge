@@ -6,6 +6,7 @@ mod backup;
 pub(crate) mod crash_tests;
 mod history;
 mod import;
+mod import_publish;
 mod layout;
 mod mempal;
 
@@ -289,6 +290,16 @@ impl Storage {
     }
 
     pub async fn open(config: &ResolvedConfig) -> Result<Self> {
+        let admission = layout::Admission::acquire(&config.config().paths.data_dir, false)?;
+        let store = Self::open_admitted(config).await?;
+        if let Err(error) = admission.validate() {
+            let _ = store.close().await;
+            return Err(error);
+        }
+        Ok(store)
+    }
+
+    async fn open_admitted(config: &ResolvedConfig) -> Result<Self> {
         let (root, created) = layout::open_root(&config.config().paths.data_dir)?;
         let store = Self {
             tree: Self::open_tree(config, &root)?,

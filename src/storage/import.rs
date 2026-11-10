@@ -10,6 +10,7 @@ use surrealkv::Durability;
 use tokio::sync::Mutex;
 
 use super::archive::{ArchiveCommit, ArchiveFile, ArchiveManifest};
+use super::import_publish::{Replacement, Root};
 use super::{
     Change, CommitRequest, OutboxEntry, RecordKind, Result, Revision, RevisionRef, Storage,
     StorageError, hash, layout, number, read_revision,
@@ -18,11 +19,22 @@ use crate::config::ResolvedConfig;
 
 const IMPORT: &[u8] = b"meta/archive_import";
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct ImportIdentity {
     pub(crate) archive_sha256: String,
     pub(crate) commit_seq: u64,
+}
+
+impl ImportIdentity {
+    pub(super) fn valid(&self) -> bool {
+        self.commit_seq <= i64::MAX as u64
+            && self.archive_sha256.len() == 64
+            && self
+                .archive_sha256
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    }
 }
 
 fn invalid() -> StorageError {
@@ -120,13 +132,7 @@ impl Storage {
             return Ok(None);
         };
         let identity: ImportIdentity = serde_json::from_slice(&bytes).map_err(|_| invalid())?;
-        if identity.commit_seq > self.sequence()?
-            || identity.archive_sha256.len() != 64
-            || !identity
-                .archive_sha256
-                .bytes()
-                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
-        {
+        if identity.commit_seq > self.sequence()? || !identity.valid() {
             return Err(invalid());
         }
         Ok(Some(identity))
@@ -186,116 +192,184 @@ impl Storage {
             archive_sha256: hash(&bytes),
             commit_seq: manifest.commit_seq,
         };
-        let identity = serde_json::to_vec(&identity)?;
         let data = &config.config().paths.data_dir;
         layout::private_dir(data, true)?;
         layout::directory(data)?;
-        let data = data.canonicalize()?;
-        if source.starts_with(&data) || data.starts_with(&source) {
+        let canonical = data.canonicalize()?;
+        if source.starts_with(&canonical) || canonical.starts_with(&source) {
             return Err(StorageError::new("UNSAFE_STORAGE_PATH"));
         }
-        let lock = OpenOptions::new()
-            .read(true)
-            .write(true)
-            .create(true)
-            .truncate(false)
-            .mode(0o600)
-            .custom_flags(
-                (rustix::fs::OFlags::NOFOLLOW | rustix::fs::OFlags::NONBLOCK).bits() as i32,
-            )
-            .open(data.join(".archive-import.lock"))?;
-        let metadata = lock.metadata()?;
-        if !metadata.is_file()
-            || metadata.nlink() != 1
-            || metadata.uid() != rustix::process::geteuid().as_raw()
-            || metadata.mode() & 0o777 != 0o600
-        {
-            return Err(StorageError::new("UNSAFE_STORAGE_PATH"));
-        }
-        lock.try_lock()
-            .map_err(|_| StorageError::new("IMPORT_BUSY"))?;
-        let destination = data.join("authority");
-        let existing = destination.try_exists()?;
-        let root = if existing {
-            destination.clone()
-        } else {
-            data.join(".archive-import")
+        let admission = layout::Admission::acquire(data, true)?;
+        let marker = Replacement::load(&admission)?;
+        let published = marker
+            .as_ref()
+            .map(|marker| marker.published(&admission, &identity))
+            .transpose()?
+            .unwrap_or(false);
+        let destination = admission.root().join("authority");
+        let previous_root = match fs::symlink_metadata(&destination) {
+            Ok(_) => Some(Root::open(&admission, "authority")?),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+            Err(e) => return Err(e.into()),
         };
-        if !existing {
-            prepare_stage(&root, &identity)?;
-        }
-        let store = if existing {
-            Self::open(config).await?
+        let previous = if let Some(root) = &previous_root {
+            layout::check_format(&root.path())?;
+            layout::directory(&root.path().join("kv"))?;
+            Some(Self::import_store(config, root)?)
         } else {
-            Self {
-                tree: Self::open_tree(config, &root)?,
-                writer: Arc::new(Mutex::new(())),
-                root: root.clone(),
-                budget_mib: config.config().runtime.memory_budget_mib,
+            None
+        };
+        let prepared = async {
+            if let Some(marker) = &marker {
+                let current = previous
+                    .as_ref()
+                    .ok_or_else(|| StorageError::new("IMPORT_CONFLICT"))?
+                    .import_identity()?
+                    .ok_or_else(|| StorageError::new("IMPORT_CONFLICT"))?;
+                marker.validate_identity(&current, published)?;
             }
+            Self::prepare_archive(
+                config,
+                &source,
+                &manifest,
+                &identity,
+                &admission,
+                previous.as_ref().zip(previous_root.as_ref()),
+            )
+            .await
+        }
+        .await;
+        let closed = if let Some(store) = &previous {
+            store.close().await
+        } else {
+            Ok(())
         };
+        drop(previous);
+        let prepared = prepared?;
+        closed?;
+        if let Some((root, replacement)) = prepared {
+            #[cfg(test)]
+            super::crash_tests::checkpoint("import-before-publish");
+            root.validate(&admission, ".archive-import")?;
+            if let Some(replacement) = replacement {
+                replacement.publish(&admission)?;
+            } else {
+                rustix::fs::renameat_with(
+                    &admission.directory,
+                    ".archive-import",
+                    &admission.directory,
+                    "authority",
+                    rustix::fs::RenameFlags::NOREPLACE,
+                )
+                .map_err(std::io::Error::from)?;
+                root.validate(&admission, "authority")?;
+            }
+        } else if let Some(root) = &previous_root {
+            root.validate(&admission, "authority")?;
+        }
+        if published && let Some(marker) = marker {
+            marker.cleanup(&admission)?;
+        }
+        // Replay also finishes publication durability after a previous command failed.
+        admission.sync()?;
+        #[cfg(test)]
+        super::crash_tests::checkpoint("import-published");
+        Ok(manifest)
+    }
+
+    fn import_store(config: &ResolvedConfig, root: &Root) -> Result<Self> {
+        Ok(Self {
+            tree: Self::open_tree(config, &root.path())?,
+            writer: Arc::new(Mutex::new(())),
+            root: root.path(),
+            budget_mib: config.config().runtime.memory_budget_mib,
+        })
+    }
+
+    async fn prepare_archive(
+        config: &ResolvedConfig,
+        source: &Path,
+        manifest: &ArchiveManifest,
+        identity: &ImportIdentity,
+        admission: &layout::Admission,
+        previous: Option<(&Self, &Root)>,
+    ) -> Result<Option<(Root, Option<Replacement>)>> {
+        let old_identity = if let Some((store, root)) = previous {
+            if store.tree.begin()?.get(super::SCHEMA)?.as_deref() != Some(&[super::FORMAT_VERSION])
+            {
+                return Err(StorageError::new("UNSUPPORTED_STORAGE_FORMAT"));
+            }
+            let old = store
+                .import_identity()?
+                .ok_or_else(|| StorageError::new("IMPORT_CONFLICT"))?;
+            if identity.commit_seq <= old.commit_seq {
+                store.read_archive(source, manifest, true, None).await?;
+                root.validate(admission, "authority")?;
+                return Ok(None);
+            }
+            if store.sequence()? != old.commit_seq {
+                return Err(StorageError::new("IMPORT_CONFLICT"));
+            }
+            Some(old)
+        } else {
+            None
+        };
+        let encoded = serde_json::to_vec(identity)?;
+        prepare_stage(&admission.root().join(".archive-import"), &encoded)?;
+        let root = Root::open(admission, ".archive-import")?;
+        prepare_stage(&root.path(), &encoded)?;
+        root.validate(admission, ".archive-import")?;
+        let store = Self::import_store(config, &root)?;
         let result = async {
             {
                 let mut tx = store.tree.begin()?;
                 match tx.get(IMPORT)? {
-                    Some(stored) if stored == identity => (),
+                    Some(stored) if stored == encoded => (),
                     Some(_) => return Err(StorageError::new("IMPORT_CONFLICT")),
-                    None if existing => return Err(StorageError::new("IMPORT_CONFLICT")),
                     None => {
                         if tx.get(super::SCHEMA)?.is_some() {
                             return Err(StorageError::new("IMPORT_CONFLICT"));
                         }
                         tx.set_durability(Durability::Immediate);
-                        tx.set(IMPORT, &identity)?;
+                        tx.set(IMPORT, &encoded)?;
                         tx.set(super::SCHEMA, &[super::FORMAT_VERSION])?;
                         tx.set(super::SEQUENCE, &0_u64.to_be_bytes())?;
                         tx.commit().await?;
                     }
                 }
             }
-            store.read_archive(&source, &manifest, existing).await?;
-            if !existing {
-                store.import_heads(manifest.commit_seq).await?;
-            } else if store.sequence()? < manifest.commit_seq {
-                return Err(invalid());
-            }
+            let common = previous
+                .zip(old_identity.as_ref())
+                .map(|((old, _), id)| (old, id.commit_seq));
+            store.read_archive(source, manifest, false, common).await?;
+            store.import_heads(manifest.commit_seq).await?;
             Ok(())
         }
         .await;
         let closed = store.close().await;
         drop(store);
-        if !existing
-            && closed.is_ok()
+        if closed.is_ok()
             && result.as_ref().is_err_and(|e| e.code == "INVALID_ARCHIVE")
+            && Replacement::load(admission)?.is_none()
         {
-            fs::remove_dir_all(&root)?;
-            layout::sync_dir(&data)?;
+            root.remove(admission, ".archive-import")?;
+            admission.sync()?;
         }
         result?;
         closed?;
-        if !existing {
-            #[cfg(test)]
-            super::crash_tests::checkpoint("import-before-publish");
-            if root.join("format.json").try_exists()? {
-                layout::check_format(&root)?;
-            } else {
-                layout::write_new(&root.join("format.json"), layout::FORMAT)?;
-            }
-            layout::sync_dir(&root)?;
-            rustix::fs::renameat_with(
-                rustix::fs::CWD,
-                &root,
-                rustix::fs::CWD,
-                &destination,
-                rustix::fs::RenameFlags::NOREPLACE,
-            )
-            .map_err(std::io::Error::from)?;
+        if root.path().join("format.json").try_exists()? {
+            layout::check_format(&root.path())?;
+        } else {
+            layout::write_new(&root.path().join("format.json"), layout::FORMAT)?;
         }
-        // A visible destination can follow a failed post-rename sync; replay must finish it.
-        layout::sync_dir(&data)?;
+        layout::sync_dir(&root.path())?;
+        root.validate(admission, ".archive-import")?;
+        let replacement = previous.zip(old_identity).map(|((_, old), old_identity)| {
+            Replacement::new(old, old_identity, &root, identity.clone())
+        });
         #[cfg(test)]
-        super::crash_tests::checkpoint("import-published");
-        Ok(manifest)
+        super::crash_tests::checkpoint("incremental-validated");
+        Ok(Some((root, replacement)))
     }
 
     async fn read_archive(
@@ -303,6 +377,7 @@ impl Storage {
         source: &Path,
         manifest: &ArchiveManifest,
         existing: bool,
+        common: Option<(&Self, u64)>,
     ) -> Result<()> {
         let mut commits = Input::open(
             &source.join("commits.jsonl"),
@@ -388,6 +463,19 @@ impl Storage {
                 || hash(&serde_json::to_vec(&request)?) != entry.receipt.request_sha256
             {
                 return Err(invalid());
+            }
+            if let Some((old, boundary)) = common
+                && seq <= boundary
+            {
+                old.stage_import(&entry, &request, true)
+                    .await
+                    .map_err(|e| {
+                        if e.code == "INVALID_ARCHIVE" {
+                            StorageError::new("IMPORT_CONFLICT")
+                        } else {
+                            e
+                        }
+                    })?;
             }
             self.stage_import(&entry, &request, existing).await?;
             count = count.checked_add(1).ok_or_else(invalid)?;

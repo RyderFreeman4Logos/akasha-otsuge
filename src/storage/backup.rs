@@ -196,7 +196,7 @@ impl Storage {
         let manifest = validate(backup)?;
         let backup = backup.canonicalize()?;
         let data = &config.config().paths.data_dir;
-        layout::private_dir(data, true)?;
+        let admission = layout::Admission::acquire(data, true)?;
         let root = fresh_destination(&data.join("authority"), &backup)?;
         let store = Self {
             tree: Self::open_tree(config, &root)?,
@@ -230,6 +230,7 @@ impl Storage {
             layout::write_new(&store.root.join("format.json"), layout::FORMAT)?;
             layout::sync_dir(&store.root)?;
             layout::sync_dir(data)?;
+            admission.validate()?;
             Ok(())
         })();
         if let Err(error) = result {
