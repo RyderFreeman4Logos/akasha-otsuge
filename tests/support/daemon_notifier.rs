@@ -1,7 +1,7 @@
 use super::*;
 use akasha_otsuge::config::ReviewMode;
 
-fn rpc(daemon: &Daemon, command: Value) -> Value {
+pub(super) fn rpc(daemon: &Daemon, command: Value) -> Value {
     static NEXT: AtomicU64 = AtomicU64::new(0);
     let mut stream = daemon.connect();
     receive(&mut stream);
@@ -32,7 +32,7 @@ fn all(daemon: &Daemon, scope: &akasha_otsuge::domain::Scope) -> Vec<Value> {
     panic!("notification pagination did not terminate");
 }
 
-fn wait_items(
+pub(super) fn wait_items(
     daemon: &Daemon,
     scope: &akasha_otsuge::domain::Scope,
     ready: impl Fn(&[Value]) -> bool,

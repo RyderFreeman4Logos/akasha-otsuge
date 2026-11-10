@@ -216,6 +216,32 @@ fn import_crash_child() {
 }
 
 #[test]
+fn import_runtime_boundary_rejects_invalid_metadata() {
+    let root = std::env::temp_dir().join(format!("akasha-import-boundary-{}", std::process::id()));
+    std::fs::create_dir(&root).unwrap();
+    let _fixture = OwnedFixture(root.clone());
+    runtime().block_on(async {
+        let store = Storage::open(&config(&root)).await.unwrap();
+        assert!(store.import_identity().unwrap().is_none());
+        for value in [
+            serde_json::json!({"archive_sha256":"a".repeat(64),"commit_seq":1}),
+            serde_json::json!({"archive_sha256":"z".repeat(64),"commit_seq":0}),
+            serde_json::json!({"archive_sha256":"a".repeat(64),"commit_seq":0,"extra":true}),
+            serde_json::json!({"commit_seq":0}),
+        ] {
+            let mut tx = store.tree.begin().unwrap();
+            tx.set(b"meta/archive_import", serde_json::to_vec(&value).unwrap())
+                .unwrap();
+            tx.commit().await.unwrap();
+            assert!(
+                matches!(store.import_identity(), Err(error) if error.code == "INVALID_ARCHIVE")
+            );
+        }
+        store.close().await.unwrap();
+    });
+}
+
+#[test]
 fn killed_archive_import_resumes_staging_heads_and_publication_without_duplicates() {
     for phase in [
         "import-staged",
@@ -295,10 +321,8 @@ fn killed_archive_import_resumes_staging_heads_and_publication_without_duplicate
                     );
                 }
                 assert_eq!(restored.commit(&original).await.unwrap(), receipts[0]);
-                assert_eq!(
-                    restored.ensure_runtime_ready().unwrap_err().code,
-                    "IMPORTED_RUNTIME_DISABLED"
-                );
+                assert_eq!(restored.import_identity().unwrap().unwrap().commit_seq, 3);
+                assert!(!restored.locally_created(&original.changes[0].key).unwrap());
                 restored.close().await.unwrap();
             }
             assert!(!root.join("data/.archive-import").exists());

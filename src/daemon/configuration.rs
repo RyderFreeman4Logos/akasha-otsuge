@@ -219,6 +219,8 @@ pub(super) async fn open(storage: &Storage, initial: ResolvedConfig) -> Result<C
         }
         let manager = ConfigManager::new(generation, initial, |_| Ok(()))?;
         save(storage, &manager.checkpoint()?).await?;
+        #[cfg(test)]
+        crate::storage::crash_tests::checkpoint("import-runtime-config");
         manager
     } else if let Some(checkpoint) = load(storage, "daemon/config")? {
         let manager = ConfigManager::restore(checkpoint, |_| Ok(()))?;
@@ -270,6 +272,8 @@ async fn initialize_imported_controls(storage: &Storage, generation: u64) -> Res
                 changes,
             })
             .await?;
+        #[cfg(test)]
+        crate::storage::crash_tests::checkpoint("import-runtime-controls");
     }
     if !storage.locally_written(
         storage
@@ -283,6 +287,8 @@ async fn initialize_imported_controls(storage: &Storage, generation: u64) -> Res
             &|| Ok(()),
         )
         .await?;
+        #[cfg(test)]
+        crate::storage::crash_tests::checkpoint("import-runtime-index");
     }
     Ok(())
 }

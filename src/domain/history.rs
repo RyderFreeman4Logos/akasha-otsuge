@@ -229,6 +229,10 @@ impl Domain<'_> {
                 config,
             )
             .await?;
+            #[cfg(test)]
+            if self.storage.import_identity()?.is_some() {
+                crate::storage::crash_tests::checkpoint("import-runtime-grant");
+            }
         }
         Ok(())
     }

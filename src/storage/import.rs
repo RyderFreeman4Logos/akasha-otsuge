@@ -150,14 +150,6 @@ impl Storage {
         })
     }
 
-    pub(crate) fn ensure_runtime_ready(&self) -> Result<()> {
-        // Imported capabilities need fresh local initialization before daemon recovery.
-        if self.tree.begin()?.get(IMPORT)?.is_some() {
-            return Err(StorageError::new("IMPORTED_RUNTIME_DISABLED"));
-        }
-        Ok(())
-    }
-
     /// Restore original revisions into a private stage, then publish without replacement.
     pub async fn import_archive(config: &ResolvedConfig, source: &Path) -> Result<ArchiveManifest> {
         layout::directory(source)?;

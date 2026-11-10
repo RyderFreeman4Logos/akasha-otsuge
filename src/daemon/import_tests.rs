@@ -486,3 +486,76 @@ async fn acknowledging_imported_notification_does_not_rearm_delivery() {
     );
     service.storage.close().await.unwrap();
 }
+
+#[test]
+#[ignore = "launched only by the import runtime crash supervisor"]
+fn import_runtime_child() {
+    let root = PathBuf::from(std::env::var_os("AKASHA_TEST_CRASH_ROOT").unwrap());
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap();
+    runtime.block_on(async {
+        let (service, _) = tests::service_at(&root, "").await;
+        service.storage.close().await.unwrap();
+        panic!("requested import runtime checkpoint was not reached");
+    });
+}
+
+#[test]
+fn killed_import_runtime_initialization_resumes_without_rearming_history() {
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap();
+    for (number, phase) in [
+        "import-runtime-config",
+        "import-runtime-controls",
+        "import-runtime-index",
+        "import-runtime-grant",
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let (_fixture, target, boundary, original) =
+            runtime.block_on(imported_fixture(&format!("import-crash-{number}")));
+        crate::storage::crash_tests::kill_at(
+            &target,
+            phase,
+            "daemon::jobs::import_tests::import_runtime_child",
+        );
+        runtime.block_on(async {
+            let mut sequence = None;
+            for _ in 0..2 {
+                let (service, _) = tests::service_at(&target, "").await;
+                assert_eq!(service.config.pin().generation(), 1001);
+                assert!(service.active().unwrap().1.is_empty());
+                service.recover().await.unwrap();
+                service.advance_incidents().await.unwrap();
+                assert_eq!(service.job("archived-job").unwrap().1.attempt, 0);
+                assert!(
+                    Invocation::load(&service.storage, "old-invocation", &principal())
+                        .await
+                        .is_err()
+                );
+                assert!(
+                    Domain::new(&service.storage)
+                        .permission(&context().unwrap(), Some(&owner_scope()))
+                        .is_ok()
+                );
+                assert_eq!(
+                    service.storage.commit(&original).await.unwrap().commit_seq,
+                    boundary
+                );
+                let progress = crate::retrieval::status(&service.storage).unwrap();
+                assert_eq!(progress.lexical_watermark, 0);
+                if let Some(old) = sequence {
+                    assert_eq!(service.storage.sequence().unwrap(), old);
+                }
+                sequence = Some(service.storage.sequence().unwrap());
+                service.storage.close().await.unwrap();
+            }
+        });
+        println!("import runtime checkpoint={phase} SIGKILL recovered with two stable restarts");
+    }
+}

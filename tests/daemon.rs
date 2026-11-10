@@ -44,6 +44,9 @@ mod incident_tests;
 #[path = "support/daemon_notifier.rs"]
 mod notifier_tests;
 
+#[path = "support/daemon_import.rs"]
+mod import_tests;
+
 #[test]
 fn memory_status_reports_actual_groups_and_keeps_open_storage_budget_on_reload() {
     let mut daemon = Daemon::new();
