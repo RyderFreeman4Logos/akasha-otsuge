@@ -196,12 +196,24 @@ impl Storage {
         let manifest = validate(backup)?;
         let backup = backup.canonicalize()?;
         let data = &config.config().paths.data_dir;
-        layout::private_dir(data, true)?;
-        let root = fresh_destination(&data.join("authority"), &backup)?;
+        let admission = layout::Admission::acquire(data, true)?;
+        if super::import_publish::Replacement::load(&admission)?.is_some() {
+            return Err(StorageError::new("IMPORT_CONFLICT"));
+        }
+        let requested = admission.root().canonicalize()?.join("authority");
+        if requested.starts_with(&backup) || backup.starts_with(&requested) {
+            return Err(StorageError::new("UNSAFE_STORAGE_PATH"));
+        }
+        layout::private_dir(&admission.root().join("authority"), false)?;
+        let root = super::import_publish::Root::open(&admission, "authority")?;
+        root.validate(&admission, "authority")?;
+        if fs::read_dir(root.path())?.next().is_some() {
+            return Err(StorageError::new("IMPORT_CONFLICT"));
+        }
         let store = Self {
             tree: Self::open_tree(config, &root)?,
             writer: Arc::new(Mutex::new(())),
-            root,
+            root: root.path(),
             budget_mib: config.config().runtime.memory_budget_mib,
         };
         let tree = store.tree.clone();
@@ -213,7 +225,7 @@ impl Storage {
         closed?;
         detach_links(&store.root.join("kv"))?;
         let store = Self {
-            tree: Self::open_tree(config, &store.root)?,
+            tree: Self::open_tree(config, &store.tree.root)?,
             writer: Arc::new(Mutex::new(())),
             root: store.root,
             budget_mib: config.config().runtime.memory_budget_mib,
@@ -229,7 +241,8 @@ impl Storage {
             }
             layout::write_new(&store.root.join("format.json"), layout::FORMAT)?;
             layout::sync_dir(&store.root)?;
-            layout::sync_dir(data)?;
+            store.tree.root.validate(&admission, "authority")?;
+            admission.sync()?;
             Ok(())
         })();
         if let Err(error) = result {

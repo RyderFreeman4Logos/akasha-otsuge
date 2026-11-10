@@ -96,31 +96,85 @@ also apply to input. Import reads one batch at a time and uses the native store
 for staging and sequence-ordered history reconstruction. It does not sort the
 complete archive in memory or make another copy of `blobs.bin`.
 
-The destination's private `.archive-import` directory is bound to the exact
-manifest hash before native staging begins. An exclusive import lock prevents
-concurrent importers. Original receipts/revisions are committed atomically in
-the stage; heads are reconstructed in original commit order. After validation
-and native close, the completed directory is published as `authority` with a
-no-replacement rename and parent sync. A concurrent daemon or existing store
-cannot be overwritten. Unrecognized staging directories are preserved and
+The destination's private directory named .archive-import is bound to the exact
+manifest hash before native staging begins. Import and restore take exclusive
+admission locks; ordinary opens take shared admission until the native engine
+owns its database. A retained directory lock also prevents replacing the lock
+filename from admitting another owner. A running daemon or other native owner
+prevents import.
+
+Original receipts/revisions are committed atomically in the stage; heads are
+reconstructed in original commit order. After validation and native close, a
+first import publishes the completed directory as authority with a no-replacement
+rename and parent sync. Unrecognized staging directories are preserved and
 rejected. No application commit is added for the import itself.
 
 Run the same command to resume a recognized stage after interruption. It
 revalidates the input and saved records before resuming incomplete commits or
-head reconstruction. Four real SIGKILL tests cover durable record staging,
-head reconstruction, before publication and after publication; these are not
-power-loss tests. Invalid archives remove only their recognized unpublished
-stage after successful close. I/O failures retain that stage for inspection or
-retry. If even the initial ownership marker is incomplete, import refuses it;
-inspect that exact directory instead of deleting arbitrary staging paths.
+head reconstruction. Invalid archives can remove only their recognized
+unpublished stage after successful native close. I/O failures retain that stage
+for inspection or retry. If even the initial ownership marker is incomplete,
+import refuses it; inspect that exact directory instead of deleting arbitrary
+staging paths.
 
-An identical completed archive can be imported again without changing later
-local commits. The entire archive and original stored revisions are checked
-again. A different archive or unrelated destination returns `IMPORT_CONFLICT`;
-merging incremental archives into an existing authority store is not implemented
-in this leaf. Successful output describes the imported archive, not the current
-sequence of an existing destination. A later close, publication-sync or output
-failure still returns a nonzero status; rerun the same input to reconcile it.
+### Incremental histories
+
+An identical archive or an older exact history prefix can be imported again
+without changing newer imported history or later local commits. Every supplied
+receipt, revision and clock is compared with the destination. Prefix equality
+uses commit identities and history, not file byte prefixes: request-key sorting
+can place new commits before old entries.
+
+A longer archive can replace an imported store only when its complete common
+history is identical and the destination has no commits after its import
+boundary. Divergence, unrelated destinations and local changes return a conflict
+without replacing existing history. Daemon initialization itself creates local
+commits, so finish these prefix extensions before starting the imported daemon.
+This operation does not merge independent local and foreign branches.
+
+The importer builds one complete temporary native database for the longer
+archive. Both histories remain open during validation, then both native handles
+close while exclusive admission is retained. A durable replacement marker binds
+the old/new archive identities and directory device/inode identities. Linux
+atomic directory exchange publishes the validated store. Parent sync precedes
+cleanup of the displaced old database, followed by another parent sync. No
+second raw archive or uncompressed corpus copy is created.
+
+If the replacement marker remains after interruption, resume with that exact
+new archive. Recovery validates the current native identity and supplied history
+before removing old data. It distinguishes pre-exchange and post-exchange
+directories and never exchanges backward. Local commits made after a completed
+exchange are retained; local writes to the old authority before exchange cause
+a conflict. Foreign directories or invalid/mismatched markers are preserved.
+Retained directory descriptors bind staging operations and cleanup to their
+owners. Unsupported Linux anonymous-file, procfs or directory-exchange operations
+fail rather than using a replacing-copy fallback.
+
+Ordinary opens, including export and daemon startup, synchronize the retained
+data directory before using native storage and again before returning it. A
+pending replacement marker must match both the retained authority inode and its
+native import identity. A synchronization failure prevents startup or export;
+successful synchronization permits later local commits without deleting the
+marker. Resume with the exact new archive to validate and clean up old history.
+Restore refuses a pending replacement. Cleanup checks the opened old directory's
+identity before removing any member. Shared native handles retain their directory
+descriptor through background commits, checkpoints and restores even when their
+caller is cancelled or drops the Storage owner.
+An owned native runtime keeps that descriptor alive through final asynchronous
+shutdown, including after the caller's runtime exits. Explicit close requests
+finish independently of a cancelled waiter. Admission locks explicitly unlock
+at scope exit, so inherited descriptor copies cannot prolong that admission.
+
+Controlled tests cover nine incremental SIGKILL phases, ordinary-open/restore/
+second-import exclusion while publication is paused, malformed markers,
+replacement directories, local writes on either side of exchange, and refusal
+to remove old history when the replacement's native identity is invalid.
+A real directory-fsync fault covers failed publication and failed replay. These
+tests do not establish power-loss or production-scale resource acceptance.
+
+Successful output describes the supplied archive, not the current sequence of
+an existing destination. A later close, publication-sync or output failure still
+returns a nonzero status; rerun the same input to reconcile it.
 
 ## Starting the imported store
 
@@ -165,5 +219,6 @@ cover configuration, queue, index and grant initialization. A controlled Pi
 fixture re-registers the same imported session with a fresh token and preserves
 the new binding across restart while rejecting the old token. This is not
 actual provider authentication. SIGKILL is not
-power-loss or real ENOSPC evidence. Actual mempal conversion, incremental
-application of different archives and full migration acceptance remain in #25.
+power-loss or real ENOSPC evidence. Read-only mempal conversion is implemented
+separately. Stable identities, updates and deletions across changed legacy
+snapshots and full migration acceptance remain in #25.

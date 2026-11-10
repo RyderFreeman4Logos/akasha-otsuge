@@ -62,6 +62,55 @@ fn request() -> CommitRequest {
     }
 }
 
+#[test]
+fn storage_background_work_survives_its_calling_runtime() {
+    let fixture = Fixture::new();
+    let runtime = || {
+        tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap()
+    };
+    let first = runtime();
+    let store = first.block_on(async {
+        let store = Storage::open(&fixture.config()).await.unwrap();
+        store.commit(&request()).await.unwrap();
+        store
+    });
+    drop(first);
+    runtime().block_on(async {
+        let mut update = request();
+        update.request_id = "after-runtime".into();
+        update
+            .changes
+            .retain(|change| change.key.kind == RecordKind::Memory);
+        update.changes[0].expected_revision = Some(1);
+        update.changes[0].content = "written by the next runtime".into();
+        let receipt =
+            tokio::time::timeout(std::time::Duration::from_secs(5), store.commit(&update))
+                .await
+                .unwrap()
+                .unwrap();
+        assert_eq!(receipt.commit_seq, 2);
+        assert_eq!(
+            store
+                .current(&update.changes[0].key)
+                .unwrap()
+                .unwrap()
+                .content,
+            update.changes[0].content
+        );
+        assert_eq!(
+            store
+                .checkpoint(&fixture.0.join("after-runtime-backup"))
+                .await
+                .unwrap(),
+            2
+        );
+        store.close().await.unwrap();
+    });
+}
+
 #[tokio::test]
 async fn commits_the_complete_batch_with_one_receipt_and_durable_outbox() {
     let fixture = Fixture::new();

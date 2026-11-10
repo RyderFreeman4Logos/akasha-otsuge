@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T17:22:59.119280+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "4a542e3e4f86fc6182c603c7880a75ba5b793299",
+    "log_sha256": "729d8c4389a1bd5a5fdfd8131d64f9b62b02f08f4df054c3af43f98b7939cacb",
+    "seconds": 18.969110053032637,
+    "utc": "2026-11-10T17:22:32.387373+00:00"
+  },
+  "process_absent": true,
+  "classification": "CAUSAL_RED_RELEASED_ADMISSION_BLOCKED_BY_DUPLICATE_OPEN_DESCRIPTION"
+}

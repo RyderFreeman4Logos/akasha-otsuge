@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "utc": "2026-11-10T12:56:36.289287+00:00",
+  "parent": "a6a4b14fc7d0c5e140182bd585b6679e91ddfe05",
+  "base": "fe30c78169fbf87bfa47cf06912b7c64d3a418b3",
+  "files": {
+    "README.md": {
+      "bytes": 2556,
+      "sha256": "9e794e186bedd51d59abf4c56acd21191d35ac7627f560644accb2cab0c9b624"
+    },
+    "design.json": {
+      "bytes": 2860,
+      "sha256": "ac63f6845128f054bc2b66432647e1f104b36aa9f364cf180a8b34138f740fa9"
+    },
+    "mvp025-incremental-focused-r1.admission.json": {
+      "bytes": 1257,
+      "sha256": "a1917fe34ba0c02478eecbf7036e5b2b71dcb85b69e2702d9eaaa1c28c575ac9"
+    },
+    "mvp025-incremental-focused-r1.collected.json": {
+      "bytes": 393,
+      "sha256": "f87becd4091b09ffa847c926df4f4f1f8216f6ab817ee2cf49aab176b3eed9df"
+    },
+    "mvp025-incremental-focused-r1.log.gz": {
+      "bytes": 1240,
+      "sha256": "fc91c011ea5c38eef15bd108e5371a06e23118e421560614f94ed4e0980e8741"
+    },
+    "mvp025-incremental-focused-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "b706d5506b445eadea0bdb7b2701496c8fb08b15d365aa08c835448f6e9435f4"
+    },
+    "mvp025-incremental-focused-r2.admission.json": {
+      "bytes": 1409,
+      "sha256": "a5e7b15c456127d7c0ed2cebfab2c6df9157873eb99dbb10c6788d046f32b200"
+    },
+    "mvp025-incremental-focused-r2.collected.json": {
+      "bytes": 397,
+      "sha256": "79b96648892d648519da4ce7ad761adefe0de3e07c9cd33640e1576e5e94937f"
+    },
+    "mvp025-incremental-focused-r2.log.gz": {
+      "bytes": 2359,
+      "sha256": "e745d44ce5ac36b5efb9e8fa9f4b63ffdc93079ba7141ad60103346d63031191"
+    },
+    "mvp025-incremental-focused-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "0266c1adbed186d5f25b64180c129a39d1e59bb1f23eb3096c4d805145864145"
+    },
+    "mvp025-incremental-focused-r3.admission.json": {
+      "bytes": 1409,
+      "sha256": "71e896b6e4475e60f980c80b16193b568f07c3d49c6e1ef3c9c845715ce3fab6"
+    },
+    "mvp025-incremental-focused-r3.collected.json": {
+      "bytes": 392,
+      "sha256": "56ae39ae67ba0c7ab90db90b52ce6e3f2a3c2576948b0c8e94738ab1b5882345"
+    },
+    "mvp025-incremental-focused-r3.log.gz": {
+      "bytes": 2864,
+      "sha256": "72e9fe3e7f4e5f018bb0ad10f6b444b340094788876f6164a2975f5bea6d2587"
+    },
+    "mvp025-incremental-focused-r3.terminal.json": {
+      "bytes": 238,
+      "sha256": "8d0d193813ad528cb888471bff009977c53725632a2c66eaeb61724fee920429"
+    },
+    "mvp025-incremental-focused-r4.admission.json": {
+      "bytes": 1409,
+      "sha256": "19c10eba69045d5f059dd42ef3e9d775423fc9240cb2b2511a7f4eaa0185de42"
+    },
+    "mvp025-incremental-focused-r4.collected.json": {
+      "bytes": 392,
+      "sha256": "63c893b8342db35fa75b5b3849c2887c99885481d18ea37c6fbe8372757e2000"
+    },
+    "mvp025-incremental-focused-r4.log.gz": {
+      "bytes": 1217,
+      "sha256": "b6bbf080ab55b6161c348f3c506af521545a0178e43ec979baf0e8907e16699e"
+    },
+    "mvp025-incremental-focused-r4.terminal.json": {
+      "bytes": 235,
+      "sha256": "7c3c87ac71c74691df0263605c9f45061041a3c475bdc44a7ba708729c530fba"
+    },
+    "mvp025-incremental-recovery-red-r1.admission.json": {
+      "bytes": 1426,
+      "sha256": "879c2c278cab4dfb7fb4ba30a1bbf2994257d3f3b501c2a1adc6a0e461dc3e75"
+    },
+    "mvp025-incremental-recovery-red-r1.collected.json": {
+      "bytes": 390,
+      "sha256": "2c25c2fe5bf222e0cb0b852a900d3f39c8176aaf3c77f0caafa64fa98d329571"
+    },
+    "mvp025-incremental-recovery-red-r1.log.gz": {
+      "bytes": 546,
+      "sha256": "40b9ee1c366b1a7ea11339f590ecefbd1ef6bfbc6eb201005f1c3e6a75c72a79"
+    },
+    "mvp025-incremental-recovery-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "911cf4805ca1465c3be6140b0dec1ba612737c8fe97569d8788d43cc1f510710"
+    },
+    "mvp025-incremental-red-r1.admission.json": {
+      "bytes": 1108,
+      "sha256": "32be59f273f47cae21fadd6405274cdf61ba5693755c5169df85f2be6c8fc256"
+    },
+    "mvp025-incremental-red-r1.collected.json": {
+      "bytes": 386,
+      "sha256": "f8c5a5af4c66a35334dfeb5d8229be60d0b6e93d253adba0ed34944ac8b1f5e2"
+    },
+    "mvp025-incremental-red-r1.log.gz": {
+      "bytes": 946,
+      "sha256": "0003b68e030c7a881107a6949d882082016896fd36f8b4247dc7ba4b745fc5f1"
+    },
+    "mvp025-incremental-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "5751c415fb87423733331c1afa9292698e70cb9e1ea16f75eb7500574b1e45f8"
+    }
+  },
+  "candidate_file_sha256": {
+    "src/storage/import.rs": "19a831c82af6eb743619f362d54bfdc44558ae14e1882f257c5de6a760b1818d",
+    "src/storage/import_publish.rs": "ac060d65427ca2633033d670fe7dd51553341f8c749be2e6118a5e15ef93a1f8",
+    "src/storage/layout.rs": "7c0667f0925d3d23175f33b738738deba310040729c3c672b402766cce79de94",
+    "src/storage/mod.rs": "caf6429f7b59509978da485bb4ea972d183029e1aee068015662ab8169b0267d",
+    "src/storage/backup.rs": "26c025ecaef4166dc7728b1b84593b02cd950513747f08dfa01472fef1f2332c",
+    "src/storage/crash_tests.rs": "7f2bf7278c4bd6bdd5e095f5b4c71b4ea9ae9bfbbb5c4570ca56b4488e317750",
+    "src/storage/crash_tests/incremental.rs": "75b1df1747da8ee259b68f705cc4e3708d2f3c5c6a5678954ef39b518ad7370a",
+    "src/daemon/import_tests.rs": "1fbb3571d985633d68ca77aa04a488c9a3183265421522f357925a3653cc9295",
+    "tests/support/archive_import.rs": "1fe9fff11629ab8fdd898c947f6c71f82d31d704d471a6cecf3ad4b3c9514263"
+  },
+  "limits": [
+    "Dirty-candidate focused evidence; exact-HEAD canonical and independent review are separate.",
+    "One neutral incremental leaf; no whole-issue completion."
+  ]
+}

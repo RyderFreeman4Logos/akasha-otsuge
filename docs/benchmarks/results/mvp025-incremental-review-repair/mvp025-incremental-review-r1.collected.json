@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T13:47:00.437233+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "085640133221975943ec4ebc7d28cc86d5df879b",
+    "log_sha256": "9b2796c30e68e530bbae0f4a2593c7ad7691bbe71f380ed97971f17fd28880c9",
+    "seconds": 979.1269750837237,
+    "utc": "2026-11-10T13:46:15.239564+00:00"
+  },
+  "process_absent": true,
+  "classification": "REVIEW_COMPLETED_VERDICT_TO_RECONCILE"
+}

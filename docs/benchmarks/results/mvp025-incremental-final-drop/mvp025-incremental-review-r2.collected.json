@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T15:01:32.849273+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "4a542e3e4f86fc6182c603c7880a75ba5b793299",
+    "log_sha256": "4e1fb311bca1ad72771c1c2893527f872045ef698ed86942643524bb0c3eb9a2",
+    "seconds": 868.3498963257298,
+    "utc": "2026-11-10T14:58:02.067141+00:00"
+  },
+  "process_absent": true,
+  "classification": "REVIEW_FAIL_ONE_HIGH_FINAL_NATIVE_DROP_ROOT_CUSTODY"
+}

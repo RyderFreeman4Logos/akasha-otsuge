@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T13:01:23.535133+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "6e692d6dbb0ac329372166a65d3029c913621049",
+    "log_sha256": "902295631a2a27c0e8a824ee40175069f8a22be0b7a314628d8922077706b4e9",
+    "seconds": 100.26177596766502,
+    "utc": "2026-11-10T13:00:05.147823+00:00"
+  },
+  "process_absent": true,
+  "classification": "FAILED_CANONICAL_REQUIRES_TRIAGE"
+}

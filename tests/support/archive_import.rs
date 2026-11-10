@@ -36,15 +36,194 @@ fn request() -> CommitRequest {
     }
 }
 
+fn failing_parent_sync(target: &Fixture) -> (PathBuf, PathBuf) {
+    let interposer = target.0.join("fail-sync.so");
+    let source_file = target.0.join("fail-sync.c");
+    let observed = target.0.join("sync-faults");
+    std::fs::write(
+        &source_file,
+        r#"
+#define _GNU_SOURCE
+#include <dlfcn.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+int fsync(int fd) {
+    const char *directory = getenv("AKASHA_FAIL_SYNC_DIRECTORY");
+    const char *published = getenv("AKASHA_FAIL_SYNC_PUBLISHED");
+    const char *observed = getenv("AKASHA_FAIL_SYNC_OBSERVED");
+    const char *old_inode = getenv("AKASHA_FAIL_SYNC_OLD_INODE");
+    struct stat wanted, actual, complete;
+    if (directory && published && observed && !stat(directory, &wanted)
+        && !stat(published, &complete) && !fstat(fd, &actual)
+        && wanted.st_dev == actual.st_dev && wanted.st_ino == actual.st_ino
+        && (!old_inode || complete.st_ino != strtoull(old_inode, NULL, 10))) {
+        int log = open(observed, O_WRONLY | O_APPEND | O_CREAT, 0600);
+        if (log >= 0) { (void)write(log, "x", 1); close(log); }
+        errno = EIO;
+        return -1;
+    }
+    int (*original)(int) = dlsym(RTLD_NEXT, "fsync");
+    return original(fd);
+}
+"#,
+    )
+    .unwrap();
+    assert!(
+        Command::new("cc")
+            .args(["-shared", "-fPIC", "-Wall", "-Wextra", "-Werror"])
+            .arg(&source_file)
+            .args(["-ldl", "-o"])
+            .arg(&interposer)
+            .status()
+            .unwrap()
+            .success()
+    );
+    (interposer, observed)
+}
+
 #[tokio::test]
-async fn archive_import_replay_must_complete_a_failed_publication_parent_sync() {
-    use std::os::unix::fs::PermissionsExt;
-    struct RestoreMode(PathBuf);
-    impl Drop for RestoreMode {
+async fn ordinary_open_requires_durable_incremental_publication_before_export_or_daemon() {
+    use std::os::unix::fs::{MetadataExt, PermissionsExt};
+    use std::time::{Duration, Instant};
+
+    struct Child(std::process::Child);
+    impl Drop for Child {
         fn drop(&mut self) {
-            let _ = std::fs::set_permissions(&self.0, std::fs::Permissions::from_mode(0o700));
+            if self.0.try_wait().ok().flatten().is_none() {
+                let _ = self.0.kill();
+                let _ = self.0.wait();
+            }
         }
     }
+    let source = Fixture::new();
+    let store = Storage::open(&source.config()).await.unwrap();
+    let first = request();
+    store.commit(&first).await.unwrap();
+    store.close().await.unwrap();
+    let old = source.0.join("old");
+    assert!(source.export(&old).status.success());
+    let target = Fixture::new();
+    std::fs::set_permissions(&target.0, std::fs::Permissions::from_mode(0o700)).unwrap();
+    assert!(target.import(&old).status.success());
+    let data = target.0.join("data");
+    let old_inode = std::fs::metadata(data.join("authority")).unwrap().ino();
+    let store = Storage::open(&source.config()).await.unwrap();
+    let mut amendment = first.clone();
+    amendment.request_id = "a-update".into();
+    amendment
+        .changes
+        .retain(|change| change.key.kind == RecordKind::Memory);
+    amendment.changes[0].expected_revision = Some(1);
+    amendment.changes[0].content = "updated original".into();
+    store.commit(&amendment).await.unwrap();
+    store.close().await.unwrap();
+    let successor = source.0.join("successor");
+    assert!(source.export(&successor).status.success());
+    let (interposer, observed) = failing_parent_sync(&target);
+    let faulted = || {
+        let mut command = Command::new(env!("CARGO_BIN_EXE_akasha-otsuge"));
+        command
+            .arg("--config")
+            .arg(target.0.join("config.toml"))
+            .env("LD_PRELOAD", &interposer)
+            .env("AKASHA_FAIL_SYNC_DIRECTORY", &data)
+            .env("AKASHA_FAIL_SYNC_PUBLISHED", data.join("authority"))
+            .env("AKASHA_FAIL_SYNC_OBSERVED", &observed)
+            .env("AKASHA_FAIL_SYNC_OLD_INODE", old_inode.to_string());
+        command
+    };
+    let output = faulted()
+        .args(["archive", "import"])
+        .arg(&successor)
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    assert_eq!(
+        serde_json::from_slice::<Value>(&output.stderr).unwrap()["error"]["code"],
+        "STORAGE_IO"
+    );
+    assert_eq!(std::fs::read(&observed).unwrap(), b"x");
+    assert!(data.join(".archive-replace.json").is_file());
+    assert!(data.join(".archive-import").is_dir());
+    let mut rejected = Vec::new();
+    for entry in ["export", "daemon"] {
+        let mut command = faulted();
+        if entry == "export" {
+            command
+                .args(["archive", "export"])
+                .arg(target.0.join("unsafe-export"));
+        } else {
+            command.args(["daemon", "run"]);
+        }
+        let stderr = target.0.join(format!("{entry}.stderr"));
+        command
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::fs::File::create(&stderr).unwrap());
+        let mut child = Child(command.spawn().unwrap());
+        let deadline = Instant::now() + Duration::from_secs(5);
+        let status = loop {
+            if let Some(status) = child.0.try_wait().unwrap() {
+                break Some(status);
+            }
+            if Instant::now() >= deadline {
+                break None;
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        };
+        drop(child);
+        let error: Option<Value> = serde_json::from_slice(&std::fs::read(stderr).unwrap()).ok();
+        let denied = status.is_some_and(|s| !s.success())
+            && error
+                .as_ref()
+                .is_some_and(|e| e["error"]["code"] == "STORAGE_IO");
+        eprintln!("entry={entry} rejected_before_ack={denied} status={status:?} error={error:?}");
+        if denied {
+            rejected.push(entry);
+        }
+    }
+    assert_eq!(
+        rejected,
+        ["export", "daemon"],
+        "ordinary open bypassed the outstanding parent sync"
+    );
+    assert_eq!(std::fs::read(&observed).unwrap(), b"xxx");
+    assert!(!target.0.join("unsafe-export").exists());
+    assert!(target.import(&successor).status.success());
+    let store = Storage::open(&target.config()).await.unwrap();
+    assert_eq!(store.sequence().unwrap(), 2);
+    assert_eq!(
+        store
+            .receipt(&first.request_id)
+            .unwrap()
+            .unwrap()
+            .commit_seq,
+        1
+    );
+    assert_eq!(
+        store
+            .receipt(&amendment.request_id)
+            .unwrap()
+            .unwrap()
+            .commit_seq,
+        2
+    );
+    store.close().await.unwrap();
+    let exported = target.0.join("safe-export");
+    assert!(target.export(&exported).status.success());
+    for name in ["manifest.json", "commits.jsonl", "blobs.bin"] {
+        assert_eq!(
+            std::fs::read(exported.join(name)).unwrap(),
+            std::fs::read(successor.join(name)).unwrap()
+        );
+    }
+}
+
+#[tokio::test]
+async fn archive_import_replay_must_complete_a_failed_publication_parent_sync() {
     let source = Fixture::new();
     let store = Storage::open(&source.config()).await.unwrap();
     store.commit(&request()).await.unwrap();
@@ -56,15 +235,19 @@ async fn archive_import_replay_must_complete_a_failed_publication_parent_sync() 
     let data = target.0.join("data");
     // Recreate a fully written unpublished stage without racing the native writer.
     std::fs::rename(data.join("authority"), data.join(".archive-import")).unwrap();
-    let _restore = RestoreMode(data.clone());
-    // Traversal and rename work, but opening the publication parent for fsync fails.
-    std::fs::set_permissions(&data, std::fs::Permissions::from_mode(0o300)).unwrap();
-    assert!(
-        std::fs::File::open(&data).is_err(),
-        "fault requires an unprivileged test user"
-    );
+    let (interposer, observed) = failing_parent_sync(&target);
     for attempt in 0..2 {
-        let output = target.import(&archive);
+        let output = Command::new(env!("CARGO_BIN_EXE_akasha-otsuge"))
+            .arg("--config")
+            .arg(target.0.join("config.toml"))
+            .args(["archive", "import"])
+            .arg(&archive)
+            .env("LD_PRELOAD", &interposer)
+            .env("AKASHA_FAIL_SYNC_DIRECTORY", &data)
+            .env("AKASHA_FAIL_SYNC_PUBLISHED", data.join("authority"))
+            .env("AKASHA_FAIL_SYNC_OBSERVED", &observed)
+            .output()
+            .unwrap();
         assert!(
             !output.status.success(),
             "attempt {attempt} skipped the outstanding parent sync"
@@ -77,7 +260,7 @@ async fn archive_import_replay_must_complete_a_failed_publication_parent_sync() 
         assert!(data.join("authority").is_dir());
         assert!(!data.join(".archive-import").exists());
     }
-    std::fs::set_permissions(&data, std::fs::Permissions::from_mode(0o700)).unwrap();
+    assert_eq!(std::fs::read(&observed).unwrap(), b"xx");
     assert!(target.import(&archive).status.success());
     let store = Storage::open(&target.config()).await.unwrap();
     assert_eq!(store.sequence().unwrap(), 1);
@@ -323,5 +506,141 @@ async fn archive_import_rejects_unknown_corrupt_and_forged_records_without_publi
             !target.0.join("data/.archive-import").exists(),
             "retained rejected archive {mutation}"
         );
+    }
+}
+
+#[tokio::test]
+async fn incremental_archive_keeps_common_history_and_replays_old_prefixes() {
+    let source = Fixture::new();
+    let store = Storage::open(&source.config()).await.unwrap();
+    let initial = request();
+    let first = store.commit(&initial).await.unwrap();
+    let key = initial.changes[1].key.clone();
+    store.close().await.unwrap();
+    let old_archive = source.0.join("old-archive");
+    assert!(source.export(&old_archive).status.success());
+    let target = Fixture::new();
+    assert!(target.import(&old_archive).status.success());
+
+    let store = Storage::open(&source.config()).await.unwrap();
+    let mut change = initial.clone();
+    // New request sorts before the old request; byte-prefix comparison is insufficient.
+    change.request_id = "a-incremental".into();
+    change.changes.retain(|c| c.key == key);
+    change.changes[0].expected_revision = Some(first.commit_seq);
+    change.changes[0].content = "new claim; original stays historical".into();
+    let second = store.commit(&change).await.unwrap();
+    change.request_id = "m-retirement".into();
+    change.changes[0].expected_revision = Some(second.commit_seq);
+    change.changes[0].content = "retired; all prior bytes retained".into();
+    let third = store.commit(&change).await.unwrap();
+    let expected: Vec<_> = (1..=3)
+        .map(|seq| {
+            (
+                store.at(&key, seq).unwrap(),
+                store.recorded_at_ms(seq).unwrap(),
+            )
+        })
+        .collect();
+    store.close().await.unwrap();
+    let archive = source.0.join("new-archive");
+    assert!(source.export(&archive).status.success());
+    let output = target.import(&archive);
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(target.import(&archive).status.success());
+    assert!(target.import(&old_archive).status.success());
+    let restored = Storage::open(&target.config()).await.unwrap();
+    assert_eq!(restored.sequence().unwrap(), third.commit_seq);
+    for (index, (revision, clock)) in expected.iter().enumerate() {
+        let seq = index as u64 + 1;
+        assert_eq!(&restored.at(&key, seq).unwrap(), revision);
+        assert_eq!(&restored.recorded_at_ms(seq).unwrap(), clock);
+    }
+    for receipt in [first, second, third] {
+        assert_eq!(
+            restored.receipt(&receipt.request_id).unwrap(),
+            Some(receipt)
+        );
+    }
+    restored.close().await.unwrap();
+    let exported = target.0.join("exported");
+    assert!(target.export(&exported).status.success());
+    for name in ["manifest.json", "commits.jsonl", "blobs.bin"] {
+        assert_eq!(
+            std::fs::read(exported.join(name)).unwrap(),
+            std::fs::read(archive.join(name)).unwrap(),
+            "{name}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn incremental_archive_refuses_divergent_local_and_corrupt_successors_without_loss() {
+    for scenario in ["divergent", "local", "corrupt"] {
+        let source = Fixture::new();
+        let store = Storage::open(&source.config()).await.unwrap();
+        let original = request();
+        store.commit(&original).await.unwrap();
+        store.close().await.unwrap();
+        let archive = source.0.join("old");
+        assert!(source.export(&archive).status.success());
+        let target = Fixture::new();
+        assert!(target.import(&archive).status.success());
+        if scenario == "local" {
+            let local = Storage::open(&target.config()).await.unwrap();
+            let mut change = original.clone();
+            change.request_id = "local-correction".into();
+            change.changes.retain(|c| c.key.kind == RecordKind::Memory);
+            change.changes[0].expected_revision = Some(1);
+            change.changes[0].content = "keep this later local decision".into();
+            local.commit(&change).await.unwrap();
+            local.close().await.unwrap();
+        }
+        let before = target.0.join("before");
+        assert!(target.export(&before).status.success());
+        let different = Fixture::new();
+        let producer = if scenario == "divergent" {
+            &different
+        } else {
+            &source
+        };
+        let store = Storage::open(&producer.config()).await.unwrap();
+        if scenario == "divergent" {
+            let mut other = original.clone();
+            other.changes[1].content = "different first history".into();
+            store.commit(&other).await.unwrap();
+        }
+        let mut change = original.clone();
+        change.request_id = "a-external-update".into();
+        change.changes.retain(|c| c.key.kind == RecordKind::Memory);
+        change.changes[0].expected_revision = Some(1);
+        change.changes[0].content = "next external revision".into();
+        store.commit(&change).await.unwrap();
+        store.close().await.unwrap();
+        let next = producer.0.join("next");
+        assert!(producer.export(&next).status.success());
+        if scenario == "corrupt" {
+            let path = next.join("blobs.bin");
+            let mut bytes = std::fs::read(&path).unwrap();
+            bytes[0] ^= 1;
+            std::fs::write(path, bytes).unwrap();
+        }
+        assert!(
+            !target.import(&next).status.success(),
+            "accepted {scenario}"
+        );
+        let after = target.0.join("after");
+        assert!(target.export(&after).status.success());
+        for name in ["manifest.json", "commits.jsonl", "blobs.bin"] {
+            assert_eq!(
+                std::fs::read(before.join(name)).unwrap(),
+                std::fs::read(after.join(name)).unwrap(),
+                "{scenario}: {name}"
+            );
+        }
     }
 }

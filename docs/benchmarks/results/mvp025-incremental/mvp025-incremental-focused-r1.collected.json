@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T12:40:42.709881+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "a6a4b14fc7d0c5e140182bd585b6679e91ddfe05",
+    "log_sha256": "50c9344a721e2eb6895dc13acf0e4d677432ee26674304d21262f146179da703",
+    "seconds": 17.661866975948215,
+    "utc": "2026-11-10T12:40:14.367298+00:00"
+  },
+  "process_absent": true,
+  "classification": "FAILED_FOCUSED_REQUIRES_TRIAGE"
+}

@@ -226,6 +226,83 @@ async fn imported_fixture(name: &str) -> (tests::Fixture, PathBuf, u64, CommitRe
 }
 
 #[tokio::test]
+async fn incremental_runtime_keeps_newly_imported_jobs_inactive_across_restarts() {
+    let (fixture, target, _, _) = imported_fixture("import-incremental-runtime").await;
+    let (source, binding) = tests::service_at(&fixture.0, "").await;
+    // The shared fixture deliberately revoked its source grant before the first export.
+    Domain::new(&source.storage)
+        .change_local_reader(
+            "incremental-source-grant",
+            &principal(),
+            Some(&owner_scope()),
+            source.config.pin().generation(),
+        )
+        .await
+        .unwrap();
+    let path = fixture.0.join("incremental-capture.jsonl");
+    std::fs::write(&path, b"").unwrap();
+    source
+        .submit("incremental-job".into(), binding, path)
+        .await
+        .unwrap();
+    let boundary = source.storage.sequence().unwrap();
+    let source_config = source.config.pin().resolved().clone();
+    source.storage.close().await.unwrap();
+    drop(source);
+    let archive = fixture.0.join("incremental-archive");
+    Storage::export_archive(&source_config, &archive)
+        .await
+        .unwrap();
+    let target_config = crate::config::resolve(
+        "",
+        None,
+        "",
+        &crate::config::Paths {
+            data_dir: target.join("data"),
+            socket_path: target.join("run/socket"),
+        },
+    )
+    .unwrap();
+    Storage::import_archive(&target_config, &archive)
+        .await
+        .unwrap();
+    let mut sequence = None;
+    for _ in 0..2 {
+        let (service, _) = tests::service_at(&target, "").await;
+        assert_eq!(
+            service
+                .storage
+                .import_identity()
+                .unwrap()
+                .unwrap()
+                .commit_seq,
+            boundary
+        );
+        service.recover().await.unwrap();
+        service.advance_incidents().await.unwrap();
+        assert!(service.active().unwrap().1.is_empty());
+        for id in ["archived-job", "incremental-job"] {
+            assert_eq!(service.job(id).unwrap().1.state, "queued");
+            assert_eq!(
+                service.claim(id, 0).await.unwrap_err().0,
+                "IMPORTED_RUNTIME_AUTHORITY"
+            );
+        }
+        assert!(
+            Domain::new(&service.storage)
+                .permission(&context().unwrap(), Some(&owner_scope()))
+                .is_ok()
+        );
+        assert!(!service.config.pin().resolved().config().runtime.paused);
+        if let Some(previous) = sequence {
+            assert_eq!(service.storage.sequence().unwrap(), previous);
+        }
+        sequence = Some(service.storage.sequence().unwrap());
+        service.storage.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
 async fn imported_runtime_bootstrap_preserves_history_and_starts_fresh_once() {
     let (_fixture, target, boundary, original) = imported_fixture("import-bootstrap").await;
     let mut generation = None;

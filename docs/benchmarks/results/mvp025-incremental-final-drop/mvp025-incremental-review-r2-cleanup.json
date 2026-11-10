@@ -1,0 +1,19 @@
+{
+  "utc": "2026-11-10T17:18:33.449230+00:00",
+  "files": [
+    {
+      "name": "mvp025-incremental-review-r2.stdout",
+      "bytes": 948293,
+      "sha256": "6269804746ebf66ae199e5a893c1c4541ab45cf1cf860f886138469c1f5644a9"
+    },
+    {
+      "name": "mvp025-incremental-review-r2.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "matching_readable_same_uid_fd_consumers": [],
+  "inaccessible_processes": 29,
+  "scope": "exact completed reviewer raw transport only; report and all test/metadata receipts retained; raw contents not inspected",
+  "absent": true
+}

@@ -1,0 +1,20 @@
+{
+  "utc": "2026-11-10T13:55:19.373136+00:00",
+  "known_child_wait_returned": true,
+  "known_wrapper_absent": true,
+  "observed_fd_consumers": [],
+  "same_uid_processes_uninspectable": 29,
+  "removed": [
+    {
+      "name": "mvp025-incremental-review-r1-reconstruction.stdout",
+      "bytes": 384732,
+      "sha256": "4a85054ca7d6b202aa028121353cd5e4b315ec61a846959613959e214a4b5035"
+    },
+    {
+      "name": "mvp025-incremental-review-r1-reconstruction.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "transcripts_inspected": false
+}

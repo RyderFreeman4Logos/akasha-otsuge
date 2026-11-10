@@ -1,0 +1,47 @@
+{
+  "utc": "2026-11-10T12:56:36.289287+00:00",
+  "base": "fe30c78169fbf87bfa47cf06912b7c64d3a418b3",
+  "task_start_utc": "2026-11-10T04:22:08.149789+00:00",
+  "leaf_start_utc": "2026-11-10T12:23:08.907438+00:00",
+  "scope": [
+    "src/storage/import.rs",
+    "src/storage/import_publish.rs",
+    "src/storage/layout.rs",
+    "src/storage/mod.rs",
+    "src/storage/backup.rs",
+    "src/storage/crash_tests.rs",
+    "src/storage/crash_tests/incremental.rs",
+    "src/daemon/import_tests.rs",
+    "tests/support/archive_import.rs",
+    "docs/neutral-archive.md",
+    "docs/plan/todo.md"
+  ],
+  "protocol": [
+    "Shared ordinary-open admission; exclusive import/restore admission retained across native close and atomic exchange. Directory lock plus compatible lockfile and retained data/stage/native roots.",
+    "Complete semantic prefix comparison of receipts/outbox/clocks/revisions, one native staging database, no new raw source copy. Longer history requires no local tail.",
+    "Anonymous durable replacement marker binds exact old/new import and directory identities. Entire stage validation and both native closes precede publication.",
+    "Recovery validates current native identity and complete supplied new history before old cleanup; late local tail survives published recovery. Unknown markers/stages are preserved."
+  ],
+  "regressions": [
+    "Initial prefix+admission causal RED",
+    "Nine incremental SIGKILL publication phases with live exclusion controls",
+    "Local writes on both sides of exchange",
+    "Foreign stage replacement and recovery",
+    "Recovery-order causal RED",
+    "Marker schema/size/inode/mode/symlink boundaries",
+    "New imported job inactivity across two runtime starts"
+  ],
+  "fixture_reclassifications": {
+    "focused-r1": "Directory-read admission moved permission failure before rename; replace chmod trigger with actual post-publication fd-specific fsync EIO injection; preserve false-success assertions.",
+    "focused-r3": "Shared runtime fixture source deliberately revoked its grant. Restore that source grant through the real Domain API before creating its next queued job. No production authorization edit."
+  },
+  "focused_evidence": {
+    "focused-r3": "23 archive +17 storage +11 crash tests passed; later new runtime fixture setup failed, so overall exit remains nonzero.",
+    "focused-r4": "7 runtime unit +2 actual daemon integration tests passed; one intentional child ignore, formatting, Clippy, plan/reference checks passed.",
+    "combined": "60 related Rust passes, four intentional child ignores across final relevant selectors; not a canonical gate."
+  },
+  "limits": [
+    "Neutral full-history prefix only; changed legacy snapshot stable-origin/update/deletion still outstanding.",
+    "No power-loss, ENOSPC, actual provider authentication or production-scale resource claim."
+  ]
+}
