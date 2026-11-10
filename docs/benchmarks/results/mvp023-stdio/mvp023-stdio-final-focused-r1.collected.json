@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T01:49:32.923860+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "91cea9964922044cfa8ae158b28df390ca3c251f",
+    "log_sha256": "51f55073989a48fa1446ef77d79877f940710d38ac7bd4d1e467c78de23797d3",
+    "seconds": 73.55775779578835,
+    "utc": "2026-11-10T01:49:14.518383+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_all_18_notifier_cases_reference_cli_and_clippy"
+}

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T01:58:03.809505+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "cde76abe7e8a45288d06919a93a7d06f940c10ee",
+    "log_sha256": "46eddbc382844471d9e6cdff01d7c30eabcfce748b8e6780c275422c291911a4",
+    "seconds": 338.1432186765596,
+    "utc": "2026-11-10T01:57:53.360558+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_complete_canonical_gate"
+}

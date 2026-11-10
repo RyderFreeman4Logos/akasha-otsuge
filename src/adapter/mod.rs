@@ -17,7 +17,8 @@ pub use code::*;
 pub mod codex;
 mod guardian;
 pub mod hermes;
-mod native;
+pub(crate) mod native;
+pub(crate) use guardian::command as guarded_command;
 #[doc(hidden)]
 pub use guardian::run_guard;
 pub mod pi;

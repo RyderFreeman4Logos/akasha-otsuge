@@ -1,4 +1,4 @@
-# Local notifications
+# Notifications and stdio plugins
 
 The daemon projects review and incident revisions from the durable storage outbox
 into a local inbox. Source revisions and their outbox entries commit atomically;
@@ -33,7 +33,8 @@ akasha-otsuge notify ack NOTIFICATION_ID --generation 1 --idempotency-key operat
 
 Responses use the normal CLI JSON envelope. List results contain `items` and
 `next`; continue while `next` is non-null, including after an empty filtered page.
-Pages examine at most 32 records. Read, acknowledgement and delivery all check
+Pages examine at most 32 records and return at most 1 MiB of serialized items.
+Read, acknowledgement and delivery all check
 the current local read grant and scope. Revoking access also stops local delivery
 of affected records; restoring access makes them eligible again.
 
@@ -66,10 +67,70 @@ Requesting another channel sets visible `delivery_error: CHANNEL_HISTORY_LIMIT`
 for that notification. Existing histories stay intact and new notifications can
 still use the new channel. Reuse a retained channel name for the same logical
 destination; changing configuration alone does not resend a completed generation.
+Each item also retains at most 64 displaced stdio destination histories. A
+new destination beyond that bound sets `DESTINATION_HISTORY_LIMIT`; returning to
+a retained destination swaps its history with the current one without eviction.
+Delivery claims reserve space below the storage record's 128 KiB limit. A
+candidate over 120 KiB sets `DELIVERY_RECORD_LIMIT` and leaves its existing
+deliveries intact. This reserves room for results, errors and source updates;
+other notifications continue normally.
 
-This implementation covers the local part of [MVP-023](spec/issues/MVP-023.md).
-The independent stdio plugin, external retry/capability protocol and ambiguous
-external-send crash recovery remain on that issue's acceptance checklist.
+The [stdio protocol](notifier-protocol.md) supports external send/update, live
+cancellation and persistent retry/crash recovery.
+
+## File plugin example
+
+The executable [file notifier](../examples/notifier-file.py) uses Python's standard
+library and writes a private JSON inbox. Configure absolute paths on the daemon
+host, then reload:
+
+```toml
+[notifiers.file]
+kind = "stdio"
+command = ["/absolute/path/notifier-file.py", "--state", "/absolute/private-dir/inbox.json", "--fail-first"]
+timeout = "30s"
+```
+
+The state directory must be owned by the daemon UID with no group/other access;
+the plugin can create it with mode 0700. It creates mode-0600 state and lock files.
+`--fail-first` persists one demonstration failure before the first message. The
+daemon retries automatically. Remove the option for ordinary use; its marker
+survives subsequent invocations either way.
+
+Inspect `inbox.json`: `messages` contains the latest minimal envelope per provider
+ID, while `receipts` binds each accepted idempotency key to its exact input hash
+and message ID. Reusing a key with different input fails. A process lock plus
+fsynced atomic replacement keeps the effect and receipt together. Concurrent
+replays return the same ID. Updates replace the existing message and retain
+earlier receipts. Loading validates every message and receipt, their references
+and the current message's input hash. Malformed state or a receipt without its
+message fails without changing the state file; an old valid receipt can still
+replay after that message was updated. This is a bounded example inbox: it refuses writes exceeding
+2 MiB and preserves the previous state; it does not expire receipts automatically.
+Plugin acknowledgement remains separate from `notify ack` and review state.
+
+## Live channel policy
+
+Each channel accepts these optional settings:
+
+```toml
+min_priority = "normal"  # normal, high or urgent
+quiet_hours_utc = [22, 7] # inclusive start hour, exclusive end; UTC, no DST
+digest_seconds = 60      # 0..86400; default 0
+timeout = "30s"          # positive ms, s, m or h; stdio attempt budget
+```
+
+Quiet hours apply to all priorities; `[0, 24]` pauses delivery for the whole day.
+The digest delay coalesces normal-priority changes per notification, measured
+from the start of its current generation. Repeated reports do not restart it.
+High/urgent escalation bypasses the digest delay, while still obeying quiet hours
+and the priority threshold. The inbox always retains the underlying items.
+
+These policies apply at each new claim or retry. Policy-only changes preserve
+destination identity and do not cancel an active send. Command or credential-ref
+changes cancel its process, then subsequent claims use the current destination.
+Changing the value of an inherited environment variable requires a daemon
+restart; changing the configured `env:NAME` reference takes effect on reload.
 
 ## Verification
 
@@ -78,3 +139,12 @@ delivery, ack replay and independence, SIGKILL before delivery, restart, live
 disable/re-enable, scope revocation, bounded pagination, channel-history limits,
 idle storage stability, and 100 grouped reports with priority escalation. The
 incident fixture uses a controlled registered Caller; it starts no model Runner.
+It also drives the independent file plugin through one persisted failure,
+100 grouped reports, important upgrades and stable external IDs.
+`python3 scripts/test_notifier_file.py` checks standalone capability/delivery,
+deduplication, update, concurrent replay and invalid-input/state preservation.
+The [focused evidence](benchmarks/results/mvp023-stdio/README.md) preserves passing
+checks and earlier failures; canonical gate, independent review and CI are
+separate publication requirements.
+The [R1 repair evidence](benchmarks/results/mvp023-stdio-r1-fixes/README.md)
+retains the rejected candidate's gate/review and both causal regressions.

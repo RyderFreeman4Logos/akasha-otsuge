@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T02:11:33.589399+00:00",
+  "terminal": {
+    "exit_code": 1,
+    "head": "cde76abe7e8a45288d06919a93a7d06f940c10ee",
+    "log_sha256": "39de71698a2d322fcd07ab655f9f96ebd3c3c70228fc7c80badfec873f8bdb2c",
+    "seconds": 65.5778074702248,
+    "utc": "2026-11-10T02:11:25.766338+00:00"
+  },
+  "process_absent": true,
+  "classification": "reproduced_nested_state_false_success_and_fifth_attempt_policy_dead_end"
+}

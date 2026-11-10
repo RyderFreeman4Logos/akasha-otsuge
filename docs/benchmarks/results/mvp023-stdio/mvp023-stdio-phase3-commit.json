@@ -1,0 +1,35 @@
+{
+  "head": "91cea9964922044cfa8ae158b28df390ca3c251f",
+  "parent": "64170edbf90c68d2c3d4b5e8f3a965798cb5ef6f",
+  "tree": "eb9a0cf0af5988a078a3acd875f3eae3e9bfd955",
+  "paths": [
+    "src/config/schema.rs",
+    "src/daemon/notifier.rs",
+    "src/daemon/notifier/stdio.rs",
+    "tests/config.rs",
+    "tests/support/daemon_notifier.rs",
+    "docs/notifier-protocol.md",
+    "docs/notifications.md",
+    "docs/plan/todo.md"
+  ],
+  "identity": {
+    "GIT_AUTHOR_IDENT": "RyderFreeman <RyderFreeman4Logos@gmail.com> 1794274699 -0800",
+    "GIT_COMMITTER_IDENT": "RyderFreeman <RyderFreeman4Logos@gmail.com> 1794274699 -0800"
+  },
+  "source_sha256": {
+    "src/config/schema.rs": "f8c6ed9747825132f4cde27f5d9e123b975888cc277246778daaf382bad56ef4",
+    "src/daemon/notifier.rs": "74e369e2afd97644694ff70c556c7f11e64d123e56a4e3659b1dc4796ad9f72e",
+    "src/daemon/notifier/stdio.rs": "1fe440fe355ca46131de6424426c56320629e72e737efa4dcd410ad5cdd900cb",
+    "tests/config.rs": "44595bff8566a2f06515f412711e007df3ea7678963f6cf82086113ed4f746d0",
+    "tests/support/daemon_notifier.rs": "67ba9c6bdfb4b44ca99336546e7e9c6fa75274039f9f72e8cfe6bfa23caf416d",
+    "docs/notifier-protocol.md": "0b7498c005cfc61bf4faf818252bf491fba1a94774058a52fc3ceae7d99723fe",
+    "docs/notifications.md": "2a7f01e77ca71d148f4bc004b84c0663b593f260dfef561c3abd3f33ce89a442",
+    "docs/plan/todo.md": "1e17b65da7253ab186d214eaf991550ee8a9a28919a53802adf663e0562adf9b"
+  },
+  "focused": [
+    "mvp023-stdio-policy-green-r1: 23 config, 2 unit and 12 daemon cases pass; timeout fixture failed before delivery witness",
+    "mvp023-stdio-policy-timeout-green-r2: corrected timeout case and clippy pass"
+  ],
+  "clean": true,
+  "hooks_bypassed": false
+}

@@ -6,6 +6,8 @@ use crate::storage::{Change, CommitRequest, RecordKey, RecordKind, hash};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
+mod stdio;
+pub(super) use stdio::Dispatch;
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -21,8 +23,12 @@ struct Notification {
     evidence_locator: String,
     occurrences: u64,
     generation: u64,
+    #[serde(default)]
+    generation_started_at_ms: u64,
     acknowledged_generation: Option<u64>,
     deliveries: BTreeMap<String, Delivery>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    destination_history: BTreeMap<String, Delivery>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     delivery_error: Option<String>,
 }
@@ -34,6 +40,36 @@ struct Delivery {
     generation: u64,
     config_generation: u64,
     external_message_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    attempt: Option<stdio::Attempt>,
+}
+
+impl Notification {
+    fn set_delivery(&mut self, channel: &str, delivery: Delivery) -> Result<Option<&'static str>> {
+        let previous = self.clone();
+        let destination = delivery.destination_key(channel);
+        if let Some(key) = &destination {
+            self.destination_history.remove(key);
+        }
+        if let Some(old) = self.deliveries.insert(channel.into(), delivery)
+            && let Some(key) = old.destination_key(channel)
+            && Some(&key) != destination.as_ref()
+        {
+            self.destination_history.insert(key, old);
+        }
+        let error = if self.destination_history.len() > 64 {
+            Some("DESTINATION_HISTORY_LIMIT")
+        } else if serde_json::to_vec(self)?.len() > 120 * 1024 {
+            // Reserve space for results, later source updates and errors.
+            Some("DELIVERY_RECORD_LIMIT")
+        } else {
+            None
+        };
+        if error.is_some() {
+            *self = previous;
+        }
+        Ok(error)
+    }
 }
 
 fn state_key(id: String) -> RecordKey {
@@ -179,6 +215,7 @@ impl Service {
                             .generation
                             .checked_add(1)
                             .ok_or(Error("NOTIFICATION_CORRUPT"))?;
+                        item.generation_started_at_ms = ipc::now_ms()?;
                     }
                     (Some(previous), item)
                 } else {
@@ -196,8 +233,10 @@ impl Service {
                             evidence_locator: format!("akasha-otsuge {kind} show {review_id}"),
                             occurrences,
                             generation: 1,
+                            generation_started_at_ms: ipc::now_ms()?,
                             acknowledged_generation: None,
                             deliveries: BTreeMap::new(),
+                            destination_history: BTreeMap::new(),
                             delivery_error: None,
                         },
                     )
@@ -238,11 +277,13 @@ impl Service {
         &self,
         scan: &mut u64,
         after: &mut Option<String>,
-    ) -> Result<()> {
+        allow_stdio: bool,
+    ) -> Result<Option<Dispatch>> {
         let _guard = self.admission.lock().await;
         self.project_notifications(scan).await?;
         let keys = self.notification_keys(after.as_deref())?;
         let more = keys.len() > 32;
+        let mut dispatch = None;
         for key in keys.into_iter().take(32) {
             let id = key
                 .id
@@ -266,27 +307,67 @@ impl Service {
                 let Some((generation, route)) = self.config.delivery_route(name) else {
                     continue;
                 };
-                if route.kind != NotifierKind::Local
-                    || item
-                        .deliveries
-                        .get(name)
-                        .is_some_and(|d| d.generation == item.generation)
-                {
+                let now = ipc::now_ms()?;
+                if !route.allows(item.priority, item.generation_started_at_ms, now) {
+                    continue;
+                }
+                if let Some(delivery) = item.deliveries.get_mut(name) {
+                    changed |= delivery.recover_interrupted(&self.instance, now)?;
+                }
+                if item.deliveries.get(name).is_some_and(|d| {
+                    d.generation == item.generation && d.status == "sent"
+                        || matches!(d.status.as_str(), "preparing" | "sending")
+                }) {
                     continue;
                 }
                 if !item.deliveries.contains_key(name) && item.deliveries.len() >= 64 {
                     delivery_error = Some("CHANNEL_HISTORY_LIMIT".into());
                     continue;
                 }
-                item.deliveries.insert(
-                    name.clone(),
+                if route.kind == NotifierKind::Stdio {
+                    if item
+                        .destination_delivery(name, &stdio::route_hash(&route)?)
+                        .is_some_and(|d| {
+                            d.retry_pending(now)
+                                || d.generation == item.generation && d.status == "failed"
+                        })
+                    {
+                        continue;
+                    }
+                    if allow_stdio
+                        && dispatch.is_none()
+                        && let Ok(permit) = self.notification_slots.clone().try_acquire_owned()
+                    {
+                        let claimed = Dispatch::claim(
+                            &item,
+                            name,
+                            generation,
+                            route,
+                            &self.instance,
+                            permit,
+                        )?;
+                        if let Some(error) = item.set_delivery(name, claimed.delivery.clone())? {
+                            delivery_error = Some(error.into());
+                            continue;
+                        }
+                        dispatch = Some(claimed);
+                        changed = true;
+                    }
+                    continue;
+                }
+                if let Some(error) = item.set_delivery(
+                    name,
                     Delivery {
                         status: "sent".into(),
                         generation: item.generation,
                         config_generation: generation,
                         external_message_id: format!("local/{name}/{id}"),
+                        attempt: None,
                     },
-                );
+                )? {
+                    delivery_error = Some(error.into());
+                    continue;
+                }
                 changed = true;
             }
             if item.delivery_error != delivery_error {
@@ -300,7 +381,7 @@ impl Service {
         if !more {
             *after = None;
         }
-        Ok(())
+        Ok(dispatch)
     }
 
     pub(super) async fn list_notifications(
@@ -311,7 +392,8 @@ impl Service {
         let _guard = self.admission.lock().await;
         Domain::new(&self.storage).permission(&jobs::context()?, Some(scope))?;
         let keys = self.notification_keys(after)?;
-        let more = keys.len() > 32;
+        let mut more = keys.len() > 32;
+        let mut bytes = 0;
         let mut items = vec![];
         let mut next = None;
         for key in keys.into_iter().take(32) {
@@ -322,6 +404,12 @@ impl Service {
                 .ok_or(Error("NOTIFICATION_CORRUPT"))?;
             let (_, item) = self.notification(id)?;
             if scope.contains(&item.scope) {
+                let size = serde_json::to_vec(&item)?.len();
+                if bytes + size > ipc::MAX_MESSAGE / 2 {
+                    more = true;
+                    break;
+                }
+                bytes += size;
                 items.push(item);
             }
             next = Some(id.to_owned());

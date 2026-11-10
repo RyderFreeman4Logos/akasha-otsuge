@@ -264,6 +264,76 @@ pub struct Notifier {
     pub command: Vec<String>,
     #[serde(default)]
     pub credential_ref: Option<String>,
+    #[serde(
+        default = "normal_priority",
+        skip_serializing_if = "is_normal_priority"
+    )]
+    pub min_priority: crate::incident::Priority,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub quiet_hours_utc: Option<[u8; 2]>,
+    #[serde(default, skip_serializing_if = "zero")]
+    pub digest_seconds: u32,
+    #[serde(
+        default = "notifier_timeout",
+        skip_serializing_if = "default_notifier_timeout"
+    )]
+    pub timeout: String,
+}
+
+fn normal_priority() -> crate::incident::Priority {
+    crate::incident::Priority::Normal
+}
+fn is_normal_priority(value: &crate::incident::Priority) -> bool {
+    *value == normal_priority()
+}
+fn zero(value: &u32) -> bool {
+    *value == 0
+}
+fn notifier_timeout() -> String {
+    "30s".into()
+}
+fn default_notifier_timeout(value: &str) -> bool {
+    value == "30s"
+}
+
+impl Notifier {
+    pub(crate) fn allows(&self, priority: crate::incident::Priority, since: u64, now: u64) -> bool {
+        let hour = (now / 3_600_000 % 24) as u8;
+        let quiet = self.quiet_hours_utc.is_some_and(|[start, end]| {
+            if start < end {
+                start <= hour && hour < end
+            } else {
+                hour >= start || hour < end
+            }
+        });
+        priority >= self.min_priority
+            && !quiet
+            && (priority > normal_priority()
+                || now >= since.saturating_add(u64::from(self.digest_seconds) * 1000))
+    }
+
+    pub(crate) fn timeout_ms(&self) -> Result<u64, ConfigError> {
+        Ok(duration(&self.timeout, "notifiers.*.timeout")?.as_millis() as u64)
+    }
+}
+
+#[test]
+fn notifier_hours_wrap_at_midnight_and_escalation_bypasses_digest() {
+    use crate::incident::Priority;
+    let mut route: Notifier =
+        serde_json::from_value(serde_json::json!({"kind":"local","quiet_hours_utc":[22,7]}))
+            .unwrap();
+    for hour in [0, 6, 22, 23] {
+        assert!(!route.allows(Priority::Urgent, 0, hour * 3_600_000));
+    }
+    for hour in [7, 21] {
+        assert!(route.allows(Priority::Normal, 0, hour * 3_600_000));
+    }
+    route.quiet_hours_utc = None;
+    route.digest_seconds = 60;
+    assert!(!route.allows(Priority::Normal, 1000, 60999));
+    assert!(route.allows(Priority::Normal, 1000, 61000));
+    assert!(route.allows(Priority::High, 1000, 1000));
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -721,6 +791,19 @@ impl Config {
                 "stdio notifier requires a command",
             )?;
             credential(&notifier.credential_ref, "notifiers.*.credential_ref")?;
+            require(
+                notifier
+                    .quiet_hours_utc
+                    .is_none_or(|[start, end]| start < 24 && end <= 24 && start != end),
+                "notifiers.*.quiet_hours_utc",
+                "expected distinct UTC start/end hours within 0..24",
+            )?;
+            require(
+                notifier.digest_seconds <= 86400,
+                "notifiers.*.digest_seconds",
+                "digest delay must not exceed one day",
+            )?;
+            notifier.timeout_ms()?;
         }
         Ok(effective)
     }

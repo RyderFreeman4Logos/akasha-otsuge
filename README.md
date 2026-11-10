@@ -30,7 +30,7 @@ A local, traceable memory system for coding agents, written in Rust.
 
 [失败与维护调查](docs/incidents.md)对显式信号去重并计算优先级，通过已有 Runner 读取证据，按授权修订指定版本或保留 review。
 
-[本地通知收件箱](docs/notifications.md)提供持久通知、分页、独立 ack、事件合并和优先级升级；投递遵循当前渠道配置与读取权限。
+[通知收件箱与 stdio 插件](docs/notifications.md)提供持久投递、退避重试、分页、独立 ack、事件合并和优先级升级；附可运行的文件插件，投递遵循当前渠道配置与读取权限。
 
 [宿主公共契约](docs/adapters.md)定义持久调用绑定、受限上下文读取、Runner 终态与共享预算；[固定参考集及勘误](docs/evaluation/reference-v1-errata-1/README.md)保存 60 项任务与评测规则。真实四宿主接入和模型质量验收仍待后续 Issues 完成。
 

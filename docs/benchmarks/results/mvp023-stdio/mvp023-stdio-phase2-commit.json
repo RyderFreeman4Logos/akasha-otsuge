@@ -1,0 +1,29 @@
+{
+  "head": "64170edbf90c68d2c3d4b5e8f3a965798cb5ef6f",
+  "parent": "2afb8dad02d49ff5375abfad2968bd541e81e45f",
+  "tree": "62fc3ef170e81126840f731c9655d782f8268e79",
+  "paths": [
+    "src/daemon/notifier.rs",
+    "src/daemon/notifier/stdio.rs",
+    "tests/fixtures/notifier/oneshot.py",
+    "tests/support/daemon_notifier.rs",
+    "docs/notifier-protocol.md",
+    "docs/plan/todo.md"
+  ],
+  "identity": {
+    "GIT_AUTHOR_IDENT": "RyderFreeman <RyderFreeman4Logos@gmail.com> 1794274261 -0800",
+    "GIT_COMMITTER_IDENT": "RyderFreeman <RyderFreeman4Logos@gmail.com> 1794274261 -0800"
+  },
+  "source_sha256": {
+    "src/daemon/notifier.rs": "d7ea79e3a4794a85b8ac434daae713a7e5dd0ab32e5236b9c095a48091fb63c3",
+    "src/daemon/notifier/stdio.rs": "3a03c6aa0fb66646d0a818abdb3d6b2f35ca2368f02682a661745917ad544b26",
+    "tests/fixtures/notifier/oneshot.py": "229d9871f27ec94431250f31e783bca8bfdfc775ae73f513f285564570b9f545",
+    "tests/support/daemon_notifier.rs": "53afa1de91191d1ffbb3c3afb503fb4564dccb3b9c70dc27aa9e9f52e74c9be2",
+    "docs/notifier-protocol.md": "c70870dcb78eeed3ea48a39c3a041ade24bea02646d701e8d09fcbb7fbc0c2a2",
+    "docs/plan/todo.md": "623298a40cfffe51f0fccb27f698e46faf8c8a844051deb854b16a63872c3a7f"
+  },
+  "focused": "mvp023-stdio-retry-crash-green-r1",
+  "lint": "mvp023-stdio-phase2-lint",
+  "clean": true,
+  "hooks_bypassed": false
+}
