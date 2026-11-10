@@ -287,6 +287,33 @@ fn invalid_configs_fail_closed_and_errors_never_echo_values() {
 }
 
 #[test]
+fn notifier_policy_is_bounded_and_hot_reloadable() {
+    let input = "[notifiers.inbox]\nkind='local'\nmin_priority='high'\nquiet_hours_utc=[22,7]\ndigest_seconds=60\ntimeout='2s'\n";
+    let current = manager("[notifiers.inbox]\nkind='local'\n");
+    config(input);
+    assert_eq!(
+        current.reload(input, None, |_| Ok(())).unwrap().status,
+        ReloadStatus::Applied
+    );
+    for bad in [
+        input.replace("'high'", "'invalid'"),
+        input.replace("[22,7]", "[24,7]"),
+        input.replace("[22,7]", "[7,7]"),
+        input.replace("[22,7]", "[7,25]"),
+        input.replace("=60", "=86401"),
+        input.replace("'2s'", "'0s'"),
+        input.replace("'2s'", "'disabled'"),
+    ] {
+        assert!(resolve(&bad, None, "", &paths()).is_err());
+    }
+    let old = config("[notifiers.inbox]\nkind='local'\n");
+    let explicit = config(
+        "[notifiers.inbox]\nkind='local'\nmin_priority='normal'\ndigest_seconds=0\ntimeout='30s'\n",
+    );
+    assert_eq!(old.digest(), explicit.digest());
+}
+
+#[test]
 fn notifier_channel_names_fit_bounded_durable_delivery_records() {
     for name in ["x".repeat(129), "bad\nchannel".into(), "   ".into()] {
         let input = format!(

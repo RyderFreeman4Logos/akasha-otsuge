@@ -74,7 +74,9 @@ original start, retry schedule, accepted envelope and idempotency key. An
 interrupted `preparing` or `sending` attempt enters the same bounded recovery
 path. Protocol errors are terminal; disable, revocation and shutdown block the
 attempt until current policy permits another claim. Each attempt shares one
-30-second capability/send deadline.
+capability/send deadline, configured by `timeout` (default `30s`). The active
+attempt uses one monotonic deadline across both processes. Reloading the timeout
+affects later claims without extending an active attempt.
 
 The inbox exposes the attempt number, original start, next retry time, last
 error and `duplicate_risk`. A send interrupted before its response may already
@@ -89,6 +91,7 @@ Basic send/update, minimal envelopes, nonblocking admission and live cancellatio
 are covered by controlled executable-plugin tests. Persistent finite retry,
 restart during backoff, and real SIGKILL before/after the plugin's durable effect
 also pass, including both idempotent replay and exposed duplicate delivery.
-Configurable routing controls and the distributable reference plugin remain
-unfinished on MVP-023. Do not interpret a stored
+Live priority, quiet-hours, digest and timeout controls also have config and
+daemon tests. The distributable reference plugin and final whole-candidate
+acceptance remain unfinished on MVP-023. Do not interpret a stored
 idempotency key or capability declaration as universal exactly-once delivery.

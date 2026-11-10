@@ -65,6 +65,38 @@ fn first_attempt() -> u32 {
     1
 }
 
+// Delivery policy changes must not change a destination's idempotency identity.
+fn route_hash(route: &Notifier) -> Result<String> {
+    #[derive(Serialize)]
+    struct Destination<'a> {
+        kind: NotifierKind,
+        enabled: bool,
+        command: &'a [String],
+        credential_ref: &'a Option<String>,
+    }
+    Ok(hash(&serde_json::to_vec(&Destination {
+        kind: route.kind,
+        enabled: true,
+        command: &route.command,
+        credential_ref: &route.credential_ref,
+    })?))
+}
+
+#[test]
+fn policy_does_not_change_existing_destination_fingerprints() {
+    let mut route: Notifier = serde_json::from_value(
+        json!({"kind":"stdio","command":["plugin"],"credential_ref":"env:EXAMPLE"}),
+    )
+    .unwrap();
+    let original = hash(&serde_json::to_vec(&route).unwrap());
+    assert_eq!(route_hash(&route).unwrap(), original);
+    route.min_priority = Priority::Urgent;
+    route.timeout = "2s".into();
+    route.digest_seconds = 60;
+    route.quiet_hours_utc = Some([22, 7]);
+    assert_eq!(route_hash(&route).unwrap(), original);
+}
+
 impl Delivery {
     fn fail(&mut self, code: &str, now: u64) -> Result<()> {
         let attempt = self.attempt.as_mut().ok_or(Error("NOTIFICATION_CORRUPT"))?;
@@ -129,6 +161,7 @@ pub(in crate::daemon) struct Dispatch {
     route: Notifier,
     pub(super) delivery: Delivery,
     permit: Arc<OwnedSemaphorePermit>,
+    deadline: tokio::time::Instant,
 }
 
 impl Dispatch {
@@ -140,7 +173,11 @@ impl Dispatch {
         owner: &str,
         permit: OwnedSemaphorePermit,
     ) -> Result<Self> {
-        let route_sha256 = hash(&serde_json::to_vec(&route)?);
+        let route_sha256 = route_hash(&route)?;
+        let timeout_ms = route.timeout_ms()?;
+        let deadline = tokio::time::Instant::now()
+            .checked_add(Duration::from_millis(timeout_ms))
+            .ok_or(Error("CLOCK_ERROR"))?;
         let previous = item
             .deliveries
             .get(channel)
@@ -190,7 +227,7 @@ impl Dispatch {
             attempt.owner = owner.into();
             attempt.started_at_ms = started_at_ms;
             attempt.deadline_ms = started_at_ms
-                .checked_add(30_000)
+                .checked_add(timeout_ms)
                 .ok_or(Error("CLOCK_ERROR"))?;
             attempt.next_retry_at_ms = None;
             attempt.error = None;
@@ -203,6 +240,7 @@ impl Dispatch {
                 route,
                 delivery,
                 permit: Arc::new(permit),
+                deadline,
             });
         }
         let duplicate_risk = item
@@ -229,7 +267,7 @@ impl Dispatch {
                     route_sha256,
                     started_at_ms,
                     deadline_ms: started_at_ms
-                        .checked_add(30_000)
+                        .checked_add(timeout_ms)
                         .ok_or(Error("CLOCK_ERROR"))?,
                     envelope,
                     capabilities: None,
@@ -241,6 +279,7 @@ impl Dispatch {
                 }),
             },
             permit: Arc::new(permit),
+            deadline,
         })
     }
 
@@ -263,7 +302,7 @@ impl Service {
             .config
             .delivery_route(&dispatch.channel)
             .ok_or(Error("CHANNEL_DISABLED"))?;
-        if hash(&serde_json::to_vec(&route)?) != dispatch.attempt()?.route_sha256 {
+        if route_hash(&route)? != dispatch.attempt()?.route_sha256 {
             return Err(Error("NOTIFIER_ROUTE_CHANGED"));
         }
         Ok(())
@@ -290,12 +329,10 @@ impl Service {
     async fn call_notifier(&self, dispatch: &Dispatch, request: Value) -> Result<Vec<u8>> {
         self.check_notification_dispatch(dispatch).await?;
         let attempt = dispatch.attempt()?;
-        let remaining = attempt
-            .deadline_ms
-            .checked_sub(ipc::now_ms()?)
-            .filter(|n| *n > 0)
-            .ok_or(Error("NOTIFIER_TIMEOUT"))?;
-        let deadline = tokio::time::Instant::now() + Duration::from_millis(remaining);
+        let deadline = dispatch.deadline;
+        if tokio::time::Instant::now() >= deadline {
+            return Err(Error("NOTIFIER_TIMEOUT"));
+        }
         let binary = native::resolve(Path::new(
             dispatch
                 .route

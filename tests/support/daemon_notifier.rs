@@ -645,6 +645,107 @@ fn plugin_rows(daemon: &Daemon, name: &str) -> Vec<Value> {
         .collect()
 }
 
+#[test]
+fn stdio_live_policy_defers_delivery_and_policy_reload_does_not_replay_success() {
+    let mut daemon = plugin_fixture("normal");
+    let plugin = daemon.root.join("notifier.py");
+    let settings = |policy: &str| {
+        format!(
+            "[notifiers.inbox]\nkind='local'\n[notifiers.plugin]\nkind='stdio'\ncommand=[{plugin:?}]\n{policy}\n"
+        )
+    };
+    daemon.configure(&settings("min_priority='high'"));
+    daemon.start();
+    wait_local(&daemon, 1);
+    assert!(!daemon.root.join("received.jsonl").exists());
+    for policy in ["quiet_hours_utc=[0,24]", "digest_seconds=86400"] {
+        daemon.configure(&settings(policy));
+        assert_eq!(
+            daemon.cli(&["config", "reload"])["data"]["status"],
+            "applied"
+        );
+        std::thread::sleep(Duration::from_millis(1200));
+        assert!(
+            !daemon.root.join("received.jsonl").exists(),
+            "policy did not defer delivery: {policy}"
+        );
+    }
+    daemon.configure(&settings("digest_seconds=0"));
+    daemon.cli(&["config", "reload"]);
+    wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    });
+    daemon.configure(&settings("timeout='2s'"));
+    daemon.cli(&["config", "reload"]);
+    std::thread::sleep(Duration::from_millis(1200));
+    assert_eq!(plugin_rows(&daemon, "received.jsonl").len(), 1);
+    assert_eq!(plugin_rows(&daemon, "attempts.jsonl").len(), 1);
+}
+
+#[test]
+fn stdio_timeout_is_pinned_and_policy_only_reload_does_not_cancel_inflight_send() {
+    let mut daemon = plugin_fixture("normal");
+    let plugin = daemon.root.join("notifier.py");
+    let settings = |policy: &str| {
+        format!("[notifiers.plugin]\nkind='stdio'\ncommand=[{plugin:?}]\n{policy}\n")
+    };
+    daemon.configure(&settings("timeout='30s'"));
+    std::fs::write(daemon.root.join("after-send"), "hold response").unwrap();
+    daemon.start();
+    let end = Instant::now() + Duration::from_secs(15);
+    while !daemon.root.join("plugin-sent").exists() {
+        assert!(Instant::now() < end);
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    daemon.configure(&settings(
+        "timeout='1ms'\nquiet_hours_utc=[0,24]\nmin_priority='urgent'",
+    ));
+    daemon.cli(&["config", "reload"]);
+    std::thread::sleep(Duration::from_millis(200));
+    let before = all(&daemon, &extraction_tests::scope());
+    assert_eq!(before[0]["deliveries"]["plugin"]["status"], "sending");
+    std::fs::remove_file(daemon.root.join("after-send")).unwrap();
+    let sent = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    });
+    assert_eq!(sent[0]["deliveries"]["plugin"]["attempt"]["number"], 1);
+    assert_eq!(plugin_rows(&daemon, "attempts.jsonl").len(), 1);
+}
+
+#[test]
+fn stdio_timeout_reaps_the_plugin_and_persists_retry() {
+    let mut daemon = plugin_fixture("normal");
+    let plugin = daemon.root.join("notifier.py");
+    daemon.configure(&format!(
+        "[notifiers.plugin]\nkind='stdio'\ncommand=[{plugin:?}]\ntimeout='5s'\n"
+    ));
+    std::fs::write(daemon.root.join("hold-plugin"), "wait past timeout").unwrap();
+    daemon.start();
+    let end = Instant::now() + Duration::from_secs(10);
+    while !daemon.root.join("plugin-started").exists() {
+        assert!(
+            Instant::now() < end,
+            "timeout fixture never reached delivery"
+        );
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    let pid = std::fs::read_to_string(daemon.root.join("plugin.pid")).unwrap();
+    let waiting = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "retry_wait"
+    });
+    assert_eq!(
+        waiting[0]["deliveries"]["plugin"]["attempt"]["error"],
+        "NOTIFIER_TIMEOUT"
+    );
+    assert!(!std::path::Path::new(&format!("/proc/{pid}")).exists());
+    assert!(!daemon.root.join("received.jsonl").exists());
+    std::fs::remove_file(daemon.root.join("hold-plugin")).unwrap();
+    let sent = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "sent"
+    });
+    assert_eq!(sent[0]["deliveries"]["plugin"]["attempt"]["number"], 2);
+}
+
 fn crash_plugin_daemon(daemon: &mut Daemon) {
     let plugin: u32 = std::fs::read_to_string(daemon.root.join("plugin.pid"))
         .unwrap()

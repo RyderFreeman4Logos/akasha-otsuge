@@ -67,10 +67,32 @@ for that notification. Existing histories stay intact and new notifications can
 still use the new channel. Reuse a retained channel name for the same logical
 destination; changing configuration alone does not resend a completed generation.
 
-This implementation covers the local part of [MVP-023](spec/issues/MVP-023.md).
-The [stdio protocol](notifier-protocol.md) now has basic external send/update and
-live cancellation. Its distributable reference plugin, persistent retries and
-ambiguous external-send crash recovery remain on the issue's acceptance checklist.
+The [stdio protocol](notifier-protocol.md) supports external send/update, live
+cancellation and persistent retry/crash recovery. Its reference plugin and final
+acceptance remain on [MVP-023](spec/issues/MVP-023.md).
+
+## Live channel policy
+
+Each channel accepts these optional settings:
+
+```toml
+min_priority = "normal"  # normal, high or urgent
+quiet_hours_utc = [22, 7] # inclusive start hour, exclusive end; UTC, no DST
+digest_seconds = 60      # 0..86400; default 0
+timeout = "30s"          # positive ms, s, m or h; stdio attempt budget
+```
+
+Quiet hours apply to all priorities; `[0, 24]` pauses delivery for the whole day.
+The digest delay coalesces normal-priority changes per notification, measured
+from the start of its current generation. Repeated reports do not restart it.
+High/urgent escalation bypasses the digest delay, while still obeying quiet hours
+and the priority threshold. The inbox always retains the underlying items.
+
+These policies apply at each new claim or retry. Policy-only changes preserve
+destination identity and do not cancel an active send. Command or credential-ref
+changes cancel its process, then subsequent claims use the current destination.
+Changing the value of an inherited environment variable requires a daemon
+restart; changing the configured `env:NAME` reference takes effect on reload.
 
 ## Verification
 

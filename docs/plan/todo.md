@@ -982,6 +982,13 @@ All ten notification tests passed in 36.161 seconds, including restart during
 backoff and SIGKILL before/after the provider effect. This is focused evidence;
 the completed stdio candidate still needs the full gate and independent review.
 
+Stdio phase 3: 23 config tests and two policy/identity unit tests pass. Twelve
+notification cases passed in the initial run; the timeout case incorrectly
+assumed its one-second probe budget had reached delivery. Its corrected fixture
+first observes physical delivery under an explicit five-second test budget, then
+proves timeout, process reap and durable retry. That focused case and all-target
+Clippy pass. The earlier failed run remains recorded; product default stays 30s.
+
 - [ ] Reuse the existing transactional revision outbox and live notifier config
   to admit scoped notifications with a stable envelope and capability contract.
   Creation must remain atomic with the source review/incident; avoid a cursor

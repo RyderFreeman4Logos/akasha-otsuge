@@ -23,6 +23,8 @@ struct Notification {
     evidence_locator: String,
     occurrences: u64,
     generation: u64,
+    #[serde(default)]
+    generation_started_at_ms: u64,
     acknowledged_generation: Option<u64>,
     deliveries: BTreeMap<String, Delivery>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -183,6 +185,7 @@ impl Service {
                             .generation
                             .checked_add(1)
                             .ok_or(Error("NOTIFICATION_CORRUPT"))?;
+                        item.generation_started_at_ms = ipc::now_ms()?;
                     }
                     (Some(previous), item)
                 } else {
@@ -200,6 +203,7 @@ impl Service {
                             evidence_locator: format!("akasha-otsuge {kind} show {review_id}"),
                             occurrences,
                             generation: 1,
+                            generation_started_at_ms: ipc::now_ms()?,
                             acknowledged_generation: None,
                             deliveries: BTreeMap::new(),
                             delivery_error: None,
@@ -273,6 +277,9 @@ impl Service {
                     continue;
                 };
                 let now = ipc::now_ms()?;
+                if !route.allows(item.priority, item.generation_started_at_ms, now) {
+                    continue;
+                }
                 if let Some(delivery) = item.deliveries.get_mut(name) {
                     changed |= delivery.recover_interrupted(&self.instance, now)?;
                 }
