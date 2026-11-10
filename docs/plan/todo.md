@@ -1,11 +1,10 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-09 UTC after PR #52 merged: **20 original Issues
-completed, 8 Issues open (#12 and #22–#28)**. #50 is also completed and closed.
-#22 is active. Its scoped ledger, bounded dispatch, lossless outcome/log reads,
-manual/automatic repair policy and configurable grouping/priority have focused
-regression evidence. Lifecycle and native failure-to-review acceptance pass;
-the exact canonical gate, independent review and publication remain below.
+Rechecked 2026-11-10 UTC after PR #53 merged: **21 original Issues
+completed, 7 Issues open (#12 and #23–#28)**. #50 is also completed and closed.
+#23 is active. #22 passed its repaired exact gate, independent whole-range R2
+review and exact-head CI before merging; its issue is closed completed. The
+post-merge main CI is being collected separately on the identical merge tree.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -885,7 +884,7 @@ The finished 190.91 MiB SSD worktree was removed after its processes ended;
 shared dependencies remain. Package-only development/release artifacts were
 cleared before switching to #22, preserving dependency caches and source evidence.
 
-## MVP-022 active implementation and remaining acceptance
+## MVP-022 completed investigation and acceptance
 
 Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b22af`.
 
@@ -900,7 +899,7 @@ Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b2
   context tools; complete auto/manual and partial-source controls pass. The
   scoped ledger, dispatch and context phases are committed through `4893aa9`.
   Grouping/priority configuration passes all 21 config tests, four incident
-  integrations and all-target Clippy. No final #22 gate or native claim yet.
+  integrations and all-target Clippy. These were intermediate focused phases.
 - [x] Reuse the configured Editor/Research path for receipt/run/code/log evidence,
   compare memory error, stale conditions, missing recall, misuse, code defects,
   environment failures, changed requirements and insufficient evidence.
@@ -923,14 +922,55 @@ Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b2
   [Acceptance and failed attempts](../benchmarks/incident-acceptance.md) retain
   192 compact evidence files (176,664 bytes; manifest
   `1bd3b9ed0dc698958623af23625784fa2a9f128bfe6c884be49a601128479fd0`).
-- [ ] Archive compact receipts, document policy/limits, pass exact canonical gate,
+- [x] Archive compact receipts, document policy/limits, pass exact canonical gate,
   independent review and hosted CI, then merge and verify #22 closure.
   First exact gate on `c17c272` passed; independent R1 review found a pre-budget
   outcome read. A counter-based RED proved it, and `4063f86` repairs the shared
   description/text admission. Six Editor unit tests, nine incident integrations
   and Clippy pass. The 22-file repair archive retains the FAIL report and both
-  RED/GREEN receipts. Fresh gate/review/CI are required on the repaired candidate;
-  [PR #53](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/53) remains draft.
+  RED/GREEN receipts. Repaired candidate `79446fd` passed `just check` in325.531s
+  (485 Rust executions including installed repetition;133 daemon cases per run),
+  [whole-range R2 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/53#issuecomment-6754874973)
+  with zero actionable findings, and
+  [CI42724758445](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/42724758445).
+  [PR #53](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/53) merged as
+  `554796b` on2026-11-10; #22 closed completed. Merge tree
+  `53413514a194369cfd7b1b3337847b75b458ab03` matches the reviewed candidate.
+  Full R2 report SHA-256:
+  `131c56f0d49a5e6a533d55667962684b28621aabf70812bba7ad43eea7789ec5`.
+  Final release SHA-256:
+  `bd4d3ad5b242605b87fa69703af49531db0c05cbff2c807c70170d9de873031b`.
+  [Closure evidence](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22#issuecomment-6754990687)
+  was read back. The completed worktree was removed after a zero-consumer census;
+  dependency/build cache was retained. No block-reclamation claim from directory removal.
+
+## MVP-023 active notifier implementation and remaining acceptance
+
+Original start2026-11-10T00:11:56Z (earliest local worktree reflog).
+Branch `feat/mvp-023-notifier`; base `554796b`. One SSD worktree, shared Cargo target.
+
+- [ ] Reuse the existing transactional revision outbox and live notifier config
+  to admit scoped notifications with a stable envelope and capability contract.
+  Creation must remain atomic with the source review/incident; avoid a cursor
+  update causing an endless outbox/checkpoint loop.
+- [ ] Provide usable local inbox/list/show/ack commands, bounded paging and
+  current read permission checks. Ack must not approve memory or resolve review.
+- [ ] Implement an independent executable stdio reference plugin, with bounded
+  input/output, error handling, provider IDs and declared send/update/idempotency
+  capabilities. Transmit only minimal summaries and review locators.
+- [ ] Persist dispatch attempts, finite retry/backoff, stable idempotency keys,
+  selected route/generation, external IDs and visible terminal/uncertain errors.
+  Unsupported provider idempotency must expose possible duplicate delivery.
+- [ ] Merge100 same-group events while preserving count and meaningful priority
+  escalation. Successful delivery must not be repeated merely by configuration reload.
+- [ ] Apply current channel disable/revocation, priority/routing policy and
+  credential changes without bypassing permissions or duplicating in-flight sends.
+- [ ] Prove actual local and stdio receipt, failure/retry, duplicate handling and
+  ack independence. Inject real crashes after source commit/before send and
+  after send/before success recording, then verify durable recovery.
+- [ ] Document protocol, configuration, example usage and boundaries; archive
+  compact evidence; pass the exact canonical gate, independent review and CI,
+  merge and verify #23 closure before moving to the next functional issue.
 
 ## Complete Issue queue
 
@@ -955,7 +995,7 @@ Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b2
 - [x] [#19 [MVP-019] 生效策略、review 队列、人工校准与 taste 使用规则](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/19) — dependencies: #5, #6, #18.
 - [x] [#20 [MVP-020] 外部 Memory Editor、范围受限 patch 与并发修订](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/20) — dependencies: #16, #19.
 - [x] [#21 [MVP-021] Run、Git/工作区、build/test 与 incident 证据关联](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21) — dependencies: #6, #11, #16.
-- [ ] [#22 [MVP-022] 执行失败触发调查、自动修订或高优 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22) — dependencies: #20, #21.
+- [x] [#22 [MVP-022] 执行失败触发调查、自动修订或高优 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22) — dependencies: #20, #21.
 - [ ] [#23 [MVP-023] Notifier 插件、可用本地/stdio 实现与持久投递](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/23) — dependencies: #8, #19, #22.
 - [ ] [#24 [MVP-024] 50 GB、100 客户端、内存预算与故障恢复压力验收](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/24) — dependencies: #4, #8, #10, #16, #17, #20, #23.
 - [ ] [#25 [MVP-025] mempal 只读迁移、中立导出与往返验证](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/25) — dependencies: #4, #5, #6, #7, #19.
