@@ -1,11 +1,11 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-10 UTC after PR #53 merged: **21 original Issues
-completed, 7 Issues open (#12 and #23–#28)**. #50 is also completed and closed.
-#23 is active. #22 passed its repaired exact gate, independent whole-range R2
-review and exact-head CI before merging; its issue is closed completed. The
-post-merge main CI also passed on that identical merge tree (run 42726070270,
-Cargo cache restored and hit).
+Rechecked 2026-11-10 UTC after PR #55 merged: **22 original Issues
+completed, 6 Issues open (#12 and #24–#28)**. #50 is also completed and closed.
+#24 is active from main `37d4d77` in one SSD worktree. #23 passed its exact full
+gate, independent whole-range R4 and CI42748687256 before closing. The merge tree
+matches the reviewed candidate. Post-merge main CI42750140146 is pending and
+will be collected at the next verification checkpoint.
 #12's reviewed code is retained, but Claude-native authentication remains deferred.
 The owner explicitly authorized Codex, or Pi/Hermes via localhost:48317, as a
 temporary substitute because no Claude subscription is available. This overrides
@@ -945,122 +945,82 @@ Original start 2026-11-09T22:01:41Z (earliest local worktree reflog). Base `94b2
   was read back. The completed worktree was removed after a zero-consumer census;
   dependency/build cache was retained. No block-reclamation claim from directory removal.
 
-## MVP-023 active notifier implementation and remaining acceptance
+## MVP-023 completed notifier acceptance
 
-Original start 2026-11-10T00:11:56Z (earliest local worktree reflog).
-Branch `feat/mvp-023-notifier`; base `554796b`. One SSD worktree, shared Cargo target.
+Original start 2026-11-10T00:11:56Z; completed 2026-11-10T03:32:52Z.
+Local PR #54 merged as `6eb77a1`; stdio PR #55 merged as `37d4d77`, with the exact
+reviewed `fc88baf` tree. [Closure](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/23#issuecomment-6758197600)
+and the [final archive](../benchmarks/results/mvp023-final/README.md) retain all
+command identities, hashes, raw checks and public readbacks.
 
-First acceptance leaf completed: usable local notification inbox for reviews/incidents.
-The focused local tests passed after meaningful missing-CLI and missing-incident
-REDs; the two initial fixture corrections retained the active-read/export and
-transport-request-ID distinctions. Additional scope, SIGKILL, reload, paging and
-idle-loop controls passed. Channel bounds also have RED/GREEN evidence. Final
-focused verification: 22 configuration tests, 6 real daemon notification tests,
-Clippy across all targets and diff checks passed in 56.657 seconds.
-PR [#54](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/54) merged as
-`6eb77a1`; its tree matches reviewed candidate `cd57352`. The exact `just check`
-passed in 287.549 seconds (498 Rust passes including installed repeat;
-139 daemon passes per run). Independent [review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/54#issuecomment-6755659738)
-passed with no actionable findings and seven focused checks. Exact-head
-[CI](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/42730893412)
-passed with Cargo cache restored/hit. The merge's main CI run 42732148687 also
-passed with Cargo cache restored/hit; it does not replace those receipts.
+- [x] Scoped local inbox/list/show/ack, atomic revision outbox and bounded paging.
+- [x] Independent executable reference plugin, minimal protocol, updates and
+  durable effect/receipt identity; 100 reports merge without losing escalation.
+- [x] Finite persistent retry, stable accepted envelopes and destination-specific
+  provider IDs/budgets, pre/post-effect SIGKILL and detached-child cleanup.
+- [x] Live priority/quiet/digest/timeout, route/credential and read controls;
+  successful-generation suppression, explicit duplicate risk and bounded history.
+- [x] R1 malformed-state/fifth-claim repairs, R2 native-error/destination recovery
+  class repairs and R3 invalid-update marker ordering, all with causal regressions.
+- [x] Exact `just check` (407.988s, 535 Rust passes, 155 daemon per run, 34 Python),
+  independent R4 PASS (zero findings; 5 Python/2 config/4 unit/22 daemon), exact
+  CI42748687256 SUCCESS, guarded merge, completed issue closure and worktree cleanup.
 
-The stdio delivery leaf is active from base `6eb77a1` in the same SSD worktree.
-#23 stays open until both leaves and all acceptance below are complete.
+Historical IPC timeout causality remains unknown; current gates pass. Provider
+idempotency is declarative, the file inbox is bounded at 2 MiB, and product stress
+is #24. Do not promote these focused guarantees into scale or model acceptance.
 
-Stdio phase 1: real executable capability/send/update and live cancellation now
-pass alongside all six local cases (8 daemon tests). The first attempt exposed
-an unclosed stdin writer, fixed by moving and dropping it after request output;
-its concurrent pagination timeout did not recur in the complete focused rerun,
-but its historical cause remains unproven. Subsequent phases below cover durable
-retry/crash recovery, live policy and the distributable reference plugin.
+## MVP-024 production scale and recovery acceptance
 
-Stdio phase 2: the meaningful retry/crash RED passed after implementing durable
-five-attempt backoff, immutable-envelope replay and duplicate-risk reporting.
-All ten notification tests passed in 36.161 seconds, including restart during
-backoff and SIGKILL before/after the provider effect. This is focused evidence;
-the completed stdio candidate still needs the full gate and independent review.
+Implement against the merged notifier candidate. Keep #24 open until the full
+production acceptance below passes; #3 spike receipts remain historical evidence.
+Use the existing 42 SSD parquet shards and deterministic streaming preparation.
+Measure a small import before admitting full storage; retain no second raw JSONL.
 
-Stdio phase 3: 23 config tests and two policy/identity unit tests pass. Twelve
-notification cases passed in the initial run; the timeout case incorrectly
-assumed its one-second probe budget had reached delivery. Its corrected fixture
-first observes physical delivery under an explicit five-second test budget, then
-proves timeout, process reap and durable retry. That focused case and all-target
-Clippy pass. The earlier failed run remains recorded; product default stays 30s.
+- [ ] Freeze source/binary, machine/filesystem/cgroup state, corpus manifest,
+  source licenses/hash/seed, actual UTF-8 bytes, document/partition identities,
+  vector distribution/dimension/coverage and 100,000-change history oracle.
+  Reverify retained shards before claiming current corpus integrity.
+- [ ] Reconcile production resource configuration and status with 512/640 and
+  2048/2048 MiB target/peak profiles, separate runner_group/service_total budgets,
+  bounded queues/build slots and explicit unavailable hard-limit reporting.
+  Low-budget admission must drain safely on reload; workers and descendants
+  remain charged. Preserve existing effective snapshot and cancellation rules.
+- [ ] Establish real production import/index coverage with a small causal fixture
+  first. All declared eligible body bytes must enter lexical coverage; actual
+  1,000,000 nonzero/nonidentical precomputed vectors must be queryable through
+  production paths with model/generation identity. Do not hide truncation,
+  filtered bytes, helper memory or spike-only routes.
+- [ ] Build the real CLI/daemon workload controller: 100 independent clients,
+  unique request IDs, at most one in-flight heavy request per client, fixed
+  write/current/BM25/ANN/history/correction rates and shared-key conflicts.
+  Persist fsynced run admission, immutable source/config/input identities,
+  per-unit receipts and progress/rate/ETA; refuse ambiguous resume effects.
+  Use nohup and a fresh-provider WD relay for every long run.
+- [ ] Run 50,000,000,000 actual UTF-8 bytes with real indexes, both required
+  profiles, cold/warm provenance and at least 1,800 seconds of steady load each.
+  Report p50/p95/p99 including failures, throughput, queue/byte/lag watermarks,
+  RSS/PSS/current/peak cgroup limits, daemon/runner/service totals and disk peaks.
+  Enforce original P95 and throughput thresholds with no routine refusal dodge.
+- [ ] Prove current/history/scope/retract/retry/conflict oracles across partitions;
+  verify full coverage and ANN recall separately from authority correctness.
+  Exercise simultaneous 100-client burst and overload with fair bounded recovery.
+- [ ] Exercise full backlog and concurrent index rebuild; high-to-low reload,
+  direct low-budget reopen, provider outage, child timeout/budget failure,
+  oversized input, disconnect, real ENOSPC/corruption, invalid config/reload races
+  and model/index generation switch. Keep old readable generations on failure.
+- [ ] Inject crashes before commit, after durable commit/before response, after
+  index application/before watermark, and around activation. Reconcile accepted
+  request IDs with the oracle; distinguish SIGKILL from hardware-power-loss proof.
+- [ ] Archive compact raw measurements, oracle/corpus/index statistics, failures,
+  exact commands and resource limits. Reclaim exact owned large scratch only
+  after all consumers exit. Canonical gate, independent review, hosted CI,
+  publication and issue closure remain separate stages for each safe leaf.
 
-Stdio phase 4: all 18 daemon notification tests, three independent file-plugin
-tests and all-target Clippy pass together in 73.558 seconds. Coverage includes
-100 grouped reports through the real reference executable, invalid/oversize
-protocol output, unsupported update, credential-reference rotation, live access
-revocation, detached-grandchild cleanup, and byte-bounded paging/record admission.
-The paging RED reproduced `RESULT_TOO_LARGE` after two retained fixture compile
-errors were corrected. The record-limit RED lacked the explicit capacity guard;
-the passing guard preserves histories and daemon operation. Focused evidence is
-archived under `docs/benchmarks/results/mvp023-stdio`; exact gate, independent
-review, CI, merge and issue closure are the remaining #23 steps.
-
-Candidate `cde76ab` passed the complete canonical gate (338.143 seconds, 525 Rust
-passes including installed repeat, 151 daemon passes per run) and hosted CI
-42739540908 with restored/hit Cargo cache. Independent [R1 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/55#issuecomment-6756948896)
-nevertheless rejected two introduced defects: malformed nested file-inbox state
-could produce false success, and cancellation on attempt five became permanently
-terminal. Both have meaningful REDs and class repairs. New focused verification
-passes 19 daemon cases, four file-plugin cases, three policy units and all-target
-Clippy in 128.895 seconds. Prior receipts and source hashes remain bound to
-`cde76ab`. R1 repair candidate `03acdcc` passed its own full gate (429.037 seconds,
-528 Rust passes including installed repeat, 152 daemon passes per run) and
-CI42742670727 with restored/hit Cargo cache. Independent [R2 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/55#issuecomment-6757374957)
-confirmed both R1 repairs but found executable/native errors bypassing retries
-and failed destinations blocking new routes. A recovery-class sweep also
-reproduced loss of an accepted envelope after A/B/A routing with source advancement.
-All three new daemon regressions fail behaviorally on `03acdcc`; their repairs
-normalize execution errors at the shared failure boundary and retain bounded
-destination-specific history. Four Python cases, four unit checks and two config
-checks pass. The first complete notifier run had 10 passes and 12 IPC read/timeouts;
-that failed log remains. Three isolated causal regressions then passed, followed
-by all 22 notification cases and Clippy in 50.202 seconds with a content-free
-owned-process observer. The observer did not reproduce the historical failure;
-its cause remains unknown. No timeout, concurrency or source change was made
-between those runs. The [R2 repair archive](../benchmarks/results/mvp023-stdio-r2-fixes/README.md)
-retains this distinction. A fresh exact gate, complete-range R3 review and
-new-head CI remain required before PR #55/#23 close.
-
-R2 repair candidate `24ca281` passed its exact canonical gate in 418.027 seconds
-(535 Rust passes including installed repeat, 155 daemon passes per run).
-Independent [R3 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/55#issuecomment-6757865244)
-confirmed the recovery repairs and all focused checks, but found one LOW reference
-plugin defect: `--fail-first` persisted its marker before validating an update
-target. A causal RED proves byte changes for a missing target. Moving that
-semantic validation before marker persistence passes five standalone cases plus
-the real daemon's 100-event grouping/reference-plugin case. Invalid/mismatched
-targets now preserve bytes; accepted receipt replay still skips the demonstration
-failure. [R3 repair evidence](../benchmarks/results/mvp023-stdio-r3-fixes/README.md)
-preserves the prior gate, full FAIL and RED/GREEN. Fresh exact canonical, whole-range
-R4 review and new-head CI remain required; #23 and PR #55 are still open/draft.
-
-- [x] Reuse the existing transactional revision outbox and live notifier config
-  to admit scoped notifications with a stable envelope and capability contract.
-  Creation must remain atomic with the source review/incident; avoid a cursor
-  update causing an endless outbox/checkpoint loop.
-- [x] Provide usable local inbox/list/show/ack commands, bounded paging and
-  current read permission checks. Ack must not approve memory or resolve review.
-- [x] Implement an independent executable stdio reference plugin, with bounded
-  input/output, error handling, provider IDs and declared send/update/idempotency
-  capabilities. Transmit only minimal summaries and review locators.
-- [x] Persist dispatch attempts, finite retry/backoff, stable idempotency keys,
-  selected route/generation, external IDs and visible terminal/uncertain errors.
-  Unsupported provider idempotency must expose possible duplicate delivery.
-- [x] Merge 100 same-group events while preserving count and meaningful priority
-  escalation. Successful delivery must not be repeated merely by configuration reload.
-- [x] Apply current channel disable/revocation, priority/routing policy and
-  credential changes without bypassing permissions or duplicating in-flight sends.
-- [x] Prove actual local and stdio receipt, failure/retry, duplicate handling and
-  ack independence. Inject real crashes after source commit/before send and
-  after send/before success recording, then verify durable recovery.
-- [ ] Document protocol, configuration, example usage and boundaries; archive
-  compact evidence; pass the exact canonical gate, independent review and CI,
-  merge and verify #23 closure before moving to the next functional issue.
+Original #24 start: 2026-11-10T03:34:44.812218Z (SSD worktree creation/reflog).
+Branch `feat/mvp-024-stress`; base `37d4d77`. No full-data product acceptance
+has run yet. Retained raw shards total 43,986,181,099 bytes; current shard hashes
+still need revalidation. Storage/daemon fixture success does not close this issue.
 
 ## Complete Issue queue
 
@@ -1086,7 +1046,7 @@ R4 review and new-head CI remain required; #23 and PR #55 are still open/draft.
 - [x] [#20 [MVP-020] 外部 Memory Editor、范围受限 patch 与并发修订](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/20) — dependencies: #16, #19.
 - [x] [#21 [MVP-021] Run、Git/工作区、build/test 与 incident 证据关联](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21) — dependencies: #6, #11, #16.
 - [x] [#22 [MVP-022] 执行失败触发调查、自动修订或高优 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22) — dependencies: #20, #21.
-- [ ] [#23 [MVP-023] Notifier 插件、可用本地/stdio 实现与持久投递](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/23) — dependencies: #8, #19, #22.
+- [x] [#23 [MVP-023] Notifier 插件、可用本地/stdio 实现与持久投递](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/23) — dependencies: #8, #19, #22.
 - [ ] [#24 [MVP-024] 50 GB、100 客户端、内存预算与故障恢复压力验收](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/24) — dependencies: #4, #8, #10, #16, #17, #20, #23.
 - [ ] [#25 [MVP-025] mempal 只读迁移、中立导出与往返验证](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/25) — dependencies: #4, #5, #6, #7, #19.
 - [ ] [#26 [MVP-026] Linux 安装、升级、卸载与四宿主使用文档](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26) — dependencies: #12, #13, #14, #15, #23, #24, #25.

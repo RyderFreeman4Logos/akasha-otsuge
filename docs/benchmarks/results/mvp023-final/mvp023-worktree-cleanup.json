@@ -1,0 +1,18 @@
+{
+  "utc": "2026-11-10T03:34:44.147084+00:00",
+  "removed_worktree": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp023",
+  "published_head": "37d4d77ec4517d9a35eff7eb85704de6a656d739",
+  "consumers": [],
+  "shared_target_preserved": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+  "ignored_owned_paths": [
+    ".review/mvp023-local-r1-brief.md",
+    ".review/mvp023-stdio-r1-brief.md",
+    ".review/mvp023-stdio-r2-brief.md",
+    ".review/mvp023-stdio-r3-brief.md",
+    ".review/mvp023-stdio-r4-brief.md",
+    "spikes/helix/__pycache__/run_case.cpython-311.pyc",
+    "target"
+  ],
+  "reported_worktree_mib": 209.68,
+  "reported_shared_target_gib": 8.81
+}
