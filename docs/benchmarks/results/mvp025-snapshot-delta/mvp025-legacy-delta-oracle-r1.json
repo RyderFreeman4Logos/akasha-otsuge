@@ -1,0 +1,234 @@
+{
+  "utc": "2026-11-10T14:45:06.371196+00:00",
+  "status": "Independent structural SQLite oracle preparation; no product migration run or private database used.",
+  "fixture_sha256": "52a892ff120e5ef308024d4cea35a4371edd58ce627b9810e89f0479688d7d4d",
+  "sqlite_version": "3.40.1",
+  "baseline_seed": [
+    {
+      "rowid": 10,
+      "key": "rowid",
+      "text": "unchanged"
+    },
+    {
+      "rowid": 20,
+      "key": "update",
+      "text": "old body"
+    },
+    {
+      "rowid": 30,
+      "key": "delete",
+      "text": "deleted body"
+    },
+    {
+      "rowid": 40,
+      "key": "shorten",
+      "text": {
+        "repeat": "x",
+        "count": 32769
+      }
+    },
+    {
+      "rowid": 50,
+      "key": "scope",
+      "text": "scope body"
+    },
+    {
+      "rowid": 60,
+      "key": "retire",
+      "text": "retired body"
+    },
+    {
+      "rowid": 70,
+      "key": "return",
+      "text": "return body"
+    },
+    {
+      "rowid": 80,
+      "key": "duplicate",
+      "text": "unchanged"
+    }
+  ],
+  "second_sql": "UPDATE drawers SET rowid=1000 WHERE id='rowid';\nUPDATE drawers SET content='new body' WHERE id='update';\nDELETE FROM drawers WHERE id IN ('delete','return');\nUPDATE drawers SET content='short' WHERE id='shorten';\nUPDATE drawers SET project_id='project-b' WHERE id='scope';\nUPDATE drawers SET status='retired' WHERE id='retire';\nINSERT INTO drawers(rowid,id,content,wing,added_at,project_id,status) VALUES(90,'insert','unchanged','test','2026-01-02 03:04:05','project-a','active');",
+  "third_sql": "INSERT INTO drawers(rowid,id,content,wing,added_at,project_id,status) VALUES(3000,'return','return body v2','test','2026-01-02 03:04:05','project-a','active');",
+  "baseline": {
+    "delete": {
+      "rowid": 30,
+      "body_sha256": "ede615ecbd1ecf5fd7b7e780539b82f7d8e8d793c1d94487ba469bb15eeed96c",
+      "body_bytes": 12,
+      "project": "project-a",
+      "status": "active"
+    },
+    "duplicate": {
+      "rowid": 80,
+      "body_sha256": "aaa8d3c8d74ad3e8f6b1772aa9c7e0eaa528cb42fc93599ce2f125b00d4c424c",
+      "body_bytes": 9,
+      "project": "project-a",
+      "status": "active"
+    },
+    "retire": {
+      "rowid": 60,
+      "body_sha256": "73818c9f767a7bc40a90cf7338ddc1fa0ca8cfe79ce8a29627ca51dc1face8d5",
+      "body_bytes": 12,
+      "project": "project-a",
+      "status": "active"
+    },
+    "return": {
+      "rowid": 70,
+      "body_sha256": "0dce92c07700aa27030dc3ecf1cef32ddf8cd69eb69e5853206ebbd0296e99df",
+      "body_bytes": 11,
+      "project": "project-a",
+      "status": "active"
+    },
+    "rowid": {
+      "rowid": 10,
+      "body_sha256": "aaa8d3c8d74ad3e8f6b1772aa9c7e0eaa528cb42fc93599ce2f125b00d4c424c",
+      "body_bytes": 9,
+      "project": "project-a",
+      "status": "active"
+    },
+    "scope": {
+      "rowid": 50,
+      "body_sha256": "13e33f0c988c15ade0a63ce6cb3aa228467668db16715215c97911687eb2823a",
+      "body_bytes": 10,
+      "project": "project-a",
+      "status": "active"
+    },
+    "shorten": {
+      "rowid": 40,
+      "body_sha256": "cd72c76486c91c4032a0b357522fe03413380d37ad7d8661bd98feb5209f1bf6",
+      "body_bytes": 32769,
+      "project": "project-a",
+      "status": "active"
+    },
+    "update": {
+      "rowid": 20,
+      "body_sha256": "2e599d46723a6e7f099e12d2bd8f8b8d77a2e043fde6f9a9c8149b204360b2b2",
+      "body_bytes": 8,
+      "project": "project-a",
+      "status": "active"
+    }
+  },
+  "second": {
+    "duplicate": {
+      "rowid": 80,
+      "body_sha256": "aaa8d3c8d74ad3e8f6b1772aa9c7e0eaa528cb42fc93599ce2f125b00d4c424c",
+      "body_bytes": 9,
+      "project": "project-a",
+      "status": "active"
+    },
+    "insert": {
+      "rowid": 90,
+      "body_sha256": "aaa8d3c8d74ad3e8f6b1772aa9c7e0eaa528cb42fc93599ce2f125b00d4c424c",
+      "body_bytes": 9,
+      "project": "project-a",
+      "status": "active"
+    },
+    "retire": {
+      "rowid": 60,
+      "body_sha256": "73818c9f767a7bc40a90cf7338ddc1fa0ca8cfe79ce8a29627ca51dc1face8d5",
+      "body_bytes": 12,
+      "project": "project-a",
+      "status": "retired"
+    },
+    "rowid": {
+      "rowid": 1000,
+      "body_sha256": "aaa8d3c8d74ad3e8f6b1772aa9c7e0eaa528cb42fc93599ce2f125b00d4c424c",
+      "body_bytes": 9,
+      "project": "project-a",
+      "status": "active"
+    },
+    "scope": {
+      "rowid": 50,
+      "body_sha256": "13e33f0c988c15ade0a63ce6cb3aa228467668db16715215c97911687eb2823a",
+      "body_bytes": 10,
+      "project": "project-b",
+      "status": "active"
+    },
+    "shorten": {
+      "rowid": 40,
+      "body_sha256": "f9b0078b5df596d2ea19010c001bbd009e651de2c57e8fb7e355f31eb9d3f739",
+      "body_bytes": 5,
+      "project": "project-a",
+      "status": "active"
+    },
+    "update": {
+      "rowid": 20,
+      "body_sha256": "ae907ab9a383483e5c37beee966723544b9e6f12148a7dcd56ceea7ad44c5a7b",
+      "body_bytes": 8,
+      "project": "project-a",
+      "status": "active"
+    }
+  },
+  "third": {
+    "duplicate": {
+      "rowid": 80,
+      "body_sha256": "aaa8d3c8d74ad3e8f6b1772aa9c7e0eaa528cb42fc93599ce2f125b00d4c424c",
+      "body_bytes": 9,
+      "project": "project-a",
+      "status": "active"
+    },
+    "insert": {
+      "rowid": 90,
+      "body_sha256": "aaa8d3c8d74ad3e8f6b1772aa9c7e0eaa528cb42fc93599ce2f125b00d4c424c",
+      "body_bytes": 9,
+      "project": "project-a",
+      "status": "active"
+    },
+    "retire": {
+      "rowid": 60,
+      "body_sha256": "73818c9f767a7bc40a90cf7338ddc1fa0ca8cfe79ce8a29627ca51dc1face8d5",
+      "body_bytes": 12,
+      "project": "project-a",
+      "status": "retired"
+    },
+    "return": {
+      "rowid": 3000,
+      "body_sha256": "474d551f310035004f5476bd255888daec7881cb711ccf995f34d5007c325328",
+      "body_bytes": 14,
+      "project": "project-a",
+      "status": "active"
+    },
+    "rowid": {
+      "rowid": 1000,
+      "body_sha256": "aaa8d3c8d74ad3e8f6b1772aa9c7e0eaa528cb42fc93599ce2f125b00d4c424c",
+      "body_bytes": 9,
+      "project": "project-a",
+      "status": "active"
+    },
+    "scope": {
+      "rowid": 50,
+      "body_sha256": "13e33f0c988c15ade0a63ce6cb3aa228467668db16715215c97911687eb2823a",
+      "body_bytes": 10,
+      "project": "project-b",
+      "status": "active"
+    },
+    "shorten": {
+      "rowid": 40,
+      "body_sha256": "f9b0078b5df596d2ea19010c001bbd009e651de2c57e8fb7e355f31eb9d3f739",
+      "body_bytes": 5,
+      "project": "project-a",
+      "status": "active"
+    },
+    "update": {
+      "rowid": 20,
+      "body_sha256": "ae907ab9a383483e5c37beee966723544b9e6f12148a7dcd56ceea7ad44c5a7b",
+      "body_bytes": 8,
+      "project": "project-a",
+      "status": "active"
+    }
+  },
+  "required_logical_outcomes": [
+    "rowid-only move keeps original memory and source identities without a new semantic candidate",
+    "changed content revises the same logical memory and appends immutable source evidence",
+    "deleted rows withdraw candidates and pending reviews without human rejection",
+    "shortened content withdraws stale chunks 1 and 2 while revising chunk 0",
+    "scope move cannot leave an old-scope pending proposal eligible for approval",
+    "retired source row remains historical and withdraws its candidate",
+    "equal text under rowid, duplicate and insert stays three distinct logical identities",
+    "reappearance of return reconnects its original history despite new rowid"
+  ],
+  "limits": [
+    "This freezes an independent key/content oracle, not the upcoming public interface or implementation design.",
+    "No native code, source archive or provider work was launched."
+  ]
+}

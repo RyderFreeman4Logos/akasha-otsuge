@@ -41,7 +41,7 @@ fn invalid() -> StorageError {
     StorageError::new("INVALID_ARCHIVE")
 }
 
-fn regular_file(path: &Path) -> Result<File> {
+pub(super) fn regular_file(path: &Path) -> Result<File> {
     let file = OpenOptions::new()
         .read(true)
         .custom_flags((rustix::fs::OFlags::NOFOLLOW | rustix::fs::OFlags::NONBLOCK).bits() as i32)

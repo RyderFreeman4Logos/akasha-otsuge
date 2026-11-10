@@ -163,10 +163,41 @@ impl Storage {
             return Err(unsafe_path());
         }
         layout::private_dir(&destination, false)?;
-        let tx = self.tree.begin()?;
-        let commit_seq = sequence(tx.get(super::SEQUENCE)?)?;
         let mut commits = Sink::new(&destination.join("commits.jsonl"))?;
         let mut blobs = Sink::new(&destination.join("blobs.bin"))?;
+        let (commit_seq, revision_count) = self.write_archive_sinks(&mut commits, &mut blobs)?;
+        let manifest = ArchiveManifest {
+            archive_version: 1,
+            record_format_version: u32::from(super::FORMAT_VERSION),
+            commit_seq,
+            commits: commit_seq,
+            revisions: revision_count,
+            files: BTreeMap::from([
+                ("blobs.bin".into(), blobs.finish()?),
+                ("commits.jsonl".into(), commits.finish()?),
+            ]),
+        };
+        // The marker appears only after both data files have reached durable storage.
+        layout::write_new(
+            &destination.join("manifest.tmp"),
+            &serde_json::to_vec(&manifest)?,
+        )?;
+        fs::rename(
+            destination.join("manifest.tmp"),
+            destination.join("manifest.json"),
+        )?;
+        layout::sync_dir(&destination)?;
+        layout::sync_dir(&parent)?;
+        Ok(manifest)
+    }
+
+    pub(super) fn write_archive_sinks(
+        &self,
+        commits: &mut Sink,
+        blobs: &mut Sink,
+    ) -> Result<(u64, u64)> {
+        let tx = self.tree.begin()?;
+        let commit_seq = sequence(tx.get(super::SEQUENCE)?)?;
         let mut count = 0_u64;
         let mut revision_count = 0_u64;
         let mut iter = tx.range(b"receipt/".to_vec(), b"receipt0".to_vec())?;
@@ -248,28 +279,6 @@ impl Storage {
         if count != commit_seq {
             return Err(corrupt());
         }
-        let manifest = ArchiveManifest {
-            archive_version: 1,
-            record_format_version: u32::from(super::FORMAT_VERSION),
-            commit_seq,
-            commits: count,
-            revisions: revision_count,
-            files: BTreeMap::from([
-                ("blobs.bin".into(), blobs.finish()?),
-                ("commits.jsonl".into(), commits.finish()?),
-            ]),
-        };
-        // The marker appears only after both data files have reached durable storage.
-        layout::write_new(
-            &destination.join("manifest.tmp"),
-            &serde_json::to_vec(&manifest)?,
-        )?;
-        fs::rename(
-            destination.join("manifest.tmp"),
-            destination.join("manifest.json"),
-        )?;
-        layout::sync_dir(&destination)?;
-        layout::sync_dir(&parent)?;
-        Ok(manifest)
+        Ok((commit_seq, revision_count))
     }
 }

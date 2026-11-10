@@ -4,27 +4,38 @@ use std::io::{Read, Write};
 use std::os::fd::AsRawFd;
 use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
 use crate::storage::archive::{ArchiveCommit, ArchiveManifest, BlobRevision, Sink};
 use crate::storage::{
-    Change, CommitReceipt, CommitRequest, RecordKey, RecordKind, Result, RevisionRef, StorageError,
-    hash,
+    Change, CommitReceipt, CommitRequest, RecordKey, RecordKind, Result, RevisionRef, Storage,
+    StorageError, hash,
 };
 
 pub(super) struct Writer {
     commits: Sink,
     blobs: Sink,
     source: String,
+    incremental: bool,
     pub observed_at_ms: u64,
     sequence: u64,
     revisions: u64,
     pending: Vec<Change>,
     pending_bytes: usize,
     completed_manifest: Option<Vec<u8>>,
+    pub(super) projection: Option<ProjectionContext>,
     // Keep output locks until buffered sinks have been dropped.
     output: Output,
+}
+
+pub(super) struct ProjectionContext {
+    pub store: Arc<Storage>,
+    pub from: String,
+    pub origin: String,
+    pub generation: String,
+    pub retained: std::collections::BTreeSet<String>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -34,6 +45,8 @@ struct Identity {
     source_sha256: String,
     observed_at_ms: u64,
     uid: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    previous_archive_sha256: Option<String>,
 }
 
 fn conflict() -> StorageError {
@@ -58,7 +71,7 @@ struct Output {
 }
 
 impl Output {
-    fn new(path: &Path, source: &super::reader::Snapshot) -> Result<Self> {
+    fn new(path: &Path, source: &super::reader::Snapshot, incremental: bool) -> Result<Self> {
         let parent_path = path
             .parent()
             .filter(|p| !p.as_os_str().is_empty())
@@ -119,6 +132,10 @@ impl Output {
         for entry in fs::read_dir(output.directory_path())? {
             let name = entry?.file_name();
             let name = name.to_str().ok_or_else(conflict)?;
+            if incremental && name == ".mempal-index" {
+                crate::storage::layout::directory(&output.directory_path().join(name))?;
+                continue;
+            }
             if !matches!(
                 name,
                 ".mempal-convert.lock"
@@ -241,7 +258,7 @@ impl Output {
     }
 }
 
-fn publish(directory: &File, name: &str, bytes: &[u8]) -> Result<File> {
+pub(super) fn publish(directory: &File, name: &str, bytes: &[u8]) -> Result<File> {
     // Anonymous bytes cannot be replaced through a staging pathname before publication.
     let mut file = File::from(
         rustix::fs::openat(
@@ -309,13 +326,28 @@ impl Writer {
         source: &super::reader::Snapshot,
         observed_at_ms: u64,
     ) -> Result<Self> {
-        let mut output = Output::new(destination, source)?;
+        Self::open(destination, source, observed_at_ms, None)
+    }
+
+    pub(super) fn open(
+        destination: &Path,
+        source: &super::reader::Snapshot,
+        observed_at_ms: u64,
+        previous_archive_sha256: Option<String>,
+    ) -> Result<Self> {
+        let mapping_version = if previous_archive_sha256.is_some() {
+            3
+        } else {
+            super::MAPPING_VERSION
+        };
+        let mut output = Output::new(destination, source, previous_archive_sha256.is_some())?;
         let source = source.sha256.as_str();
         let identity = if output.present("conversion.json")? {
             let identity: Identity = serde_json::from_slice(&output.small_file("conversion.json")?)
                 .map_err(|_| conflict())?;
-            if identity.mapping_version != super::MAPPING_VERSION
+            if identity.mapping_version != mapping_version
                 || identity.source_sha256 != source
+                || identity.previous_archive_sha256 != previous_archive_sha256
                 || identity.uid != rustix::process::geteuid().as_raw()
                 || identity.observed_at_ms > i64::MAX as u64
             {
@@ -334,10 +366,11 @@ impl Writer {
                 }
             }
             let identity = Identity {
-                mapping_version: super::MAPPING_VERSION,
+                mapping_version,
                 source_sha256: source.into(),
                 observed_at_ms,
                 uid: rustix::process::geteuid().as_raw(),
+                previous_archive_sha256,
             };
             output.publish("conversion.json", &serde_json::to_vec(&identity)?)?;
             identity
@@ -356,13 +389,26 @@ impl Writer {
             blobs,
             output,
             source: source.into(),
+            incremental: mapping_version == 3,
             observed_at_ms: identity.observed_at_ms,
             sequence: 0,
             revisions: 0,
             pending: Vec::new(),
             pending_bytes: 0,
             completed_manifest,
+            projection: None,
         })
+    }
+
+    pub(super) fn index_path(&self) -> PathBuf {
+        self.output.directory_path().join(".mempal-index")
+    }
+
+    pub(super) fn seed(&mut self, store: &Storage, generation: &str) -> Result<()> {
+        (self.sequence, self.revisions) =
+            store.write_archive_sinks(&mut self.commits, &mut self.blobs)?;
+        self.source = generation.into();
+        Ok(())
     }
 
     pub fn push(&mut self, id: String, value: &impl serde::Serialize) -> Result<()> {
@@ -391,7 +437,12 @@ impl Writer {
             .checked_add(1)
             .ok_or_else(|| StorageError::new("INVALID_STORAGE_REQUEST"))?;
         let mut request = CommitRequest {
-            request_id: format!("mempal/{}/commit/{:020}", self.source, self.sequence),
+            request_id: if self.incremental {
+                // Neutral archives are ordered by request ID, including every earlier generation.
+                format!("mempal/z/{:020}/{}", self.sequence, self.source)
+            } else {
+                format!("mempal/{}/commit/{:020}", self.source, self.sequence)
+            },
             config_generation: 1,
             policy_revision: Some("mempal-unverified-v1".into()),
             changes: std::mem::take(&mut self.pending),
@@ -406,7 +457,7 @@ impl Writer {
             revisions.push(BlobRevision {
                 key: change.key.clone(),
                 commit_seq: self.sequence,
-                previous: None,
+                previous: change.expected_revision,
                 content_sha256: hash(change.content.as_bytes()),
                 blob_offset: offset,
                 blob_bytes: change.content.len() as u64,

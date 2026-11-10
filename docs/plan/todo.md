@@ -14,8 +14,12 @@ preserves those exact identities, reports, logs and publication readbacks.
 Earlier failures and unknown historical triggers remain explicitly recorded.
 
 The active SSD worktree is reused on feat/mvp-025-snapshot-delta, based on 235c409.
-Next implement stable legacy origin identities, updates, source deletion and
-reappearance for changed mempal snapshots. #25 stays open until that contract and
+The candidate now implements stable legacy origin identities, updates, source
+withdrawal and reappearance. Public CLI three-generation, unchanged-snapshot,
+recovery and roundtrip regressions pass. The [delta development archive](../benchmarks/results/mvp025-snapshot-delta/README.md)
+preserves failures and final focused evidence. Exact-HEAD gates, real-data
+application, independent review and publication are still being completed.
+#25 stays open until that contract and
 complete roundtrips pass. Offline import (PR #58), neutral export (PR #57),
 imported runtime (PR #59) and the read-only mempal reader (PR #60) are merged.
 The [reader archive](../benchmarks/results/mvp025-mempal-final/README.md) retains

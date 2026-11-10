@@ -99,6 +99,7 @@ pub struct HistoryCursor {
 #[serde(rename_all = "snake_case")]
 pub enum HistoricalStatus {
     Candidate,
+    Withdrawn,
     Active,
     Rejected,
     Retired,
@@ -271,7 +272,7 @@ impl Domain<'_> {
             || state.previous != memory.record.previous_adoption
             || matches!(
                 memory.record.lifecycle,
-                Lifecycle::Candidate | Lifecycle::Rejected
+                Lifecycle::Candidate | Lifecycle::Rejected | Lifecycle::Withdrawn
             )
         {
             return Err(error("DOMAIN_CORRUPT"));
@@ -600,6 +601,7 @@ impl Domain<'_> {
                         .ok_or_else(|| error("DOMAIN_CORRUPT"))?;
                     let status = match revision.record.lifecycle {
                         Lifecycle::Candidate => HistoricalStatus::Candidate,
+                        Lifecycle::Withdrawn => HistoricalStatus::Withdrawn,
                         Lifecycle::Rejected => HistoricalStatus::Rejected,
                         Lifecycle::Retired => HistoricalStatus::Retired,
                         Lifecycle::Active

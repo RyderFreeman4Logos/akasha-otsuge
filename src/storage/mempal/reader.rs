@@ -87,7 +87,7 @@ struct Column {
     data_type: String,
 }
 
-#[derive(Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 #[serde(tag = "type", content = "value", rename_all = "snake_case")]
 pub(super) enum Cell {
     Null,
@@ -97,7 +97,8 @@ pub(super) enum Cell {
     Blob(String),
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 pub(super) struct Row {
     pub rowid: i64,
     pub values: Vec<Cell>,
@@ -114,6 +115,24 @@ pub(super) struct Snapshot {
 }
 
 impl Snapshot {
+    pub(super) fn check_primary_keys(&self) -> Result<()> {
+        for table in self.tables.keys() {
+            let mut query = self
+                .connection
+                .prepare("SELECT name FROM pragma_table_xinfo(?1) WHERE pk > 0 ORDER BY pk")
+                .map_err(invalid)?;
+            let actual: Vec<String> = query
+                .query_map([table], |row| row.get(0))
+                .map_err(invalid)?
+                .collect::<rusqlite::Result<_>>()
+                .map_err(invalid)?;
+            if actual != primary_key(table) {
+                return Err(unsupported());
+            }
+        }
+        Ok(())
+    }
+
     pub fn open(path: &Path) -> Result<Self> {
         let mut file = OpenOptions::new()
             .read(true)
@@ -306,4 +325,42 @@ impl Snapshot {
         }
         Ok(())
     }
+}
+
+pub(super) fn primary_key(table: &str) -> &'static [&'static str] {
+    match table {
+        "failure_events" => &["event_id"],
+        "foresights" => &["drawer_id"],
+        "fork_ext_meta" => &["key"],
+        "historical_rejudge_work_items" => &["run_id", "drawer_rowid"],
+        "leases" => &["resource_path"],
+        "patterns" => &["pattern_id"],
+        "pending_message_completions" => &["message_id"],
+        "reindex_progress" => &["source_path"],
+        "runtime_writer_lease_generations" | "runtime_writer_leases" => &["name"],
+        "skills" => &["skill_id"],
+        "taxonomy" => &["wing", "room"],
+        _ => &["id"],
+    }
+}
+
+pub(super) fn row_key(table: &str, columns: &[String], row: &Row) -> Result<String> {
+    if columns.len() != row.values.len() {
+        return Err(StorageError::new("INVALID_MEMPAL_VALUE"));
+    }
+    let values = primary_key(table)
+        .iter()
+        .map(|name| {
+            let index = columns
+                .iter()
+                .position(|column| column == name)
+                .ok_or_else(|| StorageError::new("UNSUPPORTED_MEMPAL_SCHEMA"))?;
+            let value = &row.values[index];
+            if matches!(value, Cell::Null) {
+                return Err(StorageError::new("INVALID_MEMPAL_KEY"));
+            }
+            Ok(value)
+        })
+        .collect::<Result<Vec<_>>>()?;
+    Ok(crate::storage::hash(&serde_json::to_vec(&(table, values))?))
 }

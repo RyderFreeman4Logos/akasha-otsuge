@@ -1,0 +1,39 @@
+{
+  "command": [
+    "/bin/bash",
+    "--noprofile",
+    "--norc",
+    "-c",
+    "cargo fmt --all && cargo test --locked --offline --test archive && cargo test --locked --offline --lib domain:: && cargo test --locked --offline --lib storage::mempal:: && cargo clippy --locked --offline --all-targets -- -D warnings && git diff --check"
+  ],
+  "dirty_diff_sha256": "525f38c94132cb1097284dc3c3cf2c3e7a0cd93650f1089c8c7d36abde4c80d2",
+  "environment": {
+    "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+    "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+    "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+    "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+  },
+  "head": "8cff5480f058bca4aaa3e8d6bbaae9a595a1ca75",
+  "process": {
+    "pid": 3821673,
+    "start_ticks": "615306853",
+    "state": "R"
+  },
+  "tree": "09072cca54eb0bf6ad4eda9bf2e3aed146eac0c8",
+  "untracked": [
+    {
+      "path": "src/storage/mempal/incremental.rs",
+      "sha256": "53f539fe5864fa0d7f3b7f60b66fbc4166d9ac446632caaba0bcf9933ffe3b6d"
+    },
+    {
+      "path": "src/storage/mempal/incremental/index.rs",
+      "sha256": "b6bfc9488cec0477edebc23edc29eef2f51472ff32098f47fb8e117727e04211"
+    },
+    {
+      "path": "tests/support/mempal_incremental.rs",
+      "sha256": "c846e0f3473595ead3c0cbe4c52f67e9c5f0c43f10d50b128726da609ff544a4"
+    }
+  ],
+  "utc": "2026-11-10T18:26:11.558315+00:00"
+}

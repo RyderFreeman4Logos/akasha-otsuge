@@ -1,0 +1,337 @@
+{
+  "source": "committed structural fixture only; no private snapshot read",
+  "tables": [
+    {
+      "table": "consolidation_log",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "conversation_turns",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "design_insights",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "drawers",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "embed_failure_log",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "failure_events",
+      "primary_key": [
+        {
+          "name": "event_id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "foresights",
+      "primary_key": [
+        {
+          "name": "drawer_id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "fork_ext_meta",
+      "primary_key": [
+        {
+          "name": "key",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "gating_audit",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "historical_rejudge_work_items",
+      "primary_key": [
+        {
+          "name": "run_id",
+          "type": "TEXT",
+          "not_null": true,
+          "position": 1
+        },
+        {
+          "name": "drawer_rowid",
+          "type": "INTEGER",
+          "not_null": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "table": "knowledge_cards",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "knowledge_events",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "knowledge_evidence_links",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "leases",
+      "primary_key": [
+        {
+          "name": "resource_path",
+          "type": "TEXT",
+          "not_null": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "novelty_audit",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "operation_telemetry",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "patterns",
+      "primary_key": [
+        {
+          "name": "pattern_id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "pending_message_completions",
+      "primary_key": [
+        {
+          "name": "message_id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "pending_messages",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "reindex_progress",
+      "primary_key": [
+        {
+          "name": "source_path",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "runtime_adoption_events",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "runtime_writer_lease_generations",
+      "primary_key": [
+        {
+          "name": "name",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "runtime_writer_leases",
+      "primary_key": [
+        {
+          "name": "name",
+          "type": "TEXT",
+          "not_null": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "skills",
+      "primary_key": [
+        {
+          "name": "skill_id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "sleep_log",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "sleep_resolution_log",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "taxonomy",
+      "primary_key": [
+        {
+          "name": "wing",
+          "type": "TEXT",
+          "not_null": true,
+          "position": 1
+        },
+        {
+          "name": "room",
+          "type": "TEXT",
+          "not_null": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "table": "triples",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "table": "tunnels",
+      "primary_key": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "not_null": false,
+          "position": 1
+        }
+      ]
+    }
+  ],
+  "decision": "key inventory only; no implementation decision or tracked edits"
+}

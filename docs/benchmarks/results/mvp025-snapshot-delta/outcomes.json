@@ -1,0 +1,12 @@
+{
+  "mvp025-delta-update-red-r1": "Causal RED: public --previous option unsupported.",
+  "mvp025-delta-update-green-r1": "One public update/replay/source-history test passed; shell initialization warnings are preserved.",
+  "mvp025-delta-lifecycle-red-r1": "Causal RED: deleted source remained a candidate.",
+  "mvp025-delta-lifecycle-green-r1": "Update passed; third-generation import failed INVALID_ARCHIVE. Appended hash-based request IDs violated neutral request ordering.",
+  "mvp025-delta-focused-r1": "19 tests passed, 1 child ignored; Clippy rejected one collapsible if.",
+  "mvp025-delta-unchanged-red-r1": "Causal RED: identical latest snapshot appended a migration commit.",
+  "mvp025-delta-focused-r2": "Test harness compile error: missing await on review_show. Not a product RED.",
+  "mvp025-delta-focused-r3": "33 tests passed, 2 child entries ignored, Clippy and diff checks passed before index-bootstrap repair.",
+  "mvp025-delta-index-bootstrap-red-r1": "Causal RED: interrupted empty index bootstrap returned STORAGE_IO.",
+  "mvp025-delta-focused-r4": "Final focused run: 4 delta tests, Clippy and diff checks passed after bootstrap repair."
+}

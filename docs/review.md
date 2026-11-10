@@ -7,6 +7,11 @@ with their proposal. Tool-backed facts without assumptions need no automatic
 queue entry. Use `review open` to investigate an existing memory, including a
 candidate created before this inbox was introduced.
 
+Changed mempal snapshots can withdraw an imported candidate and its pending
+review when its source changes or disappears. `withdrawn` preserves historical
+evidence and is separate from human rejection. Operator state updates cannot
+create or reopen that state; a later eligible source revision has a new review.
+
 ## Policy and applicability
 
 ```toml

@@ -7,6 +7,7 @@ pub enum ReviewState {
     Investigating,
     Resolved,
     Dismissed,
+    Withdrawn,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -167,6 +168,38 @@ pub(super) fn candidate_change(
     }))
 }
 
+pub(super) fn migrated_withdrawal(storage: &Storage, memory: &MemoryView) -> Result<Vec<Change>> {
+    let outbox = storage
+        .outbox(memory.revision.commit_seq)?
+        .ok_or_else(|| error("DOMAIN_CORRUPT"))?;
+    let mut changes = Vec::new();
+    for reference in outbox.revisions {
+        if reference.key.kind != RecordKind::State || !reference.key.id.starts_with("review/") {
+            continue;
+        }
+        let revision = storage
+            .current(&reference.key)?
+            .ok_or_else(|| error("DOMAIN_CORRUPT"))?;
+        let mut record: ReviewRecord = serde_json::from_str(&revision.content)?;
+        if record.memory_id != memory.revision.key.id
+            || record.proposal_revision != Some(memory.revision.commit_seq)
+        {
+            continue;
+        }
+        Domain::new(storage).review_detail(&reference.key.id[7..], revision.clone())?;
+        if matches!(record.state, ReviewState::Open | ReviewState::Investigating) {
+            record.state = ReviewState::Withdrawn;
+            record.reason = "mempal_source_changed".into();
+            changes.push(Change {
+                key: reference.key,
+                expected_revision: Some(revision.commit_seq),
+                content: serde_json::to_string(&record)?,
+            });
+        }
+    }
+    Ok(changes)
+}
+
 impl Domain<'_> {
     fn review_detail(&self, id: &str, revision: Revision) -> Result<ReviewDetail> {
         let record: ReviewRecord = serde_json::from_str(&revision.content)?;
@@ -245,6 +278,9 @@ impl Domain<'_> {
                     .revision(&open.memory_id, open.expected_revision)?
                     .ok_or_else(|| error("REVISION_NOT_FOUND"))?;
                 self.permission(context, Some(&target.record.draft.scope))?;
+                if target.record.lifecycle == Lifecycle::Withdrawn {
+                    return Err(error("INVALID_REVIEW_TRANSITION"));
+                }
                 let previous = self.storage.receipt(request)?;
                 if previous.is_none()
                     && self
@@ -564,7 +600,9 @@ impl Domain<'_> {
                     .ok_or_else(|| error("REVIEW_NOT_FOUND"))?;
                 let detail = self.review_detail(&update.id, revision.clone())?;
                 self.permission(context, Some(&detail.item.scope))?;
-                if detail.item.state == update.state
+                if detail.item.state == ReviewState::Withdrawn
+                    || update.state == ReviewState::Withdrawn
+                    || detail.item.state == update.state
                     || (matches!(
                         detail.item.state,
                         ReviewState::Resolved | ReviewState::Dismissed
