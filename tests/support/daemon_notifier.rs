@@ -1143,6 +1143,64 @@ fn stdio_retry_survives_restart_and_stops_after_five_attempts() {
 }
 
 #[test]
+fn stdio_fifth_attempt_policy_cancellation_can_resume_without_renewing_failure_budget() {
+    for (restored_mode, expected_state) in [("normal", "sent"), ("always-fail", "failed")] {
+        let mut daemon = plugin_fixture("fail-four");
+        let plugin = daemon.root.join("notifier.py");
+        let settings = |enabled| {
+            format!("[notifiers.plugin]\nkind='stdio'\nenabled={enabled}\ncommand=[{plugin:?}]\n")
+        };
+        std::fs::write(daemon.root.join("hold-plugin"), "hold fifth delivery").unwrap();
+        daemon.start();
+        let end = Instant::now() + Duration::from_secs(60);
+        loop {
+            if daemon.root.join("attempts.jsonl").exists()
+                && plugin_rows(&daemon, "attempts.jsonl").len() == 5
+            {
+                break;
+            }
+            assert!(Instant::now() < end, "fifth attempt was not reached");
+            std::thread::sleep(Duration::from_millis(25));
+        }
+        let accepted =
+            all(&daemon, &extraction_tests::scope())[0]["deliveries"]["plugin"]["attempt"].clone();
+        daemon.configure(&settings(false));
+        daemon.cli(&["config", "reload"]);
+        wait_items(&daemon, &extraction_tests::scope(), |items| {
+            items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == "blocked"
+        });
+        std::fs::write(daemon.root.join("plugin-mode"), restored_mode).unwrap();
+        std::fs::remove_file(daemon.root.join("hold-plugin")).unwrap();
+        daemon.configure(&settings(true));
+        daemon.cli(&["config", "reload"]);
+        let final_item = wait_items(&daemon, &extraction_tests::scope(), |items| {
+            items.len() == 1 && items[0]["deliveries"]["plugin"]["status"] == expected_state
+        })[0]
+            .clone();
+        let attempt = &final_item["deliveries"]["plugin"]["attempt"];
+        assert_eq!(attempt["number"], 6);
+        assert_eq!(
+            attempt["first_started_at_ms"],
+            accepted["first_started_at_ms"]
+        );
+        assert_eq!(attempt["envelope"], accepted["envelope"]);
+        assert_eq!(
+            attempt["transient_failures"],
+            if restored_mode == "normal" { 4 } else { 5 }
+        );
+        assert_eq!(plugin_rows(&daemon, "attempts.jsonl").len(), 6);
+        daemon.cli(&["daemon", "stop"]);
+        daemon.wait();
+        daemon.start();
+        assert_eq!(
+            all(&daemon, &extraction_tests::scope())[0]["deliveries"]["plugin"]["status"],
+            expected_state
+        );
+        assert_eq!(plugin_rows(&daemon, "attempts.jsonl").len(), 6);
+    }
+}
+
+#[test]
 fn stdio_crash_windows_replay_with_idempotency_or_expose_duplicate_risk() {
     for (barrier, mode, expected_deliveries) in [
         ("hold-plugin", "normal", 1),

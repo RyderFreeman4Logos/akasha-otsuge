@@ -59,10 +59,19 @@ pub(super) struct Attempt {
     next_retry_at_ms: Option<u64>,
     #[serde(default)]
     duplicate_risk: bool,
+    #[serde(default)]
+    transient_failures: Option<u32>,
 }
 
 fn first_attempt() -> u32 {
     1
+}
+
+fn policy_blocked(code: &str) -> bool {
+    matches!(
+        code,
+        "CANCELLED" | "CHANNEL_DISABLED" | "NOTIFIER_ROUTE_CHANGED" | "READ_DENIED"
+    )
 }
 
 // Delivery policy changes must not change a destination's idempotency identity.
@@ -97,6 +106,52 @@ fn policy_does_not_change_existing_destination_fingerprints() {
     assert_eq!(route_hash(&route).unwrap(), original);
 }
 
+#[test]
+fn policy_cancellation_keeps_failure_budget_and_recovers_legacy_terminal_controls() {
+    let original = json!({"status":"sending","generation":1,"config_generation":1,"external_message_id":"",
+        "attempt":{"owner":"old","route_sha256":"route","started_at_ms":1,"deadline_ms":30001,
+        "number":5,"first_started_at_ms":1,"transient_failures":4,"capabilities":null,"error":null,
+        "envelope":{"notification_id":"notice","idempotency_key":"key","review_id":"review","priority":"normal",
+        "summary":"review is open","evidence_locator":"review show review","action":"create","external_message_id":null}}});
+    for code in [
+        "CANCELLED",
+        "CHANNEL_DISABLED",
+        "NOTIFIER_ROUTE_CHANGED",
+        "READ_DENIED",
+    ] {
+        let mut delivery: Delivery = serde_json::from_value(original.clone()).unwrap();
+        delivery.fail(code, 100).unwrap();
+        assert_eq!(delivery.status, "blocked");
+        let attempt = delivery.attempt.as_mut().unwrap();
+        assert_eq!(attempt.transient_failures, Some(4));
+        assert!(attempt.next_retry_at_ms.is_none());
+        attempt.number = 6;
+        delivery.status = "sending".into();
+        delivery.fail("NOTIFIER_FAILED", 200).unwrap();
+        assert_eq!(delivery.status, "failed");
+        assert_eq!(
+            delivery.attempt.as_ref().unwrap().transient_failures,
+            Some(5)
+        );
+        assert!(!delivery.retry_pending(200));
+
+        let mut legacy = original.clone();
+        legacy["status"] = json!("failed");
+        legacy["attempt"]["error"] = json!(code);
+        legacy["attempt"]
+            .as_object_mut()
+            .unwrap()
+            .remove("transient_failures");
+        let mut delivery: Delivery = serde_json::from_value(legacy).unwrap();
+        assert!(delivery.recover_interrupted("new", 200).unwrap());
+        assert_eq!(delivery.status, "blocked");
+        assert_eq!(
+            delivery.attempt.as_ref().unwrap().transient_failures,
+            Some(4)
+        );
+    }
+}
+
 impl Delivery {
     fn fail(&mut self, code: &str, now: u64) -> Result<()> {
         let attempt = self.attempt.as_mut().ok_or(Error("NOTIFICATION_CORRUPT"))?;
@@ -104,11 +159,7 @@ impl Delivery {
         {
             attempt.duplicate_risk = true;
         }
-        let blocked = attempt.number < 5
-            && matches!(
-                code,
-                "CANCELLED" | "CHANNEL_DISABLED" | "NOTIFIER_ROUTE_CHANGED" | "READ_DENIED"
-            );
+        let blocked = policy_blocked(code);
         let retryable = matches!(
             code,
             "NOTIFIER_FAILED"
@@ -117,8 +168,14 @@ impl Delivery {
                 | "NOTIFIER_INTERRUPTED"
                 | "IO_ERROR"
         );
-        attempt.next_retry_at_ms = if retryable && attempt.number < 5 {
-            Some(now.saturating_add(1000 * (1 << attempt.number.saturating_sub(1))))
+        let failures = attempt
+            .transient_failures
+            .get_or_insert(attempt.number.saturating_sub(1));
+        if retryable {
+            *failures = failures.saturating_add(1);
+        }
+        attempt.next_retry_at_ms = if retryable && *failures < 5 {
+            Some(now.saturating_add(1000 * (1 << failures.saturating_sub(1))))
         } else {
             None
         };
@@ -135,6 +192,15 @@ impl Delivery {
     }
 
     pub(super) fn recover_interrupted(&mut self, owner: &str, now: u64) -> Result<bool> {
+        if self.status == "failed"
+            && let Some(attempt) = self.attempt.as_mut()
+            && attempt.transient_failures.is_none()
+            && attempt.error.as_deref().is_some_and(policy_blocked)
+        {
+            attempt.transient_failures = Some(attempt.number.saturating_sub(1));
+            self.status = "blocked".into();
+            return Ok(true);
+        }
         if matches!(self.status.as_str(), "preparing" | "sending")
             && self.attempt.as_ref().is_some_and(|a| a.owner != owner)
         {
@@ -220,6 +286,13 @@ impl Dispatch {
                 .as_mut()
                 .ok_or(Error("NOTIFICATION_CORRUPT"))?;
             // Replay the accepted envelope even if the source has advanced meanwhile.
+            attempt
+                .transient_failures
+                .get_or_insert(if previous.status == "retry_wait" {
+                    attempt.number
+                } else {
+                    attempt.number.saturating_sub(1)
+                });
             attempt.number = attempt.number.saturating_add(1);
             if attempt.first_started_at_ms == 0 {
                 attempt.first_started_at_ms = attempt.started_at_ms;
@@ -276,6 +349,7 @@ impl Dispatch {
                     first_started_at_ms: started_at_ms,
                     next_retry_at_ms: None,
                     duplicate_risk,
+                    transient_failures: Some(0),
                 }),
             },
             permit: Arc::new(permit),

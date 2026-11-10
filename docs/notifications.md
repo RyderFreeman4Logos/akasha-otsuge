@@ -99,7 +99,10 @@ ID, while `receipts` binds each accepted idempotency key to its exact input hash
 and message ID. Reusing a key with different input fails. A process lock plus
 fsynced atomic replacement keeps the effect and receipt together. Concurrent
 replays return the same ID. Updates replace the existing message and retain
-earlier receipts. This is a bounded example inbox: it refuses writes exceeding
+earlier receipts. Loading validates every message and receipt, their references
+and the current message's input hash. Malformed state or a receipt without its
+message fails without changing the state file; an old valid receipt can still
+replay after that message was updated. This is a bounded example inbox: it refuses writes exceeding
 2 MiB and preserves the previous state; it does not expire receipts automatically.
 Plugin acknowledgement remains separate from `notify ack` and review state.
 
@@ -140,3 +143,5 @@ deduplication, update, concurrent replay and invalid-input/state preservation.
 The [focused evidence](benchmarks/results/mvp023-stdio/README.md) preserves passing
 checks and earlier failures; canonical gate, independent review and CI are
 separate publication requirements.
+The [R1 repair evidence](benchmarks/results/mvp023-stdio-r1-fixes/README.md)
+retains the rejected candidate's gate/review and both causal regressions.

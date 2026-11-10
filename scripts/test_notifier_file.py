@@ -1,4 +1,6 @@
 import concurrent.futures
+import copy
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -52,6 +54,9 @@ class FileNotifierTests(unittest.TestCase):
         self.assertEqual(state["messages"], {message_id: changed})
         self.assertEqual(len(state["receipts"]), 2)
         self.assertEqual(os.stat(self.state).st_mode & 0o777, 0o600)
+        after_update = self.state.read_bytes()
+        self.assertEqual(self.deliver().stdout, sent.stdout)
+        self.assertEqual(self.state.read_bytes(), after_update)
 
     def test_conflicts_invalid_input_and_symlinks_preserve_previous_state(self):
         first = self.deliver()
@@ -78,6 +83,25 @@ class FileNotifierTests(unittest.TestCase):
         state = json.loads(self.state.read_text())
         self.assertEqual(len(state["messages"]), 1)
         self.assertEqual(len(state["receipts"]), 1)
+
+    def test_nested_corrupt_state_and_dangling_receipts_are_rejected_unchanged(self):
+        self.assertEqual(self.deliver().returncode, 0)
+        valid = json.loads(self.state.read_text())
+        fingerprint = hashlib.sha256(json.dumps(self.notice, ensure_ascii=False, sort_keys=True,
+                                                separators=(",", ":")).encode()).hexdigest()
+        malformed = valid | {"messages": {"invalid-message": False}}
+        dangling = valid | {"messages": {}, "receipts": {self.notice["idempotency_key"]:
+                    dict(sha256=fingerprint, external_message_id="missing-message")}}
+        wrong_hash = copy.deepcopy(valid)
+        wrong_hash["receipts"][self.notice["idempotency_key"]]["sha256"] = "bad"
+        missing_receipt = valid | {"receipts": {}}
+        for bad in [malformed, dangling, wrong_hash, missing_receipt]:
+            with self.subTest(state=bad):
+                self.state.write_text(json.dumps(bad))
+                before = self.state.read_bytes()
+                result = self.deliver()
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertEqual(self.state.read_bytes(), before)
 
 
 if __name__ == "__main__":

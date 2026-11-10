@@ -69,7 +69,7 @@ cleans up descendants and its private scratch directory. A configured
 ## Retries and recovery
 
 Transient process, I/O and timeout failures persist a retry deadline with 1, 2,
-4 and 8 second delays, stopping after five attempts. Restart preserves the
+4 and 8 second delays, stopping after five transient failures. Restart preserves the
 original start, retry schedule, accepted envelope and idempotency key. An
 interrupted `preparing` or `sending` attempt enters the same bounded recovery
 path. Protocol errors are terminal; disable, revocation and shutdown block the
@@ -77,6 +77,14 @@ attempt until current policy permits another claim. Each attempt shares one
 capability/send deadline, configured by `timeout` (default `30s`). The active
 attempt uses one monotonic deadline across both processes. Reloading the timeout
 affects later claims without extending an active attempt.
+
+`number` counts all claims; `transient_failures` separately counts failed or
+interrupted execution. Policy cancellation does not consume or reset that failure
+budget. Restoring availability can therefore resume a fifth cancelled claim as
+claim six, using the same accepted envelope/key; another transient failure still
+exhausts a budget that already recorded four failures. Older records infer their
+consumed budget conservatively; terminal policy cancellations from the earlier
+attempt-count implementation recover as blocked.
 
 The inbox exposes the attempt number, original start, next retry time, last
 error and `duplicate_risk`. A send interrupted before its response may already

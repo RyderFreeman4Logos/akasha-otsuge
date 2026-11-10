@@ -31,6 +31,23 @@ def private_file(fd):
           and info.st_mode & 0o077 == 0 and info.st_nlink == 1)
 
 
+def validate_notice(notice):
+    check(isinstance(notice, dict) and set(notice) == FIELDS)
+    for name in FIELDS - {"external_message_id"}:
+        value = notice[name]
+        check(isinstance(value, str) and value.strip() and len(value.encode()) <= 1024
+              and not any(ord(c) < 32 or 127 <= ord(c) <= 159 for c in value))
+    check(notice["priority"] in {"normal", "high", "urgent"})
+    check(notice["action"] in {"create", "update"})
+    external = notice["external_message_id"]
+    check((notice["action"] == "create" and external is None)
+          or (notice["action"] == "update" and isinstance(external, str) and 0 < len(external.encode()) <= 256))
+
+
+def message_id(notice):
+    return "file-" + hashlib.sha256(notice["notification_id"].encode()).hexdigest()
+
+
 def read_state(path):
     try:
         fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
@@ -45,6 +62,19 @@ def read_state(path):
           and type(state["schema_version"]) is int and state["schema_version"] == 1
           and isinstance(state["messages"], dict) and isinstance(state["receipts"], dict)
           and type(state["failed_once"]) is bool)
+    for key, receipt in state["receipts"].items():
+        check(key.strip() and len(key.encode()) <= 1024 and isinstance(receipt, dict)
+              and set(receipt) == {"sha256", "external_message_id"})
+        digest = receipt["sha256"]
+        check(isinstance(digest, str) and len(digest) == 64 and all(c in "0123456789abcdef" for c in digest))
+        target = receipt["external_message_id"]
+        check(isinstance(target, str) and target in state["messages"])
+    for target, notice in state["messages"].items():
+        validate_notice(notice)
+        check(target == message_id(notice))
+        check(notice["action"] != "update" or notice["external_message_id"] == target)
+        receipt = state["receipts"].get(notice["idempotency_key"])
+        check(receipt == dict(sha256=hashlib.sha256(encode(notice)).hexdigest(), external_message_id=target))
     return state
 
 
@@ -68,16 +98,8 @@ def save_state(path, state):
 
 
 def deliver(path, notice, fail_first):
-    check(isinstance(notice, dict) and set(notice) == FIELDS)
-    for name in FIELDS - {"external_message_id"}:
-        value = notice[name]
-        check(isinstance(value, str) and value.strip() and len(value.encode()) <= 1024
-              and not any(ord(c) < 32 or 127 <= ord(c) <= 159 for c in value))
-    check(notice["priority"] in {"normal", "high", "urgent"})
-    check(notice["action"] in {"create", "update"})
+    validate_notice(notice)
     external = notice["external_message_id"]
-    check((notice["action"] == "create" and external is None)
-          or (notice["action"] == "update" and isinstance(external, str) and 0 < len(external.encode()) <= 256))
     check(path.is_absolute())
     path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     info = path.parent.lstat()
@@ -91,19 +113,19 @@ def deliver(path, notice, fail_first):
         key = notice["idempotency_key"]
         if key in state["receipts"]:
             receipt = state["receipts"][key]
-            check(receipt["sha256"] == fingerprint)
+            check(receipt["sha256"] == fingerprint and receipt["external_message_id"] == message_id(notice))
             return receipt["external_message_id"]
         if fail_first and not state["failed_once"]:
             state["failed_once"] = True
             save_state(path, state)
             raise OSError("demonstration transient failure")
-        message_id = "file-" + hashlib.sha256(notice["notification_id"].encode()).hexdigest()
+        target = message_id(notice)
         if notice["action"] == "update":
-            check(external == message_id and external in state["messages"])
-        state["messages"][message_id] = notice
-        state["receipts"][key] = dict(sha256=fingerprint, external_message_id=message_id)
+            check(external == target and external in state["messages"])
+        state["messages"][target] = notice
+        state["receipts"][key] = dict(sha256=fingerprint, external_message_id=target)
         save_state(path, state)
-        return message_id
+        return target
     finally:
         os.close(lock)
 

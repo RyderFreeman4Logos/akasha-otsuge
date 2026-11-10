@@ -29,7 +29,7 @@ else:
                                  "credential_present": bool(os.environ.get("AKASHA_NOTIFIER_CREDENTIAL"))}) + "\n")
         output.flush()
         os.fsync(output.fileno())
-    if mode == "always-fail" or mode == "fail-once" and not earlier:
+    if mode == "always-fail" or mode == "fail-once" and not earlier or mode == "fail-four" and len(earlier) < 4:
         sys.exit(75)
     if mode in {"malformed", "oversize"}:
         print("DO_NOT_ECHO" if mode == "malformed" else "x" * 4097)

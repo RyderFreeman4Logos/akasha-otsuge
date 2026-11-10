@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T02:16:29.480415+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "cde76abe7e8a45288d06919a93a7d06f940c10ee",
+    "log_sha256": "4110a8bfa81f2f995a0b9f69fa497b98ea3298ef4e438bb3bc095e762b4ac531",
+    "seconds": 128.89513997081667,
+    "utc": "2026-11-10T02:15:30.532152+00:00"
+  },
+  "process_absent": true,
+  "classification": "passed_both_finding_classes_and_complete_notifier_regression"
+}

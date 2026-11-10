@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "prior_candidate": "cde76abe7e8a45288d06919a93a7d06f940c10ee",
+  "source_files": {
+    "src/adapter/mod.rs": "7906dbfb738f053cd86eb840168a617f016d0e5837f5209bc9cabbd04af8ec20",
+    "src/adapter/guardian.rs": "677da5ff3ce5dd461b6500f20bb3b4fe634e870d4ffcc0f7bc8e597fe4c74b4d",
+    "src/daemon.rs": "9cac1b7b1403029ef6c2c96db905de833a330436ca14b5537f9c9ee92a883127",
+    "src/daemon/jobs.rs": "ce143b37aa6fff478f09627a9444c563e72a7c6d980b8e3cd0e958b59089277a",
+    "src/daemon/notifier.rs": "d1b9eaed655d54f59190583c3a6f25b9580b04b96482e14e792d8576359efeef",
+    "src/daemon/notifier/stdio.rs": "7ce3bd99947017273883a54141e08257e3ba968fba1cd36e9830765d2cade7e0",
+    "src/config/schema.rs": "f8c6ed9747825132f4cde27f5d9e123b975888cc277246778daaf382bad56ef4",
+    "tests/config.rs": "44595bff8566a2f06515f412711e007df3ea7678963f6cf82086113ed4f746d0",
+    "tests/support/daemon_notifier.rs": "6a12de77f5a65ba942d93cf21c206319e29e5538a44afa0f14c6665e158e42d1",
+    "tests/fixtures/notifier/oneshot.py": "b576d281ddddd4c41f5567632455c53b90f8c5de6183acfb71a6164f1c2b1d81",
+    "examples/notifier-file.py": "4d5fb36eec7cfae58c617d35d287ad6e4e7da693d558163a3ba8ce2eab7974b5",
+    "scripts/test_notifier_file.py": "b907837f927fe58a8c319df6a6597c9e2fc3447478b9ea7a9fc7a4a363d76bab"
+  },
+  "files": {
+    "README.md": {
+      "bytes": 1725,
+      "sha256": "a9ec904b1c63d764fde6e74f4fe4bd527e177e4403b6b4e2bdb162710b134533"
+    },
+    "mvp023-review-r1-findings-green.admission.json": {
+      "bytes": 1257,
+      "sha256": "478f94d36ce63ecaaaad2bef6b1f3bddf622e6f6113038d1571de81bcb47d851"
+    },
+    "mvp023-review-r1-findings-green.collected.json": {
+      "bytes": 421,
+      "sha256": "d48fafe5e9df1044898bafc9d2a6b783ebb21f12cbd80151977081ace480a220"
+    },
+    "mvp023-review-r1-findings-green.log.gz": {
+      "bytes": 1159,
+      "sha256": "c5381821e698c1005d37bc683393b3f0a0b0f6cfe7ce4cde86747529faad0163"
+    },
+    "mvp023-review-r1-findings-green.terminal.json": {
+      "bytes": 237,
+      "sha256": "7a459d15fb04b4c9e08925122ead5804954e56b7181b93b1d74dc572bafefbed"
+    },
+    "mvp023-review-r1-findings-red.admission.json": {
+      "bytes": 1538,
+      "sha256": "d6a81608572b9b88ab00b8333389b3896b08b43b41fb45ad8c395f2aafc2e514"
+    },
+    "mvp023-review-r1-findings-red.collected.json": {
+      "bytes": 430,
+      "sha256": "06a9db35591ac0f913dd4394c3b7d9a29271c71f9b528793130603f4ec4dcc86"
+    },
+    "mvp023-review-r1-findings-red.log.gz": {
+      "bytes": 1855,
+      "sha256": "281e02d05b4a4c1281f3d953e9a522894f940f5b7cd00dbc17a36eea3395c034"
+    },
+    "mvp023-review-r1-findings-red.terminal.json": {
+      "bytes": 235,
+      "sha256": "7204f302b54cb512619efc753a22936a046448f1bebe724ca686775c9d521f66"
+    },
+    "mvp023-stdio-canonical-r1-verified.json": {
+      "bytes": 2138,
+      "sha256": "3ca3d3d106efc10f9f513ad4fbb1f89b6c35c13db92a6664dbb3c3ee288fe40b"
+    },
+    "mvp023-stdio-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "423b41c3bb63d8d77b7c526bfebcebe3a8a76454951f8194228bd810f30f6bc7"
+    },
+    "mvp023-stdio-canonical-r1.collected.json": {
+      "bytes": 390,
+      "sha256": "1fbc8f1b93c988d35384acc8481d65b07737277a37997921e5f474379fc04917"
+    },
+    "mvp023-stdio-canonical-r1.log.gz": {
+      "bytes": 12328,
+      "sha256": "603d31ca3c9c1d0fd1072ee1506e80084486e62e49fce2178c57bcb11e6c0f1a"
+    },
+    "mvp023-stdio-canonical-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "86b4a9f6afd9255945ca72716741af493a420e2e1807fd3751d7447452f26a18"
+    },
+    "mvp023-stdio-ci-pr-r1.json": {
+      "bytes": 3951,
+      "sha256": "bd326707663183b4099bdc7de96da744e37a819dd6e91e7fbf7231370c071739"
+    },
+    "mvp023-stdio-ci-pr-r1.log.gz": {
+      "bytes": 28406,
+      "sha256": "7b343d9e881eedfb0f07a4b36ed5b7c067d4645aa0d52c5c27e2f04c82e7b554"
+    },
+    "mvp023-stdio-review-r1-publication.json": {
+      "bytes": 264,
+      "sha256": "0619af4dcf66b715913e8994f8be25d67908df6f822b74c4925226aa1f4dcafd"
+    },
+    "mvp023-stdio-review-r1-tests.log": {
+      "bytes": 5218,
+      "sha256": "d441dcdc947a521837784a4c8a02d2ca6e48b37cebd6685ed65be68ef2d2a105"
+    },
+    "mvp023-stdio-review-r1.md": {
+      "bytes": 12003,
+      "sha256": "afddad0500701e701850d12fe63ce4e609507699ccfc44eb32b61ef2f97e68ca"
+    }
+  }
+}

@@ -1000,6 +1000,17 @@ the passing guard preserves histories and daemon operation. Focused evidence is
 archived under `docs/benchmarks/results/mvp023-stdio`; exact gate, independent
 review, CI, merge and issue closure are the remaining #23 steps.
 
+Candidate `cde76ab` passed the complete canonical gate (338.143 seconds, 525 Rust
+passes including installed repeat, 151 daemon passes per run) and hosted CI
+42739540908 with restored/hit Cargo cache. Independent [R1 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/55#issuecomment-6756948896)
+nevertheless rejected two introduced defects: malformed nested file-inbox state
+could produce false success, and cancellation on attempt five became permanently
+terminal. Both have meaningful REDs and class repairs. New focused verification
+passes 19 daemon cases, four file-plugin cases, three policy units and all-target
+Clippy in 128.895 seconds. Prior receipts and source hashes remain bound to
+`cde76ab`; the repaired candidate still needs its own full gate, complete-range
+R2 review and CI before PR #55 and #23 can close.
+
 - [x] Reuse the existing transactional revision outbox and live notifier config
   to admit scoped notifications with a stable envelope and capability contract.
   Creation must remain atomic with the source review/incident; avoid a cursor
