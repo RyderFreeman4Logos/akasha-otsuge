@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T14:18:52.022589+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "085640133221975943ec4ebc7d28cc86d5df879b",
+    "log_sha256": "a73767b79b9ecbc06a5358de4dfe1febba4240c55056b22e4aa989fd8d816d1e",
+    "seconds": 2.9769617542624474,
+    "utc": "2026-11-10T14:18:43.031836+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASSED_PUBLIC_RACE_FSYNC_ROOT_RECOVERY_CONTROLS"
+}

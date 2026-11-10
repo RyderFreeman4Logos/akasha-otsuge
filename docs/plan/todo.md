@@ -1297,6 +1297,55 @@ After #25, return to all unchecked #24 enforcement/corpus/load/fault work, then
 packaging (#26), fixed-oracle quality evaluation (#27) and final acceptance (#28).
 Claude authentication (#12) and mp SSH access remain explicit external blockers.
 
+Incremental PR #61 remains open. Canonical R2 at 0856401 passed (588 Rust
+passes, 34 ignores), as did CI42823400965 with an actual restored-cache hit.
+Whole-range review R1 nevertheless found two HIGH regressions: cleanup could
+adopt a substituted old-directory inode, and ordinary opens could bypass failed
+publication durability. Its full report was overwritten by the review wrapper's
+final-message output; the preserved source/probe evidence supports an explicitly
+reconstructed FAIL, published in the PR. The original report bytes are lost.
+The [repair evidence](../benchmarks/results/mvp025-incremental-review-repair/README.md)
+preserves that limitation, all failed attempts and their corrected classifications.
+The repair also prevents ordinary-root substitution and keeps native directory
+descriptors with every shared tree handle. The latter first failed a real native
+checkpoint after its Storage owner was dropped. Final focused validation passes
+68 Rust tests (five supervisor-child ignores), format and Clippy, plus public
+cleanup, fsync, root-substitution and local-tail recovery probes. These are dirty
+candidate results; a successor exact canonical, whole-range review and CI remain
+required before merging this leaf. Changed mempal snapshots remain unfinished.
+
+### Remaining release acceptance
+
+- [ ] #26: build the Linux release candidate and checksums, recording the platforms
+  actually executed; test a clean install and one selected CLI through capture,
+  consult, review and notification.
+- [ ] #26: execute upgrade with configuration, history and pending jobs preserved;
+  verify backup/recovery and uninstall only owned integrations, preserving existing
+  hooks, configuration and all user history.
+- [ ] #26: provide four host guides and execute their commands, including paths,
+  permissions, hints, model configuration, the 1700-second lifecycle, review,
+  notifications and resource profiles. Native Claude authentication stays deferred.
+- [ ] #27: run the unchanged 60-task frozen reference and registered thresholds;
+  compare direct retrieval and external consult for source, taste, condition,
+  scope, version, branch, no-result, error and correction cases.
+- [ ] #27: measure added main-context tokens, additional reads, external tokens
+  and quota, latency, relevance and incorrect revisions; retain failures.
+- [ ] #27: execute all 16 Caller/Runner contracts and actual cross-host coverage
+  across the four hosts; explicitly label the authorized temporary Codex
+  substitution and keep actual Claude authentication unverified.
+- [ ] #27: require zero scope/retraction/authority violations, every critical
+  decision, at least 90% relevant coverage and no more than 10% irrelevant output.
+- [ ] #28: map REQ-01 through REQ-24 to implementation, issues, PRs, tests and
+  immutable release artifacts. Execute capture → consult → candidate/Auto-Grill
+  → policy/review → outcome → investigation/edit → notification → history →
+  backup/restore.
+- [ ] #28: audit defaults, dependencies, the sole formal backend, no required MCP,
+  and deadlines; bind host, 1700-second, 50 GB/100-client, migration and recovery
+  evidence to the actual release candidate without promoting fixture evidence.
+- [ ] #28: publish an immutable tag, acceptance matrix and known limitations;
+  download the published artifacts and repeat installation and key end-to-end
+  acceptance. Close only satisfied issues; preserve external blockers explicitly.
+
 ## Complete Issue queue
 
 - [x] [#1 [MVP-001] 建立 Rust/Linux 项目骨架与可执行开发门槛](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/1) — dependencies: none.

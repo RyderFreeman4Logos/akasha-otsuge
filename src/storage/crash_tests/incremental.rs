@@ -273,11 +273,18 @@ fn incremental_recovery_checks_native_identity_before_deleting_old_history() {
             "deleted old history before checking the replacement database"
         );
         assert!(root.join("data/.archive-replace.json").is_file());
-        let store = Storage::open(&target).await.unwrap();
-        let mut tx = store.tree.begin().unwrap();
+        assert!(matches!(Storage::open(&target).await, Err(e) if e.code == "INVALID_ARCHIVE"));
+        // Repair injected metadata through the fixture's native handle; public opens must refuse it.
+        let admission = layout::Admission::acquire(&root.join("data"), false).unwrap();
+        let authority = super::super::import_publish::Root::open(&admission, "authority").unwrap();
+        let tree = Storage::open_tree(&target, &authority).unwrap();
+        let mut tx = tree.begin().unwrap();
         tx.set(b"meta/archive_import", &original).unwrap();
         tx.commit().await.unwrap();
-        store.close().await.unwrap();
+        tree.close().await.unwrap();
+        drop(tree);
+        drop(authority);
+        drop(admission);
         Storage::import_archive(&target, &root.join("archive"))
             .await
             .unwrap();
@@ -332,6 +339,10 @@ fn incremental_recovery_rejects_untrusted_marker_without_changing_either_store()
             );
             assert_eq!(std::fs::read(&marker).unwrap(), bytes);
             let after = root.join(format!("after-{number}"));
+            assert!(Storage::export_archive(&target, &after).await.is_err());
+            assert!(!after.exists());
+            assert_eq!(std::fs::read(&marker).unwrap(), bytes);
+            std::fs::write(&marker, &original).unwrap();
             Storage::export_archive(&target, &after).await.unwrap();
             assert_archive_equal(&root.join("before"), &after);
             assert!(root.join("data/.archive-import/kv").is_dir());
@@ -343,6 +354,7 @@ fn incremental_recovery_rejects_untrusted_marker_without_changing_either_store()
                 .await
                 .is_err()
         );
+        assert!(Storage::open(&target).await.is_err());
         std::fs::set_permissions(&marker, std::fs::Permissions::from_mode(0o600)).unwrap();
         let saved = root.join("saved-marker");
         std::fs::rename(&marker, &saved).unwrap();
@@ -352,6 +364,7 @@ fn incremental_recovery_rejects_untrusted_marker_without_changing_either_store()
                 .await
                 .is_err()
         );
+        assert!(Storage::open(&target).await.is_err());
         assert_eq!(std::fs::read(&saved).unwrap(), original);
         std::fs::remove_file(&marker).unwrap();
         std::fs::rename(&saved, &marker).unwrap();

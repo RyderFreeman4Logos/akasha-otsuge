@@ -65,6 +65,31 @@ fn runtime() -> tokio::runtime::Runtime {
 }
 
 #[test]
+fn native_handle_keeps_its_directory_after_storage_owner_is_dropped() {
+    let root = std::env::temp_dir().join(format!("akasha-native-owner-{}", std::process::id()));
+    std::fs::create_dir(&root).unwrap();
+    let _fixture = OwnedFixture(root.clone());
+    runtime().block_on(async {
+        let store = Storage::open(&config(&root)).await.unwrap();
+        store.commit(&request("retained")).await.unwrap();
+        let tree = store.tree.clone();
+        let backup = root.join("native-backup");
+        drop(store);
+        let (tree, checkpoint) = tokio::task::spawn_blocking(move || {
+            let checkpoint = tree.create_checkpoint(backup);
+            (tree, checkpoint)
+        })
+        .await
+        .unwrap();
+        tree.close().await.unwrap();
+        assert!(
+            checkpoint.is_ok(),
+            "native checkpoint lost its retained directory: {checkpoint:?}"
+        );
+    });
+}
+
+#[test]
 #[ignore = "launched only by the crash supervisor with an isolated database"]
 fn crash_child() {
     let root = PathBuf::from(std::env::var_os("AKASHA_TEST_CRASH_ROOT").unwrap());

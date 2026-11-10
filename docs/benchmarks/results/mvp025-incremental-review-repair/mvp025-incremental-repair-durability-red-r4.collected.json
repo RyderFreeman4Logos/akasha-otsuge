@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T14:08:29.679178+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "085640133221975943ec4ebc7d28cc86d5df879b",
+    "log_sha256": "36306a9defea19e34c4b602e57317963cfab0e8db6d53029cc07c05a1c936ea2",
+    "seconds": 6.442236670292914,
+    "utc": "2026-11-10T14:07:07.209941+00:00"
+  },
+  "process_absent": true,
+  "classification": "CAUSAL_EXPORT_SUCCESS_DAEMON_LIVE_WITHOUT_PARENT_SYNC"
+}

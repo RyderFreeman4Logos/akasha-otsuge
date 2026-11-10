@@ -279,7 +279,7 @@ impl Storage {
 
     fn import_store(config: &ResolvedConfig, root: &Root) -> Result<Self> {
         Ok(Self {
-            tree: Self::open_tree(config, &root.path())?,
+            tree: Self::open_tree(config, root)?,
             writer: Arc::new(Mutex::new(())),
             root: root.path(),
             budget_mib: config.config().runtime.memory_budget_mib,

@@ -1,0 +1,9 @@
+{
+  "utc": "2026-11-10T13:50:26.051792+00:00",
+  "original_complete_report_available": false,
+  "missing_original_report_claimed_sha256": "8a2863b41808b17753dd4e92af871bcd726c0aadd5676fead6a8edb805b95f70",
+  "retained_summary_sha256": "d405a84e8e5b48fe613a0038bc0084dc8090d5cf9744ea0dd6e43eb041facb17",
+  "retained_tests_sha256": "85c291d71a0121bc777a454bb933c9d4d063f0be4c03c56e5e16006d2073c414",
+  "cause": "CLI output-last-message reused the full report path and overwrote it with the final summary.",
+  "correction": "Preserve originals, reconstruct transparently from durable tests/source with no repeated execution, and separate report/final-output paths."
+}

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T13:55:19.347844+00:00",
+  "head": "085640133221975943ec4ebc7d28cc86d5df879b",
+  "tree": "b7e72a589d1123df67d0056326fd727d986f652c",
+  "verdict": "FAIL",
+  "introduced_findings": 2,
+  "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/61#issuecomment-6769172067",
+  "report_sha256": "38cd6cff117217319b29a1178a0ed6e6f53ca5495da555738fd0a05125cd45b8",
+  "reconstructed": true,
+  "original_full_report_lost": true,
+  "retained_tests_sha256": "85c291d71a0121bc777a454bb933c9d4d063f0be4c03c56e5e16006d2073c414"
+}

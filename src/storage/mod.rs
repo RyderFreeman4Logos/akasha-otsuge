@@ -213,10 +213,24 @@ impl CommitRequest {
 }
 
 pub struct Storage {
-    tree: Arc<Tree>,
+    tree: Arc<PinnedTree>,
     writer: Arc<Mutex<()>>,
     root: std::path::PathBuf,
     budget_mib: u32,
+}
+
+struct PinnedTree {
+    // Every background clone retains the directory until the native tree is dropped.
+    tree: Tree,
+    root: import_publish::Root,
+}
+
+impl std::ops::Deref for PinnedTree {
+    type Target = Tree;
+
+    fn deref(&self) -> &Tree {
+        &self.tree
+    }
 }
 
 impl RecordKey {
@@ -291,20 +305,31 @@ impl Storage {
 
     pub async fn open(config: &ResolvedConfig) -> Result<Self> {
         let admission = layout::Admission::acquire(&config.config().paths.data_dir, false)?;
-        let store = Self::open_admitted(config).await?;
-        if let Err(error) = admission.validate() {
+        let replacement = import_publish::Replacement::load(&admission)?;
+        // A visible exchange is not durable until its parent has been synchronized.
+        admission.sync()?;
+        let store = Self::open_admitted(config, &admission).await?;
+        let admitted = (|| {
+            let root = &store.tree.root;
+            root.validate(&admission, "authority")?;
+            if let Some(replacement) = &replacement {
+                replacement.validate_open(&admission, root, store.import_identity()?.as_ref())?;
+            }
+            admission.sync()
+        })();
+        if let Err(error) = admitted {
             let _ = store.close().await;
             return Err(error);
         }
         Ok(store)
     }
 
-    async fn open_admitted(config: &ResolvedConfig) -> Result<Self> {
-        let (root, created) = layout::open_root(&config.config().paths.data_dir)?;
+    async fn open_admitted(config: &ResolvedConfig, admission: &layout::Admission) -> Result<Self> {
+        let (root, created) = layout::open_root(admission)?;
         let store = Self {
             tree: Self::open_tree(config, &root)?,
             writer: Arc::new(Mutex::new(())),
-            root,
+            root: root.path(),
             budget_mib: config.config().runtime.memory_budget_mib,
         };
         let result = async {
@@ -330,14 +355,14 @@ impl Storage {
         Ok(store)
     }
 
-    fn open_tree(config: &ResolvedConfig, root: &std::path::Path) -> Result<Arc<Tree>> {
+    fn open_tree(config: &ResolvedConfig, root: &import_publish::Root) -> Result<Arc<PinnedTree>> {
         let (memtable, cache, sst) = if config.config().runtime.memory_budget_mib >= 2048 {
             (64, 128, 64)
         } else {
             (8, 32, 8)
         };
         let options = Options::new()
-            .with_path(root.join("kv"))
+            .with_path(root.path().join("kv"))
             .with_max_memtable_size(memtable * MIB)
             .with_block_cache_capacity((cache * MIB) as u64)
             .with_target_file_size((sst * MIB) as u64)
@@ -351,7 +376,10 @@ impl Storage {
             .with_wal_recovery_mode(WalRecoveryMode::AbsoluteConsistency)
             .with_flush_on_close(false);
         // Tree::drop closes its shared core even when other native Tree clones exist.
-        Ok(Arc::new(TreeBuilder::with_options(options).build()?))
+        Ok(Arc::new(PinnedTree {
+            tree: TreeBuilder::with_options(options).build()?,
+            root: root.clone(),
+        }))
     }
 
     pub async fn commit(&self, request: &CommitRequest) -> Result<CommitReceipt> {

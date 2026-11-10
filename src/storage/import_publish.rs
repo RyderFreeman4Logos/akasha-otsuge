@@ -11,6 +11,11 @@ use super::{Result, StorageError, layout};
 
 const MARKER: &str = ".archive-replace.json";
 
+#[cfg(test)]
+thread_local! {
+    static BEFORE_CLEANUP_OPEN: std::cell::RefCell<Option<Box<dyn FnOnce()>>> = const { std::cell::RefCell::new(None) };
+}
+
 fn conflict() -> StorageError {
     StorageError::new("IMPORT_CONFLICT")
 }
@@ -39,8 +44,9 @@ impl DirectoryId {
     }
 }
 
+#[derive(Clone)]
 pub(super) struct Root {
-    file: File,
+    file: std::sync::Arc<File>,
     id: DirectoryId,
 }
 
@@ -65,7 +71,7 @@ impl Root {
         }
         Ok(Self {
             id: DirectoryId::metadata(&metadata),
-            file,
+            file: std::sync::Arc::new(file),
         })
     }
 
@@ -214,6 +220,25 @@ impl Replacement {
         Ok(())
     }
 
+    pub(super) fn validate_open(
+        &self,
+        admission: &layout::Admission,
+        root: &Root,
+        identity: Option<&ImportIdentity>,
+    ) -> Result<()> {
+        let expected = if root.id == self.new.directory {
+            &self.new.identity
+        } else if root.id == self.old.directory {
+            &self.old.identity
+        } else {
+            return Err(conflict());
+        };
+        if identity != Some(expected) || Self::load(admission)?.as_ref() != Some(self) {
+            return Err(conflict());
+        }
+        root.validate(admission, "authority")
+    }
+
     pub(super) fn publish(&self, admission: &layout::Admission) -> Result<()> {
         admission.validate()?;
         if !self
@@ -301,7 +326,17 @@ impl Replacement {
                 if !self.old.directory.matches(&stage)? {
                     return Err(conflict());
                 }
-                Root::open(admission, ".archive-import")?.remove(admission, ".archive-import")?;
+                #[cfg(test)]
+                BEFORE_CLEANUP_OPEN.with(|hook| {
+                    if let Some(hook) = hook.take() {
+                        hook();
+                    }
+                });
+                let root = Root::open(admission, ".archive-import")?;
+                if root.id != self.old.directory {
+                    return Err(conflict());
+                }
+                root.remove(admission, ".archive-import")?;
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
             Err(e) => return Err(e.into()),
@@ -315,5 +350,74 @@ impl Replacement {
         rustix::fs::unlinkat(&admission.directory, MARKER, rustix::fs::AtFlags::empty())
             .map_err(std::io::Error::from)?;
         admission.sync()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cleanup_refuses_a_foreign_inode_substituted_after_the_path_check() {
+        struct Fixture(PathBuf);
+        impl Drop for Fixture {
+            fn drop(&mut self) {
+                fs::remove_dir_all(&self.0).unwrap();
+            }
+        }
+        let base = std::env::temp_dir().join(format!("akasha-cleanup-open-{}", std::process::id()));
+        layout::private_dir(&base, false).unwrap();
+        let _fixture = Fixture(base.clone());
+        let data = base.join("data");
+        let admission = layout::Admission::acquire(&data, true).unwrap();
+        let stage = data.join(".archive-import");
+        let foreign = base.join("foreign");
+        let parked = base.join("parked");
+        for path in [&data.join("authority"), &stage, &foreign] {
+            layout::private_dir(path, false).unwrap();
+        }
+        fs::write(data.join("authority/original"), b"old history").unwrap();
+        fs::write(stage.join("current"), b"new history").unwrap();
+        fs::write(foreign.join("victim"), b"foreign data").unwrap();
+        let old = Root::open(&admission, "authority").unwrap();
+        let new = Root::open(&admission, ".archive-import").unwrap();
+        let replacement = Replacement::new(
+            &old,
+            ImportIdentity {
+                archive_sha256: "a".repeat(64),
+                commit_seq: 1,
+            },
+            &new,
+            ImportIdentity {
+                archive_sha256: "b".repeat(64),
+                commit_seq: 2,
+            },
+        );
+        let moved_stage = stage.clone();
+        let moved_old = parked.clone();
+        BEFORE_CLEANUP_OPEN.with(|hook| {
+            *hook.borrow_mut() = Some(Box::new(move || {
+                fs::rename(&moved_stage, moved_old).unwrap();
+                fs::rename(foreign, moved_stage).unwrap();
+            }));
+        });
+        let result = replacement.publish(&admission);
+        let preserved = fs::read(stage.join("victim")).ok().as_deref() == Some(b"foreign data");
+        eprintln!(
+            "cleanup refused={} foreign_preserved={preserved}",
+            result.is_err()
+        );
+        assert!(
+            preserved,
+            "cleanup deleted the substituted foreign directory"
+        );
+        assert!(matches!(result, Err(e) if e.code == "IMPORT_CONFLICT"));
+        assert_eq!(fs::read(parked.join("original")).unwrap(), b"old history");
+        assert_eq!(
+            fs::read(data.join("authority/current")).unwrap(),
+            b"new history"
+        );
+        assert!(data.join(MARKER).is_file());
+        BEFORE_CLEANUP_OPEN.with(|hook| assert!(hook.borrow().is_none()));
     }
 }

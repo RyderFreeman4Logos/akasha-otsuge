@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T14:04:30.517016+00:00",
+  "supersedes_label_only": "THREE_CAUSAL_RED_ONE_EXISTING_CONTROL_PASS",
+  "original_collection_sha256": "f7811b0682fd4a73430a329aa387d8770371e345f19d4cc1b99320e775c486a0",
+  "actual": "TWO_CAUSAL_RED_ONE_FIXTURE_SETUP_FAILURE_ONE_EXISTING_CONTROL_PASS",
+  "causal": [
+    "cleanup deletes foreign data after exact check/open substitution",
+    "ordinary open mutates replaced data directory before refusal"
+  ],
+  "setup_failure": "Durability test tried to revise immutable Evidence rather than Memory; IMMUTABLE_EVIDENCE occurred before the injected fsync path. Not product RED.",
+  "correction": "Change only the synthetic amendment kind to existing Memory, preserving all durability/refusal assertions; rerun only this selector before production edits."
+}

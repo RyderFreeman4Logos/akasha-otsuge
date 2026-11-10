@@ -1,0 +1,14 @@
+{
+  "utc": "2026-11-10T14:18:16.156335+00:00",
+  "original_attempt": "mvp025-incremental-repair-public-r1",
+  "classification": "Cleanup check/open interleaving passed; follow-up oracle compared noncanonical synthetic manifest bytes with canonical export.",
+  "correction": "Compare all parsed manifest fields; retain exact commits.jsonl and blobs.bin byte comparison. No product edit.",
+  "retained_failure": true,
+  "original_owned_scratch_absent": true,
+  "owned_ptrace_child_reaped": true,
+  "remaining_cases_not_reached": [
+    "post-exchange EIO ordinary opens",
+    "successful-sync local-tail control",
+    "ordinary-open data-root substitution"
+  ]
+}

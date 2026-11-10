@@ -1,0 +1,21 @@
+{
+  "utc": "2026-11-10T13:51:13.978010+00:00",
+  "known_child_wait_returned": true,
+  "known_wrapper_absent": true,
+  "observed_fd_consumers": [],
+  "same_uid_processes_uninspectable": 29,
+  "removed": [
+    {
+      "name": "mvp025-incremental-review-r1.stdout",
+      "bytes": 994371,
+      "sha256": "9e09d97afb8017e6ec1cf8c9436446e76203c778c7b499cafa2843203b9eeffa"
+    },
+    {
+      "name": "mvp025-incremental-review-r1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "scratch_absent": true,
+  "limits": "Scoped census only; inaccessible processes are not claimed absent. Raw transcripts were hashed without content inspection."
+}

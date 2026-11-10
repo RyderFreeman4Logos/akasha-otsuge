@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "utc": "2026-11-10T14:32:20.827038+00:00",
+  "parent": "085640133221975943ec4ebc7d28cc86d5df879b",
+  "files": {
+    "README.md": {
+      "bytes": 2683,
+      "sha256": "24d25998e7302c0caa2e5ce7478042f7cfd50b936e5e306d7799e714754d7c39"
+    },
+    "mvp025-incremental-canonical-r2-verified.json": {
+      "bytes": 2187,
+      "sha256": "85854c5d6c05b82ea8c830ed59c30989e71e8543a374fc49a2cbbc9ff745104c"
+    },
+    "mvp025-incremental-canonical-r2.admission.json": {
+      "bytes": 1003,
+      "sha256": "5ca95918732f25fb9aead5892fa7722bfb51ea83efcf54584d2543baa35db36e"
+    },
+    "mvp025-incremental-canonical-r2.collected.json": {
+      "bytes": 383,
+      "sha256": "586938ce4d8158c973d630be66daa95f2f9d69396ef03c8297cb911dd670baf1"
+    },
+    "mvp025-incremental-canonical-r2.log.gz": {
+      "bytes": 13724,
+      "sha256": "4cc1c39d09b969ae78ea3131f8536b3301c2054b92031a361625d9da169fb6b0"
+    },
+    "mvp025-incremental-canonical-r2.terminal.json": {
+      "bytes": 237,
+      "sha256": "055b15905f85df91d5259f6af9d2e85e5062312dcffa0b9884c888e2eaadfabb"
+    },
+    "mvp025-incremental-ci-pr-r1.json": {
+      "bytes": 3951,
+      "sha256": "5f18d35ec608833db055ad65f04200eba431a057b401d1c97f074329c66d2243"
+    },
+    "mvp025-incremental-ci-pr-r1.log.gz": {
+      "bytes": 30523,
+      "sha256": "782ff7237cba6a731fd938ad4d405da36a39f59e4a3eb49a66613975b3a2b894"
+    },
+    "mvp025-incremental-native-owner-red-r1.admission.json": {
+      "bytes": 1150,
+      "sha256": "2e4953b4ca3bf4755ac4744ec098974e11cf48961e33ac4c08bc00424f6bc449"
+    },
+    "mvp025-incremental-native-owner-red-r1.collected.json": {
+      "bytes": 424,
+      "sha256": "bf63eeb4fe14a0f72133b8df76b0617c37a4395e97ddf06ac19d04e43a0bf2d3"
+    },
+    "mvp025-incremental-native-owner-red-r1.log.gz": {
+      "bytes": 615,
+      "sha256": "8752bb13de103596965b4cc1708512192ddee6f55b3ce2a5af71003a0d293c2e"
+    },
+    "mvp025-incremental-native-owner-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "2723cb0e0c08e5c47ca9cc2a7d0d8cd73b5241a407afbfc9b32fd925dd453182"
+    },
+    "mvp025-incremental-repair-durability-diagnostic-r3.admission.json": {
+      "bytes": 1203,
+      "sha256": "ae2ac86927c635a46914484c89425bf30a0038851ac39e6325410d6ed7c7b188"
+    },
+    "mvp025-incremental-repair-durability-diagnostic-r3.collected.json": {
+      "bytes": 407,
+      "sha256": "65bffd852ac48ca90d8f964c31eced76e00d5d8fb5fce226eaa5823505f13ae8"
+    },
+    "mvp025-incremental-repair-durability-diagnostic-r3.log.gz": {
+      "bytes": 739,
+      "sha256": "f91cdf6bca1162423947bba649e60fee645b0deae2525de581d52286cc869678"
+    },
+    "mvp025-incremental-repair-durability-diagnostic-r3.terminal.json": {
+      "bytes": 239,
+      "sha256": "a2cdd8fe95c6ba20c778a368711407e80e7eb3c552683a35d2958490b8232381"
+    },
+    "mvp025-incremental-repair-durability-red-r2.admission.json": {
+      "bytes": 1203,
+      "sha256": "050aec867fbb5fad70e8f62cc1f514298cfc1f2c08991b9e6ccae365bc736de2"
+    },
+    "mvp025-incremental-repair-durability-red-r2.collected.json": {
+      "bytes": 409,
+      "sha256": "03835e65075d0c60ffd77d07ec3a6cb4562583968643c22edb033d70a50db50d"
+    },
+    "mvp025-incremental-repair-durability-red-r2.log.gz": {
+      "bytes": 604,
+      "sha256": "866d70c4f3c26b00b58a3cdb45a2941ae142576d0a50a0397fce2524d35901fa"
+    },
+    "mvp025-incremental-repair-durability-red-r2.terminal.json": {
+      "bytes": 239,
+      "sha256": "966680d84db91cdb0bf6ec7bae8459ba5dd5fce89a0bea04855233a617324e5c"
+    },
+    "mvp025-incremental-repair-durability-red-r4.admission.json": {
+      "bytes": 1203,
+      "sha256": "ad926efb1868e0317f5ce4d60b3fe3c24023faa80e1fe968cbfa2fe3e6905c0a"
+    },
+    "mvp025-incremental-repair-durability-red-r4.collected.json": {
+      "bytes": 415,
+      "sha256": "c4e8aaf42b6b846789b0ae570daecdc4277fc04b0d02f2d0587ecae8a7c19cf9"
+    },
+    "mvp025-incremental-repair-durability-red-r4.log.gz": {
+      "bytes": 647,
+      "sha256": "9d02adcf73f435bdb259b6c96e51da6980f4ee4174a4237477039b3a4a0431f9"
+    },
+    "mvp025-incremental-repair-durability-red-r4.terminal.json": {
+      "bytes": 238,
+      "sha256": "21003ede8e1ba9b37acc6035a13f5058b88272b3beb28b93b73a151e7fb784e0"
+    },
+    "mvp025-incremental-repair-focused-r1.admission.json": {
+      "bytes": 1119,
+      "sha256": "8a00e32d69d6a84ff38f8918229745df657de7f69230de1e55c22117ff48b789"
+    },
+    "mvp025-incremental-repair-focused-r1.collected.json": {
+      "bytes": 424,
+      "sha256": "3ce0480414537596408d5fd5ad37ebf697a5be89d1602f819242df84989c761f"
+    },
+    "mvp025-incremental-repair-focused-r1.log.gz": {
+      "bytes": 2161,
+      "sha256": "7fb475a0ff23e7adb80770f00ed6f5726a200812116c2101b216c0375e7de037"
+    },
+    "mvp025-incremental-repair-focused-r1.terminal.json": {
+      "bytes": 238,
+      "sha256": "1f18517553179dd68c4e76805756b8bcdfffc2761cf66cdad232b06f4ec38ed3"
+    },
+    "mvp025-incremental-repair-focused-r2.admission.json": {
+      "bytes": 1119,
+      "sha256": "8567d5045605d7ba5bf1cbcbf437c3b7918752d0ba0995978d09a1a7449af7d6"
+    },
+    "mvp025-incremental-repair-focused-r2.collected.json": {
+      "bytes": 401,
+      "sha256": "2a88f4a97b7b8c69337a9f020ddca63cc8d93d37d30ea257d8984b8f1fe6c241"
+    },
+    "mvp025-incremental-repair-focused-r2.log.gz": {
+      "bytes": 3766,
+      "sha256": "5d4b5bfb3d6658ec07d30199b00979014fc5cd21945de01a4f86c1193c6a2f49"
+    },
+    "mvp025-incremental-repair-focused-r2.py": {
+      "bytes": 989,
+      "sha256": "1b0ede0e8654fb18edc66580277b91db69346ba118033553e9890117f0d8bafc"
+    },
+    "mvp025-incremental-repair-focused-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "efcdf2f840840fd3456429a80a0b961e079ebe6cd64c92da2834839fa719deae"
+    },
+    "mvp025-incremental-repair-focused-r3.admission.json": {
+      "bytes": 1119,
+      "sha256": "06f98ee2b067a3d0dafc087c498c4f22823904af8a362b91ee5e1f9203359dcc"
+    },
+    "mvp025-incremental-repair-focused-r3.collected.json": {
+      "bytes": 402,
+      "sha256": "568d32bf04ff85a7806cdd19e2355d295a9f781f1cc14565f1351d9a06de27a5"
+    },
+    "mvp025-incremental-repair-focused-r3.log.gz": {
+      "bytes": 3803,
+      "sha256": "f4265cb8f0c28ca7b628184e83edb0a7d780f65f66312abaddf29a34fcd65e80"
+    },
+    "mvp025-incremental-repair-focused-r3.terminal.json": {
+      "bytes": 237,
+      "sha256": "7c839324b35f27c18eba869a41dcbcde402f6f5a467861d88cf51e9c1f0e45d8"
+    },
+    "mvp025-incremental-repair-public-r1-classification.json": {
+      "bytes": 659,
+      "sha256": "ed4322fe384e327146479a769558b54d6eb5dec1280890855790dc5bf13eda2e"
+    },
+    "mvp025-incremental-repair-public-r1.admission.json": {
+      "bytes": 1118,
+      "sha256": "c3256bf1907d7cbca76e4965095bff7068be118bd39c75241d34663f901aad6c"
+    },
+    "mvp025-incremental-repair-public-r1.collected.json": {
+      "bytes": 425,
+      "sha256": "eac4836af131fbfab8a339b695c49c2d5b51a3efe872a5ab0ef4287452cd463b"
+    },
+    "mvp025-incremental-repair-public-r1.log.gz": {
+      "bytes": 838,
+      "sha256": "e3540899bfbecbc0e29ecd843aee9eae6dafce69e723cae90b6736b3fec65245"
+    },
+    "mvp025-incremental-repair-public-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "f792251573de45390592ec95273344449d89c420ecb64f294915b9007c144f83"
+    },
+    "mvp025-incremental-repair-public-r2.admission.json": {
+      "bytes": 1118,
+      "sha256": "fb72b623fb9f789dd163bde01885178e7b5fb3af2b7d8f419f030df80732a255"
+    },
+    "mvp025-incremental-repair-public-r2.collected.json": {
+      "bytes": 408,
+      "sha256": "daf08464b0800abb0090153a380f565b997f7d73ea605bcde57527b03c4f1bca"
+    },
+    "mvp025-incremental-repair-public-r2.log.gz": {
+      "bytes": 3308,
+      "sha256": "d2615d29b67391eb6f5b07f556d80393ea0148142da462efdc4dc93cafad8bd2"
+    },
+    "mvp025-incremental-repair-public-r2.py": {
+      "bytes": 8285,
+      "sha256": "068aceb3f8ae8d718695c58015bc7ba2d03acfef9311654515a1362284057505"
+    },
+    "mvp025-incremental-repair-public-r2.terminal.json": {
+      "bytes": 237,
+      "sha256": "91a08d91cf114f705cfabc7d56551be8b7a9cc007ef122a14372a81bbbb8b88d"
+    },
+    "mvp025-incremental-repair-public-r3.admission.json": {
+      "bytes": 1118,
+      "sha256": "c1f2c9ebddc5896062498396663c83f0e9c067acbf16162335ee729517c127e1"
+    },
+    "mvp025-incremental-repair-public-r3.collected.json": {
+      "bytes": 432,
+      "sha256": "db31777e9e8582e7deac0132ea95c89ac3e29debb10eed74d6669d35a1ad2f51"
+    },
+    "mvp025-incremental-repair-public-r3.log.gz": {
+      "bytes": 3307,
+      "sha256": "b210845eecb3fe051395d3839470e2738311a7918afff9217e57037911477c53"
+    },
+    "mvp025-incremental-repair-public-r3.terminal.json": {
+      "bytes": 236,
+      "sha256": "22b47e28fe5b58f0d807fd318cc19c89d850809a53e805c2c53ef64dcb4ced08"
+    },
+    "mvp025-incremental-repair-red-r1-classification-correction.json": {
+      "bytes": 806,
+      "sha256": "1ff0679a56e0a5cca86ab48a948e496b6f73439a4ff2c75b97429b64b6fa4d65"
+    },
+    "mvp025-incremental-repair-red-r1.admission.json": {
+      "bytes": 1115,
+      "sha256": "fc1c1988f1716a6ac4f73c31bdee708245d6791a8c2196eced8f6780ca804c06"
+    },
+    "mvp025-incremental-repair-red-r1.collected.json": {
+      "bytes": 404,
+      "sha256": "f7811b0682fd4a73430a329aa387d8770371e345f19d4cc1b99320e775c486a0"
+    },
+    "mvp025-incremental-repair-red-r1.log.gz": {
+      "bytes": 1248,
+      "sha256": "75e1087578faa9ac608ecdf46271ee3f67951f96d583903f97570cb03eff081b"
+    },
+    "mvp025-incremental-repair-red-r1.terminal.json": {
+      "bytes": 238,
+      "sha256": "c31c08f56a16d397c57593e6433974d88f63bfa22f67f29797aca73337d98a6d"
+    },
+    "mvp025-incremental-review-r1-artifact-defect.json": {
+      "bytes": 664,
+      "sha256": "4f368fd5164e1584f3943971ff6c087da19bb025b7d38aeb3bb31c53f8d8455d"
+    },
+    "mvp025-incremental-review-r1-cleanup.json": {
+      "bytes": 711,
+      "sha256": "adbea321f3c133e9e2946f2ac77802a551871c500c4095f05a0c39439c42f487"
+    },
+    "mvp025-incremental-review-r1-reconstruction-cleanup.json": {
+      "bytes": 611,
+      "sha256": "26fdce383ce65af6d2f6637c10b3f75fba110474f62f073af9105f661e8b0c23"
+    },
+    "mvp025-incremental-review-r1-reconstruction-publication.json": {
+      "bytes": 544,
+      "sha256": "c85634a6f2459b2f4fab1c70c211078409ce702e1a4849a0d1700dc9fcd86991"
+    },
+    "mvp025-incremental-review-r1-reconstruction.admission.json": {
+      "bytes": 1126,
+      "sha256": "f63fe9152d9eed622fce8166d4f0c69f70c029b93085725a3d164c1abffa394a"
+    },
+    "mvp025-incremental-review-r1-reconstruction.collected.json": {
+      "bytes": 383,
+      "sha256": "acd53f591a113ce343951c7892da163c30fbb63a0eaf2acae89756a44ba51681"
+    },
+    "mvp025-incremental-review-r1-reconstruction.log.gz": {
+      "bytes": 998,
+      "sha256": "9336787dc33532ffe53c9ab2aa030a5e28a1dfdc69c05cad561c306db32a43c6"
+    },
+    "mvp025-incremental-review-r1-reconstruction.md": {
+      "bytes": 25954,
+      "sha256": "38cd6cff117217319b29a1178a0ed6e6f53ca5495da555738fd0a05125cd45b8"
+    },
+    "mvp025-incremental-review-r1-reconstruction.terminal.json": {
+      "bytes": 237,
+      "sha256": "a8945819f993783f729049f0a340af27ca0c00a2436afb38b39f3d53fa613d3d"
+    },
+    "mvp025-incremental-review-r1-tests.log.gz": {
+      "bytes": 25021,
+      "sha256": "66ab3d3ecf78649a3ca6c2dcec10e148e8df9bd7109e11dba73caaad3b063c75"
+    },
+    "mvp025-incremental-review-r1.admission.json": {
+      "bytes": 1111,
+      "sha256": "d69312ddd8b2ca9e04cecdcdfae9de4c60697c66b0e33574eb0f69706f178c68"
+    },
+    "mvp025-incremental-review-r1.collected.json": {
+      "bytes": 397,
+      "sha256": "5da6fe6afeb674999a03c8774c097e5428ce2658181ed614dc545fd491afb1ee"
+    },
+    "mvp025-incremental-review-r1.log.gz": {
+      "bytes": 998,
+      "sha256": "5a91ae8eef5078ccb5a5e1115aec8b10899523184dd15294cc7425c9340b29ae"
+    },
+    "mvp025-incremental-review-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "308a13de0d052c53ddddee659dbfaa0ded186d58f111d66e08fd5499fb659e13"
+    },
+    "mvp025-incremental-review-r1.md.gz": {
+      "bytes": 494,
+      "sha256": "938914768119d3e2a03227dbd97d6a7c4f79c43fa8fdeaf6ad6d6ee20534164c"
+    }
+  },
+  "source_file_sha256": {
+    "src/storage/backup.rs": "113c5d444a3095e28a7246ac4bfe914ea50a9703a81470fb67c0d119fafbf162",
+    "src/storage/crash_tests.rs": "28452876a38c12e519ec7dc0dc0b59a8c59311aed416c03303c4db4598006bf2",
+    "src/storage/crash_tests/incremental.rs": "3b4c7b38aa54414b0852d372d7ec2446d3629c032e575f0ae94899ca0b5e1ca7",
+    "src/storage/import.rs": "436bcf467b7432ec24bfd8343d98a5ee278c0c666c88f79c80b976f8b384d7e8",
+    "src/storage/import_publish.rs": "c2bc954ca03d598225d64f12fd5a0984bcffe712cf55de354956b04805dc6924",
+    "src/storage/layout.rs": "9f71ea40a53587330673cc1c410b7505f937b67fbc88b28734d8771fc7f1bd51",
+    "src/storage/mod.rs": "b9b293beb4656df3d04e76b806c986eaa1015d53750c4c2aa849ce96614fe35a",
+    "tests/support/archive_import.rs": "a1337e579ad0d895012f17f605871f4ae0ac12f6fd98cf52cf21e6b5e203b24f"
+  },
+  "limits": [
+    "The original full R1 report was overwritten and is unavailable; the included reconstructed FAIL is not the lost original.",
+    "Canonical R2 and CI42823400965 apply only to historical HEAD 0856401, which failed independent review.",
+    "Final repair focused and public probes describe the dirty candidate; successor exact canonical, review and CI remain separate.",
+    "The initial RED collector classification was wrong; its append-only correction supersedes that label.",
+    "Synthetic manifest bytes differ in ordering; public recovery compares every parsed manifest field and exact commit/blob bytes.",
+    "Real power loss, full product stress, changed mempal snapshots and native Claude authentication are not established."
+  ]
+}

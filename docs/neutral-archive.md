@@ -150,6 +150,17 @@ Retained directory descriptors bind staging operations and cleanup to their
 owners. Unsupported Linux anonymous-file, procfs or directory-exchange operations
 fail rather than using a replacing-copy fallback.
 
+Ordinary opens, including export and daemon startup, synchronize the retained
+data directory before using native storage and again before returning it. A
+pending replacement marker must match both the retained authority inode and its
+native import identity. A synchronization failure prevents startup or export;
+successful synchronization permits later local commits without deleting the
+marker. Resume with the exact new archive to validate and clean up old history.
+Restore refuses a pending replacement. Cleanup checks the opened old directory's
+identity before removing any member. Shared native handles retain their directory
+descriptor through background commits, checkpoints and restores even when their
+caller is cancelled or drops the Storage owner.
+
 Controlled tests cover nine incremental SIGKILL phases, ordinary-open/restore/
 second-import exclusion while publication is paused, malformed markers,
 replacement directories, local writes on either side of exchange, and refusal
