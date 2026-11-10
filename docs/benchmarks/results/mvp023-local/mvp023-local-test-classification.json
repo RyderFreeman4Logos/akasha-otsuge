@@ -1,0 +1,8 @@
+{
+  "red": "mvp023-local-red-r1",
+  "classification": "expected_missing_notify_cli",
+  "green_r1": "harness_assertion_used_active_read_for_unadopted_candidate",
+  "correction": "Check full memory export authority=candidate and active read=absent, preserving ack and restart assertions.",
+  "green_r2": "harness_compared_transport_request_ids_instead_of_durable_data",
+  "correction_r2": "Compare complete data payloads, retaining durable receipt/request SHA and all memory/review fields."
+}

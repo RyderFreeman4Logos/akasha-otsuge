@@ -1,0 +1,474 @@
+use super::*;
+use akasha_otsuge::config::ReviewMode;
+
+fn rpc(daemon: &Daemon, command: Value) -> Value {
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+    let mut stream = daemon.connect();
+    receive(&mut stream);
+    send(
+        &mut stream,
+        &json!({"protocol_version":1,"request_id":format!("notifier-test/{}", NEXT.fetch_add(1, Ordering::Relaxed)),"command":command}),
+    );
+    receive(&mut stream)
+}
+
+fn all(daemon: &Daemon, scope: &akasha_otsuge::domain::Scope) -> Vec<Value> {
+    let mut after = Value::Null;
+    let mut items = Vec::new();
+    for _ in 0..8 {
+        let page = rpc(
+            daemon,
+            json!({"op":"notify_list","scope":scope,"after":after}),
+        );
+        assert!(page.get("error").is_none(), "{page}");
+        let batch = page["data"]["items"].as_array().unwrap();
+        assert!(batch.len() <= 32);
+        items.extend_from_slice(batch);
+        after = page["data"]["next"].clone();
+        if after.is_null() {
+            return items;
+        }
+    }
+    panic!("notification pagination did not terminate");
+}
+
+fn wait_items(
+    daemon: &Daemon,
+    scope: &akasha_otsuge::domain::Scope,
+    ready: impl Fn(&[Value]) -> bool,
+) -> Vec<Value> {
+    let end = Instant::now() + Duration::from_secs(30);
+    loop {
+        let items = all(daemon, scope);
+        if ready(&items) {
+            return items;
+        }
+        assert!(
+            Instant::now() < end,
+            "notifications did not converge: {items:?}"
+        );
+        std::thread::sleep(Duration::from_millis(25));
+    }
+}
+
+fn list(daemon: &Daemon) -> Value {
+    let path = daemon.root.join("scope.json");
+    std::fs::write(
+        &path,
+        serde_json::to_vec(&extraction_tests::scope()).unwrap(),
+    )
+    .unwrap();
+    daemon.cli(&["notify", "list", "--scope", path.to_str().unwrap()])
+}
+
+fn wait_local(daemon: &Daemon, count: usize) -> Value {
+    let deadline = Instant::now() + Duration::from_secs(15);
+    loop {
+        let response = list(daemon);
+        let items = response["data"]["items"].as_array().unwrap();
+        if items.len() == count
+            && items
+                .iter()
+                .all(|item| item["deliveries"]["inbox"]["status"] == "sent")
+        {
+            return response;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "local delivery missing: {response}"
+        );
+        std::thread::sleep(Duration::from_millis(25));
+    }
+}
+
+#[test]
+fn local_notifications_are_durable_and_ack_cannot_approve_or_close_review() {
+    let mut daemon = Daemon::new();
+    daemon.configure("[notifiers.inbox]\nkind = 'local'\n");
+    let proposal = review_tests::seed(&daemon, ReviewMode::Manual, "notify-candidate");
+    // The review and its source outbox exist before any notifier worker runs.
+    daemon.start();
+    let inbox = wait_local(&daemon, 1);
+    let item = &inbox["data"]["items"][0];
+    let id = item["notification_id"].as_str().unwrap();
+    let review_id = item["review_id"].as_str().unwrap();
+    let generation = item["generation"].as_u64().unwrap().to_string();
+    assert_eq!(item["priority"], "normal");
+    assert_eq!(item["occurrences"], 1);
+    assert!(
+        !serde_json::to_string(item)
+            .unwrap()
+            .contains("fixture build passed")
+    );
+    let review_before = daemon.cli(&["review", "show", review_id])["data"].clone();
+    let memory_before = daemon.cli(&["memory", "export", "notify-candidate"])["data"].clone();
+    assert_eq!(memory_before["record"]["authority"], "candidate");
+    assert_eq!(
+        daemon.cli(&["memory", "show", "notify-candidate"])["data"]["data"]["state"],
+        "absent"
+    );
+    assert_eq!(review_before["item"]["proposal_revision"], proposal);
+    let args = [
+        "notify",
+        "ack",
+        id,
+        "--generation",
+        &generation,
+        "--idempotency-key",
+        "ack-local",
+    ];
+    let acknowledged = daemon.cli(&args)["data"].clone();
+    assert_eq!(daemon.cli(&args)["data"], acknowledged);
+    let shown = daemon.cli(&["notify", "show", id])["data"].clone();
+    assert_eq!(shown["acknowledged_generation"], item["generation"]);
+    assert_eq!(
+        daemon.cli(&["review", "show", review_id])["data"],
+        review_before
+    );
+    assert_eq!(
+        daemon.cli(&["memory", "export", "notify-candidate"])["data"],
+        memory_before
+    );
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    assert_eq!(daemon.cli(&["notify", "show", id])["data"], shown);
+    assert_eq!(wait_local(&daemon, 1)["data"]["items"][0], shown);
+}
+
+#[test]
+fn repeated_incidents_merge_counts_but_priority_escalation_remains_unacknowledged() {
+    let (daemon, _, bound) = codex_tests::consult_fixture_with("editor_ledger", |_| {
+        "[incidents]\ntriggers=['dependency_changed']\nescalate_after=50\n[notifiers.inbox]\nkind='local'\n".into()
+    });
+    let mut owner = extraction_tests::scope();
+    owner.project = None;
+    let wait = |count: u64| {
+        let end = Instant::now() + Duration::from_secs(30);
+        loop {
+            let reply = rpc(
+                &daemon,
+                json!({"op":"notify_list","scope":owner,"after":null}),
+            );
+            assert!(reply.get("error").is_none(), "{reply}");
+            let items = reply["data"]["items"].as_array().unwrap();
+            if items.len() == 1
+                && items[0]["occurrences"] == count
+                && items[0]["deliveries"]["inbox"]["generation"] == items[0]["generation"]
+            {
+                return items[0].clone();
+            }
+            assert!(
+                Instant::now() < end,
+                "incident notification missing: {reply}"
+            );
+            std::thread::sleep(Duration::from_millis(25));
+        }
+    };
+    let mut event = json!({"event_id":"notify-event-0","invocation_id":bound["data"]["invocation_id"],
+        "source":"dependency-check","severity":"info","occurred_at_ms":akasha_otsuge::ipc::now_ms().unwrap(),
+        "execution":null,"artifacts":[],"logs":[],"receipt_jobs":[],"claims":[],
+        "incident":{"kind":"dependency_changed","key":"notify-dependency","reason":"Private source text must not leave the evidence store."}});
+    assert!(
+        rpc(&daemon, json!({"op":"outcome_submit","event":event}))
+            .get("error")
+            .is_none()
+    );
+    let first = wait(1);
+    assert_eq!(first["priority"], "normal");
+    assert_eq!(first["generation"], 1);
+    let id = first["notification_id"].as_str().unwrap();
+    daemon.cli(&[
+        "notify",
+        "ack",
+        id,
+        "--generation",
+        "1",
+        "--idempotency-key",
+        "first-generation",
+    ]);
+    for n in 1..100 {
+        event["event_id"] = json!(format!("notify-event-{n}"));
+        let reply = rpc(&daemon, json!({"op":"outcome_submit","event":event}));
+        assert!(reply.get("error").is_none(), "{reply}");
+    }
+    let repeated = wait(100);
+    assert_eq!(repeated["notification_id"], first["notification_id"]);
+    assert_eq!(repeated["priority"], "high");
+    assert_eq!(repeated["generation"], 2);
+    assert_eq!(repeated["acknowledged_generation"], 1);
+    assert_eq!(
+        repeated["deliveries"]["inbox"]["external_message_id"],
+        first["deliveries"]["inbox"]["external_message_id"]
+    );
+    event["event_id"] = json!("notify-critical");
+    event["severity"] = json!("critical");
+    assert!(
+        rpc(&daemon, json!({"op":"outcome_submit","event":event}))
+            .get("error")
+            .is_none()
+    );
+    let critical = wait(101);
+    assert_eq!(critical["priority"], "urgent");
+    assert_eq!(critical["generation"], 3);
+    assert!(!critical.to_string().contains("Private source text"));
+    let stale = rpc(
+        &daemon,
+        json!({"op":"notify_ack","id":id,"generation":1,"idempotency_key":"stale"}),
+    );
+    assert_eq!(stale["error"]["code"], "REVISION_CONFLICT");
+    let incident = daemon.cli(&["incident", "show", critical["review_id"].as_str().unwrap()]);
+    assert_eq!(incident["data"]["record"]["state"], "open");
+    assert_eq!(incident["data"]["record"]["occurrences"], 101);
+    assert!(!daemon.root.join("starts").exists());
+}
+
+#[test]
+fn disabled_local_channel_survives_sigkill_and_reload_does_not_resend_success() {
+    let mut daemon = Daemon::new();
+    daemon.configure("[notifiers.inbox]\nkind='local'\nenabled=false\n");
+    review_tests::seed(&daemon, ReviewMode::Manual, "crash-notify");
+    daemon.start();
+    let items = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1
+    });
+    assert_eq!(items[0]["deliveries"], json!({}));
+    let id = items[0]["notification_id"].as_str().unwrap();
+    let mut child = daemon.child.take().unwrap();
+    child.kill().unwrap();
+    assert!(!child.wait().unwrap().success());
+    daemon.start();
+    assert_eq!(all(&daemon, &extraction_tests::scope()), items);
+    daemon.configure("[notifiers.inbox]\nkind='local'\nenabled=true\n");
+    assert_eq!(
+        daemon.cli(&["config", "reload"])["data"]["status"],
+        "applied"
+    );
+    let delivered = wait_local(&daemon, 1)["data"]["items"][0].clone();
+    assert_eq!(delivered["notification_id"], id);
+    daemon.configure("[notifiers.inbox]\nkind='local'\nenabled=false\n");
+    daemon.cli(&["config", "reload"]);
+    let review = daemon.cli(&["review", "show", delivered["review_id"].as_str().unwrap()]);
+    let changed = rpc(
+        &daemon,
+        json!({"op":"review_state","id":delivered["review_id"],
+        "expected_revision":review["data"]["item"]["revision"],"state":"investigating",
+        "reason":"Operator is investigating","idempotency_key":"notify-investigating"}),
+    );
+    assert!(changed.get("error").is_none(), "{changed}");
+    let updated = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["generation"] == 2
+    });
+    assert_eq!(updated[0]["deliveries"], delivered["deliveries"]);
+    daemon.configure("[notifiers.inbox]\nkind='local'\nenabled=true\n");
+    daemon.cli(&["config", "reload"]);
+    let sent = wait_items(&daemon, &extraction_tests::scope(), |items| {
+        items.len() == 1 && items[0]["deliveries"]["inbox"]["generation"] == 2
+    })[0]
+        .clone();
+    daemon.configure("[notifiers.inbox]\nkind='local'\nenabled=false\n");
+    daemon.cli(&["config", "reload"]);
+    daemon.configure("[notifiers.inbox]\nkind='local'\nenabled=true\n");
+    daemon.cli(&["config", "reload"]);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    assert_eq!(wait_local(&daemon, 1)["data"]["items"][0], sent);
+}
+
+#[test]
+fn notification_reads_ack_and_dispatch_follow_live_scope() {
+    let mut daemon = Daemon::new();
+    daemon.configure("[notifiers.inbox]\nkind='local'\nenabled=false\n");
+    let alpha = extraction_tests::scope();
+    let mut beta = alpha.clone();
+    beta.project = Some("beta".into());
+    review_tests::seed(&daemon, ReviewMode::Manual, "notify-alpha");
+    review_tests::seed_memory(
+        &daemon,
+        ReviewMode::Manual,
+        "notify-beta",
+        akasha_otsuge::domain::MemoryKind::Fact,
+        beta.clone(),
+        "Private beta receipt.",
+    );
+    daemon.start();
+    let beta_item = wait_items(&daemon, &beta, |items| items.len() == 1)[0].clone();
+    let id = beta_item["notification_id"].as_str().unwrap();
+    assert!(
+        rpc(&daemon, json!({"op":"access_set","scope":null}))
+            .get("error")
+            .is_none()
+    );
+    for op in [
+        json!({"op":"notify_list","scope":alpha,"after":null}),
+        json!({"op":"notify_show","id":id}),
+        json!({"op":"notify_ack","id":id,"generation":1,"idempotency_key":"denied"}),
+    ] {
+        assert_eq!(rpc(&daemon, op)["error"]["code"], "READ_DENIED");
+    }
+    assert!(
+        rpc(&daemon, json!({"op":"access_set","scope":alpha}))
+            .get("error")
+            .is_none()
+    );
+    daemon.configure("[notifiers.inbox]\nkind='local'\nenabled=true\n");
+    daemon.cli(&["config", "reload"]);
+    wait_local(&daemon, 1);
+    assert_eq!(
+        rpc(&daemon, json!({"op":"notify_show","id":id}))["error"]["code"],
+        "READ_DENIED"
+    );
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    extraction_tests::runtime().block_on(async {
+        let store =
+            akasha_otsuge::storage::Storage::open(&extraction_tests::storage_config(&daemon))
+                .await
+                .unwrap();
+        let row = store
+            .current(&akasha_otsuge::storage::RecordKey {
+                kind: akasha_otsuge::storage::RecordKind::State,
+                id: format!("notification/item/{id}"),
+            })
+            .unwrap()
+            .unwrap();
+        let persisted: Value = serde_json::from_str(&row.content).unwrap();
+        assert_eq!(persisted["deliveries"], json!({}));
+        assert!(persisted["acknowledged_generation"].is_null());
+        store.close().await.unwrap();
+    });
+    daemon.start();
+    assert!(
+        rpc(&daemon, json!({"op":"access_set","scope":beta}))
+            .get("error")
+            .is_none()
+    );
+    let delivered = wait_items(&daemon, &beta, |items| {
+        items.len() == 1 && items[0]["deliveries"]["inbox"]["status"] == "sent"
+    });
+    assert_eq!(delivered[0]["notification_id"], id);
+    assert_eq!(
+        rpc(
+            &daemon,
+            json!({"op":"notify_list","scope":alpha,"after":null})
+        )["error"]["code"],
+        "READ_DENIED"
+    );
+}
+
+#[test]
+fn notification_pages_and_ack_backlog_do_not_create_an_idle_outbox_loop() {
+    let mut daemon = Daemon::new();
+    daemon.configure("[notifiers.inbox]\nkind='local'\n");
+    let revision = review_tests::seed(&daemon, ReviewMode::Automatic, "notification-pages");
+    daemon.start();
+    let open = |n: usize| {
+        let reply = rpc(
+            &daemon,
+            json!({"op":"review_open","memory_id":"notification-pages","expected_revision":revision,
+            "reason":format!("Page {n}"),"idempotency_key":format!("notification-page-{n}")}),
+        );
+        assert!(reply.get("error").is_none(), "{reply}");
+    };
+    for n in 0..35 {
+        open(n);
+    }
+    let scope = extraction_tests::scope();
+    let items = wait_items(&daemon, &scope, |items| {
+        items.len() == 35
+            && items
+                .iter()
+                .all(|i| i["deliveries"]["inbox"]["status"] == "sent")
+    });
+    assert_eq!(
+        items
+            .iter()
+            .map(|i| i["notification_id"].as_str().unwrap())
+            .collect::<std::collections::BTreeSet<_>>()
+            .len(),
+        35
+    );
+    for (n, item) in items.iter().enumerate() {
+        let ack = json!({"op":"notify_ack","id":item["notification_id"],"generation":1,"idempotency_key":format!("page-ack-{n}")});
+        let first = rpc(&daemon, ack.clone());
+        assert!(first.get("error").is_none(), "{first}");
+        assert_eq!(rpc(&daemon, ack)["data"], first["data"]);
+    }
+    let conflict = rpc(
+        &daemon,
+        json!({"op":"notify_ack","id":items[1]["notification_id"],"generation":1,"idempotency_key":"page-ack-0"}),
+    );
+    assert_eq!(conflict["error"]["code"], "IDEMPOTENCY_CONFLICT");
+    open(35);
+    wait_items(&daemon, &scope, |items| {
+        items.len() == 36
+            && items
+                .iter()
+                .all(|i| i["deliveries"]["inbox"]["status"] == "sent")
+    });
+    let end = Instant::now() + Duration::from_secs(20);
+    let mut stable_since = Instant::now();
+    let mut sequence = daemon.cli(&["daemon", "status"])["data"]["storage_seq"].clone();
+    loop {
+        std::thread::sleep(Duration::from_millis(100));
+        let current = daemon.cli(&["daemon", "status"])["data"]["storage_seq"].clone();
+        if current != sequence {
+            sequence = current;
+            stable_since = Instant::now();
+        }
+        if stable_since.elapsed() >= Duration::from_secs(3) {
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "idle notifications keep writing the outbox"
+        );
+    }
+}
+
+#[test]
+fn notification_channel_history_limit_is_visible_without_stopping_new_delivery() {
+    let mut daemon = Daemon::new();
+    let routes: String = (0..64)
+        .map(|n| format!("[notifiers.route{n}]\nkind='local'\n"))
+        .collect();
+    daemon.configure(&routes);
+    let revision = review_tests::seed(&daemon, ReviewMode::Manual, "many-routes");
+    daemon.start();
+    let scope = extraction_tests::scope();
+    let original = wait_items(&daemon, &scope, |items| {
+        items.len() == 1 && items[0]["deliveries"].as_object().unwrap().len() == 64
+    })[0]
+        .clone();
+    daemon.configure("[notifiers.later]\nkind='local'\n");
+    daemon.cli(&["config", "reload"]);
+    let limited = wait_items(&daemon, &scope, |items| {
+        items.len() == 1 && items[0]["delivery_error"] == "CHANNEL_HISTORY_LIMIT"
+    })[0]
+        .clone();
+    assert_eq!(limited["deliveries"], original["deliveries"]);
+    let opened = rpc(
+        &daemon,
+        json!({"op":"review_open","memory_id":"many-routes","expected_revision":revision,
+        "reason":"New notification can use the new route","idempotency_key":"later-route"}),
+    );
+    assert!(opened.get("error").is_none(), "{opened}");
+    let items = wait_items(&daemon, &scope, |items| {
+        items.len() == 2
+            && items
+                .iter()
+                .any(|i| i["deliveries"]["later"]["status"] == "sent")
+    });
+    assert_eq!(
+        items
+            .iter()
+            .filter(|i| i["delivery_error"] == "CHANNEL_HISTORY_LIMIT")
+            .count(),
+        1
+    );
+    assert_eq!(
+        daemon.cli(&["daemon", "status"])["data"]["state"],
+        "running"
+    );
+}

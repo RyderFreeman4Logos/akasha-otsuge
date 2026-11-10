@@ -1507,10 +1507,13 @@ impl Service {
     pub(super) async fn jobs(self: Arc<Self>) -> Result<()> {
         let mut running = JoinSet::new();
         let mut owned = BTreeSet::new();
+        let mut notification_after = None;
+        let mut notification_scan = 0;
         let mut tick = tokio::time::interval(Duration::from_secs(1));
         let outcome = async {
         loop {
             if !self.stopping.load(std::sync::atomic::Ordering::Acquire) {
+                self.advance_notifications(&mut notification_scan, &mut notification_after).await?;
                 self.advance_incidents().await?;
                 let ids = {
                     let _guard = self.admission.lock().await;

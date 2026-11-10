@@ -18,6 +18,7 @@ mod configuration;
 mod editor;
 mod hermes;
 mod jobs;
+mod notifier;
 mod pi;
 mod review;
 
@@ -308,6 +309,23 @@ impl Service {
                     .get(&jobs::context()?, &id, at)
                     .await?,
             )?),
+            Command::NotifyList { scope, after } => {
+                self.list_notifications(&scope, after.as_deref()).await
+            }
+            Command::NotifyShow { id } => self.show_notification(&id).await,
+            Command::NotifyAck {
+                id,
+                generation,
+                idempotency_key,
+            } => {
+                let service = self.clone();
+                self.operation(async move {
+                    service
+                        .ack_notification(&id, generation, &idempotency_key)
+                        .await
+                })
+                .await
+            }
             Command::ReviewList { scope, after } => Ok(serde_json::to_value(
                 crate::domain::Domain::new(&self.storage)
                     .review_list(&jobs::context()?, &scope, after.as_deref())

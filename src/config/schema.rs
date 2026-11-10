@@ -710,9 +710,9 @@ impl Config {
         )?;
         for (name, notifier) in &self.notifiers {
             require(
-                !name.is_empty(),
+                !name.trim().is_empty() && name.len() <= 128 && !name.chars().any(char::is_control),
                 "notifiers",
-                "channel name must not be empty",
+                "channel names require 1..128 bytes without control characters",
             )?;
             require(
                 notifier.kind != NotifierKind::Stdio
