@@ -291,12 +291,14 @@ impl VectorIndex {
         progress.indexed_rows = self.table.count_rows(None).await.map_err(index_error)?;
         if changed && progress.indexed_rows > 0 {
             let indices = self.table.list_indices().await.map_err(index_error)?;
-            if !indices.iter().any(|i| i.columns == ["scope"]) {
-                self.table
-                    .create_index(&["scope"], NativeIndex::BTree(BTreeIndexBuilder::default()))
-                    .execute()
-                    .await
-                    .map_err(index_error)?;
+            for column in ["key", "scope"] {
+                if !indices.iter().any(|i| i.columns == [column]) {
+                    self.table
+                        .create_index(&[column], NativeIndex::BTree(BTreeIndexBuilder::default()))
+                        .execute()
+                        .await
+                        .map_err(index_error)?;
+                }
             }
             if !indices.iter().any(|i| i.columns == ["vector"]) {
                 // Training samples and partition count stay inside this owner's configured budget.

@@ -177,3 +177,74 @@ fn held_query_defers_native_pruning_until_its_index_owner_finishes() {
         "idle successor did not reclaim deferred native versions"
     );
 }
+
+#[test]
+fn completed_sync_indexes_merge_keys_for_both_native_tables() {
+    use sha2::Digest;
+
+    let key = sha2::Sha256::digest(b"offline")
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<String>();
+    let endpoint = super::super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    seed(&daemon);
+    daemon.configure(&settings(&endpoint.address));
+    daemon.start();
+    daemon.cli(&["index", "sync", "--idempotency-key", "indexed-keys"]);
+    let built = finished(&daemon, "indexed-keys");
+    assert_eq!(built["state"], "succeeded", "{built}");
+    let generation = built["result"]["vector"]["generation"].as_str().unwrap();
+    let observations = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            let root = daemon.root.join("data/search");
+            let connection = lancedb::connect(root.to_str().unwrap())
+                .execute()
+                .await
+                .unwrap();
+            let mut observations = Vec::new();
+            for name in [
+                "memory_lexical_v1".to_owned(),
+                format!("memory_vector_{generation}"),
+            ] {
+                let table = connection.open_table(&name).execute().await.unwrap();
+                let indexed = table
+                    .list_indices()
+                    .await
+                    .unwrap()
+                    .iter()
+                    .any(|index| index.columns == ["key"]);
+                let query = table
+                    .query()
+                    .only_if(format!("key = '{key}'"))
+                    .select(Select::Columns(vec!["id".into()]));
+                let plan = query.explain_plan(false).await.unwrap();
+                let batches: Vec<_> = query.execute().await.unwrap().try_collect().await.unwrap();
+                let ids = batches
+                    .iter()
+                    .flat_map(|batch| {
+                        let ids = batch
+                            .column(0)
+                            .as_any()
+                            .downcast_ref::<StringArray>()
+                            .unwrap();
+                        (0..batch.num_rows()).map(move |i| ids.value(i).to_owned())
+                    })
+                    .collect::<Vec<_>>();
+                assert_eq!(ids, ["offline"]);
+                observations.push((name, indexed, plan));
+            }
+            observations
+        });
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    assert!(
+        observations
+            .iter()
+            .all(|(_, indexed, plan)| *indexed && plan.contains("ScalarIndexQuery")),
+        "native merge keys lack indexed lookup: {observations:?}"
+    );
+}

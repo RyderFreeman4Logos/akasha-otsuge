@@ -421,12 +421,14 @@ impl Index {
         pending.flush(&self.table).await?;
         if changed || before == 0 {
             let indices = self.table.list_indices().await.map_err(index_error)?;
-            if !indices.iter().any(|i| i.columns == ["scope"]) {
-                self.table
-                    .create_index(&["scope"], NativeIndex::BTree(BTreeIndexBuilder::default()))
-                    .execute()
-                    .await
-                    .map_err(index_error)?;
+            for column in ["key", "scope"] {
+                if !indices.iter().any(|i| i.columns == [column]) {
+                    self.table
+                        .create_index(&[column], NativeIndex::BTree(BTreeIndexBuilder::default()))
+                        .execute()
+                        .await
+                        .map_err(index_error)?;
+                }
             }
             if !indices.iter().any(|i| i.columns == ["body"]) {
                 self.table
