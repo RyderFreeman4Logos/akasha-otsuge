@@ -70,6 +70,16 @@ struct Output {
     source_inode: (u64, u64),
 }
 
+impl Drop for Output {
+    fn drop(&mut self) {
+        // A concurrent fork can retain the open descriptions until its exec.
+        if let Some(lock) = self.files.get(".mempal-convert.lock") {
+            let _ = lock.unlock();
+        }
+        let _ = self.directory.unlock();
+    }
+}
+
 impl Output {
     fn new(path: &Path, source: &super::reader::Snapshot, incremental: bool) -> Result<Self> {
         let parent_path = path
@@ -529,6 +539,49 @@ mod tests {
         fn drop(&mut self) {
             fs::remove_dir_all(&self.0).unwrap();
         }
+    }
+
+    #[test]
+    fn writer_release_does_not_wait_for_inherited_descriptor_copies() {
+        let mut blocked = Vec::new();
+        for member in ["directory", ".mempal-convert.lock"] {
+            let root = std::env::temp_dir().join(format!(
+                "akasha-mempal-release-{}-{member}",
+                std::process::id()
+            ));
+            fs::create_dir(&root).unwrap();
+            let _fixture = Fixture(root.clone());
+            let source_path = root.join("source.db");
+            let db = rusqlite::Connection::open(&source_path).unwrap();
+            db.execute_batch(include_str!("../../../tests/fixtures/mempal21-28.sql"))
+                .unwrap();
+            db.close().unwrap();
+            let source = super::super::reader::Snapshot::open(&source_path).unwrap();
+            let output = root.join("archive");
+            let writer = Writer::new(&output, &source, 1).unwrap();
+            let retained = if member == "directory" {
+                writer.output.directory.try_clone().unwrap()
+            } else {
+                writer.output.files[member].try_clone().unwrap()
+            };
+            assert_eq!(
+                Writer::new(&output, &source, 1)
+                    .err()
+                    .map(|error| error.code),
+                Some("MEMPAL_CONVERSION_BUSY")
+            );
+            drop(writer);
+            let next = Writer::new(&output, &source, 1);
+            if let Err(error) = &next {
+                blocked.push((member, error.code));
+            }
+            drop(next);
+            drop(retained);
+        }
+        assert!(
+            blocked.is_empty(),
+            "released output still excludes successors with descriptor copies: {blocked:?}"
+        );
     }
 
     #[test]
