@@ -24,8 +24,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-production-scale, based
-on 9253a8b. PR #63 completed controlled budget-change drain/reopen and published
+The existing SSD worktree is reused on fix/mempal-output-lock-release, based
+on reviewed e5746ac from PR #67. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
 PR #64 completed measured job admission, native worker reservations and separate
@@ -71,6 +71,19 @@ authentication is deferred. The owner authorized Codex, or Pi/Hermes through
 localhost:48317, as a temporary substitute; substitute results are not
 Claude-native evidence. mp SSH access remains a separate external blocker.
 Every unfinished issue and its original dependencies is listed below.
+
+The pruning candidate is preserved at 2e320a4 on
+feat/mvp-024-index-maintenance. Its two causal regressions, 33 related retrieval
+tests and identical small corpus pilot passed; search allocated 5,332,992 bytes
+in 77 files with one native version. Its canonical gate failed in an unchanged
+Mempal test with an unexpected busy result. That occurrence remains unclassified.
+The [separate Mempal lock leaf](../benchmarks/results/mempal-output-lock/README.md)
+proves and repairs retained-descriptor lock lifetime without changing the original
+assertion: five library and 17 public migration tests pass. Complete its exact
+gate, independent review and publication, then integrate it into the preserved
+pruning branch and finish that branch's gate/review/publication before scaling.
+PR #67's exact gate and independent review have passed; hosted CI43009584075 is
+still running. All original full-scale and downstream acceptance remains open.
 
 ## Session operating rules
 
