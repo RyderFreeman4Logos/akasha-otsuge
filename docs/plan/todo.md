@@ -40,10 +40,14 @@ retains all 19 attempts, exact gate (626 Rust / 39 intentional ignores, Python 3
 Node 7), two separate committed real-kernel tests, independent PASS with 44 fresh
 tests, CI42989102629 and public report readback. Production coverage/load is next.
 All 42 retained shards were freshly rehashed (43,986,181,099 bytes). A small
-[production corpus pilot](../benchmarks/production-scale.md) is being prepared:
-an offline production-Domain seed component preserves source evidence, UTF-8
-boundaries and exact replay; three focused tests and Clippy pass. No production
-scale result is claimed. The 37 published vector documents over 4,096 bytes
+[production corpus pilot](../benchmarks/production-scale.md) passed at 1,024 real
+records: all 1,042 current claim hashes and eight partition witnesses matched.
+Its 4,449,979 unique bytes produced 149,250,048 bytes of search data and 1,109
+native versions in 32.330 seconds. The successor coalesces bounded native writes
+for both search paths; causal version-count regressions, buffer/order controls
+and related retrieval/seed checks pass (34 tests, one intentional ignore), with
+all-target Clippy. The paired corpus measurement, full gate and review remain.
+No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
 delegation failure; its exact selector passed without explaining that failure.

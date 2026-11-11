@@ -39,6 +39,27 @@ partition witnesses, resource status and authority/index disk allocation before
 admitting larger work. It does not claim full index-body coverage from row counts,
 file-cache coldness, ANN execution, 100 clients or full-scale latency thresholds.
 
+The first pilot passed on 2026-11-11 with seeder source `b191b01` and the unchanged
+production daemon from reviewed `8442871`: 4,449,979 unique source bytes became
+1,042 memory chunks. Every current claim hash and eight partition witnesses
+matched. Seeding took 3.798 s and indexing 32.330 s. Authority allocated
+12,750,848 bytes; search allocated 149,250,048 bytes across 3,843 files and 1,109
+native versions. The final measured daemon RSS was 463,224,832 bytes; owned
+cgroups reported zero OOM kills. These are one pilot's observations, not an
+extrapolated scale result. The stopped disposable store and socket directory
+were removed after receipts and all process exits were verified.
+
+Both lexical and vector sync previously executed a native merge for every row.
+The successor retains the 32-transaction authority window and per-sequence
+completions, but coalesces native writes and removals by key. Pending Arrow data
+flushes at one thirty-second of the configured memory budget (128 KiB through
+4 MiB), or 256 distinct keys; an arriving row may cross the byte threshold.
+Native engine working memory remains subject to the separate service limits.
+Current-state checks still precede each read and progress publication. Two
+native regressions first observed 18/19 versions for 16 lexical/vector rows;
+the repaired paths stay within the eight-version test budget, including index
+creation. The paired real-corpus successor run remains to be measured.
+
 All 42 retained compressed shards were rehashed on 2026-11-11: 43,986,181,099
 bytes matched the pinned source inventory. A separate text-only shape census
 found exactly 1,000,000 DBpedia rows, 37 with title-plus-text over 4,096 bytes

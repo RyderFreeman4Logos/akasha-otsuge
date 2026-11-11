@@ -152,6 +152,7 @@ impl VectorIndex {
         let end = target.min(before.saturating_add(32));
         let mut changed = false;
         let mut completions = Vec::new();
+        let mut pending = NativeBatch::new(config.config().runtime.memory_budget_mib);
         for seq in before + 1..=end {
             let entry = storage.outbox(seq)?.ok_or_else(|| error("OUTBOX_GAP"))?;
             let mut records = Vec::new();
@@ -274,22 +275,9 @@ impl VectorIndex {
                         ],
                     )
                     .map_err(index_error)?;
-                    let mut merge = self.table.merge_insert(&["key"]);
-                    merge
-                        .when_matched_update_all(None)
-                        .when_not_matched_insert_all();
-                    merge
-                        .execute(Box::new(RecordBatchIterator::new(
-                            vec![Ok(batch)],
-                            self.schema.clone(),
-                        )))
-                        .await
-                        .map_err(index_error)?;
+                    pending.push(&self.table, row_key, Some(batch)).await?;
                 } else {
-                    self.table
-                        .delete(&format!("key = '{row_key}'"))
-                        .await
-                        .map_err(index_error)?;
+                    pending.push(&self.table, row_key, None).await?;
                 }
                 changed = true;
             }
@@ -299,6 +287,7 @@ impl VectorIndex {
         if progress.watermark == before {
             return Ok(progress);
         }
+        pending.flush(&self.table).await?;
         progress.indexed_rows = self.table.count_rows(None).await.map_err(index_error)?;
         if changed && progress.indexed_rows > 0 {
             let indices = self.table.list_indices().await.map_err(index_error)?;
