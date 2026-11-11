@@ -1,0 +1,109 @@
+{
+  "utc": "2026-11-11T03:52:23.495962+00:00",
+  "head": "3d1cfb40a33594a3500bc7226c3ee744d3ecef9c",
+  "script_sha256": "a5eabea3799da17e019d1c8a38d7f7087a702003a0da85cb9eafd5e6e6a1bc6c",
+  "unit": "akasha-otsuge-capability-946753-1794369143281271882.scope",
+  "creation": {
+    "stage": "scope_created",
+    "pid": 946755,
+    "root": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-otsuge-capability-946753-1794369143281271882.scope",
+    "command": [
+      "/usr/bin/busctl",
+      "--user",
+      "--timeout=10",
+      "call",
+      "org.freedesktop.systemd1",
+      "/org/freedesktop/systemd1",
+      "org.freedesktop.systemd1.Manager",
+      "StartTransientUnit",
+      "ssa(sv)a(sa(sv))",
+      "akasha-otsuge-capability-946753-1794369143281271882.scope",
+      "fail",
+      "4",
+      "PIDs",
+      "au",
+      "1",
+      "946755",
+      "Delegate",
+      "b",
+      "true",
+      "MemoryAccounting",
+      "b",
+      "true",
+      "CollectMode",
+      "s",
+      "inactive-or-failed",
+      "0"
+    ]
+  },
+  "functional": {
+    "stage": "passed",
+    "owner_pid": 946755,
+    "owner_group": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-otsuge-capability-946753-1794369143281271882.scope/daemon",
+    "worker": {
+      "pid": 946783,
+      "group": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-otsuge-capability-946753-1794369143281271882.scope/runner",
+      "grandchild": {
+        "pid": 946785,
+        "group": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-otsuge-capability-946753-1794369143281271882.scope/runner"
+      }
+    },
+    "samples": {
+      "akasha-otsuge-capability-946753-1794369143281271882.scope": {
+        "memory.current": "26701824",
+        "memory.peak": "26701824",
+        "memory.high": "100663296",
+        "memory.max": "134217728",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cgroup.procs": "",
+        "cgroup.events": "populated 1\nfrozen 0"
+      },
+      "daemon": {
+        "memory.current": "8970240",
+        "memory.peak": "8970240",
+        "memory.high": "50331648",
+        "memory.max": "67108864",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cgroup.procs": "946755",
+        "cgroup.events": "populated 1\nfrozen 0"
+      },
+      "runner": {
+        "memory.current": "17645568",
+        "memory.peak": "17645568",
+        "memory.high": "33554432",
+        "memory.max": "67108864",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cgroup.procs": "946783\n946785",
+        "cgroup.events": "populated 1\nfrozen 0"
+      }
+    },
+    "runner_empty_after_reap": {
+      "memory.current": "90112",
+      "memory.peak": "17645568",
+      "memory.high": "33554432",
+      "memory.max": "67108864",
+      "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+      "cgroup.procs": "",
+      "cgroup.events": "populated 0\nfrozen 0"
+    },
+    "scope_root": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/akasha-otsuge-capability-946753-1794369143281271882.scope",
+    "limits_mib": {
+      "service": [
+        96,
+        128
+      ],
+      "daemon": [
+        48,
+        64
+      ],
+      "runner": [
+        32,
+        64
+      ]
+    }
+  },
+  "root_fence": "bound root populated 0 after owner reap",
+  "post_unit": "LoadState=not-found\nActiveState=inactive\nSubState=dead\n",
+  "product_source_unchanged": true,
+  "limit": "API and normal owned lifecycle capability only; no OOM, forced supervisor death, workload or product enforcement acceptance."
+}

@@ -9,10 +9,28 @@ import time
 import unittest
 from unittest.mock import patch
 
-from check_daemon_command import command, identity
+from check_daemon_command import command, identity, owned_daemons
 
 
 class CommandOwnership(unittest.TestCase):
+    def test_owned_census_identity_survives_normal_scheduling_changes(self):
+        with tempfile.TemporaryDirectory(prefix='akasha-command-census-') as root:
+            proc = pathlib.Path(root) / '123'
+            proc.mkdir()
+            base = [sys.executable, '--config', str(pathlib.Path(root) / 'config')]
+            (proc / 'cmdline').write_bytes(
+                b'\0'.join(os.fsencode(arg) for arg in [*base, 'daemon', 'run']) + b'\0')
+            (proc / 'exe').symlink_to(sys.executable)
+            with patch('check_daemon_command.pathlib.Path.iterdir', return_value=[proc]), \
+                    patch('check_daemon_command.identity', side_effect=[
+                        (111, 'S'), (111, 'R'), (112, 'S'), (111, 'Z'), None]):
+                original = owned_daemons(base)
+                self.assertEqual(len(original), 1)
+                self.assertEqual(owned_daemons(base), original)
+                self.assertNotEqual(owned_daemons(base), original)
+                self.assertEqual(owned_daemons(base), [])
+                self.assertEqual(owned_daemons(base), [])
+
     def test_proc_identity_disappearance_is_terminal_but_access_failure_is_not(self):
         for error in (FileNotFoundError(), ProcessLookupError()):
             with patch('check_daemon_command.pathlib.Path.read_text', side_effect=error):

@@ -1,0 +1,27 @@
+{
+  "utc": "2026-11-11T08:23:45.291161+00:00",
+  "purpose": "one original-parallel-topology diagnostic; exact editor selector passed without classification; never acceptance",
+  "before": {
+    "src/resources.rs": "fd4dd1200b41345d89c3f260fd5f11db6dda6865fa73d85abe236dd5dbddb211",
+    "tests/daemon.rs": "17643240360a85c8dd82dad2fb3685ee05405ebc73c09f5cd83860b0f59b0811"
+  },
+  "after": {
+    "src/resources.rs": "30a4838ef38933e4e6e6a3e8cbacd8b18c10a4cb4dad2a429598f6eab5267a98",
+    "tests/daemon.rs": "45727fe04737691b930b6ae2413e4694d7b50794bc91006c8da0b31b88d3f04f"
+  },
+  "channels": "Only synthetic daemon.run opt-in; bounded 16 records on existing daemon stderr pipe; consumed on fixture drop; no CLI JSON stream change",
+  "no_behavior_or_oracle_change": true,
+  "restored_utc": "2026-11-11T08:28:55.690112+00:00",
+  "classification": "ORIGINAL_EDITOR_FAILURE_NOT_REPRODUCED_DIAGNOSTIC_TOPOLOGY_FAILED_IPC",
+  "diagnostic_results": {
+    "passed": 150,
+    "failed": 18,
+    "ignored": 9
+  },
+  "observations": [
+    "Real exiting child smaps_rollup ESRCH",
+    "Live-to-zombie identity race",
+    "All 18 failures were other IPC IO/timeout paths; no causality for original delegation failure established"
+  ],
+  "restored_exact": true
+}

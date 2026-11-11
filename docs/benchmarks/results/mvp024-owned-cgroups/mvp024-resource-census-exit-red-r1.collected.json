@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-11T08:32:37.309217+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "119f9b64f07f048ece264480513eecef6b19af79",
+    "log_sha256": "3fd37fdad106fcbc087859d1e91990f828ffca010a4cafe2368dd3e18f44fefc",
+    "seconds": 19.051110804080963,
+    "utc": "2026-11-11T08:32:22.206970+00:00"
+  },
+  "process_absent": true,
+  "classification": "RED_PENDING_ASSERTION"
+}

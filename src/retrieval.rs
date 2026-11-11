@@ -1,7 +1,9 @@
 //! Rebuildable disk search; authority remains in Storage and Domain.
+mod batch;
 #[cfg(test)]
 mod tests;
 mod vector;
+use batch::NativeBatch;
 use std::sync::Arc;
 pub use vector::VectorStatus;
 pub(crate) use vector::model_error;
@@ -343,6 +345,7 @@ impl Index {
         let end = target.min(before.saturating_add(32));
         let mut changed = false;
         let mut completions = Vec::new();
+        let mut pending = NativeBatch::new(self.budget_mib);
         for seq in before + 1..=end {
             let entry = storage.outbox(seq)?.ok_or_else(|| error("OUTBOX_GAP"))?;
             let mut records = Vec::new();
@@ -383,22 +386,9 @@ impl Index {
                         ],
                     )
                     .map_err(index_error)?;
-                    let mut merge = self.table.merge_insert(&["key"]);
-                    merge
-                        .when_matched_update_all(None)
-                        .when_not_matched_insert_all();
-                    merge
-                        .execute(Box::new(RecordBatchIterator::new(
-                            vec![Ok(batch)],
-                            self.schema.clone(),
-                        )))
-                        .await
-                        .map_err(index_error)?;
+                    pending.push(&self.table, key, Some(batch)).await?;
                 } else {
-                    self.table
-                        .delete(&format!("key = '{key}'"))
-                        .await
-                        .map_err(index_error)?;
+                    pending.push(&self.table, key, None).await?;
                 }
                 changed = true;
             }
@@ -408,6 +398,7 @@ impl Index {
         if progress.lexical_watermark == before {
             return Ok(progress);
         }
+        pending.flush(&self.table).await?;
         if changed || before == 0 {
             let indices = self.table.list_indices().await.map_err(index_error)?;
             if !indices.iter().any(|i| i.columns == ["scope"]) {

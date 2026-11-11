@@ -1,0 +1,290 @@
+{
+  "attempts": [
+    {
+      "name": "mvp024-owned-scope-capability-r1",
+      "classification": "HARNESS_SETUP_BEFORE_READY_CAUSE_UNAVAILABLE",
+      "exit_code": 1,
+      "seconds": 0.07883268687874079,
+      "terminal_utc": "2026-11-11T03:49:44.507058+00:00",
+      "recorded_parent_or_committed_head": "3d1cfb40a33594a3500bc7226c3ee744d3ecef9c",
+      "uncommitted_candidate": false,
+      "members": [
+        "mvp024-owned-scope-capability-r1.admission.json",
+        "mvp024-owned-scope-capability-r1.terminal.json",
+        "mvp024-owned-scope-capability-r1.collected.json",
+        "mvp024-owned-scope-capability-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-scope-capability-r2",
+      "classification": "HARNESS_SETUP_IMMEDIATE_MEMBERSHIP_ASSUMPTION",
+      "exit_code": 1,
+      "seconds": 0.1106605539098382,
+      "terminal_utc": "2026-11-11T03:50:41.422349+00:00",
+      "recorded_parent_or_committed_head": "3d1cfb40a33594a3500bc7226c3ee744d3ecef9c",
+      "uncommitted_candidate": false,
+      "members": [
+        "mvp024-owned-scope-capability-r2.admission.json",
+        "mvp024-owned-scope-capability-r2.terminal.json",
+        "mvp024-owned-scope-capability-r2.collected.json",
+        "mvp024-owned-scope-capability-r2.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-scope-capability-r3",
+      "classification": "NORMAL_OWNED_SCOPE_CAPABILITY_PASS_NOT_PRODUCT_ACCEPTANCE",
+      "exit_code": 0,
+      "seconds": 0.28739821445196867,
+      "terminal_utc": "2026-11-11T03:52:23.517301+00:00",
+      "recorded_parent_or_committed_head": "3d1cfb40a33594a3500bc7226c3ee744d3ecef9c",
+      "uncommitted_candidate": false,
+      "members": [
+        "mvp024-owned-scope-capability-r3.admission.json",
+        "mvp024-owned-scope-capability-r3.terminal.json",
+        "mvp024-owned-scope-capability-r3.collected.json",
+        "mvp024-owned-scope-capability-r3.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-lifecycle-red-r1",
+      "classification": "PRODUCT_RED_NO_KERNEL_ENFORCEMENT",
+      "exit_code": 101,
+      "seconds": 10.08908792026341,
+      "terminal_utc": "2026-11-11T07:39:26.746343+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-owned-cgroup-lifecycle-red-r1.admission.json",
+        "mvp024-owned-cgroup-lifecycle-red-r1.terminal.json",
+        "mvp024-owned-cgroup-lifecycle-red-r1.collected.json",
+        "mvp024-owned-cgroup-lifecycle-red-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-lifecycle-green-r1",
+      "classification": "NORMAL_KERNEL_LIFECYCLE_PASS",
+      "exit_code": 0,
+      "seconds": 22.743978827260435,
+      "terminal_utc": "2026-11-11T07:45:29.615826+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-owned-cgroup-lifecycle-green-r1.admission.json",
+        "mvp024-owned-cgroup-lifecycle-green-r1.terminal.json",
+        "mvp024-owned-cgroup-lifecycle-green-r1.collected.json",
+        "mvp024-owned-cgroup-lifecycle-green-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-worker-red-r1",
+      "classification": "HARNESS_COMPILE_E0631_BEFORE_EXECUTION",
+      "exit_code": 101,
+      "seconds": 5.12499342020601,
+      "terminal_utc": "2026-11-11T07:50:37.272189+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-owned-cgroup-worker-red-r1.admission.json",
+        "mvp024-owned-cgroup-worker-red-r1.terminal.json",
+        "mvp024-owned-cgroup-worker-red-r1.collected.json",
+        "mvp024-owned-cgroup-worker-red-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-worker-red-r2",
+      "classification": "PRODUCT_RED_WORKER_OUTSIDE_RUNNER_LEAF",
+      "exit_code": 101,
+      "seconds": 8.217083198018372,
+      "terminal_utc": "2026-11-11T07:51:59.079796+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-owned-cgroup-worker-red-r2.admission.json",
+        "mvp024-owned-cgroup-worker-red-r2.terminal.json",
+        "mvp024-owned-cgroup-worker-red-r2.collected.json",
+        "mvp024-owned-cgroup-worker-red-r2.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-worker-green-r1",
+      "classification": "PRODUCT_RED_TOTAL_ONLY_POST_DRAIN_CONVERGENCE",
+      "exit_code": 101,
+      "seconds": 23.004795350134373,
+      "terminal_utc": "2026-11-11T07:55:48.549806+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-owned-cgroup-worker-green-r1.admission.json",
+        "mvp024-owned-cgroup-worker-green-r1.terminal.json",
+        "mvp024-owned-cgroup-worker-green-r1.collected.json",
+        "mvp024-owned-cgroup-worker-green-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-focused-r1",
+      "classification": "FOCUSED_19_PASS_AND_CLIPPY",
+      "exit_code": 0,
+      "seconds": 86.25559222139418,
+      "terminal_utc": "2026-11-11T08:03:53.324507+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-owned-cgroup-focused-r1.admission.json",
+        "mvp024-owned-cgroup-focused-r1.terminal.json",
+        "mvp024-owned-cgroup-focused-r1.collected.json",
+        "mvp024-owned-cgroup-focused-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-regressions-r1",
+      "classification": "UNCLASSIFIED_EDITOR_DELEGATION_FAILURE",
+      "exit_code": 101,
+      "seconds": 99.29271475691348,
+      "terminal_utc": "2026-11-11T08:11:11.816111+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-owned-cgroup-regressions-r1.admission.json",
+        "mvp024-owned-cgroup-regressions-r1.terminal.json",
+        "mvp024-owned-cgroup-regressions-r1.collected.json",
+        "mvp024-owned-cgroup-regressions-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-cgroup-editor-exact-r1",
+      "classification": "EXACT_EDITOR_PASS_DIAGNOSTIC_ONLY",
+      "exit_code": 0,
+      "seconds": 1.1269731242209673,
+      "terminal_utc": "2026-11-11T08:13:45.554956+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-cgroup-editor-exact-r1.admission.json",
+        "mvp024-cgroup-editor-exact-r1.terminal.json",
+        "mvp024-cgroup-editor-exact-r1.collected.json",
+        "mvp024-cgroup-editor-exact-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-editor-memory-probe-r1",
+      "classification": "DIAGNOSTIC_ORIGINAL_NOT_REPRODUCED_18_OTHER_IPC_FAILURES_UNCLASSIFIED",
+      "exit_code": 101,
+      "seconds": 163.62686569802463,
+      "terminal_utc": "2026-11-11T08:26:34.012510+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-editor-memory-probe-r1.admission.json",
+        "mvp024-editor-memory-probe-r1.terminal.json",
+        "mvp024-editor-memory-probe-r1.collected.json",
+        "mvp024-editor-memory-probe-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-resource-census-exit-red-r1",
+      "classification": "PRODUCT_RED_OBSERVED_NORMAL_CHILD_EXIT_CENSUS",
+      "exit_code": 101,
+      "seconds": 19.051110804080963,
+      "terminal_utc": "2026-11-11T08:32:22.206970+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-resource-census-exit-red-r1.admission.json",
+        "mvp024-resource-census-exit-red-r1.terminal.json",
+        "mvp024-resource-census-exit-red-r1.collected.json",
+        "mvp024-resource-census-exit-red-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-resource-census-exit-green-r1",
+      "classification": "FROZEN_ORACLE_6_FOCUSED_PASS_AND_CLIPPY",
+      "exit_code": 0,
+      "seconds": 53.84688854124397,
+      "terminal_utc": "2026-11-11T08:34:24.596646+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-resource-census-exit-green-r1.admission.json",
+        "mvp024-resource-census-exit-green-r1.terminal.json",
+        "mvp024-resource-census-exit-green-r1.collected.json",
+        "mvp024-resource-census-exit-green-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-regressions-r2",
+      "classification": "LIBRARY98_DAEMON168_KERNEL2_PASS",
+      "exit_code": 0,
+      "seconds": 60.93478037696332,
+      "terminal_utc": "2026-11-11T08:36:22.816458+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-owned-cgroup-regressions-r2.admission.json",
+        "mvp024-owned-cgroup-regressions-r2.terminal.json",
+        "mvp024-owned-cgroup-regressions-r2.collected.json",
+        "mvp024-owned-cgroup-regressions-r2.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-commit-r1",
+      "classification": "NORMAL_HOOK_COMMIT_PASS",
+      "exit_code": 0,
+      "seconds": 0.18899546843022108,
+      "terminal_utc": "2026-11-11T08:39:30.377483+00:00",
+      "recorded_parent_or_committed_head": "119f9b64f07f048ece264480513eecef6b19af79",
+      "uncommitted_candidate": true,
+      "members": [
+        "mvp024-owned-cgroup-commit-r1.admission.json",
+        "mvp024-owned-cgroup-commit-r1.terminal.json",
+        "mvp024-owned-cgroup-commit-r1.collected.json",
+        "mvp024-owned-cgroup-commit-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-canonical-r1",
+      "classification": "EXACT_COMMITTED_CANONICAL_PASS",
+      "exit_code": 0,
+      "seconds": 497.1115221697837,
+      "terminal_utc": "2026-11-11T08:48:22.718557+00:00",
+      "recorded_parent_or_committed_head": "84428714a378bc849895c8f3ff4af6ed6af6e1c9",
+      "uncommitted_candidate": false,
+      "members": [
+        "mvp024-owned-cgroup-canonical-r1.admission.json",
+        "mvp024-owned-cgroup-canonical-r1.terminal.json",
+        "mvp024-owned-cgroup-canonical-r1.collected.json",
+        "mvp024-owned-cgroup-canonical-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-kernel-head-r1",
+      "classification": "EXACT_COMMITTED_NORMAL_KERNEL2_PASS",
+      "exit_code": 0,
+      "seconds": 1.6630747569724917,
+      "terminal_utc": "2026-11-11T08:49:30.497572+00:00",
+      "recorded_parent_or_committed_head": "84428714a378bc849895c8f3ff4af6ed6af6e1c9",
+      "uncommitted_candidate": false,
+      "members": [
+        "mvp024-owned-cgroup-kernel-head-r1.admission.json",
+        "mvp024-owned-cgroup-kernel-head-r1.terminal.json",
+        "mvp024-owned-cgroup-kernel-head-r1.collected.json",
+        "mvp024-owned-cgroup-kernel-head-r1.log.gz"
+      ]
+    },
+    {
+      "name": "mvp024-owned-cgroup-review-r1",
+      "classification": "INDEPENDENT_CONVENTIONAL_PASS_44_FRESH_TESTS",
+      "exit_code": 0,
+      "seconds": 507.85972829815,
+      "terminal_utc": "2026-11-11T08:58:56.504731+00:00",
+      "recorded_parent_or_committed_head": "84428714a378bc849895c8f3ff4af6ed6af6e1c9",
+      "uncommitted_candidate": false,
+      "members": [
+        "mvp024-owned-cgroup-review-r1.admission.json",
+        "mvp024-owned-cgroup-review-r1.terminal.json",
+        "mvp024-owned-cgroup-review-r1.collected.json",
+        "mvp024-owned-cgroup-review-r1.log.gz"
+      ]
+    }
+  ],
+  "note": "Classifications below supersede provisional collector wording only where a verified diagnosis is retained. Unknown historical causes remain unknown."
+}

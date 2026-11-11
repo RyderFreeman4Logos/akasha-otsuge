@@ -1,0 +1,27 @@
+{
+  "head": "84428714a378bc849895c8f3ff4af6ed6af6e1c9",
+  "tree": "6e1e6d2f84c9ac99c9e1e45e181f39dad1b91849",
+  "clean_before_after": true,
+  "tests": [
+    "codex_tests::owned_cgroup_worker_and_peak_survive_total_budget_lowering",
+    "resource_tests::owned_cgroup_limits_survive_reopen_and_collect_after_normal_stop"
+  ],
+  "passed": 2,
+  "ignored": 0,
+  "actual_user_cgroup_v2": true,
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "daemon",
+    "owned_cgroup_",
+    "--",
+    "--ignored",
+    "--test-threads=1"
+  ],
+  "log_sha256": "b6a29e89d6c4fb05f77eea28a5a7e61113208288d81fdfbac0ba4e4432106cf2",
+  "seconds": 1.6630747569724917,
+  "utc": "2026-11-11T08:50:19.633979+00:00",
+  "limits": "normal lifecycle only; no new OOM/supervisor-death/red-team campaign"
+}

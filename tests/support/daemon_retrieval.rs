@@ -423,6 +423,55 @@ fn original_ranges_preserve_utf8_budget_receipt_and_live_permission() {
 mod rules;
 
 #[test]
+fn vector_sync_bounds_native_versions_for_one_authority_batch() {
+    let endpoint = super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    let names = (0..16).map(|i| format!("batch-{i}")).collect::<Vec<_>>();
+    let records = names
+        .iter()
+        .map(|id| (id.as_str(), Some("alpha"), "nativebatch searchable body"))
+        .collect::<Vec<_>>();
+    assert_eq!(seed_records(&daemon, &records, 1), 32);
+    daemon.configure(&format!(
+        "[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel='vectors-2'\ndimension=2\nlocal=true\ntimeout='2s'",
+        endpoint.address,
+    ));
+    daemon.start();
+    daemon.cli(&["index", "sync", "--idempotency-key", "batch-build"]);
+    let built = finished(&daemon, "batch-build");
+    assert_eq!(built["state"], "succeeded", "{built}");
+    assert_eq!(built["result"]["vector"]["indexed_rows"], 16);
+    let generation = built["result"]["vector"]["generation"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            let root = daemon.root.join("data/search");
+            let connection = lancedb::connect(root.to_str().unwrap())
+                .execute()
+                .await
+                .unwrap();
+            let table = connection
+                .open_table(format!("memory_vector_{generation}"))
+                .execute()
+                .await
+                .unwrap();
+            assert_eq!(table.count_rows(None).await.unwrap(), 16);
+            let versions = table.version().await.unwrap() - 1;
+            assert!(
+                versions <= 8,
+                "one bounded authority batch created {versions} native vector versions"
+            );
+        });
+}
+
+#[test]
 fn real_vector_and_rerank_paths_are_scoped_versioned_and_degrade_when_offline() {
     let endpoint = super::model_tests::Endpoint::retrieval();
     let mut daemon = Daemon::new();

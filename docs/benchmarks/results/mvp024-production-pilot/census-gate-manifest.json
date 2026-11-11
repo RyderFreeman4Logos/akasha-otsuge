@@ -1,0 +1,95 @@
+{
+  "archive": "census-gate.zip",
+  "bytes": 32994,
+  "sha256": "115ef239ca05c6f5444ab507344282bb993f91ad6f47e5aba9228a5dfaf8ac7d",
+  "members": {
+    "receipts/mvp024-owned-census-green-r1.admission.json": {
+      "bytes": 1255,
+      "sha256": "e6dc055aff1a814777d4660a66178edad6ab46e257c55237d63a4ac3d515ba0d"
+    },
+    "receipts/mvp024-owned-census-green-r1.collected.json": {
+      "bytes": 491,
+      "sha256": "6c13372caa1301db2dc297159629219cdc53917970c433feff20deb2ad25cf57"
+    },
+    "receipts/mvp024-owned-census-green-r1.launch.json": {
+      "bytes": 475,
+      "sha256": "b254bcdf4ccc52a9929fe827d23cb2d507889312f49036ec4bf4344a4d49f434"
+    },
+    "receipts/mvp024-owned-census-green-r1.log": {
+      "bytes": 1232,
+      "sha256": "4999622840ca11c579d887b360e30c2a8549bd988a8981216b53c7795df93b77"
+    },
+    "receipts/mvp024-owned-census-green-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "d68ece07a1d0101e67b0ed692356cdf65ba51e58b3dedad73f4d36bbda39b2e6"
+    },
+    "receipts/mvp024-owned-census-oracle-r1.json": {
+      "bytes": 546,
+      "sha256": "9e8dec110cebdb24607ffe7d6e980dcc476d6b6f58cc5927da48cdf7f8d7b675"
+    },
+    "receipts/mvp024-owned-census-red-r1.admission.json": {
+      "bytes": 1179,
+      "sha256": "042711aacee588241ca94032c8d1196e955dff791e9f830c729151b2223d60a5"
+    },
+    "receipts/mvp024-owned-census-red-r1.collected.json": {
+      "bytes": 529,
+      "sha256": "c8ce918eca00b00cfff543a187632fb66bc75fad46e206aa01928bfb802a8586"
+    },
+    "receipts/mvp024-owned-census-red-r1.launch.json": {
+      "bytes": 397,
+      "sha256": "b1656a2a5c2ca099d7b4bc5b89f22663298fe7dfd657c2bb8e126f191a44b7f2"
+    },
+    "receipts/mvp024-owned-census-red-r1.log": {
+      "bytes": 936,
+      "sha256": "a159e2c624d970e9fef401bf83d4c6b4839c6233821f3d674fcb27d4b6777aa2"
+    },
+    "receipts/mvp024-owned-census-red-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "62c3e9092706557a76985828598634e478259a1f5e92baf2c8a286c2023a95e4"
+    },
+    "receipts/mvp024-production-canonical-r1-classification.json": {
+      "bytes": 669,
+      "sha256": "9b8dd547b5b9f013f5b86f8890eb50e18dedf4d10f565e0ad9485e56812d61a7"
+    },
+    "receipts/mvp024-production-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "fb2c382a594aa3c8fdfea22a6b89cdf78335f9bdd6440a7f4b3736649a3a2e2c"
+    },
+    "receipts/mvp024-production-canonical-r1.collected.json": {
+      "bytes": 448,
+      "sha256": "f8afccaafcb0cb18fabd46a8262ff6727ac7b2b6c456b94533dcb8f3c2c1dc0b"
+    },
+    "receipts/mvp024-production-canonical-r1.launch.json": {
+      "bytes": 225,
+      "sha256": "ad7064f5691cfa52f555ca0e476475a8ce4fda772d6f1edb0b88cbdec65b495d"
+    },
+    "receipts/mvp024-production-canonical-r1.log": {
+      "bytes": 71687,
+      "sha256": "3a7934e78b6120fedd64d765c52d6c0544674c9307f6d782c9a80b3429f60799"
+    },
+    "receipts/mvp024-production-canonical-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "9f1f5c55607827e048c102364657d960dd2dcf9d6b7262b059813126f5f7b390"
+    },
+    "scope-and-custody.json": {
+      "bytes": 763,
+      "sha256": "dea7df5a45fae04765c4fa7830fd5733e0e1dbf841cdc70ca34a70805cbb5cbf"
+    },
+    "source-after/scripts/check_daemon_command.py": {
+      "bytes": 9558,
+      "sha256": "95e3faaa6bc2e417a22e206602fa778e4f3bb4fea89f6ed5605deb5fe3bf1261"
+    },
+    "source-after/scripts/test_daemon_command.py": {
+      "bytes": 3457,
+      "sha256": "91acee509b7c442b10ea0958b241e1f45159b307d86f95690dbc4c88f05e12e1"
+    },
+    "source-before/scripts/check_daemon_command.py": {
+      "bytes": 9397,
+      "sha256": "9aed7671af9cc63e7cdadbdeebd8e539f2895fd00142ff22de599236b37c713b"
+    },
+    "source-before/scripts/test_daemon_command.py": {
+      "bytes": 2348,
+      "sha256": "cf6522bc02e2275a6f896e89ff359da89e4647d2ca630ec77380d6c50bfd215b"
+    }
+  }
+}

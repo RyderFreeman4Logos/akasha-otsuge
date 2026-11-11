@@ -1,0 +1,33 @@
+{
+  "utc": "2026-11-11T08:13:38.521547+00:00",
+  "head": "119f9b64f07f048ece264480513eecef6b19af79",
+  "tree": "97842ceada954e5744e1323fa96e01bb9f587922",
+  "base": "0a098882b08a7f197c0483b81c1ffd9f1d81ef39",
+  "branch": "feat/mvp-024-owned-cgroups",
+  "status": " M docs/memory-resources.md\n M docs/plan/todo.md\n M src/adapter/guardian.rs\n M src/adapter/hermes/native.rs\n M src/adapter/native.rs\n M src/adapter/runner.rs\n M src/daemon.rs\n M src/daemon/configuration.rs\n M src/daemon/jobs.rs\n M src/daemon/resources.rs\n M src/resources.rs\n M tests/daemon.rs\n M tests/support/daemon_codex.rs\n M tests/support/daemon_incident_native.rs\n?? src/resources/cgroup.rs\n?? tests/support/daemon_resources.rs\n",
+  "staged": "",
+  "index_lock_absent": true,
+  "patch_sha256": "96520f19d2a069771c84c32580519be3503efd2498f3b19729f519f5416b7adf",
+  "source_sha256": {
+    "docs/memory-resources.md": "0914a4a0633c75cd2464fb691915f3b41ed2b3b42ff43a0d246dbb2be605f88e",
+    "docs/plan/todo.md": "12d0a86e3c593a3c3420dd801155e33b8b55b85a601d420e0f98b3810e044006",
+    "src/adapter/guardian.rs": "631fba643f8dd9db7fbf627bea847c14be57ad769d7cf378a0090fd2ef1fff05",
+    "src/adapter/hermes/native.rs": "f72fdb3d0fc411283c88c391228931353f8054969e1fb9972f2044e08389ea60",
+    "src/adapter/native.rs": "82e4c69ccb9901c126b4af2926b2637e5ec28e84027dca73c8cdd13c082dd999",
+    "src/adapter/runner.rs": "19e42f8331141b87cf9268484c20c847fb178e6e3b7ed6fb6f4e70a6d6e5ce9f",
+    "src/daemon.rs": "eef8c5897b7cd47780e580a6f97fe7ec998a194bf2a4919884217d2e8956167a",
+    "src/daemon/configuration.rs": "b711144829d07df785c6e309961e1564400c39009f0d1102fe0bbc57f50e7f69",
+    "src/daemon/jobs.rs": "2f3613faa2377257c29b47736ad55bdb62f414dadfa8442336429c0e343a86f6",
+    "src/daemon/resources.rs": "7942e8b9059449d8f5d6d1f6701864e3d16bec4a37c6064d8ce6aab431423d43",
+    "src/resources.rs": "fd4dd1200b41345d89c3f260fd5f11db6dda6865fa73d85abe236dd5dbddb211",
+    "tests/daemon.rs": "17643240360a85c8dd82dad2fb3685ee05405ebc73c09f5cd83860b0f59b0811",
+    "tests/support/daemon_codex.rs": "4e9cb9989b17bb2cade6a5c50c919813e33e271b527f02feb78772595c5fe721",
+    "tests/support/daemon_incident_native.rs": "b9c3487c675724cb292e2e5dfaa42b01a53d3fb3e5f81c4b34e16839b76790aa",
+    "src/resources/cgroup.rs": "ddfbd4fdb987039e0ef50bdddebcba9c578f2c1ef6d26f8a93483381c6cb780f",
+    "tests/support/daemon_resources.rs": "67db7763f681ae260321a4685c19e97d5b7c7e5cc5a4f0fbb1445ead2c245e13"
+  },
+  "owner": "tests/support/daemon_editor.rs",
+  "owner_sha256": "fddd4b4c7905db9350862cb62a7b4898747e631e9e5b63f25458fbb588756822",
+  "owner_unchanged_from_base": true,
+  "classification": "UNCLASSIFIED; exact selector next, no attribution from prior green runs"
+}

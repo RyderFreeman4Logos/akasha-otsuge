@@ -140,6 +140,141 @@ async fn lexical_sync_rechecks_each_read_and_progress_publication() {
 }
 
 #[tokio::test]
+async fn one_authority_batch_bounds_native_versions_and_keeps_every_lexical_row() {
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let mut expected = std::collections::BTreeSet::new();
+    for i in 0..16 {
+        let id = format!("batch-{i}");
+        let seq = memory(&store, &id, "nativebatch searchable body", None).await;
+        expected.insert((id, seq));
+    }
+    let target = store.sequence().unwrap();
+    assert_eq!(target, 32);
+    let index = Index::open(&config, &store).await.unwrap();
+    let before = index.table.version().await.unwrap();
+    let progress = index
+        .sync_batch(&store, target, 1, &|| Ok(()))
+        .await
+        .unwrap();
+    assert_eq!(progress.lexical_watermark, target);
+    assert_eq!(progress.indexed_rows, expected.len());
+    assert_eq!(
+        index
+            .keyword("nativebatch", &scope(), 100)
+            .await
+            .unwrap()
+            .into_iter()
+            .collect::<std::collections::BTreeSet<_>>(),
+        expected
+    );
+    let versions = index.table.version().await.unwrap() - before;
+    // Includes initialization of both native indices and their first optimization.
+    assert!(
+        versions <= 8,
+        "one bounded authority batch created {versions} native versions"
+    );
+    drop(index);
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn native_batches_keep_last_operations_and_flush_bounded_buffers() {
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let index = Index::open(&config, &store).await.unwrap();
+    let row = |id: &str, body: &str| {
+        RecordBatch::try_new(
+            index.schema.clone(),
+            vec![
+                Arc::new(StringArray::from(vec![hash(id.as_bytes())])),
+                Arc::new(StringArray::from(vec![id])),
+                Arc::new(UInt64Array::from(vec![1u64])),
+                Arc::new(StringArray::from(vec!["scope"])),
+                Arc::new(StringArray::from(vec![body])),
+            ],
+        )
+        .unwrap()
+    };
+    let first = hash(b"first");
+    let second = hash(b"second");
+    let mut pending = NativeBatch::new(512);
+    pending
+        .push(&index.table, first.clone(), Some(row("first", "old")))
+        .await
+        .unwrap();
+    pending.push(&index.table, first, None).await.unwrap();
+    pending
+        .push(&index.table, second.clone(), None)
+        .await
+        .unwrap();
+    pending
+        .push(&index.table, second.clone(), Some(row("second", "latest")))
+        .await
+        .unwrap();
+    pending.flush(&index.table).await.unwrap();
+    let stored: Vec<RecordBatch> = index
+        .table
+        .query()
+        .execute()
+        .await
+        .unwrap()
+        .try_collect()
+        .await
+        .unwrap();
+    assert_eq!(stored.iter().map(RecordBatch::num_rows).sum::<usize>(), 1);
+    let body = stored[0]
+        .column_by_name("body")
+        .unwrap()
+        .as_any()
+        .downcast_ref::<StringArray>()
+        .unwrap();
+    assert_eq!(body.value(0), "latest");
+    pending.push(&index.table, second, None).await.unwrap();
+    pending.flush(&index.table).await.unwrap();
+    assert_eq!(index.table.count_rows(None).await.unwrap(), 0);
+
+    let mut pending = NativeBatch::new(4);
+    let large = "x".repeat(96 * 1024);
+    pending
+        .push(&index.table, hash(b"large-1"), Some(row("large-1", &large)))
+        .await
+        .unwrap();
+    assert_eq!(index.table.count_rows(None).await.unwrap(), 0);
+    pending
+        .push(&index.table, hash(b"large-2"), Some(row("large-2", &large)))
+        .await
+        .unwrap();
+    assert_eq!(index.table.count_rows(None).await.unwrap(), 2);
+    index.table.delete("true").await.unwrap();
+
+    let mut pending = NativeBatch::new(512);
+    for i in 0..255 {
+        let id = format!("tiny-{i}");
+        pending
+            .push(&index.table, hash(id.as_bytes()), Some(row(&id, "tiny")))
+            .await
+            .unwrap();
+    }
+    assert_eq!(index.table.count_rows(None).await.unwrap(), 0);
+    pending
+        .push(
+            &index.table,
+            hash(b"tiny-255"),
+            Some(row("tiny-255", "tiny")),
+        )
+        .await
+        .unwrap();
+    assert_eq!(index.table.count_rows(None).await.unwrap(), 256);
+    pending.flush(&index.table).await.unwrap();
+    assert_eq!(index.table.count_rows(None).await.unwrap(), 256);
+    drop(index);
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
 async fn contiguous_prefix_records_superseded_and_not_required_completions() {
     let fixture = Fixture::new();
     let config = fixture.config();

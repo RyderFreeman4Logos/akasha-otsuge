@@ -1,0 +1,14 @@
+{
+  "utc": "2026-11-11T07:44:26.286873+00:00",
+  "parent": "119f9b64f07f048ece264480513eecef6b19af79",
+  "classification": "PRODUCT_RED",
+  "assertion": "managed_cgroup_limits was false under previously verified delegated user-systemd environment",
+  "tests_passed": 0,
+  "tests_failed": 1,
+  "production_source_unchanged": true,
+  "test_sha256": {
+    "tests/daemon.rs": "3d30408c86d161e5939999a637b7b3d5b1f0fa8fe731cb742886b34b570500e3",
+    "tests/support/daemon_resources.rs": "2ec10c81f3fff92db9d92cf6f6dfba86a4aa690d594b9b71b0f093c0b87b77b0"
+  },
+  "scope": "Normal real-kernel lifecycle and budget readback; no OOM/forced-supervisor-death/red-team campaign"
+}

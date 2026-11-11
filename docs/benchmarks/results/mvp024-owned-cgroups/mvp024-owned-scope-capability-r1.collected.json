@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-11T03:49:51.270673+00:00",
+  "terminal": {
+    "exit_code": 1,
+    "head": "3d1cfb40a33594a3500bc7226c3ee744d3ecef9c",
+    "log_sha256": "dd514f9d0b30693503b22663f285357dc828d3934dac2a74575a4314cce5e50c",
+    "seconds": 0.07883268687874079,
+    "utc": "2026-11-11T03:49:44.507058+00:00"
+  },
+  "process_absent": true,
+  "classification": "HARNESS_OR_CAPABILITY_FAILURE_BEFORE_READY"
+}

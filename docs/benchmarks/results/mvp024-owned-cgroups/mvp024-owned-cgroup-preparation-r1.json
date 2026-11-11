@@ -1,0 +1,34 @@
+{
+  "utc": "2026-11-11T07:28:06.257188+00:00",
+  "status": "preparation_only_no_product_change",
+  "base_candidate": "fa88d7cc020899412026ed7b245eb7d2011062b4",
+  "prior_functional_capability": "mvp024-owned-scope-capability-r3.json",
+  "checked_constraints": [
+    "Cargo forbids unsafe; no pre_exec hook",
+    "StartTransientUnit returns a queued job; wait for actual owned scope membership",
+    "No internal processes: daemon leaf before enabling memory controller",
+    "cgroup memory.current/peak include cache/kernel charges; never label RSS",
+    "Migration does not transfer pre-existing memory charges",
+    "Owned root/control descriptors, no parent or unrelated cgroup writes",
+    "Current worktree stays frozen until PR64 review and publication complete"
+  ],
+  "intended_scope": [
+    "resources shared authority and new owned cgroup module",
+    "daemon initial setup, controlled budget transition and status",
+    "RunSpec command plus native preparation/export command paths",
+    "early internal exec entrypoint to join a worker leaf before external CLI starts, using safe Rust",
+    "normal real-kernel lifecycle and budget-lowering regressions; unavailable-delegation software fallback",
+    "docs/memory-resources.md and complete TODO"
+  ],
+  "proposed_behavior": [
+    "One owned transient user scope per daemon with daemon and runner children",
+    "Per-reservation runner leaf for kernel peak attribution and complete lifecycle ownership",
+    "Software admission stays live; lower hard limits only after old work drains and observed usage fits",
+    "Report requested and read-back effective settings, pending/draining and unavailable measurements explicitly",
+    "Use existing dependency/runtime/tool locations; no new provider, corpus copy, unsafe or Daybreak work"
+  ],
+  "sources": [
+    "https://docs.kernel.org/admin-guide/cgroup-v2.html",
+    "https://raw.githubusercontent.com/systemd/systemd/v252/src/core/dbus-manager.c"
+  ]
+}

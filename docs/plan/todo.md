@@ -24,8 +24,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-owned-cgroups, based
-on 0a09888. PR #63 completed controlled budget-change drain/reopen and published
+The existing SSD worktree is reused on feat/mvp-024-production-scale, based
+on 9253a8b. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
 PR #64 completed measured job admission, native worker reservations and separate
@@ -33,8 +33,27 @@ daemon/runner accounting, retaining ownership through reopen. Its exact-source
 gate (625 Rust executions, Python 34 / Node 7), independent review (zero findings,
 44 fresh tests) and CI42977669246 passed. The merged tree matches reviewed fa88d7c.
 The [software-control archive](../benchmarks/results/mvp024-software-memory/README.md)
-retains failures, final evidence and public readbacks. Owned cgroup limits and
-kernel peaks are the current leaf.
+retains failures, final evidence and public readbacks. PR #66 completed the
+functional owned-cgroup leaf at reviewed 8442871, merged as 9253a8b with the
+identical tree. Its [complete evidence archive](../benchmarks/results/mvp024-owned-cgroups/README.md)
+retains all 19 attempts, exact gate (626 Rust / 39 intentional ignores, Python 34 /
+Node 7), two separate committed real-kernel tests, independent PASS with 44 fresh
+tests, CI42989102629 and public report readback. Production coverage/load is next.
+All 42 retained shards were freshly rehashed (43,986,181,099 bytes). A small
+[production corpus pilot](../benchmarks/production-scale.md) passed at 1,024 real
+records: all 1,042 current claim hashes and eight partition witnesses matched.
+Its 4,449,979 unique bytes produced 149,250,048 bytes of search data and 1,109
+native versions in 32.330 seconds. The successor coalesces bounded native writes
+for both search paths; causal version-count regressions, buffer/order controls
+and related retrieval/seed checks pass (34 tests, one intentional ignore), with
+all-target Clippy. The [paired measurement archive](../benchmarks/results/mvp024-production-pilot/README.md)
+retains identical inputs/acknowledgements/oracle, all failures and both stopped
+stores' cleanup: successor indexing took 10.559 seconds with 86,781,952 search
+bytes, 912 files and 132 native versions. RSS sampled peak increased; no memory
+improvement or scale extrapolation is claimed. Final gate, review and publication
+remain, followed by further derived-index growth/reclamation before scaling.
+No production scale result is claimed. The 37 vector documents over 4,096 bytes
+need an explicit input/model/generation solution before million-vector acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
 delegation failure; its exact selector passed without explaining that failure.
 A single diagnostic topology did not reproduce it and had 18 other IPC failures.
@@ -1067,7 +1086,7 @@ public readbacks, gate/CI logs and merge identity. PR #64 subsequently completed
 software measured-memory admission and worker reservations; its
 [final archive](../benchmarks/results/mvp024-software-memory/README.md) binds
 fa88d7c, all retained failed attempts, the exact gate, complete independent review
-and CI. Dedicated cgroups and kernel peaks remain required; functional fixtures
+and CI. PR #66 adds dedicated cgroups and kernel peaks; those functional checks
 do not satisfy the full production stress acceptance.
 
 - [x] Finish controlled storage drain/reopen: same PID/socket, retriable busy
@@ -1080,19 +1099,28 @@ do not satisfy the full production stress acceptance.
   reservations that survive actual process cleanup. Total-only decreases pause
   new work without cancelling accepted workers or changing their identities and
   original deadlines. Health/receipt access remains available. PR #64 merged.
-- [ ] Own separate daemon/runner/service cgroups when delegation is available;
+- [x] Own separate daemon/runner/service cgroups when delegation is available;
   preserve ownership, limits and peaks through storage reopen, account for every
   helper/descendant, and report software-only operation honestly when unavailable.
   Verify owned setup/cleanup, limit readback, kernel peaks for later admission and
   safe budget lowering with distinct requested/effective/draining state.
-  The current candidate passes 98 library and 168 daemon tests, two separate
-  real-kernel normal lifecycle/worker tests, and all-target Clippy. Worker/guardian
+  The final candidate passed its full committed gate, two separate real-kernel
+  normal lifecycle/worker tests and independent conventional review. Worker/guardian
   membership and total-only post-drain convergence each have a retained causal
   RED; an earlier mutable-fixture callback compile failure is separately labeled
   harness failure. The real procfs exit regression also has RED/GREEN evidence;
-  prior unexplained suite failures remain retained. Committed gate, independent
-  review and publication remain pending. No full-scale or new Daybreak acceptance is claimed.
+  prior unexplained suite failures remain retained. PR #66 merged with the reviewed
+  tree; [the archive](../benchmarks/results/mvp024-owned-cgroups/README.md) preserves
+  final verification, CI, publication and cleanup. No full-scale or new Daybreak
+  acceptance is claimed.
 
+- [ ] Validate a small production corpus/coverage pilot before full-data admission.
+  Source chunks can be 64 KiB, while production claims are at most 32 KiB and
+  vector input uses 4096-byte chunk means. Prove UTF-8-safe full-span coverage,
+  original byte counts and real precomputed vector identity without silently
+  changing the model policy or claiming fresh inference. Select a bounded seed
+  path after verifying its production contract; measure disk amplification and
+  indexing progress before allocating the full store.
 - [ ] Freeze source/binary, machine/filesystem/cgroup state, corpus manifest,
   source licenses/hash/seed, actual UTF-8 bytes, document/partition identities,
   vector distribution/dimension/coverage and 100,000-change history oracle.
@@ -1135,8 +1163,14 @@ do not satisfy the full production stress acceptance.
 
 Original #24 start: 2026-11-10T03:34:44.812218Z (SSD worktree creation/reflog).
 Branch `feat/mvp-024-stress`; base `37d4d77`. No full-data product acceptance
-has run yet. Retained raw shards total 43,986,181,099 bytes; current shard hashes
-still need revalidation. Storage/daemon fixture success does not close this issue.
+has run yet. Retained compressed shards total 43,986,181,099 bytes; all 42 hashes
+were revalidated on 2026-11-11. The real paired pilot and bounded native batches
+are recorded in the production-pilot archive. Its first canonical gate passed
+all test suites but failed the final installed process census; the observed
+values are unavailable. An independently reproduced scheduling-state comparison
+defect now has unchanged RED/GREEN proof and a narrow repair. The successor still
+requires its complete exact-HEAD gate, independent review and publication.
+Storage/daemon fixture success does not close this issue.
 
 ## MVP-025 read-only migration and neutral archive acceptance
 

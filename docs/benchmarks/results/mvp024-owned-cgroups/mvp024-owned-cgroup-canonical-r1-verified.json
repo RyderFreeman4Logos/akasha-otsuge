@@ -1,0 +1,28 @@
+{
+  "head": "84428714a378bc849895c8f3ff4af6ed6af6e1c9",
+  "tree": "6e1e6d2f84c9ac99c9e1e45e181f39dad1b91849",
+  "command": [
+    "just",
+    "check"
+  ],
+  "exit_code": 0,
+  "clean_before_after": true,
+  "log_sha256": "7dd6a9b893e6bd50c47c90c35d4c3720943c1b947390828a81e208ac16dce2f4",
+  "seconds": 497.1115221697837,
+  "rust_result_records": 21,
+  "rust_passed_including_installed_repeat": 626,
+  "rust_ignored_including_installed_repeat": 39,
+  "python_tests": 34,
+  "node_tests": 7,
+  "installed": {
+    "installed": true,
+    "binary_sha256": "9b058b37553f9cf590d7f0062ad2baaec29e4a18b5f35e1a429b753c8df868f1",
+    "lifecycle": "passed",
+    "private_uid_denial": "passed",
+    "peer_uid_denial": "passed",
+    "tcp_sockets": 0,
+    "kernel_control_uid": 165536
+  },
+  "utc": "2026-11-11T08:49:15.070145+00:00",
+  "historical_failures": "retained UNCLASSIFIED; this passing gate does not establish historical cause"
+}

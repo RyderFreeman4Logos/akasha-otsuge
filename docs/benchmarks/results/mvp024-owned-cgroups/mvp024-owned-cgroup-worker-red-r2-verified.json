@@ -1,0 +1,22 @@
+{
+  "utc": "2026-11-11T07:53:30.161963+00:00",
+  "parent": "119f9b64f07f048ece264480513eecef6b19af79",
+  "classification": "PRODUCT_RED",
+  "assertion": "actual /proc worker membership is the daemon leaf, not a leaf below the owned runner group",
+  "passed": 0,
+  "failed": 1,
+  "file_sha256": {
+    "src/resources.rs": "a30f0bba6af3e57939f0f208210ef70d5abf6f37c105e994e48241ae376fe31d",
+    "src/resources/cgroup.rs": "4cd3e8e493c766007779b626e6a836439d711fdfd56a1048ca1172b1c60814ec",
+    "src/daemon.rs": "64534532b098f7b13993267c3cfdac84c08dc3a1096c0dad45f55ec2eaf29fcd",
+    "src/daemon/resources.rs": "90c69c1a6a62e734bc1eae7de27d057e12afea663d2cd1bcda682344ee7dced2",
+    "tests/daemon.rs": "17643240360a85c8dd82dad2fb3685ee05405ebc73c09f5cd83860b0f59b0811",
+    "tests/support/daemon_codex.rs": "4e9cb9989b17bb2cade6a5c50c919813e33e271b527f02feb78772595c5fe721",
+    "tests/support/daemon_resources.rs": "67db7763f681ae260321a4685c19e97d5b7c7e5cc5a4f0fbb1445ead2c245e13",
+    "tests/support/daemon_incident_native.rs": "b9c3487c675724cb292e2e5dfaa42b01a53d3fb3e5f81c4b34e16839b76790aa"
+  },
+  "later_assertions_unreached": [
+    "total-only limit convergence after the worker drains",
+    "kernel profile peak retention"
+  ]
+}
