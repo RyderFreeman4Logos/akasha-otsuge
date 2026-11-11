@@ -19,6 +19,9 @@ idle = "disabled"
 [runtime]
 max_concurrent_jobs = 1
 memory_budget_mib = 512
+# Native worker estimate; named executors can override memory_estimate_mib.
+# runner_memory_estimate_mib = 1024
+# service_total_budget_mib = 2048
 
 [review]
 mode = "policy"

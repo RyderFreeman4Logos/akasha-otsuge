@@ -579,6 +579,10 @@ impl Service {
         if bytes.len() > 8192 {
             return Err(Error("NOTIFIER_REQUEST_TOO_LARGE"));
         }
+        let admission = self.admission.lock().await;
+        if !self.memory_available().await {
+            return Err(Error("RESOURCE_BUSY"));
+        }
         let directory = std::env::temp_dir().join(format!(
             "akasha-run-{}",
             hash(&serde_json::to_vec(&(
@@ -623,6 +627,7 @@ impl Service {
                 .ok_or(Error("NOTIFIER_FAILED"))?,
             true,
         );
+        drop(admission);
         let mut input = child.stdin.take().ok_or(Error("NOTIFIER_FAILED"))?;
         let stdout = child.stdout.take().ok_or(Error("NOTIFIER_FAILED"))?;
         let stderr = child.stderr.take().ok_or(Error("NOTIFIER_FAILED"))?;

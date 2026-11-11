@@ -1,0 +1,14 @@
+{
+  "utc": "2026-11-11T03:36:31.555801+00:00",
+  "head": "0de2704f5030102291ea492baeda89a3eb183818",
+  "tree": "498c2d9564cc34358b5a76b39422b5d74fe18017",
+  "base": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
+  "verdict": "PASS",
+  "actionable_count": 0,
+  "fresh_test_executions": 30,
+  "report_sha256": "21bdad0502cbfc6d87b999dd3e0c5a34dd4a3d6d53cc9a51ca3a975f734e6ef5",
+  "test_log_sha256": "7bfc6beaa44ee7cbbe200d0c4a6188f8604ac47ab24f00350888ef3f2a939287",
+  "scope_paths": 95,
+  "instruction_paths": 92,
+  "clean_after": true
+}

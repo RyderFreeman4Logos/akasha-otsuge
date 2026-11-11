@@ -5,18 +5,6 @@
   "base": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
   "issue": 24,
   "pr": 63,
-  "candidate_file_sha256": {
-    "src/daemon.rs": "96952d9da808dcfa72a398a224fe34fbc0bd8e9b27fca058fe427fdeaa6f4e2c",
-    "src/daemon/configuration.rs": "9bbca7b534756c12c27acc0392a6a4770456dd351948a3e77a81a1e8d1f83adf",
-    "src/daemon/jobs.rs": "ffa2fc3607b5a6d5f7d68642a182a476a181d9f142a96aa6868d80592b57559c",
-    "src/daemon/resources.rs": "75e92a0dee9eef307131930d657cf064ac6a3eea1fb6e791fcf32b765f89b863",
-    "src/storage/crash_tests.rs": "6a7c350973f96fde8ec7ed5a8b206ba1370cafb78e9bbf845a9e6af5e64a2e1b",
-    "src/storage/crash_tests/native_open.rs": "286abdf0b485ed527ffb23c82ffab5c957320397f1a62ee1a8d1defda94ce466",
-    "src/storage/native.rs": "270bad25dc745f56064d117dc49503ffac1cc791885aa5cac210eb14ee74dd3c",
-    "tests/daemon.rs": "766995ffa32348380cd9ca57ab39082accce8c687faf0f1012544a0795d8d281",
-    "tests/support/daemon_models.rs": "0b561e056d4cd398bf0b1ecaad59bb8691fac303378344c19304d16a0291660e",
-    "tests/support/retrieval_lifecycle.rs": "fb3ef73f6c2b4970bd9e22df60f2a0e5c78f9d509d241d4f59040f4c15b081fb"
-  },
   "attempts": [
     {
       "name": "mvp024-reopen-owner-order-red-r1",
@@ -52,7 +40,7 @@
     "classification": "UNCLASSIFIED; local passes do not establish remote cause"
   },
   "members": {
-    "README.md": "8a5d33eba2a49133f09f37b1305561a9ee9ea6711b0b10bd5956c38f49f068eb",
+    "README.md": "f6fd138a876fe58c5d8f24b37b1ac438b3e32f6a75e2ff0e143dd9056e19ed21",
     "mvp024-reopen-canonical-r2-verified.json": "3994ef01fc7698e3e9108d46f95e06bdd772471babffe584bb8516eb9b674cd1",
     "mvp024-reopen-canonical-r2.admission.json": "4c89730c841d08d0d3101628fc7e3a96c27ac4ea58e297eb2af73dd2e80ee8bd",
     "mvp024-reopen-canonical-r2.collected.json": "5490058693ac4268a5dacff107a0536322b29e9528a380904718173bc884b615",
@@ -67,5 +55,18 @@
     "mvp024-reopen-owner-order-focused-r1.log.gz": "503f182ec28ce5e50cbacf6b32e0a44ea6937f496393419fa33b8012d7a359fa",
     "mvp024-reopen-owner-order-red-r1.json": "e3aab6fe60e1d63828b3cb2423e9ab4c1a4684dcca6f41953a63e82f4f8d7485",
     "mvp024-reopen-owner-order-red-r1.log.gz": "b8324a73ccc25a9e4e5cafd9bb35a8f743b3790073cea19d9e88226ed044aa5a"
+  },
+  "historical_source_commit": "0de2704f5030102291ea492baeda89a3eb183818",
+  "historical_source_sha256": {
+    "src/daemon.rs": "96952d9da808dcfa72a398a224fe34fbc0bd8e9b27fca058fe427fdeaa6f4e2c",
+    "src/daemon/configuration.rs": "9bbca7b534756c12c27acc0392a6a4770456dd351948a3e77a81a1e8d1f83adf",
+    "src/daemon/jobs.rs": "ffa2fc3607b5a6d5f7d68642a182a476a181d9f142a96aa6868d80592b57559c",
+    "src/daemon/resources.rs": "75e92a0dee9eef307131930d657cf064ac6a3eea1fb6e791fcf32b765f89b863",
+    "src/storage/crash_tests.rs": "6a7c350973f96fde8ec7ed5a8b206ba1370cafb78e9bbf845a9e6af5e64a2e1b",
+    "src/storage/crash_tests/native_open.rs": "286abdf0b485ed527ffb23c82ffab5c957320397f1a62ee1a8d1defda94ce466",
+    "src/storage/native.rs": "270bad25dc745f56064d117dc49503ffac1cc791885aa5cac210eb14ee74dd3c",
+    "tests/daemon.rs": "766995ffa32348380cd9ca57ab39082accce8c687faf0f1012544a0795d8d281",
+    "tests/support/daemon_models.rs": "0b561e056d4cd398bf0b1ecaad59bb8691fac303378344c19304d16a0291660e",
+    "tests/support/retrieval_lifecycle.rs": "fb3ef73f6c2b4970bd9e22df60f2a0e5c78f9d509d241d4f59040f4c15b081fb"
   }
 }

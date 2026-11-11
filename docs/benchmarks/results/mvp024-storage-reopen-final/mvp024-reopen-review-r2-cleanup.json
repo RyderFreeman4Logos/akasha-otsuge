@@ -1,0 +1,16 @@
+{
+  "utc": "2026-11-11T03:40:33.681512+00:00",
+  "removed_raw_transport": [
+    {
+      "name": "mvp024-reopen-review-r2.stdout",
+      "bytes": 461534,
+      "sha256": "2b9335711603def485f707d39e41f26a95c43990b21f1ad3908a007c1ef81031"
+    },
+    {
+      "name": "mvp024-reopen-review-r2.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "full_report_and_tests_log_retained": true
+}

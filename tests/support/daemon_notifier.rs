@@ -689,6 +689,16 @@ fn memory_status_charges_guard_plugin_and_detached_grandchild() {
         .unwrap()
         .parse()
         .unwrap();
+    let stat = std::fs::read_to_string(format!("/proc/{plugin}/stat")).unwrap();
+    let guardian: u32 = stat
+        .rsplit_once(") ")
+        .unwrap()
+        .1
+        .split_whitespace()
+        .nth(1)
+        .unwrap()
+        .parse()
+        .unwrap();
     let observed = daemon.cli(&["daemon", "status"]);
     std::fs::remove_file(daemon.root.join("hold-plugin")).unwrap();
     wait_items(&daemon, &extraction_tests::scope(), |items| {
@@ -696,23 +706,35 @@ fn memory_status_charges_guard_plugin_and_detached_grandchild() {
     });
     let sample = &observed["data"]["resources"]["measurement"];
     assert_eq!(sample["complete"], true);
-    let pids = sample["runner_group"]["pids"].as_array().unwrap();
+    let pids = sample["daemon_group"]["pids"].as_array().unwrap();
     assert!(
-        pids.len() >= 3,
-        "guardian and both descendants must be charged"
+        pids.len() >= 4,
+        "daemon, helper guardian, plugin and descendant must all be charged"
     );
-    assert!(pids.contains(&json!(child)) && pids.contains(&json!(plugin)));
+    for pid in [
+        &observed["data"]["pid"],
+        &json!(guardian),
+        &json!(plugin),
+        &json!(child),
+    ] {
+        assert!(pids.contains(pid), "missing helper PID {pid}: {pids:?}");
+    }
+    assert_eq!(sample["runner_group"]["pids"], json!([]));
     assert!(!pids.contains(&json!(std::process::id())));
     for metric in ["rss_bytes", "pss_bytes"] {
         let daemon = sample["daemon_group"][metric].as_u64().unwrap();
         let runner = sample["runner_group"][metric].as_u64().unwrap();
-        assert!(runner > 0);
+        assert!(daemon > 0);
+        assert_eq!(runner, 0);
         assert_eq!(sample["service_total"][metric], daemon + runner);
     }
     let end = Instant::now() + Duration::from_secs(5);
     loop {
         let current = daemon.cli(&["daemon", "status"]);
-        if current["data"]["resources"]["measurement"]["runner_group"]["pids"] == json!([]) {
+        if current["data"]["resources"]["measurement"]["complete"] == true
+            && current["data"]["resources"]["measurement"]["service_total"]["pids"]
+                == json!([current["data"]["pid"]])
+        {
             break;
         }
         assert!(Instant::now() < end, "reaped children remained charged");

@@ -77,6 +77,7 @@ impl Service {
                     if header["cwd"].as_str() != workspace.to_str() {
                         return Err(Error("BINDING_CONFLICT"));
                     }
+                    service.check_process_memory().await?;
                     let capability = pi::probe(&binary).await?;
                     if capability.version.as_deref() != Some(pi::SUPPORTED_VERSION) {
                         return Err(Error("ADAPTER_UNSUPPORTED"));

@@ -20,6 +20,31 @@ fn config(input: &str) -> ResolvedConfig {
 }
 
 #[test]
+fn native_worker_memory_estimates_are_optional_positive_and_preserve_old_digests() {
+    let old = serde_json::to_value(config("").config()).unwrap();
+    assert!(old["runtime"].get("runner_memory_estimate_mib").is_none());
+    let input = "[runtime]\nrunner_memory_estimate_mib=1536\n[executors.worker]\nkind='codex'\nbinary='codex'\nmemory_estimate_mib=3072\n";
+    let accepted = config(input);
+    let value = serde_json::to_value(accepted.config()).unwrap();
+    assert_eq!(value["runtime"]["runner_memory_estimate_mib"], 1536);
+    assert_eq!(value["executors"]["worker"]["memory_estimate_mib"], 3072);
+    for invalid in [
+        "[runtime]\nrunner_memory_estimate_mib=0\n",
+        "[executors.worker]\nkind='codex'\nbinary='codex'\nmemory_estimate_mib=0\n",
+    ] {
+        assert!(resolve(invalid, None, "", &paths()).is_err());
+    }
+    let legacy =
+        serde_json::to_value(config("[executors.worker]\nkind='codex'\nbinary='codex'\n").config())
+            .unwrap();
+    assert!(
+        legacy["executors"]["worker"]
+            .get("memory_estimate_mib")
+            .is_none()
+    );
+}
+
+#[test]
 fn memory_profiles_expose_targets_peaks_and_separate_service_budget() {
     for (target, peak) in [(512, 640), (1024, 1280), (2048, 2048)] {
         let resolved = config(&format!("[runtime]\nmemory_budget_mib={target}\n"));

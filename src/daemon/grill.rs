@@ -415,7 +415,18 @@ impl Service {
         let directory = config.config().paths.data_dir.join("runner-work");
         private_dir(&directory)?;
         let (options, runner_timeout) = native.options(config, profile)?;
-        let mut runner = native.runner(&directory, instructions).await?;
+        let memory = {
+            let _guard = self.admission.lock().await;
+            self.reserve_runner(profile, config).await?
+        };
+        let lease = lease.with_resources(memory.clone());
+        let mut runner = {
+            let _guard = self.admission.lock().await;
+            self.check_process_memory().await?;
+            memory
+                .scope(native.runner(&directory, instructions))
+                .await?
+        };
         let mut spec = RunSpec::for_grill(
             RunOptions {
                 job_id: job.id.clone(),
@@ -442,6 +453,7 @@ impl Service {
             if self.stopping.load(std::sync::atomic::Ordering::Acquire) {
                 return Err(Error("RUNNER_INTERRUPTED"));
             }
+            self.check_process_memory().await?;
             runner.start(spec, &mut source).await?
         };
         let run = async {

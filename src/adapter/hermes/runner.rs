@@ -177,6 +177,7 @@ impl AgentRunner for HermesRunner {
                 .kill_on_drop(!spec.guarded())
                 .spawn()
                 .map_err(spawn_error)?;
+            spec.register_process(child.id());
             let group = ProcessGroup(
                 Pid::from_raw(child.id().ok_or(ErrorCode::RunnerFailed)? as i32)
                     .ok_or(ErrorCode::RunnerFailed)?,

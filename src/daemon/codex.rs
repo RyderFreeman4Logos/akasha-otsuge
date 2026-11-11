@@ -68,6 +68,7 @@ impl Service {
                     if !workspace.is_dir() {
                         return Err(Error("PATH_DENIED"));
                     }
+                    service.check_process_memory().await?;
                     let capability = crate::adapter::codex::probe(&binary).await?;
                     if capability.version.as_deref() != Some("0.164.0") {
                         return Err(Error("ADAPTER_UNSUPPORTED"));

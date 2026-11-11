@@ -119,6 +119,7 @@ impl Service {
                     if !workspace.is_dir() {
                         return Err(Error("PATH_DENIED"));
                     }
+                    service.check_process_memory().await?;
                     let capability = crate::adapter::claude::probe(&binary).await?;
                     if capability.version.as_deref() != Some("2.1.311") {
                         return Err(Error("ADAPTER_UNSUPPORTED"));
