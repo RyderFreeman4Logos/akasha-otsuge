@@ -1,0 +1,665 @@
+{
+  "utc": "2026-11-11T03:21:22.436006+00:00",
+  "base": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
+  "head": "0de2704f5030102291ea492baeda89a3eb183818",
+  "tree": "498c2d9564cc34358b5a76b39422b5d74fe18017",
+  "branch": "feat/mvp-024-resource-enforcement",
+  "clean": true,
+  "paths": [
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/README.md",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/manifest.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2-verified.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2.admission.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2.collected.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2.terminal.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-codex-diagnostic-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-codex-diagnostic-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-r2-failure-preflight.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-r2-failure.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-r2-failure.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-owner-order-focused-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-owner-order-focused-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-owner-order-red-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-owner-order-red-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/README.md",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/focused-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/focused-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/green-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/green-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/manifest.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1-verified.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1.admission.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1.collected.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1.terminal.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-ci-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-ci-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1-cleanup.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1-publication.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1-tests.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1-verified.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1.md",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/red-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/red-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen/README.md",
+    "docs/benchmarks/results/mvp024-storage-reopen/controls-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen/controls-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen/controls-r2.json",
+    "docs/benchmarks/results/mvp024-storage-reopen/controls-r2.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen/green-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen/green-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen/manifest.json",
+    "docs/benchmarks/results/mvp024-storage-reopen/red-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen/red-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-green-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-green-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-red-r1.json",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-red-r1.log.gz",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-red-r2.json",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-red-r2.log.gz",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/README.md",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/manifest.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-completion-publication.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1-verified.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1.admission.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1.collected.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1.log.gz",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1.terminal.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-ci-r1.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-ci-r1.log.gz",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-merge-publication.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-merged.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-pr-final.md.gz",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1-public.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1-units-public.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1.admission.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1.collected.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1.log.gz",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1.terminal.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1-cleanup.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1-publication.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1-tests.log.gz",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1-verified.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.admission.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.collected.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.exit.json",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.log.gz",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.md.gz",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.terminal.json",
+    "docs/configuration.md",
+    "docs/daemon.md",
+    "docs/memory-resources.md",
+    "docs/plan/todo.md",
+    "src/daemon.rs",
+    "src/daemon/configuration.rs",
+    "src/daemon/jobs.rs",
+    "src/daemon/resources.rs",
+    "src/storage/crash_tests.rs",
+    "src/storage/crash_tests/native_open.rs",
+    "src/storage/native.rs",
+    "tests/daemon.rs",
+    "tests/support/daemon_models.rs",
+    "tests/support/retrieval_lifecycle.rs"
+  ],
+  "source_sha256": {
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/README.md": "8a5d33eba2a49133f09f37b1305561a9ee9ea6711b0b10bd5956c38f49f068eb",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/manifest.json": "26b1e2b162669b6ed79e036b332d374ccaaeb63bb23a3a64f5068005a572e147",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2-verified.json": "3994ef01fc7698e3e9108d46f95e06bdd772471babffe584bb8516eb9b674cd1",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2.admission.json": "4c89730c841d08d0d3101628fc7e3a96c27ac4ea58e297eb2af73dd2e80ee8bd",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2.collected.json": "5490058693ac4268a5dacff107a0536322b29e9528a380904718173bc884b615",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2.log.gz": "26d68dc291ddb5c05bbc1a3f6543807d52c978e915eb86d1d1c302fb50d52c9a",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-canonical-r2.terminal.json": "649392047132f885e97f4cd690b01db20226037673712f219353b87bbf7721ff",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-codex-diagnostic-r1.json": "ea35a510062233457610e4b389926e6cbf073cc433259cfdc4822086b0ec61ed",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-codex-diagnostic-r1.log.gz": "c5dbfacbbac51fc8b66db9c74d840e36f22f1754bf17ecd2723446a31feb0d7b",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-r2-failure-preflight.json": "23bf1124b86af855d45639562af9bf848bd05c85f941d07f21c9be4012b2707a",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-r2-failure.json": "44a4f881d28877659073dc55b7417a1f0bdf34f20895a9822493cf15a4c45b3a",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-ci-r2-failure.log.gz": "d52dc00a53c6a11fd977e10688ba4de1ed8c5e8c5abfbf09747ae80d49555ff4",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-owner-order-focused-r1.json": "a8194116a58bcfe5dd6cdddf7ec96b7bedb96eb599a747c39ceca7cacf1b5caa",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-owner-order-focused-r1.log.gz": "503f182ec28ce5e50cbacf6b32e0a44ea6937f496393419fa33b8012d7a359fa",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-owner-order-red-r1.json": "e3aab6fe60e1d63828b3cb2423e9ab4c1a4684dcca6f41953a63e82f4f8d7485",
+    "docs/benchmarks/results/mvp024-storage-reopen-owner-order/mvp024-reopen-owner-order-red-r1.log.gz": "b8324a73ccc25a9e4e5cafd9bb35a8f743b3790073cea19d9e88226ed044aa5a",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/README.md": "c380f033cfefd33553a44d9322faf5b6a7466f75baa63822905f292a466cf70f",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/focused-r1.json": "f151b7e8dfd69b4d5103d1e2c0ec33bb9f7cb5380a68975b0bf611c38650a677",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/focused-r1.log.gz": "840f2a92c1525580271728b2081f7e88b0f13effe73c8c4c2fed535110fde193",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/green-r1.json": "2b41a9d82698729b00991ef4adeb7712423bc6884370996c70142df246a27545",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/green-r1.log.gz": "68140648441efcf3abcc5b9ad141a8b74156b3a8d77008684ca56cb8a23619df",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/manifest.json": "06096569d3b61d2999c86b59f5a4b72d3467b23aa9af5e848ec1bd7bd58d3dc2",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1-verified.json": "c290c78fafa1c39c408db7bf1d0b262dc56c4b516f4eb283866ba58a653bad75",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1.admission.json": "81efb3d097a1895f96f96c70c82d472e08ea4d15e6c3121f6879ceaf97097613",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1.collected.json": "1c31cacb918ce915e57441add544ee2f4c25d0ef0f860cf060f4cfb102bf2c03",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1.log.gz": "167a3a832abed323634dedacb437b51f7e8741b36ed3c00b50814a3da4601f3b",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-canonical-r1.terminal.json": "3df1ec04d48e83140eb2c8549758a32d9f249edc4f922a8bfcee3dea6ca4f88b",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-ci-r1.json": "1bd50485a410a35f423b8c48ce12158eea9d1eb8d8b76548b7cd3c4b1d3cd694",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-ci-r1.log.gz": "450e6b86384b0e8947bed13558f283f3c5eba29f815f60193728129ea7fae72e",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1-cleanup.json": "a51b9cdb76b707711f43d6a89a339df098a09ca88879ebcfb349622e7e3b85d2",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1-publication.json": "234ea507c8056f9c0388cc194a8590b4521e9c41fe1e217a1067efb5de76d50e",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1-tests.log.gz": "5267829fa864db2de139319365591db10c82c96ec117d17eda06630c7645c48d",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1-verified.json": "b334d4a2e97608854c00b9f878839533f0f3c24c13faada4e81f1536512f3a46",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/mvp024-reopen-review-r1.md": "015ab727587cab0e00340966c0332c67af95a5538ae1f4db2a7c6cf9796ad5d1",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/red-r1.json": "87ca73da1c640925b9ebedb81b03a9f19ac9d2d46e8e612dc1ef0c84111a23af",
+    "docs/benchmarks/results/mvp024-storage-reopen-review-fixes/red-r1.log.gz": "f7d837eee0ad82870add6672f3f5386a4c9bd161ae73347ed40799f578f4879f",
+    "docs/benchmarks/results/mvp024-storage-reopen/README.md": "247acdce478cc244263762702349ae69798655437056c127b4a5493c73d95eb7",
+    "docs/benchmarks/results/mvp024-storage-reopen/controls-r1.json": "414b79974dd64e735a55a42c337af7b2fbfb8660c296bae47ee8ad44462223e0",
+    "docs/benchmarks/results/mvp024-storage-reopen/controls-r1.log.gz": "4c1051c1352f61ce9f764703387d1eb45b822af088021ae5b11ea6e1e7fce900",
+    "docs/benchmarks/results/mvp024-storage-reopen/controls-r2.json": "189374807d3e1c21310546d51904cfd206c7aafadd6909aa33828ab6a03f2c07",
+    "docs/benchmarks/results/mvp024-storage-reopen/controls-r2.log.gz": "552fb4691f3298c765d9dbd427663b0faab82a81f8ab501aa3a787d9e5dd718c",
+    "docs/benchmarks/results/mvp024-storage-reopen/green-r1.json": "077eec0be166e87321431c3492c636b3d6d4e2a77d0de2a3327ccab78592553d",
+    "docs/benchmarks/results/mvp024-storage-reopen/green-r1.log.gz": "9e8149ca86b994d3c122dd7e2f4d084d606eb69fda1b886cdfe87fd584bb3328",
+    "docs/benchmarks/results/mvp024-storage-reopen/manifest.json": "16c1bc206f7c4eb04e17c0f9fbe460743b3275e2a25d9950f9e4ccebf0d9a786",
+    "docs/benchmarks/results/mvp024-storage-reopen/red-r1.json": "0dfb44cb5cabe0f7a71a69837999dfeafefb30c659e897c92f9682d1252ab323",
+    "docs/benchmarks/results/mvp024-storage-reopen/red-r1.log.gz": "d8be0c6eae8351d60ed5400335f3e10103260697959f277e05498ef42cd6631a",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-green-r1.json": "cd5aa1f1b1299e151c2ac5e0f18bef1ce14ae9f01a85de459e947a5184a6330f",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-green-r1.log.gz": "3fc0e9d7f2531096a1d39b4a01881eb154fa56631a56b06bb185b7fdf9d3121b",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-red-r1.json": "648a441d6449ab0aee2334c7b36b1b03cbe95775265c5d23172adf97baf4a1cf",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-red-r1.log.gz": "c6627b15d5c4fb0510041ab1b4595ce2aff062071acbb710edfb5cd37025c693",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-red-r2.json": "dcdd277db78aefe4e2efccff02489d415a653b92bc61c84a8218e0a92334a958",
+    "docs/benchmarks/results/mvp024-storage-reopen/transition-red-r2.log.gz": "4bf26c7ed44182b2bbbb53909d600aab0c03f8965d2a116cc7292a933c1774db",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/README.md": "df27d70d0dab4f306194fa4678248da4b64df7fa9f520d6e962035261a0c04da",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/manifest.json": "f183c7a83d724f68a7b9c1518fac8ce35888c6364a5f3bfd801af12b06ad77f0",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-completion-publication.json": "f908c2943e49874bc7d4f1feab207398f1b09b4f127c27c982e4df79628fbc94",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1-verified.json": "53094f5244049bed4f47fd8e1c3ce09c5035e0e638ddc0960b184f02e714213c",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1.admission.json": "dc38f8a349a470f655922a2d89d2f653b45d11f362198359b44d9bfd5e46e715",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1.collected.json": "1bbaaaa74bd225132d69e9053c2c44270378866bd76151b1a3dba4dc77596f21",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1.log.gz": "90941474f5b32b70635fa1605d21ee65c15da2b8cd87cec992584ab6127690c7",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-canonical-r1.terminal.json": "6b27701bb3ac1682471ae299857c250f38333bb5e720137fd7b74e5e1f3e82a3",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-ci-r1.json": "bd7c49486cf020f713a130a83ed5f02fb0816b3f8d3203f78df525950a656b9c",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-ci-r1.log.gz": "a3fd8d87a19e7517541b5145070ca3b9360359ddeb848d668a1329bf49839055",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-merge-publication.json": "f4c76f95b7b12e9d7a3538e6d9991506739eda56379abfe49efb7b2411ebcc9c",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-merged.json": "f788962d7ea51e5756a77eac61766714374acadf1aa02a6ba4f37578338fd0fd",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-pr-final.md.gz": "fec599a2c71ff8df62265f93711466363a9438e4fb668d7ad431c1aecd4a5fe7",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1-public.json": "cb9575d4215bd43f34c123c7b5ed624259a3f68ab0761a26a462981fdeec814f",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1-units-public.json": "74096485d5256b53b7367d14183b9ab2bf31d9baf0c5f26a08a123e499816925",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1.admission.json": "b864c6b8e812774e42a2ffff60467a59b7998cf952c32a077417b213cc50efcd",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1.collected.json": "a4dcf33b5619d0ff80ea0f71af59c040def8d46122ceb09e9959bb8537899cdd",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1.log.gz": "9a69c2785799b17b6c4baeed8fc9e8665657aa0428c2687c49b58675f3eba8cd",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-real-r1.terminal.json": "ffbb42bf9fa02f1c8710932d70b7af9064c17201ea8f54533a747e735fc8791e",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1-cleanup.json": "4b763c8819ea9ecb836659a795d68688f2b4f758c88eff08181f249ab0b65524",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1-publication.json": "6c87d47a3753821ede0b92b07909facfd8e6c51b32a13fa12cc65127baf21890",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1-tests.log.gz": "c399404ed3a34e3868f9edef03ae340b5932827d34bbc4ec5ca6b1571eac5583",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1-verified.json": "2ee7caa0fd9a6606acdc3a785d9c508884be06d7dff42024bb87ad4a18abfe0a",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.admission.json": "034fa1ea7f0526d2c126debb47b29fad6e8bbca251b62f23cd8494f4ad51ac78",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.collected.json": "1d8bd35e8a780ca82580e8a4350250a019ffc7535a1ecd6aecfd1cf112ae0deb",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.exit.json": "e0726f615218fc9d10372f9a416d3c4f45f6fe3ff1e743824dc9931785b0ee2b",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.log.gz": "49fa73f4ba19eaddc9da57031cf6c113937de21825a8624ff1c4d87fb5ab008b",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.md.gz": "899be6fe2b7794f580d4db19f0e8f39655b1947645647b9561d000e8e4f6d72b",
+    "docs/benchmarks/results/mvp025-snapshot-delta-final/mvp025-delta-review-r1.terminal.json": "238a93410dd56ebd0f370c1e9a63bb0e49fee86a67421c914007349ff8425975",
+    "docs/configuration.md": "cb74e70a35c8df46cbb9409466a55e028f717379a71309cee545583b34ecd44b",
+    "docs/daemon.md": "5d4f676115078966e037d153aadf76dbc78164cc2fa9797490ccca8aa212df72",
+    "docs/memory-resources.md": "af0683cec9bb29a4a66f2ef5b188614f4ac03525a7e3fc5f0afb3beff61c48be",
+    "docs/plan/todo.md": "fc1f451176c379a93637e5bb7eb92ed64fd1a54b0b946e14061217342593ed73",
+    "src/daemon.rs": "96952d9da808dcfa72a398a224fe34fbc0bd8e9b27fca058fe427fdeaa6f4e2c",
+    "src/daemon/configuration.rs": "9bbca7b534756c12c27acc0392a6a4770456dd351948a3e77a81a1e8d1f83adf",
+    "src/daemon/jobs.rs": "ffa2fc3607b5a6d5f7d68642a182a476a181d9f142a96aa6868d80592b57559c",
+    "src/daemon/resources.rs": "75e92a0dee9eef307131930d657cf064ac6a3eea1fb6e791fcf32b765f89b863",
+    "src/storage/crash_tests.rs": "6a7c350973f96fde8ec7ed5a8b206ba1370cafb78e9bbf845a9e6af5e64a2e1b",
+    "src/storage/crash_tests/native_open.rs": "286abdf0b485ed527ffb23c82ffab5c957320397f1a62ee1a8d1defda94ce466",
+    "src/storage/native.rs": "270bad25dc745f56064d117dc49503ffac1cc791885aa5cac210eb14ee74dd3c",
+    "tests/daemon.rs": "766995ffa32348380cd9ca57ab39082accce8c687faf0f1012544a0795d8d281",
+    "tests/support/daemon_models.rs": "0b561e056d4cd398bf0b1ecaad59bb8691fac303378344c19304d16a0291660e",
+    "tests/support/retrieval_lifecycle.rs": "fb3ef73f6c2b4970bd9e22df60f2a0e5c78f9d509d241d4f59040f4c15b081fb"
+  },
+  "instructions": [
+    {
+      "path": "/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen-owner-order/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen-owner-order/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen-review-fixes/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen-review-fixes/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp025-snapshot-delta-final/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp025-snapshot-delta-final/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/plan/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/plan/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/daemon/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/daemon/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/storage/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/storage/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/storage/crash_tests/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/storage/crash_tests/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/tests/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/tests/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/tests/support/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/tests/support/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen-owner-order/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen-owner-order/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen-review-fixes/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp024-storage-reopen-review-fixes/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp025-snapshot-delta-final/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/benchmarks/results/mvp025-snapshot-delta-final/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/plan/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/docs/plan/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/daemon/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/daemon/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/storage/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/storage/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/storage/crash_tests/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/src/storage/crash_tests/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/tests/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/tests/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/tests/support/AGENTS.md",
+      "exists": false,
+      "symlink": false
+    },
+    {
+      "path": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025/tests/support/CLAUDE.md",
+      "exists": false,
+      "symlink": false
+    }
+  ],
+  "target_symlink": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target"
+}

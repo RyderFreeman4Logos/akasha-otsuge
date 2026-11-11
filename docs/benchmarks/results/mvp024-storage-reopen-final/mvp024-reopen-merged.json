@@ -1,0 +1,17 @@
+{
+  "utc": "2026-11-11T03:42:19.517547+00:00",
+  "pr": 63,
+  "issue": 24,
+  "reviewed_head": "0de2704f5030102291ea492baeda89a3eb183818",
+  "merged_head": "8e14ee61c63b4dafe486e98ce5ca1f251f213001",
+  "tree": "498c2d9564cc34358b5a76b39422b5d74fe18017",
+  "reviewed_tree_identical": true,
+  "main_clean": true,
+  "worktree_clean": true,
+  "next_branch": "feat/mvp-024-memory-controls",
+  "next_base": "8e14ee61c63b4dafe486e98ce5ca1f251f213001",
+  "new_worktree_created": false,
+  "review_url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/63#issuecomment-6786312238",
+  "ci_run": 42951891062,
+  "issue_stays_open": true
+}

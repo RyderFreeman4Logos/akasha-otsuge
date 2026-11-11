@@ -16,11 +16,12 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-resource-enforcement, based
-on a500d53. The migration evidence/TODO documentation leaf is committed as
-d6552b9. #24's current leaf implements controlled budget-change drain/reopen;
-finish its functional checks, exact-source gate, conventional review and merge.
-Measured-memory admission and separate daemon/runner/service limits follow.
+The existing SSD worktree is reused on feat/mvp-024-memory-controls, based
+on 8e14ee6. PR #63 completed controlled budget-change drain/reopen and published
+the migration evidence/TODO documentation from d6552b9. The merged tree matches
+reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
+The current leaf implements measured-memory admission and separate
+daemon/runner/service limits, retaining resource ownership through reopen.
 The full corpus/load/recovery checklist below remains open. PR #56
 provides observability only; it does not establish enforcement or scale acceptance.
 All seven #24 dependencies are completed; its stale blocked label was removed.
@@ -1015,7 +1016,7 @@ run; independent R1 PASS with zero introduced findings; CI42753418883 SUCCESS.
 [Final evidence](../benchmarks/results/mvp024-observability-final/README.md) retains
 the full report/public readback, gate and CI. The finished worktree was removed
 after zero consumers were found; shared target and corpus inputs remain.
-Controlled budget-change drain/reopen is the current leaf. The first real-daemon
+Controlled budget-change drain/reopen is a completed leaf. The first real-daemon
 regression passed for running/queued job preservation. Two additional REDs exposed
 missing busy replies during close/open and failure to retain the active snapshot
 when the configuration file was rejected; both now pass. The final focused run
@@ -1036,15 +1037,29 @@ A final owner-before-accept control exposed another first-error path. The shared
 close path now records each collected error immediately; all three orderings,
 the budget cases and both retrieval controls pass (30 executions), with Clippy
 and plan validation. [Owner-order evidence](../benchmarks/results/mvp024-storage-reopen-owner-order/README.md)
-retains this RED/GREEN and both historical gate/CI outcomes. A new exact-source
-gate, independent review and PR #63 merge remain pending. Measured-memory
-admission and dedicated cgroups follow separately; neither observability nor
-focused fixtures satisfy the full production stress acceptance.
+retains this RED/GREEN and both historical gate/CI outcomes. Final candidate
+0de2704 passed its exact-source canonical gate (613 Rust executions/35 ignores,
+Python 34/Node 7, release and installed UID controls), CI42951891062 and independent
+R2 review (zero actionable findings, 30 fresh functional tests). PR #63 merged
+as 8e14ee6 with an identical tree. The [final leaf archive](../benchmarks/results/mvp024-storage-reopen-final/README.md)
+preserves the complete report, five explicit parent line-coordinate corrections,
+public readbacks, gate/CI logs and merge identity. Measured-memory admission and
+dedicated cgroups are next; neither observability nor functional fixtures satisfy
+the full production stress acceptance.
 
-- [ ] Finish controlled storage drain/reopen: same PID/socket, retriable busy
+- [x] Finish controlled storage drain/reopen: same PID/socket, retriable busy
   replies, original accepted job snapshots/deadlines, watcher reload, repeated
   or reverted budgets, pending/rejected configuration and explicit stop/signals.
-  Complete the exact-source gate, independent conventional review and merge.
+  Exact-source gate, independent conventional review and merge completed in PR #63.
+
+- [ ] Enforce measured-memory admission for new jobs, heavy requests and workers,
+  including worker estimates/reservations and actual peaks. Cover total-only
+  budget decreases with requested/effective/draining status while retaining
+  accepted identities, original deadlines and health/receipt access.
+- [ ] Own separate daemon/runner/service cgroups when delegation is available;
+  preserve ownership, limits and peaks through storage reopen, account for every
+  helper/descendant, and report software-only operation honestly when unavailable.
+  Verify owned setup/cleanup, limit readback and safe budget lowering.
 
 - [ ] Freeze source/binary, machine/filesystem/cgroup state, corpus manifest,
   source licenses/hash/seed, actual UTF-8 bytes, document/partition identities,

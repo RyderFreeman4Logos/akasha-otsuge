@@ -30,9 +30,10 @@ that were not reached. A new candidate's CI is independent evidence.
 The previous full R1 FAIL report and earlier failures remain in the linked
 [review-fix archive](../mvp024-storage-reopen-review-fixes/README.md). Its source
 pins now explicitly refer to historical 622fc8a. This archive's manifest pins
-the successor's affected source/test bytes; admissions precede formatting and
-are not interchangeable with those final source pins. A new committed
-canonical gate, independent review and PR #63 merge remain required.
+the affected source/test bytes at historical 0de2704; admissions precede formatting and
+are not interchangeable with those final source pins. The committed
+canonical gate, independent review and PR #63 merge subsequently passed; see
+the [final leaf archive](../mvp024-storage-reopen-final/README.md).
 
 Measured-RSS admission, cgroup enforcement and full #24 scale acceptance are
 unfinished. No Daybreak, new red-team campaign, private corpus mutation or

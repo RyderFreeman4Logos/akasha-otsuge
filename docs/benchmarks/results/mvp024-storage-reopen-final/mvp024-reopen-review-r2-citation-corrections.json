@@ -1,0 +1,47 @@
+{
+  "utc": "2026-11-11T03:39:29.569470+00:00",
+  "verifier": "parent postflight; not a rewritten independent review",
+  "head": "0de2704f5030102291ea492baeda89a3eb183818",
+  "tree": "498c2d9564cc34358b5a76b39422b5d74fe18017",
+  "review_report_sha256": "21bdad0502cbfc6d87b999dd3e0c5a34dd4a3d6d53cc9a51ca3a975f734e6ef5",
+  "classification": "five inaccurate line coordinates; cited symbols and described control flow verified in frozen blobs; no semantic source contradiction found",
+  "corrections": [
+    {
+      "path": "src/daemon.rs",
+      "reported_line": 866,
+      "correct_line": 855,
+      "anchor": "tokio::task::spawn_blocking(move || {",
+      "source_sha256": "96952d9da808dcfa72a398a224fe34fbc0bd8e9b27fca058fe427fdeaa6f4e2c"
+    },
+    {
+      "path": "src/daemon.rs",
+      "reported_line": 893,
+      "correct_line": 877,
+      "anchor": "if let Err(error) = accepting {",
+      "source_sha256": "96952d9da808dcfa72a398a224fe34fbc0bd8e9b27fca058fe427fdeaa6f4e2c"
+    },
+    {
+      "path": "src/daemon.rs",
+      "reported_line": 910,
+      "correct_line": 891,
+      "anchor": "async fn reject_busy(mut stream: UnixStream) {",
+      "source_sha256": "96952d9da808dcfa72a398a224fe34fbc0bd8e9b27fca058fe427fdeaa6f4e2c"
+    },
+    {
+      "path": "src/daemon.rs",
+      "reported_line": 793,
+      "correct_line": 794,
+      "anchor": "_ = watcher.tick() => {",
+      "source_sha256": "96952d9da808dcfa72a398a224fe34fbc0bd8e9b27fca058fe427fdeaa6f4e2c"
+    },
+    {
+      "path": "src/daemon/jobs.rs",
+      "reported_line": 1442,
+      "correct_line": 1446,
+      "anchor": "async fn claim(&self, id: &str, running: usize) -> Result<bool> {",
+      "source_sha256": "ffa2fc3607b5a6d5f7d68642a182a476a181d9f142a96aa6868d80592b57559c"
+    }
+  ],
+  "product_source_unchanged": true,
+  "tests_not_rerun": true
+}
