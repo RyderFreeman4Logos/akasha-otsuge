@@ -71,3 +71,16 @@ The final SSD `dua` audit reports 44,552,318,976 bytes for retained corpus/tooli
 worktree before this archive. It follows the actual SSD roots. Recorded
 filesystem free space did not immediately change after store deletion; no exact
 physical-space gain is inferred from removed logical allocations.
+
+The first final canonical run at `ae1ab02` passed 633 Rust test executions
+(including the installed-binary repeat), 34 Python tests and seven Node tests,
+then failed the installed smoke's process census assertion. Its actual census
+values were not retained, so the historical failure remains unclassified.
+The census compared volatile scheduling state along with PID/start time. A
+separate deterministic regression proves that the same process changing from
+sleeping to running was rejected; the repair compares PID/start time while
+still rejecting zombies and distinguishing PID reuse. Three process tests and
+the real candidate lifecycle/alternate-UID/TCP smoke pass after the repair.
+[census-gate.zip](census-gate.zip) retains the failed gate, unchanged RED/GREEN
+oracle and source custody; [its manifest](census-gate-manifest.json) hashes every
+member. A new exact-HEAD canonical gate and independent review are still required.

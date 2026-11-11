@@ -41,7 +41,8 @@ def owned_daemons(base):
                 assert (proc / 'exe').resolve() == pathlib.Path(base[0]).resolve()
                 current = identity(int(proc.name))
                 if current and current[1] != 'Z':
-                    found.append((int(proc.name), current))
+                    # Scheduling state can change between two reads of the same process.
+                    found.append((int(proc.name), current[0]))
         except (FileNotFoundError, ProcessLookupError, PermissionError):
             continue
     return found
@@ -103,7 +104,8 @@ def main():
             pid = status['data']['pid']
             original = identity(pid)
             assert original and original[1] != 'Z'
-            assert owned_daemons(base) == [(pid, original)]
+            owned = owned_daemons(base)
+            assert owned == [(pid, original[0])], {'expected': [(pid, original[0])], 'observed': owned}
             assert pathlib.Path(f'/proc/{pid}/exe').resolve() == binary.resolve()
             assert endpoint.stat().st_mode & 0o777 == 0o600
             assert endpoint.parent.stat().st_mode & 0o777 == 0o700
@@ -183,12 +185,12 @@ print('peer_denied')
                               'tcp_sockets': 0, 'kernel_control_uid': peer_uid}))
         finally:
             # A timed out start can detach successfully before returning its PID.
-            for owned_pid, started_identity in owned_daemons(base):
+            for owned_pid, started_ticks in owned_daemons(base):
                 current = identity(owned_pid)
-                if current and current[0] == started_identity[0] and current[1] != 'Z':
+                if current and current[0] == started_ticks and current[1] != 'Z':
                     os.kill(owned_pid, signal.SIGKILL)
                     end = time.monotonic() + 10
-                    while (current := identity(owned_pid)) and current[0] == started_identity[0] and current[1] != 'Z':
+                    while (current := identity(owned_pid)) and current[0] == started_ticks and current[1] != 'Z':
                         assert time.monotonic() < end, 'owned daemon did not exit after cleanup'
                         time.sleep(0.02)
 

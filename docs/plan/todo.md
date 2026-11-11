@@ -1163,8 +1163,14 @@ do not satisfy the full production stress acceptance.
 
 Original #24 start: 2026-11-10T03:34:44.812218Z (SSD worktree creation/reflog).
 Branch `feat/mvp-024-stress`; base `37d4d77`. No full-data product acceptance
-has run yet. Retained raw shards total 43,986,181,099 bytes; current shard hashes
-still need revalidation. Storage/daemon fixture success does not close this issue.
+has run yet. Retained compressed shards total 43,986,181,099 bytes; all 42 hashes
+were revalidated on 2026-11-11. The real paired pilot and bounded native batches
+are recorded in the production-pilot archive. Its first canonical gate passed
+all test suites but failed the final installed process census; the observed
+values are unavailable. An independently reproduced scheduling-state comparison
+defect now has unchanged RED/GREEN proof and a narrow repair. The successor still
+requires its complete exact-HEAD gate, independent review and publication.
+Storage/daemon fixture success does not close this issue.
 
 ## MVP-025 read-only migration and neutral archive acceptance
 
