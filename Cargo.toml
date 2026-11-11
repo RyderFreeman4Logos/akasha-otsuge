@@ -39,6 +39,10 @@ tokio = { version = "1.54.1", features = ["macros", "rt", "test-util"] }
 members = ["."]
 resolver = "3"
 
+[[example]]
+name = "corpus_seed"
+test = true
+
 [lints.rust]
 unsafe_code = "forbid"
 

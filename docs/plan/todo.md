@@ -39,6 +39,12 @@ identical tree. Its [complete evidence archive](../benchmarks/results/mvp024-own
 retains all 19 attempts, exact gate (626 Rust / 39 intentional ignores, Python 34 /
 Node 7), two separate committed real-kernel tests, independent PASS with 44 fresh
 tests, CI42989102629 and public report readback. Production coverage/load is next.
+All 42 retained shards were freshly rehashed (43,986,181,099 bytes). A small
+[production corpus pilot](../benchmarks/production-scale.md) is being prepared:
+an offline production-Domain seed component preserves source evidence, UTF-8
+boundaries and exact replay; three focused tests and Clippy pass. No production
+scale result is claimed. The 37 published vector documents over 4,096 bytes
+need an explicit input/model/generation solution before million-vector acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
 delegation failure; its exact selector passed without explaining that failure.
 A single diagnostic topology did not reproduce it and had 18 other IPC failures.
@@ -1071,7 +1077,7 @@ public readbacks, gate/CI logs and merge identity. PR #64 subsequently completed
 software measured-memory admission and worker reservations; its
 [final archive](../benchmarks/results/mvp024-software-memory/README.md) binds
 fa88d7c, all retained failed attempts, the exact gate, complete independent review
-and CI. Dedicated cgroups and kernel peaks remain required; functional fixtures
+and CI. PR #66 adds dedicated cgroups and kernel peaks; those functional checks
 do not satisfy the full production stress acceptance.
 
 - [x] Finish controlled storage drain/reopen: same PID/socket, retriable busy
