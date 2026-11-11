@@ -24,8 +24,9 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-index-maintenance, based
-on reviewed e5746ac from PR #67. PR #63 completed controlled budget-change drain/reopen and published
+The existing SSD worktree is reused on feat/mvp-024-index-maintenance, combining
+the preserved pruning candidate with reviewed Mempal lock repair e7cef25.
+PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
 PR #64 completed measured job admission, native worker reservations and separate
@@ -53,7 +54,8 @@ bytes, 912 files and 132 native versions. RSS sampled peak increased; no memory
 improvement or scale extrapolation is claimed. PR #67's final exact gate passed
 633 Rust executions (39 ignores), Python 35 and Node 7. Independent conventional
 review passed with zero findings and 37 fresh tests; its complete report and
-parent citation corrections are published. Hosted CI43009584075 is still running.
+parent citation corrections are published. Hosted CI43009584075 passed; merge
+b71b18d has exactly the reviewed e5746ac tree.
 The next [exclusive version-pruning leaf](../benchmarks/results/mvp024-native-prune/README.md)
 is committed as c0b9a96 after unchanged RED/GREEN and 33 related retrieval tests.
 Its identical 1,024-record pilot retains all current-claim and partition oracles
@@ -80,6 +82,18 @@ authentication is deferred. The owner authorized Codex, or Pi/Hermes through
 localhost:48317, as a temporary substitute; substitute results are not
 Claude-native evidence. mp SSH access remains a separate external blocker.
 Every unfinished issue and its original dependencies is listed below.
+
+The first pruning candidate 2e320a4 failed its canonical gate in an unchanged
+Mempal test with an unexpected busy result. That occurrence remains unclassified.
+The [separate Mempal lock leaf](../benchmarks/results/mempal-output-lock/README.md)
+proves and repairs retained-descriptor lock lifetime without changing the original
+assertion: five library and 17 public migration tests pass. Its exact e7cef25 gate
+passes 634 Rust executions (39 ignored), Python 35 and Node 7; independent review
+passes with zero findings and 23 fresh tests. The reviewed branch is pushed;
+PR/CI publication waits for main's new build cache to avoid duplicate cold builds.
+Integrate the unchanged repairs, finish that publication, and obtain this pruning
+branch's fresh canonical gate/review/publication before scaling. All original
+full-scale and downstream acceptance remains open.
 
 ## Session operating rules
 
