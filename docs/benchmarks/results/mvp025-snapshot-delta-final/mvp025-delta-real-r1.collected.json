@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T19:09:34.808478+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "014e15d6cc1c3119d6b16ab08d79a4b028e41249",
+    "log_sha256": "4e824bddb7ed07186db1edfcadcd524767b9241601c845dc5aea0060327d194e",
+    "seconds": 1635.301811432466,
+    "utc": "2026-11-10T19:09:30.347070+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASS: exact 014e15d real unchanged 3,525,645-row snapshot; full previous/output/source hashes, same-history repeat, source/input preservation and owned duplicate/scratch cleanup; zero provider calls; changed lifecycle remains ordinary fixture evidence."
+}

@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "head": "014e15d6cc1c3119d6b16ab08d79a4b028e41249",
+  "tree": "46ac6632cef510642c4653055aa2da6cf2446802",
+  "binary_sha256": "4fe07ef3452254da7895d14b84c9d5a4b5ce810ebc9c75b983328f12667b0b19",
+  "source_bytes": 11741294592,
+  "source_rows": 3525645,
+  "retained_commits": 27511,
+  "retained_revisions": 1687022,
+  "archive_bytes": 5984986447,
+  "units_completed": 6,
+  "total_units": 6,
+  "seconds": 1634.9429342746735,
+  "unchanged_snapshot": true,
+  "source_and_input_archive_preserved": true,
+  "output_bytes_match_previous": true,
+  "repeat_response_and_output_identical": true,
+  "transient_output_removed": true,
+  "sqlite_source_copies": 0,
+  "max_attempts": 1,
+  "providers_contacted": 0,
+  "limits": [
+    "Real source was unchanged; changed-snapshot lifecycle is exercised by the independent structural fixture.",
+    "No Daybreak/red-team campaign, new provider authentication, resource stress or quality evaluation."
+  ]
+}

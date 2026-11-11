@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "utc": "2026-11-11T01:49:52.446524+00:00",
+  "reviewed_head": "014e15d6cc1c3119d6b16ab08d79a4b028e41249",
+  "reviewed_tree": "46ac6632cef510642c4653055aa2da6cf2446802",
+  "merged_head": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
+  "issue": 25,
+  "issue_state": "closed",
+  "state_reason": "completed",
+  "files": {
+    "README.md": {
+      "bytes": 3470,
+      "sha256": "df27d70d0dab4f306194fa4678248da4b64df7fa9f520d6e962035261a0c04da"
+    },
+    "mvp025-completion-publication.json": {
+      "bytes": 4672,
+      "sha256": "f908c2943e49874bc7d4f1feab207398f1b09b4f127c27c982e4df79628fbc94"
+    },
+    "mvp025-delta-canonical-r1-verified.json": {
+      "bytes": 2138,
+      "sha256": "53094f5244049bed4f47fd8e1c3ce09c5035e0e638ddc0960b184f02e714213c"
+    },
+    "mvp025-delta-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "dc38f8a349a470f655922a2d89d2f653b45d11f362198359b44d9bfd5e46e715"
+    },
+    "mvp025-delta-canonical-r1.collected.json": {
+      "bytes": 385,
+      "sha256": "1bbaaaa74bd225132d69e9053c2c44270378866bd76151b1a3dba4dc77596f21"
+    },
+    "mvp025-delta-canonical-r1.log.gz": {
+      "bytes": 14045,
+      "sha256": "90941474f5b32b70635fa1605d21ee65c15da2b8cd87cec992584ab6127690c7"
+    },
+    "mvp025-delta-canonical-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "6b27701bb3ac1682471ae299857c250f38333bb5e720137fd7b74e5e1f3e82a3"
+    },
+    "mvp025-delta-ci-r1.json": {
+      "bytes": 3951,
+      "sha256": "bd7c49486cf020f713a130a83ed5f02fb0816b3f8d3203f78df525950a656b9c"
+    },
+    "mvp025-delta-ci-r1.log.gz": {
+      "bytes": 31191,
+      "sha256": "a3fd8d87a19e7517541b5145070ca3b9360359ddeb848d668a1329bf49839055"
+    },
+    "mvp025-delta-merge-publication.json": {
+      "bytes": 411,
+      "sha256": "f4c76f95b7b12e9d7a3538e6d9991506739eda56379abfe49efb7b2411ebcc9c"
+    },
+    "mvp025-delta-merged.json": {
+      "bytes": 449,
+      "sha256": "f788962d7ea51e5756a77eac61766714374acadf1aa02a6ba4f37578338fd0fd"
+    },
+    "mvp025-delta-pr-final.md.gz": {
+      "bytes": 1277,
+      "sha256": "fec599a2c71ff8df62265f93711466363a9438e4fb668d7ad431c1aecd4a5fe7"
+    },
+    "mvp025-delta-real-r1-public.json": {
+      "bytes": 959,
+      "sha256": "cb9575d4215bd43f34c123c7b5ed624259a3f68ab0761a26a462981fdeec814f"
+    },
+    "mvp025-delta-real-r1-units-public.json": {
+      "bytes": 2012,
+      "sha256": "74096485d5256b53b7367d14183b9ab2bf31d9baf0c5f26a08a123e499816925"
+    },
+    "mvp025-delta-real-r1.admission.json": {
+      "bytes": 1719,
+      "sha256": "b864c6b8e812774e42a2ffff60467a59b7998cf952c32a077417b213cc50efcd"
+    },
+    "mvp025-delta-real-r1.collected.json": {
+      "bytes": 612,
+      "sha256": "a4dcf33b5619d0ff80ea0f71af59c040def8d46122ceb09e9959bb8537899cdd"
+    },
+    "mvp025-delta-real-r1.log.gz": {
+      "bytes": 754,
+      "sha256": "9a69c2785799b17b6c4baeed8fc9e8665657aa0428c2687c49b58675f3eba8cd"
+    },
+    "mvp025-delta-real-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "ffbb42bf9fa02f1c8710932d70b7af9064c17201ea8f54533a747e735fc8791e"
+    },
+    "mvp025-delta-review-r1-cleanup.json": {
+      "bytes": 659,
+      "sha256": "4b763c8819ea9ecb836659a795d68688f2b4f758c88eff08181f249ab0b65524"
+    },
+    "mvp025-delta-review-r1-publication.json": {
+      "bytes": 424,
+      "sha256": "6c87d47a3753821ede0b92b07909facfd8e6c51b32a13fa12cc65127baf21890"
+    },
+    "mvp025-delta-review-r1-tests.log.gz": {
+      "bytes": 4620,
+      "sha256": "c399404ed3a34e3868f9edef03ae340b5932827d34bbc4ec5ca6b1571eac5583"
+    },
+    "mvp025-delta-review-r1-verified.json": {
+      "bytes": 780,
+      "sha256": "2ee7caa0fd9a6606acdc3a785d9c508884be06d7dff42024bb87ad4a18abfe0a"
+    },
+    "mvp025-delta-review-r1.admission.json": {
+      "bytes": 1115,
+      "sha256": "034fa1ea7f0526d2c126debb47b29fad6e8bbca251b62f23cd8494f4ad51ac78"
+    },
+    "mvp025-delta-review-r1.collected.json": {
+      "bytes": 599,
+      "sha256": "1d8bd35e8a780ca82580e8a4350250a019ffc7535a1ecd6aecfd1cf112ae0deb"
+    },
+    "mvp025-delta-review-r1.exit.json": {
+      "bytes": 2196,
+      "sha256": "e0726f615218fc9d10372f9a416d3c4f45f6fe3ff1e743824dc9931785b0ee2b"
+    },
+    "mvp025-delta-review-r1.log.gz": {
+      "bytes": 994,
+      "sha256": "49fa73f4ba19eaddc9da57031cf6c113937de21825a8624ff1c4d87fb5ab008b"
+    },
+    "mvp025-delta-review-r1.md.gz": {
+      "bytes": 6125,
+      "sha256": "899be6fe2b7794f580d4db19f0e8f39655b1947645647b9561d000e8e4f6d72b"
+    },
+    "mvp025-delta-review-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "238a93410dd56ebd0f370c1e9a63bb0e49fee86a67421c914007349ff8425975"
+    }
+  },
+  "historical_source_sha256": {
+    "src/domain/history.rs": "21fbdba4ac7ae0e8054d434f0954c7a26739ba8b632ff56bc3e99c05ab4ab7e6",
+    "src/domain/mod.rs": "1e0ad0a0ba551478720e729b929bccd6b28a9eeb6bcf32857322d33063c63860",
+    "src/domain/review.rs": "f06a1a20c8f1d4fd74fff3dcb0f777f4d0408c31f14318ea283f22c9b6385f27",
+    "src/domain/schema.rs": "23cb8ff607c4bfa9a1b42f828431aded5e8b8166501f389e273bb10fdbf54348",
+    "src/main.rs": "b63278b450ec3b0799562248ea28d86b2a694648987632881f6167002ed4c4d1",
+    "src/storage/archive.rs": "7747caefa9d3ca5ea09f829b7e1e90acfc05ef84f23f65248f6b669b34503b70",
+    "src/storage/import.rs": "dcece00b45581b1b50a40fe83d63c9d61a5a2542ac191a624671f8105c80ab2b",
+    "src/storage/mempal.rs": "232602456375b6d6a725da95fbc975cd7a6ed3baa0c68576313a689ebb97aa9e",
+    "src/storage/mempal/incremental.rs": "53f539fe5864fa0d7f3b7f60b66fbc4166d9ac446632caaba0bcf9933ffe3b6d",
+    "src/storage/mempal/incremental/index.rs": "588ac225e74a651087ab75d22bba2f049217099383f0cd6dc33d22fda9eec124",
+    "src/storage/mempal/projection.rs": "00568521ce4013a5639db9c7432ca61740d8e0369406e9ee5aef361b4c53601a",
+    "src/storage/mempal/reader.rs": "65f8818ca4ca5c3c2f4e33db9005b5bfcf1fd8adcdc010d6f5d6380d60a74d3f",
+    "src/storage/mempal/writer.rs": "d52bfe43c5d3f849637d31b1ef880b19a53841a6d19ddfd109f6170f0a3317b9",
+    "src/storage/mod.rs": "a94f2535608c8dd7fb68047ffdc775084c77b8509ed6789a4415c8872a5b20b1",
+    "tests/support/mempal.rs": "df2b5ffc19b14ce963c0c1beaa1d67c04d019bee8b08c258f24999971f5c2a43",
+    "tests/support/mempal_incremental.rs": "6a11b18021c089f6cae0a5b24717a8dc2d2a1248b86b75463491cb9fa38f5dfb"
+  }
+}

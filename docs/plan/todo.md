@@ -1,39 +1,34 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-10 UTC: **22 original Issues completed, 6 Issues open
-(#12 and #24–#28)**. #50 is also completed and closed. No completed acceptance
-is waiting for issue closure.
+Rechecked 2026-11-11 UTC: **23 original Issues completed, 5 Issues open
+(#12, #24, #26, #27, #28)**. #50 is also completed and closed. No completed
+acceptance is waiting for issue closure.
 
-Neutral-history incremental import merged in PR #61 as 235c409, with the same
-tree as reviewed e4f973d. Exact canonical R4 passed 595 Rust cases/35 ignores,
-installed lifecycle and UID isolation; independent conventional R3 passed with
-zero actionable findings and 71 fresh cases/six child ignores; CI42866447962
-passed with a verified cache restore and primary-key hit. The
-[final incremental archive](../benchmarks/results/mvp025-incremental-final/README.md)
-preserves those exact identities, reports, logs and publication readbacks.
-Earlier failures and unknown historical triggers remain explicitly recorded.
+Issue #25 closed as completed after PR #62 merged as a500d53, with the same
+tree as reviewed 014e15d. The [final migration archive](../benchmarks/results/mvp025-snapshot-delta-final/README.md)
+preserves canonical 599 Rust passes/35 ignores, independent conventional PASS
+with zero findings and four fresh delta tests, successful CI42878422485, and
+all six real unchanged-snapshot acceptance units. The latter retained 27,511
+commits and 1,687,022 revisions from 3,525,645 rows, proved complete output/repeat
+equality and unchanged inputs, then removed the disposable native store/output.
+Changed-source lifecycle is independently covered by the structural fixture;
+it is not a claim that private source records were modified for this acceptance.
+PRs #57 through #61 and their historical gates, failures and real-data identities
+remain linked from the final archive.
 
-The active SSD worktree is reused on feat/mvp-025-snapshot-delta, based on 235c409.
-The candidate now implements stable legacy origin identities, updates, source
-withdrawal and reappearance. Public CLI three-generation, unchanged-snapshot,
-recovery and roundtrip regressions pass. The [delta development archive](../benchmarks/results/mvp025-snapshot-delta/README.md)
-preserves failures and final focused evidence. Exact-HEAD gates, real-data
-application, independent review and publication are still being completed.
-#25 stays open until that contract and
-complete roundtrips pass. Offline import (PR #58), neutral export (PR #57),
-imported runtime (PR #59) and the read-only mempal reader (PR #60) are merged.
-The [reader archive](../benchmarks/results/mvp025-mempal-final/README.md) retains
-its distinct real-data and controlled acceptance identities.
+The existing SSD worktree is reused on feat/mvp-024-resource-enforcement, based
+on a500d53. Complete the evidence/TODO documentation leaf, then implement #24's
+resource admission, budget-lowering drain/reopen and separate daemon/runner/service
+limits. The full corpus/load/recovery checklist below remains open. PR #56
+provides observability only; it does not establish enforcement or scale acceptance.
+All seven #24 dependencies are completed; its stale blocked label was removed.
 
-After #25, finish #24 resource enforcement and full production acceptance, then
-#26 packaging, #27 fixed-reference quality evaluation and #28 final release.
-#24's observability leaf (PR #56) is already merged.
-
-#12's reviewed implementation is retained, but actual Claude authentication is
-deferred. The owner authorized Codex, or Pi/Hermes through localhost:48317, as a
-temporary substitute; substitute results are not Claude-native evidence.
-mp SSH access remains a separate external blocker. Every unfinished issue and
-its original dependencies is listed below.
+Then finish #26 packaging, #27 fixed-reference quality evaluation and #28 final
+release. #12's reviewed implementation is retained, but actual Claude
+authentication is deferred. The owner authorized Codex, or Pi/Hermes through
+localhost:48317, as a temporary substitute; substitute results are not
+Claude-native evidence. mp SSH access remains a separate external blocker.
+Every unfinished issue and its original dependencies is listed below.
 
 ## Session operating rules
 
@@ -49,8 +44,9 @@ its original dependencies is listed below.
 - At check-ins verify exact process identity, durable progress, original campaign
   age and a bounded next action. Reconcile terminal work before any resume;
   never reset an existing operation deadline or replay ambiguous effects.
-- Keep one database writer. Reuse the 42 verified compressed source shards and
-  existing writable SSD; stream the 84 GB expansion without retaining it.
+- Keep one database writer. Reuse the 42 retained compressed source shards and
+  existing writable SSD; reverify hashes before new acceptance and stream the
+  84 GB expansion without retaining it.
 - Keep `target` and `.spike-work` at the corresponding
   `/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/`
   paths, reached through checkout symlinks. Do not recreate large artifact roots
@@ -1256,7 +1252,7 @@ Runtime post-merge main CI42779863508 also passed separately.
   and explicit relations. Export raw originals, effective state, known history
   and recall receipts without a selected-engine dependency. Bound streaming
   memory and file sizes; preserve exact content and request/result identities.
-- [ ] Implement public production export/import commands. Verify all identities,
+- [x] Implement public production export/import commands. Verify all identities,
   hashes, lengths, versions and references before publication; reject malformed,
   corrupt, unknown-version or incomplete archives without replacing valid data.
   Preserve scopes, authority and readable history; do not activate foreign jobs
@@ -1276,23 +1272,23 @@ Runtime post-merge main CI42779863508 also passed separately.
 - [x] Extend neutral import to exact common-history prefixes with crash-safe
   publication and ordinary-open/restore exclusion. Replaying older archives
   must preserve newer history; divergence and local writes must remain intact.
-- [ ] Support changed mempal snapshots with explicit stable origin identities,
+- [x] Support changed mempal snapshots with explicit stable origin identities,
   primary-key ambiguity, updates and deletion semantics. Verify duplicate and
   incremental application without duplicate logical records or forged approval.
 - [x] Verify a real supported mempal sample against independent counts, hashes,
   sampled content and relations. Use an isolated source/target and keep private
   content out of committed fixtures/reports. Prove source preservation and safe
   refusal of unknown versions and corrupt records with exact failure evidence.
-- [ ] Exercise neutral export → empty import through public commands; compare
+- [x] Exercise neutral export → empty import through public commands; compare
   effective state, historical views, source bytes, receipt identities and outputs.
   Cover idempotency, incremental changes, interrupted import/resume, scope,
   deletion/retraction, malformed references, bounded oversize input and disk errors.
-- [ ] Publish supported-version/field mapping, usage, limitations and compact
+- [x] Publish supported-version/field mapping, usage, limitations and compact
   real acceptance evidence. Complete focused causal tests, exact canonical gate,
   independent review and CI for each safe leaf; merge and verify issue #25 closure
   only after the whole migration/round-trip contract is satisfied.
 
-After #25, return to all unchecked #24 enforcement/corpus/load/fault work, then
+Continue all unchecked #24 enforcement/corpus/load/fault work, then
 packaging (#26), fixed-oracle quality evaluation (#27) and final acceptance (#28).
 Claude authentication (#12) and mp SSH access remain explicit external blockers.
 
@@ -1304,8 +1300,11 @@ R1's lost original/reconstructed report distinction, R2's final-drop failure and
 the transient IMPORT_BUSY holder's unknown identity remain in the prior archives.
 Owned native shutdown and explicit admission unlock have separate causal REDs
 and passing regressions. The unchanged historical incident trigger is likewise
-not reclassified by later green runs. Changed mempal snapshots remain unfinished;
-Daybreak/red-team work is temporarily deferred by the owner.
+not reclassified by later green runs. Changed mempal snapshots subsequently completed in PR #62. The
+[final migration archive](../benchmarks/results/mvp025-snapshot-delta-final/README.md)
+records exact canonical/review/CI, real unchanged-snapshot replay, cleanup, merge
+and issue closure at 2026-11-10T19:19:33Z. All #25 acceptance checkboxes above are
+complete. Daybreak/new red-team work remains temporarily deferred by the owner.
 
 ### Remaining release acceptance
 
@@ -1365,7 +1364,7 @@ Daybreak/red-team work is temporarily deferred by the owner.
 - [x] [#22 [MVP-022] 执行失败触发调查、自动修订或高优 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22) — dependencies: #20, #21.
 - [x] [#23 [MVP-023] Notifier 插件、可用本地/stdio 实现与持久投递](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/23) — dependencies: #8, #19, #22.
 - [ ] [#24 [MVP-024] 50 GB、100 客户端、内存预算与故障恢复压力验收](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/24) — dependencies: #4, #8, #10, #16, #17, #20, #23.
-- [ ] [#25 [MVP-025] mempal 只读迁移、中立导出与往返验证](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/25) — dependencies: #4, #5, #6, #7, #19.
+- [x] [#25 [MVP-025] mempal 只读迁移、中立导出与往返验证](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/25) — dependencies: #4, #5, #6, #7, #19.
 - [ ] [#26 [MVP-026] Linux 安装、升级、卸载与四宿主使用文档](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26) — dependencies: #12, #13, #14, #15, #23, #24, #25.
 - [ ] [#27 [MVP-027] 质量评测、主上下文开销与组合回归](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) — dependencies: #16, #18, #19, #20, #22, #24, #26.
 - [ ] [#28 [MVP-028] 需求逐项终验、发布和完成证据归档](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/28) — dependencies: #1, #2, #3, #4, #5, #6, #7, #8, #9, #10, #11, #12, #13, #14, #15, #16, #17, #18, #19, #20, #21, #22, #23, #24, #25, #26, #27.

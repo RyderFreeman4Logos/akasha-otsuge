@@ -1,0 +1,62 @@
+{
+  "utc": "2026-11-10T19:12:38.302047+00:00",
+  "head": "014e15d6cc1c3119d6b16ab08d79a4b028e41249",
+  "unit_receipts_hash_verified": 6,
+  "units": {
+    "inputs": {
+      "status": "PASS",
+      "source_and_previous_archive_unchanged": true,
+      "read_only_mount": true,
+      "unit": "inputs",
+      "seconds": 18.801706459373236
+    },
+    "convert": {
+      "status": "PASS",
+      "no_new_commits": true,
+      "original_history_retained": true,
+      "native_scratch_absent": true,
+      "unit": "convert",
+      "seconds": 819.7195066427812
+    },
+    "verify": {
+      "status": "PASS",
+      "every_archive_byte_matches": true,
+      "commits": 27511,
+      "revisions": 1687022,
+      "unit": "verify",
+      "seconds": 10.749309161677957
+    },
+    "repeat": {
+      "status": "PASS",
+      "no_new_commits": true,
+      "original_history_retained": true,
+      "native_scratch_absent": true,
+      "unit": "repeat",
+      "seconds": 766.3415576787665
+    },
+    "source_preserved": {
+      "status": "PASS",
+      "source_and_previous_archive_unchanged": true,
+      "read_only_mount": true,
+      "unit": "source_preserved",
+      "seconds": 19.024005877785385
+    },
+    "cleanup": {
+      "status": "PASS",
+      "owned_output_absent": true,
+      "native_scratch_absent": true,
+      "removed_logical_bytes": 5984986686,
+      "removed_allocated_bytes": 5984997376,
+      "scoped_same_uid_consumers": [],
+      "inaccessible_same_uid_processes": 384,
+      "unit": "cleanup",
+      "seconds": 0.06048000045120716
+    }
+  },
+  "clean_source": true,
+  "limits": [
+    "Private source paths, source/data fingerprints and stdout-content hashes omitted; full private receipts retained locally.",
+    "Cleanup consumer census is scoped to readable same-UID processes; 384 processes were inaccessible in the namespace. Known acceptance commands and native scratch owners completed.",
+    "This is unchanged real-source replay; changed-snapshot semantics use the independent structural fixture."
+  ]
+}
