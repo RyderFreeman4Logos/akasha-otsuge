@@ -1021,8 +1021,15 @@ missing busy replies during close/open and failure to retain the active snapshot
 when the configuration file was rejected; both now pass. The final focused run
 passed 17 budget-related daemon cases, both retrieval-generation controls, nine
 scheduler cases, all-target Clippy and the plan check. [Causal evidence](../benchmarks/results/mvp024-storage-reopen/README.md)
-retains the failed attempts and their classifications. The canonical gate,
-independent review and merge remain pending. Measured-memory
+retains the failed attempts and their classifications. Candidate e814024 passed
+the canonical gate (611 Rust executions/35 ignores) and CI42946605310, but
+independent R1 found blocking native initialization and lost first-error
+precedence. Both have causal REDs and repaired regressions, including a prior
+scheduler-error control. The repaired focused run passes 111 executions/11
+intentional library ignores, all-target Clippy and plan validation.
+[Review-fix evidence](../benchmarks/results/mvp024-storage-reopen-review-fixes/README.md)
+preserves the full published FAIL report and old gate/CI separately. A new
+exact-source gate, independent review and PR #63 merge remain pending. Measured-memory
 admission and dedicated cgroups follow separately; neither observability nor
 focused fixtures satisfy the full production stress acceptance.
 

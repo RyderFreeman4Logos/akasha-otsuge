@@ -1,5 +1,12 @@
 # MVP-024 controlled storage reopen
 
+Historical candidate: e81402448411b19cf392c9f6f5014a5d6e92d8e7. Independent R1
+subsequently found two transition defects despite its passing focused/canonical
+tests and CI: native initialization could block busy replies, and a later error
+could replace the first failure. This archive records that original candidate,
+not a complete responsiveness/error-precedence proof. See the retained report
+and causal repairs in [the review-fix archive](../mvp024-storage-reopen-review-fixes/README.md).
+
 This leaf applies a changed storage memory target after running jobs drain. It
 keeps the daemon PID/socket, accepted job configuration and original deadlines.
 New jobs receive `RESOURCE_BUSY` during drain; existing idempotent submissions
@@ -8,8 +15,8 @@ connections, transactions and storage close, and while the next service opens.
 Explicit stop and shutdown signals remain authoritative. Reopening retains the
 active configuration and its pending/rejected input state.
 
-The parent is d6552b9; `manifest.json` binds the seven final implementation/test
-files. Its per-attempt receipts preserve command, pre-execution dirty digest,
+The parent is d6552b9; `manifest.json` binds the seven original implementation/test
+files at the historical candidate above. Its per-attempt receipts preserve command, pre-execution dirty digest,
 pinned tool paths, exit, elapsed time, full-log hash and collected process state.
 Logs are gzip-compressed without changing their uncompressed bytes. A command
 that starts with `cargo fmt` has a pre-format admission digest; the manifest

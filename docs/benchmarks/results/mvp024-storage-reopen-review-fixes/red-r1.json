@@ -1,0 +1,53 @@
+{
+  "classification": "PRODUCT_RED: initialization blocked busy replies; later owner error replaced earlier accept error",
+  "admission": {
+    "command": [
+      "/bin/bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "cargo fmt --all && cargo test --locked --offline --lib daemon::jobs::tests::budget_transition_ -- --nocapture"
+    ],
+    "dirty_diff_sha256": "1edaec6595beb67278ec9414159187b7c998c013c07f97b52da26c03be20d284",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+    "process": {
+      "pid": 794478,
+      "start_ticks": "618302725",
+      "state": "R"
+    },
+    "tree": "4cb277a253704743fb4727f202dda23c874c5052",
+    "untracked": [
+      {
+        "path": "src/storage/crash_tests/native_open.rs",
+        "sha256": "19b067daffec50ea268a01a4e211ab6cd42595df89803539dda6b77e20e2ae98"
+      }
+    ],
+    "utc": "2026-11-11T02:45:30.278662+00:00"
+  },
+  "terminal": {
+    "exit_code": 101,
+    "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+    "log_sha256": "6d364d5a4fe64198166ccf0f46ee81425d00bbaba75c9a066a6ade2e5bc662bc",
+    "seconds": 21.731449750252068,
+    "utc": "2026-11-11T02:45:51.989385+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T02:46:04.896802+00:00",
+    "terminal": {
+      "exit_code": 101,
+      "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+      "log_sha256": "6d364d5a4fe64198166ccf0f46ee81425d00bbaba75c9a066a6ade2e5bc662bc",
+      "seconds": 21.731449750252068,
+      "utc": "2026-11-11T02:45:51.989385+00:00"
+    },
+    "process_absent": true,
+    "classification": "inspect_review_regression_red"
+  }
+}

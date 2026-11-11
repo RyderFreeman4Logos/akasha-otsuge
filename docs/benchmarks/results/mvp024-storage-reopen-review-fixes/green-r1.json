@@ -1,0 +1,53 @@
+{
+  "classification": "PASS: both regressions; prior scheduler-error control retained",
+  "admission": {
+    "command": [
+      "/bin/bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "cargo fmt --all && cargo test --locked --offline --lib daemon::jobs::tests::budget_transition_ -- --nocapture"
+    ],
+    "dirty_diff_sha256": "9e1285bd4d333803abb0cadb10634fd467783513e7b87984c61865606709616a",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+    "process": {
+      "pid": 816954,
+      "start_ticks": "618331892",
+      "state": "R"
+    },
+    "tree": "4cb277a253704743fb4727f202dda23c874c5052",
+    "untracked": [
+      {
+        "path": "src/storage/crash_tests/native_open.rs",
+        "sha256": "03f5ac3cb06097669ddb43a70b6cf0e0b0f58cd6c2493bc1ada32498a51da46f"
+      }
+    ],
+    "utc": "2026-11-11T02:50:22.011375+00:00"
+  },
+  "terminal": {
+    "exit_code": 0,
+    "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+    "log_sha256": "83a8c90f1ec692501829bb2460ad4295c91ae6a9eadb97ec1c1f87905ee64512",
+    "seconds": 20.756247334182262,
+    "utc": "2026-11-11T02:50:42.684867+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T02:51:18.997567+00:00",
+    "terminal": {
+      "exit_code": 0,
+      "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+      "log_sha256": "83a8c90f1ec692501829bb2460ad4295c91ae6a9eadb97ec1c1f87905ee64512",
+      "seconds": 20.756247334182262,
+      "utc": "2026-11-11T02:50:42.684867+00:00"
+    },
+    "process_absent": true,
+    "classification": "initialization_busy_and_error_precedence_regressions_pass"
+  }
+}

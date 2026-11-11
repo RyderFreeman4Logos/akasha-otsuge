@@ -807,6 +807,8 @@ where
                 }
             }
         };
+        let first_error = std::sync::Mutex::new(outcome.as_ref().err().copied());
+        let transition_error = &first_error;
         let transition = async move {
             service
                 .stopping
@@ -819,6 +821,9 @@ where
                     .map_err(|_| Error("JOB_ERROR"))
                     .and_then(|r| r);
                 outcome = outcome.and(drained);
+            }
+            if let Err(error) = outcome {
+                transition_error.lock().unwrap().get_or_insert(error);
             }
             service.close(outcome).await?;
             if !reopen
@@ -833,9 +838,14 @@ where
             let profile = service.profile.clone();
             let last_config = service.last_config.lock().await.clone();
             drop(service);
-            open_service(config, path, profile, last_config)
-                .await
-                .map(Some)
+            // Native initialization and filesystem sync must not block the listener runtime.
+            let runtime = tokio::runtime::Handle::current();
+            tokio::task::spawn_blocking(move || {
+                runtime.block_on(open_service(config, path, profile, last_config))
+            })
+            .await
+            .map_err(|_| Error("JOB_ERROR"))?
+            .map(Some)
         };
         tokio::pin!(transition);
         let (next, accepting) = loop {
@@ -844,18 +854,22 @@ where
                 result = &mut transition => break (result, Ok(())),
                 accepted = accept() => match accepted {
                     Ok((stream, _)) => reject_busy(stream).await,
-                    Err(error) => break (transition.await, Err(error.into())),
+                    Err(error) => {
+                        let error = Error::from(error);
+                        first_error.lock().unwrap().get_or_insert(error);
+                        break (transition.await, Err(error));
+                    },
                 },
             }
         };
-        let next = next?;
         if let Err(error) = accepting {
+            let error = first_error.lock().unwrap().unwrap_or(error);
             return match next {
-                Some(service) => service.close(Err(error)).await,
-                None => Err(error),
+                Ok(Some(service)) => service.close(Err(error)).await,
+                _ => Err(error),
             };
         }
-        let Some(next) = next else {
+        let Some(next) = next? else {
             return Ok(());
         };
         service = next;

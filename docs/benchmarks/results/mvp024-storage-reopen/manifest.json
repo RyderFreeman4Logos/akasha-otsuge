@@ -4,15 +4,6 @@
   "parent": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
   "base": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
   "issue": 24,
-  "candidate_file_sha256": {
-    "src/daemon.rs": "fba038aa09b5550d6be1ce93b36c6fbe7cecb87490e86e67690ef68d91f54375",
-    "src/daemon/configuration.rs": "9bbca7b534756c12c27acc0392a6a4770456dd351948a3e77a81a1e8d1f83adf",
-    "src/daemon/jobs.rs": "171c7bf8c1895f417dbcd608a957fe79de07b70a31d269965d499f1c42d1668c",
-    "src/daemon/resources.rs": "75e92a0dee9eef307131930d657cf064ac6a3eea1fb6e791fcf32b765f89b863",
-    "tests/daemon.rs": "766995ffa32348380cd9ca57ab39082accce8c687faf0f1012544a0795d8d281",
-    "tests/support/daemon_models.rs": "0b561e056d4cd398bf0b1ecaad59bb8691fac303378344c19304d16a0291660e",
-    "tests/support/retrieval_lifecycle.rs": "fb3ef73f6c2b4970bd9e22df60f2a0e5c78f9d509d241d4f59040f4c15b081fb"
-  },
   "attempts": [
     {
       "name": "red-r1",
@@ -85,6 +76,16 @@
     "transition-red-r1.log.gz": "c6627b15d5c4fb0510041ab1b4595ce2aff062071acbb710edfb5cd37025c693",
     "transition-red-r2.json": "dcdd277db78aefe4e2efccff02489d415a653b92bc61c84a8218e0a92334a958",
     "transition-red-r2.log.gz": "4bf26c7ed44182b2bbbb53909d600aab0c03f8965d2a116cc7292a933c1774db",
-    "README.md": "29c41059556f02ce03252b67a84b210642d096621c6a00b09fa3cf7f7925564f"
+    "README.md": "247acdce478cc244263762702349ae69798655437056c127b4a5493c73d95eb7"
+  },
+  "historical_source_commit": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+  "historical_source_sha256": {
+    "src/daemon.rs": "fba038aa09b5550d6be1ce93b36c6fbe7cecb87490e86e67690ef68d91f54375",
+    "src/daemon/configuration.rs": "9bbca7b534756c12c27acc0392a6a4770456dd351948a3e77a81a1e8d1f83adf",
+    "src/daemon/jobs.rs": "171c7bf8c1895f417dbcd608a957fe79de07b70a31d269965d499f1c42d1668c",
+    "src/daemon/resources.rs": "75e92a0dee9eef307131930d657cf064ac6a3eea1fb6e791fcf32b765f89b863",
+    "tests/daemon.rs": "766995ffa32348380cd9ca57ab39082accce8c687faf0f1012544a0795d8d281",
+    "tests/support/daemon_models.rs": "0b561e056d4cd398bf0b1ecaad59bb8691fac303378344c19304d16a0291660e",
+    "tests/support/retrieval_lifecycle.rs": "fb3ef73f6c2b4970bd9e22df60f2a0e5c78f9d509d241d4f59040f4c15b081fb"
   }
 }

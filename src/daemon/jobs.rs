@@ -115,6 +115,158 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn budget_transition_keeps_busy_replies_during_native_open() {
+        let (fixture, service, _) =
+            fixture("reopen-native-hold", "[runtime]\nmemory_budget_mib=2048\n").await;
+        let socket = service
+            .config
+            .pin()
+            .resolved()
+            .config()
+            .paths
+            .socket_path
+            .clone();
+        let (listener, _owner) = listen(&socket).unwrap();
+        std::fs::write(&service.config_path, "[runtime]\nmemory_budget_mib=512\n").unwrap();
+        assert_eq!(service.reload().await.unwrap()["status"], "applied");
+        let mut gate =
+            crate::storage::crash_tests::native_open::Gate::new(&fixture.0.join("data/authority"));
+        let probe_socket = socket.clone();
+        let probe = std::thread::spawn(move || {
+            gate.reached.recv_timeout(Duration::from_secs(5)).unwrap();
+            let runtime = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap();
+            let response = runtime.block_on(async {
+                tokio::time::timeout(
+                    Duration::from_secs(2),
+                    ipc::call(
+                        &probe_socket,
+                        &Request {
+                            protocol_version: ipc::VERSION,
+                            request_id: "held-open-status".into(),
+                            deadline_ms: None,
+                            command: Command::Status,
+                        },
+                    ),
+                )
+                .await
+            });
+            let _ = gate.release.take().unwrap().send(());
+            response
+        });
+        let serving = tokio::spawn(async move { serve(service, || listener.accept()).await });
+        let observed = tokio::task::spawn_blocking(move || probe.join().unwrap())
+            .await
+            .unwrap();
+        tokio::time::timeout(Duration::from_secs(5), async {
+            loop {
+                let response = ipc::call(
+                    &socket,
+                    &Request {
+                        protocol_version: ipc::VERSION,
+                        request_id: "stop-after-open".into(),
+                        deadline_ms: None,
+                        command: Command::Stop,
+                    },
+                )
+                .await
+                .unwrap();
+                if response.get("error").is_none() {
+                    break;
+                }
+                assert_eq!(response["error"]["code"], "RESOURCE_BUSY");
+                tokio::time::sleep(Duration::from_millis(5)).await;
+            }
+        })
+        .await
+        .unwrap();
+        serving.await.unwrap().unwrap();
+        let response = observed
+            .expect("native initialization blocked the listener")
+            .unwrap();
+        assert_eq!(response["error"]["code"], "RESOURCE_BUSY");
+        assert_eq!(response["request_id"], "held-open-status");
+    }
+
+    #[tokio::test]
+    async fn budget_transition_accept_error_survives_a_later_owner_failure() {
+        for prior_scheduler_error in [false, true] {
+            let (_fixture, service, _) = fixture(
+                &format!("reopen-error-order-{prior_scheduler_error}"),
+                "[runtime]\nmemory_budget_mib=2048\n",
+            )
+            .await;
+            if prior_scheduler_error {
+                service
+                    .storage
+                    .commit(&CommitRequest {
+                        request_id: "corrupt-active".into(),
+                        config_generation: 1,
+                        policy_revision: None,
+                        changes: vec![Change {
+                            key: active_key(),
+                            expected_revision: None,
+                            content: "[\"missing\"]".into(),
+                        }],
+                    })
+                    .await
+                    .unwrap();
+            } else {
+                std::fs::write(&service.config_path, "[runtime]\nmemory_budget_mib=512\n").unwrap();
+                service.reload().await.unwrap();
+            }
+            let (release, held) = tokio::sync::oneshot::channel();
+            service.operations.lock().await.spawn(async move {
+                held.await.unwrap();
+                panic!("controlled later owner failure");
+            });
+            let release = Arc::new(std::sync::Mutex::new(Some(release)));
+            let error = serve(service.clone(), || {
+                let service = service.clone();
+                let release = release.clone();
+                async move {
+                    while !service.stopping.load(std::sync::atomic::Ordering::Acquire) {
+                        tokio::time::sleep(Duration::from_millis(1)).await;
+                    }
+                    if let Some(release) = release.lock().unwrap().take() {
+                        let _ = release.send(());
+                    }
+                    Err(std::io::Error::other("first transition accept failure"))
+                }
+            })
+            .await
+            .unwrap_err();
+            assert!(service.operations.lock().await.is_empty());
+            assert_eq!(
+                error.0,
+                if prior_scheduler_error {
+                    "JOB_NOT_FOUND"
+                } else {
+                    "IO_ERROR"
+                }
+            );
+            assert!(
+                service
+                    .storage
+                    .commit(&CommitRequest {
+                        request_id: "after-transition-error".into(),
+                        config_generation: 1,
+                        policy_revision: None,
+                        changes: vec![Change {
+                            key: job_key("after-transition-error"),
+                            expected_revision: None,
+                            content: "closed".into()
+                        }],
+                    })
+                    .await
+                    .is_err()
+            );
+        }
+    }
+
+    #[tokio::test]
     async fn serve_accept_error_stops_and_closes_storage() {
         let (_fixture, service, _) = fixture("accept-error", "").await;
         let error = serve(service.clone(), || async {
