@@ -1,0 +1,19 @@
+{
+  "head": "84428714a378bc849895c8f3ff4af6ed6af6e1c9",
+  "tree": "6e1e6d2f84c9ac99c9e1e45e181f39dad1b91849",
+  "base": "0a098882b08a7f197c0483b81c1ffd9f1d81ef39",
+  "verdict": "PASS",
+  "actionable_count": 0,
+  "changed_paths": 98,
+  "report_sha256": "4742cce4d2f8f4f3b8adbb5f5286ca91b4fdd34529b52b2061366baec93d3b58",
+  "test_log_sha256": "ea459ccb95ef050fb0d326780447618c25be25bbb50de1dcf6952287fd45fe0a",
+  "fresh_commands": 6,
+  "fresh_tests_passed": 44,
+  "report_bytes": 38455,
+  "frozen_source_citations_checked": 80,
+  "citation_audit_sha256": "6d6e6e89e670f5cdabd716f2909d83e1cd9d43cacb38b6aff7cc217d1b2bcc03",
+  "coordinate_corrections": [],
+  "clean_after": true,
+  "utc": "2026-11-11T09:03:51.119260+00:00",
+  "limitations": "normal conventional review; kernel evidence independently parent-run; full scale/recovery and historical cause attribution pending"
+}

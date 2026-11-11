@@ -1,0 +1,29 @@
+{
+  "utc": "2026-11-11T09:10:37.837051+00:00",
+  "all_consumers_terminal": true,
+  "publication_url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/66#issuecomment-6791715702",
+  "preserved": [
+    "complete report",
+    "maintained-test log",
+    "exit/usage metadata",
+    "admission/terminal/custody/publication receipts"
+  ],
+  "removed_exact_owned_raw_transport": [
+    {
+      "name": "mvp024-owned-cgroup-review-r1.stdout",
+      "bytes": 610332,
+      "sha256": "85eecdefd09db09d915f9eed2b067e2842706f19bfd868617c9a0ad1f0f8e33e"
+    },
+    {
+      "name": "mvp024-owned-cgroup-review-r1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "mvp024-owned-cgroup-review-r1.final.txt",
+      "bytes": 495,
+      "sha256": "ad47b1c2a2badbd42eb98ea8749601f317ed213f93667d159b28e09e5c5d63dd"
+    }
+  ],
+  "removed_bytes": 610827
+}

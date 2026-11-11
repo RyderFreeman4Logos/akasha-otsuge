@@ -1,0 +1,20 @@
+{
+  "pull_request": 66,
+  "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/66",
+  "head": "84428714a378bc849895c8f3ff4af6ed6af6e1c9",
+  "tree": "6e1e6d2f84c9ac99c9e1e45e181f39dad1b91849",
+  "merge": "9253a8b799421db3893e0e67dd2cfb55ca8c4b79",
+  "merged_at": "2026-11-11T09:06:30Z",
+  "merged_tree_matches_reviewed": true,
+  "review_url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/66#issuecomment-6791715702",
+  "review_sha256": "4742cce4d2f8f4f3b8adbb5f5286ca91b4fdd34529b52b2061366baec93d3b58",
+  "ci_run": 42989102629,
+  "acceptance_issue": 65,
+  "acceptance_issue_state": "open",
+  "utc": "2026-11-11T09:09:12.013464+00:00",
+  "main_fast_forwarded": true,
+  "next_branch": "feat/mvp-024-production-scale",
+  "next_branch_base": "9253a8b799421db3893e0e67dd2cfb55ca8c4b79",
+  "reused_existing_ssd_worktree": true,
+  "new_corpus_copies": 0
+}

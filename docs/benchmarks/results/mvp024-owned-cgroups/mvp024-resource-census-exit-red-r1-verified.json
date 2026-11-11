@@ -1,0 +1,9 @@
+{
+  "utc": "2026-11-11T08:33:26.251355+00:00",
+  "classification": "PRODUCT_RED_COMPLETE_CENSUS_DISCARDED_AFTER_OBSERVED_NORMAL_CHILD_EXIT",
+  "red_log_sha256": "3fd37fdad106fcbc087859d1e91990f828ffca010a4cafe2368dd3e18f44fefc",
+  "red_source_sha256": "46d91a0e9bd5ce0ff62f6630acf663c46e19deef69795494d50308369e40a2f9",
+  "frozen_test_sha256": "09961db7bcecd9a87e7ee107dc67863bee200939b488c393ed0bbe6edc080ab9",
+  "prior_editor_failure_causality": "UNPROVEN",
+  "controls": "actual child existed, graceful stdin EOF exit, parent waited and confirmed reaped before missing smaps_rollup read; owned parent stopped before assertion"
+}

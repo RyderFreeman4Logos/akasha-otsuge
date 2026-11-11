@@ -24,8 +24,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-owned-cgroups, based
-on 0a09888. PR #63 completed controlled budget-change drain/reopen and published
+The existing SSD worktree is reused on feat/mvp-024-production-scale, based
+on 9253a8b. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
 PR #64 completed measured job admission, native worker reservations and separate
@@ -33,8 +33,12 @@ daemon/runner accounting, retaining ownership through reopen. Its exact-source
 gate (625 Rust executions, Python 34 / Node 7), independent review (zero findings,
 44 fresh tests) and CI42977669246 passed. The merged tree matches reviewed fa88d7c.
 The [software-control archive](../benchmarks/results/mvp024-software-memory/README.md)
-retains failures, final evidence and public readbacks. Owned cgroup limits and
-kernel peaks are the current leaf.
+retains failures, final evidence and public readbacks. PR #66 completed the
+functional owned-cgroup leaf at reviewed 8442871, merged as 9253a8b with the
+identical tree. Its [complete evidence archive](../benchmarks/results/mvp024-owned-cgroups/README.md)
+retains all 19 attempts, exact gate (626 Rust / 39 intentional ignores, Python 34 /
+Node 7), two separate committed real-kernel tests, independent PASS with 44 fresh
+tests, CI42989102629 and public report readback. Production coverage/load is next.
 The first broader candidate regression had 167 daemon passes and one editor
 delegation failure; its exact selector passed without explaining that failure.
 A single diagnostic topology did not reproduce it and had 18 other IPC failures.
@@ -1080,19 +1084,28 @@ do not satisfy the full production stress acceptance.
   reservations that survive actual process cleanup. Total-only decreases pause
   new work without cancelling accepted workers or changing their identities and
   original deadlines. Health/receipt access remains available. PR #64 merged.
-- [ ] Own separate daemon/runner/service cgroups when delegation is available;
+- [x] Own separate daemon/runner/service cgroups when delegation is available;
   preserve ownership, limits and peaks through storage reopen, account for every
   helper/descendant, and report software-only operation honestly when unavailable.
   Verify owned setup/cleanup, limit readback, kernel peaks for later admission and
   safe budget lowering with distinct requested/effective/draining state.
-  The current candidate passes 98 library and 168 daemon tests, two separate
-  real-kernel normal lifecycle/worker tests, and all-target Clippy. Worker/guardian
+  The final candidate passed its full committed gate, two separate real-kernel
+  normal lifecycle/worker tests and independent conventional review. Worker/guardian
   membership and total-only post-drain convergence each have a retained causal
   RED; an earlier mutable-fixture callback compile failure is separately labeled
   harness failure. The real procfs exit regression also has RED/GREEN evidence;
-  prior unexplained suite failures remain retained. Committed gate, independent
-  review and publication remain pending. No full-scale or new Daybreak acceptance is claimed.
+  prior unexplained suite failures remain retained. PR #66 merged with the reviewed
+  tree; [the archive](../benchmarks/results/mvp024-owned-cgroups/README.md) preserves
+  final verification, CI, publication and cleanup. No full-scale or new Daybreak
+  acceptance is claimed.
 
+- [ ] Validate a small production corpus/coverage pilot before full-data admission.
+  Source chunks can be 64 KiB, while production claims are at most 32 KiB and
+  vector input uses 4096-byte chunk means. Prove UTF-8-safe full-span coverage,
+  original byte counts and real precomputed vector identity without silently
+  changing the model policy or claiming fresh inference. Select a bounded seed
+  path after verifying its production contract; measure disk amplification and
+  indexing progress before allocating the full store.
 - [ ] Freeze source/binary, machine/filesystem/cgroup state, corpus manifest,
   source licenses/hash/seed, actual UTF-8 bytes, document/partition identities,
   vector distribution/dimension/coverage and 100,000-change history oracle.

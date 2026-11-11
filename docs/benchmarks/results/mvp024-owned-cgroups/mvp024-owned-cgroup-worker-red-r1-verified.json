@@ -1,0 +1,7 @@
+{
+  "utc": "2026-11-11T07:51:45.606229+00:00",
+  "attempt": "mvp024-owned-cgroup-worker-red-r1",
+  "classification": "HARNESS_COMPILE_FAILURE_NOT_PRODUCT_RED",
+  "cause": "Existing incident fixture passed fn(&Daemon) directly to the newly mutable per-instance preparation callback; Rust E0631 before test execution.",
+  "repair": "Coerce through a one-line closure at that existing caller; no production change."
+}

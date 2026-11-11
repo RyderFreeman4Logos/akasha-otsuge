@@ -1,0 +1,91 @@
+{
+  "observed_at": "2026-11-11T08:59:55.225Z",
+  "head_sha": "84428714a378bc849895c8f3ff4af6ed6af6e1c9",
+  "run": {
+    "id": 42989102629,
+    "name": "CI",
+    "status": "completed",
+    "conclusion": "success",
+    "run_number": 156,
+    "jobs_url": "https://api.github.com/repos/RyderFreeman4Logos/akasha-otsuge/actions/runs/42989102629/jobs",
+    "logs_url": "https://api.github.com/repos/RyderFreeman4Logos/akasha-otsuge/actions/runs/42989102629/logs",
+    "workflow_id": 393510417
+  },
+  "jobs": [
+    {
+      "id": 130417315252,
+      "name": "linux",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42989102629,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Install native build tools",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install pinned Rust",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Reuse Cargo dependencies and build artifacts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Reuse Cargo dependencies and build artifacts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    }
+  ],
+  "source": "GitHub connector fetch_commit_workflow_runs + fetch_workflow_run_jobs + full decoded fetch_workflow_job_logs",
+  "job_id": 130417315252,
+  "run_url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/42989102629",
+  "log_sha256": "479323b59a9c6855054ce9dc0e016a3a9216f67e3d58bcc1ba0e82b9c073d439",
+  "compressed_log_sha256": "77218dff356d00b8f67c099065c6cd3bd031c4e0ca39ee4e02c5958d4a25baa2",
+  "raw_bytes": 126096,
+  "compressed_bytes": 30712,
+  "cache_lines": [
+    "2026-11-11T08:43:28.5762284Z Cache restored from key: Linux-X64-cargo-v1-cae51a1a5dfc1321dbdf9613395ea1f9a7d324c13ebbc77184cf5a1421792290",
+    "2026-11-11T08:54:15.3316118Z Cache hit occurred on the primary key Linux-X64-cargo-v1-cae51a1a5dfc1321dbdf9613395ea1f9a7d324c13ebbc77184cf5a1421792290, not saving cache."
+  ]
+}

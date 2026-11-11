@@ -1,0 +1,15 @@
+{
+  "utc": "2026-11-11T08:00:01.250234+00:00",
+  "classification": "PRODUCT_RED_TOTAL_ONLY_KERNEL_CONVERGENCE",
+  "attempt": "mvp024-owned-cgroup-worker-green-r1",
+  "proved_before_failure": [
+    "worker and guardian in same dedicated runner leaf",
+    "positive kernel peak",
+    "existing worker retains original generation/deadline during lowering",
+    "old 2048 MiB cap remains while worker runs",
+    "worker succeeds and software reservation is released"
+  ],
+  "failed_assertion": "After worker drain, effective service total stayed 2048 MiB instead of requested 1024 MiB.",
+  "test_sha256": "4e9cb9989b17bb2cade6a5c50c919813e33e271b527f02feb78772595c5fe721",
+  "repair_scope": "Apply pending limits at ordinary scheduler idle/drain boundaries; keep same socket and storage for total-only changes."
+}

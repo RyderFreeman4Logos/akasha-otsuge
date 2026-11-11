@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-11T03:52:27.014852+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "3d1cfb40a33594a3500bc7226c3ee744d3ecef9c",
+    "log_sha256": "e467c90542ac7fab1e37a3ec72f6907ef4b45ec94aa7a9a9ef0e7c6dd5760d62",
+    "seconds": 0.28739821445196867,
+    "utc": "2026-11-11T03:52:23.517301+00:00"
+  },
+  "process_absent": true,
+  "classification": "PASS_OWNED_SCOPE_NORMAL_LIFECYCLE_CAPABILITY"
+}

@@ -1,0 +1,15 @@
+{
+  "pull_request": 66,
+  "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/66",
+  "head": "84428714a378bc849895c8f3ff4af6ed6af6e1c9",
+  "merge": "9253a8b799421db3893e0e67dd2cfb55ca8c4b79",
+  "tree": "6e1e6d2f84c9ac99c9e1e45e181f39dad1b91849",
+  "merged_at": "2026-11-11T09:06:30Z",
+  "issue65_state": "open",
+  "bodies_exact_readback": true,
+  "utc": "2026-11-11T09:14:40.142Z",
+  "pr_body_sha256": "7a61a24f187f52c71118c4ada55a41c4b2423e4a9325195e0307b071e6b8b781",
+  "pr_body_artifact": "mvp024-owned-cgroup-final-pr-body.md.gz",
+  "issue65_body_sha256": "0c2f7d530b3e4e0f6000eeb01e61c6a15a6f82766cd5a9de22fe3cb0d7fb880f",
+  "issue65_body_artifact": "mvp024-owned-cgroup-issue65-body.md.gz"
+}

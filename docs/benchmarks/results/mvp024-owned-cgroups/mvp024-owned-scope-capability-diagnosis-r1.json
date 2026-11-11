@@ -1,0 +1,15 @@
+{
+  "utc": "2026-11-11T03:52:19.287419+00:00",
+  "attempts": [
+    "mvp024-owned-scope-capability-r1",
+    "mvp024-owned-scope-capability-r2"
+  ],
+  "classification": "HARNESS_SETUP, before memory limits/worker assertions; no product RED",
+  "r1_limit": "Child stderr was not retained; underlying branch is unavailable.",
+  "r2_evidence": "StartTransientUnit returned success; immediate compound membership/ownership assertion failed. Journal confirms the unique scope started and it is now collected. Which predicate failed was not logged.",
+  "source_contract": "systemd v252 method_start_transient_unit returns bus_unit_queue_job(... JOB_START ...); successful reply is not completed membership/delegation.",
+  "source_url": "https://raw.githubusercontent.com/systemd/systemd/v252/src/core/dbus-manager.c",
+  "decision": "No blind same-probe retry. Replace the incorrect immediate readiness assumption with bounded actual membership/ownership readback and capture initial/final values; keep the same tiny owned functional fixture.",
+  "r2_unit_collected": true,
+  "product_source_unchanged": true
+}
