@@ -74,7 +74,39 @@ The full `b801af9` gate passed 640 Rust executions / 39 ignores, Python 35 and
 Node 7, but independent R1 blocked publication for a missing per-prune execution
 lease check. Commit `c0de454` repairs the shared rebuild/prune guard after an
 actual native-deletion RED; unchanged-test GREEN, 35 related tests and Clippy
-pass. Finish the successor's final gate, independent R2 review and publication.
+pass. The following `5163147` gate r4 timed out in the unchanged installed
+daemon suite at 300 seconds; its last test and cause remain unavailable. The
+unchanged installed-entrypoint diagnostic passed 172 daemon tests in 251.03
+seconds, without explaining r4. Gate r5 then failed the incident root-revocation
+fixture after it restored access before workflow settlement. The exact isolated
+selector passed once; that does not override the failed full gate.
+
+[PR #69](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/69) preserves the
+existing runner barrier until the revoked runner exits, retaining the original
+PATH_DENIED, unchanged-memory and no-replay assertions. Both exact `bcec374`
+canonical gates pass 634 Rust executions / 39 intentional ignores, Python 35,
+Node 7 and installed lifecycle/UID/TCP checks. Its full independent review passes
+with zero findings and 26 fresh tests. Both hosted CI attempts failed in apt
+before project checks because the Ubuntu mirror DNS lookup failed. The single
+retry is exhausted; PR #69 remains a draft. The retained barrier prevents a
+normal successful runner result; PID disappearance alone does not prove the
+signal-level cancellation path. Historical r4 timeout causality remains unknown.
+
+Local merge `2512229` integrates the reviewed fixture into the maintenance
+branch without changing remote main or rewriting `5163147`. The
+[integration archive](../benchmarks/results/mvp024-native-prune/README.md#integration-validation)
+retains both failures, diagnostics, foundation gates, full review and CI failures.
+The merged candidate still needs its own gate and complete R2 review.
+
+- [ ] Pass the integrated maintenance candidate's exact canonical gate and
+  independent whole-range R2 review; retain every previous failed attempt.
+- [ ] Restore hosted CI execution after the recorded package-mirror DNS failure,
+  then publish PR #69 and the dependent maintenance changes with exact readback.
+- [ ] Bound effective FTS update memory/workers, verify a bounded production
+  control, and then complete the unchanged full corpus/load/recovery criteria.
+- [ ] Resolve the 37 oversized vector documents through verified licensed inputs
+  and documented model/vector identity, without increasing the product limit or
+  downloading another full corpus.
 The allocator observation supports retained free arenas but failed a disk census
 race and lacked cgroup delegation because the preload reached helper processes.
 A one-setting mmap control under enforced original limits still failed at

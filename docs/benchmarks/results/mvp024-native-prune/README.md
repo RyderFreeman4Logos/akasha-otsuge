@@ -176,3 +176,37 @@ Shared identical inputs reference the existing scale-comparison archive instead
 of duplicating the corpus/oracle. Both failed stores and sockets were removed
 after terminality, full file hashes and scoped handle checks; the sampler build
 was archived and removed. No immediate physical-space gain is inferred.
+
+## Integration validation
+
+The frozen `5163147` gate r4 exceeded the unchanged 300-second installed-suite
+limit. The original last test/output is unavailable; the unchanged installed
+entrypoint then passed 172 daemon tests (nine opt-in ignores) in 251.03 seconds.
+This isolated pass does not explain or replace r4. Gate r5 separately failed the
+incident root-revocation fixture after permission was restored before durable
+workflow settlement; its unchanged isolated selector subsequently passed once.
+
+The independently reviewed foundation `bcec374` keeps the existing runner
+barrier closed during root revocation. It preserves all original PATH_DENIED,
+unchanged-memory, single-start and no-replay assertions. Two exact canonical
+runs passed, each with 634 Rust executions / 39 intentional ignores, Python 35,
+Node 7 and installed lifecycle/UID/TCP checks. The full independent report is
+PASS with zero findings and 26 fresh tests. This excludes a normal successful
+runner result; PID disappearance alone is not signal-level cancellation proof.
+Neither the exact historical r5 interleaving nor r4 timeout cause is asserted.
+
+[PR #69](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/69) remains a draft:
+both hosted attempts failed in apt with Ubuntu mirror DNS resolution errors
+(exit 100), before project checks. The single retry is exhausted. A local wait
+transport failure was separately reconciled without starting another CI attempt.
+Local merge `2512229` brings the reviewed fixture into maintenance; remote main
+is unchanged. The resulting candidate needs a fresh complete gate and R2 review
+before publication. Full Issue #65 scale/recovery acceptance remains open.
+
+[integration-validation.zip](integration-validation.zip) retains 55 members in
+102,242 bytes, SHA-256
+`a4d4d9a4bc663b49a574c8f9b388a9b2e2b6930ea0c44d92a31388cb6f18ccbd`.
+[The manifest](integration-validation-manifest.json) verifies each member,
+including both foundation gates, the complete independent report, both hosted
+failures, earlier gate diagnostics and local merge custody. The original r5
+failure/focused repair remain in the linked incident-revocation archive.
