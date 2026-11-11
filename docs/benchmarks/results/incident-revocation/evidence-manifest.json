@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-11-11T14:42:09.865640+00:00",
+  "archive": "evidence.zip",
+  "archive_bytes": 29272,
+  "archive_sha256": "c83d0cc1f95c56d793325399e0712c45a37bc3e28de9ed1e14a174551b9ec1b7",
+  "members": {
+    "incident-revocation-focused-r1-verified.json": {
+      "bytes": 1189,
+      "sha256": "a3d04e50681b3aa10a1dc0c25e8195a3f382cf93b291d6a1f1fe2520c98ef990"
+    },
+    "incident-revocation-focused-r1.admission.json": {
+      "bytes": 1201,
+      "sha256": "70828c7de7de0f4031fbd0c90cc896d7d810a08756e2d9ad2da659de480b147b"
+    },
+    "incident-revocation-focused-r1.collected.json": {
+      "bytes": 458,
+      "sha256": "0e056d9d018d2d80a5bdf9f8a812361ec6d12b33cadfd9f8c09834d9c525cd11"
+    },
+    "incident-revocation-focused-r1.log": {
+      "bytes": 3858,
+      "sha256": "e50dcdc1609a738b25409dc379d7d5a7ffe5f4c20311d910d39833bb61fb1aed"
+    },
+    "incident-revocation-focused-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "827a835467377f008a8daafeb96532c2f37f10d518af6c606bb12bbbf93671c6"
+    },
+    "incident-revocation.patch": {
+      "bytes": 825,
+      "sha256": "05735869726d8dd9708e5affce743125b6c0eedcb6458f87bace2e2f47687f74"
+    },
+    "mvp024-incident-roots-baseline-r1.admission.json": {
+      "bytes": 1199,
+      "sha256": "f080c46c6f8ae27ed8215a7ae17600e86ba9d6217b4527cd483207d6414082b1"
+    },
+    "mvp024-incident-roots-baseline-r1.collected.json": {
+      "bytes": 456,
+      "sha256": "ecc16564cc495ae6b458dd1f998b38db443e0ca977b031f90a2610c83ec88ea1"
+    },
+    "mvp024-incident-roots-baseline-r1.log": {
+      "bytes": 449,
+      "sha256": "ee81096fceefc3630c59f6b55ab71d031f9b732b92fe804cee6896235ab149f4"
+    },
+    "mvp024-incident-roots-baseline-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "9ce28bd1e439b54054b0f68bf78b30dc758eb43b85448acdb5f5a68d50686573"
+    },
+    "mvp024-incident-roots-causal-classification-r1.json": {
+      "bytes": 2617,
+      "sha256": "74a7d74d442df248953080691a35a3925fc4ea98cd29a21e55f1eb7b9c5708e6"
+    },
+    "mvp024-index-prune-canonical-r4-failure-verified.json": {
+      "bytes": 2305,
+      "sha256": "96a0a66864ca5a39b8043feede09f779790173cca9ac56b8eebbaf10b6976702"
+    },
+    "mvp024-index-prune-canonical-r5-failure-verified.json": {
+      "bytes": 4352,
+      "sha256": "02bd2529586afe86f540ed7d871dd7980fbac1ccb06071ba8216b382608faf0f"
+    },
+    "mvp024-index-prune-canonical-r5-preflight.json": {
+      "bytes": 5635,
+      "sha256": "a698bc525a1a24d9c4c281f5b933017b2de3f04d393984973d3fde9fed89c5f7"
+    },
+    "mvp024-index-prune-canonical-r5.admission.json": {
+      "bytes": 1003,
+      "sha256": "b5687f18d6c9a23d400d9f87f95c15f7a759b5055ce52550cb9ccd11f8d57375"
+    },
+    "mvp024-index-prune-canonical-r5.collected.json": {
+      "bytes": 477,
+      "sha256": "be79d6fbdacc8f05424834f461a7a82cdbed42a666b459e820158bc25a0e1685"
+    },
+    "mvp024-index-prune-canonical-r5.log": {
+      "bytes": 51756,
+      "sha256": "665fe15758b751d67255ab8ebde59a5456ade84f37489f8be2151c8edbc25995"
+    },
+    "mvp024-index-prune-canonical-r5.terminal.json": {
+      "bytes": 239,
+      "sha256": "ec19c65074bff389748c453c6e886057e3a3816790112b28c3e57060b89e3a69"
+    },
+    "mvp024-installed-timeout-diagnostic-r1-verified.json": {
+      "bytes": 1029,
+      "sha256": "1453fa4c262f0f4d99a79a34863d437728e1cd14ada15856e975607977f95294"
+    }
+  },
+  "scope": "Observed historical full-gate failure, isolated baseline and focused fixture repair; final exact-tree gates/review/publication are separate."
+}

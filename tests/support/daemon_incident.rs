@@ -427,7 +427,10 @@ fn incident_live_policy_budget_and_restart_do_not_replay_or_silently_escalate_au
                 ));
                 daemon.cli(&["config", "reload"]);
             }
-            std::fs::write(daemon.root.join("editor-release"), "").unwrap();
+            // A revoked runner must exit through cancellation before read access is restored.
+            if case != "roots_off" {
+                std::fs::write(daemon.root.join("editor-release"), "").unwrap();
+            }
         }
         if case == "roots_off" {
             let denied = rpc(&daemon, json!({"op":"incident_show","id":id,"after":null}));
