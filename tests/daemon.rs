@@ -47,6 +47,9 @@ mod notifier_tests;
 #[path = "support/daemon_import.rs"]
 mod import_tests;
 
+#[path = "support/daemon_resources.rs"]
+mod resource_tests;
+
 #[test]
 fn budget_reopen_replies_busy_while_existing_connections_drain() {
     let mut daemon = Daemon::new();
@@ -191,6 +194,7 @@ struct Daemon {
     root: PathBuf,
     socket_name: String,
     child: Option<Child>,
+    delegated: bool,
 }
 impl Daemon {
     fn new() -> Self {
@@ -208,6 +212,7 @@ impl Daemon {
             root,
             socket_name: "service.sock".into(),
             child: None,
+            delegated: false,
         };
         daemon.configure("");
         daemon
@@ -232,6 +237,10 @@ impl Daemon {
             .env_remove("XDG_CONFIG_HOME")
             .env_remove("XDG_DATA_HOME")
             .env_remove("XDG_RUNTIME_DIR")
+            .env(
+                "DBUS_SESSION_BUS_ADDRESS",
+                "unix:path=/akasha-no-session-bus",
+            )
             .arg("--config")
             .arg(self.root.join("config.toml"))
             .arg("--socket")
@@ -242,7 +251,11 @@ impl Daemon {
         self.start_with(&[]);
     }
     fn start_with(&mut self, options: &[&str]) {
-        let mut command = self.command();
+        let mut command = if self.delegated {
+            resource_tests::delegated_command(self)
+        } else {
+            self.command()
+        };
         command.args(options);
         self.start_command(command);
     }

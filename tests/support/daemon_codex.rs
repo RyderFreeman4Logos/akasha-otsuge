@@ -24,7 +24,7 @@ pub(super) fn consult_fixture_with(
 pub(super) fn consult_fixture_prepared(
     scenario: &str,
     settings: impl FnOnce(&std::path::Path) -> String,
-    prepare: impl FnOnce(&Daemon),
+    prepare: impl FnOnce(&mut Daemon),
 ) -> (Daemon, Value, Value) {
     let mut daemon = Daemon::new();
     let workspace = daemon.root.join("workspace");
@@ -112,7 +112,7 @@ pub(super) fn consult_fixture_prepared(
     if matches!(scenario, "research" | "code_policy") {
         std::fs::write(workspace.join("notes.rs"), "memory needle\n").unwrap();
     }
-    prepare(&daemon);
+    prepare(&mut daemon);
     daemon.start();
     let registered = native(
         &daemon,
@@ -181,7 +181,21 @@ fn named_terminal(daemon: &Daemon, event: Value) -> Value {
 
 #[test]
 fn total_budget_lowering_keeps_running_worker_and_learned_peaks() {
-    let (daemon, event, _) = consult_fixture("code_policy");
+    lowering_keeps_worker(false);
+}
+
+#[test]
+#[ignore = "requires systemd user memory delegation"]
+fn owned_cgroup_worker_and_peak_survive_total_budget_lowering() {
+    lowering_keeps_worker(true);
+}
+
+fn lowering_keeps_worker(delegated: bool) {
+    let (daemon, event, _) = consult_fixture_prepared(
+        "code_policy",
+        |_| String::new(),
+        |daemon| daemon.delegated = delegated,
+    );
     let submitted = native(&daemon, event);
     let id = submitted["data"]["id"].as_str().unwrap();
     let end = Instant::now() + Duration::from_secs(15);
@@ -205,6 +219,56 @@ fn total_budget_lowering_keeps_running_worker_and_learned_peaks() {
             .unwrap()
             .contains(&json!(runner))
     );
+    let worker_group = if delegated {
+        assert_eq!(
+            status["resources"]["enforcement"]["managed_cgroup_limits"],
+            true
+        );
+        let cgroup = &status["resources"]["cgroup"];
+        let root = PathBuf::from(cgroup["path"].as_str().unwrap());
+        let membership = std::fs::read_to_string(format!("/proc/{runner}/cgroup")).unwrap();
+        let path =
+            PathBuf::from("/sys/fs/cgroup").join(membership.trim().strip_prefix("0::/").unwrap());
+        assert_eq!(path.parent().unwrap(), root.join("runner"));
+        assert!(
+            path.file_name()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .starts_with("run-")
+        );
+        let stat = std::fs::read_to_string(format!("/proc/{runner}/stat")).unwrap();
+        let guardian: u32 = stat
+            .rsplit_once(") ")
+            .unwrap()
+            .1
+            .split_whitespace()
+            .nth(1)
+            .unwrap()
+            .parse()
+            .unwrap();
+        assert_eq!(
+            std::fs::read_to_string(format!("/proc/{guardian}/cgroup")).unwrap(),
+            membership
+        );
+        let pids: Vec<u32> = std::fs::read_to_string(path.join("cgroup.procs"))
+            .unwrap()
+            .split_whitespace()
+            .map(|pid| pid.parse().unwrap())
+            .collect();
+        assert!(pids.contains(&runner) && pids.contains(&guardian));
+        assert!(
+            std::fs::read_to_string(path.join("memory.peak"))
+                .unwrap()
+                .trim()
+                .parse::<u64>()
+                .unwrap()
+                > 0
+        );
+        Some(path)
+    } else {
+        None
+    };
     let access = format!(
         "[access]\nread_roots=[{:?},{:?}]\n",
         daemon.root.join("workspace"),
@@ -219,6 +283,17 @@ fn total_budget_lowering_keeps_running_worker_and_learned_peaks() {
     assert_eq!(lowered["resources"]["storage_reopen_required"], false);
     assert_eq!(lowered["resources"]["draining"], true);
     assert_eq!(lowered["resources"]["workers"]["active_reservations"], 1);
+    if delegated {
+        assert_eq!(
+            lowered["resources"]["cgroup"]["effective"]["service_total_budget_mib"],
+            2048
+        );
+        assert_eq!(lowered["resources"]["cgroup"]["pending"], true);
+        assert_eq!(
+            lowered["resources"]["cgroup"]["service_total"]["max_bytes"],
+            2048_u64 * 1024 * 1024
+        );
+    }
     let busy = daemon
         .command()
         .args(["index", "sync", "--idempotency-key", "lowered-budget-build"])
@@ -245,12 +320,44 @@ fn total_budget_lowering_keeps_running_worker_and_learned_peaks() {
         .as_u64()
         .unwrap();
     assert!(peak > 0);
+    let kernel_peak = if delegated {
+        assert_eq!(
+            released["resources"]["cgroup"]["effective"]["service_total_budget_mib"],
+            1024
+        );
+        assert_eq!(released["resources"]["cgroup"]["pending"], false);
+        assert_eq!(
+            released["resources"]["cgroup"]["service_total"]["max_bytes"],
+            1024_u64 * 1024 * 1024
+        );
+        assert!(
+            !worker_group.as_ref().unwrap().exists(),
+            "settled worker cgroup retained"
+        );
+        let peak = released["resources"]["workers"]["completed_runner_kernel_peaks"]["caller"]
+            .as_u64()
+            .unwrap();
+        assert!(peak > 0);
+        Some(peak)
+    } else {
+        None
+    };
     daemon.configure(&format!(
         "{access}[runtime]\nmemory_budget_mib=1024\nservice_total_budget_mib=3072\n"
     ));
     daemon.cli(&["config", "reload"]);
     let reopened = wait_for_storage_budget(&daemon, 1024);
     assert_eq!(reopened["pid"], status["pid"]);
+    if let Some(peak) = kernel_peak {
+        assert_eq!(
+            reopened["resources"]["workers"]["completed_runner_kernel_peaks"]["caller"],
+            peak
+        );
+        assert_eq!(
+            reopened["resources"]["cgroup"]["path"],
+            status["resources"]["cgroup"]["path"]
+        );
+    }
     assert_eq!(
         reopened["resources"]["workers"]["completed_runner_sampled_peaks"]["caller"],
         peak

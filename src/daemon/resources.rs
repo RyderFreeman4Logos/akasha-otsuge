@@ -14,6 +14,7 @@ impl Service {
             .runtime
             .memory_limits();
         self.resources.admits(measured.as_ref(), limits)
+            && self.resources.kernel_ready(limits).await
     }
 
     // Call while holding admission; routing estimates stay pinned, global capacity stays live.
@@ -73,6 +74,28 @@ impl Service {
                 .memory_budget_mib
     }
 
+    pub(super) async fn reconcile_kernel_limits(&self) -> super::Result<()> {
+        let _admission = self.admission.lock().await;
+        let limits = self
+            .config
+            .pin()
+            .resolved()
+            .config()
+            .runtime
+            .memory_limits();
+        if self.storage_reopen_required() || self.resources.kernel_ready(limits).await {
+            return Ok(());
+        }
+        let mut owners = self.operations.lock().await;
+        while let Some(result) = owners.try_join_next() {
+            result.map_err(|_| super::Error("JOB_ERROR"))?;
+        }
+        if owners.is_empty() {
+            self.resources.apply_kernel(limits, true).await;
+        }
+        Ok(())
+    }
+
     pub(super) async fn resource_status(&self) -> Value {
         let config = self.config.pin();
         let requested = config.resolved().config().runtime.memory_limits();
@@ -83,13 +106,20 @@ impl Service {
             Err(_) => json!({"inspected":false,"open_budget_mib":null}),
         };
         let measurement = self.resources.measure().await;
+        let cgroup = self.resources.kernel_status(requested).await;
         let draining = self.storage.budget_mib() != requested.daemon_memory_target_mib
-            || !self.resources.admits(measurement.as_ref(), requested);
+            || !self.resources.admits(measurement.as_ref(), requested)
+            || (cgroup["available"] != false
+                && (cgroup["complete"] != true
+                    || cgroup["enforced"] != true
+                    || cgroup["pending"] != false
+                    || !cgroup["error"].is_null()));
         json!({"config_generation":config.generation(),"requested":requested,
             "storage_open_budget_mib":self.storage.budget_mib(),
             "storage_reopen_required":self.storage.budget_mib()!=requested.daemon_memory_target_mib,
             "draining":draining,
             "index":index,"measurement":sample(measurement),"workers":self.resources.status(),
-            "enforcement":{"software_memory_admission":true,"managed_cgroup_limits":false}})
+            "enforcement":{"software_memory_admission":true,"managed_cgroup_limits":cgroup["enforced"]==true},
+            "cgroup":cgroup})
     }
 }

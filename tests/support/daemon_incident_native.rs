@@ -4,7 +4,7 @@ fn fixture(settings: &str) -> (Daemon, Value, Value) {
     super::super::codex_tests::consult_fixture_prepared(
         "editor_incident_actual",
         |_| settings.to_owned(),
-        prepare,
+        |daemon| prepare(daemon),
     )
 }
 

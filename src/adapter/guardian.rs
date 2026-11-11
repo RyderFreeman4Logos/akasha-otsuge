@@ -73,6 +73,9 @@ fn cleanup() {
 /// Internal stdio-transparent owner for daemon-launched native workers.
 #[doc(hidden)]
 pub fn run_guard(args: &[OsString]) -> Result<u8> {
+    if args.first().is_some_and(|arg| arg == "--cgroup-exec") {
+        return crate::resources::resource_exec(&args[1..]).map_err(super::native::spawn_error);
+    }
     tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()

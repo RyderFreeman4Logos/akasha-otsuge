@@ -1772,6 +1772,9 @@ impl Service {
         let outcome = async {
         loop {
             if !self.stopping.load(std::sync::atomic::Ordering::Acquire) && !self.storage_reopen_required() {
+                if running.is_empty() && notifications.is_empty() {
+                    self.reconcile_kernel_limits().await?;
+                }
                 if self.memory_available().await {
                 if let Some(dispatch) = self.advance_notifications(&mut notification_scan, &mut notification_after, notifications.is_empty()).await? {
                     let service = self.clone();

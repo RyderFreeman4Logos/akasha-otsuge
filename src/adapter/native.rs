@@ -73,7 +73,7 @@ pub(crate) fn bridge_deadline() -> Result<tokio::time::Instant> {
 
 pub(crate) async fn version_output(binary: &Path, timeout: Duration) -> Result<(PathBuf, String)> {
     let executable = resolve(binary)?;
-    let mut command = std::process::Command::new(&executable);
+    let mut command = resource_command(&executable)?;
     command
         .arg("--version")
         .stdin(Stdio::null())
@@ -103,6 +103,14 @@ pub(crate) async fn version_output(binary: &Path, timeout: Duration) -> Result<(
     }
     let text = String::from_utf8(stdout).map_err(|_| ErrorCode::AdapterUnsupported)?;
     Ok((executable, text))
+}
+
+pub(crate) fn resource_command(binary: &Path) -> Result<std::process::Command> {
+    let command = std::process::Command::new(binary);
+    match crate::resources::native_reservation() {
+        Some(resources) => resources.command(command).map_err(spawn_error),
+        None => Ok(command),
+    }
 }
 
 pub(crate) fn spawn_error(error: std::io::Error) -> AdapterError {
