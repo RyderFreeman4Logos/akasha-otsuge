@@ -1,0 +1,24 @@
+{
+  "utc": "2026-11-11T07:30:28.336520+00:00",
+  "head": "fa88d7cc020899412026ed7b245eb7d2011062b4",
+  "tree": "7205c02423cd158d80b571ad479f75ad1ea6e8ab",
+  "base": "8e14ee61c63b4dafe486e98ce5ca1f251f213001",
+  "verdict": "PASS",
+  "actionable_count": 0,
+  "report_sha256": "4f0b61d49b0f35e8ee59beee488c58bf55a887405251cb1317147cd2ae1afb1d",
+  "test_log_sha256": "a4aa64b797acf50906f8d2d9084da51b85e028f925ffa26901631b30aea3544f",
+  "fresh_passed": 44,
+  "fresh_failed": 0,
+  "fresh_commands": 7,
+  "source_paths": 61,
+  "frozen_citations_checked": 36,
+  "citation_corrections_required": false,
+  "clean_before_after": true,
+  "reviewer_exit_receipt_sha256": "2ed5b656c2267b37e65d42ff098e48a3406723d8d1eff3c2ba006c07063f82ce",
+  "scope_sha256": "3719b423a618b4b8b5e23be84049d20a56043692a483999b0245bb4c619d2183",
+  "limitations": [
+    "Software-control leaf only; #24 stays open.",
+    "Hard cgroups, kernel peaks, full corpus/load/recovery remain pending.",
+    "No Daybreak or new red-team campaign."
+  ]
+}

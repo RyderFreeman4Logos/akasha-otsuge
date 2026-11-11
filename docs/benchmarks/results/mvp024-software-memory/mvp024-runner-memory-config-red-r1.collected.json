@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-11T04:19:11.066291+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "f980e5a4e6a83aa47bd54ba641acb10ad966e731",
+    "log_sha256": "d4aa6923cab106e0997dfe87f11d27d61d7ba745786bd48eb06da1c948468df3",
+    "seconds": 1.5361044900491834,
+    "utc": "2026-11-11T04:18:53.842210+00:00"
+  },
+  "process_absent": true,
+  "classification": "PRODUCT_RED"
+}

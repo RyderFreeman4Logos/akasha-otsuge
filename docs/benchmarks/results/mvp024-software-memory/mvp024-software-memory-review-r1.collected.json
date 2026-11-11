@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-11T07:29:11.306238+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "fa88d7cc020899412026ed7b245eb7d2011062b4",
+    "log_sha256": "b651d5ec0f11ec28808232b333ec065718e2ad77c32787b3b1f597f6ed6d20a1",
+    "seconds": 446.61523713637143,
+    "utc": "2026-11-11T07:28:42.717381+00:00"
+  },
+  "process_absent": true,
+  "classification": "TERMINAL_REPORT_PENDING_PARENT_VERIFICATION"
+}

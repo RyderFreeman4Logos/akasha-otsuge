@@ -1,0 +1,18 @@
+{
+  "utc": "2026-11-11T07:07:52.659906+00:00",
+  "command": [
+    "/home/obj/.local/bin/dua",
+    "aggregate",
+    "--threads",
+    "2",
+    "--format",
+    "bytes",
+    "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025",
+    "/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge",
+    "/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target"
+  ],
+  "output": "\u001b[32m 225357824 b\u001b[39m \u001b[36m/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge-mvp025\u001b[39m\n\u001b[32m 491560960 b\u001b[39m \u001b[36m/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge\u001b[39m\n\u001b[32m17238708224 b\u001b[39m \u001b[36m/mnt/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target\u001b[39m\n\u001b[32m17955627008 b\u001b[39m total\n",
+  "stderr": "",
+  "ssd_free_bytes": 411877560320,
+  "managed_tasks_absent": true
+}

@@ -16,13 +16,17 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-memory-controls, based
-on 8e14ee6. PR #63 completed controlled budget-change drain/reopen and published
+The existing SSD worktree is reused on feat/mvp-024-owned-cgroups, based
+on 0a09888. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
-The current leaf finishes measured job admission, native worker reservations
-and separate daemon/runner accounting, retaining ownership through reopen.
-It is limited to software controls; owned cgroup limits are the next leaf.
+PR #64 completed measured job admission, native worker reservations and separate
+daemon/runner accounting, retaining ownership through reopen. Its exact-source
+gate (625 Rust executions, Python 34 / Node 7), independent review (zero findings,
+44 fresh tests) and CI42977669246 passed. The merged tree matches reviewed fa88d7c.
+The [software-control archive](../benchmarks/results/mvp024-software-memory/README.md)
+retains failures, final evidence and public readbacks. Owned cgroup limits and
+kernel peaks are the current leaf.
 The full corpus/load/recovery checklist below remains open. PR #56
 provides observability only; it does not establish enforcement or scale acceptance.
 All seven #24 dependencies are completed; its stale blocked label was removed.
@@ -1044,23 +1048,28 @@ Python 34/Node 7, release and installed UID controls), CI42951891062 and indepen
 R2 review (zero actionable findings, 30 fresh functional tests). PR #63 merged
 as 8e14ee6 with an identical tree. The [final leaf archive](../benchmarks/results/mvp024-storage-reopen-final/README.md)
 preserves the complete report, five explicit parent line-coordinate corrections,
-public readbacks, gate/CI logs and merge identity. Measured-memory admission and
-dedicated cgroups remain required; neither observability nor functional fixtures satisfy
-the full production stress acceptance.
+public readbacks, gate/CI logs and merge identity. PR #64 subsequently completed
+software measured-memory admission and worker reservations; its
+[final archive](../benchmarks/results/mvp024-software-memory/README.md) binds
+fa88d7c, all retained failed attempts, the exact gate, complete independent review
+and CI. Dedicated cgroups and kernel peaks remain required; functional fixtures
+do not satisfy the full production stress acceptance.
 
 - [x] Finish controlled storage drain/reopen: same PID/socket, retriable busy
   replies, original accepted job snapshots/deadlines, watcher reload, repeated
   or reverted budgets, pending/rejected configuration and explicit stop/signals.
   Exact-source gate, independent conventional review and merge completed in PR #63.
 
-- [ ] Enforce measured-memory admission for new jobs, heavy requests and workers,
-  including worker estimates/reservations and actual peaks. Cover total-only
-  budget decreases with requested/effective/draining status while retaining
-  accepted identities, original deadlines and health/receipt access.
+- [x] Enforce software measured-memory admission for new jobs, queued claims and
+  workers, including configured estimates, retained sampled profile peaks and
+  reservations that survive actual process cleanup. Total-only decreases pause
+  new work without cancelling accepted workers or changing their identities and
+  original deadlines. Health/receipt access remains available. PR #64 merged.
 - [ ] Own separate daemon/runner/service cgroups when delegation is available;
   preserve ownership, limits and peaks through storage reopen, account for every
   helper/descendant, and report software-only operation honestly when unavailable.
-  Verify owned setup/cleanup, limit readback and safe budget lowering.
+  Verify owned setup/cleanup, limit readback, kernel peaks for later admission and
+  safe budget lowering with distinct requested/effective/draining state.
 
 - [ ] Freeze source/binary, machine/filesystem/cgroup state, corpus manifest,
   source licenses/hash/seed, actual UTF-8 bytes, document/partition identities,

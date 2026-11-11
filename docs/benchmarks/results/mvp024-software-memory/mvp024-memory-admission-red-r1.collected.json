@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-11T03:57:44.055941+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "3d1cfb40a33594a3500bc7226c3ee744d3ecef9c",
+    "log_sha256": "3863bd5e381da5d6ac52376a074463cc70f957800ea1cd2ee3c9ec73fd10b882",
+    "seconds": 10.86117997020483,
+    "utc": "2026-11-11T03:56:23.442781+00:00"
+  },
+  "process_absent": true,
+  "classification": "PRODUCT_RED_NEW_WORK_ADMITTED_ABOVE_MEASURED_BUDGET"
+}

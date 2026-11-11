@@ -1,0 +1,15 @@
+{
+  "utc": "2026-11-11T07:09:36.120917+00:00",
+  "head": "fa88d7cc020899412026ed7b245eb7d2011062b4",
+  "tree": "7205c02423cd158d80b571ad479f75ad1ea6e8ab",
+  "branch": "feat/mvp-024-memory-controls",
+  "base": "8e14ee61c63b4dafe486e98ce5ca1f251f213001",
+  "clean": true,
+  "index_lock_absent": true,
+  "target": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+  "tmp": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9",
+  "source_sha256": {
+    "justfile": "81412dee891494aed69f9ad811baa63e47d2ad48d25587446dc977cdb835fa82",
+    "scripts/check.sh": "ce083b075da870b04e8a8a73a19565efb56819ce59b052c9bf50fe4543efe498"
+  }
+}
