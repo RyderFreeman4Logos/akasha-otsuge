@@ -113,6 +113,7 @@ struct BatchGate {
 
 struct Service {
     storage: Arc<Storage>,
+    resources: Arc<resources::Resources>,
     config: crate::config::ConfigManager<()>,
     config_path: PathBuf,
     profile: Option<String>,
@@ -666,7 +667,8 @@ pub async fn run(
 ) -> Result<()> {
     private_dir(&config.config().paths.data_dir)?;
     let (listener, _owner) = listen(&config.config().paths.socket_path)?;
-    let service = open_service(config, config_path, profile, None).await?;
+    let resources = Arc::new(resources::Resources::default());
+    let service = open_service(config, config_path, profile, None, resources).await?;
     serve(service, || listener.accept()).await
 }
 
@@ -675,6 +677,7 @@ async fn open_service(
     config_path: PathBuf,
     profile: Option<String>,
     last_config: Option<(String, serde_json::Value)>,
+    resources: Arc<resources::Resources>,
 ) -> Result<Arc<Service>> {
     let reconcile_input = last_config.is_none();
     let providers = crate::provider::Client::new().map_err(|e| Error(e.0))?;
@@ -695,6 +698,7 @@ async fn open_service(
     };
     let service = Arc::new(Service {
         storage,
+        resources,
         config: manager,
         config_path,
         profile,
@@ -849,11 +853,12 @@ where
             let path = service.config_path.clone();
             let profile = service.profile.clone();
             let last_config = service.last_config.lock().await.clone();
+            let resources = service.resources.clone();
             drop(service);
             // Native initialization and filesystem sync must not block the listener runtime.
             let runtime = tokio::runtime::Handle::current();
             tokio::task::spawn_blocking(move || {
-                runtime.block_on(open_service(config, path, profile, last_config))
+                runtime.block_on(open_service(config, path, profile, last_config, resources))
             })
             .await
             .map_err(|_| Error("JOB_ERROR"))?

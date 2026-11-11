@@ -141,7 +141,7 @@ fn memory_budget_reload_reopens_idle_storage_and_reports_actual_groups() {
         sample["daemon_group"]["rss_bytes"]
     );
     assert_eq!(resource["enforcement"]["managed_cgroup_limits"], false);
-    assert_eq!(resource["enforcement"]["software_memory_admission"], false);
+    assert_eq!(resource["enforcement"]["software_memory_admission"], true);
     daemon.configure("[runtime]\nmemory_budget_mib=512\nservice_total_budget_mib=3072\n");
     assert_eq!(
         daemon.cli(&["config", "reload"])["data"]["status"],
@@ -242,9 +242,13 @@ impl Daemon {
         self.start_with(&[]);
     }
     fn start_with(&mut self, options: &[&str]) {
+        let mut command = self.command();
+        command.args(options);
+        self.start_command(command);
+    }
+    fn start_command(&mut self, mut command: Command) {
         self.child = Some(
-            self.command()
-                .args(options)
+            command
                 .args(["daemon", "run"])
                 .stdin(Stdio::null())
                 .stdout(Stdio::null())

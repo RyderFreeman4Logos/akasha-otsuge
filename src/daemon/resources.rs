@@ -42,14 +42,77 @@ fn kib(text: &str, name: &str) -> Option<u64> {
         .then_some(bytes)
 }
 
-#[derive(Default, Serialize)]
+#[derive(Clone, Default, Serialize)]
 struct Group {
     pids: Vec<u32>,
     rss_bytes: u64,
     pss_bytes: u64,
 }
 
-fn measure(root: u32) -> Option<Value> {
+#[derive(Clone, Serialize)]
+struct Measurement {
+    daemon_group: Group,
+    runner_group: Group,
+    service_total: Group,
+}
+
+impl Measurement {
+    fn admits(&self, limits: crate::config::MemoryLimits) -> bool {
+        self.daemon_group.rss_bytes < u64::from(limits.daemon_memory_target_mib) * 1024 * 1024
+            && self.service_total.rss_bytes
+                < u64::from(limits.service_total_budget_mib) * 1024 * 1024
+    }
+}
+
+#[derive(Default)]
+pub(super) struct Resources {
+    #[cfg(test)]
+    fixture: Option<std::sync::Mutex<Option<Measurement>>>,
+}
+
+impl Resources {
+    async fn measure(&self) -> Option<Measurement> {
+        #[cfg(test)]
+        if let Some(fixture) = &self.fixture {
+            return fixture.lock().unwrap().clone();
+        }
+        tokio::task::spawn_blocking(|| measure(std::process::id()))
+            .await
+            .ok()
+            .flatten()
+    }
+
+    #[cfg(test)]
+    pub(super) fn fixture() -> Self {
+        let resources = Self {
+            fixture: Some(std::sync::Mutex::new(None)),
+        };
+        // In-process service fixtures do not own the test harness's other threads or children.
+        resources.set_fixture_sample(Some((1024 * 1024, 0)));
+        resources
+    }
+
+    #[cfg(test)]
+    pub(super) fn set_fixture_sample(&self, bytes: Option<(u64, u64)>) {
+        *self.fixture.as_ref().unwrap().lock().unwrap() =
+            bytes.map(|(daemon, runners)| Measurement {
+                daemon_group: Group {
+                    rss_bytes: daemon,
+                    ..Group::default()
+                },
+                runner_group: Group {
+                    rss_bytes: runners,
+                    ..Group::default()
+                },
+                service_total: Group {
+                    rss_bytes: daemon.checked_add(runners).unwrap(),
+                    ..Group::default()
+                },
+            });
+    }
+}
+
+fn measure(root: u32) -> Option<Measurement> {
     let mut pending = vec![(root, None)];
     let mut seen = BTreeMap::new();
     let mut daemon = Group::default();
@@ -108,12 +171,16 @@ fn measure(root: u32) -> Option<Value> {
         rss_bytes: daemon.rss_bytes.checked_add(runners.rss_bytes)?,
         pss_bytes: daemon.pss_bytes.checked_add(runners.pss_bytes)?,
     };
-    Some(json!({"daemon_group":daemon,"runner_group":runners,"service_total":total}))
+    Some(Measurement {
+        daemon_group: daemon,
+        runner_group: runners,
+        service_total: total,
+    })
 }
 
-fn sample(root: u32) -> Value {
-    let mut value = match measure(root) {
-        Some(value) => value,
+fn sample(measurement: Option<Measurement>) -> Value {
+    let mut value = match measurement {
+        Some(value) => json!(value),
         None => json!({"daemon_group":null,"runner_group":null,"service_total":null,
             "error":"RESOURCE_MEASUREMENT_UNAVAILABLE"}),
     };
@@ -126,6 +193,20 @@ fn sample(root: u32) -> Value {
 }
 
 impl Service {
+    pub(super) async fn memory_available(&self) -> bool {
+        let measured = self.resources.measure().await;
+        let limits = self
+            .config
+            .pin()
+            .resolved()
+            .config()
+            .runtime
+            .memory_limits();
+        measured
+            .as_ref()
+            .is_some_and(|sample| sample.admits(limits))
+    }
+
     pub(super) fn storage_reopen_required(&self) -> bool {
         self.storage.budget_mib()
             != self
@@ -146,17 +227,17 @@ impl Service {
             }
             Err(_) => json!({"inspected":false,"open_budget_mib":null}),
         };
-        let measurement = tokio::task::spawn_blocking(|| sample(std::process::id()))
-            .await
-            .unwrap_or_else(
-                |_| json!({"complete":false,"error":"RESOURCE_MEASUREMENT_UNAVAILABLE"}),
-            );
+        let measurement = self.resources.measure().await;
+        let draining = self.storage.budget_mib() != requested.daemon_memory_target_mib
+            || measurement
+                .as_ref()
+                .is_none_or(|sample| !sample.admits(requested));
         json!({"config_generation":config.generation(),"requested":requested,
             "storage_open_budget_mib":self.storage.budget_mib(),
             "storage_reopen_required":self.storage.budget_mib()!=requested.daemon_memory_target_mib,
-            "draining":self.storage.budget_mib()!=requested.daemon_memory_target_mib,
-            "index":index,"measurement":measurement,
-            "enforcement":{"software_memory_admission":false,"managed_cgroup_limits":false}})
+            "draining":draining,
+            "index":index,"measurement":sample(measurement),
+            "enforcement":{"software_memory_admission":true,"managed_cgroup_limits":false}})
     }
 }
 
@@ -166,7 +247,7 @@ mod tests {
 
     #[test]
     fn memory_samples_refuse_unknown_processes_and_malformed_or_overflowing_units() {
-        let failed = sample(u32::MAX);
+        let failed = sample(measure(u32::MAX));
         assert_eq!(failed["complete"], false);
         assert!(failed["service_total"].is_null());
         assert_eq!(failed["error"], "RESOURCE_MEASUREMENT_UNAVAILABLE");

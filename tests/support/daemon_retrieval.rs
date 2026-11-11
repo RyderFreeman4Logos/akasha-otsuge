@@ -154,6 +154,62 @@ fn finished(daemon: &Daemon, id: &str) -> Value {
 }
 
 #[test]
+fn memory_pressure_refuses_new_work_and_recovers_after_budget_raise() {
+    let mut daemon = Daemon::new();
+    daemon.configure("[runtime]\nmemory_budget_mib=1\n");
+    let mut command = daemon.command();
+    command.env(
+        "DBUS_SESSION_BUS_ADDRESS",
+        format!(
+            "unix:path={}",
+            daemon.root.join("absent-user-bus").display()
+        ),
+    );
+    daemon.start_command(command);
+    let before = daemon.cli(&["daemon", "status"])["data"].clone();
+    assert_eq!(before["resources"]["measurement"]["complete"], true);
+    assert!(
+        before["resources"]["measurement"]["daemon_group"]["rss_bytes"]
+            .as_u64()
+            .unwrap()
+            > 1024 * 1024
+    );
+    let args = ["index", "sync", "--idempotency-key", "pressure-build"];
+    let busy = daemon.command().args(args).output().unwrap();
+    assert_eq!(busy.status.code(), Some(4), "{busy:?}");
+    assert!(String::from_utf8_lossy(&busy.stderr).contains("RESOURCE_BUSY"));
+    let absent = daemon
+        .command()
+        .args(["job", "show", "pressure-build"])
+        .output()
+        .unwrap();
+    assert!(String::from_utf8_lossy(&absent.stderr).contains("JOB_NOT_FOUND"));
+    let pressured = daemon.cli(&["daemon", "status"])["data"].clone();
+    assert_eq!(pressured["resources"]["draining"], true);
+    assert_eq!(
+        pressured["resources"]["enforcement"]["software_memory_admission"],
+        true
+    );
+    assert_eq!(
+        pressured["resources"]["enforcement"]["managed_cgroup_limits"],
+        false
+    );
+    daemon.configure("[runtime]\nmemory_budget_mib=512\n");
+    daemon.cli(&["config", "reload"]);
+    let after = wait_for_storage_budget(&daemon, 512);
+    assert_eq!(after["pid"], before["pid"]);
+    let accepted = daemon.cli(&args)["data"].clone();
+    let complete = finished(&daemon, "pressure-build");
+    assert_eq!(complete["state"], "succeeded", "{complete}");
+    let repeated = daemon.cli(&args)["data"].clone();
+    for field in ["id", "request_sha256", "config_generation", "config_digest"] {
+        assert_eq!(repeated[field], accepted[field], "{field}");
+    }
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
 fn empty_library_returns_no_hit_with_an_explicit_memory_only_boundary() {
     let mut daemon = Daemon::new();
     let scope_file = daemon.root.join("scope.json");

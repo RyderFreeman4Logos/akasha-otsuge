@@ -82,6 +82,7 @@ mod tests {
         let manager = configuration::open(&storage, initial).await.unwrap();
         let service = Arc::new(Service {
             storage,
+            resources: Arc::new(resources::Resources::fixture()),
             config: manager,
             config_path: root.join("config.toml"),
             profile: None,
@@ -486,6 +487,66 @@ mod tests {
                 .await
                 .is_err()
         );
+    }
+
+    #[tokio::test]
+    async fn memory_pressure_preserves_replay_and_queued_deadlines() {
+        let (fixture, service, binding) = fixture("memory-pressure", "").await;
+        let path = fixture.0.join("missing.jsonl");
+        for id in ["expire", "recover"] {
+            service
+                .submit(id.into(), binding.clone(), path.clone())
+                .await
+                .unwrap();
+        }
+        let original = service.job("recover").unwrap().1;
+        for measured in [
+            Some((512 * 1024 * 1024, 0)),
+            Some((1, 2048 * 1024 * 1024)),
+            None,
+        ] {
+            service.resources.set_fixture_sample(measured);
+            assert_eq!(service.resource_status().await["draining"], true);
+            service
+                .submit("recover".into(), binding.clone(), path.clone())
+                .await
+                .unwrap();
+            let error = service
+                .submit("refused".into(), binding.clone(), path.clone())
+                .await
+                .unwrap_err();
+            assert_eq!(error.0, "RESOURCE_BUSY");
+            assert_eq!(service.job("refused").err().unwrap().0, "JOB_NOT_FOUND");
+            assert!(!service.claim("recover", 0).await.unwrap());
+            let job = service.job("recover").unwrap().1;
+            assert_eq!(job.state, "queued");
+            assert_eq!(job.attempt, original.attempt);
+            assert_eq!(job.queue_deadline_ms, original.queue_deadline_ms);
+            assert_eq!(job.config_generation, original.config_generation);
+            assert_eq!(job.config_digest, original.config_digest);
+            assert!(job.started_at_ms.is_none());
+        }
+        let (revision, mut job) = service.job("expire").unwrap();
+        job.queue_deadline_ms = ipc::now_ms().unwrap().saturating_sub(1);
+        service
+            .save_job(&job, Some(revision), vec![])
+            .await
+            .unwrap();
+        assert!(!service.claim("expire", 0).await.unwrap());
+        assert_eq!(service.job("expire").unwrap().1.state, "failed");
+        assert_eq!(
+            service.job("expire").unwrap().1.error.as_deref(),
+            Some("QUEUE_TIMEOUT")
+        );
+        service.resources.set_fixture_sample(Some((1024 * 1024, 0)));
+        assert_eq!(service.resource_status().await["draining"], false);
+        assert!(service.claim("recover", 0).await.unwrap());
+        let (revision, job) = service.job("recover").unwrap();
+        service
+            .finish_job(job, revision, "cancelled", Some("CANCELLED"))
+            .await
+            .unwrap();
+        service.storage.close().await.unwrap();
     }
 
     #[tokio::test]
@@ -1115,6 +1176,7 @@ impl Service {
                 || runtime.paused
                 || ids.len() >= MAX_ACTIVE
                 || queued >= runtime.max_queued_jobs
+                || !service.memory_available().await
             {
                 return Err(Error("RESOURCE_BUSY"));
             }
@@ -1473,7 +1535,17 @@ impl Service {
             || self.storage_reopen_required()
             || self.stopping.load(std::sync::atomic::Ordering::Acquire)
             || now < job.retry_at_ms
+            || !self.memory_available().await
         {
+            return Ok(false);
+        }
+        let now = ipc::now_ms()?;
+        if (job.started_at_ms.is_none() && now >= job.queue_deadline_ms)
+            || job
+                .execution_deadline_ms
+                .is_some_and(|deadline| now >= deadline)
+        {
+            self.wake_jobs();
             return Ok(false);
         }
         job.state = "running".into();
@@ -1700,11 +1772,13 @@ impl Service {
         let outcome = async {
         loop {
             if !self.stopping.load(std::sync::atomic::Ordering::Acquire) && !self.storage_reopen_required() {
+                if self.memory_available().await {
                 if let Some(dispatch) = self.advance_notifications(&mut notification_scan, &mut notification_after, notifications.is_empty()).await? {
                     let service = self.clone();
                     notifications.spawn(async move { service.deliver_notification(dispatch).await });
                 }
                 self.advance_incidents().await?;
+                }
                 let ids = {
                     let _guard = self.admission.lock().await;
                     self.active()?.1
