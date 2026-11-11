@@ -5,18 +5,6 @@
   "base": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
   "issue": 24,
   "pr": 63,
-  "candidate_file_sha256": {
-    "src/daemon.rs": "666ed63d31fc8821b93fe4006178d87c775230748d9b44a729e367d48ae805b5",
-    "src/daemon/configuration.rs": "9bbca7b534756c12c27acc0392a6a4770456dd351948a3e77a81a1e8d1f83adf",
-    "src/daemon/jobs.rs": "aa333bf1855912a0874585072306cf7238b92633c2868bea05f1cbcbf7f45294",
-    "src/daemon/resources.rs": "75e92a0dee9eef307131930d657cf064ac6a3eea1fb6e791fcf32b765f89b863",
-    "src/storage/crash_tests.rs": "6a7c350973f96fde8ec7ed5a8b206ba1370cafb78e9bbf845a9e6af5e64a2e1b",
-    "src/storage/crash_tests/native_open.rs": "286abdf0b485ed527ffb23c82ffab5c957320397f1a62ee1a8d1defda94ce466",
-    "src/storage/native.rs": "270bad25dc745f56064d117dc49503ffac1cc791885aa5cac210eb14ee74dd3c",
-    "tests/daemon.rs": "766995ffa32348380cd9ca57ab39082accce8c687faf0f1012544a0795d8d281",
-    "tests/support/daemon_models.rs": "0b561e056d4cd398bf0b1ecaad59bb8691fac303378344c19304d16a0291660e",
-    "tests/support/retrieval_lifecycle.rs": "fb3ef73f6c2b4970bd9e22df60f2a0e5c78f9d509d241d4f59040f4c15b081fb"
-  },
   "attempts": [
     {
       "name": "red-r1",
@@ -50,7 +38,7 @@
     "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/63#issuecomment-6785427950"
   },
   "members": {
-    "README.md": "dccb447025256710c8a4b48590d17bb02f4cf0d156f8821658666e9698fb60a7",
+    "README.md": "c380f033cfefd33553a44d9322faf5b6a7466f75baa63822905f292a466cf70f",
     "focused-r1.json": "f151b7e8dfd69b4d5103d1e2c0ec33bb9f7cb5380a68975b0bf611c38650a677",
     "focused-r1.log.gz": "840f2a92c1525580271728b2081f7e88b0f13effe73c8c4c2fed535110fde193",
     "green-r1.json": "2b41a9d82698729b00991ef4adeb7712423bc6884370996c70142df246a27545",
@@ -69,5 +57,18 @@
     "mvp024-reopen-review-r1.md": "015ab727587cab0e00340966c0332c67af95a5538ae1f4db2a7c6cf9796ad5d1",
     "red-r1.json": "87ca73da1c640925b9ebedb81b03a9f19ac9d2d46e8e612dc1ef0c84111a23af",
     "red-r1.log.gz": "f7d837eee0ad82870add6672f3f5386a4c9bd161ae73347ed40799f578f4879f"
+  },
+  "historical_source_commit": "622fc8a3ddd8484ee24359e315aeb1802429f2ae",
+  "historical_source_sha256": {
+    "src/daemon.rs": "666ed63d31fc8821b93fe4006178d87c775230748d9b44a729e367d48ae805b5",
+    "src/daemon/configuration.rs": "9bbca7b534756c12c27acc0392a6a4770456dd351948a3e77a81a1e8d1f83adf",
+    "src/daemon/jobs.rs": "aa333bf1855912a0874585072306cf7238b92633c2868bea05f1cbcbf7f45294",
+    "src/daemon/resources.rs": "75e92a0dee9eef307131930d657cf064ac6a3eea1fb6e791fcf32b765f89b863",
+    "src/storage/crash_tests.rs": "6a7c350973f96fde8ec7ed5a8b206ba1370cafb78e9bbf845a9e6af5e64a2e1b",
+    "src/storage/crash_tests/native_open.rs": "286abdf0b485ed527ffb23c82ffab5c957320397f1a62ee1a8d1defda94ce466",
+    "src/storage/native.rs": "270bad25dc745f56064d117dc49503ffac1cc791885aa5cac210eb14ee74dd3c",
+    "tests/daemon.rs": "766995ffa32348380cd9ca57ab39082accce8c687faf0f1012544a0795d8d281",
+    "tests/support/daemon_models.rs": "0b561e056d4cd398bf0b1ecaad59bb8691fac303378344c19304d16a0291660e",
+    "tests/support/retrieval_lifecycle.rs": "fb3ef73f6c2b4970bd9e22df60f2a0e5c78f9d509d241d4f59040f4c15b081fb"
   }
 }

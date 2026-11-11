@@ -192,13 +192,13 @@ mod tests {
 
     #[tokio::test]
     async fn budget_transition_accept_error_survives_a_later_owner_failure() {
-        for prior_scheduler_error in [false, true] {
+        for first in ["accept", "scheduler", "owner"] {
             let (_fixture, service, _) = fixture(
-                &format!("reopen-error-order-{prior_scheduler_error}"),
+                &format!("reopen-error-order-{first}"),
                 "[runtime]\nmemory_budget_mib=2048\n",
             )
             .await;
-            if prior_scheduler_error {
+            if first == "scheduler" {
                 service
                     .storage
                     .commit(&CommitRequest {
@@ -217,10 +217,24 @@ mod tests {
                 std::fs::write(&service.config_path, "[runtime]\nmemory_budget_mib=512\n").unwrap();
                 service.reload().await.unwrap();
             }
+            if first == "owner" {
+                let failed = service.operations.lock().await.spawn(async {
+                    panic!("controlled earlier owner failure");
+                });
+                tokio::time::timeout(Duration::from_secs(5), async {
+                    while !failed.is_finished() {
+                        tokio::time::sleep(Duration::from_millis(1)).await;
+                    }
+                })
+                .await
+                .unwrap();
+            }
             let (release, held) = tokio::sync::oneshot::channel();
             service.operations.lock().await.spawn(async move {
                 held.await.unwrap();
-                panic!("controlled later owner failure");
+                if first != "owner" {
+                    panic!("controlled later owner failure");
+                }
             });
             let release = Arc::new(std::sync::Mutex::new(Some(release)));
             let error = serve(service.clone(), || {
@@ -241,10 +255,10 @@ mod tests {
             assert!(service.operations.lock().await.is_empty());
             assert_eq!(
                 error.0,
-                if prior_scheduler_error {
-                    "JOB_NOT_FOUND"
-                } else {
-                    "IO_ERROR"
+                match first {
+                    "scheduler" => "JOB_NOT_FOUND",
+                    "owner" => "JOB_ERROR",
+                    _ => "IO_ERROR",
                 }
             );
             assert!(

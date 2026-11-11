@@ -1,0 +1,48 @@
+{
+  "classification": "PRODUCT_RED: earlier collected owner error replaced by later accept error",
+  "admission": {
+    "command": [
+      "/bin/bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "cargo fmt --all && cargo test --locked --offline --lib daemon::jobs::tests::budget_transition_accept_error_survives_a_later_owner_failure -- --exact --nocapture"
+    ],
+    "dirty_diff_sha256": "3234aa3a6f5789df64852988575c73966d118ef20cab2fb476360fdb3b70e407",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "622fc8a3ddd8484ee24359e315aeb1802429f2ae",
+    "process": {
+      "pid": 860649,
+      "start_ticks": "618439236",
+      "state": "R"
+    },
+    "tree": "052b0929aab365fcd1e1be9c0fc1b7ca2c61c981",
+    "untracked": [],
+    "utc": "2026-11-11T03:08:15.386852+00:00"
+  },
+  "terminal": {
+    "exit_code": 101,
+    "head": "622fc8a3ddd8484ee24359e315aeb1802429f2ae",
+    "log_sha256": "e93e78c03c484fb31cacbd04625f8a498c42607fd4c496d2eff83929cc19bcc2",
+    "seconds": 18.43358425796032,
+    "utc": "2026-11-11T03:08:33.800373+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T03:10:04.233216+00:00",
+    "terminal": {
+      "exit_code": 101,
+      "head": "622fc8a3ddd8484ee24359e315aeb1802429f2ae",
+      "log_sha256": "e93e78c03c484fb31cacbd04625f8a498c42607fd4c496d2eff83929cc19bcc2",
+      "seconds": 18.43358425796032,
+      "utc": "2026-11-11T03:08:33.800373+00:00"
+    },
+    "process_absent": true,
+    "classification": "earlier_owner_error_precedence_product_red"
+  }
+}

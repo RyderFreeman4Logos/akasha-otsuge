@@ -160,17 +160,29 @@ impl Service {
         receive.await.map_err(|_| Error("JOB_ERROR"))?
     }
 
-    async fn close(&self, mut outcome: Result<()>) -> Result<()> {
+    async fn close(&self, outcome: Result<()>) -> Result<()> {
+        self.close_recording(&std::sync::Mutex::new(outcome.err()))
+            .await
+    }
+
+    async fn close_recording(&self, first_error: &std::sync::Mutex<Option<Error>>) -> Result<()> {
         self.stopping
             .store(true, std::sync::atomic::Ordering::Release);
         self.wake_jobs();
         let mut owners = self.operations.lock().await;
         while let Some(result) = owners.join_next().await {
-            outcome = outcome.and(result.map_err(|_| Error("JOB_ERROR")));
+            if result.is_err() {
+                first_error
+                    .lock()
+                    .unwrap()
+                    .get_or_insert(Error("JOB_ERROR"));
+            }
         }
         self.search_index.lock().await.take();
-        let closed = self.storage.close().await.map_err(Error::from);
-        outcome.and(closed)
+        if let Err(error) = self.storage.close().await {
+            first_error.lock().unwrap().get_or_insert(error.into());
+        }
+        first_error.lock().unwrap().map_or(Ok(()), Err)
     }
 
     async fn dispatch(
@@ -825,7 +837,7 @@ where
             if let Err(error) = outcome {
                 transition_error.lock().unwrap().get_or_insert(error);
             }
-            service.close(outcome).await?;
+            service.close_recording(transition_error).await?;
             if !reopen
                 || !service
                     .reopen_ready

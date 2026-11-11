@@ -38,8 +38,10 @@ case preserves an already observed scheduler error.
 After the first GREEN, the test-only gate was made indifferent to unrelated
 invalid/unlinked paths; the broader focused run covers the final helper. Only
 the blocking-open test uses the directory-keyed hold; other fixtures retain
-ordinary initialization. `manifest.json` pins the complete current affected
-source/test set. Per-attempt admissions precede any formatter in the command;
+ordinary initialization. `manifest.json` pins the complete affected source/test set at historical
+622fc8a. Its later owner-before-accept control failed; the complete successor
+repair and preserved canonical/CI outcomes are in the
+[owner-order archive](../mvp024-storage-reopen-owner-order/README.md). Per-attempt admissions precede any formatter in the command;
 the final source pins and subsequent committed gate are distinct authorities.
 
 This is functional lifecycle evidence. Measured-memory admission, cgroup limits,

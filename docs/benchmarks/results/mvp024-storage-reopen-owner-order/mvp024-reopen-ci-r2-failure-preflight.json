@@ -1,0 +1,82 @@
+{
+  "utc": "2026-11-11T03:05:12.176521+00:00",
+  "head": "622fc8a3ddd8484ee24359e315aeb1802429f2ae",
+  "tree": "052b0929aab365fcd1e1be9c0fc1b7ca2c61c981",
+  "selector": "caller::native_call_binds_exact_turn_before_its_result_and_retries_keep_the_fence",
+  "ci_run": 42949516550,
+  "failure": "HistoryGap at tests/support/codex_caller.rs:72, initial bind",
+  "attribution": [
+    {
+      "path": "tests/support/codex_caller.rs",
+      "base_sha256": "4420fb864eca640773a35ade02e932547f279b3a61c7accc14e267cd8d01e9f1",
+      "candidate_sha256": "4420fb864eca640773a35ade02e932547f279b3a61c7accc14e267cd8d01e9f1",
+      "unchanged": true,
+      "worktree_matches": true
+    },
+    {
+      "path": "tests/codex.rs",
+      "base_sha256": "633d80eead4d3541acbd7e1f06d690c2ff40a4b2acb66f31ff97ff33b8e0c9d7",
+      "candidate_sha256": "633d80eead4d3541acbd7e1f06d690c2ff40a4b2acb66f31ff97ff33b8e0c9d7",
+      "unchanged": true,
+      "worktree_matches": true
+    },
+    {
+      "path": "tests/fixtures/codex/0.164.0/exec-root.jsonl",
+      "base_sha256": "72f441921c14435d6a136aba6fa1bcdba553ad5e3aab03ffe5f336aecb18dd4e",
+      "candidate_sha256": "72f441921c14435d6a136aba6fa1bcdba553ad5e3aab03ffe5f336aecb18dd4e",
+      "unchanged": true,
+      "worktree_matches": true
+    },
+    {
+      "path": "tests/fixtures/codex/0.164.0/exec-pre-tool-use.json",
+      "base_sha256": "e89c8bc7938f2cc9d8dcb58af11e5523807fd52826884ad2ffe04cb8e7b544c9",
+      "candidate_sha256": "e89c8bc7938f2cc9d8dcb58af11e5523807fd52826884ad2ffe04cb8e7b544c9",
+      "unchanged": true,
+      "worktree_matches": true
+    },
+    {
+      "path": "src/adapter/codex/caller.rs",
+      "base_sha256": "8ab13da37c2e8a0ea4cd47c6beb8997ffa2af2c7d5d4f529f32bebeddc9bd1be",
+      "candidate_sha256": "8ab13da37c2e8a0ea4cd47c6beb8997ffa2af2c7d5d4f529f32bebeddc9bd1be",
+      "unchanged": true,
+      "worktree_matches": true
+    },
+    {
+      "path": "src/adapter/codex/transcript.rs",
+      "base_sha256": "8f7de8ff1fbe9132272657ae9624e5e3432a99c9a6fbca382f79bcd2cd3ab02b",
+      "candidate_sha256": "8f7de8ff1fbe9132272657ae9624e5e3432a99c9a6fbca382f79bcd2cd3ab02b",
+      "unchanged": true,
+      "worktree_matches": true
+    },
+    {
+      "path": "src/storage/mod.rs",
+      "base_sha256": "a94f2535608c8dd7fb68047ffdc775084c77b8509ed6789a4415c8872a5b20b1",
+      "candidate_sha256": "a94f2535608c8dd7fb68047ffdc775084c77b8509ed6789a4415c8872a5b20b1",
+      "unchanged": true,
+      "worktree_matches": true
+    },
+    {
+      "path": "Cargo.toml",
+      "base_sha256": "bfe7250b28e35d3ea480a4b37e4c78faad2ff9bea1629d09626ef75efda2a576",
+      "candidate_sha256": "bfe7250b28e35d3ea480a4b37e4c78faad2ff9bea1629d09626ef75efda2a576",
+      "unchanged": true,
+      "worktree_matches": true
+    },
+    {
+      "path": "Cargo.lock",
+      "base_sha256": "8b86d628c432640a5b4911704072b73f8ad16bf8e3d0200cc65984b827436b6b",
+      "candidate_sha256": "8b86d628c432640a5b4911704072b73f8ad16bf8e3d0200cc65984b827436b6b",
+      "unchanged": true,
+      "worktree_matches": true
+    }
+  ],
+  "classification": "UNCLASSIFIED; owning source and inspected dependencies unchanged, runtime trigger not established",
+  "unreached_ci_sections": [
+    "remaining tests after codex binary (config, daemon, history, Hermes, Pi, providers, storage, doc tests)",
+    "release build",
+    "capture-command check",
+    "installed daemon repeat and UID controls",
+    "release help/version and final diff check"
+  ],
+  "next": "After the active canonical primary exits, run this exact selector once and at most one justified owning-binary topology; no retry approval is inferred from a focused pass."
+}

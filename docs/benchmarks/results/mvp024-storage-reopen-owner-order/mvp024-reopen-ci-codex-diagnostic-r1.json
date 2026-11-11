@@ -1,0 +1,52 @@
+{
+  "classification": "HISTORICAL_DIAGNOSTIC_PASS: exact CI selector on 622fc8a; remote cause remains unknown",
+  "admission": {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--test",
+      "codex",
+      "caller::native_call_binds_exact_turn_before_its_result_and_retries_keep_the_fence",
+      "--",
+      "--exact"
+    ],
+    "dirty_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "622fc8a3ddd8484ee24359e315aeb1802429f2ae",
+    "process": {
+      "pid": 859713,
+      "start_ticks": "618434465",
+      "state": "R"
+    },
+    "tree": "052b0929aab365fcd1e1be9c0fc1b7ca2c61c981",
+    "untracked": [],
+    "utc": "2026-11-11T03:07:27.678302+00:00"
+  },
+  "terminal": {
+    "exit_code": 0,
+    "head": "622fc8a3ddd8484ee24359e315aeb1802429f2ae",
+    "log_sha256": "b21596d15eef0fcfb3f887e0a28f9ac0aec1bd7dfbcf40fb4a6979ce4112188d",
+    "seconds": 0.41092367842793465,
+    "utc": "2026-11-11T03:07:28.071319+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T03:08:09.644631+00:00",
+    "terminal": {
+      "exit_code": 0,
+      "head": "622fc8a3ddd8484ee24359e315aeb1802429f2ae",
+      "log_sha256": "b21596d15eef0fcfb3f887e0a28f9ac0aec1bd7dfbcf40fb4a6979ce4112188d",
+      "seconds": 0.41092367842793465,
+      "utc": "2026-11-11T03:07:28.071319+00:00"
+    },
+    "process_absent": true,
+    "classification": "exact_local_selector_pass_ci_cause_unresolved"
+  }
+}

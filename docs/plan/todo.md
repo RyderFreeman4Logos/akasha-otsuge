@@ -1028,8 +1028,16 @@ precedence. Both have causal REDs and repaired regressions, including a prior
 scheduler-error control. The repaired focused run passes 111 executions/11
 intentional library ignores, all-target Clippy and plan validation.
 [Review-fix evidence](../benchmarks/results/mvp024-storage-reopen-review-fixes/README.md)
-preserves the full published FAIL report and old gate/CI separately. A new
-exact-source gate, independent review and PR #63 merge remain pending. Measured-memory
+preserves the full published FAIL report and old gate/CI separately. Candidate
+622fc8a passed its local canonical gate (613 Rust executions/35 ignores), but
+CI42949516550 failed in an unchanged Codex caller bind with HistoryGap. The same
+selector passed locally; its remote failure cause remains unclassified.
+A final owner-before-accept control exposed another first-error path. The shared
+close path now records each collected error immediately; all three orderings,
+the budget cases and both retrieval controls pass (30 executions), with Clippy
+and plan validation. [Owner-order evidence](../benchmarks/results/mvp024-storage-reopen-owner-order/README.md)
+retains this RED/GREEN and both historical gate/CI outcomes. A new exact-source
+gate, independent review and PR #63 merge remain pending. Measured-memory
 admission and dedicated cgroups follow separately; neither observability nor
 focused fixtures satisfy the full production stress acceptance.
 
