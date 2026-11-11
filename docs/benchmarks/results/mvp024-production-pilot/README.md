@@ -83,4 +83,9 @@ still rejecting zombies and distinguishing PID reuse. Three process tests and
 the real candidate lifecycle/alternate-UID/TCP smoke pass after the repair.
 [census-gate.zip](census-gate.zip) retains the failed gate, unchanged RED/GREEN
 oracle and source custody; [its manifest](census-gate-manifest.json) hashes every
-member. A new exact-HEAD canonical gate and independent review are still required.
+member. The successor exact-HEAD gate at e5746ac passed 633 Rust executions
+(39 ignored), 35 Python tests and seven Node tests, including the installed
+lifecycle/UID/TCP checks. The [complete independent review and citation corrections](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/67#issuecomment-6794229668)
+are published: PASS, zero findings, 37 fresh tests and Clippy. PR #67's hosted
+CI43009584075 is still running. The subsequent native-version reclamation and
+its separate paired measurement are documented [here](../mvp024-native-prune/README.md).

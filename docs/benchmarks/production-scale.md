@@ -63,8 +63,13 @@ also passes with byte-identical inputs, acknowledgements and full claim oracle:
 indexing took 10.559 s, search allocated 86,781,952 bytes in 912 files and 132
 native versions. The RSS sampled peak increased to 489,836,544 bytes. This single
 pair does not establish a memory improvement or full-scale operating envelope.
-Both disposable databases were removed after verification. Further native-index
-disk growth and reclamation must be addressed before full-corpus admission.
+Both disposable databases were removed after verification. The next committed
+change prunes old native versions only when the builder exclusively owns the
+index. A query holding the index defers reclamation until a later idle sync;
+authoritative history is preserved. The [third paired pilot](results/mvp024-native-prune/README.md)
+passes the identical inputs and oracles with 5,332,992 allocated search bytes,
+77 files and one native version, taking 10.491 seconds to index. This small
+measurement does not establish full-scale growth, ANN or concurrent-load bounds.
 
 All 42 retained compressed shards were rehashed on 2026-11-11: 43,986,181,099
 bytes matched the pinned source inventory. A separate text-only shape census
