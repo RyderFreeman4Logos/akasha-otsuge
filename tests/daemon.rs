@@ -48,7 +48,75 @@ mod notifier_tests;
 mod import_tests;
 
 #[test]
-fn memory_status_reports_actual_groups_and_keeps_open_storage_budget_on_reload() {
+fn budget_reopen_replies_busy_while_existing_connections_drain() {
+    let mut daemon = Daemon::new();
+    daemon.configure("[runtime]\nmemory_budget_mib=2048\n");
+    daemon.start();
+    let mut held = daemon.connect();
+    assert_eq!(receive(&mut held)["protocol_version"], 1);
+    daemon.configure("[runtime]\nmemory_budget_mib=512\n");
+    daemon.cli(&["config", "reload"]);
+    let started = Instant::now();
+    loop {
+        let output = daemon
+            .command()
+            .args(["daemon", "status"])
+            .output()
+            .unwrap();
+        if !output.status.success() {
+            assert_eq!(output.status.code(), Some(4));
+            assert!(
+                String::from_utf8_lossy(&output.stderr).contains("RESOURCE_BUSY"),
+                "{output:?}"
+            );
+            assert!(
+                started.elapsed() < Duration::from_secs(3),
+                "busy response waited for the held connection"
+            );
+            break;
+        }
+        assert!(
+            started.elapsed() < Duration::from_secs(3),
+            "never entered storage drain"
+        );
+    }
+    drop(held);
+    wait_for_storage_budget(&daemon, 512);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+fn wait_for_storage_budget(daemon: &Daemon, budget: u64) -> Value {
+    let until = Instant::now() + Duration::from_secs(15);
+    loop {
+        let output = daemon
+            .command()
+            .args(["daemon", "status"])
+            .output()
+            .unwrap();
+        if output.status.success() {
+            let status: Value = serde_json::from_slice(&output.stdout).unwrap();
+            if status["data"]["resources"]["storage_open_budget_mib"] == budget
+                && status["data"]["resources"]["draining"] == false
+            {
+                return status["data"].clone();
+            }
+        } else {
+            assert!(
+                String::from_utf8_lossy(&output.stderr).contains("RESOURCE_BUSY"),
+                "{output:?}"
+            );
+        }
+        assert!(
+            Instant::now() < until,
+            "storage did not reopen with budget {budget}"
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+}
+
+#[test]
+fn memory_budget_reload_reopens_idle_storage_and_reports_actual_groups() {
     let mut daemon = Daemon::new();
     daemon.configure("[runtime]\nmemory_budget_mib=2048\n");
     daemon.start();
@@ -79,25 +147,33 @@ fn memory_status_reports_actual_groups_and_keeps_open_storage_budget_on_reload()
         daemon.cli(&["config", "reload"])["data"]["status"],
         "applied"
     );
-    let after = daemon.cli(&["daemon", "status"]);
-    let resource = &after["data"]["resources"];
+    let after = wait_for_storage_budget(&daemon, 512);
+    assert_eq!(after["pid"], before["data"]["pid"]);
+    let resource = &after["resources"];
     assert_eq!(resource["requested"]["daemon_memory_target_mib"], 512);
     assert_eq!(resource["requested"]["daemon_peak_limit_mib"], 640);
     assert_eq!(resource["requested"]["service_total_budget_mib"], 3072);
-    assert_eq!(resource["storage_open_budget_mib"], 2048);
-    assert_eq!(resource["storage_reopen_required"], true);
+    assert_eq!(resource["storage_open_budget_mib"], 512);
+    assert_eq!(resource["storage_reopen_required"], false);
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
+}
+
+#[test]
+fn budget_file_watcher_reopens_storage_without_an_explicit_reload() {
+    let mut daemon = Daemon::new();
+    daemon.configure("[runtime]\nmemory_budget_mib=2048\n");
     daemon.start();
-    let reopened = daemon.cli(&["daemon", "status"]);
-    assert_eq!(
-        reopened["data"]["resources"]["storage_open_budget_mib"],
-        512
+    let before = daemon.cli(&["daemon", "status"])["data"].clone();
+    daemon.configure("[runtime]\nmemory_budget_mib=1024\n");
+    let after = wait_for_storage_budget(&daemon, 1024);
+    assert_eq!(after["pid"], before["pid"]);
+    assert!(
+        after["resources"]["config_generation"].as_u64().unwrap()
+            > before["resources"]["config_generation"].as_u64().unwrap()
     );
-    assert_eq!(
-        reopened["data"]["resources"]["storage_reopen_required"],
-        false
-    );
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
 }
 
 #[path = "support/daemon_codex.rs"]

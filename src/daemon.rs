@@ -122,6 +122,7 @@ struct Service {
     stop: Notify,
     work: Notify,
     stopping: std::sync::atomic::AtomicBool,
+    reopen_ready: std::sync::atomic::AtomicBool,
     instance: String,
     providers: crate::provider::Client,
     runner_slots: Arc<Semaphore>,
@@ -229,6 +230,8 @@ impl Service {
                 json!({"transport":"unix","peer_uid":rustix::process::geteuid().as_raw(),"storage_seq":self.storage.sequence()?,"local_long_timeout_verified":false}),
             ),
             Command::Stop => {
+                self.reopen_ready
+                    .store(false, std::sync::atomic::Ordering::Release);
                 self.stopping
                     .store(true, std::sync::atomic::Ordering::Release);
                 self.stop.notify_one();
@@ -649,9 +652,20 @@ pub async fn run(
     config_path: PathBuf,
     profile: Option<String>,
 ) -> Result<()> {
-    let providers = crate::provider::Client::new().map_err(|e| Error(e.0))?;
     private_dir(&config.config().paths.data_dir)?;
     let (listener, _owner) = listen(&config.config().paths.socket_path)?;
+    let service = open_service(config, config_path, profile, None).await?;
+    serve(service, || listener.accept()).await
+}
+
+async fn open_service(
+    config: ResolvedConfig,
+    config_path: PathBuf,
+    profile: Option<String>,
+    last_config: Option<(String, serde_json::Value)>,
+) -> Result<Arc<Service>> {
+    let reconcile_input = last_config.is_none();
+    let providers = crate::provider::Client::new().map_err(|e| Error(e.0))?;
     let storage = Arc::new(Storage::open(&config).await?);
     let manager = match configuration::open(&storage, config).await {
         Ok(manager) => manager,
@@ -674,10 +688,11 @@ pub async fn run(
         profile,
         admission: Mutex::new(()),
         operations: Mutex::new(JoinSet::new()),
-        last_config: Mutex::new(None),
+        last_config: Mutex::new(last_config),
         stop: Notify::new(),
         work: Notify::new(),
         stopping: std::sync::atomic::AtomicBool::new(false),
+        reopen_ready: std::sync::atomic::AtomicBool::new(false),
         instance,
         providers,
         runner_slots: Arc::new(Semaphore::new(16)),
@@ -692,7 +707,7 @@ pub async fn run(
     });
     let initialized = async {
     // Reconcile startup input through the same pipeline, without resetting durable generations.
-    if let Ok(input) = crate::config::read_file(&service.config_path) {
+    if reconcile_input && let Ok(input) = crate::config::read_file(&service.config_path) {
         let active = service.config.pin();
         let candidate = crate::config::resolve(
             &input,
@@ -717,12 +732,12 @@ pub async fn run(
     Ok(())
     }.await;
     if let Err(error) = initialized {
-        return service.close(Err(error)).await;
+        service.close(Err(error)).await?;
     }
-    serve(service, || listener.accept()).await
+    Ok(service)
 }
 
-async fn serve<A, F>(service: Arc<Service>, mut accept: A) -> Result<()>
+async fn serve<A, F>(mut service: Arc<Service>, mut accept: A) -> Result<()>
 where
     A: FnMut() -> F,
     F: std::future::Future<Output = std::io::Result<(UnixStream, tokio::net::unix::SocketAddr)>>,
@@ -737,65 +752,127 @@ where
         Ok(signals) => signals,
         Err(error) => return service.close(Err(error.into())).await,
     };
-    let mut scheduler = tokio::spawn(service.clone().jobs());
-    let mut scheduler_collected = false;
-    let slots = Arc::new(Semaphore::new(16));
-    let mut tasks = JoinSet::new();
-    let mut watcher = tokio::time::interval(Duration::from_millis(500));
-    watcher.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
-    let mut observed = None;
-    let mut outcome = loop {
+    loop {
+        // Keep the signal receivers and socket owner across a controlled storage reopen.
         tokio::select! {
-            _ = service.stop.notified() => break Ok(()),
-            _ = terminate.recv() => break Ok(()),
-            _ = interrupt.recv() => break Ok(()),
-            result = &mut scheduler => {
-                scheduler_collected = true;
-                break result.map_err(|_| Error("JOB_ERROR")).and_then(|r|r);
-            },
-            _ = watcher.tick() => {
-                if let Ok(input) = crate::config::read_file(&service.config_path) {
-                    let digest = crate::storage::hash(input.as_bytes());
-                    if observed.as_ref() == Some(&digest) && service.last_config.lock().await.as_ref().map(|(hash,_)| hash) != Some(&digest) {
-                        let _ = service.reload().await;
+            biased;
+            _ = terminate.recv() => return service.close(Ok(())).await,
+            _ = interrupt.recv() => return service.close(Ok(())).await,
+            _ = std::future::ready(()) => {},
+        }
+        let mut scheduler = tokio::spawn(service.clone().jobs());
+        let mut scheduler_collected = false;
+        let mut reopen = false;
+        let slots = Arc::new(Semaphore::new(16));
+        let mut tasks = JoinSet::new();
+        let mut watcher = tokio::time::interval(Duration::from_millis(500));
+        watcher.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+        let mut observed = None;
+        let mut outcome = loop {
+            tokio::select! {
+                biased;
+                _ = service.stop.notified() => break Ok(()),
+                _ = terminate.recv() => break Ok(()),
+                _ = interrupt.recv() => break Ok(()),
+                result = &mut scheduler => {
+                    scheduler_collected = true;
+                    reopen = service.reopen_ready.load(std::sync::atomic::Ordering::Acquire);
+                    break result.map_err(|_| Error("JOB_ERROR")).and_then(|r|r);
+                },
+                _ = watcher.tick() => {
+                    if let Ok(input) = crate::config::read_file(&service.config_path) {
+                        let digest = crate::storage::hash(input.as_bytes());
+                        if observed.as_ref() == Some(&digest) && service.last_config.lock().await.as_ref().map(|(hash,_)| hash) != Some(&digest) {
+                            let _ = service.reload().await;
+                        }
+                        observed = Some(digest);
                     }
-                    observed = Some(digest);
-                }
-            },
-            Some(_) = tasks.join_next(), if !tasks.is_empty() => {},
-            accepted = accept() => {
-                let (mut stream, _) = match accepted {
-                    Ok(connection) => connection,
-                    Err(error) => break Err(error.into()),
-                };
-                if !stream.peer_cred().is_ok_and(|peer| peer.uid() == rustix::process::geteuid().as_raw()) { continue; }
-                if let Ok(permit) = slots.clone().try_acquire_owned() {
-                    let service = service.clone();
-                    tasks.spawn(async move {
-                        let _permit = permit;
-                        let _ = tokio::time::timeout(ipc::TRANSPORT_TIMEOUT, service.connection(&mut stream)).await;
-                    });
-                } else {
-                    let _ = tokio::time::timeout(Duration::from_millis(100), async {
-                        let mut hello = ipc::hello();
-                        hello["error"] = Error("RESOURCE_BUSY").value();
-                        ipc::write(&mut stream, &hello).await
-                    }).await;
+                },
+                Some(_) = tasks.join_next(), if !tasks.is_empty() => {},
+                accepted = accept() => {
+                    let (mut stream, _) = match accepted {
+                        Ok(connection) => connection,
+                        Err(error) => break Err(error.into()),
+                    };
+                    if !stream.peer_cred().is_ok_and(|peer| peer.uid() == rustix::process::geteuid().as_raw()) { continue; }
+                    if let Ok(permit) = slots.clone().try_acquire_owned() {
+                        let service = service.clone();
+                        tasks.spawn(async move {
+                            let _permit = permit;
+                            let _ = tokio::time::timeout(ipc::TRANSPORT_TIMEOUT, service.connection(&mut stream)).await;
+                        });
+                    } else {
+                        reject_busy(stream).await;
+                    }
                 }
             }
+        };
+        let transition = async move {
+            service
+                .stopping
+                .store(true, std::sync::atomic::Ordering::Release);
+            service.wake_jobs();
+            while tasks.join_next().await.is_some() {}
+            if !scheduler_collected {
+                let drained = scheduler
+                    .await
+                    .map_err(|_| Error("JOB_ERROR"))
+                    .and_then(|r| r);
+                outcome = outcome.and(drained);
+            }
+            service.close(outcome).await?;
+            if !reopen
+                || !service
+                    .reopen_ready
+                    .load(std::sync::atomic::Ordering::Acquire)
+            {
+                return Ok(None);
+            }
+            let config = service.config.pin().resolved().clone();
+            let path = service.config_path.clone();
+            let profile = service.profile.clone();
+            let last_config = service.last_config.lock().await.clone();
+            drop(service);
+            open_service(config, path, profile, last_config)
+                .await
+                .map(Some)
+        };
+        tokio::pin!(transition);
+        let (next, accepting) = loop {
+            tokio::select! {
+                biased;
+                result = &mut transition => break (result, Ok(())),
+                accepted = accept() => match accepted {
+                    Ok((stream, _)) => reject_busy(stream).await,
+                    Err(error) => break (transition.await, Err(error.into())),
+                },
+            }
+        };
+        let next = next?;
+        if let Err(error) = accepting {
+            return match next {
+                Some(service) => service.close(Err(error)).await,
+                None => Err(error),
+            };
         }
-    };
-    service
-        .stopping
-        .store(true, std::sync::atomic::Ordering::Release);
-    service.wake_jobs();
-    while tasks.join_next().await.is_some() {}
-    if !scheduler_collected {
-        let drained = scheduler
-            .await
-            .map_err(|_| Error("JOB_ERROR"))
-            .and_then(|r| r);
-        outcome = outcome.and(drained);
+        let Some(next) = next else {
+            return Ok(());
+        };
+        service = next;
     }
-    service.close(outcome).await
+}
+
+async fn reject_busy(mut stream: UnixStream) {
+    if !stream
+        .peer_cred()
+        .is_ok_and(|peer| peer.uid() == rustix::process::geteuid().as_raw())
+    {
+        return;
+    }
+    let _ = tokio::time::timeout(Duration::from_millis(100), async {
+        let mut hello = ipc::hello();
+        hello["error"] = Error("RESOURCE_BUSY").value();
+        ipc::write(&mut stream, &hello).await
+    })
+    .await;
 }

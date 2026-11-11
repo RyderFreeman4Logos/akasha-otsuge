@@ -115,6 +115,7 @@ profile, prompt, resume and extension options return `CONFIG_INVALID`.
 | Executor/model routes, prompts, timeouts, retrieval, review | Complete resource prepare, then one snapshot swap | Retain accepted generation/resources |
 | Embedding model/dimension | Prepare complete matching encoder/index resources before swap | Retain old matching bundle |
 | Concurrency, pause, read policy, executor permission | Consumers check current snapshot at admission/read/delegation/return | Execution plan stays pinned; limits stay live |
+| Storage memory target | Pause new job admission/claims, drain owners, close/reopen in the same process | Keep admitted configuration and original deadlines; retry `RESOURCE_BUSY` with the same identity |
 | Notifier enable/route/credentials | `delivery_route()` reads current generation for each claim/retry/send | Never reuse event-generation route permission |
 | Data directory or socket path | Entire candidate pending; explicit drain/restart required | No fields partially applied |
 | Logging | New active diagnostic setting; retrieval fingerprint unaffected | No retrieval cache invalidation for log-only changes |

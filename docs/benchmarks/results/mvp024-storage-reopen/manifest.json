@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-11-11T02:19:50.132570+00:00",
+  "parent": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+  "base": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
+  "issue": 24,
+  "candidate_file_sha256": {
+    "src/daemon.rs": "fba038aa09b5550d6be1ce93b36c6fbe7cecb87490e86e67690ef68d91f54375",
+    "src/daemon/configuration.rs": "9bbca7b534756c12c27acc0392a6a4770456dd351948a3e77a81a1e8d1f83adf",
+    "src/daemon/jobs.rs": "171c7bf8c1895f417dbcd608a957fe79de07b70a31d269965d499f1c42d1668c",
+    "src/daemon/resources.rs": "75e92a0dee9eef307131930d657cf064ac6a3eea1fb6e791fcf32b765f89b863",
+    "tests/daemon.rs": "766995ffa32348380cd9ca57ab39082accce8c687faf0f1012544a0795d8d281",
+    "tests/support/daemon_models.rs": "0b561e056d4cd398bf0b1ecaad59bb8691fac303378344c19304d16a0291660e",
+    "tests/support/retrieval_lifecycle.rs": "fb3ef73f6c2b4970bd9e22df60f2a0e5c78f9d509d241d4f59040f4c15b081fb"
+  },
+  "attempts": [
+    {
+      "name": "red-r1",
+      "classification": "product RED: missing draining state",
+      "exit_code": 101,
+      "seconds": 10.555964170023799,
+      "log_sha256": "3ca6646bec05e685861b08c594ac0f101995834976a4b4849956b2594ba27915"
+    },
+    {
+      "name": "green-r1",
+      "classification": "PASS: original job snapshots and deadlines survive drain/reopen",
+      "exit_code": 0,
+      "seconds": 63.58091125637293,
+      "log_sha256": "76c147a21b0ce611397aa5c4c1fcb8fd61a8c4e3fbdcff2fefab8952f75f821f"
+    },
+    {
+      "name": "transition-red-r1",
+      "classification": "HARNESS: default 512 to 512 did not trigger reopen; not product RED",
+      "exit_code": 101,
+      "seconds": 8.979451635852456,
+      "log_sha256": "555906dd331df5f7b2e7804bb87b83d01e10b0d11c1153300cb78cb6b4a1168e"
+    },
+    {
+      "name": "transition-red-r2",
+      "classification": "product RED: no busy reply during connection drain; rejected config terminates reopening daemon",
+      "exit_code": 101,
+      "seconds": 13.897405905649066,
+      "log_sha256": "49570909172599a6e2173a2fe9a57a815cc078224420f70b41882e61b433cdf4"
+    },
+    {
+      "name": "transition-green-r1",
+      "classification": "PASS: prompt busy reply and retained active/pending/rejected config",
+      "exit_code": 0,
+      "seconds": 73.76403886731714,
+      "log_sha256": "c29dc7bd5146366e930490c59cc086ec0b737a1ed86ee9acc27db62f0f240865"
+    },
+    {
+      "name": "controls-r1",
+      "classification": "HARNESS: stopped daemon closed response; new test resumed normal endpoint and its write failed Broken pipe; 16 controls passed; later commands not reached",
+      "exit_code": 101,
+      "seconds": 26.945274356752634,
+      "log_sha256": "790bde154d970bca8d41c2a3ddd917bd38ae752cc2182284673272b9e2c7157b"
+    },
+    {
+      "name": "controls-r2",
+      "classification": "PASS: 17 budget cases + 2 retrieval generation cases + 9 scheduler cases; all-target Clippy, plan and diff checks",
+      "exit_code": 0,
+      "seconds": 55.519946741871536,
+      "log_sha256": "90b9770d577983e635811b383b0908574eb72c143986642e186dc5a1fd89a9d7"
+    }
+  ],
+  "fresh_final_test_executions": 28,
+  "limitations": [
+    "Functional fixture evidence only; not measured RSS admission, cgroup protection, corpus scale or full acceptance.",
+    "Commands containing cargo fmt bind a pre-format admission digest; candidate_file_sha256 binds the final collected source. The committed exact-source gate is separate.",
+    "No Daybreak or new red-team campaign; no external provider calls."
+  ],
+  "members": {
+    "controls-r1.json": "414b79974dd64e735a55a42c337af7b2fbfb8660c296bae47ee8ad44462223e0",
+    "controls-r1.log.gz": "4c1051c1352f61ce9f764703387d1eb45b822af088021ae5b11ea6e1e7fce900",
+    "controls-r2.json": "189374807d3e1c21310546d51904cfd206c7aafadd6909aa33828ab6a03f2c07",
+    "controls-r2.log.gz": "552fb4691f3298c765d9dbd427663b0faab82a81f8ab501aa3a787d9e5dd718c",
+    "green-r1.json": "077eec0be166e87321431c3492c636b3d6d4e2a77d0de2a3327ccab78592553d",
+    "green-r1.log.gz": "9e8149ca86b994d3c122dd7e2f4d084d606eb69fda1b886cdfe87fd584bb3328",
+    "red-r1.json": "0dfb44cb5cabe0f7a71a69837999dfeafefb30c659e897c92f9682d1252ab323",
+    "red-r1.log.gz": "d8be0c6eae8351d60ed5400335f3e10103260697959f277e05498ef42cd6631a",
+    "transition-green-r1.json": "cd5aa1f1b1299e151c2ac5e0f18bef1ce14ae9f01a85de459e947a5184a6330f",
+    "transition-green-r1.log.gz": "3fc0e9d7f2531096a1d39b4a01881eb154fa56631a56b06bb185b7fdf9d3121b",
+    "transition-red-r1.json": "648a441d6449ab0aee2334c7b36b1b03cbe95775265c5d23172adf97baf4a1cf",
+    "transition-red-r1.log.gz": "c6627b15d5c4fb0510041ab1b4595ce2aff062071acbb710edfb5cd37025c693",
+    "transition-red-r2.json": "dcdd277db78aefe4e2efccff02489d415a653b92bc61c84a8218e0a92334a958",
+    "transition-red-r2.log.gz": "4bf26c7ed44182b2bbbb53909d600aab0c03f8965d2a116cc7292a933c1774db",
+    "README.md": "29c41059556f02ce03252b67a84b210642d096621c6a00b09fa3cf7f7925564f"
+  }
+}

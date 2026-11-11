@@ -1,0 +1,48 @@
+{
+  "classification": "PASS: 17 budget cases + 2 retrieval generation cases + 9 scheduler cases; all-target Clippy, plan and diff checks",
+  "admission": {
+    "command": [
+      "/bin/bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "cargo fmt --all && cargo test --locked --offline --test daemon budget_ && cargo test --locked --offline --test daemon old_generation_serves_queries_while_new_embedding_is_held && cargo test --locked --offline --test daemon queued_search_keeps_its_admitted_model_after_generation_switch && cargo test --locked --offline --lib daemon::jobs::tests && cargo clippy --workspace --all-targets --locked --offline -- -D warnings && python3 scripts/check_plan.py && git diff --check"
+    ],
+    "dirty_diff_sha256": "b3de69de646b616701f87b285922cdf205e53a779d342a8fe67fc8cda712a9d3",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "process": {
+      "pid": 736405,
+      "start_ticks": "618133140",
+      "state": "R"
+    },
+    "tree": "9547e327fe31fc43a9aef72d7c33f77a4066fda6",
+    "untracked": [],
+    "utc": "2026-11-11T02:17:14.440703+00:00"
+  },
+  "terminal": {
+    "exit_code": 0,
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "log_sha256": "90b9770d577983e635811b383b0908574eb72c143986642e186dc5a1fd89a9d7",
+    "seconds": 55.519946741871536,
+    "utc": "2026-11-11T02:18:09.930752+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T02:18:22.621945+00:00",
+    "terminal": {
+      "exit_code": 0,
+      "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+      "log_sha256": "90b9770d577983e635811b383b0908574eb72c143986642e186dc5a1fd89a9d7",
+      "seconds": 55.519946741871536,
+      "utc": "2026-11-11T02:18:09.930752+00:00"
+    },
+    "process_absent": true,
+    "classification": "functional_controls_retrieval_scheduler_clippy_pass"
+  }
+}

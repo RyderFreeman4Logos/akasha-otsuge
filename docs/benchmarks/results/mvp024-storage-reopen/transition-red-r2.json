@@ -1,0 +1,52 @@
+{
+  "classification": "product RED: no busy reply during connection drain; rejected config terminates reopening daemon",
+  "admission": {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--test",
+      "daemon",
+      "budget_reopen_",
+      "--",
+      "--nocapture"
+    ],
+    "dirty_diff_sha256": "c44ea53c0bc00cda93fd068a6a36ff3cc4189e9106061a9fd02c3e14c25b2e39",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "process": {
+      "pid": 731176,
+      "start_ticks": "618102000",
+      "state": "R"
+    },
+    "tree": "9547e327fe31fc43a9aef72d7c33f77a4066fda6",
+    "untracked": [],
+    "utc": "2026-11-11T02:12:03.027544+00:00"
+  },
+  "terminal": {
+    "exit_code": 101,
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "log_sha256": "49570909172599a6e2173a2fe9a57a815cc078224420f70b41882e61b433cdf4",
+    "seconds": 13.897405905649066,
+    "utc": "2026-11-11T02:12:16.903915+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T02:12:34.201780+00:00",
+    "terminal": {
+      "exit_code": 101,
+      "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+      "log_sha256": "49570909172599a6e2173a2fe9a57a815cc078224420f70b41882e61b433cdf4",
+      "seconds": 13.897405905649066,
+      "utc": "2026-11-11T02:12:16.903915+00:00"
+    },
+    "process_absent": true,
+    "classification": "budget_transition_product_red"
+  }
+}

@@ -17,9 +17,11 @@ PRs #57 through #61 and their historical gates, failures and real-data identitie
 remain linked from the final archive.
 
 The existing SSD worktree is reused on feat/mvp-024-resource-enforcement, based
-on a500d53. Complete the evidence/TODO documentation leaf, then implement #24's
-resource admission, budget-lowering drain/reopen and separate daemon/runner/service
-limits. The full corpus/load/recovery checklist below remains open. PR #56
+on a500d53. The migration evidence/TODO documentation leaf is committed as
+d6552b9. #24's current leaf implements controlled budget-change drain/reopen;
+finish its functional checks, exact-source gate, conventional review and merge.
+Measured-memory admission and separate daemon/runner/service limits follow.
+The full corpus/load/recovery checklist below remains open. PR #56
 provides observability only; it does not establish enforcement or scale acceptance.
 All seven #24 dependencies are completed; its stale blocked label was removed.
 
@@ -1013,8 +1015,21 @@ run; independent R1 PASS with zero introduced findings; CI42753418883 SUCCESS.
 [Final evidence](../benchmarks/results/mvp024-observability-final/README.md) retains
 the full report/public readback, gate and CI. The finished worktree was removed
 after zero consumers were found; shared target and corpus inputs remain.
-Memory admission/draining and dedicated cgroups follow as a separate leaf; neither
-observability nor focused fixtures satisfy the full production stress acceptance.
+Controlled budget-change drain/reopen is the current leaf. The first real-daemon
+regression passed for running/queued job preservation. Two additional REDs exposed
+missing busy replies during close/open and failure to retain the active snapshot
+when the configuration file was rejected; both now pass. The final focused run
+passed 17 budget-related daemon cases, both retrieval-generation controls, nine
+scheduler cases, all-target Clippy and the plan check. [Causal evidence](../benchmarks/results/mvp024-storage-reopen/README.md)
+retains the failed attempts and their classifications. The canonical gate,
+independent review and merge remain pending. Measured-memory
+admission and dedicated cgroups follow separately; neither observability nor
+focused fixtures satisfy the full production stress acceptance.
+
+- [ ] Finish controlled storage drain/reopen: same PID/socket, retriable busy
+  replies, original accepted job snapshots/deadlines, watcher reload, repeated
+  or reverted budgets, pending/rejected configuration and explicit stop/signals.
+  Complete the exact-source gate, independent conventional review and merge.
 
 - [ ] Freeze source/binary, machine/filesystem/cgroup state, corpus manifest,
   source licenses/hash/seed, actual UTF-8 bytes, document/partition identities,

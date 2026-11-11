@@ -1,0 +1,48 @@
+{
+  "classification": "HARNESS: stopped daemon closed response; new test resumed normal endpoint and its write failed Broken pipe; 16 controls passed; later commands not reached",
+  "admission": {
+    "command": [
+      "/bin/bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "cargo fmt --all && cargo test --locked --offline --test daemon budget_ && cargo test --locked --offline --test daemon old_generation_serves_queries_while_new_embedding_is_held && cargo test --locked --offline --test daemon queued_search_keeps_its_admitted_model_after_generation_switch && cargo test --locked --offline --lib daemon::jobs::tests"
+    ],
+    "dirty_diff_sha256": "eb9ced23ffa971a1d01917c0c9d9db23091c88a2452f7436ab596115e318429d",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "process": {
+      "pid": 734196,
+      "start_ticks": "618122464",
+      "state": "R"
+    },
+    "tree": "9547e327fe31fc43a9aef72d7c33f77a4066fda6",
+    "untracked": [],
+    "utc": "2026-11-11T02:15:27.669786+00:00"
+  },
+  "terminal": {
+    "exit_code": 101,
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "log_sha256": "790bde154d970bca8d41c2a3ddd917bd38ae752cc2182284673272b9e2c7157b",
+    "seconds": 26.945274356752634,
+    "utc": "2026-11-11T02:15:54.589258+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T02:16:03.327502+00:00",
+    "terminal": {
+      "exit_code": 101,
+      "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+      "log_sha256": "790bde154d970bca8d41c2a3ddd917bd38ae752cc2182284673272b9e2c7157b",
+      "seconds": 26.945274356752634,
+      "utc": "2026-11-11T02:15:54.589258+00:00"
+    },
+    "process_absent": true,
+    "classification": "inspect_budget_controls_failure"
+  }
+}

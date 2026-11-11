@@ -164,6 +164,7 @@ impl Service {
             .map_err(|_| Error("CONFIG_INVALID"))??;
             let report = serde_json::to_value(report)?;
             *service.last_config.lock().await = Some((digest, report.clone()));
+            service.wake_jobs();
             Ok(report)
         })
         .await

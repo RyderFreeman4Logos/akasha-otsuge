@@ -1,0 +1,48 @@
+{
+  "classification": "PASS: prompt busy reply and retained active/pending/rejected config",
+  "admission": {
+    "command": [
+      "/bin/bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "cargo fmt --all && cargo test --locked --offline --test daemon budget_reopen_ -- --nocapture"
+    ],
+    "dirty_diff_sha256": "ef9cb900f0624dfb698353c2ac65a0baa4ecb4165e304e9c47b9f7cefb744609",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "process": {
+      "pid": 732144,
+      "start_ticks": "618108542",
+      "state": "R"
+    },
+    "tree": "9547e327fe31fc43a9aef72d7c33f77a4066fda6",
+    "untracked": [],
+    "utc": "2026-11-11T02:13:08.444739+00:00"
+  },
+  "terminal": {
+    "exit_code": 0,
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "log_sha256": "c29dc7bd5146366e930490c59cc086ec0b737a1ed86ee9acc27db62f0f240865",
+    "seconds": 73.76403886731714,
+    "utc": "2026-11-11T02:14:22.187925+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T02:14:26.986715+00:00",
+    "terminal": {
+      "exit_code": 0,
+      "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+      "log_sha256": "c29dc7bd5146366e930490c59cc086ec0b737a1ed86ee9acc27db62f0f240865",
+      "seconds": 73.76403886731714,
+      "utc": "2026-11-11T02:14:22.187925+00:00"
+    },
+    "process_absent": true,
+    "classification": "busy_and_config_preservation_pass"
+  }
+}

@@ -91,6 +91,7 @@ mod tests {
             stop: Notify::new(),
             work: Notify::new(),
             stopping: std::sync::atomic::AtomicBool::new(false),
+            reopen_ready: std::sync::atomic::AtomicBool::new(false),
             instance: "new-daemon".into(),
             providers: crate::provider::Client::new().unwrap(),
             runner_slots: Arc::new(Semaphore::new(16)),
@@ -944,6 +945,7 @@ impl Service {
                 }
             }
             if service.stopping.load(std::sync::atomic::Ordering::Acquire)
+                || service.storage_reopen_required()
                 || runtime.paused
                 || ids.len() >= MAX_ACTIVE
                 || queued >= runtime.max_queued_jobs
@@ -1302,6 +1304,7 @@ impl Service {
         let runtime = &snapshot.resolved().config().runtime;
         if running >= runtime.max_concurrent_jobs.min(MAX_RUNNING)
             || runtime.paused
+            || self.storage_reopen_required()
             || self.stopping.load(std::sync::atomic::Ordering::Acquire)
             || now < job.retry_at_ms
         {
@@ -1530,7 +1533,7 @@ impl Service {
         let mut tick = tokio::time::interval(Duration::from_secs(1));
         let outcome = async {
         loop {
-            if !self.stopping.load(std::sync::atomic::Ordering::Acquire) {
+            if !self.stopping.load(std::sync::atomic::Ordering::Acquire) && !self.storage_reopen_required() {
                 if let Some(dispatch) = self.advance_notifications(&mut notification_scan, &mut notification_after, notifications.is_empty()).await? {
                     let service = self.clone();
                     notifications.spawn(async move { service.deliver_notification(dispatch).await });
@@ -1551,6 +1554,7 @@ impl Service {
                     }
                 }
             } else if running.is_empty() && notifications.is_empty() {
+                self.reopen_ready.store(!self.stopping.load(std::sync::atomic::Ordering::Acquire), std::sync::atomic::Ordering::Release);
                 break;
             }
             tokio::select! {
