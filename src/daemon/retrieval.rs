@@ -90,6 +90,9 @@ impl Service {
         let (_, job) = self
             .job(id)
             .map_err(|e| crate::storage::StorageError::new(e.0))?;
+        if job.state != "running" || job.lease_owner.as_deref() != Some(&self.instance) {
+            return Err(crate::storage::StorageError::new("LEASE_LOST"));
+        }
         self.authorize_job(&job)
             .map_err(|e| crate::storage::StorageError::new(e.0))?;
         let code = if job.cancel_requested {
@@ -288,6 +291,115 @@ impl Service {
                 self.finish_job(job, revision, "failed", Some(error.0))
                     .await
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::tests::fixture;
+    use super::*;
+
+    async fn versions(table: &lancedb::Table) -> Vec<u64> {
+        let mut versions = table
+            .list_versions()
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|v| v.version)
+            .collect::<Vec<_>>();
+        versions.sort_unstable();
+        versions
+    }
+
+    #[tokio::test]
+    async fn native_pruning_requires_running_job_and_current_lease_owner() {
+        let mut observations = Vec::new();
+        for (state, own_lease) in [("queued", true), ("running", false)] {
+            let (fixture, service, _) = fixture(&format!("prune-lease-{state}"), "").await;
+            let id = "lease-index";
+            service
+                .submit_retrieval(id.into(), RetrievalRequest::Sync)
+                .await
+                .unwrap();
+            assert!(service.claim(id, 0).await.unwrap());
+            let workflow = Deadline::start(
+                crate::config::deadline::Layer::Workflow,
+                Duration::from_secs(30),
+                None,
+            )
+            .unwrap();
+            let index = service.retrieval_index(id, &workflow).await.unwrap();
+            let target = service.storage.sequence().unwrap();
+            let progress = index
+                .sync_batch(
+                    &service.storage,
+                    target,
+                    service.config.pin().generation(),
+                    &|| Ok(()),
+                )
+                .await
+                .unwrap();
+            assert!(progress.lexical_watermark >= target);
+            drop(index);
+            let connection = lancedb::connect(fixture.0.join("data/search").to_str().unwrap())
+                .execute()
+                .await
+                .unwrap();
+            let table = connection
+                .open_table("memory_lexical_v1")
+                .execute()
+                .await
+                .unwrap();
+            let before = versions(&table).await;
+            assert!(before.len() > 1, "fixture needs obsolete native versions");
+            let (revision, mut job) = service.job(id).unwrap();
+            job.state = state.into();
+            job.lease_owner = Some(if own_lease {
+                service.instance.clone()
+            } else {
+                "another-daemon".into()
+            });
+            service
+                .save_job(&job, Some(revision), vec![])
+                .await
+                .unwrap();
+            let denied = service
+                .retrieval_result(id, &workflow)
+                .await
+                .map(|_| ())
+                .map_err(|e| e.0);
+            let after_denial = versions(&table).await;
+            let (revision, mut job) = service.job(id).unwrap();
+            job.state = "running".into();
+            job.lease_owner = Some(service.instance.clone());
+            service
+                .save_job(&job, Some(revision), vec![])
+                .await
+                .unwrap();
+            let allowed = service
+                .retrieval_result(id, &workflow)
+                .await
+                .map(|_| ())
+                .map_err(|e| e.0);
+            let after_allowed = versions(&table).await;
+            drop(table);
+            drop(connection);
+            service.close(Ok(())).await.unwrap();
+            observations.push((state, denied, before, after_denial, allowed, after_allowed));
+        }
+        for (state, denied, before, after_denial, allowed, after_allowed) in observations {
+            assert_eq!(
+                denied,
+                Err("LEASE_LOST"),
+                "{state}: {before:?} -> {after_denial:?}"
+            );
+            assert_eq!(
+                after_denial, before,
+                "{state}: denied maintenance removed native versions"
+            );
+            assert_eq!(allowed, Ok(()));
+            assert_eq!(after_allowed, vec![*before.last().unwrap()]);
         }
     }
 }
