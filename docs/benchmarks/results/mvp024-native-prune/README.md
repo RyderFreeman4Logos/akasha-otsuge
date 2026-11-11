@@ -7,7 +7,8 @@ Production sync now attempts native version pruning after 32 authority windows
 and at completion. It holds the index cache lock and requires exactly the cache
 and builder to own the same index. Existing readers defer reclamation; the lock
 prevents new readers entering during cleanup. Each native table operation checks
-permission, job cancellation, service shutdown and the original workflow deadline.
+permission, running state, current lease owner, job cancellation, service shutdown
+and the original workflow deadline.
 The current lexical table and cached vector table retain their latest versions.
 Authoritative current/history records and prior vector generations are unchanged.
 Recent unverified orphan files remain protected by the native cleanup policy.
@@ -101,8 +102,8 @@ and 125,710,336 file-backed bytes; its last kernel `memory.high` event counter i
 IPC timeout. Zero observed OOM kills does not cover the unsampled final interval.
 The different partial completion points are not comparable completed-run latency
 or disk benchmarks, and the key index did not resolve this scale failure.
-The next step is a bounded discriminating memory observation before another
-scale attempt; limits, timeouts and acceptance thresholds remain unchanged.
+The bounded allocator observations below preserve these failures; limits,
+timeouts and acceptance thresholds remain unchanged.
 
 [scale-comparison.zip](scale-comparison.zip) retains 119 members in 2,173,203 bytes;
 [scale-comparison-manifest.json](scale-comparison-manifest.json) hashes every
@@ -112,4 +113,66 @@ hashes and guarded cleanup receipts remain. Both controllers, daemons, seeders
 and owned cgroups exited before their disposable store/socket roots were removed.
 No immediate filesystem free-space gain is claimed. The included historical
 canonical PASS (638 Rust / 39 ignores, Python 35 / Node 7) belongs to `767b39e`;
-the enlarged candidate still requires its own final gate and independent review.
+the later `b801af9` gate and its blocking review are recorded below.
+
+The full gate at `b801af9` passed 640 Rust executions / 39 intentional ignores,
+35 Python tests, seven Node tests, formatting, Clippy and installed lifecycle/UID
+checks. Independent R1 nevertheless returned **FAIL**, with one missing
+per-operation lease check. It ran 34 related tests and Clippy; its originally
+requested daemon selector selected zero tests, which it retained and corrected
+to `retrieval_tests::`. The original scheduler was not observed losing ownership.
+
+Commit `c0de454` adds the existing running-state/current-instance predicate to
+the shared rebuild/prune authorization. The maintained regression runs actual
+sync maintenance with each predicate independently invalidated. Before repair,
+queued/current-owner maintenance returned success and removed native versions
+`[1, 2, 3, 4]` down to `[4]`. The same test now requires `LEASE_LOST`, unchanged
+version sets, and successful pruning after restoring valid ownership. Nine
+library and 26 daemon retrieval tests pass, with one intentional ignored child,
+plus formatting and Clippy. This is a controlled lifecycle fixture, not a claim
+that a scheduler takeover or data-loss race was observed.
+
+[review-repair.zip](review-repair.zip) retains 56 members in 70,610 bytes;
+[its manifest](review-repair-manifest.json) hashes every member. It preserves
+the historical full gate, complete R1 FAIL, RED/GREEN custody, related checks,
+source and normal repair commit. The final successor still needs its own
+canonical gate, independent R2 review and publication.
+
+Two further diagnostics used the same `b801af9` source and `b909dc2e310e` daemon
+binary, with byte-identical R2 inputs/configuration/binding/acknowledgements and
+full expected oracle. Neither completed indexing or the current/lexical checks:
+
+- The allocator sampler failed at 3,508/8,322 when its disk census encountered a
+  disappearing native temporary file. Its 45 complete allocator samples show a
+  peak live-allocation estimate of 116,291,711 bytes; that sample has 505,516,032
+  arena bytes with 420,943,745 free. This supports retained free arenas, but the
+  preload also propagated to subprocesses. A separate `busctl --version` control
+  reproduces exit 121 on the already-existing report, and source inspection
+  explains how delegation can fail. The original helper exit was discarded;
+  this causal attribution is inferred. Every resource sample reports cgroups
+  unavailable, so this is not an enforced-memory comparison. OOM evidence is
+  unavailable, not zero.
+- The control removed the sampler and changed only the daemon's allocator
+  setting to `MALLOC_MMAP_THRESHOLD_=131072`. It required effective original
+  512/640/2048 MiB limits at every sample. The census now retries the whole walk
+  at most three times on disappearing files and fails if still incomplete;
+  successful retry, exhaustion and missing-root self-checks passed. Indexing
+  reached 6,270/8,322, then `job show` hit its unchanged 10-second IPC timeout.
+  RSS sampled peak was 679,796,736 bytes, with five of 127 samples over 640 MiB;
+  kernel charged peak was 555,077,632 and observed OOM kills zero. The allocator
+  setting alone is insufficient. The original R2 did not record inherited
+  allocator environment, so it is not retroactively asserted here.
+
+These partial points are not completed-run performance comparisons. The exact
+historical IPC mechanism remains unclassified. Separately, pinned Lance 13
+source shows FTS creation memory/worker parameters are omitted from persisted
+metadata; later default optimization can use 2 GiB per worker. Effective update
+limits need a separate repair/validation before scale admission. That static
+gap is not yet established as the cause of these measured failures.
+
+[allocator-diagnostics.zip](allocator-diagnostics.zip) retains 63 members in
+551,067 bytes, with [per-member hashes](allocator-diagnostics-manifest.json).
+Shared identical inputs reference the existing scale-comparison archive instead
+of duplicating the corpus/oracle. Both failed stores and sockets were removed
+after terminality, full file hashes and scoped handle checks; the sampler build
+was archived and removed. No immediate physical-space gain is inferred.

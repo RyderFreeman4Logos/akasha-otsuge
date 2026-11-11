@@ -70,9 +70,19 @@ IPC timed out. Sampled RSS peaks were 691,466,240 and 689,385,472 bytes, both ov
 640 MiB. The successor records growing anonymous memory and kernel high-pressure
 events; the precise timeout cause remains unclassified. Neither reached complete
 output oracles. All receipts are retained and both disposable stores were removed.
-Finish this bounded index-maintenance leaf's final canonical gate, independent
-review and publication. Then isolate the memory growth with a discriminating
-observation before another scale attempt, and resolve vector inputs.
+The full `b801af9` gate passed 640 Rust executions / 39 ignores, Python 35 and
+Node 7, but independent R1 blocked publication for a missing per-prune execution
+lease check. Commit `c0de454` repairs the shared rebuild/prune guard after an
+actual native-deletion RED; unchanged-test GREEN, 35 related tests and Clippy
+pass. Finish the successor's final gate, independent R2 review and publication.
+The allocator observation supports retained free arenas but failed a disk census
+race and lacked cgroup delegation because the preload reached helper processes.
+A one-setting mmap control under enforced original limits still failed at
+6,270/8,322 and RSS 679,796,736 bytes. Both failed stores/sockets were removed.
+The setting alone is insufficient; full output oracles and exact IPC causality
+remain unresolved. Pinned Lance source also shows creation-only FTS memory/worker
+settings are not retained for default updates. Bound and verify those effective
+update limits in the next resource leaf, then resolve vector inputs and scale.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
@@ -1150,6 +1160,15 @@ do not satisfy the full production stress acceptance.
   final verification, CI, publication and cleanup. No full-scale or new Daybreak
   acceptance is claimed.
 
+- [x] Repair the independently reviewed per-operation index-maintenance lease
+  gap through the shared rebuild/prune callback. Retain the native version-set
+  RED/GREEN and valid-owner controls; commit `c0de454` passes 35 related checks.
+  Final successor canonical gate, R2 review and publication remain separate.
+- [ ] Bound effective FTS update memory/worker settings after index reopen;
+  pinned Lance omits creation-only limits from persisted parameters. Preserve
+  original resource/timeout thresholds and prove the production path. Allocator
+  observation and the failed single-setting control are diagnostics, not fixes
+  or full-scale acceptance; preserve their confounds and unexplained IPC failures.
 - [ ] Validate a small production corpus/coverage pilot before full-data admission.
   Source chunks can be 64 KiB, while production claims are at most 32 KiB and
   vector input uses 4096-byte chunk means. Prove UTF-8-safe full-span coverage,
