@@ -126,6 +126,17 @@ fn sample(root: u32) -> Value {
 }
 
 impl Service {
+    pub(super) fn storage_reopen_required(&self) -> bool {
+        self.storage.budget_mib()
+            != self
+                .config
+                .pin()
+                .resolved()
+                .config()
+                .runtime
+                .memory_budget_mib
+    }
+
     pub(super) async fn resource_status(&self) -> Value {
         let config = self.config.pin();
         let requested = config.resolved().config().runtime.memory_limits();
@@ -143,6 +154,7 @@ impl Service {
         json!({"config_generation":config.generation(),"requested":requested,
             "storage_open_budget_mib":self.storage.budget_mib(),
             "storage_reopen_required":self.storage.budget_mib()!=requested.daemon_memory_target_mib,
+            "draining":self.storage.budget_mib()!=requested.daemon_memory_target_mib,
             "index":index,"measurement":measurement,
             "enforcement":{"software_memory_admission":false,"managed_cgroup_limits":false}})
     }

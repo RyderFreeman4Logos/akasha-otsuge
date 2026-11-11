@@ -1,0 +1,48 @@
+{
+  "classification": "PASS: original job snapshots and deadlines survive drain/reopen",
+  "admission": {
+    "command": [
+      "/bin/bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "cargo fmt --all && cargo test --locked --offline --test daemon model_tests::budget_reload_drains_running_work_then_reopens_without_resetting_jobs -- --exact"
+    ],
+    "dirty_diff_sha256": "51fc9825f9376936863669deb659c081ebc1fda155424288d2634612aa23c13a",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "process": {
+      "pid": 721166,
+      "start_ticks": "618037664",
+      "state": "R"
+    },
+    "tree": "9547e327fe31fc43a9aef72d7c33f77a4066fda6",
+    "untracked": [],
+    "utc": "2026-11-11T02:01:19.663840+00:00"
+  },
+  "terminal": {
+    "exit_code": 0,
+    "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+    "log_sha256": "76c147a21b0ce611397aa5c4c1fcb8fd61a8c4e3fbdcff2fefab8952f75f821f",
+    "seconds": 63.58091125637293,
+    "utc": "2026-11-11T02:02:23.224255+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T02:08:45.147099+00:00",
+    "terminal": {
+      "exit_code": 0,
+      "head": "d6552b9e3221e330b7f891d6d6f49bac8b105a59",
+      "log_sha256": "76c147a21b0ce611397aa5c4c1fcb8fd61a8c4e3fbdcff2fefab8952f75f821f",
+      "seconds": 63.58091125637293,
+      "utc": "2026-11-11T02:02:23.224255+00:00"
+    },
+    "process_absent": true,
+    "classification": "controlled_budget_reopen_focused_pass"
+  }
+}

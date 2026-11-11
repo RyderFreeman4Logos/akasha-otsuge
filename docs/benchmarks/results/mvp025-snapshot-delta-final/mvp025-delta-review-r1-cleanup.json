@@ -1,0 +1,19 @@
+{
+  "utc": "2026-11-10T19:16:00.767036+00:00",
+  "files": [
+    {
+      "name": "mvp025-delta-review-r1.stdout",
+      "bytes": 468132,
+      "sha256": "72e532d7cf39e973e6465b17e2b0c97b4e43888ff907610e762e688e06590c96"
+    },
+    {
+      "name": "mvp025-delta-review-r1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "matching_readable_same_uid_fd_consumers": [],
+  "inaccessible_processes": 94,
+  "absent": true,
+  "scope": "Completed reviewer raw transport only; complete report, tests and metadata retained; contents not inspected. Scoped census does not prove global absence."
+}

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T19:18:03.174262+00:00",
+  "previous_main": "235c409e8c79766cef84da193d7f6b8338157d58",
+  "reviewed_head": "014e15d6cc1c3119d6b16ab08d79a4b028e41249",
+  "merge": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
+  "tree": "46ac6632cef510642c4653055aa2da6cf2446802",
+  "main_clean": true,
+  "worktree_clean": true,
+  "next_branch": "feat/mvp-024-resource-enforcement",
+  "new_target_created": false,
+  "new_worktree_created": false
+}

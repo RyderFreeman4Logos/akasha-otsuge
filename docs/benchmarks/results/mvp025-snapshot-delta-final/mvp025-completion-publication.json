@@ -1,0 +1,22 @@
+{
+  "issue": 25,
+  "state": "closed",
+  "state_reason": "completed",
+  "closed_at": "2026-11-10T19:19:33Z",
+  "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/25",
+  "comment": {
+    "id": 6776919316,
+    "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/25#issuecomment-6776919316",
+    "body": "验收完成，最后一项实现已在 [PR #62](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/62) 合并为 `a500d531b7a02c575a593a1cbad37b93dcf8cb0a`，树与受检 `014e15d6cc1c3119d6b16ab08d79a4b028e41249` 完全一致。前置实现为 PR #57（导出）、#58（离线导入）、#59（导入后的本地运行时）、#60（只读 mempal 迁移）、#61（共同历史前缀增量导入）。\n\n| 验收条件 | 结果与证据 |\n| --- | --- |\n| 固定支持版本、字段映射和缺失数据 | 支持源 commit `4593a5c5e6a9ea1140256cd42fa5838511a24e14` 对应 schema 21/fork 28；[映射、用法和限制](https://github.com/RyderFreeman4Logos/akasha-otsuge/blob/a500d531b7a02c575a593a1cbad37b93dcf8cb0a/docs/mempal-migration.md) 明确不可恢复的历史/来源和未验证审核，不伪造批准。 |\n| 实际样本计数/hash/抽样关系 | 独立只读快照 11,741,294,592 字节；29 个保留表、3,525,645 行。独立 typed-row/table hash 与全行转换核对通过；七类选定关系无缺失目标，35 次隔离 CLI 调用检查原文/候选/审核/历史。详细历史结果与实际受检源在 [reader/final archive](https://github.com/RyderFreeman4Logos/akasha-otsuge/tree/a500d531b7a02c575a593a1cbad37b93dcf8cb0a/docs/benchmarks/results/mvp025-mempal-final) 和其链接的 reader archive。 |\n| 幂等、损坏/未知版本拒绝、恢复 | 公共 CLI 回归验证版本/结构/hash/引用拒绝、重复及截断前缀恢复；原有 SIGKILL、写入/发布失败及所有历史 FAIL 均保留。新源身份、NULL 主键歧义、行号变化、删除/缩短/范围变化/退役/重现由三代独立结构 fixture 检查。 |\n| 中立 export → 空库 import | 实际数据完成两次空库导入、一次重复导入和两次导出，字节、receipt、revision、clock 一致；原文和候选保持未批准/未激活。增量导入保留旧回执，拒绝分叉及本地写入冲突。新 delta 公共命令回归再次核对有效状态和历史。 |\n| 原始来源不变 | 转换仅使用内核只读挂载内的一份独立快照，前后完整 hash/身份核对通过；未复制第二份 SQLite，未修改旧 mempal checkout/服务。实时旧数据库可能自行变化，未把快照不变夸大为实时库静止。 |\n| 最终候选验收 | `014e15d` 的 `just check`：599 Rust 测试执行通过、35 个既有忽略，含安装重复、生命周期和 UID 隔离，Python/Node/fmt/Clippy/release 通过。[独立全范围审查](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/62#issuecomment-6776829447) PASS/0 findings，另跑四个 maintained delta tests 全通过。[精确提交 CI](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/42878422485) 成功，日志证明缓存恢复/主键命中。 |\n| 当前二进制实际数据复核 | 对同一未修改真实快照执行 `migrate mempal SNAPSHOT OUTPUT --previous PRIOR` 并重复：6/6 步通过，耗时 1,635 秒，27,511 commits/1,687,022 revisions 完整保留、输出全字节一致、没有新提交；输入归档/快照 hash 不变，临时 native store 和约 5.98 GB 输出已清理。 |\n\n最终环境：Linux 6.1.0-52-amd64 x86_64，Rust/Cargo 1.99.1；受检 release binary SHA-256 `4fe07ef3452254da7895d14b84c9d5a4b5ce810ebc9c75b983328f12667b0b19`。原始数据验证不调用模型/provider。命令包括 `just check`、`cargo test --locked --offline --test archive mempal::incremental::`、公共 migrate/archive export/archive import 和隔离 daemon CLI。来源私有内容/路径/指纹不公开。\n\n限制保持明确：当前真实数据复核使用未修改快照，变化生命周期证据来自独立 fixture；已安装 mempal 的精确编译源仍未知，版本字符串不是证明；缺失的旧历史和审核事实保持 unknown。清理进程检查仅覆盖可读取的同 UID 进程，不声称全局无消费者。Daybreak/新红队测试按用户要求暂缓，资源压力、模型质量、native Claude 认证分别属于 #24/#27/#12。\n\n本 issue 的实现、迁移/往返验收与合并均已完成，可按 completed 关闭。",
+    "body_equal": true
+  },
+  "merge": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
+  "head": "014e15d6cc1c3119d6b16ab08d79a4b028e41249",
+  "open_after": [
+    28,
+    27,
+    26,
+    24,
+    12
+  ]
+}

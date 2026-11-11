@@ -6,6 +6,7 @@ use super::*;
 use crate::config::{Paths, resolve};
 
 mod incremental;
+pub(crate) mod native_open;
 
 pub(crate) fn checkpoint(phase: &str) {
     if std::env::var("AKASHA_TEST_CRASH_PHASE").as_deref() != Ok(phase) {

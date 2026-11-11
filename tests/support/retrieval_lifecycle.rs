@@ -66,19 +66,25 @@ fn generation_switch(jobs: usize) {
             &settings(&next.address, 3).replace("memory_budget_mib=512", "memory_budget_mib=1024"),
         );
         daemon.cli(&["config", "reload"]);
-        daemon.cli(&[
-            "search",
-            "offline",
-            "--scope",
-            scope_file.to_str().unwrap(),
-            "--idempotency-key",
-            "cache-busy",
-        ]);
-        let busy = finished(&daemon, "cache-busy");
-        assert_eq!(busy["state"], "failed", "{busy}");
-        assert_eq!(busy["error"], "RESOURCE_BUSY");
+        let busy = daemon
+            .command()
+            .args([
+                "search",
+                "offline",
+                "--scope",
+                scope_file.to_str().unwrap(),
+                "--idempotency-key",
+                "cache-busy",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(busy.status.code(), Some(4));
+        assert!(String::from_utf8_lossy(&busy.stderr).contains("RESOURCE_BUSY"));
     }
     next.resume();
+    if jobs == 2 {
+        wait_for_storage_budget(&daemon, 1024);
+    }
     let built = finished(&daemon, "new-generation");
     let job = finished(&daemon, "during-build");
     if jobs == 2 {

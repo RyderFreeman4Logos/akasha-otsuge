@@ -59,6 +59,8 @@ impl PinnedTree {
                 drop(runtime);
                 drop(owner);
             })?;
+        #[cfg(test)]
+        super::crash_tests::native_open::checkpoint(&root.path());
         let tree = ready
             .recv()
             .map_err(|_| StorageError::new("STORAGE_OPEN_FAILED"))??;

@@ -1,0 +1,53 @@
+{
+  "classification": "PASS: 111 test executions, 11 intentional library ignores, all-target Clippy, plan and whitespace checks",
+  "admission": {
+    "command": [
+      "/bin/bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "cargo fmt --all && cargo test --locked --offline --lib && cargo test --locked --offline --test daemon budget_ && cargo test --locked --offline --test daemon old_generation_serves_queries_while_new_embedding_is_held && cargo test --locked --offline --test daemon queued_search_keeps_its_admitted_model_after_generation_switch && cargo clippy --workspace --all-targets --locked --offline -- -D warnings && python3 scripts/check_plan.py && git diff --check"
+    ],
+    "dirty_diff_sha256": "efae16bbc6cf14e24db689c06d226952a30ddf8551fc1ae53b8c6612629a1b25",
+    "environment": {
+      "CARGO_TARGET_DIR": "/ssd/mirror-rootfs/home/obj/project/github/RyderFreeman4Logos/akasha-otsuge/target",
+      "PATH": "/home/obj/.hermes/node/bin:/home/obj/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/home/obj/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+      "RUSTC_WRAPPER": "/mnt/ssd/mirror-rootfs/home/obj/.local/share/mise-rebuilt/installs/sccache/0.19.0/sccache-v0.19.0-x86_64-unknown-linux-musl/sccache",
+      "SCCACHE_SERVER_UDS": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9/s",
+      "TMPDIR": "/mnt/ssd/mirror-rootfs/home/obj/tmp/a15-cache-s0s9a8n9"
+    },
+    "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+    "process": {
+      "pid": 822452,
+      "start_ticks": "618347384",
+      "state": "R"
+    },
+    "tree": "4cb277a253704743fb4727f202dda23c874c5052",
+    "untracked": [
+      {
+        "path": "src/storage/crash_tests/native_open.rs",
+        "sha256": "b4cde008fd9f95d05316f977a1dcfff521ae4a3b84bcae728244071f5b8b0088"
+      }
+    ],
+    "utc": "2026-11-11T02:52:56.878677+00:00"
+  },
+  "terminal": {
+    "exit_code": 0,
+    "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+    "log_sha256": "4395a9436491d9e2e6fa4392bdb4161e8587d1c5816cb9870a175deba66d2cf9",
+    "seconds": 109.94888920988888,
+    "utc": "2026-11-11T02:54:46.798907+00:00"
+  },
+  "collected": {
+    "utc": "2026-11-11T02:54:52.313282+00:00",
+    "terminal": {
+      "exit_code": 0,
+      "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+      "log_sha256": "4395a9436491d9e2e6fa4392bdb4161e8587d1c5816cb9870a175deba66d2cf9",
+      "seconds": 109.94888920988888,
+      "utc": "2026-11-11T02:54:46.798907+00:00"
+    },
+    "process_absent": true,
+    "classification": "full_library_budget_retrieval_clippy_pass"
+  }
+}

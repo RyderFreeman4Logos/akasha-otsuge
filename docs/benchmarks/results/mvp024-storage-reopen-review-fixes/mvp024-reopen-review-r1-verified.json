@@ -1,0 +1,16 @@
+{
+  "utc": "2026-11-11T02:43:11.839276+00:00",
+  "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+  "tree": "4cb277a253704743fb4727f202dda23c874c5052",
+  "base": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
+  "verdict": "FAIL",
+  "actionable_count": 2,
+  "findings": [
+    "R1 synchronous storage initialization blocks transition busy response",
+    "R2 subsequent transition error masks earlier accept failure"
+  ],
+  "fresh_test_executions": 28,
+  "report_sha256": "015ab727587cab0e00340966c0332c67af95a5538ae1f4db2a7c6cf9796ad5d1",
+  "test_log_sha256": "ec8b59e0782c9b47903bb0395c7080e39d2ac43da18b57777606f6fd8c78c494",
+  "clean_after": true
+}

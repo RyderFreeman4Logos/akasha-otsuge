@@ -91,6 +91,7 @@ mod tests {
             stop: Notify::new(),
             work: Notify::new(),
             stopping: std::sync::atomic::AtomicBool::new(false),
+            reopen_ready: std::sync::atomic::AtomicBool::new(false),
             instance: "new-daemon".into(),
             providers: crate::provider::Client::new().unwrap(),
             runner_slots: Arc::new(Semaphore::new(16)),
@@ -111,6 +112,172 @@ mod tests {
             "scope":scope,"stream":"stream","coverage":"available_payloads"
         })).unwrap();
         (service, binding)
+    }
+
+    #[tokio::test]
+    async fn budget_transition_keeps_busy_replies_during_native_open() {
+        let (fixture, service, _) =
+            fixture("reopen-native-hold", "[runtime]\nmemory_budget_mib=2048\n").await;
+        let socket = service
+            .config
+            .pin()
+            .resolved()
+            .config()
+            .paths
+            .socket_path
+            .clone();
+        let (listener, _owner) = listen(&socket).unwrap();
+        std::fs::write(&service.config_path, "[runtime]\nmemory_budget_mib=512\n").unwrap();
+        assert_eq!(service.reload().await.unwrap()["status"], "applied");
+        let mut gate =
+            crate::storage::crash_tests::native_open::Gate::new(&fixture.0.join("data/authority"));
+        let probe_socket = socket.clone();
+        let probe = std::thread::spawn(move || {
+            gate.reached.recv_timeout(Duration::from_secs(5)).unwrap();
+            let runtime = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap();
+            let response = runtime.block_on(async {
+                tokio::time::timeout(
+                    Duration::from_secs(2),
+                    ipc::call(
+                        &probe_socket,
+                        &Request {
+                            protocol_version: ipc::VERSION,
+                            request_id: "held-open-status".into(),
+                            deadline_ms: None,
+                            command: Command::Status,
+                        },
+                    ),
+                )
+                .await
+            });
+            let _ = gate.release.take().unwrap().send(());
+            response
+        });
+        let serving = tokio::spawn(async move { serve(service, || listener.accept()).await });
+        let observed = tokio::task::spawn_blocking(move || probe.join().unwrap())
+            .await
+            .unwrap();
+        tokio::time::timeout(Duration::from_secs(5), async {
+            loop {
+                let response = ipc::call(
+                    &socket,
+                    &Request {
+                        protocol_version: ipc::VERSION,
+                        request_id: "stop-after-open".into(),
+                        deadline_ms: None,
+                        command: Command::Stop,
+                    },
+                )
+                .await
+                .unwrap();
+                if response.get("error").is_none() {
+                    break;
+                }
+                assert_eq!(response["error"]["code"], "RESOURCE_BUSY");
+                tokio::time::sleep(Duration::from_millis(5)).await;
+            }
+        })
+        .await
+        .unwrap();
+        serving.await.unwrap().unwrap();
+        let response = observed
+            .expect("native initialization blocked the listener")
+            .unwrap();
+        assert_eq!(response["error"]["code"], "RESOURCE_BUSY");
+        assert_eq!(response["request_id"], "held-open-status");
+    }
+
+    #[tokio::test]
+    async fn budget_transition_accept_error_survives_a_later_owner_failure() {
+        for first in ["accept", "scheduler", "owner"] {
+            let (_fixture, service, _) = fixture(
+                &format!("reopen-error-order-{first}"),
+                "[runtime]\nmemory_budget_mib=2048\n",
+            )
+            .await;
+            if first == "scheduler" {
+                service
+                    .storage
+                    .commit(&CommitRequest {
+                        request_id: "corrupt-active".into(),
+                        config_generation: 1,
+                        policy_revision: None,
+                        changes: vec![Change {
+                            key: active_key(),
+                            expected_revision: None,
+                            content: "[\"missing\"]".into(),
+                        }],
+                    })
+                    .await
+                    .unwrap();
+            } else {
+                std::fs::write(&service.config_path, "[runtime]\nmemory_budget_mib=512\n").unwrap();
+                service.reload().await.unwrap();
+            }
+            if first == "owner" {
+                let failed = service.operations.lock().await.spawn(async {
+                    panic!("controlled earlier owner failure");
+                });
+                tokio::time::timeout(Duration::from_secs(5), async {
+                    while !failed.is_finished() {
+                        tokio::time::sleep(Duration::from_millis(1)).await;
+                    }
+                })
+                .await
+                .unwrap();
+            }
+            let (release, held) = tokio::sync::oneshot::channel();
+            service.operations.lock().await.spawn(async move {
+                held.await.unwrap();
+                if first != "owner" {
+                    panic!("controlled later owner failure");
+                }
+            });
+            let release = Arc::new(std::sync::Mutex::new(Some(release)));
+            let error = serve(service.clone(), || {
+                let service = service.clone();
+                let release = release.clone();
+                async move {
+                    while !service.stopping.load(std::sync::atomic::Ordering::Acquire) {
+                        tokio::time::sleep(Duration::from_millis(1)).await;
+                    }
+                    if let Some(release) = release.lock().unwrap().take() {
+                        let _ = release.send(());
+                    }
+                    Err(std::io::Error::other("first transition accept failure"))
+                }
+            })
+            .await
+            .unwrap_err();
+            assert!(service.operations.lock().await.is_empty());
+            assert_eq!(
+                error.0,
+                match first {
+                    "scheduler" => "JOB_NOT_FOUND",
+                    "owner" => "JOB_ERROR",
+                    _ => "IO_ERROR",
+                }
+            );
+            assert!(
+                service
+                    .storage
+                    .commit(&CommitRequest {
+                        request_id: "after-transition-error".into(),
+                        config_generation: 1,
+                        policy_revision: None,
+                        changes: vec![Change {
+                            key: job_key("after-transition-error"),
+                            expected_revision: None,
+                            content: "closed".into()
+                        }],
+                    })
+                    .await
+                    .is_err()
+            );
+        }
     }
 
     #[tokio::test]
@@ -944,6 +1111,7 @@ impl Service {
                 }
             }
             if service.stopping.load(std::sync::atomic::Ordering::Acquire)
+                || service.storage_reopen_required()
                 || runtime.paused
                 || ids.len() >= MAX_ACTIVE
                 || queued >= runtime.max_queued_jobs
@@ -1302,6 +1470,7 @@ impl Service {
         let runtime = &snapshot.resolved().config().runtime;
         if running >= runtime.max_concurrent_jobs.min(MAX_RUNNING)
             || runtime.paused
+            || self.storage_reopen_required()
             || self.stopping.load(std::sync::atomic::Ordering::Acquire)
             || now < job.retry_at_ms
         {
@@ -1530,7 +1699,7 @@ impl Service {
         let mut tick = tokio::time::interval(Duration::from_secs(1));
         let outcome = async {
         loop {
-            if !self.stopping.load(std::sync::atomic::Ordering::Acquire) {
+            if !self.stopping.load(std::sync::atomic::Ordering::Acquire) && !self.storage_reopen_required() {
                 if let Some(dispatch) = self.advance_notifications(&mut notification_scan, &mut notification_after, notifications.is_empty()).await? {
                     let service = self.clone();
                     notifications.spawn(async move { service.deliver_notification(dispatch).await });
@@ -1551,6 +1720,7 @@ impl Service {
                     }
                 }
             } else if running.is_empty() && notifications.is_empty() {
+                self.reopen_ready.store(!self.stopping.load(std::sync::atomic::Ordering::Acquire), std::sync::atomic::Ordering::Release);
                 break;
             }
             tokio::select! {

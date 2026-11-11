@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-11T02:30:07.887480+00:00",
+  "terminal": {
+    "exit_code": 0,
+    "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+    "log_sha256": "fd0a85931bdc19c508fbb3572429fd580f5d05851e58f6d31485584a4e6a55ce",
+    "seconds": 477.17088022083044,
+    "utc": "2026-11-11T02:29:33.652386+00:00"
+  },
+  "process_absent": true,
+  "classification": "canonical_gate_zero_exit"
+}

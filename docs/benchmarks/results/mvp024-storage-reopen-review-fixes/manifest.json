@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-11-11T02:56:36.550174+00:00",
+  "parent": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+  "base": "a500d531b7a02c575a593a1cbad37b93dcf8cb0a",
+  "issue": 24,
+  "pr": 63,
+  "attempts": [
+    {
+      "name": "red-r1",
+      "classification": "PRODUCT_RED: initialization blocked busy replies; later owner error replaced earlier accept error",
+      "log_sha256": "6d364d5a4fe64198166ccf0f46ee81425d00bbaba75c9a066a6ade2e5bc662bc",
+      "exit_code": 101,
+      "seconds": 21.731449750252068
+    },
+    {
+      "name": "green-r1",
+      "classification": "PASS: both regressions; prior scheduler-error control retained",
+      "log_sha256": "83a8c90f1ec692501829bb2460ad4295c91ae6a9eadb97ec1c1f87905ee64512",
+      "exit_code": 0,
+      "seconds": 20.756247334182262
+    },
+    {
+      "name": "focused-r1",
+      "classification": "PASS: 111 test executions, 11 intentional library ignores, all-target Clippy, plan and whitespace checks",
+      "log_sha256": "4395a9436491d9e2e6fa4392bdb4161e8587d1c5816cb9870a175deba66d2cf9",
+      "exit_code": 0,
+      "seconds": 109.94888920988888
+    }
+  ],
+  "final_focused_passed": 111,
+  "final_focused_ignored": 11,
+  "historical_review": {
+    "verdict": "FAIL",
+    "actionable_count": 2,
+    "head": "e81402448411b19cf392c9f6f5014a5d6e92d8e7",
+    "report": "mvp024-reopen-review-r1.md",
+    "url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/63#issuecomment-6785427950"
+  },
+  "members": {
+    "README.md": "c380f033cfefd33553a44d9322faf5b6a7466f75baa63822905f292a466cf70f",
+    "focused-r1.json": "f151b7e8dfd69b4d5103d1e2c0ec33bb9f7cb5380a68975b0bf611c38650a677",
+    "focused-r1.log.gz": "840f2a92c1525580271728b2081f7e88b0f13effe73c8c4c2fed535110fde193",
+    "green-r1.json": "2b41a9d82698729b00991ef4adeb7712423bc6884370996c70142df246a27545",
+    "green-r1.log.gz": "68140648441efcf3abcc5b9ad141a8b74156b3a8d77008684ca56cb8a23619df",
+    "mvp024-reopen-canonical-r1-verified.json": "c290c78fafa1c39c408db7bf1d0b262dc56c4b516f4eb283866ba58a653bad75",
+    "mvp024-reopen-canonical-r1.admission.json": "81efb3d097a1895f96f96c70c82d472e08ea4d15e6c3121f6879ceaf97097613",
+    "mvp024-reopen-canonical-r1.collected.json": "1c31cacb918ce915e57441add544ee2f4c25d0ef0f860cf060f4cfb102bf2c03",
+    "mvp024-reopen-canonical-r1.log.gz": "167a3a832abed323634dedacb437b51f7e8741b36ed3c00b50814a3da4601f3b",
+    "mvp024-reopen-canonical-r1.terminal.json": "3df1ec04d48e83140eb2c8549758a32d9f249edc4f922a8bfcee3dea6ca4f88b",
+    "mvp024-reopen-ci-r1.json": "1bd50485a410a35f423b8c48ce12158eea9d1eb8d8b76548b7cd3c4b1d3cd694",
+    "mvp024-reopen-ci-r1.log.gz": "450e6b86384b0e8947bed13558f283f3c5eba29f815f60193728129ea7fae72e",
+    "mvp024-reopen-review-r1-cleanup.json": "a51b9cdb76b707711f43d6a89a339df098a09ca88879ebcfb349622e7e3b85d2",
+    "mvp024-reopen-review-r1-publication.json": "234ea507c8056f9c0388cc194a8590b4521e9c41fe1e217a1067efb5de76d50e",
+    "mvp024-reopen-review-r1-tests.log.gz": "5267829fa864db2de139319365591db10c82c96ec117d17eda06630c7645c48d",
+    "mvp024-reopen-review-r1-verified.json": "b334d4a2e97608854c00b9f878839533f0f3c24c13faada4e81f1536512f3a46",
+    "mvp024-reopen-review-r1.md": "015ab727587cab0e00340966c0332c67af95a5538ae1f4db2a7c6cf9796ad5d1",
+    "red-r1.json": "87ca73da1c640925b9ebedb81b03a9f19ac9d2d46e8e612dc1ef0c84111a23af",
+    "red-r1.log.gz": "f7d837eee0ad82870add6672f3f5386a4c9bd161ae73347ed40799f578f4879f"
+  },
+  "historical_source_commit": "622fc8a3ddd8484ee24359e315aeb1802429f2ae",
+  "historical_source_sha256": {
+    "src/daemon.rs": "666ed63d31fc8821b93fe4006178d87c775230748d9b44a729e367d48ae805b5",
+    "src/daemon/configuration.rs": "9bbca7b534756c12c27acc0392a6a4770456dd351948a3e77a81a1e8d1f83adf",
+    "src/daemon/jobs.rs": "aa333bf1855912a0874585072306cf7238b92633c2868bea05f1cbcbf7f45294",
+    "src/daemon/resources.rs": "75e92a0dee9eef307131930d657cf064ac6a3eea1fb6e791fcf32b765f89b863",
+    "src/storage/crash_tests.rs": "6a7c350973f96fde8ec7ed5a8b206ba1370cafb78e9bbf845a9e6af5e64a2e1b",
+    "src/storage/crash_tests/native_open.rs": "286abdf0b485ed527ffb23c82ffab5c957320397f1a62ee1a8d1defda94ce466",
+    "src/storage/native.rs": "270bad25dc745f56064d117dc49503ffac1cc791885aa5cac210eb14ee74dd3c",
+    "tests/daemon.rs": "766995ffa32348380cd9ca57ab39082accce8c687faf0f1012544a0795d8d281",
+    "tests/support/daemon_models.rs": "0b561e056d4cd398bf0b1ecaad59bb8691fac303378344c19304d16a0291660e",
+    "tests/support/retrieval_lifecycle.rs": "fb3ef73f6c2b4970bd9e22df60f2a0e5c78f9d509d241d4f59040f4c15b081fb"
+  }
+}

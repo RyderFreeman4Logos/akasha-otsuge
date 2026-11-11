@@ -46,6 +46,14 @@ management uses the running daemon's profile rather than a client-side override.
 Startup requires a valid configuration. Changing storage/socket paths requires
 explicit drain and restart; the daemon never migrates the old database implicitly.
 
+A memory target change automatically pauses new jobs, drains running work with
+its original deadlines, then closes and reopens storage in the same process.
+`daemon status` reports the requested target, open budget and `draining` state.
+During close/open the socket returns `RESOURCE_BUSY`; retry with the same request
+or idempotency key. Queued job snapshots and pending path configuration survive.
+Stop and production shutdown signals still end the daemon. See
+[memory budgets](memory-resources.md) for the remaining enforcement limits.
+
 ## Frames and bounds
 
 Each frame is a four-byte unsigned big-endian byte length followed by UTF-8 JSON.

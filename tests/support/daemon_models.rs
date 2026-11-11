@@ -287,6 +287,209 @@ fn await_request(endpoint: &Endpoint) {
 }
 
 #[test]
+fn budget_reload_drains_running_work_then_reopens_without_resetting_jobs() {
+    let endpoint = Endpoint::new();
+    endpoint.pause();
+    let mut daemon = Daemon::new();
+    let settings = |budget| {
+        text_config(&endpoint)
+            .replace(
+                "[runtime]",
+                &format!("[runtime]\nmemory_budget_mib={budget}"),
+            )
+            .replace("timeout='3s'", "timeout='30s'")
+    };
+    daemon.configure(&settings(2048));
+    daemon.start();
+    let pid = daemon.child.as_ref().unwrap().id();
+    submit_text(&daemon, "before-reopen");
+    await_request(&endpoint);
+    let running = daemon.cli(&["job", "show", "before-reopen"])["data"].clone();
+    let queued = submit_text(&daemon, "queued-before-reopen");
+    assert_eq!(running["state"], "running");
+    assert_eq!(queued["state"], "queued");
+    daemon.configure(&settings(512).replace("timeout='30s'", "timeout='2s'"));
+    let reload = daemon.cli(&["config", "reload"])["data"].clone();
+    assert_eq!(reload["status"], "applied");
+    let status = daemon.cli(&["daemon", "status"]);
+    let resources = &status["data"]["resources"];
+    assert_eq!(resources["draining"], true);
+    assert_eq!(resources["requested"]["daemon_memory_target_mib"], 512);
+    assert_eq!(resources["storage_open_budget_mib"], 2048);
+    assert_eq!(submit_text(&daemon, "before-reopen"), running);
+    let refused = daemon
+        .command()
+        .args([
+            "model",
+            "run",
+            daemon.root.join("plan.json").to_str().unwrap(),
+            "--idempotency-key",
+            "during-reopen",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(refused.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&refused.stderr).contains("RESOURCE_BUSY"));
+    assert_eq!(endpoint.requests.lock().unwrap().len(), 1);
+    assert_eq!(
+        daemon.cli(&["job", "show", "queued-before-reopen"])["data"],
+        queued
+    );
+    endpoint.resume();
+    wait_for_storage_budget(&daemon, 512);
+    let first = terminal(&daemon, "before-reopen");
+    let second = terminal(&daemon, "queued-before-reopen");
+    assert_eq!(first["state"], "succeeded");
+    assert_eq!(second["state"], "succeeded");
+    for field in [
+        "config_generation",
+        "config_digest",
+        "started_at_ms",
+        "execution_deadline_ms",
+        "queue_deadline_ms",
+    ] {
+        assert_eq!(first[field], running[field], "{field}");
+    }
+    for field in [
+        "config_generation",
+        "config_digest",
+        "execution_budget_ms",
+        "queue_deadline_ms",
+    ] {
+        assert_eq!(second[field], queued[field], "{field}");
+    }
+    let after = daemon.cli(&["daemon", "status"]);
+    assert_eq!(after["data"]["pid"], pid);
+    assert_eq!(after["data"]["resources"]["storage_open_budget_mib"], 512);
+    assert_eq!(after["data"]["resources"]["storage_reopen_required"], false);
+    assert_eq!(after["data"]["resources"]["draining"], false);
+    assert_eq!(
+        after["data"]["resources"]["config_generation"],
+        reload["active_generation"]
+    );
+    assert_eq!(endpoint.requests.lock().unwrap().len(), 2);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
+fn budget_reopen_preserves_pending_paths_and_rejected_config() {
+    let endpoint = Endpoint::new();
+    endpoint.pause();
+    let mut daemon = Daemon::new();
+    let settings = text_config(&endpoint)
+        .replace("[runtime]", "[runtime]\nmemory_budget_mib=2048")
+        .replace("timeout='3s'", "timeout='30s'");
+    daemon.configure(&settings);
+    daemon.start();
+    let pid = daemon.child.as_ref().unwrap().id();
+    submit_text(&daemon, "retained");
+    await_request(&endpoint);
+    daemon.configure(&settings.replace("memory_budget_mib=2048", "memory_budget_mib=512"));
+    daemon.cli(&["config", "reload"]);
+    let config_path = daemon.root.join("config.toml");
+    let input = std::fs::read_to_string(&config_path).unwrap();
+    std::fs::write(&config_path, input.replace("service.sock", "pending.sock")).unwrap();
+    assert_eq!(
+        daemon.cli(&["config", "reload"])["data"]["status"],
+        "restart_required"
+    );
+    std::fs::write(&config_path, "[runtime]\nmemory_budget_mib='invalid'\n").unwrap();
+    assert_eq!(
+        daemon.cli(&["config", "reload"])["data"]["status"],
+        "rejected"
+    );
+    let before = daemon.cli(&["config", "status"])["data"].clone();
+    assert!(!before["pending"].is_null());
+    endpoint.resume();
+    let reopened = wait_for_storage_budget(&daemon, 512);
+    assert_eq!(reopened["pid"], pid);
+    assert_eq!(daemon.cli(&["config", "status"])["data"], before);
+    assert_eq!(terminal(&daemon, "retained")["state"], "succeeded");
+    assert!(!daemon.root.join("run/pending.sock").exists());
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
+fn budget_reload_can_be_replaced_or_reverted_while_a_job_drains() {
+    let endpoint = Endpoint::new();
+    endpoint.pause();
+    let mut daemon = Daemon::new();
+    let settings = text_config(&endpoint).replace("timeout='3s'", "timeout='30s'");
+    let config = |budget| {
+        settings.replace(
+            "[runtime]",
+            &format!("[runtime]\nmemory_budget_mib={budget}"),
+        )
+    };
+    daemon.configure(&config(2048));
+    daemon.start();
+    submit_text(&daemon, "held");
+    await_request(&endpoint);
+    let running = daemon.cli(&["job", "show", "held"])["data"].clone();
+    for budget in [512, 1024, 2048] {
+        daemon.configure(&config(budget));
+        let reload = daemon.cli(&["config", "reload"])["data"].clone();
+        assert_eq!(reload["status"], "applied");
+        let status = daemon.cli(&["daemon", "status"])["data"].clone();
+        assert_eq!(status["resources"]["storage_open_budget_mib"], 2048);
+        assert_eq!(
+            status["resources"]["requested"]["daemon_memory_target_mib"],
+            budget
+        );
+        assert_eq!(status["resources"]["draining"], budget != 2048);
+        assert_eq!(
+            status["resources"]["config_generation"],
+            reload["active_generation"]
+        );
+        assert_eq!(daemon.cli(&["job", "show", "held"])["data"], running);
+    }
+    assert_eq!(submit_text(&daemon, "after-revert")["state"], "queued");
+    assert_eq!(endpoint.requests.lock().unwrap().len(), 1);
+    endpoint.resume();
+    assert_eq!(terminal(&daemon, "held")["state"], "succeeded");
+    assert_eq!(terminal(&daemon, "after-revert")["state"], "succeeded");
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
+fn budget_drain_never_reopens_after_stop_or_production_signals() {
+    for stop in ["stop", "-TERM", "-INT"] {
+        let endpoint = Endpoint::new();
+        endpoint.pause();
+        let mut daemon = Daemon::new();
+        let settings = text_config(&endpoint)
+            .replace("[runtime]", "[runtime]\nmemory_budget_mib=2048")
+            .replace("timeout='3s'", "timeout='30s'");
+        daemon.configure(&settings);
+        daemon.start();
+        submit_text(&daemon, "held");
+        await_request(&endpoint);
+        daemon.configure(&settings.replace("memory_budget_mib=2048", "memory_budget_mib=512"));
+        daemon.cli(&["config", "reload"]);
+        assert_eq!(
+            daemon.cli(&["daemon", "status"])["data"]["resources"]["draining"],
+            true
+        );
+        if stop == "stop" {
+            daemon.cli(&["daemon", "stop"]);
+        } else {
+            assert!(
+                Command::new("kill")
+                    .args([stop, &daemon.child.as_ref().unwrap().id().to_string()])
+                    .status()
+                    .unwrap()
+                    .success()
+            );
+        }
+        daemon.wait();
+        assert!(!daemon.socket().exists());
+    }
+}
+
+#[test]
 fn model_cancel_shutdown_and_crash_never_replay_ambiguous_calls() {
     for mode in ["cancel", "shutdown", "crash"] {
         let endpoint = Endpoint::with_mode(Mode::Slow);

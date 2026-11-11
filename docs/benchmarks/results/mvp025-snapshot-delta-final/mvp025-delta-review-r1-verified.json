@@ -1,0 +1,19 @@
+{
+  "utc": "2026-11-10T19:15:38.598304+00:00",
+  "head": "014e15d6cc1c3119d6b16ab08d79a4b028e41249",
+  "tree": "46ac6632cef510642c4653055aa2da6cf2446802",
+  "base": "235c409e8c79766cef84da193d7f6b8338157d58",
+  "verdict": "PASS",
+  "actionable_count": 0,
+  "report_sha256": "e4d8fe349cfdbbf2d8498d844edd01d668711c45c46afa90d5ae680ac674c186",
+  "report_bytes": 14147,
+  "tests_log_sha256": "7f5fb301c43a21b05822370decfebc8b257b3745defc2d45eb306d0e311a059e",
+  "fresh_rust_passed": 4,
+  "fresh_rust_ignored": 0,
+  "scope_paths_verified": 90,
+  "live_instruction_paths_absent": 74,
+  "archive_members_verified": 66,
+  "source_pins_verified_against_respective_commits": 28,
+  "scope": "conventional full-range review; Daybreak/new red-team activity deferred",
+  "clean_after": true
+}
