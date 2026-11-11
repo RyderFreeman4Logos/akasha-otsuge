@@ -62,7 +62,7 @@ pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<Vecto
 
 pub(crate) struct VectorIndex {
     pub generation: String,
-    table: Table,
+    pub(super) table: Table,
     schema: Arc<Schema>,
 }
 

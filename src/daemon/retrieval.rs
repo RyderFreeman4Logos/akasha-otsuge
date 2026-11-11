@@ -86,6 +86,24 @@ impl Service {
         Ok(index)
     }
 
+    fn authorize_index_work(&self, id: &str, workflow: &Deadline) -> crate::storage::Result<()> {
+        let (_, job) = self
+            .job(id)
+            .map_err(|e| crate::storage::StorageError::new(e.0))?;
+        self.authorize_job(&job)
+            .map_err(|e| crate::storage::StorageError::new(e.0))?;
+        let code = if job.cancel_requested {
+            Some("CANCELLED")
+        } else if self.stopping.load(Ordering::Acquire) {
+            Some("INDEX_INTERRUPTED")
+        } else if workflow.expired().is_some() {
+            Some("WORKFLOW_TIMEOUT")
+        } else {
+            None
+        };
+        code.map_or(Ok(()), |code| Err(crate::storage::StorageError::new(code)))
+    }
+
     async fn rebuild_index(
         &self,
         id: &str,
@@ -103,23 +121,7 @@ impl Service {
         {
             return Err(Error("RESOURCE_BUSY"));
         }
-        let authorize = || {
-            let (_, job) = self
-                .job(id)
-                .map_err(|e| crate::storage::StorageError::new(e.0))?;
-            self.authorize_job(&job)
-                .map_err(|e| crate::storage::StorageError::new(e.0))?;
-            let code = if job.cancel_requested {
-                Some("CANCELLED")
-            } else if self.stopping.load(Ordering::Acquire) {
-                Some("INDEX_INTERRUPTED")
-            } else if workflow.expired().is_some() {
-                Some("WORKFLOW_TIMEOUT")
-            } else {
-                None
-            };
-            code.map_or(Ok(()), |code| Err(crate::storage::StorageError::new(code)))
-        };
+        let authorize = || self.authorize_index_work(id, workflow);
         Index::begin_rebuild(&self.storage, id, generation, &authorize).await?;
         *owned = None;
         let index = Arc::new(Index::open(self.config.pin().resolved(), &self.storage).await?);
@@ -174,6 +176,7 @@ impl Service {
                 };
                 self.index_epoch.fetch_add(1, Ordering::Release);
                 let _epoch = IndexBuild(&self.index_epoch);
+                let mut windows_since_prune = 0u8;
                 loop {
                     {
                         let _guard = self.admission.lock().await;
@@ -209,12 +212,28 @@ impl Service {
                                 .await?,
                         );
                     }
-                    if progress.lexical_watermark >= target
+                    let complete = progress.lexical_watermark >= target
                         && progress
                             .vector
                             .as_ref()
-                            .is_none_or(|v| v.watermark >= target)
+                            .is_none_or(|v| v.watermark >= target);
+                    windows_since_prune = windows_since_prune.saturating_add(1);
+                    if (complete || windows_since_prune >= 32)
+                        && let Ok(owned) = self.search_index.try_lock()
+                        && owned.as_ref().is_some_and(|cached| {
+                            Arc::ptr_eq(cached, &index) && Arc::strong_count(cached) == 2
+                        })
                     {
+                        // Keep new readers behind this lock until native cleanup has returned.
+                        index
+                            .prune_versions(&|| {
+                                authorize()?;
+                                self.authorize_index_work(id, workflow)
+                            })
+                            .await?;
+                        windows_since_prune = 0;
+                    }
+                    if complete {
                         crate::retrieval::activate_vector(
                             &self.storage,
                             &progress,

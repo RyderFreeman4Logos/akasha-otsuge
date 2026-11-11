@@ -6,6 +6,9 @@ use akasha_otsuge::storage::Storage;
 #[path = "retrieval_regressions.rs"]
 mod regressions;
 
+#[path = "retrieval_maintenance.rs"]
+mod maintenance;
+
 fn scope(project: &str) -> Scope {
     Scope {
         user: format!("uid:{}", rustix::process::geteuid().as_raw()),
