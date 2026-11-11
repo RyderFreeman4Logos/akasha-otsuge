@@ -25,7 +25,7 @@ PRs #57 through #61 and their historical gates, failures and real-data identitie
 remain linked from the final archive.
 
 The existing SSD worktree is reused on feat/mvp-024-index-maintenance, combining
-the preserved pruning candidate with reviewed Mempal lock repair e7cef25.
+native version pruning and merge-key indexing with the merged Mempal repair.
 PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
@@ -60,9 +60,19 @@ The next [exclusive version-pruning leaf](../benchmarks/results/mvp024-native-pr
 is committed as c0b9a96 after unchanged RED/GREEN and 33 related retrieval tests.
 Its identical 1,024-record pilot retains all current-claim and partition oracles
 with 5,332,992 allocated search bytes, 77 files and one native version. Both pilot
-processes exited and their disposable store/socket were removed. This leaf still
-needs its final canonical gate, independent review and publication. Then measure
-larger derived-index growth and resolve vector inputs before scaling.
+processes exited and their disposable store/socket were removed. Commit e36916a
+also adds the missing BTree merge-key index to both native tables; an unchanged
+behavioral RED/GREEN proves native indexed lookup, and 34 related tests plus
+Clippy pass. Two earlier fixture compilation failures remain separate.
+The larger identical-input pilots both failed: 8,192 records / 35,875,218 unique
+bytes / 8,322 claims reached 3,140 and 3,380 indexed rows before the public status
+IPC timed out. Sampled RSS peaks were 691,466,240 and 689,385,472 bytes, both over
+640 MiB. The successor records growing anonymous memory and kernel high-pressure
+events; the precise timeout cause remains unclassified. Neither reached complete
+output oracles. All receipts are retained and both disposable stores were removed.
+Finish this bounded index-maintenance leaf's final canonical gate, independent
+review and publication. Then isolate the memory growth with a discriminating
+observation before another scale attempt, and resolve vector inputs.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
@@ -89,11 +99,14 @@ The [separate Mempal lock leaf](../benchmarks/results/mempal-output-lock/README.
 proves and repairs retained-descriptor lock lifetime without changing the original
 assertion: five library and 17 public migration tests pass. Its exact e7cef25 gate
 passes 634 Rust executions (39 ignored), Python 35 and Node 7; independent review
-passes with zero findings and 23 fresh tests. The reviewed branch is pushed;
-PR/CI publication waits for main's new build cache to avoid duplicate cold builds.
-Integrate the unchanged repairs, finish that publication, and obtain this pruning
-branch's fresh canonical gate/review/publication before scaling. All original
-full-scale and downstream acceptance remains open.
+passes with zero findings and 23 fresh tests. PR #68 is merged as 9f2ba15 with
+exactly the reviewed e7cef25 tree; the complete public review was read back and
+CI43020682782 passed with an actual cache hit. Its final archive retains those
+receipts. The integrated pruning branch's 767b39e canonical passed 638 Rust
+executions, Python 35 and Node 7 before the key-index change; this historical
+receipt does not qualify e36916a or the final documentation tree. Obtain the
+complete candidate's fresh gate/review/publication. All original full-scale and
+downstream acceptance remains open.
 
 ## Session operating rules
 

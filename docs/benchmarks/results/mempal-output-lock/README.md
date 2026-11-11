@@ -34,7 +34,22 @@ related checks, normal commit receipt, source preimages and the separate pruning
 context. That pruning candidate remains intact on its branch and must be
 qualified again after integrating this repair.
 
-Final exact-HEAD checks, independent review and publication are separate steps.
+PR [#68](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/68) is merged as
+`9f2ba152529a796383204a8a98dd89a5c6af6616`, with exactly the reviewed `e7cef25`
+tree. Its exact-HEAD canonical gate passes 634 Rust executions (39 intentional
+ignores), Python 35 and Node 7. Independent conventional review passes with zero
+findings and 23 fresh Rust tests plus all-target Clippy. The full
+[public review](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/68#issuecomment-6795824581)
+was read back exactly before merge. CI43020682782 passes on a synthetic merge
+checkout with the same tree and actually restores the cache saved by main's
+CI43015543965. These are separate gate, review, CI and merge receipts.
+
+[finalization.zip](finalization.zip) retains 39 members in 97,102 bytes;
+[finalization-manifest.json](finalization-manifest.json) records their hashes and
+the archive SHA-256 `4a70d7a75640899bd338b30606d0302f36b3eff141a54999f8ebb2117cc463d9`.
+Every member was decompressed and verified. Disposable reviewer transport was
+removed after terminal collection and public readback; its digests, report and
+test logs remain. The original unexplained canonical failure remains a failure.
 This is not a repeat of full real-snapshot acceptance or completion of
 [#65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65). No new Daybreak
 or adversarial campaign was run.

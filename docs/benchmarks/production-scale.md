@@ -71,6 +71,15 @@ passes the identical inputs and oracles with 5,332,992 allocated search bytes,
 77 files and one native version, taking 10.491 seconds to index. This small
 measurement does not establish full-scale growth, ANN or concurrent-load bounds.
 
+The next 8,192-record pilots both fail before completing indexing. Their identical
+35,875,218 unique source bytes produce 8,322 expected claims; last published
+index progress is 3,140 and 3,380 claims. Both exceed the 640 MiB sampled RSS
+limit and hit the unchanged 10-second status IPC deadline. Adding native merge-key
+indexes passes its causal regression but does not resolve this scale failure.
+The [failed scale comparison](results/mvp024-native-prune/README.md) preserves
+all inputs, failures, memory breakdown and cleanup evidence. Further scaling
+requires memory diagnosis; partial progress is not an acceptance pass.
+
 All 42 retained compressed shards were rehashed on 2026-11-11: 43,986,181,099
 bytes matched the pinned source inventory. A separate text-only shape census
 found exactly 1,000,000 DBpedia rows, 37 with title-plus-text over 4,096 bytes

@@ -1,4 +1,4 @@
-# Exclusive native-version reclamation
+# Native index maintenance
 
 This is a partial result for [#65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65).
 Full production scale, concurrency, vector coverage and recovery remain pending.
@@ -66,3 +66,50 @@ Only the stopped database and socket directory were removed; compact metadata,
 shared corpus and build cache remain. Filesystem free space did not immediately
 change, so no exact physical-space gain is inferred. No new Daybreak or
 adversarial campaign was run.
+
+Both native tables also need a BTree on the merge key. Commit `e36916a` adds the
+`key` index beside the existing `scope` index, using the existing initialization
+path. A real-daemon regression first proves both key indexes absent and both
+lookup plans scanning; the unchanged test then proves both indexes present,
+correct single-row results and native `ScalarIndexQuery` plans. This checks the
+ordinary lookup plan, not a directly observed merge execution plan. Two earlier
+fixture compilation failures are retained separately from the behavioral RED.
+Eight library and 26 daemon retrieval tests pass, with one existing ignored child
+helper, plus all-target Clippy and formatting. The original pruning assertions
+remain unchanged.
+
+Two subsequent pilots use identical 1,024 DBpedia and 7,168 FineWeb source
+records: 35,875,218 unique UTF-8 bytes become 8,322 memory claims. The manifest,
+policy, binding, every seed acknowledgement and complete expected claim oracle
+match byte for byte. **Both pilots fail during indexing** at the public
+`daemon status` command's unchanged 10-second IPC timeout. Neither reaches the
+complete current-claim checks or partition witnesses.
+
+| Observed value | Pruning, `767b39e` | Pruning and key index, `e36916a` |
+| --- | ---: | ---: |
+| Last published indexed rows | 3,140 / 8,322 | 3,380 / 8,322 |
+| Index elapsed at last progress, seconds | 476.163 | 142.786 |
+| Daemon RSS sampled peak, bytes | 691,466,240 | 689,385,472 |
+| Samples over the 640 MiB peak limit | 102 / 142 | 32 / 74 |
+| Daemon cgroup charged peak, bytes | 566,718,464 | 560,123,904 |
+| Observed OOM kills | 0 | 0 |
+| Final native store allocated bytes | 114,900,992 | 190,480,384 |
+
+The successor's passive procfs breakdown reaches 562,397,184 anonymous bytes
+and 125,710,336 file-backed bytes; its last kernel `memory.high` event counter is
+69,779. This establishes sustained memory pressure, not the precise cause of the
+IPC timeout. Zero observed OOM kills does not cover the unsampled final interval.
+The different partial completion points are not comparable completed-run latency
+or disk benchmarks, and the key index did not resolve this scale failure.
+The next step is a bounded discriminating memory observation before another
+scale attempt; limits, timeouts and acceptance thresholds remain unchanged.
+
+[scale-comparison.zip](scale-comparison.zip) retains 119 members in 2,173,203 bytes;
+[scale-comparison-manifest.json](scale-comparison-manifest.json) hashes every
+member and the archive. Identical pilot inputs/oracles are stored once. Both
+failures, source/binary identities, all metadata, complete stopped-store file
+hashes and guarded cleanup receipts remain. Both controllers, daemons, seeders
+and owned cgroups exited before their disposable store/socket roots were removed.
+No immediate filesystem free-space gain is claimed. The included historical
+canonical PASS (638 Rust / 39 ignores, Python 35 / Node 7) belongs to `767b39e`;
+the enlarged candidate still requires its own final gate and independent review.
