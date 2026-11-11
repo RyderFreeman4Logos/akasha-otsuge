@@ -268,13 +268,18 @@ impl Service {
                 self.authorize_job(job)?;
                 let max = self.config.pin().resolved().config().runtime.max_concurrent_jobs.min(MAX_RUNNING);
                 if MAX_RUNNING - self.runner_slots.available_permits() >= max { return Err(Error("DELEGATION_UNAVAILABLE")); }
-                budget.start()?
+                let memory = self.reserve_runner(profile, config).await?;
+                budget.start()?.with_resources(memory)
             };
             let instructions = plan.prompt(&self.storage, &context()?)?;
             let directory = config.config().paths.data_dir.join("runner-work");
             private_dir(&directory)?;
             let (options, runner_timeout) = native.options(config, profile)?;
-            let mut runner = native.runner(&directory, &instructions).await?;
+            let mut runner = {
+                let _guard = self.admission.lock().await;
+                self.check_process_memory().await?;
+                lease.resources.as_ref().ok_or(Error("JOB_CORRUPT"))?.scope(native.runner(&directory, &instructions)).await?
+            };
             let mut spec = RunSpec::for_extraction(RunOptions { job_id:job.id.clone(), executor_profile:profile.into(), instructions_version:PROMPT_VERSION.into(), runner_timeout, args:ConsultArgs::new(None)? }, lease, job.config_generation)?.with_guard(std::env::current_exe()?);
             spec.native_options = options;
             let lease = spec.lease_handle();
@@ -286,6 +291,7 @@ impl Service {
                 self.authorize_job(&current)?;
                 if current.cancel_requested { return Err(Error("CANCELLED")); }
                 if self.stopping.load(std::sync::atomic::Ordering::Acquire) { return Err(Error("RUNNER_INTERRUPTED")); }
+                self.check_process_memory().await?;
                 runner.start(spec, &mut source).await?
             };
             let run = async {

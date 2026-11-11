@@ -56,6 +56,7 @@ pub struct RunLease {
     depth: u32,
     reported_tokens: Mutex<(u64, u64)>,
     _permit: OwnedSemaphorePermit,
+    pub(crate) resources: Option<Arc<crate::resources::Reservation>>,
 }
 impl RunBudget {
     pub fn new(
@@ -129,6 +130,7 @@ impl RunBudget {
             depth,
             reported_tokens: Mutex::new((0, 0)),
             _permit: permit,
+            resources: None,
         })
     }
     pub fn usage(&self) -> Result<BudgetUsage> {
@@ -175,6 +177,11 @@ impl RunBudget {
     }
 }
 impl RunLease {
+    pub(crate) fn with_resources(mut self, resources: Arc<crate::resources::Reservation>) -> Self {
+        self.resources = Some(resources);
+        self
+    }
+
     pub fn delegate(&self) -> Result<Self> {
         self.budget.reserve(
             self.depth

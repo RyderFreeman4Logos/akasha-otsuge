@@ -20,8 +20,9 @@ The existing SSD worktree is reused on feat/mvp-024-memory-controls, based
 on 8e14ee6. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
-The current leaf implements measured-memory admission and separate
-daemon/runner/service limits, retaining resource ownership through reopen.
+The current leaf finishes measured job admission, native worker reservations
+and separate daemon/runner accounting, retaining ownership through reopen.
+It is limited to software controls; owned cgroup limits are the next leaf.
 The full corpus/load/recovery checklist below remains open. PR #56
 provides observability only; it does not establish enforcement or scale acceptance.
 All seven #24 dependencies are completed; its stale blocked label was removed.
@@ -1044,7 +1045,7 @@ R2 review (zero actionable findings, 30 fresh functional tests). PR #63 merged
 as 8e14ee6 with an identical tree. The [final leaf archive](../benchmarks/results/mvp024-storage-reopen-final/README.md)
 preserves the complete report, five explicit parent line-coordinate corrections,
 public readbacks, gate/CI logs and merge identity. Measured-memory admission and
-dedicated cgroups are next; neither observability nor functional fixtures satisfy
+dedicated cgroups remain required; neither observability nor functional fixtures satisfy
 the full production stress acceptance.
 
 - [x] Finish controlled storage drain/reopen: same PID/socket, retriable busy

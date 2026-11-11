@@ -262,6 +262,7 @@ async fn send_command(socket: &Path, command: ipc::Command) -> Result<Value> {
             "JOB_NOT_FOUND" => "JOB_NOT_FOUND",
             "JOB_CORRUPT" => "JOB_CORRUPT",
             "OUTPUT_LIMIT" => "OUTPUT_LIMIT",
+            "RESOURCE_BUSY" => "RESOURCE_BUSY",
             _ => "BINDING_UNAVAILABLE",
         }));
     }

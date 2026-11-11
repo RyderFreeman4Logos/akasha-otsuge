@@ -480,6 +480,11 @@ impl RunSpec {
     pub(crate) fn guarded(&self) -> bool {
         self.guard.is_some()
     }
+    pub(crate) fn register_process(&self, pid: Option<u32>) {
+        if let (Some(resources), Some(pid)) = (&self.lease.resources, pid) {
+            resources.register(pid);
+        }
+    }
     pub(crate) fn bridge_deadline_ms(&self) -> Result<u64> {
         let trace = self.deadline.trace();
         trace

@@ -11,6 +11,48 @@ use std::{
 };
 use tokio::io::{AsyncRead, AsyncReadExt};
 
+pub(crate) struct OwnedChild {
+    child: Option<tokio::process::Child>,
+    group: Option<ProcessGroup>,
+    memory: Option<std::sync::Arc<crate::resources::Reservation>>,
+}
+
+impl OwnedChild {
+    pub(crate) fn new(child: tokio::process::Child) -> Result<Self> {
+        let memory = crate::resources::native_reservation();
+        let Some(pid) = child.id().and_then(|pid| Pid::from_raw(pid as i32)) else {
+            reap(child, false, move || drop(memory));
+            return Err(ErrorCode::RunnerFailed.into());
+        };
+        if let Some(memory) = &memory {
+            memory.register(pid.as_raw_nonzero().get() as u32);
+        }
+        Ok(Self {
+            child: Some(child),
+            group: Some(ProcessGroup(pid, false)),
+            memory,
+        })
+    }
+
+    pub(crate) fn child(&mut self) -> &mut tokio::process::Child {
+        self.child.as_mut().unwrap()
+    }
+
+    pub(crate) fn reap(&mut self) -> Reap {
+        drop(self.group.take());
+        let memory = self.memory.take();
+        reap(self.child.take().unwrap(), false, move || drop(memory))
+    }
+}
+
+impl Drop for OwnedChild {
+    fn drop(&mut self) {
+        if self.child.is_some() {
+            self.reap();
+        }
+    }
+}
+
 pub(crate) fn bridge_deadline() -> Result<tokio::time::Instant> {
     let raw = std::env::var("AKASHA_RUN_DEADLINE_MS").map_err(|_| ErrorCode::ConfigInvalid)?;
     let end = if raw.len() <= 20 && !raw.is_empty() && raw.bytes().all(|b| b.is_ascii_digit()) {
@@ -38,24 +80,23 @@ pub(crate) async fn version_output(binary: &Path, timeout: Duration) -> Result<(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .process_group(0);
-    let mut child = tokio::process::Command::from(command)
+    let child = tokio::process::Command::from(command)
         .kill_on_drop(true)
         .spawn()
         .map_err(spawn_error)?;
-    let group = ProcessGroup(
-        Pid::from_raw(child.id().ok_or(ErrorCode::RunnerFailed)? as i32)
-            .ok_or(ErrorCode::RunnerFailed)?,
-        false,
-    );
-    let stdout = child.stdout.take().ok_or(ErrorCode::RunnerFailed)?;
-    let stderr = child.stderr.take().ok_or(ErrorCode::RunnerFailed)?;
+    let mut owner = OwnedChild::new(child)?;
+    let stdout = owner.child().stdout.take().ok_or(ErrorCode::RunnerFailed)?;
+    let stderr = owner.child().stderr.take().ok_or(ErrorCode::RunnerFailed)?;
     let result = tokio::time::timeout(timeout, async {
-        tokio::try_join!(bounded(stdout), bounded(stderr), wait_for_exit(&child))
+        tokio::try_join!(
+            bounded(stdout),
+            bounded(stderr),
+            wait_for_exit(owner.child())
+        )
     })
     .await
     .map_err(|_| ErrorCode::RunnerTimeout);
-    drop(group);
-    let status = reap(child, false, || {}).wait().await;
+    let status = owner.reap().wait().await;
     let (stdout, _, ()) = result??;
     if !status.ok_or(ErrorCode::RunnerTimeout)?.success() {
         return Err(ErrorCode::RunnerFailed.into());
@@ -253,6 +294,35 @@ mod cleanup_tests {
         config::deadline::{Deadline, Layer},
     };
     use std::{os::unix::process::ExitStatusExt, sync::Arc};
+
+    #[tokio::test]
+    async fn ordinary_probe_collection_retains_its_memory_reservation() {
+        let resources = Arc::new(crate::resources::Resources::fixture());
+        let memory = resources
+            .reserve(
+                crate::config::MemoryLimits {
+                    daemon_memory_target_mib: 512,
+                    daemon_peak_limit_mib: 640,
+                    service_total_budget_mib: 2048,
+                },
+                "probe",
+                1024,
+            )
+            .await
+            .unwrap();
+        let mut owner = memory
+            .scope(async {
+                let mut command = std::process::Command::new("/bin/sleep");
+                command.arg("0.05").process_group(0);
+                OwnedChild::new(tokio::process::Command::from(command).spawn().unwrap()).unwrap()
+            })
+            .await;
+        drop(memory);
+        assert_eq!(resources.status()["active_reservations"], 1);
+        wait_for_exit(owner.child()).await.unwrap();
+        assert!(owner.reap().wait().await.unwrap().success());
+        assert_eq!(resources.status()["active_reservations"], 0);
+    }
 
     struct Release(Option<std::sync::mpsc::Sender<()>>);
     impl Drop for Release {

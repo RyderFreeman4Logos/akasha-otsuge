@@ -88,6 +88,13 @@ impl Research<'_> {
                 let outcome = self
                     .run_inner(lease, args.clone(), &run_id, &profile, native)
                     .await
+                    .map_err(|error| {
+                        if depth > 0 && error.0 == "RESOURCE_BUSY" {
+                            Error("DELEGATION_UNAVAILABLE")
+                        } else {
+                            error
+                        }
+                    })
                     .and_then(|text| self.conclusion(&text));
                 self.current_run = parent;
                 self.runs[index]["state"] = json!(if outcome.is_ok() {
@@ -151,10 +158,12 @@ impl Research<'_> {
         let config = self.config.clone();
         let settings = &config.resolved().config().consult;
         let (native_options, runner_timeout) = native.options(config.resolved(), profile)?;
-        {
+        let memory = {
             let _guard = service.admission.lock().await;
             service.authorize_executor(profile, &native)?;
-        }
+            service.reserve_runner(profile, config.resolved()).await?
+        };
+        let lease = lease.with_resources(memory.clone());
         let directory = config
             .resolved()
             .config()
@@ -180,7 +189,13 @@ impl Research<'_> {
         } else {
             instructions.to_owned()
         };
-        let mut runner = native.runner(&directory, &instructions).await?;
+        let mut runner = {
+            let _guard = service.admission.lock().await;
+            service.check_process_memory().await?;
+            memory
+                .scope(native.runner(&directory, &instructions))
+                .await?
+        };
         let mut spec = RunSpec::new(
             &self.invocation,
             RunOptions {
@@ -213,6 +228,7 @@ impl Research<'_> {
                 return Err(Error("RUNNER_INTERRUPTED"));
             }
             service.authorize_executor(profile, &native)?;
+            service.check_process_memory().await?;
             runner.start(spec, self).await?
         };
         let run = async {

@@ -13,3 +13,5 @@ pub mod provider;
 pub mod storage;
 
 pub mod retrieval;
+
+pub(crate) mod resources;

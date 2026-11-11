@@ -46,7 +46,13 @@ pub(super) fn consult_fixture_prepared(
         "editor_incident_actual" => 0,
         _ => 1,
     };
-    daemon.configure(&format!("[access]\nread_roots=[{workspace:?},{home:?}]\n[runtime]\nmax_concurrent_jobs={concurrency}\n[consult]\nmax_delegation_depth={depth}\n{}", settings(&daemon.root)));
+    // These concurrent workers are bounded Python protocol fixtures, not real model CLIs.
+    let memory = if concurrency > 1 {
+        "runner_memory_estimate_mib=64\n"
+    } else {
+        ""
+    };
+    daemon.configure(&format!("[access]\nread_roots=[{workspace:?},{home:?}]\n[runtime]\nmax_concurrent_jobs={concurrency}\n{memory}[consult]\nmax_delegation_depth={depth}\n{}", settings(&daemon.root)));
     let binary = daemon.root.join("codex");
     let host = include_str!("../fixtures/codex/0.164.0/runner_host.py")
         .replace("scenario = (root / 'scenario').read_text()", "scenario = (root / 'scenario').read_text()\nwith (root / 'starts').open('a') as f: f.write('start\\n')\n(root / 'runner.pid').write_text(str(os.getpid()))");
@@ -171,6 +177,110 @@ fn named_terminal(daemon: &Daemon, event: Value) -> Value {
         assert!(Instant::now() < end, "named executor did not finish: {job}");
         std::thread::sleep(Duration::from_millis(10));
     }
+}
+
+#[test]
+fn total_budget_lowering_keeps_running_worker_and_learned_peaks() {
+    let (daemon, event, _) = consult_fixture("code_policy");
+    let submitted = native(&daemon, event);
+    let id = submitted["data"]["id"].as_str().unwrap();
+    let end = Instant::now() + Duration::from_secs(15);
+    while !daemon.root.join("code-read-ready").exists() {
+        assert!(
+            Instant::now() < end,
+            "worker did not reach its normal read barrier"
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let original = daemon.cli(&["job", "show", id])["data"].clone();
+    let status = daemon.cli(&["daemon", "status"])["data"].clone();
+    assert_eq!(status["resources"]["workers"]["active_reservations"], 1);
+    let runner: u32 = std::fs::read_to_string(daemon.root.join("runner.pid"))
+        .unwrap()
+        .parse()
+        .unwrap();
+    assert!(
+        status["resources"]["measurement"]["runner_group"]["pids"]
+            .as_array()
+            .unwrap()
+            .contains(&json!(runner))
+    );
+    let access = format!(
+        "[access]\nread_roots=[{:?},{:?}]\n",
+        daemon.root.join("workspace"),
+        daemon.root.join("native-home")
+    );
+    daemon.configure(&format!(
+        "{access}[runtime]\nservice_total_budget_mib=1024\n"
+    ));
+    daemon.cli(&["config", "reload"]);
+    let lowered = daemon.cli(&["daemon", "status"])["data"].clone();
+    assert_eq!(lowered["pid"], status["pid"]);
+    assert_eq!(lowered["resources"]["storage_reopen_required"], false);
+    assert_eq!(lowered["resources"]["draining"], true);
+    assert_eq!(lowered["resources"]["workers"]["active_reservations"], 1);
+    let busy = daemon
+        .command()
+        .args(["index", "sync", "--idempotency-key", "lowered-budget-build"])
+        .output()
+        .unwrap();
+    assert_eq!(busy.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&busy.stderr).contains("RESOURCE_BUSY"));
+    let running = daemon.cli(&["job", "show", id])["data"].clone();
+    assert_eq!(running["state"], "running");
+    for field in [
+        "config_generation",
+        "config_digest",
+        "execution_deadline_ms",
+        "started_at_ms",
+    ] {
+        assert_eq!(running[field], original[field], "{field}");
+    }
+    std::fs::write(daemon.root.join("code-read-release"), "").unwrap();
+    let complete = super::extraction_tests::finished(&daemon, id);
+    assert_eq!(complete["state"], "succeeded", "{complete}");
+    let released = wait_for_storage_budget(&daemon, 512);
+    assert_eq!(released["resources"]["workers"]["active_reservations"], 0);
+    let peak = released["resources"]["workers"]["completed_runner_sampled_peaks"]["caller"]
+        .as_u64()
+        .unwrap();
+    assert!(peak > 0);
+    daemon.configure(&format!(
+        "{access}[runtime]\nmemory_budget_mib=1024\nservice_total_budget_mib=3072\n"
+    ));
+    daemon.cli(&["config", "reload"]);
+    let reopened = wait_for_storage_budget(&daemon, 1024);
+    assert_eq!(reopened["pid"], status["pid"]);
+    assert_eq!(
+        reopened["resources"]["workers"]["completed_runner_sampled_peaks"]["caller"],
+        peak
+    );
+    assert!(
+        reopened["resources"]["workers"]["sample_count"]
+            .as_u64()
+            .unwrap()
+            >= released["resources"]["workers"]["sample_count"]
+                .as_u64()
+                .unwrap()
+    );
+}
+
+#[test]
+fn consult_refuses_an_executor_estimate_that_does_not_fit_before_native_start() {
+    let (daemon, event, _) = consult_fixture_with("success", |root| {
+        format!(
+            "executor='primary'\n[executors.primary]\nkind='codex'\nbinary={:?}\nmemory_estimate_mib=2048\n",
+            root.join("codex")
+        )
+    });
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["state"], "failed", "{job}");
+    assert_eq!(job["error"], "RESOURCE_BUSY", "{job}");
+    assert!(!daemon.root.join("starts").exists());
+    assert_eq!(
+        daemon.cli(&["daemon", "status"])["data"]["state"],
+        "running"
+    );
 }
 
 #[test]

@@ -1,7 +1,7 @@
 use super::HermesCall;
 use crate::adapter::{
     ErrorCode, Result,
-    native::{self, ProcessGroup},
+    native::{self, OwnedChild},
 };
 use std::{
     os::unix::process::CommandExt,
@@ -54,17 +54,13 @@ pub(crate) async fn export_session(binary: &Path, home: &Path, session: &str) ->
     .stdout(Stdio::piped())
     .stderr(Stdio::piped())
     .process_group(0);
-    let mut child = tokio::process::Command::from(cmd)
+    let child = tokio::process::Command::from(cmd)
         .kill_on_drop(true)
         .spawn()
         .map_err(native::spawn_error)?;
-    let group = ProcessGroup(
-        rustix::process::Pid::from_raw(child.id().ok_or(ErrorCode::RunnerFailed)? as i32)
-            .ok_or(ErrorCode::RunnerFailed)?,
-        false,
-    );
-    let stdout = child.stdout.take().ok_or(ErrorCode::RunnerFailed)?;
-    let stderr = child.stderr.take().ok_or(ErrorCode::RunnerFailed)?;
+    let mut owner = OwnedChild::new(child)?;
+    let stdout = owner.child().stdout.take().ok_or(ErrorCode::RunnerFailed)?;
+    let stderr = owner.child().stderr.take().ok_or(ErrorCode::RunnerFailed)?;
     let result = tokio::time::timeout(Duration::from_secs(5), async {
         let output = async {
             let mut bytes = Vec::new();
@@ -81,13 +77,12 @@ pub(crate) async fn export_session(binary: &Path, home: &Path, session: &str) ->
         tokio::try_join!(
             output,
             native::bounded(stderr),
-            native::wait_for_exit(&child)
+            native::wait_for_exit(owner.child())
         )
     })
     .await
     .map_err(|_| ErrorCode::RunnerTimeout);
-    drop(group);
-    let status = native::reap(child, false, || {}).wait().await;
+    let status = owner.reap().wait().await;
     let (bytes, _, ()) = result??;
     if !status.ok_or(ErrorCode::RunnerTimeout)?.success() {
         return Err(ErrorCode::SourceUnavailable.into());

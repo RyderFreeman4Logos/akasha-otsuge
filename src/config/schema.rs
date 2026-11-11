@@ -150,6 +150,8 @@ pub struct Runtime {
     pub daemon_peak_limit_mib: Option<u32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub service_total_budget_mib: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub runner_memory_estimate_mib: Option<u32>,
     pub paused: bool,
 }
 
@@ -161,6 +163,10 @@ pub struct MemoryLimits {
 }
 
 impl Runtime {
+    pub fn runner_estimate_mib(&self) -> u32 {
+        self.runner_memory_estimate_mib.unwrap_or(1024)
+    }
+
     pub fn memory_limits(&self) -> MemoryLimits {
         MemoryLimits {
             daemon_memory_target_mib: self.memory_budget_mib,
@@ -237,6 +243,8 @@ pub struct Executor {
     pub args: Vec<String>,
     #[serde(default = "enabled")]
     pub enabled: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory_estimate_mib: Option<u32>,
     #[serde(default)]
     pub model: Option<String>,
     #[serde(default)]
@@ -537,6 +545,11 @@ impl Config {
         )?;
         let limits = self.runtime.memory_limits();
         require(
+            self.runtime.runner_estimate_mib() > 0,
+            "runtime.runner_memory_estimate_mib",
+            "must be positive",
+        )?;
+        require(
             (limits.daemon_memory_target_mib..=2048).contains(&limits.daemon_peak_limit_mib),
             "runtime.daemon_peak_limit_mib",
             "must be at least the daemon target and at most 2048 MiB",
@@ -658,6 +671,13 @@ impl Config {
         let mut visiting = BTreeSet::new();
         let mut visited = BTreeSet::new();
         for (name, executor) in &self.executors {
+            require(
+                executor
+                    .memory_estimate_mib
+                    .is_none_or(|estimate| estimate > 0),
+                "executors.*.memory_estimate_mib",
+                "must be positive",
+            )?;
             require(
                 !name.is_empty() && name != "caller",
                 "executors",
