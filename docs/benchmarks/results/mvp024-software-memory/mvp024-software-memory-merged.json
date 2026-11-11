@@ -1,0 +1,13 @@
+{
+  "utc": "2026-11-11T07:32:15.141007+00:00",
+  "pr": 64,
+  "head": "fa88d7cc020899412026ed7b245eb7d2011062b4",
+  "tree": "7205c02423cd158d80b571ad479f75ad1ea6e8ab",
+  "base": "8e14ee61c63b4dafe486e98ce5ca1f251f213001",
+  "merge_commit": "0a098882b08a7f197c0483b81c1ffd9f1d81ef39",
+  "tree_identical": true,
+  "main_clean": true,
+  "ssd_worktree_clean": true,
+  "next_branch": "feat/mvp-024-owned-cgroups",
+  "issue24_still_open": true
+}

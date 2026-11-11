@@ -1,0 +1,14 @@
+{
+  "parent": "3d1cfb40a33594a3500bc7226c3ee744d3ecef9c",
+  "tree": "fdefd86af54de627c49b95edacee022fb15b6721",
+  "paths": [
+    "src/daemon.rs",
+    "src/daemon/jobs.rs",
+    "src/daemon/resources.rs",
+    "tests/daemon.rs",
+    "tests/support/daemon_retrieval.rs"
+  ],
+  "patch_serializer": "git diff --cached --binary --full-index",
+  "staged_patch_sha256": "423a6d4b86be825049462b5f396b1f2e3f3e7d2e33ec5ff19f0d436a40308cdb",
+  "focused_gate": "mvp024-memory-admission-isolation-green-r1"
+}

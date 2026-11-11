@@ -38,7 +38,7 @@ pub(crate) async fn export_session(binary: &Path, home: &Path, session: &str) ->
         return Err(ErrorCode::InvalidArgument.into());
     }
     let executable = native::resolve(binary)?;
-    let mut cmd = std::process::Command::new(executable);
+    let mut cmd = native::resource_command(&executable)?;
     cmd.args([
         "sessions",
         "export",

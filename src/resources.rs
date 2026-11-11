@@ -4,6 +4,8 @@ use std::collections::BTreeMap;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
 
+mod cgroup;
+
 const MAX_PROCESSES: usize = 4096;
 const MAX_THREADS: usize = 32768;
 
@@ -26,6 +28,10 @@ fn read(path: impl AsRef<std::path::Path>) -> Option<String> {
 
 fn identity(pid: u32) -> Option<Identity> {
     let stat = read(format!("/proc/{pid}/stat"))?;
+    parse_identity(&stat)
+}
+
+fn parse_identity(stat: &str) -> Option<Identity> {
     let fields: Vec<_> = stat.rsplit_once(") ")?.1.split_whitespace().collect();
     Some(Identity {
         parent: fields.get(1)?.parse().ok()?,
@@ -72,6 +78,8 @@ struct State {
     reservations: BTreeMap<u64, Allocation>,
     runner_peaks: BTreeMap<String, u64>,
     other_runner_peak: u64,
+    runner_kernel_peaks: BTreeMap<String, u64>,
+    other_runner_kernel_peak: u64,
     daemon_peak: u64,
     runner_peak: u64,
     total_peak: u64,
@@ -84,12 +92,14 @@ struct Allocation {
     bytes: u64,
     root: Option<(u32, Identity)>,
     sampled_peak: u64,
+    group: Option<Arc<cgroup::Run>>,
 }
 
 #[derive(Debug, Default)]
 pub(crate) struct Resources {
     state: Mutex<State>,
     admission: tokio::sync::Mutex<()>,
+    kernel: Arc<Mutex<cgroup::Kernel>>,
     #[cfg(test)]
     fixture: Option<std::sync::Mutex<Option<Measurement>>>,
 }
@@ -108,7 +118,29 @@ pub(crate) fn native_reservation() -> Option<Arc<Reservation>> {
     NATIVE_RESERVATION.try_with(Arc::clone).ok()
 }
 
+pub(crate) fn resource_exec(args: &[std::ffi::OsString]) -> std::io::Result<u8> {
+    cgroup::exec(args)
+}
+
 impl Reservation {
+    pub(crate) fn command(
+        &self,
+        command: std::process::Command,
+    ) -> std::io::Result<std::process::Command> {
+        let group = self
+            .resources
+            .state
+            .lock()
+            .unwrap()
+            .reservations
+            .get(&self.id)
+            .and_then(|allocation| allocation.group.clone());
+        match group {
+            Some(group) => group.command(command),
+            None => Ok(command),
+        }
+    }
+
     pub(crate) async fn scope<T>(
         self: &Arc<Self>,
         future: impl std::future::Future<Output = T>,
@@ -133,25 +165,131 @@ impl Reservation {
 
 impl Drop for Reservation {
     fn drop(&mut self) {
-        let mut state = self.resources.state.lock().unwrap();
-        if let Some(allocation) = state
+        let group = self
+            .resources
+            .state
+            .lock()
+            .unwrap()
             .reservations
-            .remove(&self.id)
-            .filter(|a| a.sampled_peak > 0)
-        {
-            if state.runner_peaks.len() < 256
-                || state.runner_peaks.contains_key(&allocation.profile)
-            {
-                let peak = state.runner_peaks.entry(allocation.profile).or_default();
-                *peak = (*peak).max(allocation.sampled_peak);
-            } else {
-                state.other_runner_peak = state.other_runner_peak.max(allocation.sampled_peak);
+            .get(&self.id)
+            .and_then(|allocation| allocation.group.clone());
+        if let Some(group) = group {
+            let resources = self.resources.clone();
+            let id = self.id;
+            let finish = move || {
+                if group.empty().unwrap_or(false) {
+                    let peak = group.peak();
+                    if group.remove().is_ok() {
+                        resources.release(id, peak);
+                        return true;
+                    }
+                } else {
+                    let _ = group.kill();
+                }
+                false
+            };
+            if !finish() {
+                // Keep capacity until the exact owned subtree is empty, even after caller drop.
+                std::thread::spawn(move || {
+                    while !finish() {
+                        std::thread::sleep(std::time::Duration::from_millis(10));
+                    }
+                });
             }
+        } else {
+            self.resources.release(self.id, None);
         }
     }
 }
 
 impl Resources {
+    fn release(&self, id: u64, kernel_peak: Option<u64>) {
+        let mut state = self.state.lock().unwrap();
+        if let Some(allocation) = state.reservations.remove(&id) {
+            if allocation.sampled_peak > 0
+                && (state.runner_peaks.len() < 256
+                    || state.runner_peaks.contains_key(&allocation.profile))
+            {
+                let peak = state
+                    .runner_peaks
+                    .entry(allocation.profile.clone())
+                    .or_default();
+                *peak = (*peak).max(allocation.sampled_peak);
+            } else {
+                state.other_runner_peak = state.other_runner_peak.max(allocation.sampled_peak);
+            }
+            if let Some(peak) = kernel_peak.filter(|peak| *peak > 0) {
+                if state.runner_kernel_peaks.len() < 256
+                    || state.runner_kernel_peaks.contains_key(&allocation.profile)
+                {
+                    let old = state
+                        .runner_kernel_peaks
+                        .entry(allocation.profile)
+                        .or_default();
+                    *old = (*old).max(peak);
+                } else {
+                    state.other_runner_kernel_peak = state.other_runner_kernel_peak.max(peak);
+                }
+            }
+        }
+    }
+    pub(crate) async fn open() -> Self {
+        let kernel = match cgroup::Managed::create().await {
+            Ok(managed) => cgroup::Kernel {
+                managed: Some(managed),
+                error: None,
+            },
+            Err(_) => cgroup::Kernel {
+                managed: None,
+                error: Some("CGROUP_DELEGATION_UNAVAILABLE"),
+            },
+        };
+        Self {
+            kernel: Arc::new(Mutex::new(kernel)),
+            ..Self::default()
+        }
+    }
+
+    pub(crate) async fn apply_kernel(&self, limits: crate::config::MemoryLimits, drained: bool) {
+        if self.kernel.lock().unwrap().managed.is_none() {
+            return;
+        }
+        let drained = drained && self.state.lock().unwrap().reservations.is_empty();
+        let kernel = self.kernel.clone();
+        let _ = tokio::task::spawn_blocking(move || {
+            let mut kernel = kernel.lock().unwrap();
+            if let Some(managed) = &mut kernel.managed {
+                kernel.error = managed
+                    .apply(limits, drained)
+                    .err()
+                    .map(|_| "CGROUP_LIMIT_UPDATE_FAILED");
+            }
+        })
+        .await;
+    }
+
+    pub(crate) async fn kernel_ready(&self, limits: crate::config::MemoryLimits) -> bool {
+        if self.kernel.lock().unwrap().managed.is_none() {
+            return true;
+        }
+        let kernel = self.kernel.clone();
+        tokio::task::spawn_blocking(move || kernel.lock().unwrap().ready(limits))
+            .await
+            .unwrap_or(false)
+    }
+
+    pub(crate) async fn kernel_status(&self, limits: crate::config::MemoryLimits) -> Value {
+        {
+            let kernel = self.kernel.lock().unwrap();
+            if kernel.managed.is_none() {
+                return kernel.status(limits);
+            }
+        }
+        let kernel = self.kernel.clone();
+        tokio::task::spawn_blocking(move || kernel.lock().unwrap().status(limits)).await
+            .unwrap_or_else(|_|json!({"available":true,"complete":false,"enforced":false,"error":"CGROUP_MEASUREMENT_UNAVAILABLE"}))
+    }
+
     pub(crate) async fn measure(&self) -> Option<Measurement> {
         let sample = self.read_measurement().await?;
         let mut state = self.state.lock().unwrap();
@@ -231,30 +369,61 @@ impl Resources {
         estimate_mib: u32,
     ) -> Option<Arc<Reservation>> {
         let _admission = self.admission.lock().await;
+        if !self.kernel_ready(limits).await {
+            return None;
+        }
         let sample = self.measure().await?;
         if estimate_mib == 0 || !sample.admits(limits) {
             return None;
         }
+        let (id, estimate) = {
+            let mut state = self.state.lock().unwrap();
+            let estimate = (u64::from(estimate_mib) * 1024 * 1024)
+                .max(
+                    *state
+                        .runner_peaks
+                        .get(profile)
+                        .unwrap_or(&state.other_runner_peak),
+                )
+                .max(
+                    *state
+                        .runner_kernel_peaks
+                        .get(profile)
+                        .unwrap_or(&state.other_runner_kernel_peak),
+                );
+            let projected = Self::projected(
+                &sample,
+                &state,
+                u64::from(limits.daemon_peak_limit_mib) * 1024 * 1024,
+            )?;
+            if state.reservations.len() >= 256
+                || projected.checked_add(estimate)?
+                    > u64::from(limits.service_total_budget_mib) * 1024 * 1024
+            {
+                return None;
+            }
+            state.next = state.next.checked_add(1)?;
+            (state.next, estimate)
+        };
+        let managed = self.kernel.lock().unwrap().managed.is_some();
+        let group = if managed {
+            let kernel = self.kernel.clone();
+            tokio::task::spawn_blocking(move || {
+                kernel
+                    .lock()
+                    .unwrap()
+                    .managed
+                    .as_ref()
+                    .map(|managed| managed.runner(id).map(Arc::new))
+                    .transpose()
+            })
+            .await
+            .ok()?
+            .ok()?
+        } else {
+            None
+        };
         let mut state = self.state.lock().unwrap();
-        let estimate = (u64::from(estimate_mib) * 1024 * 1024).max(
-            *state
-                .runner_peaks
-                .get(profile)
-                .unwrap_or(&state.other_runner_peak),
-        );
-        let projected = Self::projected(
-            &sample,
-            &state,
-            u64::from(limits.daemon_peak_limit_mib) * 1024 * 1024,
-        )?;
-        if state.reservations.len() >= 256
-            || projected.checked_add(estimate)?
-                > u64::from(limits.service_total_budget_mib) * 1024 * 1024
-        {
-            return None;
-        }
-        state.next = state.next.checked_add(1)?;
-        let id = state.next;
         state.reservations.insert(
             id,
             Allocation {
@@ -262,6 +431,7 @@ impl Resources {
                 bytes: estimate,
                 root: None,
                 sampled_peak: 0,
+                group,
             },
         );
         Some(Arc::new(Reservation {
@@ -271,6 +441,9 @@ impl Resources {
     }
 
     pub(crate) async fn can_start(&self, limits: crate::config::MemoryLimits) -> bool {
+        if !self.kernel_ready(limits).await {
+            return false;
+        }
         self.measure().await.is_some_and(|sample| {
             sample.admits(limits)
                 && Self::projected(
@@ -291,7 +464,9 @@ impl Resources {
             "sample_count":state.samples,
             "sampled_peak_rss_bytes":(state.samples>0).then(||json!({"daemon_group":state.daemon_peak,"runner_group":state.runner_peak,"service_total":state.total_peak})),
             "completed_runner_sampled_peaks":state.runner_peaks,
-            "other_runner_sampled_peak":state.other_runner_peak})
+            "other_runner_sampled_peak":state.other_runner_peak,
+            "completed_runner_kernel_peaks":state.runner_kernel_peaks,
+            "other_runner_kernel_peak":state.other_runner_kernel_peak})
     }
 
     #[cfg(test)]
@@ -327,6 +502,23 @@ impl Resources {
 }
 
 fn measure(root: u32, roots: &BTreeMap<u32, (u64, Identity)>) -> Option<Measurement> {
+    measure_with(root, roots, |path| read(path))
+}
+
+fn measure_with(
+    root: u32,
+    roots: &BTreeMap<u32, (u64, Identity)>,
+    mut read_proc: impl FnMut(&std::path::Path) -> Option<String>,
+) -> Option<Measurement> {
+    // A normal child/thread exit can race procfs; discard the whole incomplete sample.
+    (0..3).find_map(|_| measure_once(root, roots, &mut read_proc))
+}
+
+fn measure_once(
+    root: u32,
+    roots: &BTreeMap<u32, (u64, Identity)>,
+    read_proc: &mut impl FnMut(&std::path::Path) -> Option<String>,
+) -> Option<Measurement> {
     let mut pending = vec![(root, None, None)];
     let mut seen = BTreeMap::new();
     let mut daemon = Group::default();
@@ -340,7 +532,9 @@ fn measure(root: u32, roots: &BTreeMap<u32, (u64, Identity)>) -> Option<Measurem
         if seen.len() >= MAX_PROCESSES {
             return None;
         }
-        let before = identity(pid)?;
+        let before = parse_identity(&read_proc(std::path::Path::new(&format!(
+            "/proc/{pid}/stat"
+        )))?)?;
         let runner = roots
             .get(&pid)
             .filter(|(_, id)| id.start == before.start)
@@ -352,7 +546,7 @@ fn measure(root: u32, roots: &BTreeMap<u32, (u64, Identity)>) -> Option<Measurem
         let (rss, pss) = if before.zombie {
             (0, 0)
         } else {
-            let rollup = read(format!("/proc/{pid}/smaps_rollup"))?;
+            let rollup = read_proc(std::path::Path::new(&format!("/proc/{pid}/smaps_rollup")))?;
             (kib(&rollup, "Rss:")?, kib(&rollup, "Pss:")?)
         };
         // Children belong to threads; scanning only the leader misses Tokio-spawned workers.
@@ -361,7 +555,7 @@ fn measure(root: u32, roots: &BTreeMap<u32, (u64, Identity)>) -> Option<Measurem
             if threads > MAX_THREADS {
                 return None;
             }
-            let children = read(task.ok()?.path().join("children"))?;
+            let children = read_proc(&task.ok()?.path().join("children"))?;
             for child in children.split_whitespace() {
                 if pending.len() + seen.len() >= MAX_PROCESSES {
                     return None;
@@ -383,7 +577,11 @@ fn measure(root: u32, roots: &BTreeMap<u32, (u64, Identity)>) -> Option<Measurem
     }
     // Refuse a raced sample rather than count a reused PID or a vanished subtree as zero.
     for (pid, before) in &seen {
-        if identity(*pid)? != *before {
+        if parse_identity(&read_proc(std::path::Path::new(&format!(
+            "/proc/{pid}/stat"
+        )))?)?
+            != *before
+        {
             return None;
         }
     }
@@ -509,6 +707,66 @@ mod tests {
         assert!(Arc::ptr_eq(&a, &left));
         assert!(Arc::ptr_eq(&b, &right));
         assert!(native_reservation().is_none());
+    }
+
+    #[test]
+    fn memory_sample_restarts_after_an_observed_child_exits_without_using_partial_data() {
+        use std::io::{BufRead, BufReader, Write};
+        use std::process::{Command, Stdio};
+        let mut owner = Command::new("/usr/bin/python3")
+            .args([
+                "-c",
+                r#"import subprocess,sys
+child = subprocess.Popen(['/bin/cat'], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL)
+print(child.pid, flush=True)
+sys.stdin.readline()
+child.stdin.close()
+assert child.wait() == 0
+print('reaped', flush=True)
+sys.stdin.readline()
+"#,
+            ])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
+        let mut output = BufReader::new(owner.stdout.take().unwrap());
+        let mut line = String::new();
+        output.read_line(&mut line).unwrap();
+        let child: u32 = line.trim().parse().unwrap();
+        let child_rollup = std::path::PathBuf::from(format!("/proc/{child}/smaps_rollup"));
+        let mut released = false;
+        let measured = measure_with(owner.id(), &BTreeMap::new(), |path| {
+            if path == child_rollup && !released {
+                writeln!(owner.stdin.as_mut().unwrap(), "release").unwrap();
+                line.clear();
+                output.read_line(&mut line).unwrap();
+                assert_eq!(line.trim(), "reaped");
+                released = true;
+                assert!(!path.exists());
+            }
+            read(path)
+        });
+        drop(owner.stdin.take());
+        assert!(owner.wait().unwrap().success());
+        assert!(
+            released,
+            "the real child must exit between census and memory read"
+        );
+        let measured = measured.expect("a fresh complete scan must replace the raced sample");
+        assert_eq!(measured.service_total.pids, vec![owner.id()]);
+        assert!(measured.service_total.rss_bytes > 0);
+
+        let mut reads = 0;
+        let unavailable = measure_with(std::process::id(), &BTreeMap::new(), |_| {
+            reads += 1;
+            None
+        });
+        assert!(
+            unavailable.is_none(),
+            "persistent unknown memory must not be admitted"
+        );
+        assert!(reads <= 3, "sampling retries must be bounded");
     }
 
     #[test]

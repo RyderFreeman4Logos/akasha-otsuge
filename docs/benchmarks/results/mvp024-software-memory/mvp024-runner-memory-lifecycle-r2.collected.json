@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-11T06:53:11.388866+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "f980e5a4e6a83aa47bd54ba641acb10ad966e731",
+    "log_sha256": "e423570f3522d1d7801b3a50810f30fe7e1344a121b8ed9a622fe901e2c910b6",
+    "seconds": 30.537608032114804,
+    "utc": "2026-11-11T06:52:26.797698+00:00"
+  },
+  "process_absent": true,
+  "classification": "FOCUSED_FAILURE_PENDING_CLASSIFICATION"
+}

@@ -1,0 +1,122 @@
+[
+  {
+    "name": "mvp024-memory-admission-red-r1",
+    "classification": "PRODUCT_RED: new index sync admitted despite daemon RSS above 1 MiB target",
+    "exit_code": 101,
+    "seconds": 10.86117997020483,
+    "terminal_utc": "2026-11-11T03:56:23.442781+00:00",
+    "log_sha256": "3863bd5e381da5d6ac52376a074463cc70f957800ea1cd2ee3c9ec73fd10b882"
+  },
+  {
+    "name": "mvp024-memory-admission-green-r1",
+    "classification": "FAILURE: public regression passed; one library claim refused",
+    "exit_code": 101,
+    "seconds": 62.87889701779932,
+    "terminal_utc": "2026-11-11T04:01:43.662628+00:00",
+    "log_sha256": "b3fc1cb98e426008bd9cf40bdb8b48b5e860c76949ddacd2225634c95c5b7133"
+  },
+  {
+    "name": "mvp024-memory-admission-diagnostic-r1",
+    "classification": "DIAGNOSTIC_FAILURE: shared test-harness process measurement unavailable",
+    "exit_code": 101,
+    "seconds": 17.120370656251907,
+    "terminal_utc": "2026-11-11T04:09:06.408779+00:00",
+    "log_sha256": "d76c71a4358aacb8304bd28d1ae77663a227309344d5eba3d4b3c1c035ca30db"
+  },
+  {
+    "name": "mvp024-memory-admission-diagnostic-r2",
+    "classification": "HARNESS_ISOLATION: exact and serial pass; parallel procfs ENOENT for exited sibling task",
+    "exit_code": 101,
+    "seconds": 16.066710986196995,
+    "terminal_utc": "2026-11-11T04:09:46.853226+00:00",
+    "log_sha256": "655282eb30f5db7ee88eaef50f01762b70074811d6604afb1aa75dca99dd98d8"
+  },
+  {
+    "name": "mvp024-memory-admission-isolation-green-r1",
+    "classification": "PASS: per-instance fixture isolation; two scheduler suites, public procfs regression, Clippy",
+    "exit_code": 0,
+    "seconds": 84.88011108990759,
+    "terminal_utc": "2026-11-11T04:13:36.991319+00:00",
+    "log_sha256": "940c7b87d9f9cec8e0b92ff86542becedabbd9b1bba87bc5e3ad2ad5df6759bb"
+  },
+  {
+    "name": "mvp024-runner-memory-config-red-r1",
+    "classification": "PRODUCT_RED: valid new optional estimate rejected as unknown field",
+    "exit_code": 101,
+    "seconds": 1.5361044900491834,
+    "terminal_utc": "2026-11-11T04:18:53.842210+00:00",
+    "log_sha256": "d4aa6923cab106e0997dfe87f11d27d61d7ba745786bd48eb06da1c948468df3"
+  },
+  {
+    "name": "mvp024-runner-memory-admission-red-r1",
+    "classification": "PRODUCT_RED: configured over-capacity native worker incorrectly started",
+    "exit_code": 101,
+    "seconds": 19.342116506770253,
+    "terminal_utc": "2026-11-11T04:20:12.915302+00:00",
+    "log_sha256": "8a1418379fcc6cd9cd253776b55686146f63e2f59e9beb367f5ef7d06c6f2dbc"
+  },
+  {
+    "name": "mvp024-runner-memory-focused-r1",
+    "classification": "PASS: resource arithmetic, refusal, normal named executor and Clippy",
+    "exit_code": 0,
+    "seconds": 161.24244478717446,
+    "terminal_utc": "2026-11-11T04:31:03.014572+00:00",
+    "log_sha256": "baaad4266a2fd9d4e15922a4cab923350493afec635548f29704b439ad05559c"
+  },
+  {
+    "name": "mvp024-runner-memory-lifecycle-r1",
+    "classification": "HARNESS_COMPILE_FAILURE: library passed; new daemon test had unnecessary mut and did not execute",
+    "exit_code": 101,
+    "seconds": 36.04814860224724,
+    "terminal_utc": "2026-11-11T04:35:04.519175+00:00",
+    "log_sha256": "3838ffee7c20c1bb8a6454ecfb5ba828844727d689fca9b1dca95b5d34c6591d"
+  },
+  {
+    "name": "mvp024-runner-memory-lifecycle-r2",
+    "classification": "FAILURE: lowering test passed; repeated consult hook reported generic binding error",
+    "exit_code": 101,
+    "seconds": 30.537608032114804,
+    "terminal_utc": "2026-11-11T06:52:26.797698+00:00",
+    "log_sha256": "e423570f3522d1d7801b3a50810f30fe7e1344a121b8ed9a622fe901e2c910b6"
+  },
+  {
+    "name": "mvp024-runner-memory-hook-diagnostic-r1",
+    "classification": "PRODUCT_DIAGNOSIS: idempotent replay registration probe requested a second full worker estimate",
+    "exit_code": 101,
+    "seconds": 22.107046512886882,
+    "terminal_utc": "2026-11-11T06:56:07.863179+00:00",
+    "log_sha256": "01743b04b60854279a09e874239d6d07fd2f402e7a598ed596a572b960c4a103"
+  },
+  {
+    "name": "mvp024-runner-memory-helper-green-r1",
+    "classification": "FAILURE: hook fixed; old notifier test expected core helper in runner group",
+    "exit_code": 101,
+    "seconds": 104.61488544382155,
+    "terminal_utc": "2026-11-11T07:00:24.348891+00:00",
+    "log_sha256": "eb20c8aa2bd0ce59a1c783e6d60eba9e271d57f4c3110038d0ec4eae0581e700"
+  },
+  {
+    "name": "mvp024-software-memory-focused-r1",
+    "classification": "PASS: independently attributed core-helper census; full daemon 168 passes/7 opt-in ignores, Clippy/plan",
+    "exit_code": 0,
+    "seconds": 96.35126019082963,
+    "terminal_utc": "2026-11-11T07:05:35.438829+00:00",
+    "log_sha256": "8c97d99edcfc4d2cdfcb4262a8641f5843c52f1bc0fd4cdca9c3722b926764dc"
+  },
+  {
+    "name": "mvp024-software-memory-canonical-r1",
+    "classification": "PASS: exact fa88d7c just check",
+    "exit_code": 0,
+    "seconds": 462.2108765700832,
+    "terminal_utc": "2026-11-11T07:18:41.356435+00:00",
+    "log_sha256": "42455e4d276ed75daee8078e513e37df4bd387633a12899a6792861dcdc42555"
+  },
+  {
+    "name": "mvp024-software-memory-review-r1",
+    "classification": "PASS: whole-candidate independent conventional review",
+    "exit_code": 0,
+    "seconds": 446.61523713637143,
+    "terminal_utc": "2026-11-11T07:28:42.717381+00:00",
+    "log_sha256": "b651d5ec0f11ec28808232b333ec065718e2ad77c32787b3b1f597f6ed6d20a1"
+  }
+]

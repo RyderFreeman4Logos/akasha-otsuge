@@ -1,8 +1,16 @@
 # Active work and complete remaining checklist
 
 Rechecked 2026-11-11 UTC: **23 original Issues completed, 5 Issues open
-(#12, #24, #26, #27, #28)**. #50 is also completed and closed. No completed
+(#12, #26, #27, #28 and #65)**. #50 is also completed and closed. No completed
 acceptance is waiting for issue closure.
+
+Post-merge readback found #24 automatically marked completed at
+2026-11-11T07:31:41Z even though PR64 covered only software controls.
+[Issue #65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65)
+supersedes that incomplete closure and retains the entire unchanged MVP-024
+acceptance. #24 is not counted as accepted. Partial PR descriptions must use
+`Refs` links and avoid even negated closing-keyword references. All historical
+#24 evidence below retains its original identity; remaining work is tracked in #65.
 
 Issue #25 closed as completed after PR #62 merged as a500d53, with the same
 tree as reviewed 014e15d. The [final migration archive](../benchmarks/results/mvp025-snapshot-delta-final/README.md)
@@ -16,13 +24,24 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-memory-controls, based
-on 8e14ee6. PR #63 completed controlled budget-change drain/reopen and published
+The existing SSD worktree is reused on feat/mvp-024-owned-cgroups, based
+on 0a09888. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
-The current leaf finishes measured job admission, native worker reservations
-and separate daemon/runner accounting, retaining ownership through reopen.
-It is limited to software controls; owned cgroup limits are the next leaf.
+PR #64 completed measured job admission, native worker reservations and separate
+daemon/runner accounting, retaining ownership through reopen. Its exact-source
+gate (625 Rust executions, Python 34 / Node 7), independent review (zero findings,
+44 fresh tests) and CI42977669246 passed. The merged tree matches reviewed fa88d7c.
+The [software-control archive](../benchmarks/results/mvp024-software-memory/README.md)
+retains failures, final evidence and public readbacks. Owned cgroup limits and
+kernel peaks are the current leaf.
+The first broader candidate regression had 167 daemon passes and one editor
+delegation failure; its exact selector passed without explaining that failure.
+A single diagnostic topology did not reproduce it and had 18 other IPC failures.
+Both remain preserved and unclassified. The observed procfs child-exit mechanism
+has a separate real-process RED/GREEN regression. The successor passes 98 library,
+168 daemon and two actual kernel tests, plus Clippy. Bounded whole-census
+resampling is not asserted to explain either historical suite failure.
 The full corpus/load/recovery checklist below remains open. PR #56
 provides observability only; it does not establish enforcement or scale acceptance.
 All seven #24 dependencies are completed; its stale blocked label was removed.
@@ -997,7 +1016,7 @@ is #24. Do not promote these focused guarantees into scale or model acceptance.
 
 ## MVP-024 production scale and recovery acceptance
 
-Implement against the merged notifier candidate. Keep #24 open until the full
+Implement against the merged notifier candidate. Keep successor #65 open until the full
 production acceptance below passes; #3 spike receipts remain historical evidence.
 Use the existing 42 SSD parquet shards and deterministic streaming preparation.
 Measure a small import before admitting full storage; retain no second raw JSONL.
@@ -1044,23 +1063,35 @@ Python 34/Node 7, release and installed UID controls), CI42951891062 and indepen
 R2 review (zero actionable findings, 30 fresh functional tests). PR #63 merged
 as 8e14ee6 with an identical tree. The [final leaf archive](../benchmarks/results/mvp024-storage-reopen-final/README.md)
 preserves the complete report, five explicit parent line-coordinate corrections,
-public readbacks, gate/CI logs and merge identity. Measured-memory admission and
-dedicated cgroups remain required; neither observability nor functional fixtures satisfy
-the full production stress acceptance.
+public readbacks, gate/CI logs and merge identity. PR #64 subsequently completed
+software measured-memory admission and worker reservations; its
+[final archive](../benchmarks/results/mvp024-software-memory/README.md) binds
+fa88d7c, all retained failed attempts, the exact gate, complete independent review
+and CI. Dedicated cgroups and kernel peaks remain required; functional fixtures
+do not satisfy the full production stress acceptance.
 
 - [x] Finish controlled storage drain/reopen: same PID/socket, retriable busy
   replies, original accepted job snapshots/deadlines, watcher reload, repeated
   or reverted budgets, pending/rejected configuration and explicit stop/signals.
   Exact-source gate, independent conventional review and merge completed in PR #63.
 
-- [ ] Enforce measured-memory admission for new jobs, heavy requests and workers,
-  including worker estimates/reservations and actual peaks. Cover total-only
-  budget decreases with requested/effective/draining status while retaining
-  accepted identities, original deadlines and health/receipt access.
+- [x] Enforce software measured-memory admission for new jobs, queued claims and
+  workers, including configured estimates, retained sampled profile peaks and
+  reservations that survive actual process cleanup. Total-only decreases pause
+  new work without cancelling accepted workers or changing their identities and
+  original deadlines. Health/receipt access remains available. PR #64 merged.
 - [ ] Own separate daemon/runner/service cgroups when delegation is available;
   preserve ownership, limits and peaks through storage reopen, account for every
   helper/descendant, and report software-only operation honestly when unavailable.
-  Verify owned setup/cleanup, limit readback and safe budget lowering.
+  Verify owned setup/cleanup, limit readback, kernel peaks for later admission and
+  safe budget lowering with distinct requested/effective/draining state.
+  The current candidate passes 98 library and 168 daemon tests, two separate
+  real-kernel normal lifecycle/worker tests, and all-target Clippy. Worker/guardian
+  membership and total-only post-drain convergence each have a retained causal
+  RED; an earlier mutable-fixture callback compile failure is separately labeled
+  harness failure. The real procfs exit regression also has RED/GREEN evidence;
+  prior unexplained suite failures remain retained. Committed gate, independent
+  review and publication remain pending. No full-scale or new Daybreak acceptance is claimed.
 
 - [ ] Freeze source/binary, machine/filesystem/cgroup state, corpus manifest,
   source licenses/hash/seed, actual UTF-8 bytes, document/partition identities,
@@ -1334,7 +1365,7 @@ Runtime post-merge main CI42779863508 also passed separately.
   independent review and CI for each safe leaf; merge and verify issue #25 closure
   only after the whole migration/round-trip contract is satisfied.
 
-Continue all unchecked #24 enforcement/corpus/load/fault work, then
+Continue all unchecked MVP-024 enforcement/corpus/load/fault work in #65, then
 packaging (#26), fixed-oracle quality evaluation (#27) and final acceptance (#28).
 Claude authentication (#12) and mp SSH access remain explicit external blockers.
 
@@ -1409,7 +1440,7 @@ complete. Daybreak/new red-team work remains temporarily deferred by the owner.
 - [x] [#21 [MVP-021] Run、Git/工作区、build/test 与 incident 证据关联](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/21) — dependencies: #6, #11, #16.
 - [x] [#22 [MVP-022] 执行失败触发调查、自动修订或高优 review](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/22) — dependencies: #20, #21.
 - [x] [#23 [MVP-023] Notifier 插件、可用本地/stdio 实现与持久投递](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/23) — dependencies: #8, #19, #22.
-- [ ] [#24 [MVP-024] 50 GB、100 客户端、内存预算与故障恢复压力验收](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/24) — dependencies: #4, #8, #10, #16, #17, #20, #23.
+- [ ] [#65 [MVP-024] Remaining memory, 50 GB and 100-client acceptance](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65) — supersedes incomplete #24 closure; dependencies #4, #8, #10, #16, #17, #20, #23 completed.
 - [x] [#25 [MVP-025] mempal 只读迁移、中立导出与往返验证](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/25) — dependencies: #4, #5, #6, #7, #19.
 - [ ] [#26 [MVP-026] Linux 安装、升级、卸载与四宿主使用文档](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26) — dependencies: #12, #13, #14, #15, #23, #24, #25.
 - [ ] [#27 [MVP-027] 质量评测、主上下文开销与组合回归](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) — dependencies: #16, #18, #19, #20, #22, #24, #26.

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-11T04:10:01.697311+00:00",
+  "terminal": {
+    "exit_code": 101,
+    "head": "3d1cfb40a33594a3500bc7226c3ee744d3ecef9c",
+    "log_sha256": "655282eb30f5db7ee88eaef50f01762b70074811d6604afb1aa75dca99dd98d8",
+    "seconds": 16.066710986196995,
+    "utc": "2026-11-11T04:09:46.853226+00:00"
+  },
+  "process_absent": true,
+  "classification": "FIXTURE_THREAD_LIFECYCLE_RACE"
+}

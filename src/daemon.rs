@@ -667,7 +667,7 @@ pub async fn run(
 ) -> Result<()> {
     private_dir(&config.config().paths.data_dir)?;
     let (listener, _owner) = listen(&config.config().paths.socket_path)?;
-    let resources = Arc::new(resources::Resources::default());
+    let resources = Arc::new(resources::Resources::open().await);
     let service = open_service(config, config_path, profile, None, resources).await?;
     serve(service, || listener.accept()).await
 }
@@ -680,6 +680,9 @@ async fn open_service(
     resources: Arc<resources::Resources>,
 ) -> Result<Arc<Service>> {
     let reconcile_input = last_config.is_none();
+    resources
+        .apply_kernel(config.config().runtime.memory_limits(), true)
+        .await;
     let providers = crate::provider::Client::new().map_err(|e| Error(e.0))?;
     let storage = Arc::new(Storage::open(&config).await?);
     let manager = match configuration::open(&storage, config).await {

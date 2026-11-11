@@ -498,9 +498,15 @@ impl RunSpec {
         binary: &std::path::Path,
         directory: &std::path::Path,
     ) -> Result<std::process::Command> {
-        match &self.guard {
+        let command = match &self.guard {
             Some(guard) => super::guardian::command(guard, binary, directory),
             None => Ok(std::process::Command::new(binary)),
+        }?;
+        match &self.lease.resources {
+            Some(resources) => resources
+                .command(command)
+                .map_err(super::native::spawn_error),
+            None => Ok(command),
         }
     }
     pub fn options(&self) -> &RunOptions {
