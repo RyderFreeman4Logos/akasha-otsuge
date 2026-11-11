@@ -58,7 +58,13 @@ Native engine working memory remains subject to the separate service limits.
 Current-state checks still precede each read and progress publication. Two
 native regressions first observed 18/19 versions for 16 lexical/vector rows;
 the repaired paths stay within the eight-version test budget, including index
-creation. The paired real-corpus successor run remains to be measured.
+creation. The [paired real-corpus run](results/mvp024-production-pilot/README.md)
+also passes with byte-identical inputs, acknowledgements and full claim oracle:
+indexing took 10.559 s, search allocated 86,781,952 bytes in 912 files and 132
+native versions. The RSS sampled peak increased to 489,836,544 bytes. This single
+pair does not establish a memory improvement or full-scale operating envelope.
+Both disposable databases were removed after verification. Further native-index
+disk growth and reclamation must be addressed before full-corpus admission.
 
 All 42 retained compressed shards were rehashed on 2026-11-11: 43,986,181,099
 bytes matched the pinned source inventory. A separate text-only shape census

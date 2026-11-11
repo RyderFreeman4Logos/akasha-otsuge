@@ -46,7 +46,12 @@ Its 4,449,979 unique bytes produced 149,250,048 bytes of search data and 1,109
 native versions in 32.330 seconds. The successor coalesces bounded native writes
 for both search paths; causal version-count regressions, buffer/order controls
 and related retrieval/seed checks pass (34 tests, one intentional ignore), with
-all-target Clippy. The paired corpus measurement, full gate and review remain.
+all-target Clippy. The [paired measurement archive](../benchmarks/results/mvp024-production-pilot/README.md)
+retains identical inputs/acknowledgements/oracle, all failures and both stopped
+stores' cleanup: successor indexing took 10.559 seconds with 86,781,952 search
+bytes, 912 files and 132 native versions. RSS sampled peak increased; no memory
+improvement or scale extrapolation is claimed. Final gate, review and publication
+remain, followed by further derived-index growth/reclamation before scaling.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
