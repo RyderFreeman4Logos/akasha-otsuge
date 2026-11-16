@@ -43,6 +43,15 @@ corresponding kind. `retrieval.extraction` accepts a text profile or
 The latter needs no extra text, embedding or reranker endpoint. Nothing is selected
 or invoked by default.
 
+With an embedding profile configured, `retrieval.embedding_scopes` optionally
+limits vector indexing to 1–64 scope ceilings. Each requires `user`; optional
+`project`, `branch_or_version` and `session` constrain the match. A branch requires
+a project. For example, `embedding_scopes = [{ user = "uid:1001", project = "alpha" }]`
+inside `[retrieval]` selects that project and its narrower scopes. Replace the UID
+with the daemon owner's UID. Omit this setting to embed all active memories.
+Lexical indexing still covers every active memory. See [vector coverage](retrieval.md)
+for generation changes and query coverage gaps.
+
 `review.mode` accepts `manual`, `policy` (selective, default), or `automatic`.
 See the [policy matrix and operator CLI](review.md). Extraction and Auto-Grill
 pin the mode at admission; a reload applies to new operations. Old serialized

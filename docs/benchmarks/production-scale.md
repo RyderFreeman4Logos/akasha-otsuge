@@ -104,6 +104,15 @@ with zero sampled OOM kills. Its exact stopped store/socket were removed after
 hash and consumer checks. This bounded production result does not replace the
 unchanged full-scale acceptance.
 
+The final canonical/install release artifact at `b83cf3d` also passed the same
+corpus: all 8,322 claim checks and eight witnesses, 212.304 index seconds, and
+198 complete enforced samples. Sampled RSS maximum was 418,988,032 bytes and P99
+413,306,880, with zero sampled OOM kills. Its disposable store/socket were removed.
+PR #71 merged as `96e2b5f` after exact-source gate, independent review and CI;
+the [final archive](results/mvp024-native-memory/README.md#final-artifact-and-publication)
+preserves the reviewer UID-prerequisite failure and separate successful parent
+and CI acceptance. Full coverage/load/recovery remains pending.
+
 All 42 retained compressed shards were rehashed on 2026-11-11: 43,986,181,099
 bytes matched the pinned source inventory. A separate text-only shape census
 found exactly 1,000,000 DBpedia rows, 37 with title-plus-text over 4,096 bytes

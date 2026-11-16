@@ -186,10 +186,20 @@ pub struct Retrieval {
     pub max_original_chars: usize,
     #[serde(default)]
     pub embedding: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub embedding_scopes: Option<Vec<crate::domain::Scope>>,
     #[serde(default)]
     pub reranker: Option<String>,
     #[serde(default)]
     pub extraction: Option<String>,
+}
+
+impl Retrieval {
+    pub(crate) fn embeds_scope(&self, scope: &crate::domain::Scope) -> bool {
+        self.embedding_scopes
+            .as_ref()
+            .is_none_or(|scopes| scopes.iter().any(|selected| selected.contains(scope)))
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -575,6 +585,15 @@ impl Config {
             "retrieval.max_original_chars",
             "must be positive",
         )?;
+        if let Some(scopes) = &self.retrieval.embedding_scopes {
+            require(
+                self.retrieval.embedding.is_some()
+                    && (1..=64).contains(&scopes.len())
+                    && scopes.iter().all(|scope| scope.contains(scope)),
+                "retrieval.embedding_scopes",
+                "requires an embedding profile and between 1 and 64 valid scopes",
+            )?;
+        }
         let t = &self.timeouts;
         let mut effective = EffectiveTimeouts {
             local_request: duration(&t.local_request, "timeouts.local_request")?,

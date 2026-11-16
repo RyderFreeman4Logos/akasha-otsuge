@@ -56,7 +56,14 @@ impl Service {
         }
         progress.vector = pinned_vector;
         if let Some(vector) = &progress.vector {
-            if vector.watermark == 0 {
+            if !vector_config
+                .resolved()
+                .config()
+                .retrieval
+                .embeds_scope(&scope)
+            {
+                gaps.push("vector_scope_excluded".to_owned());
+            } else if vector.watermark == 0 {
                 gaps.push("vector_generation_pending".to_owned());
             } else {
                 let outcome = self

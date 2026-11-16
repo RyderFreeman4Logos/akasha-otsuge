@@ -9,6 +9,9 @@ mod regressions;
 #[path = "retrieval_maintenance.rs"]
 mod maintenance;
 
+#[path = "retrieval_coverage.rs"]
+mod coverage;
+
 fn scope(project: &str) -> Scope {
     Scope {
         user: format!("uid:{}", rustix::process::geteuid().as_raw()),

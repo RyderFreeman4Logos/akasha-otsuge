@@ -302,6 +302,55 @@ fn defaults_cover_all_local_model_roles_without_an_endpoint_requirement() {
 }
 
 #[test]
+fn embedding_scope_selection_is_optional_bounded_and_validated() {
+    let legacy = config(&format!("{MODELS}\n[retrieval]\nembedding='embed'\n"));
+    let serialized = serde_json::to_value(legacy.config()).unwrap();
+    assert!(serialized["retrieval"].get("embedding_scopes").is_none());
+    let restored: akasha_otsuge::config::Config =
+        serde_json::from_value(serialized.clone()).unwrap();
+    assert_eq!(serde_json::to_value(restored).unwrap(), serialized);
+    let selection = "[retrieval]\nembedding='embed'\nembedding_scopes=[{user='owner',project='alpha'},{user='owner',project='beta'}]\n";
+    let input = format!("{MODELS}\n{selection}");
+    let selected = config(&input);
+    assert_eq!(
+        selected
+            .config()
+            .retrieval
+            .embedding_scopes
+            .as_ref()
+            .unwrap()
+            .len(),
+        2
+    );
+    assert_ne!(
+        legacy.retrieval_fingerprint(),
+        selected.retrieval_fingerprint()
+    );
+    for scopes in [
+        "[]".to_owned(),
+        "[{user=''}]".to_owned(),
+        "[{user='owner',branch_or_version='main'}]".to_owned(),
+        format!("[{{user={:?}}}]", "x".repeat(257)),
+        format!("[{}]", vec!["{user='owner'}"; 65].join(",")),
+    ] {
+        let invalid =
+            format!("{MODELS}\n[retrieval]\nembedding='embed'\nembedding_scopes={scopes}\n");
+        let error = resolve(&invalid, None, "", &paths()).err().unwrap();
+        assert_eq!(error.code, "CONFIG_INVALID");
+        assert_eq!(error.field, "retrieval.embedding_scopes");
+    }
+    assert!(
+        resolve(
+            "[retrieval]\nembedding_scopes=[{user='owner'}]\n",
+            None,
+            "",
+            &paths()
+        )
+        .is_err()
+    );
+}
+
+#[test]
 fn profile_and_management_precedence_have_auditable_field_sources() {
     let input = r#"
 [timeouts]

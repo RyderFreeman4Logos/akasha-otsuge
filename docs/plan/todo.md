@@ -24,8 +24,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on fix/mvp-024-native-memory, based on merged
-maintenance commit `63acf39`. No additional corpus or Rust target is copied.
+The existing SSD worktree is reused on feat/mvp-024-vector-coverage, based on
+merged native-startup commit `96e2b5f`. No additional corpus or Rust target is copied.
 PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
@@ -109,11 +109,16 @@ retains complete reports, logs and readbacks, including every earlier failure.
   independent whole-range R2 review; retain every previous failed attempt.
 - [x] Restore hosted CI execution after the recorded package-mirror DNS failure,
   then publish PR #69 and the dependent maintenance changes with exact readback.
-- [ ] Verify and publish the independent native-startup resource leaf, including
+- [x] Verify and publish the independent native-startup resource leaf, including
   foreground/detached entrypoints, exact canonical gate and independent review.
 - [x] Verify production defaults on the bounded real corpus, with complete
   current-claim/partition checks, original resource limits and exact cleanup.
 - [ ] Complete the unchanged full corpus/load/recovery criteria below.
+- [x] Implement explicit production vector scope coverage while preserving the default
+  all-claim policy, old configuration digests, contiguous completion and generation
+  activation. Verify actual provider calls, excluded-scope disclosure and reload.
+- [ ] Publish the vector scope leaf after its exact canonical gate, independent
+  review and hosted CI. Full corpus admission remains a separate unchecked task.
 - [ ] Resolve the 37 oversized vector documents through verified licensed inputs
   and documented model/vector identity, without increasing the product limit or
   downloading another full corpus.
@@ -137,19 +142,41 @@ Commit `92031ea` also passed the same real corpus through its release daemon's
 own startup defaults, with no external native tuning: all 8,322 claims and eight
 witnesses passed, indexing took 218.891 seconds, and sampled RSS peaked at
 414,588,928 bytes across 197 complete/enforced observations. Its store/socket
-were removed after full file hashes and consumer checks. The final candidate
-still needs its exact canonical gate, independent review and publication.
+were removed after full file hashes and consumer checks. Its later final
+canonical artifact was verified separately as described below.
 Its first full gate failed an existing native-consult fixture's empty PID read.
 Both readiness producers now publish the completed PID atomically; deterministic
 source-derived RED/GREEN and 32 native consult tests pass without changing
 ownership assertions or deadlines. The failed gate and isolated diagnostic are
-retained; the repaired candidate needs a fresh complete gate before review.
+retained. The repaired `b83cf3d` gate passed 643 Rust executions / 39 intentional
+ignores, Python 35, Node 7 and installed lifecycle/UID/TCP checks. The exact final
+binary also passed the identical corpus: 8,322 claims, eight scoped witnesses,
+212.304 index seconds and 198 complete enforced samples. RSS maximum was
+418,988,032 bytes and P99 413,306,880, with zero sampled OOM kills. Its exact
+127,373,312-byte data directory and owned socket were removed.
+The full independent review reports zero actionable regressions and 64 fresh
+Rust passes. Its detached smoke remains a failed alternate-UID prerequisite;
+the exact lower-level launcher failure was not captured. The unchanged helper
+and same binary subsequently passed the parent environment's UID/lifecycle smoke.
+CI43963794901 passed all 643 Rust / 35 Python / seven Node checks and installed
+acceptance on the reviewed tree. PR #71 merged as `96e2b5f` with that same tree.
+The [final archive](../benchmarks/results/mvp024-native-memory/README.md#final-artifact-and-publication)
+retains the complete report, separate smoke outcomes, final pilot, gate and CI
+logs, exact cleanup and publication readbacks. Full-scale acceptance stays open.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
 A licensed 37-row dictionary-vector supplement is prepared but not admitted.
-Cross-corpus identity, cardinality and explicit production vector coverage remain
-pending; current production sync embeds every active claim, so the supplement
-alone does not solve partial coverage of the full text corpus.
+Cross-corpus identity and cardinality remain pending. The current candidate
+adds optional explicit vector scopes while retaining complete lexical indexing
+and the default all-claim policy. Its [focused evidence](../benchmarks/results/mvp024-vector-coverage/README.md)
+preserves the unchanged-test behavioral RED/GREEN, two fixture compilation
+failures, and 67 related Rust passes / one intentional ignore plus Clippy and
+format checks. Generation switching retains the old selection until activation;
+removing the selector restores the old all-memory identity. Excluded queries
+report their coverage gap without embedding calls, and excluded records still
+have contiguous completion entries. Canonical gate, review and publication are
+next. The supplement and this functional coverage contract do not establish
+million-vector or full-scale acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
 delegation failure; its exact selector passed without explaining that failure.
 A single diagnostic topology did not reproduce it and had 18 other IPC failures.
@@ -1229,11 +1256,12 @@ do not satisfy the full production stress acceptance.
   gap through the shared rebuild/prune callback. Retain the native version-set
   RED/GREEN and valid-owner controls; commit `c0de454` passes 35 related checks.
   Final successor canonical gate, R2 review and publication remain separate.
-- [ ] Bound effective FTS update memory/worker settings after index reopen;
+- [x] Bound effective FTS update memory/worker settings after index reopen;
   pinned Lance omits creation-only limits from persisted parameters. Preserve
   original resource/timeout thresholds and prove the production path. Allocator
   observation and the failed single-setting control are diagnostics, not fixes
   or full-scale acceptance; preserve their confounds and unexplained IPC failures.
+  PR #71 delivers the verified startup defaults; full corpus/load remains below.
 - [ ] Validate a small production corpus/coverage pilot before full-data admission.
   Source chunks can be 64 KiB, while production claims are at most 32 KiB and
   vector input uses 4096-byte chunk means. Prove UTF-8-safe full-span coverage,
