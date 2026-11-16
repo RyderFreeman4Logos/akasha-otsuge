@@ -139,6 +139,11 @@ witnesses passed, indexing took 218.891 seconds, and sampled RSS peaked at
 414,588,928 bytes across 197 complete/enforced observations. Its store/socket
 were removed after full file hashes and consumer checks. The final candidate
 still needs its exact canonical gate, independent review and publication.
+Its first full gate failed an existing native-consult fixture's empty PID read.
+Both readiness producers now publish the completed PID atomically; deterministic
+source-derived RED/GREEN and 32 native consult tests pass without changing
+ownership assertions or deadlines. The failed gate and isolated diagnostic are
+retained; the repaired candidate needs a fresh complete gate before review.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
 A licensed 37-row dictionary-vector supplement is prepared but not admitted.

@@ -118,3 +118,34 @@ absent; shared corpus and build cache remain.
 commands, output assertions, resource observations and cleanup receipts. Five
 shared inputs reference the existing scale-comparison archive with verified hashes.
 The following evidence-only commit preserves the exact tested implementation.
+
+## Canonical gate and PID fixture repair
+
+The first canonical gate on `6435c3e` failed before installed acceptance. Its
+daemon suite had 172 passes, nine intentional ignores and one failure:
+`consult_cancel_shutdown_and_crash_end_native_processes_without_replaying`
+parsed an empty PID file before acquiring process handles. The same exact
+selector passed once in isolation; that pass does not waive the full-gate failure.
+
+The producer and consumer are byte-identical on the merged base. The fixture's
+`child.pid` readiness path can exist after file creation but before its PID bytes
+are written. A deterministic filesystem probe executes the actual source-derived
+producer statements and observes this window at both publication sites. The
+first tiny probe used `/tmp` and removed its exact roots; the paired RED/GREEN
+was repeated under the existing canonical SSD temporary root. Neither probe
+claims to reproduce the exact historical scheduling trigger or cancellation mode.
+
+Both child PID producers now write a sibling temporary file and atomically
+rename it after the write closes. The earlier runner/parent PID writes finish
+before this readiness marker. All original ownership, cancellation, shutdown,
+crash, no-replay assertions and deadlines remain unchanged. The same publication
+probe now observes no ready marker during the incomplete write, then the complete
+PID. All 32 native consult tests pass, along with syntax compilation of both
+changed Python files, Clippy and formatting. The exact repaired source still
+requires its complete canonical gate and independent review.
+
+[pid-publication.zip](pid-publication.zip) and
+[its manifest](pid-publication-manifest.json) preserve the failed gate, isolated
+diagnostic, source preimages, both publication probes, classification and focused
+repair results. The production startup implementation and its real-corpus result
+are unchanged by this fixture repair.
