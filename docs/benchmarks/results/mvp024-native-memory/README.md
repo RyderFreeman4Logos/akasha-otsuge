@@ -141,11 +141,52 @@ before this readiness marker. All original ownership, cancellation, shutdown,
 crash, no-replay assertions and deadlines remain unchanged. The same publication
 probe now observes no ready marker during the incomplete write, then the complete
 PID. All 32 native consult tests pass, along with syntax compilation of both
-changed Python files, Clippy and formatting. The exact repaired source still
-requires its complete canonical gate and independent review.
+changed Python files, Clippy and formatting. Final exact-source gate and review
+results follow below.
 
 [pid-publication.zip](pid-publication.zip) and
 [its manifest](pid-publication-manifest.json) preserve the failed gate, isolated
 diagnostic, source preimages, both publication probes, classification and focused
 repair results. The production startup implementation and its real-corpus result
 are unchanged by this fixture repair.
+
+## Final artifact and publication
+
+The complete `b83cf3d` canonical gate passed 643 Rust executions / 39 intentional
+ignores, 35 Python tests, seven Node tests and installed lifecycle/UID/TCP checks.
+Its release SHA-256 is
+`0a5436f0dc22a2858f3f083be56be55a278b78f31315d76888ebd309c5425fc1`.
+The earlier pilot's build command differs; the exact binary-hash difference
+remains unclassified. No bitwise reproducible-build claim is made.
+
+The exact final artifact passed the same 8,192-source pilot without external
+native tuning: all 8,322 current-claim checks and eight scoped witnesses passed.
+Indexing took 212.304 seconds. All 198 resource samples were complete under the
+original 512/640/2048 MiB limits; sampled RSS maximum was 418,988,032 bytes and
+nearest-rank P99 413,306,880, with zero sampled OOM kills. Seeder `f009f18a`
+remains the `92031ea` build with unchanged production source. The exact stopped
+store's 543 files / 127,373,312 allocated bytes and owned socket were removed
+after hashes, process/cgroup terminality and consumer checks.
+
+The [full independent report](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/71#issuecomment-6930405102)
+reports zero actionable regressions and 64 fresh Rust passes. Its release smoke
+failed because an alternate-UID prerequisite was unavailable. The original
+failure and report remain unchanged; the precise lower-level launcher failure
+was not captured. A single parent-environment diagnosis found the unchanged
+helper available, and the same artifact passed lifecycle/private-UID/peer-UID
+and no-TCP smoke. These are separate outcomes.
+
+[CI43963794901](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/43963794901)
+passed on attempt 1 with 643 Rust passes / 39 ignores, Python 35, Node 7 and
+installed acceptance. Its tested merge tree equals the reviewed tree.
+[PR #71](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/71) merged as
+`96e2b5f07f1dea0289f82d88bc89b43c754d4fc1`, retaining that exact tree.
+
+[final-publication.zip](final-publication.zip) and
+[its manifest](final-publication-manifest.json) contain 115 verified members
+and five shared-input references. They preserve final pilot/gate/review/CI
+evidence, failures, source identities, cleanup and public readbacks. One parent
+JSON readback had a trailing literal backslash-n; original bytes are retained
+as raw text beside the separately normalized identical value and correction
+receipt. No public issue data changed. Native child transcripts are excluded.
+This completes the bounded startup leaf, not the remaining full #65 acceptance.
