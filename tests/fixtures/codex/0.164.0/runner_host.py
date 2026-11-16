@@ -40,7 +40,9 @@ assert turn_request['method'] == 'turn/start'
 hint = json.loads(turn_request['params']['input'][0]['text']).get('hint')
 if scenario in ('timeout', 'cancel'):
     child = subprocess.Popen(['/bin/sleep', '30'], start_new_session=detached)
-    (root / 'child.pid').write_text(str(child.pid))
+    # Publish readiness only after the PID bytes are complete.
+    (root / 'child.pid.tmp').write_text(str(child.pid))
+    (root / 'child.pid.tmp').replace(root / 'child.pid')
 send({'id': 4, 'result': {'turn': {'id': 'turn'}}})
 send({'method': 'item/reasoning/summaryPartAdded', 'params': {'threadId': 'thread', 'turnId': 'turn', 'itemId': 'reason', 'summaryIndex': 0}})
 if scenario in ('auth', 'auth_http'):
@@ -184,7 +186,8 @@ if scenario.startswith('delegate_'):
             tool('delegate', {'hint':'child'})
             raise AssertionError('cancelled delegate returned')
         child = subprocess.Popen(['/bin/sleep', '30'], start_new_session=True)
-        (root / 'child.pid').write_text(str(child.pid))
+        (root / 'child.pid.tmp').write_text(str(child.pid))
+        (root / 'child.pid.tmp').replace(root / 'child.pid')
         time.sleep(30)
     elif scenario == 'delegate_denied':
         result = tool('delegate', {'hint':'child'})

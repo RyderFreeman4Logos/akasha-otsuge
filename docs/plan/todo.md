@@ -1,6 +1,6 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-11 UTC: **23 original Issues completed, 5 Issues open
+Rechecked 2026-11-16 UTC: **23 original Issues completed, 5 Issues open
 (#12, #26, #27, #28 and #65)**. #50 is also completed and closed. No completed
 acceptance is waiting for issue closure.
 
@@ -24,8 +24,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-index-maintenance, combining
-native version pruning and merge-key indexing with the merged Mempal repair.
+The existing SSD worktree is reused on fix/mvp-024-native-memory, based on merged
+maintenance commit `63acf39`. No additional corpus or Rust target is copied.
 PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
@@ -88,22 +88,32 @@ canonical gates pass 634 Rust executions / 39 intentional ignores, Python 35,
 Node 7 and installed lifecycle/UID/TCP checks. Its full independent review passes
 with zero findings and 26 fresh tests. Both hosted CI attempts failed in apt
 before project checks because the Ubuntu mirror DNS lookup failed. The single
-retry is exhausted; PR #69 remains a draft. The retained barrier prevents a
+retry was exhausted. PR #69 subsequently merged through PR #70's reviewed
+integration, whose hosted CI passed. The retained barrier prevents a
 normal successful runner result; PID disappearance alone does not prove the
 signal-level cancellation path. Historical r4 timeout causality remains unknown.
 
-Local merge `2512229` integrates the reviewed fixture into the maintenance
-branch without changing remote main or rewriting `5163147`. The
+Local merge `2512229` integrated the reviewed fixture into the maintenance
+branch without rewriting `5163147`. The
 [integration archive](../benchmarks/results/mvp024-native-prune/README.md#integration-validation)
 retains both failures, diagnostics, foundation gates, full review and CI failures.
-The merged candidate still needs its own gate and complete R2 review.
+Candidate `2987eb1` then passed its exact R6 canonical gate (641 Rust executions,
+39 intentional ignores, Python 35 / Node 7 and installed lifecycle/UID/TCP),
+whole-range independent R2 review (zero findings, 61 fresh passes / three ignores),
+and hosted CI43942780707. PR #70 merged as `63acf39` with the exact reviewed tree;
+PR #69 was also marked merged through that history. The
+[final archive](../benchmarks/results/mvp024-native-prune/README.md#final-publication)
+retains complete reports, logs and readbacks, including every earlier failure.
 
-- [ ] Pass the integrated maintenance candidate's exact canonical gate and
+- [x] Pass the integrated maintenance candidate's exact canonical gate and
   independent whole-range R2 review; retain every previous failed attempt.
-- [ ] Restore hosted CI execution after the recorded package-mirror DNS failure,
+- [x] Restore hosted CI execution after the recorded package-mirror DNS failure,
   then publish PR #69 and the dependent maintenance changes with exact readback.
-- [ ] Bound effective FTS update memory/workers, verify a bounded production
-  control, and then complete the unchanged full corpus/load/recovery criteria.
+- [ ] Verify and publish the independent native-startup resource leaf, including
+  foreground/detached entrypoints, exact canonical gate and independent review.
+- [x] Verify production defaults on the bounded real corpus, with complete
+  current-claim/partition checks, original resource limits and exact cleanup.
+- [ ] Complete the unchanged full corpus/load/recovery criteria below.
 - [ ] Resolve the 37 oversized vector documents through verified licensed inputs
   and documented model/vector identity, without increasing the product limit or
   downloading another full corpus.
@@ -113,10 +123,33 @@ A one-setting mmap control under enforced original limits still failed at
 6,270/8,322 and RSS 679,796,736 bytes. Both failed stores/sockets were removed.
 The setting alone is insufficient; full output oracles and exact IPC causality
 remain unresolved. Pinned Lance source also shows creation-only FTS memory/worker
-settings are not retained for default updates. Bound and verify those effective
-update limits in the next resource leaf, then resolve vector inputs and scale.
+settings are not retained for default updates. The new
+[bounded controls](../benchmarks/results/mvp024-native-memory/README.md) preserve
+one further FTS-only failure and two complete arena-limited runs. FTS1/32 alone
+failed at 3,622/8,322 with sampled RSS 692,056,064 bytes. Adding an explicit
+two-arena setting completed all 8,322 claim checks and eight partition witnesses:
+FTS1/32 used 203.635 index seconds and peaked at 406,609,920 sampled RSS bytes;
+FTS1/1 used 795.438 seconds and peaked at 282,107,904 bytes. Every control retained
+the original limits/deadlines; all three disposable stores/sockets were removed.
+The 32 MiB setting is selected for the next production-startup leaf. These single
+tuning observations do not establish full scale or a causal performance interval.
+Commit `92031ea` also passed the same real corpus through its release daemon's
+own startup defaults, with no external native tuning: all 8,322 claims and eight
+witnesses passed, indexing took 218.891 seconds, and sampled RSS peaked at
+414,588,928 bytes across 197 complete/enforced observations. Its store/socket
+were removed after full file hashes and consumer checks. The final candidate
+still needs its exact canonical gate, independent review and publication.
+Its first full gate failed an existing native-consult fixture's empty PID read.
+Both readiness producers now publish the completed PID atomically; deterministic
+source-derived RED/GREEN and 32 native consult tests pass without changing
+ownership assertions or deadlines. The failed gate and isolated diagnostic are
+retained; the repaired candidate needs a fresh complete gate before review.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
+A licensed 37-row dictionary-vector supplement is prepared but not admitted.
+Cross-corpus identity, cardinality and explicit production vector coverage remain
+pending; current production sync embeds every active claim, so the supplement
+alone does not solve partial coverage of the full text corpus.
 The first broader candidate regression had 167 daemon passes and one editor
 delegation failure; its exact selector passed without explaining that failure.
 A single diagnostic topology did not reproduce it and had 18 other IPC failures.

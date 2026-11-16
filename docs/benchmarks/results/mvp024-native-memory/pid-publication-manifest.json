@@ -1,0 +1,135 @@
+{
+  "base": "6435c3e8365ea7f4ca1ca6445a7c1077279d83ba",
+  "candidate_source_sha256": {
+    "tests/fixtures/codex/0.164.0/runner_host.py": "5196dc690ff23e76d961625d226a6cf8d23d0587c2d22e516a63cb63d6853c81"
+  },
+  "scope": "Canonical gate empty-PID failure, one isolated pass without waiver, unchanged-base producer provenance, deterministic source-derived publication RED/GREEN and atomic child PID fixture repair. All 32 native consult focused tests, full changed-Python syntax vector, Clippy and formatting pass. Exact successor canonical gate and independent review remain pending.",
+  "zip_bytes": 44093,
+  "zip_sha256": "d2dc29fccee6ea0b3295893f2841a89282eef8d89bb2f6be147f03f06244435e",
+  "members": {
+    "archive-builder.py": {
+      "bytes": 2912,
+      "sha256": "c24f96c8a3a0560eff169755fc763fc8bd23be10fa52b2214a4840d449426971"
+    },
+    "receipts/mvp024-codex-pid-classification-r1.json": {
+      "bytes": 2076,
+      "sha256": "70abef7af47a89fe7b3564b06813f1111ddf092e15cf2b3b2ac48bd3f2051fe7"
+    },
+    "receipts/mvp024-codex-pid-focused-r1-results.json": {
+      "bytes": 698,
+      "sha256": "a5ac9eb990ee49f581293aac6fe301916ab1b0f16eda25c26c2d4aeb96485c84"
+    },
+    "receipts/mvp024-codex-pid-focused-r1.admission.json": {
+      "bytes": 1110,
+      "sha256": "7c41a30108501c8e8dc9e303ecaf3af6cb5ab433dc24d6e49d186a2edb1e7acd"
+    },
+    "receipts/mvp024-codex-pid-focused-r1.collected.json": {
+      "bytes": 491,
+      "sha256": "d7e1060d5db7e554e30fe04e209f9b7d99f61a5e6a068e759c10d382a97531ee"
+    },
+    "receipts/mvp024-codex-pid-focused-r1.launch.json": {
+      "bytes": 329,
+      "sha256": "5aac610428ad922286bcf06f428701cdcd288c99cad989e1860265d98e2321c1"
+    },
+    "receipts/mvp024-codex-pid-focused-r1.log": {
+      "bytes": 3728,
+      "sha256": "768ba7a7ea1acf5c15cacf9c8a402f761df8b64246d99a6d9c320bc0b00065bd"
+    },
+    "receipts/mvp024-codex-pid-focused-r1.py": {
+      "bytes": 873,
+      "sha256": "e99f09874e273f2a20fca16276521d238b9dc5e63757686fa3b6ec26603ad784"
+    },
+    "receipts/mvp024-codex-pid-focused-r1.supervisor.log": {
+      "bytes": 223,
+      "sha256": "d1877195a025b0351102d9494287e0b4b06290929c86965cb647061532b02a49"
+    },
+    "receipts/mvp024-codex-pid-focused-r1.terminal.json": {
+      "bytes": 235,
+      "sha256": "26f916c3626e67dfb9f6a87953e8035c6e9968d9fe1772e4eec00e3175f44f56"
+    },
+    "receipts/mvp024-codex-pid-instructions-r1.json": {
+      "bytes": 2027,
+      "sha256": "dea5eb58168e6735bd30b01974a5ae2f712df6408ab20652734695acd2a9746e"
+    },
+    "receipts/mvp024-codex-pid-publication-green-r1.json": {
+      "bytes": 1216,
+      "sha256": "e044c8089c4efe237721b4bdfdc9beb7dd8d76b165deb79635a797bbcef52bab"
+    },
+    "receipts/mvp024-codex-pid-publication-probe-r1.py": {
+      "bytes": 3229,
+      "sha256": "62a0422a40aff1e96e907c38685c53a39e08ca3ff10707cf481a12a75dff9d58"
+    },
+    "receipts/mvp024-codex-pid-publication-probe-r2.py": {
+      "bytes": 3255,
+      "sha256": "9f34cdefe29a790c7dc86efcbc348536addd0cd90fb64cb6cba74a9c2beb4d2a"
+    },
+    "receipts/mvp024-codex-pid-publication-red-r1.json": {
+      "bytes": 1111,
+      "sha256": "a67f179ec160a3233e47ab98671be04155bb33b2a5bd7a36b7de00c2d3127a62"
+    },
+    "receipts/mvp024-codex-pid-publication-red-r2.json": {
+      "bytes": 1211,
+      "sha256": "c4cbf87c6225a7cfe58f9e6557e4cd489ae4d21029b7b2e375a5e9a61c0a3e0e"
+    },
+    "receipts/mvp024-native-canonical-failure-selector-r1.admission.json": {
+      "bytes": 1184,
+      "sha256": "d812543ef22e7ad45aa3a72b261a09cdb885fc4b454435ba9e1785d813521b17"
+    },
+    "receipts/mvp024-native-canonical-failure-selector-r1.collected.json": {
+      "bytes": 472,
+      "sha256": "071f3f2896cc2ae81c404f95fb5645ce16de76e516e99813c21c6b4a68028885"
+    },
+    "receipts/mvp024-native-canonical-failure-selector-r1.launch.json": {
+      "bytes": 419,
+      "sha256": "d8fd79937674fae55ac0853ad4afac5b4b6bc41c3eaf3340d240e91273f13fd0"
+    },
+    "receipts/mvp024-native-canonical-failure-selector-r1.log": {
+      "bytes": 434,
+      "sha256": "f7f4feb5d17c728874f2aec8da4e9cb58f083a41787b660419665f97987a16db"
+    },
+    "receipts/mvp024-native-canonical-failure-selector-r1.supervisor.log": {
+      "bytes": 225,
+      "sha256": "96a9bd80c073fb73b6fbeed4cebcbe16b5b2a340b4acb930c464ed89e1efba4c"
+    },
+    "receipts/mvp024-native-canonical-failure-selector-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "2081109a88e56ee7fd714bfddc58d010541bcccc20c28543bee133db655465cc"
+    },
+    "receipts/mvp024-native-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "587d5d5dee9dedc9790f4f73a0d82c8ab748179940e913e45d5ef6748f769142"
+    },
+    "receipts/mvp024-native-canonical-r1.collected.json": {
+      "bytes": 479,
+      "sha256": "7f6e6bd0628c379c8ffe2a7cfc9e066331bf718d383f30596bb5980f03b73624"
+    },
+    "receipts/mvp024-native-canonical-r1.launch.json": {
+      "bytes": 221,
+      "sha256": "1fb44584b46297aef12f5e0a6c4373473c93a88ad72f1d0abc8ade00a5b98c48"
+    },
+    "receipts/mvp024-native-canonical-r1.log": {
+      "bytes": 47067,
+      "sha256": "1d58c46b78a1ffc187141fe90fd7d7a8302aa369e505e2839ede914e5b3e9cc7"
+    },
+    "receipts/mvp024-native-canonical-r1.supervisor.log": {
+      "bytes": 227,
+      "sha256": "5423f96a7baac3c9eeb47760e7cc98c07dfd62e85d5827699ba158f0e073f586"
+    },
+    "receipts/mvp024-native-canonical-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "7279b537db7f5e8b3d3ad09f07fc2e38a355b247314df24e8bb10bf2b3ca8e4d"
+    },
+    "base/tests/fixtures/codex/0.164.0/runner_host.py": {
+      "bytes": 21789,
+      "sha256": "57120200fd24c33e94172093bc6b5893cd61f075da83c807253a6fd530579754"
+    },
+    "candidate/tests/fixtures/codex/0.164.0/runner_host.py": {
+      "bytes": 21978,
+      "sha256": "5196dc690ff23e76d961625d226a6cf8d23d0587c2d22e516a63cb63d6853c81"
+    },
+    "identity.json": {
+      "bytes": 587,
+      "sha256": "b9e63016636e1deeee850fbcd1807bb4355d3f5cbb44d39ae09abf26664672b5"
+    }
+  }
+}
