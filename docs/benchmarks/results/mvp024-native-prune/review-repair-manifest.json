@@ -1,0 +1,234 @@
+{
+  "head": "c0de4542ff09c05dd06d3a64fc67800c765c31bb",
+  "tree": "e924fe8bc4a6ea204fc8c9c25ac585cae4d2a221",
+  "scope": "Historical b801 canonical PASS and independent R1 FAIL; unchanged-test lease RED/GREEN, related checks and normal repair commit. Not final successor gate/review or scale acceptance.",
+  "native_data": "Removed after hash/ownership/cgroup/FD checks; inventories retained.",
+  "zip_sha256": "fb52a90308f94298c192ce8114701d5f630b2b40ff96a42cdb8a783eb6cdf0d9",
+  "zip_bytes": 70610,
+  "members": {
+    "receipts/mvp024-prune-lease-baseline.rs": {
+      "bytes": 11631,
+      "sha256": "12ab1e0d8c2eea9518abc864666edd1dbd003347b3406e7e1bf787805908531c"
+    },
+    "receipts/mvp024-prune-lease-commit-r1.json": {
+      "bytes": 781,
+      "sha256": "5c501b154b6be988fe7e79b194425a9fb5eadc2be787c4463b97769b33af122c"
+    },
+    "receipts/mvp024-prune-lease-green-r1.admission.json": {
+      "bytes": 1192,
+      "sha256": "5e51dc9bd466122700cde7ef59a9437b2f68759fb83e4e2e1226cd55e598e475"
+    },
+    "receipts/mvp024-prune-lease-green-r1.collected.json": {
+      "bytes": 440,
+      "sha256": "f7d9603536343ef89dbfe80a7ebfb10eb1e18879b52654179f9cc9872f73f295"
+    },
+    "receipts/mvp024-prune-lease-green-r1.launch.json": {
+      "bytes": 411,
+      "sha256": "3e570a381daaf42405a32d6d85284cf64cdff3c964ab876916d703d5ea2a62bb"
+    },
+    "receipts/mvp024-prune-lease-green-r1.log": {
+      "bytes": 580,
+      "sha256": "f582b07e94cc597589a4487aeca200ad8cb1a86fb68d2758892ccd1ee5e85827"
+    },
+    "receipts/mvp024-prune-lease-green-r1.supervisor.log": {
+      "bytes": 224,
+      "sha256": "d2786505aab0eedd6c7362ae387d9b1e0b9474c1dc25a7c9bafa9967432ebbe2"
+    },
+    "receipts/mvp024-prune-lease-green-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "7a3563f0205e2baa2acfc12fb262264fe6935319432319f850812bf2d39a6570"
+    },
+    "receipts/mvp024-prune-lease-green-verified.json": {
+      "bytes": 651,
+      "sha256": "a98394b680b9ac02c9ba631c107a071c142ccecf2ebea66ea30c233ac66820a2"
+    },
+    "receipts/mvp024-prune-lease-red-preflight.json": {
+      "bytes": 1120,
+      "sha256": "e8df0fea19a3cc0da857d050dc92bdf354a2e50c1d56c82cfbeaca48eda2ed67"
+    },
+    "receipts/mvp024-prune-lease-red-r1.admission.json": {
+      "bytes": 1192,
+      "sha256": "45a4a09e558ce361b6be1856348432a6ec4b718a6d57194161bc155899c1de70"
+    },
+    "receipts/mvp024-prune-lease-red-r1.collected.json": {
+      "bytes": 452,
+      "sha256": "d0edd2739c4f9d80dee1201fecfb14d4af1b2ce25ae10d8a9f066af77dc5fded"
+    },
+    "receipts/mvp024-prune-lease-red-r1.launch.json": {
+      "bytes": 409,
+      "sha256": "e89c943a7bb1c8c93d6fc839646c4838a5cb1883b14627cc289d14ad6e006c88"
+    },
+    "receipts/mvp024-prune-lease-red-r1.log": {
+      "bytes": 1085,
+      "sha256": "dca4583861ab4027fc5e0e76aae2de22e4799da18443d00afb42d6974e607d33"
+    },
+    "receipts/mvp024-prune-lease-red-r1.supervisor.log": {
+      "bytes": 227,
+      "sha256": "de030517996a27e83fe5279c305edf3069d36130a3ec7e56c424f9a2e835f9e1"
+    },
+    "receipts/mvp024-prune-lease-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "fde15ad8edb95e1a7b0688a881e0296960df66e3caa56a72aea133b08c2ef86c"
+    },
+    "receipts/mvp024-prune-lease-red-test.rs": {
+      "bytes": 3980,
+      "sha256": "994d126519dd7369fc64aea660819d5454fbcadc58ae1fb2c4a0d715a9066717"
+    },
+    "receipts/mvp024-prune-lease-red-verified.json": {
+      "bytes": 650,
+      "sha256": "2e2e27081c0c1ef6ed1e880aa4f56613257a12795f9d48ba23fa6541d8a5caef"
+    },
+    "receipts/mvp024-prune-lease-regression-r1.rs": {
+      "bytes": 3293,
+      "sha256": "9c2e5db027f974e52f041ebf6a8a1d77edda96d70bdb7d643a7845d9abce8c00"
+    },
+    "receipts/mvp024-prune-lease-related-r1.admission.json": {
+      "bytes": 1112,
+      "sha256": "7c8f69f6496c9bd795d567359028b1238ae09235d3c398c2e02619723fb75390"
+    },
+    "receipts/mvp024-prune-lease-related-r1.collected.json": {
+      "bytes": 475,
+      "sha256": "a5734fd76384d2d89d4531d15349d1d942a9447d5b546e803b5056b1b1c05e2f"
+    },
+    "receipts/mvp024-prune-lease-related-r1.launch.json": {
+      "bytes": 333,
+      "sha256": "631acd7268f72a0538bdd9489f705cd168db17ad529b551368b1815212e14e31"
+    },
+    "receipts/mvp024-prune-lease-related-r1.log": {
+      "bytes": 5275,
+      "sha256": "7f19c4f3c78477c87ce9fb60a8056ac5829ac942673dd71e8cc53f43ac0fd704"
+    },
+    "receipts/mvp024-prune-lease-related-r1.py": {
+      "bytes": 600,
+      "sha256": "47c9abe34bc0071cf1c352924fba40db3dd3b8a1304b84af1c35d241c21bf0e8"
+    },
+    "receipts/mvp024-prune-lease-related-r1.supervisor.log": {
+      "bytes": 224,
+      "sha256": "cf455792f308f577312ba9196d847a60cc3178ccf0fdd91b832ee69a3ace401c"
+    },
+    "receipts/mvp024-prune-lease-related-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "67ca38701fae43145921ce5c905b46c2fc766e306bdf80d57364261387a7103f"
+    },
+    "receipts/mvp024-prune-lease-related-verified.json": {
+      "bytes": 1246,
+      "sha256": "8745dde48969e459e46a8e51cbff6d73aa30dc501700cbd186c408df99f7166e"
+    },
+    "receipts/mvp024-index-prune-review-r1-archives.json": {
+      "bytes": 923,
+      "sha256": "d7340b1b16c369f9cd78423a9f33aa2481d6aa10ef3b05ea3e8c95d5fbb2e7e0"
+    },
+    "receipts/mvp024-index-prune-review-r1-final.json": {
+      "bytes": 807,
+      "sha256": "ec9c6a3750b53d629f68f8c29ee991234204865a4ab0c995ba2c027b32555a72"
+    },
+    "receipts/mvp024-index-prune-review-r1-instructions.json": {
+      "bytes": 15648,
+      "sha256": "049eb2f4f954a86ed37d7dcabcc12bc2e3b7ae5ae63440e55cbc4cbd73409e86"
+    },
+    "receipts/mvp024-index-prune-review-r1-parent-classification.json": {
+      "bytes": 940,
+      "sha256": "29252048f5550787a954d6cbe08411acd1d8ee227af9a0b26bb25898f80a9e97"
+    },
+    "receipts/mvp024-index-prune-review-r1-postflight.json": {
+      "bytes": 2994,
+      "sha256": "2d044f5ed7a76f97bf7f3130054f7bbc883074594c45fe6a83ccbbacfbc33391"
+    },
+    "receipts/mvp024-index-prune-review-r1-scope.json": {
+      "bytes": 4709,
+      "sha256": "03a87909b4fdb2b6f01d7bb0590db0413c5fe3fe60882ace0a936d834012668c"
+    },
+    "receipts/mvp024-index-prune-review-r1-tests.log": {
+      "bytes": 6261,
+      "sha256": "262e9e504a4ee5749c4777d6957b79d750b9ce36f9fe726598ce4e7d88f276b7"
+    },
+    "receipts/mvp024-index-prune-review-r1-transport-cleanup.json": {
+      "bytes": 849,
+      "sha256": "e38e9cdde19b4b5ce80b7d59ac0591088e2f44460f0eaa82cedbe48acaf93842"
+    },
+    "receipts/mvp024-index-prune-review-r1.exit.json": {
+      "bytes": 2206,
+      "sha256": "a8033ae097b3f6a062d9fd758307d715de95d0dbf4d4d1153ab548df0d3b8eda"
+    },
+    "receipts/mvp024-index-prune-review-r1.md": {
+      "bytes": 11984,
+      "sha256": "1fbd2dead2e948b63db2b8c0d4d2a920e0a1f3e18bd528378f76e0ca8367cee3"
+    },
+    "receipts/mvp024-index-prune-review-r1.py": {
+      "bytes": 2738,
+      "sha256": "ab2eb3bd6250f48b634a6157c2e2162cae1f0920adf114dd8e56329c54d076d4"
+    },
+    "receipts/mvp024-index-prune-review-launch-r1.admission.json": {
+      "bytes": 1111,
+      "sha256": "db5073cd144c79469cb89b6a72bed6b61c4a6f460dfefc08ad25af8d5c55e981"
+    },
+    "receipts/mvp024-index-prune-review-launch-r1.collected.json": {
+      "bytes": 398,
+      "sha256": "b20eef6616d9fb5fbb3867820838fc59ece155bb7e8dfd35eb002b1e54b96f61"
+    },
+    "receipts/mvp024-index-prune-review-launch-r1.launch.json": {
+      "bytes": 338,
+      "sha256": "5049b2f4cf02c841eb4aa468600e5644e887af674304ce5ab74ad495f6ee0639"
+    },
+    "receipts/mvp024-index-prune-review-launch-r1.log": {
+      "bytes": 2055,
+      "sha256": "f34ea8557576e2657aab08ba393b1563eaf04d1ad07a619d6f33ab6cd9a3243d"
+    },
+    "receipts/mvp024-index-prune-review-launch-r1.supervisor.log": {
+      "bytes": 224,
+      "sha256": "4a173c626168730b65057d6808a1943aeb04f5fa31a45cc624cc8f4c2f66cf3e"
+    },
+    "receipts/mvp024-index-prune-review-launch-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "df1bd4ac5fcc29711acaaa76d8b573add8c6da46dc1a211211a6c4efa9968710"
+    },
+    "receipts/mvp024-index-prune-canonical-r3-preflight.json": {
+      "bytes": 4370,
+      "sha256": "1cb7a78e22be0fb1fd9dc2cc713617b1d01685467deb4e141c0df1843bd557df"
+    },
+    "receipts/mvp024-index-prune-canonical-r3-verified.json": {
+      "bytes": 1149,
+      "sha256": "965890d94757cbba6d7e37acba8671b23af23ff78bfd11a16566e2d10fd2de81"
+    },
+    "receipts/mvp024-index-prune-canonical-r3.admission.json": {
+      "bytes": 1003,
+      "sha256": "575dd8ae5cb2ff6117af02d46819b2c0cc96957952863cdcbe4c40b5af81642b"
+    },
+    "receipts/mvp024-index-prune-canonical-r3.collected.json": {
+      "bytes": 401,
+      "sha256": "32bc4569dc6db8a4928b2e3a8dfbfa8edfa04d0b3630951bf35d8a09ac55743f"
+    },
+    "receipts/mvp024-index-prune-canonical-r3.launch.json": {
+      "bytes": 226,
+      "sha256": "325abbbdc9b26a8df19cf900ffbcadc307158f175b4b36b880782af773f00b1d"
+    },
+    "receipts/mvp024-index-prune-canonical-r3.log": {
+      "bytes": 72181,
+      "sha256": "a2d60da2b569fcb3879a7d2c6cbe33c4f0ce967cce09bf2286af82cd5b0de392"
+    },
+    "receipts/mvp024-index-prune-canonical-r3.supervisor.log": {
+      "bytes": 225,
+      "sha256": "3209a3769b42328b33fb873f71516bfc8ad8ab720c05a274efd78bbb2ebf19be"
+    },
+    "receipts/mvp024-index-prune-canonical-r3.terminal.json": {
+      "bytes": 237,
+      "sha256": "1621f15f16494ada9563e0874321e5943206923513681d44224120a823949006"
+    },
+    "review-brief.md": {
+      "bytes": 7427,
+      "sha256": "df4c0dc758adf1b29cf808d168e0cd1e5aa538375e7fde9b9290e101524aa107"
+    },
+    "source/c0de4542ff09c05dd06d3a64fc67800c765c31bb/src/daemon/retrieval.rs": {
+      "bytes": 15784,
+      "sha256": "028c6335f1b1932a2d464bd36ae57fd37e652d42c311693755cfb0bc4ed33b6d"
+    },
+    "identity.json": {
+      "bytes": 396,
+      "sha256": "ae2e37fdb6e90bb8a37a7c2b49924b563d82777c93c2207067d153d7736791ee"
+    },
+    "archive-builder.py": {
+      "bytes": 5223,
+      "sha256": "4c1c82f22a51da433fc4953d6ebc54e368280c5997c21f0726a0e61bf19de8d8"
+    }
+  }
+}

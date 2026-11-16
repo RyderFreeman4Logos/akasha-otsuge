@@ -1,0 +1,262 @@
+{
+  "head": "c0de4542ff09c05dd06d3a64fc67800c765c31bb",
+  "tree": "e924fe8bc4a6ea204fc8c9c25ac585cae4d2a221",
+  "scope": "Diagnostic malloc observation failed a disk-stat race and lost cgroup delegation due to inherited preload. Fixed mmap threshold alone still failed IPC at 6270/8322 and exceeded sampled 640 MiB RSS. Neither is acceptance; original IPC cause remains unclassified. Source fixed at b801 with b909 binary; referenced shared inputs are stored once in existing scale-comparison.zip.",
+  "native_data": "Removed after hash/ownership/cgroup/FD checks; inventories retained.",
+  "zip_sha256": "745cc6dd0462092fc22c05398709e063c0bfa8973a3b3f6e83e63c464a2013dd",
+  "zip_bytes": 551067,
+  "members": {
+    "receipts/mvp024-production-allocator-observe-r1-build.json": {
+      "bytes": 1711,
+      "sha256": "f5d7c44866e63ec8ba1c2a0b522cbb1ea72d2aabebd62012467e7884ef7b5778"
+    },
+    "receipts/mvp024-production-allocator-observe-r1-cleanup-admission.json": {
+      "bytes": 5675,
+      "sha256": "62fa432adc3388c47adc02d4cc79bb3d3204cb1f1ad6c046e58fe6747af7557d"
+    },
+    "receipts/mvp024-production-allocator-observe-r1-cleanup.json": {
+      "bytes": 5794,
+      "sha256": "f4932c838f1af81e9dbde475061778b849019aa41c83d8f5589b4429185d6e78"
+    },
+    "receipts/mvp024-production-allocator-observe-r1-preparation.json": {
+      "bytes": 612,
+      "sha256": "b6ea3fed80269313d81fd5fea5d8bd6cc4e204ed948b36718812141bd0fc5b33"
+    },
+    "receipts/mvp024-production-allocator-observe-r1-verified.json": {
+      "bytes": 182572,
+      "sha256": "e15b60b7f5a4cf8e77e1868d3abf5bbd2bf1d85a55e8941c625b6da6122bb89d"
+    },
+    "receipts/mvp024-production-allocator-observe-r1.admission.json": {
+      "bytes": 1145,
+      "sha256": "17b3b453d9d5e6b8539eb2049775d1a5e503bca9f5635a0f0559f2c23928ffae"
+    },
+    "receipts/mvp024-production-allocator-observe-r1.collected.json": {
+      "bytes": 403,
+      "sha256": "cb0b7bd7f51254cd8c27a9c49bf3a8d56b334ca1aecd9477e8720f70b633802e"
+    },
+    "receipts/mvp024-production-allocator-observe-r1.launch.json": {
+      "bytes": 375,
+      "sha256": "d2443075c775438588e59359c33d3bafa6eab5ec5f67b27f9c32cdb2e419f695"
+    },
+    "receipts/mvp024-production-allocator-observe-r1.log": {
+      "bytes": 1440,
+      "sha256": "ac26b342fff261e460dfb93a328a67b2828a3cc3360c8b00e35a802e0e5f801b"
+    },
+    "receipts/mvp024-production-allocator-observe-r1.py": {
+      "bytes": 17101,
+      "sha256": "d629c6a65a735ea18d3a8e4219bc63c47749bdb1c51e09d6e2a6159cb81c8ca9"
+    },
+    "receipts/mvp024-production-allocator-observe-r1.supervisor.log": {
+      "bytes": 224,
+      "sha256": "354b0cc0243c2cce6d73a06304db63124d4458704e5010bb6983aed72d5c426f"
+    },
+    "receipts/mvp024-production-allocator-observe-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "fe4b632276da62c02b957156bcbee81084649f2bf000dc49e3deb69138f4a671"
+    },
+    "receipts/mvp024-production-mmap-control-r1-build.json": {
+      "bytes": 1844,
+      "sha256": "564d361498a117ceef057c6b5a92f7a90d807bc47b6dae6a8f9ec27cab368f28"
+    },
+    "receipts/mvp024-production-mmap-control-r1-cleanup-admission.json": {
+      "bytes": 5495,
+      "sha256": "2b1e3d3c3751c7cec950f098d890b548d6d1cce5cc3821cebed425fc21c9db97"
+    },
+    "receipts/mvp024-production-mmap-control-r1-cleanup.json": {
+      "bytes": 5614,
+      "sha256": "1637c27ee5b292297bb5258fd07e4392b871b9627ccb7ba0483e7f197c4e9c4a"
+    },
+    "receipts/mvp024-production-mmap-control-r1-driver.diff": {
+      "bytes": 5736,
+      "sha256": "9382d5fec198dfb98327840c662ad3fed7d2cc7223923a808b66ff274d5ec01a"
+    },
+    "receipts/mvp024-production-mmap-control-r1-verified.json": {
+      "bytes": 133752,
+      "sha256": "f03e2b4198f1cc43ed3362c8f6f701f67c62d8bc4949b711808d887b55972216"
+    },
+    "receipts/mvp024-production-mmap-control-r1.admission.json": {
+      "bytes": 1140,
+      "sha256": "e5a9e9dc178dfd9a013a0958f2a12364fd19e88aa27da359b253968306c974dd"
+    },
+    "receipts/mvp024-production-mmap-control-r1.collected.json": {
+      "bytes": 461,
+      "sha256": "4e646a92870d38b93068e09b8df97bb5701900691353cea9b81e49499ddca243"
+    },
+    "receipts/mvp024-production-mmap-control-r1.launch.json": {
+      "bytes": 365,
+      "sha256": "02ba89619d79e1b6ad9550beac9377df2e49ea5203b2fa40c38802a1eb5576ce"
+    },
+    "receipts/mvp024-production-mmap-control-r1.log": {
+      "bytes": 956,
+      "sha256": "b6715347f192352cca823bc34076e9fcc3fbdedc52ac86cf9e42fa20b7af0f53"
+    },
+    "receipts/mvp024-production-mmap-control-r1.py": {
+      "bytes": 19913,
+      "sha256": "dca95c31164a548d13c168a05bd22c2be9c7ce59b5eff17d7231f60cfc63055b"
+    },
+    "receipts/mvp024-production-mmap-control-r1.supervisor.log": {
+      "bytes": 225,
+      "sha256": "a69150de77db3a3a4cfaef1b0bf62d02acb2d589e98696214672e06168b6ae2a"
+    },
+    "receipts/mvp024-production-mmap-control-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "6cded85bffcf1621d455589a9de54c27a425047dcc0345e1a975f074bc28ac3d"
+    },
+    "receipts/mvp024-allocator-observation-r1-design.json": {
+      "bytes": 1526,
+      "sha256": "3871f58d95e9eee8f0ade9761f7892a030c2dc1cdc04b361a660b482e8e72a83"
+    },
+    "receipts/mvp024-allocator-observer-r1-selfcheck.json": {
+      "bytes": 876,
+      "sha256": "4a6650243a9e8cc6dde1f853c7a013a650ce3cae8fc9736532bcc8bde209d7a7"
+    },
+    "receipts/mvp024-pending-fts-maintenance-budget-r1.json": {
+      "bytes": 1939,
+      "sha256": "3ae1145f3c6eaf018283bdf23ed47d2714fa043390e231662b6fca8b57901c59"
+    },
+    "mvp024-production-allocator-observe-r1/admission.json": {
+      "bytes": 2257,
+      "sha256": "49a508f2c960793468b50566ebecb2caef9e1100d7f93911296e3a6c9a06e56d"
+    },
+    "mvp024-production-allocator-observe-r1/commands.jsonl": {
+      "bytes": 33661,
+      "sha256": "8abe62b47e11268185cdcc3c6e3af0af4d58d0436b11b4023ffdee12142e9902"
+    },
+    "mvp024-production-allocator-observe-r1/daemon-process.json": {
+      "bytes": 67,
+      "sha256": "ee34b5ce6c76efc52ee147ea93041885010f24676e9a1a689133d21b65975032"
+    },
+    "mvp024-production-allocator-observe-r1/daemon.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-allocator-observe-r1/daemon.toml": {
+      "bytes": 251,
+      "sha256": "ab046db695fe10200058c3182575ba7705eb701fcf834f0f851f4238575529ed"
+    },
+    "mvp024-production-allocator-observe-r1/disk-latest.json": {
+      "bytes": 82,
+      "sha256": "f2ae9cd4798f95be25fb4dbf683d19b56e61c4454c7c8443d652fc295f815901"
+    },
+    "mvp024-production-allocator-observe-r1/failure.json": {
+      "bytes": 555,
+      "sha256": "a84c4399ae28a85293f9c7a66ac537d4632717ae34d4b3c1ccde97403f2e50e8"
+    },
+    "mvp024-production-allocator-observe-r1/initial-status.json": {
+      "bytes": 1625,
+      "sha256": "99a414a2d02c5eb0e724abb1dd04de391c4f8f9f5957278b1b01f7c9144b0022"
+    },
+    "mvp024-production-allocator-observe-r1/malloc-info.log": {
+      "bytes": 2617489,
+      "sha256": "09e0ec66a82a19220a932a49035431c401019bcd9f4ea90530dfe353da37472f"
+    },
+    "mvp024-production-allocator-observe-r1/metrics.jsonl": {
+      "bytes": 61558,
+      "sha256": "9e4a9956a244b14bf43d7712c34bf563046858ba4b98a818fd2b00aa95dda4ee"
+    },
+    "mvp024-production-allocator-observe-r1/progress.json": {
+      "bytes": 378,
+      "sha256": "593242757576a8d4e9b82be9d27c206d3fc4393928f8b56cfefd627ebb2644b9"
+    },
+    "mvp024-production-allocator-observe-r1/progress.yaml": {
+      "bytes": 378,
+      "sha256": "593242757576a8d4e9b82be9d27c206d3fc4393928f8b56cfefd627ebb2644b9"
+    },
+    "mvp024-production-allocator-observe-r1/seed-process.json": {
+      "bytes": 67,
+      "sha256": "5ded8b4b9bc945ee01caa156d6fb4137db742be469427d530b3f45a4d246726b"
+    },
+    "mvp024-production-allocator-observe-r1/seed.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-allocator-observe-r1/state.json": {
+      "bytes": 617,
+      "sha256": "ff69e7db77047ff0d52fa5cdd9ed460b7c223175f40315c81f985778a3c65d1f"
+    },
+    "mvp024-production-mmap-control-r1/admission.json": {
+      "bytes": 2275,
+      "sha256": "63b8dd739b769be42cecb144f9063c4a4e8106454ba680fdd6432461fc35362f"
+    },
+    "mvp024-production-mmap-control-r1/commands.jsonl": {
+      "bytes": 96876,
+      "sha256": "7929ba853dbbfbb59c711a07b745fe55e8f9f5c9b0fd905eaed9a7de7b1649f1"
+    },
+    "mvp024-production-mmap-control-r1/daemon-process.json": {
+      "bytes": 67,
+      "sha256": "41b2e94a8207058bb733a22dbc80e0a2aa58a92c3105019df799e40f50627ff2"
+    },
+    "mvp024-production-mmap-control-r1/daemon.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-mmap-control-r1/daemon.toml": {
+      "bytes": 246,
+      "sha256": "a34c2feac5623dc7af2a0ce54cd7cd290349410593b77e2d434dbcf887d804b4"
+    },
+    "mvp024-production-mmap-control-r1/disk-latest.json": {
+      "bytes": 106,
+      "sha256": "093152f36c05b34605b8be391b7bbb8a7c56c37522d0c64faaa17a0244fc054d"
+    },
+    "mvp024-production-mmap-control-r1/failure.json": {
+      "bytes": 472,
+      "sha256": "9ff388215c858396655471a214d4e222f67305311dc5ede1cee3b5ad2db6ff66"
+    },
+    "mvp024-production-mmap-control-r1/initial-status.json": {
+      "bytes": 3000,
+      "sha256": "7065ab5441a809cea07ffe859fb2a145f61098221320943bdb4ffca1e81b18cc"
+    },
+    "mvp024-production-mmap-control-r1/metrics.jsonl": {
+      "bytes": 467389,
+      "sha256": "c6e7a7795167d41b0ccc494cc41f28198b40841fce14ba88a6b12a895ce4c451"
+    },
+    "mvp024-production-mmap-control-r1/progress.json": {
+      "bytes": 380,
+      "sha256": "be2fd4467fb39682ec3c4b7fec357719004024cc9e7ed37b96af7cb5f2cd276e"
+    },
+    "mvp024-production-mmap-control-r1/progress.yaml": {
+      "bytes": 380,
+      "sha256": "be2fd4467fb39682ec3c4b7fec357719004024cc9e7ed37b96af7cb5f2cd276e"
+    },
+    "mvp024-production-mmap-control-r1/seed-process.json": {
+      "bytes": 67,
+      "sha256": "ea217316f443329b2e87bcb9842f7dda741e86ff787ec540cff3687764539e66"
+    },
+    "mvp024-production-mmap-control-r1/seed.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-mmap-control-r1/state.json": {
+      "bytes": 534,
+      "sha256": "8457dc4eb4d4d658f940bb0b387e5c179651cb2af684424f79b08290aaac1fb6"
+    },
+    "shared-input-references.json": {
+      "bytes": 2394,
+      "sha256": "841fb6a64ebcb51e121215c0382e04b279f7fb95045d3da7cf7c8e7ae0e697e0"
+    },
+    "observer/build.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "observer/observe.c": {
+      "bytes": 1443,
+      "sha256": "e448c22f44ef0d9df034049e1eb7a23ddee5692395b7474f85c93f4fbadc23d7"
+    },
+    "observer/observe.so": {
+      "bytes": 16344,
+      "sha256": "07bbc1413d6fa5716982b65b66706caec346035651a7e205b32481272d433c90"
+    },
+    "observer/selfcheck.log": {
+      "bytes": 652,
+      "sha256": "8907f4e7f59a0fd75b14fc408ccf9a6b253ee62089b001264f942f16767cae65"
+    },
+    "identity.json": {
+      "bytes": 590,
+      "sha256": "bb59104124e347136b0cf9680d8f51e83be4ef074b28c9a6859bde4041fd65aa"
+    },
+    "archive-builder.py": {
+      "bytes": 5223,
+      "sha256": "4c1c82f22a51da433fc4953d6ebc54e368280c5997c21f0726a0e61bf19de8d8"
+    }
+  }
+}

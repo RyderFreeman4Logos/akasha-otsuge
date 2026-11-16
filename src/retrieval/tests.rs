@@ -170,7 +170,7 @@ async fn one_authority_batch_bounds_native_versions_and_keeps_every_lexical_row(
         expected
     );
     let versions = index.table.version().await.unwrap() - before;
-    // Includes initialization of both native indices and their first optimization.
+    // Includes native-index initialization and the first optimization.
     assert!(
         versions <= 8,
         "one bounded authority batch created {versions} native versions"

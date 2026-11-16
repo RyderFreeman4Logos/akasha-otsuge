@@ -299,6 +299,26 @@ impl Index {
         Ok(())
     }
 
+    // The daemon holds the cache lock and proves no query owns this index before pruning.
+    pub(crate) async fn prune_versions(
+        &self,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        let vector = self.vector.lock().await;
+        for table in std::iter::once(&self.table).chain(vector.as_deref().map(|v| &v.table)) {
+            authorize()?;
+            table
+                .optimize(lancedb::table::OptimizeAction::Prune {
+                    older_than: Some(chrono::Duration::zero()),
+                    delete_unverified: Some(false),
+                    error_if_tagged_old_versions: Some(true),
+                })
+                .await
+                .map_err(index_error)?;
+        }
+        Ok(())
+    }
+
     pub(crate) async fn vector_index(
         &self,
         storage: &Storage,
@@ -401,12 +421,14 @@ impl Index {
         pending.flush(&self.table).await?;
         if changed || before == 0 {
             let indices = self.table.list_indices().await.map_err(index_error)?;
-            if !indices.iter().any(|i| i.columns == ["scope"]) {
-                self.table
-                    .create_index(&["scope"], NativeIndex::BTree(BTreeIndexBuilder::default()))
-                    .execute()
-                    .await
-                    .map_err(index_error)?;
+            for column in ["key", "scope"] {
+                if !indices.iter().any(|i| i.columns == [column]) {
+                    self.table
+                        .create_index(&[column], NativeIndex::BTree(BTreeIndexBuilder::default()))
+                        .execute()
+                        .await
+                        .map_err(index_error)?;
+                }
             }
             if !indices.iter().any(|i| i.columns == ["body"]) {
                 self.table

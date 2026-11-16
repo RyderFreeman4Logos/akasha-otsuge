@@ -24,8 +24,9 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on fix/mempal-output-lock-release, based
-on reviewed e5746ac from PR #67. PR #63 completed controlled budget-change drain/reopen and published
+The existing SSD worktree is reused on feat/mvp-024-index-maintenance, combining
+native version pruning and merge-key indexing with the merged Mempal repair.
+PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
 PR #64 completed measured job admission, native worker reservations and separate
@@ -50,8 +51,70 @@ all-target Clippy. The [paired measurement archive](../benchmarks/results/mvp024
 retains identical inputs/acknowledgements/oracle, all failures and both stopped
 stores' cleanup: successor indexing took 10.559 seconds with 86,781,952 search
 bytes, 912 files and 132 native versions. RSS sampled peak increased; no memory
-improvement or scale extrapolation is claimed. Final gate, review and publication
-remain, followed by further derived-index growth/reclamation before scaling.
+improvement or scale extrapolation is claimed. PR #67's final exact gate passed
+633 Rust executions (39 ignores), Python 35 and Node 7. Independent conventional
+review passed with zero findings and 37 fresh tests; its complete report and
+parent citation corrections are published. Hosted CI43009584075 passed; merge
+b71b18d has exactly the reviewed e5746ac tree.
+The next [exclusive version-pruning leaf](../benchmarks/results/mvp024-native-prune/README.md)
+is committed as c0b9a96 after unchanged RED/GREEN and 33 related retrieval tests.
+Its identical 1,024-record pilot retains all current-claim and partition oracles
+with 5,332,992 allocated search bytes, 77 files and one native version. Both pilot
+processes exited and their disposable store/socket were removed. Commit e36916a
+also adds the missing BTree merge-key index to both native tables; an unchanged
+behavioral RED/GREEN proves native indexed lookup, and 34 related tests plus
+Clippy pass. Two earlier fixture compilation failures remain separate.
+The larger identical-input pilots both failed: 8,192 records / 35,875,218 unique
+bytes / 8,322 claims reached 3,140 and 3,380 indexed rows before the public status
+IPC timed out. Sampled RSS peaks were 691,466,240 and 689,385,472 bytes, both over
+640 MiB. The successor records growing anonymous memory and kernel high-pressure
+events; the precise timeout cause remains unclassified. Neither reached complete
+output oracles. All receipts are retained and both disposable stores were removed.
+The full `b801af9` gate passed 640 Rust executions / 39 ignores, Python 35 and
+Node 7, but independent R1 blocked publication for a missing per-prune execution
+lease check. Commit `c0de454` repairs the shared rebuild/prune guard after an
+actual native-deletion RED; unchanged-test GREEN, 35 related tests and Clippy
+pass. The following `5163147` gate r4 timed out in the unchanged installed
+daemon suite at 300 seconds; its last test and cause remain unavailable. The
+unchanged installed-entrypoint diagnostic passed 172 daemon tests in 251.03
+seconds, without explaining r4. Gate r5 then failed the incident root-revocation
+fixture after it restored access before workflow settlement. The exact isolated
+selector passed once; that does not override the failed full gate.
+
+[PR #69](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/69) preserves the
+existing runner barrier until the revoked runner exits, retaining the original
+PATH_DENIED, unchanged-memory and no-replay assertions. Both exact `bcec374`
+canonical gates pass 634 Rust executions / 39 intentional ignores, Python 35,
+Node 7 and installed lifecycle/UID/TCP checks. Its full independent review passes
+with zero findings and 26 fresh tests. Both hosted CI attempts failed in apt
+before project checks because the Ubuntu mirror DNS lookup failed. The single
+retry is exhausted; PR #69 remains a draft. The retained barrier prevents a
+normal successful runner result; PID disappearance alone does not prove the
+signal-level cancellation path. Historical r4 timeout causality remains unknown.
+
+Local merge `2512229` integrates the reviewed fixture into the maintenance
+branch without changing remote main or rewriting `5163147`. The
+[integration archive](../benchmarks/results/mvp024-native-prune/README.md#integration-validation)
+retains both failures, diagnostics, foundation gates, full review and CI failures.
+The merged candidate still needs its own gate and complete R2 review.
+
+- [ ] Pass the integrated maintenance candidate's exact canonical gate and
+  independent whole-range R2 review; retain every previous failed attempt.
+- [ ] Restore hosted CI execution after the recorded package-mirror DNS failure,
+  then publish PR #69 and the dependent maintenance changes with exact readback.
+- [ ] Bound effective FTS update memory/workers, verify a bounded production
+  control, and then complete the unchanged full corpus/load/recovery criteria.
+- [ ] Resolve the 37 oversized vector documents through verified licensed inputs
+  and documented model/vector identity, without increasing the product limit or
+  downloading another full corpus.
+The allocator observation supports retained free arenas but failed a disk census
+race and lacked cgroup delegation because the preload reached helper processes.
+A one-setting mmap control under enforced original limits still failed at
+6,270/8,322 and RSS 679,796,736 bytes. Both failed stores/sockets were removed.
+The setting alone is insufficient; full output oracles and exact IPC causality
+remain unresolved. Pinned Lance source also shows creation-only FTS memory/worker
+settings are not retained for default updates. Bound and verify those effective
+update limits in the next resource leaf, then resolve vector inputs and scale.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
@@ -72,18 +135,20 @@ localhost:48317, as a temporary substitute; substitute results are not
 Claude-native evidence. mp SSH access remains a separate external blocker.
 Every unfinished issue and its original dependencies is listed below.
 
-The pruning candidate is preserved at 2e320a4 on
-feat/mvp-024-index-maintenance. Its two causal regressions, 33 related retrieval
-tests and identical small corpus pilot passed; search allocated 5,332,992 bytes
-in 77 files with one native version. Its canonical gate failed in an unchanged
+The first pruning candidate 2e320a4 failed its canonical gate in an unchanged
 Mempal test with an unexpected busy result. That occurrence remains unclassified.
 The [separate Mempal lock leaf](../benchmarks/results/mempal-output-lock/README.md)
 proves and repairs retained-descriptor lock lifetime without changing the original
-assertion: five library and 17 public migration tests pass. Complete its exact
-gate, independent review and publication, then integrate it into the preserved
-pruning branch and finish that branch's gate/review/publication before scaling.
-PR #67's exact gate and independent review have passed; hosted CI43009584075 is
-still running. All original full-scale and downstream acceptance remains open.
+assertion: five library and 17 public migration tests pass. Its exact e7cef25 gate
+passes 634 Rust executions (39 ignored), Python 35 and Node 7; independent review
+passes with zero findings and 23 fresh tests. PR #68 is merged as 9f2ba15 with
+exactly the reviewed e7cef25 tree; the complete public review was read back and
+CI43020682782 passed with an actual cache hit. Its final archive retains those
+receipts. The integrated pruning branch's 767b39e canonical passed 638 Rust
+executions, Python 35 and Node 7 before the key-index change; this historical
+receipt does not qualify e36916a or the final documentation tree. Obtain the
+complete candidate's fresh gate/review/publication. All original full-scale and
+downstream acceptance remains open.
 
 ## Session operating rules
 
@@ -1127,6 +1192,15 @@ do not satisfy the full production stress acceptance.
   final verification, CI, publication and cleanup. No full-scale or new Daybreak
   acceptance is claimed.
 
+- [x] Repair the independently reviewed per-operation index-maintenance lease
+  gap through the shared rebuild/prune callback. Retain the native version-set
+  RED/GREEN and valid-owner controls; commit `c0de454` passes 35 related checks.
+  Final successor canonical gate, R2 review and publication remain separate.
+- [ ] Bound effective FTS update memory/worker settings after index reopen;
+  pinned Lance omits creation-only limits from persisted parameters. Preserve
+  original resource/timeout thresholds and prove the production path. Allocator
+  observation and the failed single-setting control are diagnostics, not fixes
+  or full-scale acceptance; preserve their confounds and unexplained IPC failures.
 - [ ] Validate a small production corpus/coverage pilot before full-data admission.
   Source chunks can be 64 KiB, while production claims are at most 32 KiB and
   vector input uses 4096-byte chunk means. Prove UTF-8-safe full-span coverage,

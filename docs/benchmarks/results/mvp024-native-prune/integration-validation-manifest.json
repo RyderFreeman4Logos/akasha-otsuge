@@ -1,0 +1,232 @@
+{
+  "integration_head": "2512229320e7fab90cc2a587cf7643e71569eda1",
+  "integration_tree": "3f55fbe842d17e026ff02234375266b62e7ecfa5",
+  "foundation_head": "bcec374895bed1f26491524059cf6a121fc0cc85",
+  "maintenance_before": "51631472a175317695c4ec303435d4cacbc97705",
+  "scope": "Historical failures, two exact foundation gates, complete independent review and two hosted apt/DNS failures. Local forward integration only; merged candidate validation and all scale acceptance remain pending.",
+  "prior_evidence": "../incident-revocation/evidence.zip preserves original r5 failure and focused repair; review-repair.zip preserves earlier maintenance R1 FAIL and lease repair.",
+  "zip_sha256": "a4d4d9a4bc663b49a574c8f9b388a9b2e2b6930ea0c44d92a31388cb6f18ccbd",
+  "zip_bytes": 102242,
+  "members": {
+    "archive-builder.py": {
+      "bytes": 3104,
+      "sha256": "9c51f032e0ee54007f0a47f577496f05c5b9382a8528c96358151fa34f414020"
+    },
+    "identity.json": {
+      "bytes": 676,
+      "sha256": "bd8efaf793e1cd4ca6b5afaa96780f9ffad6a4eab7f792cb8987fdaa30cdc02a"
+    },
+    "receipts/incident-revocation-canonical-r1-verified.json": {
+      "bytes": 1694,
+      "sha256": "13f4bb88157eaefb5e659174baacbd2e4299053012a828c3f559e5f3f00f901d"
+    },
+    "receipts/incident-revocation-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "cab78f6a498d54642c6f957956151681d486c3faa60c225199a262e5bf7ae5c0"
+    },
+    "receipts/incident-revocation-canonical-r1.collected.json": {
+      "bytes": 439,
+      "sha256": "e2079ab5e4b02f1835a486b5839f29abc2277b80ee2c5c4e066d0bc3dd204dca"
+    },
+    "receipts/incident-revocation-canonical-r1.launch.json": {
+      "bytes": 227,
+      "sha256": "edf4a5a79248bd6551273d54d773aba691897cb466eddbc737e0668705ced993"
+    },
+    "receipts/incident-revocation-canonical-r1.log": {
+      "bytes": 71664,
+      "sha256": "6b91b929f5127c1701092f9356c0f33bd15620ed74878b294496ec4ef4c9231c"
+    },
+    "receipts/incident-revocation-canonical-r1.supervisor.log": {
+      "bytes": 225,
+      "sha256": "8a1a1f0026f45d0ea0b0a7bdf33d5c5e2d99a4a5ce0a85262b8c5f42facaf7d7"
+    },
+    "receipts/incident-revocation-canonical-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "5089d538eab4a589e2a37677c6a5bb3bc05f6d85c8d843e7d247d09dd85bc863"
+    },
+    "receipts/incident-revocation-canonical-r2-verified.json": {
+      "bytes": 1693,
+      "sha256": "7fd41027271d84c922dff328fab114ec330f6269d7f8c87f696748fb6849fd51"
+    },
+    "receipts/incident-revocation-canonical-r2.admission.json": {
+      "bytes": 1003,
+      "sha256": "21b81303c4cf05711bfb50f0b4b5dc49aaf4c0f25fd2ef2ebf45625dbc38cacb"
+    },
+    "receipts/incident-revocation-canonical-r2.collected.json": {
+      "bytes": 444,
+      "sha256": "5f1c0493c8593ac018a6c2205cbecbcc618fef4965287596f0178f02164545e5"
+    },
+    "receipts/incident-revocation-canonical-r2.launch.json": {
+      "bytes": 227,
+      "sha256": "d93b716501f586293816c6b2a55453500bb77f7c494542514fa208be54ec74c9"
+    },
+    "receipts/incident-revocation-canonical-r2.log": {
+      "bytes": 71410,
+      "sha256": "cd7c9b00f8c0c194b23baf1af9b579ce3236d5afdb0e506e2a7b9df41b24d808"
+    },
+    "receipts/incident-revocation-canonical-r2.supervisor.log": {
+      "bytes": 224,
+      "sha256": "c9a9182950074643c06404b45469ab3d1257271dbc48a22d3ea049d4181fefef"
+    },
+    "receipts/incident-revocation-canonical-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "15f7013e55d0965852df6e773e2ef862912712d56263b989742c0713586cacd8"
+    },
+    "receipts/incident-revocation-ci-attempt1-failure.json": {
+      "bytes": 2396,
+      "sha256": "fd8419e2c01271408897485ed0070f9344507fcf40b0d453c86439968ac6bf70"
+    },
+    "receipts/incident-revocation-ci-attempt1.log.gz": {
+      "bytes": 5880,
+      "sha256": "04e6696158bc64f1a9362493b1d957f6f00c6e49c281c6c75c6f47355ad959bc"
+    },
+    "receipts/incident-revocation-ci-attempt2-admission.json": {
+      "bytes": 317,
+      "sha256": "7f3294f2e71c699e446557cb950ddbbbf0fac7cd4d9fb01b0f913752684cf0a7"
+    },
+    "receipts/incident-revocation-ci-attempt2-failure.json": {
+      "bytes": 2094,
+      "sha256": "4994c2ebad1c81f907f2509c34c6fa0fd85ffe819b24da384fed6c4014691519"
+    },
+    "receipts/incident-revocation-ci-attempt2.log.gz": {
+      "bytes": 5913,
+      "sha256": "0f03e14ac6c813c72532061517b9d908c9af13198d7b792324ee248f4621c80b"
+    },
+    "receipts/incident-revocation-ci-blocked-publication-r1.json": {
+      "bytes": 441,
+      "sha256": "d1928c07341ad8ef865ae77685e96ff272383b843e0cd87c5333c955a89779d3"
+    },
+    "receipts/incident-revocation-ci-pr-r3.json": {
+      "bytes": 275,
+      "sha256": "18734671b2bf87085f01c793bcdd0173821cdf8cb4e7817c66dda18ff9d26394"
+    },
+    "receipts/incident-revocation-ci-wait-r2-transport-failure.json": {
+      "bytes": 542,
+      "sha256": "a28853f4f9df488fa090b91222992caec8a9aceb1aa45ac1914e2f7506bab155"
+    },
+    "receipts/incident-revocation-review-r1-archive.json": {
+      "bytes": 3968,
+      "sha256": "04ba0f1bb543a7cb0e0ea2ea74db16614b473c360ae4c1450304027e28e61b2e"
+    },
+    "receipts/incident-revocation-review-r1-custody.json": {
+      "bytes": 1230,
+      "sha256": "8432e2ab46dcfcd98f277d008d5f4566da02c5ddc05406272d768608c0c869d5"
+    },
+    "receipts/incident-revocation-review-r1-instructions.json": {
+      "bytes": 11173,
+      "sha256": "eb5528b4149774eb8528413bcfba95d70fad9c9157577f62df33e1f23c6d73a0"
+    },
+    "receipts/incident-revocation-review-r1-preparation.json": {
+      "bytes": 1208,
+      "sha256": "a21b4bd06797ea8b22aa06f2426e52619722278f39a0118bed9f3c8e0ed84483"
+    },
+    "receipts/incident-revocation-review-r1-publication.json": {
+      "bytes": 483,
+      "sha256": "f387926ba933bf9d9030f0c22de7cd2605d1578beea39e3f372919aabd9d6c8d"
+    },
+    "receipts/incident-revocation-review-r1-scope.json": {
+      "bytes": 795,
+      "sha256": "c07c6b654cd472d91a4a9343b6319734d7bf7f5e42f60940bd1c9e006392b9ac"
+    },
+    "receipts/incident-revocation-review-r1-tests.log": {
+      "bytes": 4206,
+      "sha256": "e9552ea54e0370067d849df0f2081d8c67476318d3cf33a20c7552f60ad7f290"
+    },
+    "receipts/incident-revocation-review-r1-verified.json": {
+      "bytes": 2257,
+      "sha256": "ed0ced9a403997f41f4eb67a1bfc429f0c7230eb3892cce235f8aba13f3d1d84"
+    },
+    "receipts/incident-revocation-review-r1.exit.json": {
+      "bytes": 2206,
+      "sha256": "852a4618d28260b30cb66baf40b31c3d5fa02cd972b8b089e4c722045e5c7707"
+    },
+    "receipts/incident-revocation-review-r1.md": {
+      "bytes": 7458,
+      "sha256": "a19309fc8c91327f0d1b89ace105b5241ebc42f22ebaffc0cb82164fe4d447eb"
+    },
+    "receipts/incident-revocation-review-r1.py": {
+      "bytes": 2998,
+      "sha256": "44aa9a94ebd0a7907851a4c8254c600e9e16722555e5bf44ef490165214d3c43"
+    },
+    "receipts/mvp024-incident-roots-causal-classification-r1.json": {
+      "bytes": 2617,
+      "sha256": "74a7d74d442df248953080691a35a3925fc4ea98cd29a21e55f1eb7b9c5708e6"
+    },
+    "receipts/mvp024-index-prune-canonical-r4-failure-verified.json": {
+      "bytes": 2305,
+      "sha256": "96a0a66864ca5a39b8043feede09f779790173cca9ac56b8eebbaf10b6976702"
+    },
+    "receipts/mvp024-index-prune-canonical-r4-preflight.json": {
+      "bytes": 5363,
+      "sha256": "b8c5e922702336068b441d4e011c2e12b1b9439fc7695e4a0d5333935614e7a9"
+    },
+    "receipts/mvp024-index-prune-canonical-r4.admission.json": {
+      "bytes": 1003,
+      "sha256": "6e55271360fd4c05d8568fa0e64566fab75aeac038228752ce6876d734756e22"
+    },
+    "receipts/mvp024-index-prune-canonical-r4.collected.json": {
+      "bytes": 465,
+      "sha256": "7ad5356682b8a5139fabca6f6f9af7d67ff3c97c2d698112a3ad909e11e46c54"
+    },
+    "receipts/mvp024-index-prune-canonical-r4.launch.json": {
+      "bytes": 226,
+      "sha256": "3fbb38ec7d68cb8437121d4d5e7be090e7f8a7f877d4eba4a8638afda0f5a8c1"
+    },
+    "receipts/mvp024-index-prune-canonical-r4.log": {
+      "bytes": 56314,
+      "sha256": "2d7c1bc26eea1e89abe1eddcb4c05b3c5881742b77511e063c6c718a6f197649"
+    },
+    "receipts/mvp024-index-prune-canonical-r4.supervisor.log": {
+      "bytes": 224,
+      "sha256": "bf55b8f9c34d8cd324eaa7a6a2c192065b44f5b57bdec6fc7af269efddcd08b7"
+    },
+    "receipts/mvp024-index-prune-canonical-r4.terminal.json": {
+      "bytes": 236,
+      "sha256": "02ce516bf7ea41b7012a74c8b6008396a54cd9fe03ada4f69573970266728620"
+    },
+    "receipts/mvp024-index-prune-canonical-r5-failure-verified.json": {
+      "bytes": 4352,
+      "sha256": "02bd2529586afe86f540ed7d871dd7980fbac1ccb06071ba8216b382608faf0f"
+    },
+    "receipts/mvp024-installed-timeout-diagnostic-r1-verified.json": {
+      "bytes": 1029,
+      "sha256": "1453fa4c262f0f4d99a79a34863d437728e1cd14ada15856e975607977f95294"
+    },
+    "receipts/mvp024-installed-timeout-diagnostic-r1.admission.json": {
+      "bytes": 1121,
+      "sha256": "5c3788d8a2466de27a13a2148c77d791d14a4ecba698307371efcab58cd65eb3"
+    },
+    "receipts/mvp024-installed-timeout-diagnostic-r1.collected.json": {
+      "bytes": 478,
+      "sha256": "3fbfdaba570049025de9a9d28cd0f97916ed14fae38da98026588ed33000b2fa"
+    },
+    "receipts/mvp024-installed-timeout-diagnostic-r1.launch.json": {
+      "bytes": 351,
+      "sha256": "b789ced9c40e0459f6e76af993e817b47de8f98beb3ad9b340149631c268a719"
+    },
+    "receipts/mvp024-installed-timeout-diagnostic-r1.log": {
+      "bytes": 17502,
+      "sha256": "6f5640ef3130c8825410772794b23832f39366281f226e16eecd07177cfba766"
+    },
+    "receipts/mvp024-installed-timeout-diagnostic-r1.py": {
+      "bytes": 688,
+      "sha256": "4ebeaa46d1e62c67851b68e1ffa3927e30535a531b5afdbaa989758b150dd8c7"
+    },
+    "receipts/mvp024-installed-timeout-diagnostic-r1.supervisor.log": {
+      "bytes": 224,
+      "sha256": "02b49fd136e05a63fcd564e73f5a537814793dafbc6dd1b9493184cb189c7be7"
+    },
+    "receipts/mvp024-installed-timeout-diagnostic-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "f330be2f56421b3b18390b6b8078f2cae0dbfa94c1c5ad8cb58967bbdf034cce"
+    },
+    "receipts/mvp024-maintenance-foundation-integration-r1-admission.json": {
+      "bytes": 465,
+      "sha256": "5ff7d01fa8e690590a757fcfc1257b40182192e247456ad869820d87d53adf1c"
+    },
+    "receipts/mvp024-maintenance-foundation-integration-r1.json": {
+      "bytes": 690,
+      "sha256": "0331d21ca5c4e013906f768efaa9d2982b7eb35001ff816b776b45cb573c8822"
+    }
+  }
+}

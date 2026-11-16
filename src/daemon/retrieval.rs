@@ -86,6 +86,27 @@ impl Service {
         Ok(index)
     }
 
+    fn authorize_index_work(&self, id: &str, workflow: &Deadline) -> crate::storage::Result<()> {
+        let (_, job) = self
+            .job(id)
+            .map_err(|e| crate::storage::StorageError::new(e.0))?;
+        if job.state != "running" || job.lease_owner.as_deref() != Some(&self.instance) {
+            return Err(crate::storage::StorageError::new("LEASE_LOST"));
+        }
+        self.authorize_job(&job)
+            .map_err(|e| crate::storage::StorageError::new(e.0))?;
+        let code = if job.cancel_requested {
+            Some("CANCELLED")
+        } else if self.stopping.load(Ordering::Acquire) {
+            Some("INDEX_INTERRUPTED")
+        } else if workflow.expired().is_some() {
+            Some("WORKFLOW_TIMEOUT")
+        } else {
+            None
+        };
+        code.map_or(Ok(()), |code| Err(crate::storage::StorageError::new(code)))
+    }
+
     async fn rebuild_index(
         &self,
         id: &str,
@@ -103,23 +124,7 @@ impl Service {
         {
             return Err(Error("RESOURCE_BUSY"));
         }
-        let authorize = || {
-            let (_, job) = self
-                .job(id)
-                .map_err(|e| crate::storage::StorageError::new(e.0))?;
-            self.authorize_job(&job)
-                .map_err(|e| crate::storage::StorageError::new(e.0))?;
-            let code = if job.cancel_requested {
-                Some("CANCELLED")
-            } else if self.stopping.load(Ordering::Acquire) {
-                Some("INDEX_INTERRUPTED")
-            } else if workflow.expired().is_some() {
-                Some("WORKFLOW_TIMEOUT")
-            } else {
-                None
-            };
-            code.map_or(Ok(()), |code| Err(crate::storage::StorageError::new(code)))
-        };
+        let authorize = || self.authorize_index_work(id, workflow);
         Index::begin_rebuild(&self.storage, id, generation, &authorize).await?;
         *owned = None;
         let index = Arc::new(Index::open(self.config.pin().resolved(), &self.storage).await?);
@@ -174,6 +179,7 @@ impl Service {
                 };
                 self.index_epoch.fetch_add(1, Ordering::Release);
                 let _epoch = IndexBuild(&self.index_epoch);
+                let mut windows_since_prune = 0u8;
                 loop {
                     {
                         let _guard = self.admission.lock().await;
@@ -209,12 +215,28 @@ impl Service {
                                 .await?,
                         );
                     }
-                    if progress.lexical_watermark >= target
+                    let complete = progress.lexical_watermark >= target
                         && progress
                             .vector
                             .as_ref()
-                            .is_none_or(|v| v.watermark >= target)
+                            .is_none_or(|v| v.watermark >= target);
+                    windows_since_prune = windows_since_prune.saturating_add(1);
+                    if (complete || windows_since_prune >= 32)
+                        && let Ok(owned) = self.search_index.try_lock()
+                        && owned.as_ref().is_some_and(|cached| {
+                            Arc::ptr_eq(cached, &index) && Arc::strong_count(cached) == 2
+                        })
                     {
+                        // Keep new readers behind this lock until native cleanup has returned.
+                        index
+                            .prune_versions(&|| {
+                                authorize()?;
+                                self.authorize_index_work(id, workflow)
+                            })
+                            .await?;
+                        windows_since_prune = 0;
+                    }
+                    if complete {
                         crate::retrieval::activate_vector(
                             &self.storage,
                             &progress,
@@ -269,6 +291,115 @@ impl Service {
                 self.finish_job(job, revision, "failed", Some(error.0))
                     .await
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::tests::fixture;
+    use super::*;
+
+    async fn versions(table: &lancedb::Table) -> Vec<u64> {
+        let mut versions = table
+            .list_versions()
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|v| v.version)
+            .collect::<Vec<_>>();
+        versions.sort_unstable();
+        versions
+    }
+
+    #[tokio::test]
+    async fn native_pruning_requires_running_job_and_current_lease_owner() {
+        let mut observations = Vec::new();
+        for (state, own_lease) in [("queued", true), ("running", false)] {
+            let (fixture, service, _) = fixture(&format!("prune-lease-{state}"), "").await;
+            let id = "lease-index";
+            service
+                .submit_retrieval(id.into(), RetrievalRequest::Sync)
+                .await
+                .unwrap();
+            assert!(service.claim(id, 0).await.unwrap());
+            let workflow = Deadline::start(
+                crate::config::deadline::Layer::Workflow,
+                Duration::from_secs(30),
+                None,
+            )
+            .unwrap();
+            let index = service.retrieval_index(id, &workflow).await.unwrap();
+            let target = service.storage.sequence().unwrap();
+            let progress = index
+                .sync_batch(
+                    &service.storage,
+                    target,
+                    service.config.pin().generation(),
+                    &|| Ok(()),
+                )
+                .await
+                .unwrap();
+            assert!(progress.lexical_watermark >= target);
+            drop(index);
+            let connection = lancedb::connect(fixture.0.join("data/search").to_str().unwrap())
+                .execute()
+                .await
+                .unwrap();
+            let table = connection
+                .open_table("memory_lexical_v1")
+                .execute()
+                .await
+                .unwrap();
+            let before = versions(&table).await;
+            assert!(before.len() > 1, "fixture needs obsolete native versions");
+            let (revision, mut job) = service.job(id).unwrap();
+            job.state = state.into();
+            job.lease_owner = Some(if own_lease {
+                service.instance.clone()
+            } else {
+                "another-daemon".into()
+            });
+            service
+                .save_job(&job, Some(revision), vec![])
+                .await
+                .unwrap();
+            let denied = service
+                .retrieval_result(id, &workflow)
+                .await
+                .map(|_| ())
+                .map_err(|e| e.0);
+            let after_denial = versions(&table).await;
+            let (revision, mut job) = service.job(id).unwrap();
+            job.state = "running".into();
+            job.lease_owner = Some(service.instance.clone());
+            service
+                .save_job(&job, Some(revision), vec![])
+                .await
+                .unwrap();
+            let allowed = service
+                .retrieval_result(id, &workflow)
+                .await
+                .map(|_| ())
+                .map_err(|e| e.0);
+            let after_allowed = versions(&table).await;
+            drop(table);
+            drop(connection);
+            service.close(Ok(())).await.unwrap();
+            observations.push((state, denied, before, after_denial, allowed, after_allowed));
+        }
+        for (state, denied, before, after_denial, allowed, after_allowed) in observations {
+            assert_eq!(
+                denied,
+                Err("LEASE_LOST"),
+                "{state}: {before:?} -> {after_denial:?}"
+            );
+            assert_eq!(
+                after_denial, before,
+                "{state}: denied maintenance removed native versions"
+            );
+            assert_eq!(allowed, Ok(()));
+            assert_eq!(after_allowed, vec![*before.last().unwrap()]);
         }
     }
 }

@@ -63,8 +63,29 @@ also passes with byte-identical inputs, acknowledgements and full claim oracle:
 indexing took 10.559 s, search allocated 86,781,952 bytes in 912 files and 132
 native versions. The RSS sampled peak increased to 489,836,544 bytes. This single
 pair does not establish a memory improvement or full-scale operating envelope.
-Both disposable databases were removed after verification. Further native-index
-disk growth and reclamation must be addressed before full-corpus admission.
+Both disposable databases were removed after verification. The next committed
+change prunes old native versions only when the builder exclusively owns the
+index. A query holding the index defers reclamation until a later idle sync;
+authoritative history is preserved. The [third paired pilot](results/mvp024-native-prune/README.md)
+passes the identical inputs and oracles with 5,332,992 allocated search bytes,
+77 files and one native version, taking 10.491 seconds to index. This small
+measurement does not establish full-scale growth, ANN or concurrent-load bounds.
+
+The next 8,192-record pilots both fail before completing indexing. Their identical
+35,875,218 unique source bytes produce 8,322 expected claims; last published
+index progress is 3,140 and 3,380 claims. Both exceed the 640 MiB sampled RSS
+limit and hit the unchanged 10-second status IPC deadline. Adding native merge-key
+indexes passes its causal regression but does not resolve this scale failure.
+The [failed scale comparison](results/mvp024-native-prune/README.md) preserves
+all inputs, failures, memory breakdown and cleanup evidence. A later allocator
+observation supports retained free arenas but failed its disk census and had
+unavailable cgroups because the preload also reached helper processes. A control
+without the sampler, changing only the daemon's mmap threshold, still failed
+`job show` at 6,270/8,322 with RSS 679,796,736 bytes under effective original
+limits. Neither completed the output oracles; the allocator setting alone is
+insufficient. Pinned-source inspection also found that FTS creation limits are
+not persisted for later default optimization. Effective update limits still
+need repair and verification before scaling; partial progress is not acceptance.
 
 All 42 retained compressed shards were rehashed on 2026-11-11: 43,986,181,099
 bytes matched the pinned source inventory. A separate text-only shape census

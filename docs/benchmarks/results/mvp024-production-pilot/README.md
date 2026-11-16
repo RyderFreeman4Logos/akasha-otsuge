@@ -83,4 +83,18 @@ still rejecting zombies and distinguishing PID reuse. Three process tests and
 the real candidate lifecycle/alternate-UID/TCP smoke pass after the repair.
 [census-gate.zip](census-gate.zip) retains the failed gate, unchanged RED/GREEN
 oracle and source custody; [its manifest](census-gate-manifest.json) hashes every
-member. A new exact-HEAD canonical gate and independent review are still required.
+member. The successor exact-HEAD gate at e5746ac passed 633 Rust executions
+(39 ignored), 35 Python tests and seven Node tests, including the installed
+lifecycle/UID/TCP checks. The [complete independent review and citation corrections](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/67#issuecomment-6794229668)
+are published: PASS, zero findings, 37 fresh tests and Clippy. PR #67's hosted
+[CI43009584075](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/43009584075)
+passed with the same test counts and installed smoke. The synthetic CI merge
+`550a67c` and actual merge `b71b18d` both have exactly the reviewed `e5746ac` tree.
+[finalization.zip](finalization.zip) preserves 63 members in 179,867 compressed
+bytes: the final gate, review, failed launcher attempt, citation corrections,
+public readbacks, CI log, merge receipts and committed source preimages.
+[finalization-manifest.json](finalization-manifest.json) hashes every member and
+the archive. Its SHA-256 is
+`47075e33a613f4d3b26d9db286d46998c343b37561ffb5c87f36a47cef168404`.
+The subsequent native-version reclamation and its separate paired measurement
+are documented [here](../mvp024-native-prune/README.md).
