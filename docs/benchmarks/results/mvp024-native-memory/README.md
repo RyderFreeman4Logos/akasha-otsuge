@@ -87,5 +87,34 @@ This smoke used the debug artifact, not an installed-release acceptance claim.
 
 [regression.zip](regression.zip) and [its manifest](regression-manifest.json)
 retain all source preimages, failure logs, per-command results and hashes.
-The committed release's real-corpus pilot, exact canonical gate, independent
-review and publication remain separate steps.
+The committed release's real-corpus pilot follows below. Exact canonical gate,
+independent review and publication remain separate steps.
+
+## Production defaults on the real corpus
+
+Normal commit `92031ea46c6dcb33e4810954aba00b91c5d3357d` was built in release
+mode. Its daemon SHA-256 is
+`93c7abb6f2e1fbf2d90d631e66768e65c56bf4e82b8c1ba3111108d481d41082`;
+the seeder retains `f009f18a372add120f4c8994bb80844d6301f9eba8b2f3af8afca747c365ff3c`.
+The controller supplied no FTS or allocator overrides. After readiness, procfs
+confirmed the product's arena2/FTS1/32 environment and unchanged PID/start identity.
+
+All 8,192 sources, 8,322 indexed/current claims and eight scoped lexical witnesses
+passed again with the same complete input/oracle identities. Seeding took 40.388
+seconds and indexing 218.891. All 197 resource observations were complete and
+confirmed original 512/640/2048 MiB enforcement. Sampled RSS maximum was
+414,588,928 bytes; nearest-rank sampled P99 was 411,643,904. No sample exceeded
+512 MiB. Observed kernel charged peak was 537,186,304 bytes, with zero sampled
+OOM kills. This one bounded run does not establish continuous peaks or full-scale
+performance. No ANN, 100-client load or complete native-index-body oracle is claimed.
+
+The stopped store contained 543 files and 127,356,928 allocated bytes. Complete
+file hashes, exact terminal identities, absent owned cgroup and consumer checks
+preceded removal of only that data directory and socket root. Both paths are
+absent; shared corpus and build cache remain.
+
+[production-default.zip](production-default.zip) and
+[its manifest](production-default-manifest.json) retain the complete build,
+commands, output assertions, resource observations and cleanup receipts. Five
+shared inputs reference the existing scale-comparison archive with verified hashes.
+The following evidence-only commit preserves the exact tested implementation.

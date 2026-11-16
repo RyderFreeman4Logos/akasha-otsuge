@@ -95,8 +95,14 @@ bytes. A separate 1 MiB FTS partition control also completed, taking 795.438
 seconds with peak 282,107,904 bytes. The
 [complete control archive](results/mvp024-native-memory/README.md) retains the
 failure, successful output checks, all resource samples and exact cleanup.
-These are single tuning observations; the selected startup defaults still need
-production-entrypoint validation and the unchanged full-scale acceptance.
+These are single tuning observations. Commit `92031ea` then passed the same
+corpus using the release daemon's own startup defaults, with no externally
+injected allocator/FTS settings. All 8,322 claims and eight witnesses passed;
+indexing took 218.891 seconds, and all 197 observations were complete under the
+original limits. Sampled RSS maximum was 414,588,928 bytes and P99 411,643,904,
+with zero sampled OOM kills. Its exact stopped store/socket were removed after
+hash and consumer checks. This bounded production result does not replace the
+unchanged full-scale acceptance.
 
 All 42 retained compressed shards were rehashed on 2026-11-11: 43,986,181,099
 bytes matched the pinned source inventory. A separate text-only shape census

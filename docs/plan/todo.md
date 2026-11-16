@@ -111,8 +111,9 @@ retains complete reports, logs and readbacks, including every earlier failure.
   then publish PR #69 and the dependent maintenance changes with exact readback.
 - [ ] Verify and publish the independent native-startup resource leaf, including
   foreground/detached entrypoints, exact canonical gate and independent review.
-- [ ] Verify the production defaults on the bounded real corpus, then complete
-  the unchanged full corpus/load/recovery criteria below.
+- [x] Verify production defaults on the bounded real corpus, with complete
+  current-claim/partition checks, original resource limits and exact cleanup.
+- [ ] Complete the unchanged full corpus/load/recovery criteria below.
 - [ ] Resolve the 37 oversized vector documents through verified licensed inputs
   and documented model/vector identity, without increasing the product limit or
   downloading another full corpus.
@@ -132,6 +133,12 @@ FTS1/1 used 795.438 seconds and peaked at 282,107,904 bytes. Every control retai
 the original limits/deadlines; all three disposable stores/sockets were removed.
 The 32 MiB setting is selected for the next production-startup leaf. These single
 tuning observations do not establish full scale or a causal performance interval.
+Commit `92031ea` also passed the same real corpus through its release daemon's
+own startup defaults, with no external native tuning: all 8,322 claims and eight
+witnesses passed, indexing took 218.891 seconds, and sampled RSS peaked at
+414,588,928 bytes across 197 complete/enforced observations. Its store/socket
+were removed after full file hashes and consumer checks. The final candidate
+still needs its exact canonical gate, independent review and publication.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
 A licensed 37-row dictionary-vector supplement is prepared but not admitted.
