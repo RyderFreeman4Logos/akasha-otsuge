@@ -1,0 +1,159 @@
+{
+  "utc": "2026-11-16T22:34:03.241470+00:00",
+  "status": "FOCUSED_FUNCTIONAL_PASS_NOT_CANONICAL_OR_SCALE_ACCEPTANCE",
+  "archive": "evidence.zip",
+  "bytes": 28577,
+  "sha256": "fdbd4afd1796e1411fddfcf77636739c99b7c114614196fa39d432518f47e7c4",
+  "members": {
+    "mvp024-vector-coverage-red-r1.admission.json": {
+      "bytes": 1263,
+      "sha256": "c83b3f2a18cb7c05082c3cb99aa92343376b8d4a6bf0bf6c3d3caac9c5dc4399"
+    },
+    "mvp024-vector-coverage-red-r1.terminal.json": {
+      "bytes": 238,
+      "sha256": "b861b78dff94c710106683a4fe86dbc9e15623a1220d37dda2636f11fd8b7ca9"
+    },
+    "mvp024-vector-coverage-red-r1.collected.json": {
+      "bytes": 475,
+      "sha256": "f850848ed733f8c1d8e6f4a7c23c0b4ed04784da121aa7f38c2a702dee1040ee"
+    },
+    "mvp024-vector-coverage-red-r1-results.json": {
+      "bytes": 1436,
+      "sha256": "104066af2584bb76d6b4f95edc47323db2497e6e1cd8a59a5421fc5d93b3fb7f"
+    },
+    "mvp024-vector-coverage-red-r1-test.rs": {
+      "bytes": 2747,
+      "sha256": "dd2f3a16a8fb3f70e07330abcadb983f6a35c7ffc383f75e114377ea9ad2ab41"
+    },
+    "mvp024-vector-coverage-red-r1-preimplementation.patch": {
+      "bytes": 4450,
+      "sha256": "767e9ce3a828faafe8221d8b6fa9e584610ced064cfa214c26a587fe6c267d3d"
+    },
+    "mvp024-vector-coverage-red-r1-verified.json": {
+      "bytes": 550,
+      "sha256": "dff6747eebb3c9e5d4509ac18e1f4af96985cf61fb4e64b788dbd27084c1e2d7"
+    },
+    "mvp024-vector-coverage-red-r1.log": {
+      "bytes": 3807,
+      "sha256": "af691a323fa4664837cfc069c574cbcdccffcc49f9e550619ad5a8cdb0fd5977"
+    },
+    "mvp024-vector-coverage-red-r1.py": {
+      "bytes": 1863,
+      "sha256": "4fe50893f13cdfedeca7af6f885baa998e3f8eb6d7e2ab9cd741d1d66c2ba446"
+    },
+    "mvp024-vector-coverage-green-r1.admission.json": {
+      "bytes": 1265,
+      "sha256": "e335e82c9d13263b2ead9f0899e2d07996fbd5e008c44ccf0b3d049fcbbc7d80"
+    },
+    "mvp024-vector-coverage-green-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "10ec56bf8fdb54f9729fd4f32699a19bb2f3b5fffb6759b93ee3a6653f9e4a37"
+    },
+    "mvp024-vector-coverage-green-r1.collected.json": {
+      "bytes": 448,
+      "sha256": "d0d264d155eef52cf48cac66cc0377183fbf3c158295154eacdc95bd8639a6b0"
+    },
+    "mvp024-vector-coverage-green-r1-results.json": {
+      "bytes": 1420,
+      "sha256": "d9855ac577915930153edfc14f250934a6fdb5ea6cd6d35a78dc93b9bf1bc0c3"
+    },
+    "mvp024-vector-coverage-green-r1.log": {
+      "bytes": 1430,
+      "sha256": "46478416f6853436d8b8c9f3eb0805b7169c482a2019edcc8fd2db3d319b4ec8"
+    },
+    "mvp024-vector-coverage-green-r1.py": {
+      "bytes": 1654,
+      "sha256": "b179cb5ada543e6fda310c3cdbab995ed84f0b38bce2a17e9854cc59bdcc8e20"
+    },
+    "mvp024-vector-coverage-focused-r1.admission.json": {
+      "bytes": 1267,
+      "sha256": "a962a14cf3c6ea14fe1808448c33b54e31544c63a62889231519b2fc4c6765d5"
+    },
+    "mvp024-vector-coverage-focused-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "4007feeec584fc061f5ef113ee69373a3682bd33ea22c665e6afae7e98b3c5d9"
+    },
+    "mvp024-vector-coverage-focused-r1.collected.json": {
+      "bytes": 439,
+      "sha256": "3da80fdf23fa96b9b9e00efd8d8eafb1505d97ad2098afd348cab83822def471"
+    },
+    "mvp024-vector-coverage-focused-r1-results.json": {
+      "bytes": 1353,
+      "sha256": "17f18382456001687adc9da0cb4ef3c2220adc3beb78fbf366cd71abc79cba8d"
+    },
+    "mvp024-vector-coverage-focused-r1-classification.json": {
+      "bytes": 401,
+      "sha256": "afc9dc77995094d3d9e82582e542ec31f901bece901cf12c8399b16a110344a0"
+    },
+    "mvp024-vector-coverage-focused-r1.log": {
+      "bytes": 858,
+      "sha256": "b59d4a915038a58447801d3577a8f78eaf9fbc086e08ad40be4eb84bf338825a"
+    },
+    "mvp024-vector-coverage-focused-r1.py": {
+      "bytes": 1545,
+      "sha256": "5626c4a0539c1e3d2d7ff762fab513663564acd02a5d70fe7e6b81a962c641ac"
+    },
+    "mvp024-vector-coverage-focused-r2.admission.json": {
+      "bytes": 1267,
+      "sha256": "f344edf58ca752b25a116c36b2bb9910ad827ba691aaebba8390b86221415b59"
+    },
+    "mvp024-vector-coverage-focused-r2.terminal.json": {
+      "bytes": 238,
+      "sha256": "be7fdb7a0c1b51a3b8b3a276d408489cd7aa045a2f6473c48e7e54e2250adffa"
+    },
+    "mvp024-vector-coverage-focused-r2.collected.json": {
+      "bytes": 424,
+      "sha256": "315e7a9fecce9b067ade771896f82eb89e6f5f3a7572559b324e727c39ee3887"
+    },
+    "mvp024-vector-coverage-focused-r2-results.json": {
+      "bytes": 1353,
+      "sha256": "753fe084db07ffade9429d34f3485eb28d4cc554a75e59e379d624127a52d608"
+    },
+    "mvp024-vector-coverage-focused-r2-classification.json": {
+      "bytes": 503,
+      "sha256": "342ee40e739113198a4433e07a091d8488733098924c5af6d5c3114809987e5d"
+    },
+    "mvp024-vector-coverage-focused-r2.log": {
+      "bytes": 1602,
+      "sha256": "d7fa6b457a86a7c03610b1432ccf6e89dedfade7a5882c6dcab94ceb76e2e776"
+    },
+    "mvp024-vector-coverage-focused-r2.py": {
+      "bytes": 1545,
+      "sha256": "04f56811e8c9e381afe10f63324178fd907eed5a7c714d46a1d4f20e33a3ef17"
+    },
+    "mvp024-vector-coverage-focused-r3.admission.json": {
+      "bytes": 1267,
+      "sha256": "9c7e97e136505475be6df52f71c607553f1051375befe74c99811a72ed15869a"
+    },
+    "mvp024-vector-coverage-focused-r3.terminal.json": {
+      "bytes": 236,
+      "sha256": "833b4c775dd7442a2cdb803c17b16c36dd7a26fb1ee94acdda8198a1bfe60799"
+    },
+    "mvp024-vector-coverage-focused-r3.collected.json": {
+      "bytes": 460,
+      "sha256": "a675c89311ea3143ef28fddc270eaf7a4a51f05b4c096f2f0a900bdaf5edc83a"
+    },
+    "mvp024-vector-coverage-focused-r3-results.json": {
+      "bytes": 2273,
+      "sha256": "24548229cb4ac4564b8ac5b5bb4e70f1cca923ecf341a03af901f3d942ccafde"
+    },
+    "mvp024-vector-coverage-focused-r3.log": {
+      "bytes": 8535,
+      "sha256": "131de4a5e954398a3c3cd4e397048956ece2ce7327595d183a60cb1e49dee306"
+    },
+    "mvp024-vector-coverage-focused-r3.py": {
+      "bytes": 1545,
+      "sha256": "4fdfee38e7aaf33ceed15e63227a345d34c9f65fcfc4d76be6aa3d120977e2ac"
+    }
+  },
+  "summary": {
+    "rust_passed": 67,
+    "rust_ignored": 1,
+    "behavioral_red_vectors": 3,
+    "expected_vectors": 2,
+    "unchanged_red_green_test_sha256": "dd2f3a16a8fb3f70e07330abcadb983f6a35c7ffc383f75e114377ea9ad2ab41",
+    "fixture_compile_failures": 2,
+    "canonical": "not_run",
+    "independent_review": "not_run"
+  }
+}

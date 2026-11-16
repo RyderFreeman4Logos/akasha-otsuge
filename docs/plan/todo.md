@@ -114,9 +114,11 @@ retains complete reports, logs and readbacks, including every earlier failure.
 - [x] Verify production defaults on the bounded real corpus, with complete
   current-claim/partition checks, original resource limits and exact cleanup.
 - [ ] Complete the unchanged full corpus/load/recovery criteria below.
-- [ ] Add explicit production vector scope coverage while preserving the default
+- [x] Implement explicit production vector scope coverage while preserving the default
   all-claim policy, old configuration digests, contiguous completion and generation
   activation. Verify actual provider calls, excluded-scope disclosure and reload.
+- [ ] Publish the vector scope leaf after its exact canonical gate, independent
+  review and hosted CI. Full corpus admission remains a separate unchecked task.
 - [ ] Resolve the 37 oversized vector documents through verified licensed inputs
   and documented model/vector identity, without increasing the product limit or
   downloading another full corpus.
@@ -164,9 +166,17 @@ logs, exact cleanup and publication readbacks. Full-scale acceptance stays open.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
 A licensed 37-row dictionary-vector supplement is prepared but not admitted.
-Cross-corpus identity, cardinality and explicit production vector coverage remain
-pending; current production sync embeds every active claim, so the supplement
-alone does not solve partial coverage of the full text corpus.
+Cross-corpus identity and cardinality remain pending. The current candidate
+adds optional explicit vector scopes while retaining complete lexical indexing
+and the default all-claim policy. Its [focused evidence](../benchmarks/results/mvp024-vector-coverage/README.md)
+preserves the unchanged-test behavioral RED/GREEN, two fixture compilation
+failures, and 67 related Rust passes / one intentional ignore plus Clippy and
+format checks. Generation switching retains the old selection until activation;
+removing the selector restores the old all-memory identity. Excluded queries
+report their coverage gap without embedding calls, and excluded records still
+have contiguous completion entries. Canonical gate, review and publication are
+next. The supplement and this functional coverage contract do not establish
+million-vector or full-scale acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
 delegation failure; its exact selector passed without explaining that failure.
 A single diagnostic topology did not reproduce it and had 18 other IPC failures.

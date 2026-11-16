@@ -283,6 +283,7 @@ const SAFE_FIELDS: &[&str] = &[
     "max_candidates",
     "max_original_chars",
     "embedding",
+    "embedding_scopes",
     "reranker",
     "extraction",
     "review",

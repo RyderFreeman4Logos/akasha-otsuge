@@ -75,6 +75,13 @@ reranker failures retain the existing ranking with `reranker_unavailable`.
 Cancellation, workflow expiration and interrupted calls fail the job. A missing
 initial lexical index is `INDEX_NOT_READY`, not an empty successful search.
 
+By default, the embedding profile covers all active memories. An explicit
+`retrieval.embedding_scopes` list limits vector indexing to memories contained
+by at least one configured scope ceiling; lexical indexing remains unchanged.
+Queries outside the active vector generation's selection use lexical results
+and report `vector_scope_excluded` without sending the query for embedding.
+The selection is an indexing boundary; existing read permissions still apply.
+
 Every candidate is checked against the current authoritative Memory revision,
 scope, lifecycle, current read grant and validity window. Stale physical rows do
 not make retired or corrected records current. Publication rechecks the selected
@@ -101,27 +108,34 @@ subsequent records from being sent. Management stays available during model wait
 Lexical and vector indexes
 maintain separate contiguous prefixes. Every covered outbox entry has a durable
 completion reason: non-Memory entries are `not_required`; Memory revisions are
-`indexed`, `superseded` or `inactive`. A batch publishes its completion ledger and
+`indexed`, `superseded` or `inactive`. Vector entries outside an explicit scope
+selection are `scope_excluded`; they advance the prefix without a provider call.
+A batch publishes its completion ledger and
 watermark atomically **after** physical index updates. Replaying a crash before
 publication replaces the same row keys; a completed prefix does not rewrite them.
 A failed embedding stores its call error/trace without advancing that prefix,
 including finite-f64 conversion overflow and zero/invalid pooled cosine vectors.
 
 `index status` reports requested-generation progress, its model identity and
-dimension, the active vector generation/configuration, and `building`. Search
+dimension, any explicit `embedding_scopes`, the active vector
+generation/configuration, and `building`. Search
 marks concurrent index mutation with `index_building`. A bounded outbox-tail
 check can distinguish unrelated metadata writes from Memory lag; a tail larger
 than 256 commits is conservatively `index_lag`. No count is a full-source coverage
 claim or an ETA. `no_hit` applies to this bounded active-Memory query only; it
 does not mean the user has no preference.
 
-Changing embedding identity/dimension creates a separate generation. Queries pin
+Changing embedding identity/dimension or the explicit scope list creates a
+separate generation. Queries pin
 the effective generation and its provider configuration at admission. The old
 generation remains usable until both candidate prefixes reach the fixed sync
 target and the active pointer commits atomically. In the meantime results carry
 `generation_pending`; a generation with no completed prefix is explicitly pending.
 Queries can run during indexing when the configured scheduler has spare slots.
 The default one-job concurrency cap still queues them normally.
+Until the new generation activates, queries use the old generation's selection
+as well as its provider. Removing `embedding_scopes` restores the all-memory
+generation identity and resumes its durable prefix.
 
 A daemon restart fails ambiguous interrupted retrieval/model work instead of
 automatically resending provider calls. Submit a fresh sync key to resume the

@@ -28,6 +28,11 @@ mod tests {
         let manager = ConfigManager::new(1, initial, |_| Ok(())).unwrap();
         let legacy = manager.checkpoint().unwrap();
         assert!(legacy["active"]["config"].get("grill").is_none());
+        assert!(
+            legacy["active"]["config"]["retrieval"]
+                .get("embedding_scopes")
+                .is_none()
+        );
         let restored = ConfigManager::restore(legacy.clone(), |_| Ok(())).unwrap();
         assert_eq!(restored.pin().resolved().digest(), digest);
         assert_eq!(restored.checkpoint().unwrap(), legacy);

@@ -10,6 +10,8 @@ pub struct VectorStatus {
     pub generation: String,
     pub model_identity: String,
     pub dimension: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub embedding_scopes: Option<Vec<Scope>>,
     pub watermark: u64,
     pub indexed_rows: usize,
     pub last_call: Option<serde_json::Value>,
@@ -34,6 +36,14 @@ pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<Vecto
         "claim-4096-byte-mean-cosine-v1",
         &identity,
     ))?);
+    let scopes = &config.config().retrieval.embedding_scopes;
+    if let Some(scopes) = scopes {
+        generation = hash(&serde_json::to_vec(&(
+            "embedding-scopes-v1",
+            &generation,
+            scopes,
+        ))?);
+    }
     let lexical = super::status(storage)?.generation;
     if lexical != GENERATION {
         generation = hash(&serde_json::to_vec(&(&generation, lexical))?);
@@ -46,6 +56,7 @@ pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<Vecto
         generation: generation.clone(),
         model_identity: identity.clone(),
         dimension,
+        embedding_scopes: scopes.clone(),
         watermark: 0,
         indexed_rows: 0,
         last_call: None,
@@ -53,6 +64,7 @@ pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<Vecto
     if progress.generation != generation
         || progress.model_identity != identity
         || progress.dimension != dimension
+        || progress.embedding_scopes.as_ref() != scopes.as_ref()
         || progress.watermark > storage.sequence()?
     {
         return Err(error("INDEX_CORRUPT"));
@@ -168,12 +180,21 @@ impl VectorIndex {
                         Domain::new(storage).active(&reference.key.id)
                     })
                     .await?;
-                let outcome = completion_outcome(reference, memory.as_ref());
+                let required = memory.as_ref().is_some_and(|memory| {
+                    config
+                        .config()
+                        .retrieval
+                        .embeds_scope(&memory.record.draft.scope)
+                });
+                let outcome = match completion_outcome(reference, memory.as_ref()) {
+                    "indexed" if !required => "scope_excluded",
+                    outcome => outcome,
+                };
                 records.push(serde_json::json!({"key_hash":row_key,"revision":reference.commit_seq,"outcome":outcome}));
                 if outcome == "superseded" {
                     continue;
                 }
-                if let Some(memory) = memory {
+                if let Some(memory) = memory.filter(|_| required) {
                     let embedded = async {
                         let mut vector = vec![0f32; progress.dimension as usize];
                         let text = &memory.record.draft.claim;
