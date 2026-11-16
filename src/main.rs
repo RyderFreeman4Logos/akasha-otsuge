@@ -860,6 +860,22 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             output(&bytes, false)?;
             return Ok(0);
         }
+        let native_environment = [
+            ("MALLOC_ARENA_MAX", "2"),
+            ("LANCE_FTS_NUM_SHARDS", "1"),
+            ("LANCE_FTS_PARTITION_SIZE", "32"),
+        ];
+        if native_environment.iter().any(|(key, value)| {
+            std::env::var_os(key).as_deref() != Some(std::ffi::OsStr::new(value))
+        }) {
+            use std::os::unix::process::CommandExt;
+            // glibc startup and Lance's lazy update defaults must see bounded settings.
+            return Err(std::process::Command::new(std::env::current_exe()?)
+                .args(&args)
+                .envs(native_environment)
+                .exec()
+                .into());
+        }
         akasha_otsuge::daemon::run(resolved, config_path, profile).await?;
         Ok(0)
     }

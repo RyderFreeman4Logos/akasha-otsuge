@@ -98,7 +98,9 @@ def main():
         pid = None
         original = None
         try:
-            started = command([*base, 'daemon', 'start'])
+            started = command([*base, 'daemon', 'start'], env=dict(
+                os.environ, MALLOC_ARENA_MAX='8', LANCE_FTS_NUM_SHARDS='7',
+                LANCE_FTS_PARTITION_SIZE='64'))
             assert started.returncode == 0, started.stderr
             status = json.loads(started.stdout)
             pid = status['data']['pid']
@@ -107,6 +109,10 @@ def main():
             owned = owned_daemons(base)
             assert owned == [(pid, original[0])], {'expected': [(pid, original[0])], 'observed': owned}
             assert pathlib.Path(f'/proc/{pid}/exe').resolve() == binary.resolve()
+            native_environment = pathlib.Path(f'/proc/{pid}/environ').read_bytes().split(b'\0')
+            for setting in (b'MALLOC_ARENA_MAX=2', b'LANCE_FTS_NUM_SHARDS=1',
+                            b'LANCE_FTS_PARTITION_SIZE=32'):
+                assert setting in native_environment, setting
             assert endpoint.stat().st_mode & 0o777 == 0o600
             assert endpoint.parent.stat().st_mode & 0o777 == 0o700
             assert data.stat().st_mode & 0o777 == 0o700

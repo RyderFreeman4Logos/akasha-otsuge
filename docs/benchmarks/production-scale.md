@@ -87,6 +87,17 @@ insufficient. Pinned-source inspection also found that FTS creation limits are
 not persisted for later default optimization. Effective update limits still
 need repair and verification before scaling; partial progress is not acceptance.
 
+On the merged maintenance source, an FTS1/32-only control again failed at
+3,622/8,322 with sampled RSS 692,056,064 bytes. Adding a two-arena allocator
+setting completed all current-claim checks and eight scoped witnesses under the
+original limits: indexing took 203.635 seconds with sampled RSS peak 406,609,920
+bytes. A separate 1 MiB FTS partition control also completed, taking 795.438
+seconds with peak 282,107,904 bytes. The
+[complete control archive](results/mvp024-native-memory/README.md) retains the
+failure, successful output checks, all resource samples and exact cleanup.
+These are single tuning observations; the selected startup defaults still need
+production-entrypoint validation and the unchanged full-scale acceptance.
+
 All 42 retained compressed shards were rehashed on 2026-11-11: 43,986,181,099
 bytes matched the pinned source inventory. A separate text-only shape census
 found exactly 1,000,000 DBpedia rows, 37 with title-plus-text over 4,096 bytes

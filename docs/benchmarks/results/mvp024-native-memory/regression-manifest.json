@@ -1,0 +1,153 @@
+{
+  "base": "63acf39d2138bc582ee746b6eefede970fd3f8cc",
+  "candidate_source_sha256": {
+    "src/main.rs": "33cb2ff2429bbf544ef3cfdbdbe72fc301c8902e1a30f4d2966465e18be34ba3",
+    "tests/support/daemon_resources.rs": "8c0ef6b608335294db56f57fdf7f28022930e2ef938f46a27921ee04f1360d2b",
+    "scripts/check_daemon_command.py": "5709d3e2ad70c0f24ab98ed07ff520b441dbb3cbf54bfcf7a4b4e9757ad9a163"
+  },
+  "scope": "Real foreground startup RED, formatter-comparator setup failure, same-assertion GREEN and 32 focused tests plus actual detached lifecycle/UID/TCP, Clippy and formatting. Canonical gate and independent review pending.",
+  "zip_bytes": 47404,
+  "zip_sha256": "87a82858d00ba37b1571864c8c7531fa9fe6772f74b4f61471c8eef9e4e9157f",
+  "members": {
+    "archive-builder.py": {
+      "bytes": 2709,
+      "sha256": "53c80336fba0129ae611483c8c1d02d0e6e5a7a4ccfbb3b3ec00479de9e2b8ea"
+    },
+    "receipts/mvp024-native-startup-focused-r1.admission.json": {
+      "bytes": 1115,
+      "sha256": "ef7ca65f45d5f575592ce1e500a5b6edb20f0cf26dff610e243f0539e64ec9dc"
+    },
+    "receipts/mvp024-native-startup-focused-r1.collected.json": {
+      "bytes": 532,
+      "sha256": "acc037ffb6959a792bdb94accf59342fa8c2ba8cb4bd4508fd6d394fc9bfc259"
+    },
+    "receipts/mvp024-native-startup-focused-r1.launch.json": {
+      "bytes": 339,
+      "sha256": "fbc097949cad06af5a2a0f5eaea939c90891a89ad686fb40094264d745f68502"
+    },
+    "receipts/mvp024-native-startup-focused-r1.log": {
+      "bytes": 429,
+      "sha256": "32be00a76ca8d1852d4976f164845549d0c37d6784f469b6ee59fa2680ca3fb0"
+    },
+    "receipts/mvp024-native-startup-focused-r1.py": {
+      "bytes": 1268,
+      "sha256": "b0d8531924b3b7a34511c372cef4be7470cb43f6ecc16e7df4bbae174212858f"
+    },
+    "receipts/mvp024-native-startup-focused-r1.supervisor.log": {
+      "bytes": 224,
+      "sha256": "23103d2d042ad4f2c0a7ead38023faa404fc133e6aac616ae313b9e3661abb09"
+    },
+    "receipts/mvp024-native-startup-focused-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "683b75953ef4a5bd26938557acb90946b58e5104ff52d1200298e1dd923ccb3c"
+    },
+    "receipts/mvp024-native-startup-focused-r2-results.json": {
+      "bytes": 1306,
+      "sha256": "819639e0050321c82c67e95c04deadaa5d8cf4bb8b96bb08248cd0c4e90ec767"
+    },
+    "receipts/mvp024-native-startup-focused-r2.admission.json": {
+      "bytes": 2005,
+      "sha256": "30f6fb1493c1909af08900897f7ba748d1956485f2d43ee7e2d25daa26245ea1"
+    },
+    "receipts/mvp024-native-startup-focused-r2.collected.json": {
+      "bytes": 444,
+      "sha256": "b30b46dedd55a6f0f366e9a7842ca8d5d521725ceadddc4573fbfea94b85d079"
+    },
+    "receipts/mvp024-native-startup-focused-r2.launch.json": {
+      "bytes": 339,
+      "sha256": "1c08fb5a27540510b77d4bc8daed1aa8c347fe6413a5943f3283780384dd5c9e"
+    },
+    "receipts/mvp024-native-startup-focused-r2.log": {
+      "bytes": 5092,
+      "sha256": "7c5fe32e8e64bb690bb6ce59453b3ae97a50ad1a42023b750e1cb7ea080e282f"
+    },
+    "receipts/mvp024-native-startup-focused-r2.py": {
+      "bytes": 1268,
+      "sha256": "6401255fc6f5dfded526274ac6991a9f43e2213e00d111b36e1a03bbb18c4345"
+    },
+    "receipts/mvp024-native-startup-focused-r2.supervisor.log": {
+      "bytes": 224,
+      "sha256": "7c60a06cfcbb4aab4f3925094e4058ab8b7b6e058f429402f86b94fe05d78abd"
+    },
+    "receipts/mvp024-native-startup-focused-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "07292f48623e05d0e49ffdb43296a9b639541274fc63f3b4db644f13635dfece"
+    },
+    "receipts/mvp024-native-startup-instructions-r1.json": {
+      "bytes": 3870,
+      "sha256": "eff9b5f0cdec89508fbf27f5e181591638076e7bace7496263bc32f4ef0bcfb8"
+    },
+    "receipts/mvp024-native-startup-red-r1-test.rs": {
+      "bytes": 5955,
+      "sha256": "fc4b781e1451a430c9b723fe7724461c55dc84b156a36e3c207716d984ee83d3"
+    },
+    "receipts/mvp024-native-startup-red-r1.admission.json": {
+      "bytes": 1175,
+      "sha256": "3428e18b6f1cc75f1c379a763b2f326b91194e7beddaee1123de3e56f2532019"
+    },
+    "receipts/mvp024-native-startup-red-r1.collected.json": {
+      "bytes": 489,
+      "sha256": "63cfad9c56e01e3904684041e63a921057857bb0cc2345ef2d680cb298641a58"
+    },
+    "receipts/mvp024-native-startup-red-r1.launch.json": {
+      "bytes": 395,
+      "sha256": "33c0e7818a0c9c5b1bdf9944919f955b6b4963ac3245bb4a3909532555d0581e"
+    },
+    "receipts/mvp024-native-startup-red-r1.log": {
+      "bytes": 993,
+      "sha256": "9396de792f27a6c3218e7cb86bacab8c0f954f720fbf85feaa2e6a44f4060c4e"
+    },
+    "receipts/mvp024-native-startup-red-r1.supervisor.log": {
+      "bytes": 227,
+      "sha256": "9335dbff573985a9b025b35f84238cf9d1961310b22ee50841160f32a78e2e5d"
+    },
+    "receipts/mvp024-native-startup-red-r1.terminal.json": {
+      "bytes": 239,
+      "sha256": "b44f5541904de6951f6bc3326131a7e2187c544bc614de814c85fc426ff1548c"
+    },
+    "receipts/mvp024-native-startup-regression-format-r1.diff": {
+      "bytes": 1036,
+      "sha256": "a9e76e6ccefe47e1fa3f852ecdadd4c6c963a6378bcdc3d188210af3627ce341"
+    },
+    "receipts/mvp024-native-startup-regression-format-r1.json": {
+      "bytes": 1424,
+      "sha256": "51f7cb2e51d142746888001b0a5cb454f05a965843ea5b6db0030300797787d4"
+    },
+    "receipts/mvp024-native-startup-scope-decision-r1.json": {
+      "bytes": 502,
+      "sha256": "d1e9c8a0fdc740cfaba9f8346dee78aa79de104f170f9c0adde9eb0b0bbf4f01"
+    },
+    "receipts/mvp024-native-startup-scope-r1.json": {
+      "bytes": 2333,
+      "sha256": "38d29b10b321767225774c18a11f6aa5832935889e42bf340c69d65099952d34"
+    },
+    "base/src/main.rs": {
+      "bytes": 39234,
+      "sha256": "b63278b450ec3b0799562248ea28d86b2a694648987632881f6167002ed4c4d1"
+    },
+    "candidate/src/main.rs": {
+      "bytes": 39911,
+      "sha256": "33cb2ff2429bbf544ef3cfdbdbe72fc301c8902e1a30f4d2966465e18be34ba3"
+    },
+    "base/tests/support/daemon_resources.rs": {
+      "bytes": 4570,
+      "sha256": "67db7763f681ae260321a4685c19e97d5b7c7e5cc5a4f0fbb1445ead2c245e13"
+    },
+    "candidate/tests/support/daemon_resources.rs": {
+      "bytes": 6044,
+      "sha256": "8c0ef6b608335294db56f57fdf7f28022930e2ef938f46a27921ee04f1360d2b"
+    },
+    "base/scripts/check_daemon_command.py": {
+      "bytes": 9558,
+      "sha256": "95e3faaa6bc2e417a22e206602fa778e4f3bb4fea89f6ed5605deb5fe3bf1261"
+    },
+    "candidate/scripts/check_daemon_command.py": {
+      "bytes": 9989,
+      "sha256": "5709d3e2ad70c0f24ab98ed07ff520b441dbb3cbf54bfcf7a4b4e9757ad9a163"
+    },
+    "identity.json": {
+      "bytes": 626,
+      "sha256": "f5a2fe9f80c01217e387fa0cf63ff34c19c8d9572c6e14ad7c689c827a63217f"
+    }
+  }
+}

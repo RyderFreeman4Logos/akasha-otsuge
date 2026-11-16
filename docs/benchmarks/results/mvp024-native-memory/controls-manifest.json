@@ -1,0 +1,519 @@
+{
+  "head": "2987eb1e744d2a2c55e642df3457b6156c8e2a88",
+  "tree": "f8396cd1e5db8acbaf0d223a89eb735828c67bed",
+  "cases": [
+    "mvp024-production-fts-control-r1",
+    "mvp024-production-arena-control-r1",
+    "mvp024-production-arena-min-control-r1"
+  ],
+  "scope": "One failed FTS1/32 control, two complete arena2 controls with FTS1/32 and FTS1/1; original limits and oracles. Bounded tuning only; full-scale and production-default acceptance pending.",
+  "cleanup": "All exact disposable databases and sockets removed after process/consumer checks; original source shards and shared oracles are not duplicated.",
+  "zip_sha256": "1b6520290a3f566345e2544dae3429bf8a4cefbfa267a7e9e53f9e461e3c45b0",
+  "zip_bytes": 2582247,
+  "members": {
+    "mvp024-production-fts-control-r1/admission.json": {
+      "bytes": 2400,
+      "sha256": "338aad33aab58985a8101e83f329d6f775e181a4e6f56cd041be5a01fc8fd590"
+    },
+    "mvp024-production-fts-control-r1/commands.jsonl": {
+      "bytes": 72065,
+      "sha256": "8e0cd6a913d596f1009315580959eb4b30ff31c7b01f288cc38b77c212d3e23b"
+    },
+    "mvp024-production-fts-control-r1/daemon-process.json": {
+      "bytes": 67,
+      "sha256": "e381a22e2bed46ea69efbd79e5d9c402b51704727492ffb4b60f6876068c0988"
+    },
+    "mvp024-production-fts-control-r1/daemon.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-fts-control-r1/daemon.toml": {
+      "bytes": 245,
+      "sha256": "a368fc50d2a2fc3c6153da63461fdef06bf8017115773897444d7684dc85db4c"
+    },
+    "mvp024-production-fts-control-r1/disk-latest.json": {
+      "bytes": 106,
+      "sha256": "f2629cca783126d59cc8380015055a11d4b85fadea4b0fcca2653ee479081eae"
+    },
+    "mvp024-production-fts-control-r1/failure.json": {
+      "bytes": 478,
+      "sha256": "71e13f14d7af8dba4637a9248fc37f1f384572791173c4638da2e61a6758cbd8"
+    },
+    "mvp024-production-fts-control-r1/fts-environment.json": {
+      "bytes": 316,
+      "sha256": "6ce61f69ae2208c8c754a26da8fe9261da62d8a04a8aad36df3dab61d27a5429"
+    },
+    "mvp024-production-fts-control-r1/initial-status.json": {
+      "bytes": 3000,
+      "sha256": "cfc7f8664a1435e3f432ddc187c9dde6bb9ed4153589000e96840b6646ed1e9b"
+    },
+    "mvp024-production-fts-control-r1/metrics.jsonl": {
+      "bytes": 344488,
+      "sha256": "9adc9154e42972fc84a6a67427ea7b79a57936c257f332abea7b177f57584953"
+    },
+    "mvp024-production-fts-control-r1/progress.json": {
+      "bytes": 381,
+      "sha256": "389f90e6cd93297a97ad277b2e5aa40f528e1f15ad9282c4191c40a8afcb83b7"
+    },
+    "mvp024-production-fts-control-r1/progress.yaml": {
+      "bytes": 381,
+      "sha256": "389f90e6cd93297a97ad277b2e5aa40f528e1f15ad9282c4191c40a8afcb83b7"
+    },
+    "mvp024-production-fts-control-r1/seed-process.json": {
+      "bytes": 67,
+      "sha256": "d55a7f7c72b1c72b08925b6eab874faafe6275fe94bcd37677435a942edfc6f5"
+    },
+    "mvp024-production-fts-control-r1/seed.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-fts-control-r1/state.json": {
+      "bytes": 540,
+      "sha256": "88a775f930aaa0b40fb5c2677d644ef3429396a91b2c18be07a4e4bde37510fb"
+    },
+    "receipts/mvp024-production-fts-control-r1-build.json": {
+      "bytes": 718,
+      "sha256": "2446e42b9c5e0f77fa9b2b2b5fba0d3ed82b51b77985d1802dc0a5ecc1d681d5"
+    },
+    "receipts/mvp024-production-fts-control-r1-cleanup-admission.json": {
+      "bytes": 6059,
+      "sha256": "2a60b49ef16a23ad410813bc36139904e2f9f24525cb0589b80aa39bfe1520df"
+    },
+    "receipts/mvp024-production-fts-control-r1-cleanup.json": {
+      "bytes": 6166,
+      "sha256": "d8c67f660b69fb68fe0755e8c8ce6a72b084c9b89049be60a9eae804e6342912"
+    },
+    "receipts/mvp024-production-fts-control-r1-driver.diff": {
+      "bytes": 4884,
+      "sha256": "744d8289a41c532cd7ae48dfad89df36b2a21db059eeaeeb5049cc08bef9edc3"
+    },
+    "receipts/mvp024-production-fts-control-r1-preparation.json": {
+      "bytes": 807,
+      "sha256": "e5d410a1eace44a2e62f0fd83faec09750f3e391e73cd253dcbed4248b393c73"
+    },
+    "receipts/mvp024-production-fts-control-r1-reconcile.py": {
+      "bytes": 7317,
+      "sha256": "25801720371ea18ce45849289228d9d8cff42f086ecd34ce7707cc17f342b7c5"
+    },
+    "receipts/mvp024-production-fts-control-r1-verified.json": {
+      "bytes": 75803,
+      "sha256": "0d8ea00725efa319c31ede866523543b5fcc8519d2d26194f9945b358f5bb567"
+    },
+    "receipts/mvp024-production-fts-control-r1.py": {
+      "bytes": 20834,
+      "sha256": "cb692526bee1811b216c4ed4b1f1c561c55294538e50771d1e99639c6ca17e2a"
+    },
+    "mvp024-production-arena-control-r1/admission.json": {
+      "bytes": 2617,
+      "sha256": "34ca37b990f278ec945c282b4b945be3c9b82b072fe351ed070b67124e86c8ad"
+    },
+    "mvp024-production-arena-control-r1/commands.jsonl": {
+      "bytes": 2863799,
+      "sha256": "c3ad67c9c369a4ac099679005699f0a42d10556290bbb9b008f12c9ae4eeafca"
+    },
+    "mvp024-production-arena-control-r1/daemon-process.json": {
+      "bytes": 67,
+      "sha256": "d3b97150c9db37acb3761c6b97b41a3eb12092028567a556892fa9b847f8ffd4"
+    },
+    "mvp024-production-arena-control-r1/daemon.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-arena-control-r1/daemon.toml": {
+      "bytes": 247,
+      "sha256": "3decf70f1f5b7f25950618a3cc3244b7891afb5e898b9ef6f7c023312935fc25"
+    },
+    "mvp024-production-arena-control-r1/disk-latest.json": {
+      "bytes": 106,
+      "sha256": "296590f123db5f17f4ff7b61fcf25021460024ead675ec3e8bcb572420dad62b"
+    },
+    "mvp024-production-arena-control-r1/final-status.json": {
+      "bytes": 3011,
+      "sha256": "d5516e8effc2e020f7da7e305a9883608e293eefd528e8fe7feda27607d16b3c"
+    },
+    "mvp024-production-arena-control-r1/fts-environment.json": {
+      "bytes": 361,
+      "sha256": "d3421bbef5225faa6d3d7fd8d9d7145d18066b95b7b0c34f3c34d6f0560495d1"
+    },
+    "mvp024-production-arena-control-r1/indexed-status.json": {
+      "bytes": 196,
+      "sha256": "3dcd1e1d8fd94403c27966e51494a005bd691ee2cc3479b6c4e078acc242df65"
+    },
+    "mvp024-production-arena-control-r1/initial-status.json": {
+      "bytes": 3000,
+      "sha256": "c64a55172e9bd00c2ec8a8ad1831a4c4878b40be6ade6848aab364eb2cfe3cf6"
+    },
+    "mvp024-production-arena-control-r1/metrics.jsonl": {
+      "bytes": 725936,
+      "sha256": "4985515a9ca8ffb69da9a1c3c56a672423ae8cec6dd50a17e55fe6a15d8af99e"
+    },
+    "mvp024-production-arena-control-r1/p0-scope.json": {
+      "bytes": 99,
+      "sha256": "54ab54db735b5706c0a5709645fe8e54c667b3e1e7fc9d2a512658c5eae14663"
+    },
+    "mvp024-production-arena-control-r1/p1-scope.json": {
+      "bytes": 99,
+      "sha256": "6b1ca6a14575a9fa4b846e7502af6bbbe971e02041033830a8f2ecdca376abd0"
+    },
+    "mvp024-production-arena-control-r1/p2-scope.json": {
+      "bytes": 99,
+      "sha256": "70a95b011c40f7cd7a2af53f127177b22759404157fb96971391ac6288e9cd9c"
+    },
+    "mvp024-production-arena-control-r1/p3-scope.json": {
+      "bytes": 99,
+      "sha256": "25557ca787830e549aeaae0a70b89c3b1b646d16724e00082955a4fc868a21d5"
+    },
+    "mvp024-production-arena-control-r1/p4-scope.json": {
+      "bytes": 99,
+      "sha256": "7bbd8a405d5802b25a8778fa1d869a1da1b928a8587b3c7ee3c65bb2212c6b7c"
+    },
+    "mvp024-production-arena-control-r1/p5-scope.json": {
+      "bytes": 99,
+      "sha256": "d87d5f5938b79efdbd142790883a5454d3c9f1b69bfe07deb98c5104401b913f"
+    },
+    "mvp024-production-arena-control-r1/p6-scope.json": {
+      "bytes": 99,
+      "sha256": "56e7ff59eed8d2d7079e66ac0362c95d1dfbfb29b3e1c634f1ef89d5a934b6d1"
+    },
+    "mvp024-production-arena-control-r1/p7-scope.json": {
+      "bytes": 99,
+      "sha256": "7f1b6ccecf3a6aca8767b63eabbe581a750226a8a155d187ca59e7e0a5ff004b"
+    },
+    "mvp024-production-arena-control-r1/pilot-index-terminal.json": {
+      "bytes": 812,
+      "sha256": "d18beba63de30228d1fba630bf3cbbbb1fc1607421d8dec80e1f88548238fc18"
+    },
+    "mvp024-production-arena-control-r1/pilot-search-p0-terminal.json": {
+      "bytes": 76604,
+      "sha256": "f467ef1d66b820b8f90fcaf0efd054b010d0a34fcd4f976986d0e55e7598b034"
+    },
+    "mvp024-production-arena-control-r1/pilot-search-p1-terminal.json": {
+      "bytes": 74454,
+      "sha256": "a072618f160b6a657fdf366df9247b02117ae201fd36031c036eb12eb646bce1"
+    },
+    "mvp024-production-arena-control-r1/pilot-search-p2-terminal.json": {
+      "bytes": 70897,
+      "sha256": "3d79f3e8204cfb7b001cf0b9b912eb8aeba11e0045b927eda7af0d147472382a"
+    },
+    "mvp024-production-arena-control-r1/pilot-search-p3-terminal.json": {
+      "bytes": 3404,
+      "sha256": "88a70c74eb0b54b6bf0e932102267c1ee148eb25a328bc1a93b3e480551acab4"
+    },
+    "mvp024-production-arena-control-r1/pilot-search-p4-terminal.json": {
+      "bytes": 89357,
+      "sha256": "e01cd890b8648165cd7e1e92f973ca377303f34f4d5412901edc14f6a6d67cef"
+    },
+    "mvp024-production-arena-control-r1/pilot-search-p5-terminal.json": {
+      "bytes": 46080,
+      "sha256": "8e4cd267cf9c4ea7f56bb19bf8f35b8d4df7d24502551faf187003fce1b09d9a"
+    },
+    "mvp024-production-arena-control-r1/pilot-search-p6-terminal.json": {
+      "bytes": 54881,
+      "sha256": "a663e14d3e294c52fb6c2df3f89c25fc62f2c8392a6793b8ae3b4d63406d2c84"
+    },
+    "mvp024-production-arena-control-r1/pilot-search-p7-terminal.json": {
+      "bytes": 75729,
+      "sha256": "60c309e27fd21c1885ee9fd3647cbc6e95bfe352a5070313087fdc8a6d2d5c4f"
+    },
+    "mvp024-production-arena-control-r1/progress.json": {
+      "bytes": 367,
+      "sha256": "5ac897d77d4c256d98bc59be7642d90f8d308a938c720431996c66242c45c6c8"
+    },
+    "mvp024-production-arena-control-r1/progress.yaml": {
+      "bytes": 367,
+      "sha256": "5ac897d77d4c256d98bc59be7642d90f8d308a938c720431996c66242c45c6c8"
+    },
+    "mvp024-production-arena-control-r1/result.json": {
+      "bytes": 235884,
+      "sha256": "bafda8d0f368f987afe12dba68464e9fcbc82f23accb3137c65c9eae8f1f7367"
+    },
+    "mvp024-production-arena-control-r1/seed-process.json": {
+      "bytes": 67,
+      "sha256": "f0309e9a9a0aa3a89591e8a1c48f5d3ec2e3547e53b20dcac78069a46fae13ae"
+    },
+    "mvp024-production-arena-control-r1/seed.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-arena-control-r1/state.json": {
+      "bytes": 414,
+      "sha256": "66b9927a0c4d8b0e6c5cc75d4e28ad687f44d1c13982aa853477247c3b323e1a"
+    },
+    "receipts/mvp024-production-arena-control-r1-build.json": {
+      "bytes": 1145,
+      "sha256": "a6474bf3dab97fe91da4609b0eb656ef7261723c1640881bfc2a6677a7d49d25"
+    },
+    "receipts/mvp024-production-arena-control-r1-cleanup-admission.json": {
+      "bytes": 6066,
+      "sha256": "bc6e94f9625955e7ac02eb268d1b94e26e6fcf522eadb60442c8551e9f103317"
+    },
+    "receipts/mvp024-production-arena-control-r1-cleanup.json": {
+      "bytes": 6173,
+      "sha256": "fc6c3ca5a9b30348e9851cc5f0cac6e909ba3ab2bab665e24fb40605945ea8fd"
+    },
+    "receipts/mvp024-production-arena-control-r1-driver.diff": {
+      "bytes": 5720,
+      "sha256": "707364b79caf426762eccf9ad565094f6d60b2e779d6b815f4a5b9f709704346"
+    },
+    "receipts/mvp024-production-arena-control-r1-reconcile.py": {
+      "bytes": 9343,
+      "sha256": "af71114fe7045ba5a2936cab60ae53dd4b4296a3c00a05c031e7255ce69a474e"
+    },
+    "receipts/mvp024-production-arena-control-r1-verified.json": {
+      "bytes": 142872,
+      "sha256": "979b481f71f4e8093cb96ba027f62f6d4d0c0d30613baf1ba1b3df98fffffaa7"
+    },
+    "receipts/mvp024-production-arena-control-r1.admission.json": {
+      "bytes": 1141,
+      "sha256": "ffd4535d857fa8b99b334eb3be4c3d9062721b1d88ae2094cbd7ea02c24032ef"
+    },
+    "receipts/mvp024-production-arena-control-r1.collected.json": {
+      "bytes": 480,
+      "sha256": "b658604125b53bb8bd1a40256ca09eb1a7892601465f570918194dc0c253cf1f"
+    },
+    "receipts/mvp024-production-arena-control-r1.launch.json": {
+      "bytes": 367,
+      "sha256": "446db73639d5814c42fcb48373115fd6f004d288a9ca9e9fdb7fe8adbc56c72c"
+    },
+    "receipts/mvp024-production-arena-control-r1.log": {
+      "bytes": 513,
+      "sha256": "f7b5b461d4c8510b07934a1d0e9f624a3fa8ba3f95040fdc8065c57315ab1f72"
+    },
+    "receipts/mvp024-production-arena-control-r1.py": {
+      "bytes": 21121,
+      "sha256": "dc7626be0126a7dffc51dab8303a5364551fa4c8b2a2201e495bac1520ae1bc7"
+    },
+    "receipts/mvp024-production-arena-control-r1.supervisor.log": {
+      "bytes": 225,
+      "sha256": "b2edf61e8f28702494e57c8920fbccd19630c41344d4b34c7ac8d3876eaff7cf"
+    },
+    "receipts/mvp024-production-arena-control-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "19f422631b687aca1f51014f01bb43b6228c143f3865e40b2e1069aaa4226320"
+    },
+    "mvp024-production-arena-min-control-r1/admission.json": {
+      "bytes": 2674,
+      "sha256": "22297ea664952d4ebe3e37f53b2d8134d052938230fc2074bac3856486dd26af"
+    },
+    "mvp024-production-arena-min-control-r1/commands.jsonl": {
+      "bytes": 3287423,
+      "sha256": "0456a229eb48a653d27e20cb1db80a50c03e89630308e171d8b035fba1cc8422"
+    },
+    "mvp024-production-arena-min-control-r1/daemon-process.json": {
+      "bytes": 67,
+      "sha256": "d748443f8c6c1c6affe0f911cd67de33f3fe3a1df3b63229a90760d4925146e8"
+    },
+    "mvp024-production-arena-min-control-r1/daemon.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-arena-min-control-r1/daemon.toml": {
+      "bytes": 251,
+      "sha256": "86b8f8b43b047b03e707fa35968517e1480f0e9cdfebf455fcd631e5da2c16b8"
+    },
+    "mvp024-production-arena-min-control-r1/disk-latest.json": {
+      "bytes": 106,
+      "sha256": "0b2690b390e30d0d77d52eafea625257ed7feb9ea07e91ee9cc6d55d2c20ced3"
+    },
+    "mvp024-production-arena-min-control-r1/final-status.json": {
+      "bytes": 3012,
+      "sha256": "bada935cda3777e183054d5eb697e4b93ceaae9f5c9fcc5aa096869a10cd5d08"
+    },
+    "mvp024-production-arena-min-control-r1/fts-environment.json": {
+      "bytes": 360,
+      "sha256": "26e8de4e9a4afb7b9e4a2b56eed294500d7cdca044847d9ad1434fd7855009fb"
+    },
+    "mvp024-production-arena-min-control-r1/indexed-status.json": {
+      "bytes": 196,
+      "sha256": "3dcd1e1d8fd94403c27966e51494a005bd691ee2cc3479b6c4e078acc242df65"
+    },
+    "mvp024-production-arena-min-control-r1/initial-status.json": {
+      "bytes": 3000,
+      "sha256": "3cd700b3a4424a1a5a7cac2efbcb9142e82b8949bc6094402887d132766c4097"
+    },
+    "mvp024-production-arena-min-control-r1/metrics.jsonl": {
+      "bytes": 2779901,
+      "sha256": "9ecd01acd87311f46f990f4bf483627e88396f07f4acd194a635535e398b2e95"
+    },
+    "mvp024-production-arena-min-control-r1/p0-scope.json": {
+      "bytes": 99,
+      "sha256": "54ab54db735b5706c0a5709645fe8e54c667b3e1e7fc9d2a512658c5eae14663"
+    },
+    "mvp024-production-arena-min-control-r1/p1-scope.json": {
+      "bytes": 99,
+      "sha256": "6b1ca6a14575a9fa4b846e7502af6bbbe971e02041033830a8f2ecdca376abd0"
+    },
+    "mvp024-production-arena-min-control-r1/p2-scope.json": {
+      "bytes": 99,
+      "sha256": "70a95b011c40f7cd7a2af53f127177b22759404157fb96971391ac6288e9cd9c"
+    },
+    "mvp024-production-arena-min-control-r1/p3-scope.json": {
+      "bytes": 99,
+      "sha256": "25557ca787830e549aeaae0a70b89c3b1b646d16724e00082955a4fc868a21d5"
+    },
+    "mvp024-production-arena-min-control-r1/p4-scope.json": {
+      "bytes": 99,
+      "sha256": "7bbd8a405d5802b25a8778fa1d869a1da1b928a8587b3c7ee3c65bb2212c6b7c"
+    },
+    "mvp024-production-arena-min-control-r1/p5-scope.json": {
+      "bytes": 99,
+      "sha256": "d87d5f5938b79efdbd142790883a5454d3c9f1b69bfe07deb98c5104401b913f"
+    },
+    "mvp024-production-arena-min-control-r1/p6-scope.json": {
+      "bytes": 99,
+      "sha256": "56e7ff59eed8d2d7079e66ac0362c95d1dfbfb29b3e1c634f1ef89d5a934b6d1"
+    },
+    "mvp024-production-arena-min-control-r1/p7-scope.json": {
+      "bytes": 99,
+      "sha256": "7f1b6ccecf3a6aca8767b63eabbe581a750226a8a155d187ca59e7e0a5ff004b"
+    },
+    "mvp024-production-arena-min-control-r1/pilot-index-terminal.json": {
+      "bytes": 812,
+      "sha256": "406be2f4ac0cf8d0478f8c0dfed171b71630113cbb4dc9be083f6e268a39fae2"
+    },
+    "mvp024-production-arena-min-control-r1/pilot-search-p0-terminal.json": {
+      "bytes": 76604,
+      "sha256": "a714e40eb849e08e56d9c23e5c170ff2d5eb22c4ef71edb6ad48918557e16d5d"
+    },
+    "mvp024-production-arena-min-control-r1/pilot-search-p1-terminal.json": {
+      "bytes": 74454,
+      "sha256": "18600c7bad6b80e80bd2f820c6dd995485dc15d358fa35e0b072e7a053bda580"
+    },
+    "mvp024-production-arena-min-control-r1/pilot-search-p2-terminal.json": {
+      "bytes": 70897,
+      "sha256": "a2c3db53220cd40fbc7a7881d205a5948422db189012895e256fbf40f658f942"
+    },
+    "mvp024-production-arena-min-control-r1/pilot-search-p3-terminal.json": {
+      "bytes": 3404,
+      "sha256": "71a96d1085e9d69c27a7c8dc8800b9de267437591e5ae6cd8bdf3f83104ca445"
+    },
+    "mvp024-production-arena-min-control-r1/pilot-search-p4-terminal.json": {
+      "bytes": 89357,
+      "sha256": "2062b9f170dcecf0e44f2c89eef19082f2dc1f7c79b1a200b3ae2a40048ffc40"
+    },
+    "mvp024-production-arena-min-control-r1/pilot-search-p5-terminal.json": {
+      "bytes": 46080,
+      "sha256": "ef33e84f40216312bc09b23abc6d2bdc2196f0672e333f4db0d7d85e5c5f62a9"
+    },
+    "mvp024-production-arena-min-control-r1/pilot-search-p6-terminal.json": {
+      "bytes": 54881,
+      "sha256": "ecce5262ac63b1faf7e83960d9edca4f89c0a6415a180e3e10cb68616a4b465e"
+    },
+    "mvp024-production-arena-min-control-r1/pilot-search-p7-terminal.json": {
+      "bytes": 75729,
+      "sha256": "1ea20faba1267c49081385050b122f0459f2478328c1ca515fd52a77423a41da"
+    },
+    "mvp024-production-arena-min-control-r1/progress.json": {
+      "bytes": 366,
+      "sha256": "33ced7b88f5512b94987de1d45260294232527a4b68954a891d117c508206d1b"
+    },
+    "mvp024-production-arena-min-control-r1/progress.yaml": {
+      "bytes": 366,
+      "sha256": "33ced7b88f5512b94987de1d45260294232527a4b68954a891d117c508206d1b"
+    },
+    "mvp024-production-arena-min-control-r1/result.json": {
+      "bytes": 235922,
+      "sha256": "7fae10987c192c8e2b1a2c4bf54fd24a82a36af854918efa8d08f8f600860292"
+    },
+    "mvp024-production-arena-min-control-r1/seed-process.json": {
+      "bytes": 67,
+      "sha256": "c3aa62279863c1934fb8f3176a8a41b8d614bb9428ab0003e99cfb348d3786f2"
+    },
+    "mvp024-production-arena-min-control-r1/seed.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mvp024-production-arena-min-control-r1/state.json": {
+      "bytes": 414,
+      "sha256": "d9ac5060a6de1cf9b37a99389fdf824ade5246aa1aaf6be547802f60aee58041"
+    },
+    "receipts/mvp024-production-arena-min-control-r1-build.json": {
+      "bytes": 1760,
+      "sha256": "092a010339fe76dd83d3bedcf5d3b9eb8e72843e453ff90b632c9c0a02c3aa2e"
+    },
+    "receipts/mvp024-production-arena-min-control-r1-cleanup-admission.json": {
+      "bytes": 6070,
+      "sha256": "5ef1588d950b03bb40d99d3176b9197c49dc083dada42dc962b900fcf3b9ac86"
+    },
+    "receipts/mvp024-production-arena-min-control-r1-cleanup.json": {
+      "bytes": 6177,
+      "sha256": "0be2bee3ee0e4512bb959331cfcc7ccddfb76c2985d2cdb8342faf5116c5e904"
+    },
+    "receipts/mvp024-production-arena-min-control-r1-reconcile.py": {
+      "bytes": 9487,
+      "sha256": "55a8fafa7721fc51e82dbb68814e4941a7494f038c5853d07260f0f7dced5de7"
+    },
+    "receipts/mvp024-production-arena-min-control-r1-verified.json": {
+      "bytes": 189628,
+      "sha256": "284a530d4061122ec5c6c95379df8206fb14334053f06a80dee63014c6d3d1ed"
+    },
+    "receipts/mvp024-production-arena-min-control-r1.admission.json": {
+      "bytes": 1145,
+      "sha256": "8b65d923a82d6d5ce59731308933649f568aaab62bbe20c235d5ca4b08723405"
+    },
+    "receipts/mvp024-production-arena-min-control-r1.collected.json": {
+      "bytes": 457,
+      "sha256": "7819ac4f18f0f0892ef5343f580c825b6f42f9c05aafa672d8e8715c9ad9f492"
+    },
+    "receipts/mvp024-production-arena-min-control-r1.launch.json": {
+      "bytes": 375,
+      "sha256": "08383a52eedacfbf9dd79b8b862b73de02c982ffb23fdbed731a0a401a3cef96"
+    },
+    "receipts/mvp024-production-arena-min-control-r1.log": {
+      "bytes": 517,
+      "sha256": "858ff2bb1787d249ea16e66b8feafe2c7c6a0fdf9e241697e2e7423ac51fba7c"
+    },
+    "receipts/mvp024-production-arena-min-control-r1.py": {
+      "bytes": 21184,
+      "sha256": "a4fe937362b7e85ff1c94854278c7713ae91008677ea5ca8f1c4dd71259e82da"
+    },
+    "receipts/mvp024-production-arena-min-control-r1.supervisor.log": {
+      "bytes": 224,
+      "sha256": "0e8847b240e726bf7f10f494599b0a6094860a5f1c0ad9439420d352deb800e7"
+    },
+    "receipts/mvp024-production-arena-min-control-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "0a74a2a630ad07e64e5e8aed04b1d471eeeea996596c0da42b37f2a05ed98023"
+    },
+    "receipts/mvp024-production-fts-control-launch-r1.admission.json": {
+      "bytes": 1122,
+      "sha256": "56f7f281d9a25b33d08af5ad2ef7ce13c31a24348a8540b2a6c4d0d2b0cf34a2"
+    },
+    "receipts/mvp024-production-fts-control-launch-r1.collected.json": {
+      "bytes": 420,
+      "sha256": "e67c7d846cf3939f2e47b804eab328d5cfd1bc135d254a329185d9b53d8ee85b"
+    },
+    "receipts/mvp024-production-fts-control-launch-r1.launch.json": {
+      "bytes": 353,
+      "sha256": "e1b8d3ce1582d56c99b8a5f5a6a99c3c1e792de9675608547fd73211f697d4dd"
+    },
+    "receipts/mvp024-production-fts-control-launch-r1.log": {
+      "bytes": 2058,
+      "sha256": "c936f4fc7fd39af5cf534ff2be5b42fbe89b2cbe6fba6a51a5e4a7d34a36bb7a"
+    },
+    "receipts/mvp024-production-fts-control-launch-r1.py": {
+      "bytes": 1835,
+      "sha256": "754a529e1d6ecc15f1281bc8651d835a910a2ab577ebc22b9edc08f93b3b32d4"
+    },
+    "receipts/mvp024-production-fts-control-launch-r1.supervisor.log": {
+      "bytes": 225,
+      "sha256": "9e9413e568d4c1c8e3345ae2af8250e90ec9206b171459deab8f25e198555a8d"
+    },
+    "receipts/mvp024-production-fts-control-launch-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "3e0274270c45fc5036a196ed568a793da9bdb89224e01bd018c99c347a2a8597"
+    },
+    "identity.json": {
+      "bytes": 616,
+      "sha256": "df6819d2f38adc560b789af72d4991b2355bf9adaed4ced1bed68c255f9b8ebc"
+    },
+    "shared-input-references.json": {
+      "bytes": 5272,
+      "sha256": "6423c2a4e50146317cdec9fb0cfaccd51f95eb26d257274761bda1f3beed0ed0"
+    },
+    "archive-builder.py": {
+      "bytes": 4292,
+      "sha256": "050e57234c469967208174ff2fb94289b2024cae9385a94cb8656a09ece38794"
+    }
+  }
+}

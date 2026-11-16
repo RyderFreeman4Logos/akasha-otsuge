@@ -13,6 +13,23 @@ Omitted options stay omitted in archived configuration serialization, preserving
 old configuration digests and accepted jobs. Invalid cross-budget combinations
 reject the entire reload; pinned jobs retain their configuration generation.
 
+Before opening storage, `daemon run` sets `MALLOC_ARENA_MAX=2`,
+`LANCE_FTS_NUM_SHARDS=1` and `LANCE_FTS_PARTITION_SIZE=32`. If needed, it executes
+the same binary again with the same arguments and PID. `daemon start` uses this
+same entrypoint. This bounds glibc's default arena count and Lance's FTS update
+defaults to one worker with a 32 MiB partition buffer; creation-only index
+parameters are not retained by Lance for later updates. These startup settings
+remain unchanged during budget reload, including the required 2048-to-512 MiB
+transition. Smaller compatible targets still use the same update buffer.
+
+These are working-memory settings, not total RSS limits. Other environment
+values remain inherited by the daemon and its children. An explicit
+[`glibc.malloc.arena_max` tunable](https://sourceware.org/glibc/manual/latest/html_node/Memory-Allocation-Tunables.html)
+supersedes `MALLOC_ARENA_MAX`; a different allocator can also ignore it. Actual
+procfs/cgroup observations remain authoritative. The
+[bounded corpus controls](benchmarks/results/mvp024-native-memory/README.md)
+do not establish the full production operating envelope.
+
 ```toml
 [runtime]
 memory_budget_mib = 512

@@ -1,6 +1,46 @@
 use super::*;
 use std::os::unix::fs::FileExt;
 
+#[test]
+fn native_startup_limits_preserve_pid_and_unrelated_environment() {
+    for inherited in [None, Some(["8", "7", "64"]), Some(["2", "1", "32"])] {
+        let mut daemon = Daemon::new();
+        let mut command = daemon.command();
+        let keys = [
+            "MALLOC_ARENA_MAX",
+            "LANCE_FTS_NUM_SHARDS",
+            "LANCE_FTS_PARTITION_SIZE",
+        ];
+        for (index, key) in keys.iter().enumerate() {
+            if let Some(values) = inherited {
+                command.env(key, values[index]);
+            } else {
+                command.env_remove(key);
+            }
+        }
+        command.env("GLIBC_TUNABLES", "glibc.malloc.trim_threshold=131072");
+        daemon.start_command(command);
+        let pid = daemon.child.as_ref().unwrap().id();
+        assert_eq!(daemon.cli(&["daemon", "status"])["data"]["pid"], pid);
+        let environment = std::fs::read(format!("/proc/{pid}/environ")).unwrap();
+        for setting in [
+            "MALLOC_ARENA_MAX=2",
+            "LANCE_FTS_NUM_SHARDS=1",
+            "LANCE_FTS_PARTITION_SIZE=32",
+            "GLIBC_TUNABLES=glibc.malloc.trim_threshold=131072",
+        ] {
+            assert!(
+                environment
+                    .split(|byte| *byte == 0)
+                    .any(|entry| entry == setting.as_bytes()),
+                "missing native startup setting: {setting}"
+            );
+        }
+        daemon.cli(&["daemon", "stop"]);
+        daemon.wait();
+    }
+}
+
 pub(super) fn delegated_command(daemon: &Daemon) -> Command {
     let mut command = daemon.command();
     command.env_remove("DBUS_SESSION_BUS_ADDRESS");

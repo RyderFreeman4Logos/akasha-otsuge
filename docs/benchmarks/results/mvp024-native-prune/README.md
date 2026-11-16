@@ -195,13 +195,13 @@ PASS with zero findings and 26 fresh tests. This excludes a normal successful
 runner result; PID disappearance alone is not signal-level cancellation proof.
 Neither the exact historical r5 interleaving nor r4 timeout cause is asserted.
 
-[PR #69](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/69) remains a draft:
+[PR #69](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/69) initially remained a draft:
 both hosted attempts failed in apt with Ubuntu mirror DNS resolution errors
 (exit 100), before project checks. The single retry is exhausted. A local wait
 transport failure was separately reconciled without starting another CI attempt.
-Local merge `2512229` brings the reviewed fixture into maintenance; remote main
-is unchanged. The resulting candidate needs a fresh complete gate and R2 review
-before publication. Full Issue #65 scale/recovery acceptance remains open.
+Local merge `2512229` brought the reviewed fixture into maintenance. Its subsequent
+complete gate, R2 review and publication are recorded below. Full Issue #65
+scale/recovery acceptance remains open.
 
 [integration-validation.zip](integration-validation.zip) retains 55 members in
 102,242 bytes, SHA-256
@@ -210,3 +210,29 @@ before publication. Full Issue #65 scale/recovery acceptance remains open.
 including both foundation gates, the complete independent report, both hosted
 failures, earlier gate diagnostics and local merge custody. The original r5
 failure/focused repair remain in the linked incident-revocation archive.
+
+## Final publication
+
+Frozen candidate `2987eb1e744d2a2c55e642df3457b6156c8e2a88`, tree
+`f8396cd1e5db8acbaf0d223a89eb735828c67bed`, passed the complete R6 canonical
+gate: 641 Rust executions / 39 intentional ignores, 35 Python tests, seven Node
+tests, formatting, Clippy, release build and installed lifecycle/UID/TCP checks.
+The installed serial daemon suite passed 172 tests in 244.14 seconds.
+The full independent whole-range R2 report passed with zero actionable findings
+and 61 fresh tests (three intentional ignores). That nohup reviewer finished
+during the requested restart pause; its original result and source identity were
+collected after resume without repeating the successful gate/review.
+
+[Hosted CI43942780707](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/43942780707)
+passed on the same tree with all checks and installed acceptance.
+[PR #70](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/70) merged on
+2026-11-16 as `63acf39d2138bc582ee746b6eefede970fd3f8cc`, whose tree exactly
+matches the reviewed candidate. PR #69 was also marked merged through the
+integrated history. Its earlier standalone apt/DNS failures remain failures.
+
+[final-publication.zip](final-publication.zip) contains 41 members in 84,226 bytes,
+SHA-256 `f5454b615cf3c16a4ced9f348e181b3881e83081e02b008366ceb010504d5cb0`.
+[The manifest](final-publication-manifest.json) verifies every decompressed
+member, including the complete report, test logs, gate/CI custody and merge
+readbacks. The [resource controls](../mvp024-native-memory/README.md) are a
+separate continuation; full production scale acceptance remains pending.
