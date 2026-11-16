@@ -165,18 +165,32 @@ retains the complete report, separate smoke outcomes, final pilot, gate and CI
 logs, exact cleanup and publication readbacks. Full-scale acceptance stays open.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
-A licensed 37-row dictionary-vector supplement is prepared but not admitted.
-Cross-corpus identity and cardinality remain pending. The current candidate
-adds optional explicit vector scopes while retaining complete lexical indexing
+A licensed 37-row dictionary-vector supplement is prepared. The 2026-11-16
+41-shard read-only census verifies 1,000,000 distinct original vectors,
+999,963 eligible complete inputs and 37 nonoverlapping supplementary vectors.
+All 999,963 eligible original inputs also have distinct text hashes. The full
+10,959,509-chunk text-shard overlap scan is a superset of the old cutoff; the
+historical 50,000,002,783-byte lexical dedup count was not recounted. Only 68,006
+bytes of census receipts were retained, with no second corpus copy.
+PR #72 adds optional explicit vector scopes while retaining complete lexical indexing
 and the default all-claim policy. Its [focused evidence](../benchmarks/results/mvp024-vector-coverage/README.md)
 preserves the unchanged-test behavioral RED/GREEN, two fixture compilation
 failures, and 67 related Rust passes / one intentional ignore plus Clippy and
 format checks. Generation switching retains the old selection until activation;
 removing the selector restores the old all-memory identity. Excluded queries
 report their coverage gap without embedding calls, and excluded records still
-have contiguous completion entries. Canonical gate, review and publication are
-next. The supplement and this functional coverage contract do not establish
-million-vector or full-scale acceptance.
+have contiguous completion entries. Its exact canonical retry and CI both pass
+650 Rust executions / 39 intentional ignores, Python 35, Node 7 and installed
+lifecycle/UID/no-TCP checks. The first gate's unchanged Codex `HistoryGap` remains
+unclassified. R1's product review passed, but its overall FAIL remains because
+it overwrote a parent scope receipt and left a stale report-hash attestation.
+R2 independently recertified the intact gate/tests and final promotion evidence;
+the unavailable original scope bytes were not reconstructed. Both complete
+reports are published on [PR #72](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/72),
+merged as `c51f97b` with the reviewed tree. Production cohort seeding, exact-input
+precomputed lookup, a real vector pilot and full import/load/recovery are next.
+The supplement and functional coverage contract do not establish million-vector
+or full-scale acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
 delegation failure; its exact selector passed without explaining that failure.
 A single diagnostic topology did not reproduce it and had 18 other IPC failures.

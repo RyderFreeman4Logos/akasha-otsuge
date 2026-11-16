@@ -15,13 +15,34 @@ positive `observed_time_ms`. The controller must verify source hashes and freeze
 the selection, license, source code and executable identities before seeding.
 The binding does not itself verify a dataset or grant human approval.
 
-Each input has exactly `key`, `body` and `partition` (`p0` through `p7`). The body
+Each input has `key`, `body` and `partition` (`p0` through `p7`). An optional
+`vector_cohort` boolean defaults to false; unknown fields remain invalid. The body
 must be nonempty and at most 65,536 UTF-8 bytes. The component records the complete
 source and creates contiguous claims of at most 32,768 bytes without splitting a
 UTF-8 character. Every claim cites its actual source revision and byte range.
 An invalid claim, including an all-whitespace chunk, fails explicitly rather than
 being silently omitted. Rows become tool-origin, delegated facts only within the
 local owner's `corpus/pN` project scopes; they are not human-confirmed memories.
+
+`vector_cohort: true` additionally sets `branch_or_version` to `vectors` and
+requires the complete input to fit 4,096 UTF-8 bytes. It remains one unchanged
+claim. Configure `retrieval.embedding_scopes` with these eight project/branch
+scopes to embed the cohort while retaining every other claim in the lexical
+index. A vector query needs the corresponding branch scope; a project-only
+query retains keyword coverage. Changing the cohort flag on a previously
+admitted binding/key conflicts, just as changing its body does.
+
+`spikes/data/precomputed.py` supplies the local benchmark lookup. Its manifest
+contains a model identity, dimension 1536 and at most 27 sources, each with
+`path`, `size`, `sha256` and `layout` (`dbpedia` or `dictionary`). `Lookup` verifies
+the files and indexes complete text hashes to Parquet row addresses in memory.
+It rejects duplicate inputs and retains one decoded row group, limited to
+64 MiB of declared uncompressed data. No second text or vector file is created.
+The controller owns the loopback HTTP server, shutdown, resource accounting
+and durable progress callback. It records the helper's memory separately.
+Unknown, altered or oversized inputs and changed files fail; there is no
+synthetic fallback. This lookup replays retained embeddings and is not live
+model inference. Its small fixture tests use synthetic vectors only.
 
 One flushed acknowledgement follows each fully committed record. It includes
 content hashes, the source revision and all memory revisions. Stable binding/key
