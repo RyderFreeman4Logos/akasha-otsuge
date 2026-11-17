@@ -20,8 +20,13 @@ Each input has `key`, `body` and `partition` (`p0` through `p7`). An optional
 must be nonempty and at most 65,536 UTF-8 bytes. The component records the complete
 source and creates contiguous claims of at most 32,768 bytes without splitting a
 UTF-8 character. Every claim cites its actual source revision and byte range.
-An invalid claim, including an all-whitespace chunk, fails explicitly rather than
-being silently omitted. Rows become tool-origin, delegated facts only within the
+When a UTF-8 boundary would leave a short all-whitespace tail, the seeder moves
+the preceding claim's last non-whitespace character into that tail if both
+claims remain nonempty and within the limit. Every source byte is retained.
+An irreducible all-whitespace chunk still fails explicitly. Existing partial
+imports retain their request-conflict protection; this change does not migrate
+an already committed claim to different boundaries.
+Rows become tool-origin, delegated facts only within the
 local owner's `corpus/pN` project scopes; they are not human-confirmed memories.
 
 `vector_cohort: true` additionally sets `branch_or_version` to `vectors` and

@@ -1,0 +1,120 @@
+{
+  "archive_bytes": 340167,
+  "archive_sha256": "24fa64d83cc22689c63f5546d8eb90ff769e5c49bd450b72c793f5033cd2b460",
+  "members": {
+    "OWNER": {
+      "bytes": 47,
+      "sha256": "79c6692b718b107acdcef13494ec6779193a4ed076c46537f206b0d78043b2ad"
+    },
+    "admission.json": {
+      "bytes": 2569,
+      "sha256": "a4134d6c474d4a469b253b4f7ef261bf4639341505f2e260c90cd0ba8807dee9"
+    },
+    "bodies/16cc6d3063bd30409eb2331002ef92838f529bc5604ce5abe61e4955c743c1b1.txt.gz": {
+      "bytes": 25401,
+      "sha256": "856be1b3d5d71f6eea55aed29c9cd645ae8fa7b35cd3fb39098bd25a91bdaf12"
+    },
+    "bodies/30374bee81cff87958b63885a30daf1391fcf9cb3517e055b1c1fecdf66dedb0.txt.gz": {
+      "bytes": 23732,
+      "sha256": "c738d17e1c724f860e56fd32a906d192af81a955908fce101bb2bc5a8b69aef7"
+    },
+    "bodies/5f8181ebf60c0b6a3a1ac9501b13ee0b96edfdd513d879ce3628b0335bdb4a54.txt.gz": {
+      "bytes": 23391,
+      "sha256": "2f95f385c7f67ee9b8d97849c280952a27a7bdc4c3bd8d1fbb49183a4cb3672f"
+    },
+    "bodies/7ad3bb6bbc6a940edd528446f4a89d5ab45541a61fb1420f8a011fd8a5911024.txt.gz": {
+      "bytes": 24012,
+      "sha256": "b149f77f94b7c0437c3f5ee4ca7691efe2355e4d75cd0aa6f7fb538de42c38cc"
+    },
+    "bodies/851b42b462bb0ff77d61975ef230708e58f78fa5296e774ec700abf7a6525228.txt.gz": {
+      "bytes": 20800,
+      "sha256": "af017301e7b2147c60a035addb509ec6d58be7caff7503ac1f821e4d78fefc6c"
+    },
+    "bodies/87a8686e8b418857b504d9d4fd63d32d960b58d04cbe2911c6fce1df8f0950b4.txt.gz": {
+      "bytes": 25916,
+      "sha256": "4c28452fcd87b719bc35141f56ab67bad7fecaaf44e49829af0aa9df1a175e3e"
+    },
+    "bodies/9f503125dbc1a64e2310fc6ba775f09fa2586dde59fcbb5ac54c863854df1c99.txt.gz": {
+      "bytes": 27894,
+      "sha256": "da266f230f0abc20729466dcd04cf5a9d084d13e0d9bb6dfde978443982a3e0b"
+    },
+    "bodies/aaf67d83a68e19ed5ac266e5d380e14b52b833ae6c037ae6e9ab378b1d5f7b6a.txt.gz": {
+      "bytes": 24472,
+      "sha256": "3b228059bd56736199fe62d228ef73f692b927ecca1acc683679b2f2f72e3744"
+    },
+    "bodies/b048a8659e5e9caa5237f5cc92c810222b91848857eff4bb70de908b9891f4d1.txt.gz": {
+      "bytes": 20287,
+      "sha256": "b854350a58a6657c3885918f6a7f6bababef244ca07458d0065c66a74b8f932a"
+    },
+    "bodies/caf593ad294da83bb88b7fd0c06cc7507f543a2ecf5c6cda054647cd4e337b0b.txt.gz": {
+      "bytes": 23529,
+      "sha256": "dd6f6389872550cf69ec6a58e0464115bd0e2af750ad404a8be5f76eda0b39bb"
+    },
+    "bodies/e4679008350fce057c4963a15207fdadae7fd5c6304c2580be1a987d5116a435.txt.gz": {
+      "bytes": 24920,
+      "sha256": "e07d0fbdc6f64f48bd752791b2e94f1dbcdf00746f67f4a72460f8b9ff2d9585"
+    },
+    "bodies/e7f2801a45ecba0e50b1404c73c0703dba8d5ad23e7b489268511c8c94440075.txt.gz": {
+      "bytes": 25926,
+      "sha256": "58e00872ff2dd6db2be2e0dd6118f3e9c8bdafc662cb4174b73faab170492934"
+    },
+    "bodies/e9a819883a876597684e4807705f150f8d13e2a9d3c34f53bf79fd5dc2819854.txt.gz": {
+      "bytes": 25246,
+      "sha256": "a554bf7e3b0455040687ecf213ab046c8e82e905ab981465ee9607dfc9ae88d1"
+    },
+    "evidence/mvp024-empty-claim-diagnostic-r1-verified.json": {
+      "bytes": 922,
+      "sha256": "989aba50e9e737b1f45883dad604aeebb596188b43cb6f51cc572c24fa0aeac1"
+    },
+    "evidence/mvp024-empty-claim-diagnostic-r1.collected.json": {
+      "bytes": 496,
+      "sha256": "f7edeb2409a88827af649e2a78f941ecd8db9bbcdad2ca78561466c07e9ed9ea"
+    },
+    "evidence/mvp024-empty-claim-diagnostic-r1.launch.json": {
+      "bytes": 530,
+      "sha256": "58b2ad3b0684b394de10c1ca3b6ec548833e44b4a16c9232899bd2264bfe43dd"
+    },
+    "evidence/mvp024-empty-claim-diagnostic-r1.log": {
+      "bytes": 249,
+      "sha256": "74be77dc80eda84be2f9b7f9f237bfddd8b65af4905f01de23e2cf4fbed34fd5"
+    },
+    "evidence/mvp024-empty-claim-diagnostic-r1.py": {
+      "bytes": 8349,
+      "sha256": "fccb777e50daf7bfdc77c45e2a188cb094f9379bf76241f08607e2f7eb89b153"
+    },
+    "evidence/mvp024-empty-claim-diagnostic-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "07626ece963dc9a097a46fba047bfbea11b955de18ffd181a4bfe19f9d139a0d"
+    },
+    "evidence/mvp024_import_protocol_r1.py": {
+      "bytes": 8264,
+      "sha256": "67a37c1c9b17a48027928a2d6bf1ebafa2b7fd0547201260424d9391b2175374"
+    },
+    "progress.json": {
+      "bytes": 199,
+      "sha256": "8cbd6f5b187a611b1871328e4ea66dfdf7a8392afe55165826226ac233e5fdba"
+    },
+    "result.json": {
+      "bytes": 14517,
+      "sha256": "26ea84dbc5b56037f22b119895db623d62f9ef1138940bfd09f740650f66b505"
+    },
+    "run.toml": {
+      "bytes": 106,
+      "sha256": "1c0b38d5f5458af91a25d9e9187cc02adce3e8b8c7b7355b7b7185094184eb51"
+    },
+    "source/original-corpus_seed.rs": {
+      "bytes": 19384,
+      "sha256": "7d061371e3596b120f96566a9793162cd9aaf41ac76de3b90132ade0b0a8ba57"
+    },
+    "state.json": {
+      "bytes": 14517,
+      "sha256": "26ea84dbc5b56037f22b119895db623d62f9ef1138940bfd09f740650f66b505"
+    }
+  },
+  "scope": "13 exact licensed public corpus bodies, original rejected spans and read-only candidate; no production repair or real Domain rerun yet.",
+  "source_attribution": {
+    "license": "ODC-BY; original content rights retained",
+    "repository": "HuggingFaceFW/fineweb-edu",
+    "revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9"
+  }
+}

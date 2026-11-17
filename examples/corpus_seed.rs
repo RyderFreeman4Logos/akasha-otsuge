@@ -181,6 +181,19 @@ async fn seed_stream(
                 while !row.body.is_char_boundary(end) {
                     end -= 1;
                 }
+                if end < row.body.len()
+                    && row.body[end..].trim().is_empty()
+                    && let Some((last, _)) = row.body[..end]
+                        .char_indices()
+                        .rev()
+                        .find(|(_, ch)| !ch.is_whitespace())
+                    && last > start
+                    && row.body.len() - last <= 32768
+                    && !row.body[start..last].trim().is_empty()
+                {
+                    end = last;
+                }
+
                 let id = format!("{source_id}/{start}");
                 let memory = domain
                     .propose(
@@ -324,6 +337,87 @@ mod tests {
         .unwrap();
         bytes.push(b'\n');
         bytes
+    }
+
+    #[tokio::test]
+    async fn seed_preserves_short_blank_tail_without_dropping_evidence() {
+        for tail in ["b", "你"] {
+            let root = Fixture::new();
+            let data = root.0.join("data");
+            let body = format!(
+                "{}你{}{tail}\n",
+                "a".repeat(32767),
+                "b".repeat(32765 - tail.len())
+            );
+            assert_eq!(body.len(), 65536);
+            let input = line(&body);
+            let mut output = Vec::new();
+            assert_eq!(
+                seed_stream(&data, &binding(), input.as_slice(), &mut output).await,
+                Ok(1),
+                "a one-byte blank tail must retain its original source bytes"
+            );
+            let ack: Ack = serde_json::from_slice(&output).unwrap();
+            assert_eq!(ack.memories.len(), 3);
+            let config = resolve(
+                "",
+                None,
+                "",
+                &Paths {
+                    data_dir: data.clone(),
+                    socket_path: root.0.join("unused.sock"),
+                },
+            )
+            .unwrap();
+            let store = Storage::open(&config).await.unwrap();
+            let domain = Domain::new(&store);
+            assert_eq!(
+                domain
+                    .source(&ack.source_id, ack.source_revision)
+                    .unwrap()
+                    .payload
+                    .text,
+                body
+            );
+            let boundaries = [0, 32767, 65535 - tail.len(), body.len()];
+            let mut joined = String::new();
+            for (index, (id, revision)) in ack.memories.iter().enumerate() {
+                let memory = domain.active(id).unwrap().unwrap();
+                assert_eq!(memory.revision.commit_seq, *revision);
+                let draft = &memory.record.draft;
+                assert!(!draft.claim.trim().is_empty());
+                assert!(draft.claim.len() <= 32768);
+                let span = &draft.source_spans[0];
+                assert_eq!(
+                    (span.start, span.end),
+                    (boundaries[index], boundaries[index + 1])
+                );
+                assert_eq!(draft.claim, body[span.start..span.end]);
+                joined.push_str(&draft.claim);
+            }
+            assert_eq!(joined, body);
+            store.close().await.unwrap();
+            let mut replay = Vec::new();
+            assert_eq!(
+                seed_stream(&data, &binding(), input.as_slice(), &mut replay).await,
+                Ok(1)
+            );
+            assert_eq!(replay, output);
+        }
+        let root = Fixture::new();
+        let irreducible = line(&format!("x{}", " ".repeat(32768)));
+        let mut refused = Vec::new();
+        assert_eq!(
+            seed_stream(
+                &root.0.join("data"),
+                &binding(),
+                irreducible.as_slice(),
+                &mut refused
+            )
+            .await,
+            Err("INVALID_MEMORY")
+        );
+        assert!(refused.is_empty());
     }
 
     #[tokio::test]

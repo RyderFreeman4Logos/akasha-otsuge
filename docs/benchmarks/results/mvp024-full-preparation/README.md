@@ -38,8 +38,10 @@ preparer ceiling. A check-only wrapper examined each yielded record and claim;
 it did not alter the reader, output records or stream order.
 
 That wrapper found 13 records whose current production split creates an empty
-claim. All 13 are 65,536-byte sources; the exact empty-span lengths have not yet
-been measured. The complete census has 11,564,678 planned claims and 999,963
+claim. All 13 are 65,536-byte sources. A later
+[exact-body diagnosis and repair](../mvp024-claim-tail/README.md) measured a
+one-byte whitespace tail in every case; the original scan did not measure those
+lengths. The complete census has 11,564,678 planned claims and 999,963
 eligible original vector inputs. The overall run is **failed** for production
 record admission, despite passing source reproduction and preparation memory.
 There is no success result or production import. These records must be diagnosed
@@ -49,3 +51,21 @@ without silently filtering source bytes or weakening the production validator.
 `9260e6fa170836b21e8426ca153af762b7e8ef5f2501a9a9c7de9c40b81d215e`.
 `source-validation-manifest.json` gives the hashes of the complete receipts,
 new source manifest, wrapper, all rejection identities and original failed terminal.
+
+## Final publication
+
+PR #74 merged as `bf1576828c2797f28f702370857b8bbc523e515e`, with the same
+`d37d9be8012702194a7700710ef5d12428e9e02f` tree as reviewed head
+`d49e812bcb8bee8030175412d2eef7bfefbecffa`. Its exact canonical gate and
+CI44009285018 passed 651 Rust executions / 39 intentional ignores, 35 Python and
+7 Node tests, plus installed lifecycle, UID-denial and no-TCP checks. The hosted
+merge checkout resolves to that same tree. Independent review passed with zero
+actionable findings and four fresh PyArrow tests. Its complete report is in the
+PR description. These results do not erase the recorded admission failure.
+
+`final-publication.zip` contains 64 members and 167,140 bytes, SHA-256
+`87f6d4bb278f777e49468be7a442c1b6f46e2ea563356d8c15f3b03cd7717261`.
+The adjacent manifest records every member hash. It retains full gate/review/CI,
+push, PR readback, merge and issue reconciliation evidence, including the archive
+builder's failed directory assertion and its correction. No validation reran
+because of that archive assembly error.
