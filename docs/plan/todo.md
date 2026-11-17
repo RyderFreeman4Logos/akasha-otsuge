@@ -136,9 +136,12 @@ retains complete reports, logs and readbacks, including every earlier failure.
 - [ ] Resolve the 13 empty-claim splits found by the complete production record
   census. Exact diagnosis found one whitespace byte at each tail. The source
   repair passes unchanged RED/GREEN and all five seeder tests while preserving
-  bytes, UTF-8 spans and irreducible rejection. Actual 13-body replay, canonical
-  gate, independent review and publication remain pending. The original
-  admission run remains failed.
+  bytes, UTF-8 spans and irreducible rejection. All 13 real bodies passed
+  byte-identical replay and all 39 daemon current reads. The
+  [claim-tail archive](../benchmarks/results/mvp024-claim-tail/README.md) preserves
+  the cleanup/environment failures and their completed reconciliation.
+  Canonical gate, independent review and publication remain pending. The
+  original full admission run remains failed.
 - [ ] Stream the full eligible cohort and unchanged lexical source data through
   bounded preparation and production import; verify actual counts and byte
   coverage before full load/recovery admission. The source census is not import.
