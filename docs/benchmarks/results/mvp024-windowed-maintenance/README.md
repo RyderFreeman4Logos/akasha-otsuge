@@ -32,9 +32,40 @@ Native queries include new rows before the next maintenance window.
 
 The regression checks new-row search, denied maintenance, fewer fragments,
 unchanged authority progress, old-version readers, repeated maintenance and reopen.
-Ten related retrieval tests pass. One crash child is intentionally ignored.
+The initial focused run passed ten retrieval tests with one intentional ignore.
 The first formatter launch lacked the established toolchain environment and failed.
-Formatting passed with that environment. No full gate or review result is claimed here.
+Formatting passed with that environment. The subsequent gate and review are recorded next.
+
+## Review correction
+
+The exact `c861c26` canonical gate passed 653 Rust executions, 35 Python tests
+and seven Node tests. Independent R1 review then found one actionable defect.
+A query pinned to the old vector generation could replace the shared cache
+while the new generation's writer awaited its batch. Maintenance then selected
+the old cached table instead of the writer's table.
+
+The daemon now retains the writer's vector object through its batch and passes
+that object to maintenance. Queries can still select the previous generation.
+The deterministic regression switches the real cache between two native tables.
+Old code left 48 writer rows unindexed. The repaired code indexes all 64 rows,
+preserves the reader's native version and returns all rows from both tables.
+The authority sequence stays unchanged. Eleven retrieval tests pass with one ignore.
+The fixture data and assertions are unchanged. GREEN adapts the call to the new
+explicit argument, so raw test bytes and selected command scopes differ.
+
+The first fixture attempt failed compilation because it lacked a required trait
+object cast. That setup failure remains separate from behavioral RED.
+The reviewer exited 0 with a FAIL report. Its wrapper exited 3 because two
+runtime cache directories remained. Parent cleanup checked consumers and removed
+only that private scratch directory. The failed report remains unchanged.
+The corrected candidate still requires its own canonical gate and independent review.
+
+`review-correction.zip` contains 49 members and 94,600 bytes, SHA-256
+`5a98ddd07162bb83af3be8f71d9ee01f7099560303f94bbda710b1d830f4aa5c`.
+Its manifest records each member hash. The archive preserves the full R1 report,
+historical gate, cleanup receipts, fixture compilation failure, native RED and GREEN.
+
+## Bounded native diagnostics
 
 Separate 2,048-row native diagnostics retained exact row digests, scoped queries
 and reopen behavior. Compaction alone left 128 vector fragments unchanged because

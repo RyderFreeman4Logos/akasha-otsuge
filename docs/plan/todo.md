@@ -151,9 +151,13 @@ retains complete reports, logs and readbacks, including every earlier failure.
   and read amplification. All owned processes exited and the socket was removed.
   The retained 2,354,728,960-byte store has a complete 14,079-file digest inventory.
 - [ ] Publish bounded windowed native maintenance after canonical gate and independent
-  review. The four-path candidate passes ten retrieval tests with one intentional
-  ignore. Its [evidence archive](../benchmarks/results/mvp024-windowed-maintenance/README.md)
-  preserves the stopped baseline and bounded native diagnostic results.
+  review. The first candidate passed its canonical gate, but independent R1 found
+  maintenance could select the old query generation. A deterministic native RED
+  reproduced 48 writer rows left unindexed. The explicit writer-object correction
+  passes eleven retrieval tests with one intentional ignore. Its own canonical
+  gate and full-range review remain pending. The
+  [evidence archive](../benchmarks/results/mvp024-windowed-maintenance/README.md)
+  preserves the stopped baseline, diagnostics, rejected review and correction.
 - [ ] Rebuild the retained real prefix with an explicit source transition; measure
   index completion, query witnesses, memory, time and native I/O before more growth.
 - [ ] Qualify the changed-source importer transition, preserving completed input

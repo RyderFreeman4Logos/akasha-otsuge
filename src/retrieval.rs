@@ -304,12 +304,12 @@ impl Index {
     // Native searches include newly appended rows until the next maintenance window.
     pub(crate) async fn maintain_tables(
         &self,
+        vector: Option<&vector::VectorIndex>,
         authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<()> {
-        let vector = self.vector.lock().await;
         let buffer_mib = (self.budget_mib / 64).clamp(1, 8) as usize;
         for (table, maintained) in std::iter::once((&self.table, &self.maintained_version))
-            .chain(vector.as_deref().map(|v| (&v.table, &v.maintained_version)))
+            .chain(vector.map(|v| (&v.table, &v.maintained_version)))
         {
             authorize()?;
             if maintained.load(std::sync::atomic::Ordering::Relaxed)

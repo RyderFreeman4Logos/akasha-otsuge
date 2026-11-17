@@ -198,11 +198,15 @@ impl Service {
                     let mut progress = index
                         .sync_batch(&self.storage, target, config.generation(), &authorize)
                         .await?;
-                    if config.resolved().config().retrieval.embedding.is_some() {
+                    // Queries can replace the cache while this writer awaits its own generation.
+                    let vector = if config.resolved().config().retrieval.embedding.is_some() {
+                        Some(index.vector_index(&self.storage, config.resolved()).await?)
+                    } else {
+                        None
+                    };
+                    if let Some(vector) = &vector {
                         progress.vector = Some(
-                            index
-                                .vector_index(&self.storage, config.resolved())
-                                .await?
+                            vector
                                 .sync_batch(
                                     &self.storage,
                                     target,
@@ -226,7 +230,9 @@ impl Service {
                             authorize()?;
                             self.authorize_index_work(id, workflow)
                         };
-                        index.maintain_tables(&authorize_native).await?;
+                        index
+                            .maintain_tables(vector.as_deref(), &authorize_native)
+                            .await?;
                         windows_since_maintenance = 0;
                         if let Ok(owned) = self.search_index.try_lock()
                             && owned.as_ref().is_some_and(|cached| {

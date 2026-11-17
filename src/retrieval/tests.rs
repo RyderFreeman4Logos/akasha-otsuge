@@ -530,10 +530,12 @@ async fn maintenance_keeps_unindexed_reads_and_authority_progress() {
         .await
         .unwrap();
     previous.checkout(version).await.unwrap();
-    let denied = index.maintain_tables(&|| Err(error("READ_DENIED"))).await;
+    let denied = index
+        .maintain_tables(None, &|| Err(error("READ_DENIED")))
+        .await;
     assert!(matches!(denied, Err(e) if e.code == "READ_DENIED"));
     assert_eq!(index.table.version().await.unwrap(), version);
-    index.maintain_tables(&|| Ok(())).await.unwrap();
+    index.maintain_tables(None, &|| Ok(())).await.unwrap();
     assert!(
         index
             .table
@@ -574,7 +576,7 @@ async fn maintenance_keeps_unindexed_reads_and_authority_progress() {
     );
     drop(previous);
     let maintained_version = index.table.version().await.unwrap();
-    index.maintain_tables(&|| Ok(())).await.unwrap();
+    index.maintain_tables(None, &|| Ok(())).await.unwrap();
     assert_eq!(index.table.version().await.unwrap(), maintained_version);
     assert_eq!(
         serde_json::to_value(status(&store).unwrap()).unwrap(),
@@ -595,4 +597,133 @@ async fn maintenance_keeps_unindexed_reads_and_authority_progress() {
     );
     drop(index);
     store.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn maintenance_keeps_the_writer_generation_when_a_reader_replaces_the_cache() {
+    use arrow_array::{FixedSizeListArray, types::Float32Type};
+    use lancedb::{DistanceType, index::vector::IvfFlatIndexBuilder};
+
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let index = Index::open(&config, &store).await.unwrap();
+    let configs = ["reader", "writer"].map(|model| {
+        resolve(
+            &format!("[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint='http://127.0.0.1:1/v1'\nmodel='{model}'\ndimension=2\nlocal=true\ntimeout='2s'"),
+            None,
+            "",
+            &Paths { data_dir: fixture.0.join("data"), socket_path: fixture.0.join("run/socket") },
+        ).unwrap()
+    });
+    for config in &configs {
+        let vector = index.vector_index(&store, config).await.unwrap();
+        let schema = vector.table.schema().await.unwrap();
+        for wave in 0..4 {
+            let ids = (wave * 16..(wave + 1) * 16)
+                .map(|i| format!("vector-{i}"))
+                .collect::<Vec<_>>();
+            let batch = RecordBatch::try_new(
+                schema.clone(),
+                vec![
+                    Arc::new(StringArray::from(
+                        ids.iter().map(|id| hash(id.as_bytes())).collect::<Vec<_>>(),
+                    )),
+                    Arc::new(StringArray::from(ids)),
+                    Arc::new(UInt64Array::from(vec![1u64; 16])),
+                    Arc::new(StringArray::from(vec![
+                        hash(
+                            &serde_json::to_vec(&scope()).unwrap()
+                        );
+                        16
+                    ])),
+                    Arc::new(
+                        FixedSizeListArray::from_iter_primitive::<Float32Type, _, _>(
+                            (wave * 16..(wave + 1) * 16)
+                                .map(|i| Some(vec![Some(1.0), Some(i as f32 / 64.0)])),
+                            2,
+                        ),
+                    ),
+                ],
+            )
+            .unwrap();
+            vector
+                .table
+                .add(
+                    Box::new(RecordBatchIterator::new(vec![Ok(batch)], schema.clone()))
+                        as Box<dyn arrow_array::RecordBatchReader + Send>,
+                )
+                .execute()
+                .await
+                .unwrap();
+            if wave == 0 {
+                vector
+                    .table
+                    .create_index(
+                        &["vector"],
+                        NativeIndex::IvfFlat(
+                            IvfFlatIndexBuilder::default()
+                                .distance_type(DistanceType::Cosine)
+                                .num_partitions(2)
+                                .sample_rate(8),
+                        ),
+                    )
+                    .execute()
+                    .await
+                    .unwrap();
+            }
+        }
+    }
+    let writer = index.vector_index(&store, &configs[1]).await.unwrap();
+    let reader = index.vector_index(&store, &configs[0]).await.unwrap();
+    assert_ne!(writer.generation, reader.generation);
+    assert!(Arc::ptr_eq(
+        index.vector.lock().await.as_ref().unwrap(),
+        &reader
+    ));
+    let reader_version = reader.table.version().await.unwrap();
+    let native_index = writer.table.list_indices().await.unwrap()[0].name.clone();
+    let before = writer
+        .table
+        .index_stats(&native_index)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(before.num_unindexed_rows, 48);
+    index
+        .maintain_tables(Some(writer.as_ref()), &|| Ok(()))
+        .await
+        .unwrap();
+    let after = writer
+        .table
+        .index_stats(&native_index)
+        .await
+        .unwrap()
+        .unwrap();
+    let reader_after = reader.table.version().await.unwrap();
+    let reader_rows = reader
+        .search(&[1.0, 0.0], &scope(), 64)
+        .await
+        .unwrap()
+        .len();
+    let writer_rows = writer
+        .search(&[1.0, 0.0], &scope(), 64)
+        .await
+        .unwrap()
+        .len();
+    let sequence = store.sequence().unwrap();
+    drop(writer);
+    drop(reader);
+    drop(index);
+    store.close().await.unwrap();
+    assert_eq!(
+        after.num_unindexed_rows, 0,
+        "writer generation missed maintenance"
+    );
+    assert_eq!(after.num_indexed_rows, 64);
+    assert_eq!(
+        reader_after, reader_version,
+        "reader generation was maintained instead"
+    );
+    assert_eq!((reader_rows, writer_rows, sequence), (64, 64, 0));
 }
