@@ -170,7 +170,7 @@ async fn one_authority_batch_bounds_native_versions_and_keeps_every_lexical_row(
         expected
     );
     let versions = index.table.version().await.unwrap() - before;
-    // Includes native-index initialization and the first optimization.
+    // Includes native-index initialization.
     assert!(
         versions <= 8,
         "one bounded authority batch created {versions} native versions"
@@ -490,6 +490,109 @@ async fn rebuild_generation_survives_restart_and_reclaims_only_old_native_tables
         .unwrap();
     assert_eq!(store.sequence().unwrap(), sequence);
     assert_eq!(status(&store).unwrap().lexical_watermark, target);
+    drop(index);
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn maintenance_keeps_unindexed_reads_and_authority_progress() {
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let mut last = None;
+    for i in 0..128 {
+        let id = format!("maintenance-{i}");
+        let seq = memory(&store, &id, &format!("windowtoken{i}"), None).await;
+        last = Some((id, seq));
+    }
+    let target = store.sequence().unwrap();
+    let index = Index::open(&config, &store).await.unwrap();
+    let progress = sync(&index, &store, target).await;
+    let authority_seq = store.sequence().unwrap();
+    let expected = vec![last.unwrap()];
+    assert_eq!(
+        index.keyword("windowtoken127", &scope(), 20).await.unwrap(),
+        expected
+    );
+    let fragments = index
+        .table
+        .as_native()
+        .unwrap()
+        .count_fragments()
+        .await
+        .unwrap();
+    assert!(fragments > 2);
+    let version = index.table.version().await.unwrap();
+    let previous = index
+        .connection
+        .open_table(table_name(&index.generation))
+        .execute()
+        .await
+        .unwrap();
+    previous.checkout(version).await.unwrap();
+    let denied = index.maintain_tables(&|| Err(error("READ_DENIED"))).await;
+    assert!(matches!(denied, Err(e) if e.code == "READ_DENIED"));
+    assert_eq!(index.table.version().await.unwrap(), version);
+    index.maintain_tables(&|| Ok(())).await.unwrap();
+    assert!(
+        index
+            .table
+            .as_native()
+            .unwrap()
+            .count_fragments()
+            .await
+            .unwrap()
+            < fragments
+    );
+    assert_eq!(store.sequence().unwrap(), authority_seq);
+    let old_batches: Vec<_> = previous
+        .query()
+        .select(Select::Columns(vec!["id".into()]))
+        .execute()
+        .await
+        .unwrap()
+        .try_collect()
+        .await
+        .unwrap();
+    let old_ids: std::collections::BTreeSet<_> = old_batches
+        .iter()
+        .flat_map(|batch| {
+            let ids = batch
+                .column_by_name("id")
+                .unwrap()
+                .as_any()
+                .downcast_ref::<StringArray>()
+                .unwrap();
+            (0..batch.num_rows())
+                .map(|i| ids.value(i).to_owned())
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    assert_eq!(
+        old_ids,
+        (0..128).map(|i| format!("maintenance-{i}")).collect()
+    );
+    drop(previous);
+    let maintained_version = index.table.version().await.unwrap();
+    index.maintain_tables(&|| Ok(())).await.unwrap();
+    assert_eq!(index.table.version().await.unwrap(), maintained_version);
+    assert_eq!(
+        serde_json::to_value(status(&store).unwrap()).unwrap(),
+        serde_json::to_value(progress).unwrap()
+    );
+    assert_eq!(
+        index.keyword("windowtoken127", &scope(), 20).await.unwrap(),
+        expected
+    );
+    drop(index);
+    store.close().await.unwrap();
+    let store = Storage::open(&config).await.unwrap();
+    let index = Index::open(&config, &store).await.unwrap();
+    assert_eq!(status(&store).unwrap().lexical_watermark, target);
+    assert_eq!(
+        index.keyword("windowtoken127", &scope(), 20).await.unwrap(),
+        expected
+    );
     drop(index);
     store.close().await.unwrap();
 }

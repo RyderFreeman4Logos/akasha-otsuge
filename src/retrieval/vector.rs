@@ -2,7 +2,7 @@ use super::*;
 use crate::config::deadline::Deadline;
 use crate::provider::{Call, Client, Input};
 use arrow_array::{FixedSizeListArray, types::Float32Type};
-use lancedb::{DistanceType, index::vector::IvfFlatIndexBuilder, table::OptimizeAction};
+use lancedb::{DistanceType, index::vector::IvfFlatIndexBuilder};
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -76,6 +76,7 @@ pub(crate) struct VectorIndex {
     pub generation: String,
     pub(super) table: Table,
     schema: Arc<Schema>,
+    pub(super) maintained_version: std::sync::atomic::AtomicU64,
 }
 
 impl VectorIndex {
@@ -132,6 +133,7 @@ impl VectorIndex {
             generation: progress.generation.clone(),
             table,
             schema,
+            maintained_version: std::sync::atomic::AtomicU64::new(0),
         })
     }
 
@@ -342,10 +344,6 @@ impl VectorIndex {
                     .await
                     .map_err(index_error)?;
             }
-            self.table
-                .optimize(OptimizeAction::Index(Default::default()))
-                .await
-                .map_err(index_error)?;
         }
         publish_progress(
             storage,

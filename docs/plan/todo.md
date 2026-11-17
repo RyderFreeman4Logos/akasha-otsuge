@@ -24,8 +24,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on fix/mvp-024-claim-tail, based on
-merged preparation commit `bf15768`. No additional corpus or Rust target is copied.
+The existing SSD worktree is reused on fix/mvp-024-windowed-maintenance, based
+on PR #75 merge `a177d6e`. No additional corpus or Rust target is copied.
 PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
@@ -133,15 +133,35 @@ retains complete reports, logs and readbacks, including every earlier failure.
 - [x] Publish the preparation leaf with exact local gate, independent review and
   hosted CI. PR #74 merged with the reviewed tree; source reproduction and memory
   passed while the 13-record production admission failure remains preserved.
-- [ ] Resolve the 13 empty-claim splits found by the complete production record
+- [x] Resolve the 13 empty-claim splits found by the complete production record
   census. Exact diagnosis found one whitespace byte at each tail. The source
   repair passes unchanged RED/GREEN and all five seeder tests while preserving
   bytes, UTF-8 spans and irreducible rejection. All 13 real bodies passed
   byte-identical replay and all 39 daemon current reads. The
   [claim-tail archive](../benchmarks/results/mvp024-claim-tail/README.md) preserves
   the cleanup/environment failures and their completed reconciliation.
-  Canonical gate, independent review and publication remain pending. The
-  original full admission run remains failed.
+  PR #75 merged with the reviewed tree. Its canonical gate passed 652 Rust
+  executions, 35 Python tests and seven Node tests. Independent review reported
+  zero findings; hosted CI44016475601 passed. The final publication archive
+  retains the complete receipts. The original full admission run remains failed.
+- [x] Import a bounded prefix of 65,536 real sources and check all current claims,
+  original reads and 16 input-unit digests. This does not establish full coverage.
+- [x] Collect both incomplete prefix-index attempts. R1 failed its disappearing-file
+  observer. R2 ended through deliberate native cancellation after measured reclaim
+  and read amplification. All owned processes exited and the socket was removed.
+  The retained 2,354,728,960-byte store has a complete 14,079-file digest inventory.
+- [ ] Publish bounded windowed native maintenance after canonical gate and independent
+  review. The four-path candidate passes ten retrieval tests with one intentional
+  ignore. Its [evidence archive](../benchmarks/results/mvp024-windowed-maintenance/README.md)
+  preserves the stopped baseline and bounded native diagnostic results.
+- [ ] Rebuild the retained real prefix with an explicit source transition; measure
+  index completion, query witnesses, memory, time and native I/O before more growth.
+- [ ] Qualify the changed-source importer transition, preserving completed input
+  units, original admissions, identities and deadlines. The qualified observer-only
+  transition does not authorize a new source epoch.
+- [ ] Integrate the bounded capture reader and finish the real 100-client controller.
+  Focused native client, capture, current, scoped-history and correction fixtures
+  passed. These small fixtures do not establish the required workload duration.
 - [ ] Stream the full eligible cohort and unchanged lexical source data through
   bounded preparation and production import; verify actual counts and byte
   coverage before full load/recovery admission. The source census is not import.
