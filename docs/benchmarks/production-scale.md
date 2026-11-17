@@ -37,7 +37,8 @@ contains a model identity, dimension 1536 and at most 27 sources, each with
 `path`, `size`, `sha256` and `layout` (`dbpedia` or `dictionary`). `Lookup` verifies
 the files and indexes complete text hashes to Parquet row addresses in memory.
 It rejects duplicate inputs and retains one decoded row group, limited to
-64 MiB of declared uncompressed data. No second text or vector file is created.
+64 MiB of declared uncompressed data. Per-file prefetch buffering is disabled.
+No second text or vector file is created.
 The controller owns the loopback HTTP server, shutdown, resource accounting
 and durable progress callback. It records the helper's memory separately.
 Unknown, altered or oversized inputs and changed files fail; there is no

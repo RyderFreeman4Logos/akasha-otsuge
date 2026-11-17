@@ -44,7 +44,8 @@ class Lookup:
                 path = pathlib.Path(source["path"]).resolve(strict=True)
                 before = stamp(path)
                 verify(path, source)
-                reader = parquet.ParquetFile(path)
+                # Retained readers must not each keep a second column prefetch cache.
+                reader = parquet.ParquetFile(path, pre_buffer=False)
                 self.files.append((path, before, reader, source["layout"]))
                 columns = ["title", "text"] if source["layout"] == "dbpedia" else ["word"]
                 for group in range(reader.num_row_groups):
