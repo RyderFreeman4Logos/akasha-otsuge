@@ -27,3 +27,27 @@ receipts, initial regression bytes and pre-filter patch. [manifest.json](manifes
 binds every archive member. The canonical gate and independent review remain
 pending at this checkpoint. Full acceptance stays open in
 [#65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65).
+
+## Final gate and publication
+
+PR #72 merged as `c51f97b1b0eb36d3e6d3b254cf1b8eebc04c57c2`, preserving
+reviewed tree `2529fe1d86f3879b3ee8f96f2c2661647f873df5`. The exact canonical
+retry and [CI 43978197739](https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/43978197739)
+each passed 650 Rust executions / 39 intentional ignores, Python 35, Node 7,
+and installed lifecycle/UID/no-TCP checks. The first canonical gate failed
+in an unchanged Codex caller with `HistoryGap`; its isolated selector passed,
+but the original cause remains unclassified.
+
+The [complete R1 report](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/72#issuecomment-6932339514)
+has zero actionable product findings and 67 fresh Rust passes / one ignore.
+Its overall **FAIL** remains: the reviewer overwrote the original parent scope
+receipt and left a stale final report-hash attestation. Original scope bytes
+are unavailable. The [R2 PASS](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/72#issuecomment-6932340485)
+is a bounded independent recertification of the retained product/gate evidence
+and exact-candidate promotion eligibility, with isolated outputs and verified
+final custody. It does not reconstruct the lost receipt or replace R1's verdict.
+
+[final-publication.zip](final-publication.zip) and
+[its manifest](final-publication-manifest.json) retain both reports, incidents,
+canonical outcomes, fresh checks, CI and publication receipts. Native child
+transcripts are excluded. Full corpus import, load and recovery remain pending.

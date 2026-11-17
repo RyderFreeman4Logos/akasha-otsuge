@@ -26,6 +26,8 @@ struct Record {
     key: String,
     body: String,
     partition: String,
+    #[serde(default)]
+    vector_cohort: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -112,6 +114,7 @@ async fn seed_stream(
                 || row.key.len() > 256
                 || row.body.trim().is_empty()
                 || row.body.len() > 65536
+                || (row.vector_cohort && row.body.len() > 4096)
                 || !matches!(
                     row.partition.as_str(),
                     "p0" | "p1" | "p2" | "p3" | "p4" | "p5" | "p6" | "p7"
@@ -128,7 +131,7 @@ async fn seed_stream(
             let scope = Scope {
                 user: format!("uid:{}", rustix::process::geteuid().as_raw()),
                 project: Some(format!("corpus/{}", row.partition)),
-                branch_or_version: None,
+                branch_or_version: row.vector_cohort.then(|| "vectors".into()),
                 session: None,
             };
             let ingress = Ingress::tool(
@@ -431,6 +434,74 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(unchanged, output);
+    }
+
+    #[tokio::test]
+    async fn vector_cohort_preserves_exact_input_scope_and_replay() {
+        let root = Fixture::new();
+        let data = root.0.join("data");
+        let body = "真实 retained vector input";
+        let mut input = serde_json::to_vec(&serde_json::json!({
+            "key": "public-document", "body": body, "partition": "p3",
+            "vector_cohort": true
+        }))
+        .unwrap();
+        input.push(b'\n');
+        let mut output = Vec::new();
+        assert_eq!(
+            seed_stream(&data, &binding(), input.as_slice(), &mut output).await,
+            Ok(1)
+        );
+        let ack: Ack = serde_json::from_slice(&output).unwrap();
+        assert_eq!(ack.memories.len(), 1);
+        let config = resolve(
+            "",
+            None,
+            "",
+            &Paths {
+                data_dir: data.clone(),
+                socket_path: root.0.join("unused.sock"),
+            },
+        )
+        .unwrap();
+        let store = Storage::open(&config).await.unwrap();
+        let domain = Domain::new(&store);
+        let source = domain.source(&ack.source_id, ack.source_revision).unwrap();
+        let memory = domain.active(&ack.memories[0].0).unwrap().unwrap();
+        assert_eq!(source.payload.text, body);
+        assert_eq!(memory.record.draft.claim, body);
+        assert_eq!(
+            memory.record.draft.scope.project.as_deref(),
+            Some("corpus/p3")
+        );
+        assert_eq!(
+            memory.record.draft.scope.branch_or_version.as_deref(),
+            Some("vectors")
+        );
+        assert_eq!(source.payload.scope, memory.record.draft.scope);
+        store.close().await.unwrap();
+        let mut replay = Vec::new();
+        assert_eq!(
+            seed_stream(&data, &binding(), input.as_slice(), &mut replay).await,
+            Ok(1)
+        );
+        assert_eq!(output, replay);
+        assert_eq!(
+            seed_stream(&data, &binding(), line(body).as_slice(), Vec::new()).await,
+            Err("IDEMPOTENCY_CONFLICT")
+        );
+        let mut oversized = serde_json::to_vec(&serde_json::json!({
+            "key": "too-long", "body": "x".repeat(4097), "partition": "p3",
+            "vector_cohort": true
+        }))
+        .unwrap();
+        oversized.push(b'\n');
+        let mut refused = Vec::new();
+        assert_eq!(
+            seed_stream(&data, &binding(), oversized.as_slice(), &mut refused).await,
+            Err("INVALID_CORPUS_RECORD")
+        );
+        assert!(refused.is_empty());
     }
 
     #[tokio::test]

@@ -1,0 +1,239 @@
+{
+  "head": "e3ce456c3ba42bfafdaf78cd36825a462e3283fe",
+  "tree": "2529fe1d86f3879b3ee8f96f2c2661647f873df5",
+  "merge": "c51f97b1b0eb36d3e6d3b254cf1b8eebc04c57c2",
+  "scope": "Final PR72 canonical gate, independent product review with R1 custody FAIL, scoped R2 recertification, CI and exact-tree publication. No full issue65 acceptance.",
+  "custody": "The original R1 parent scope receipt was overwritten and is unavailable. Current R1 scope bytes are the reviewer replacement. R1 final hash attestation is stale. The reports and incidents remain unchanged. Fresh R2 custody does not recover original bytes.",
+  "members": {
+    "mvp024-vector-coverage-canonical-r1.admission.json": {
+      "bytes": 1003,
+      "sha256": "1c9920519148dd4fea6126682cef2a995a74af992c93e133f0d4faec616ed524"
+    },
+    "mvp024-vector-coverage-canonical-r1.collected.json": {
+      "bytes": 452,
+      "sha256": "32c38673e265b780ba427b7a74ad4bf230ed9579117359fe9c5b6eedbe06e438"
+    },
+    "mvp024-vector-coverage-canonical-r1.launch.json": {
+      "bytes": 230,
+      "sha256": "d7f93842b713abd3a699d1ca787389f216d17899d50a8c0182a43545b6371701"
+    },
+    "mvp024-vector-coverage-canonical-r1.log": {
+      "bytes": 27426,
+      "sha256": "74e25636701b138ce96ddd0389247ed7c76f0de3f7f8c044bbf2faa9201074a1"
+    },
+    "mvp024-vector-coverage-canonical-r1.terminal.json": {
+      "bytes": 238,
+      "sha256": "8117ab7bc8d991e992e2a4a967d380c2e98120454b965ebf3f727839d28a987c"
+    },
+    "mvp024-vector-coverage-canonical-r2-custody-reverified.json": {
+      "bytes": 3174,
+      "sha256": "831b12dcdd5c591c3fc6f4d4bff5ff6698cd2c826da03353cf7ea082aab2bd2d"
+    },
+    "mvp024-vector-coverage-canonical-r2-verified.json": {
+      "bytes": 3174,
+      "sha256": "2ca5135c6ab7f95542e70d51e363f72a9d2eda9b884e34139293f7f3ce19534f"
+    },
+    "mvp024-vector-coverage-canonical-r2.admission.json": {
+      "bytes": 1003,
+      "sha256": "c13de1549c8d7b3c5c625a235380a95c52875b257b86c11b67e363f927bc792c"
+    },
+    "mvp024-vector-coverage-canonical-r2.collected.json": {
+      "bytes": 459,
+      "sha256": "b14b744eca32471fd263c44123fc02eec625781b2ae02a77cbb5f6b131fe7c70"
+    },
+    "mvp024-vector-coverage-canonical-r2.launch.json": {
+      "bytes": 230,
+      "sha256": "06c937bd14fbf7eb8959ed8f79a78c6e9a7c27c20b0d785c80edd095121e3245"
+    },
+    "mvp024-vector-coverage-canonical-r2.log": {
+      "bytes": 73459,
+      "sha256": "e97c7f94f8ddb40610e1d37599dd342efeea6a5c6440abd2f1b9ef799ff59cfd"
+    },
+    "mvp024-vector-coverage-canonical-r2.terminal.json": {
+      "bytes": 236,
+      "sha256": "92412d2e83075a5d30df646b112d87729d1f59feb1a6fa129e0610251e0e6447"
+    },
+    "mvp024-vector-coverage-ci43978197739-metadata.json": {
+      "bytes": 2208,
+      "sha256": "0ccc3c0645b4645774aacde449b7e65fa4240d0e3039b2067d57ba7d9e3ef1da"
+    },
+    "mvp024-vector-coverage-ci43978197739-verified.json": {
+      "bytes": 3150,
+      "sha256": "53938e9b07dd0d0b780c19a0d4edb38a2e54ff0ceee770c7945bcf2d01a9ad25"
+    },
+    "mvp024-vector-coverage-ci43978197739.log.gz": {
+      "bytes": 32067,
+      "sha256": "b9f86f5a338aa3b99b2ed0b41eed2cf68ab510e98538c0bb9838f8e8b1c659f0"
+    },
+    "mvp024-vector-coverage-codex-gap-diagnostic-r1-result.json": {
+      "bytes": 3970,
+      "sha256": "6dce94036d422ab52309708f347ce267e2dce10cf31eb22ed8ac01e44dbfcbb4"
+    },
+    "mvp024-vector-coverage-codex-gap-diagnostic-r1.admission.json": {
+      "bytes": 1129,
+      "sha256": "4b527bf7e5648527daec342a96903aa5d297db10d8b7f4349d8b3c535a7cbded"
+    },
+    "mvp024-vector-coverage-codex-gap-diagnostic-r1.collected.json": {
+      "bytes": 448,
+      "sha256": "dc4de29bc7fa8aba102aa1633262f9e87689e107b8f1dff413f0b72e4b226493"
+    },
+    "mvp024-vector-coverage-codex-gap-diagnostic-r1.launch.json": {
+      "bytes": 367,
+      "sha256": "33ceb7ee5bc83f067a40e92701ed2f34e21000b890b528efbd5025b6b866c3af"
+    },
+    "mvp024-vector-coverage-codex-gap-diagnostic-r1.log": {
+      "bytes": 590,
+      "sha256": "a25d49a7d578ff658cb38e55c10f1ae3e2030717e242ee74efd402816ff64f88"
+    },
+    "mvp024-vector-coverage-codex-gap-diagnostic-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "2a7759d3aba0926aebf0d595310079bcdb461da4673a70cb21e1c587f463b2d1"
+    },
+    "mvp024-vector-coverage-parent-scope-r2.json": {
+      "bytes": 14429,
+      "sha256": "686d66962420d170defcc6904e703ec80deb0c86c64ada2e6e03df77c3dda534"
+    },
+    "mvp024-vector-coverage-pr72-merged-r1.json": {
+      "bytes": 5076,
+      "sha256": "a22d32dc8cb9896af0551dffc24d5767a1805364aa05fc1a76e683c4c3834f25"
+    },
+    "mvp024-vector-coverage-pr72-publication-r1.json": {
+      "bytes": 34781,
+      "sha256": "b0221e8f601c4484822f4402d95f2b63bd0426e4af66d0d5f9097426e5184ea0"
+    },
+    "mvp024-vector-coverage-pr72-publication-setup-failure-r1.json": {
+      "bytes": 236,
+      "sha256": "a74a208d69b880d192a0a01a65903bc060d053126e2fe02cfa0c43cc12f6f802"
+    },
+    "mvp024-vector-coverage-review-accepted-r2.json": {
+      "bytes": 1201,
+      "sha256": "6cc1da006f649e1b865a517728d6b7ea06825bec0e2dd69c63420438de098937"
+    },
+    "mvp024-vector-coverage-review-launch-r1.admission.json": {
+      "bytes": 1115,
+      "sha256": "a6886933c281a7d0782632a12584820c4d56480c583d8b6c2e8cb2b92e80af04"
+    },
+    "mvp024-vector-coverage-review-launch-r1.collected.json": {
+      "bytes": 461,
+      "sha256": "bf3e9ae1daba93702dab363983b04c217cff789e341eda07a9abd27e42e23fba"
+    },
+    "mvp024-vector-coverage-review-launch-r1.launch.json": {
+      "bytes": 346,
+      "sha256": "eff373a666fa4bd7bac929d61ed155bb507a03f7fb9f4c59fd2b8ff464ed41dd"
+    },
+    "mvp024-vector-coverage-review-launch-r1.log": {
+      "bytes": 2036,
+      "sha256": "0d01bb39df51a744de8416392c0ca1bca9e30add622cf95cb31d5c0b398855ff"
+    },
+    "mvp024-vector-coverage-review-launch-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "74ad73dba64aed0092a7ce56625d80df8c35439a79dd857f02cc9019278ae97f"
+    },
+    "mvp024-vector-coverage-review-launch-r2.admission.json": {
+      "bytes": 1115,
+      "sha256": "6a816031252e8327c97fdbcad76c606f0e047c58edeca91cf1c18df1d695996d"
+    },
+    "mvp024-vector-coverage-review-launch-r2.collected.json": {
+      "bytes": 455,
+      "sha256": "03ae06fbc9a55dcc2a7e6795e49048489b43e5a7963284d7d2d7c963ecd25c79"
+    },
+    "mvp024-vector-coverage-review-launch-r2.launch.json": {
+      "bytes": 346,
+      "sha256": "e69e9089ef6b74e14ba81755bd5835abb62f4e5a05dbf1631a1c5054ff4db79a"
+    },
+    "mvp024-vector-coverage-review-launch-r2.log": {
+      "bytes": 2032,
+      "sha256": "c084f47b786093ccff7b80e191c801709cf8959bd40c0e2db621626bc700db62"
+    },
+    "mvp024-vector-coverage-review-launch-r2.terminal.json": {
+      "bytes": 237,
+      "sha256": "8bc959ef8927ca9bdf17dcdab004fb6aaaf8ff119022ad813799f2dcdc0af319"
+    },
+    "mvp024-vector-coverage-review-r1-admission.json": {
+      "bytes": 5048,
+      "sha256": "8c3996a558a9a5c6deb8e0aa4495e28dcd41597d575800390a3c622865eddcbe"
+    },
+    "mvp024-vector-coverage-review-r1-archives.json": {
+      "bytes": 1075,
+      "sha256": "c74696d1941a690c48b154471d69f703b61fab96a51d50c0f55ee2001de360b5"
+    },
+    "mvp024-vector-coverage-review-r1-final-r2.json": {
+      "bytes": 1963,
+      "sha256": "d45d852bb8f9e72056d6d83a4192659bc1e7ec64b16dab84009a5da396b81307"
+    },
+    "mvp024-vector-coverage-review-r1-final.json": {
+      "bytes": 1778,
+      "sha256": "2b34f1c19089653d49c5be829ecb1131ec94c83ddd4f5531d20cb88c5b02a4c0"
+    },
+    "mvp024-vector-coverage-review-r1-instructions.json": {
+      "bytes": 63409,
+      "sha256": "9233fb1eb894d1ca647080a0b08401b8cbc92f3ee8d524f914c3cfb005810437"
+    },
+    "mvp024-vector-coverage-review-r1-parent-incident.json": {
+      "bytes": 1101,
+      "sha256": "64b57d097f016b98e92b8c0a0b33e8f2249e8c92039757564143df5e4555134b"
+    },
+    "mvp024-vector-coverage-review-r1-postflight.json": {
+      "bytes": 3256,
+      "sha256": "5a08a96c71beac6f194bf130b3eae025ef333bb950ffab5efcf459e022e7f99d"
+    },
+    "mvp024-vector-coverage-review-r1-receipt-incident.json": {
+      "bytes": 988,
+      "sha256": "b3c25d3dd4b395b4d9a59b161b33803fc423140e7837fedc7fa2f1780b39fb3e"
+    },
+    "mvp024-vector-coverage-review-r1-report-before-citation-correction.md": {
+      "bytes": 23711,
+      "sha256": "cfbe585d48bfa837ebe95e2f61d42b4c97246757c6b4d20bd330bc93043a9c81"
+    },
+    "mvp024-vector-coverage-review-r1-scope.json": {
+      "bytes": 53395,
+      "sha256": "3fa789d4edfc5f66aaeca9d330bb2f53a828c479e3208d6730fb54ddc37775c4"
+    },
+    "mvp024-vector-coverage-review-r1-test-exits.json": {
+      "bytes": 1017,
+      "sha256": "136aa8f3c2a460d708a5d9c2b7ba732a72ddda2faf1567ab421e2a352fcc1f5f"
+    },
+    "mvp024-vector-coverage-review-r1-tests.log": {
+      "bytes": 7973,
+      "sha256": "f11c19cbd1aa8dd037395a290662a302d4e7c5e3798fbca13c1898f407c9e9e7"
+    },
+    "mvp024-vector-coverage-review-r1.exit.json": {
+      "bytes": 2188,
+      "sha256": "b2f050e5780f5089c757ff8ed5bddc4f58b869e5301cc11316e7e34856c96bd7"
+    },
+    "mvp024-vector-coverage-review-r1.md": {
+      "bytes": 23711,
+      "sha256": "2d6125d810f57f08e9c9a390807aff538fdaddb476457a0ba119f70e1b04b5a2"
+    },
+    "mvp024-vector-coverage-review-r2/report.md": {
+      "bytes": 6371,
+      "sha256": "0b174b26ca036803bf59dc823f31a2ed484f8ea5537e58c3efd502f648550d07"
+    },
+    "mvp024-vector-coverage-review-r2/reviewer-final-attestation.json": {
+      "bytes": 1382,
+      "sha256": "d8f37bb92d620d8767d5ed23e7528dfc4019d9775805f45bf184060ec73732b8"
+    },
+    "mvp024-vector-coverage-review-r2/reviewer-instructions.json": {
+      "bytes": 12260,
+      "sha256": "a28f58e71357156c34317b8131c2b19c96f9d2d37180ff56e091fc42d45a2ad0"
+    },
+    "mvp024-vector-coverage-review-r2/reviewer-postflight.json": {
+      "bytes": 678,
+      "sha256": "822540b01433658634dde7ecf4caff9a03f276bf504d0a7eb4148aef1016423f"
+    },
+    "mvp024-vector-coverage-review-r2/reviewer-source-claims.json": {
+      "bytes": 1847,
+      "sha256": "53bf2e7f5ef87c919917cc84fd1022190e4db2cfa23cef0fc1e643a041ce1c2c"
+    },
+    "mvp024-vector-coverage-review-r2/reviewer-verification.json": {
+      "bytes": 11063,
+      "sha256": "0d9f0b23d230143a4f2fd02a4692f6fc1bc13d5662a1fa60156f893aa0ba95fa"
+    },
+    "mvp024-vector-coverage-review-r2.exit.json": {
+      "bytes": 2184,
+      "sha256": "2b7e647da93ec9494a414a937bccd0cfbf5073ef6a7b4e333ffd2e25a71ec197"
+    }
+  },
+  "zip_bytes": 145527,
+  "zip_sha256": "28f15a2d191fc1f5b8312d0c320fc9bd2f4ddedf3e721eaa4c88825660ea2161"
+}

@@ -15,13 +15,36 @@ positive `observed_time_ms`. The controller must verify source hashes and freeze
 the selection, license, source code and executable identities before seeding.
 The binding does not itself verify a dataset or grant human approval.
 
-Each input has exactly `key`, `body` and `partition` (`p0` through `p7`). The body
+Each input has `key`, `body` and `partition` (`p0` through `p7`). An optional
+`vector_cohort` boolean defaults to false; unknown fields remain invalid. The body
 must be nonempty and at most 65,536 UTF-8 bytes. The component records the complete
 source and creates contiguous claims of at most 32,768 bytes without splitting a
 UTF-8 character. Every claim cites its actual source revision and byte range.
 An invalid claim, including an all-whitespace chunk, fails explicitly rather than
 being silently omitted. Rows become tool-origin, delegated facts only within the
 local owner's `corpus/pN` project scopes; they are not human-confirmed memories.
+
+`vector_cohort: true` additionally sets `branch_or_version` to `vectors` and
+requires the complete input to fit 4,096 UTF-8 bytes. It remains one unchanged
+claim. Configure `retrieval.embedding_scopes` with these eight project/branch
+scopes to embed the cohort while retaining every other claim in the lexical
+index. Scored hits require the exact scope: a vector query uses the corresponding
+`vectors` branch, while a project-only query searches the null-branch records.
+Changing the cohort flag on a previously
+admitted binding/key conflicts, just as changing its body does.
+
+`spikes/data/precomputed.py` supplies the local benchmark lookup. Its manifest
+contains a model identity, dimension 1536 and at most 27 sources, each with
+`path`, `size`, `sha256` and `layout` (`dbpedia` or `dictionary`). `Lookup` verifies
+the files and indexes complete text hashes to Parquet row addresses in memory.
+It rejects duplicate inputs and retains one decoded row group, limited to
+64 MiB of declared uncompressed data. Per-file prefetch buffering is disabled.
+No second text or vector file is created.
+The controller owns the loopback HTTP server, shutdown, resource accounting
+and durable progress callback. It records the helper's memory separately.
+Unknown, altered or oversized inputs and changed files fail; there is no
+synthetic fallback. This lookup replays retained embeddings and is not live
+model inference. Its small fixture tests use synthetic vectors only.
 
 One flushed acknowledgement follows each fully committed record. It includes
 content hashes, the source revision and all memory revisions. Stable binding/key
@@ -125,3 +148,13 @@ The canonical workspace test command includes the example's real Domain tests:
 UTF-8 evidence and exact replay, acknowledged-prefix recovery/conflicting input,
 and bounded frame reads. Source shape checks and a pilot are preparation, not
 closure of the unchanged acceptance specification.
+
+The [cohort evidence](results/mvp024-vector-cohort/README.md) records a bounded
+production run with 8,229 sources, 8,359 current claims and 1,061 retained vectors.
+All current claim and vector input/output checks passed. Its initial keyword
+witness used the wrong branch and failed; the unchanged exact-scope contract was
+correct. Reopening the same store completed eight corrected keyword witnesses
+and eight vector self hits without reimport or reindex. The original failure,
+different release artifact identities, separate helper memory measurements and
+exact disposable-store cleanup remain recorded. This does not establish the
+million-vector, full lexical, load or recovery acceptance.

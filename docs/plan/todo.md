@@ -1,6 +1,6 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-16 UTC: **23 original Issues completed, 5 Issues open
+Rechecked 2026-11-17 UTC: **23 original Issues completed, 5 Issues open
 (#12, #26, #27, #28 and #65)**. #50 is also completed and closed. No completed
 acceptance is waiting for issue closure.
 
@@ -24,8 +24,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-vector-coverage, based on
-merged native-startup commit `96e2b5f`. No additional corpus or Rust target is copied.
+The existing SSD worktree is reused on feat/mvp-024-vector-cohort, based on
+merged vector-coverage commit `c51f97b`. No additional corpus or Rust target is copied.
 PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
@@ -117,11 +117,16 @@ retains complete reports, logs and readbacks, including every earlier failure.
 - [x] Implement explicit production vector scope coverage while preserving the default
   all-claim policy, old configuration digests, contiguous completion and generation
   activation. Verify actual provider calls, excluded-scope disclosure and reload.
-- [ ] Publish the vector scope leaf after its exact canonical gate, independent
+- [x] Publish the vector scope leaf after its exact canonical gate, independent
   review and hosted CI. Full corpus admission remains a separate unchecked task.
-- [ ] Resolve the 37 oversized vector documents through verified licensed inputs
+- [x] Resolve the 37 oversized vector documents through verified licensed inputs
   and documented model/vector identity, without increasing the product limit or
   downloading another full corpus.
+- [ ] Publish the cohort seeder, exact-input lookup and bounded real-vector
+  evidence after the final canonical gate, independent review and hosted CI.
+- [ ] Stream the full eligible cohort and unchanged lexical source data through
+  bounded preparation and production import; verify actual counts and byte
+  coverage before full load/recovery admission. The source census is not import.
 The allocator observation supports retained free arenas but failed a disk census
 race and lacked cgroup delegation because the preload reached helper processes.
 A one-setting mmap control under enforced original limits still failed at
@@ -165,18 +170,41 @@ retains the complete report, separate smoke outcomes, final pilot, gate and CI
 logs, exact cleanup and publication readbacks. Full-scale acceptance stays open.
 No production scale result is claimed. The 37 vector documents over 4,096 bytes
 need an explicit input/model/generation solution before million-vector acceptance.
-A licensed 37-row dictionary-vector supplement is prepared but not admitted.
-Cross-corpus identity and cardinality remain pending. The current candidate
-adds optional explicit vector scopes while retaining complete lexical indexing
+A licensed 37-row dictionary-vector supplement is prepared. The 2026-11-16
+41-shard read-only census verifies 1,000,000 distinct original vectors,
+999,963 eligible complete inputs and 37 nonoverlapping supplementary vectors.
+All 999,963 eligible original inputs also have distinct text hashes. The full
+10,959,509-chunk text-shard overlap scan is a superset of the old cutoff; the
+historical 50,000,002,783-byte lexical dedup count was not recounted. Only 68,006
+bytes of census receipts were retained, with no second corpus copy.
+PR #72 adds optional explicit vector scopes while retaining complete lexical indexing
 and the default all-claim policy. Its [focused evidence](../benchmarks/results/mvp024-vector-coverage/README.md)
 preserves the unchanged-test behavioral RED/GREEN, two fixture compilation
 failures, and 67 related Rust passes / one intentional ignore plus Clippy and
 format checks. Generation switching retains the old selection until activation;
 removing the selector restores the old all-memory identity. Excluded queries
 report their coverage gap without embedding calls, and excluded records still
-have contiguous completion entries. Canonical gate, review and publication are
-next. The supplement and this functional coverage contract do not establish
-million-vector or full-scale acceptance.
+have contiguous completion entries. Its exact canonical retry and CI both pass
+650 Rust executions / 39 intentional ignores, Python 35, Node 7 and installed
+lifecycle/UID/no-TCP checks. The first gate's unchanged Codex `HistoryGap` remains
+unclassified. R1's product review passed, but its overall FAIL remains because
+it overwrote a parent scope receipt and left a stale report-hash attestation.
+R2 independently recertified the intact gate/tests and final promotion evidence;
+the unavailable original scope bytes were not reconstructed. Both complete
+reports are published on [PR #72](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/72),
+merged as `c51f97b` with the reviewed tree. Cohort seeding and exact-input lookup
+are committed at `3b53674`; the [bounded real-vector evidence](../benchmarks/results/mvp024-vector-cohort/README.md)
+retains 8,229 sources, all 8,359 current-claim checks and 1,061 exact retained-vector
+input/output pairs. The first keyword query used the wrong branch and failed.
+The same persisted store subsequently passed eight corrected keyword witnesses
+and eight vector self hits with unchanged index identities and no seed/index
+replay. All sampled daemon limits were enforced; helper memory is reported
+separately. The 152,547,328-byte disposable store and owned socket were removed
+after complete file hashes, terminal-process and consumer checks. The 3.4 MB
+archive retains the failure and all receipts, without copying the raw corpus.
+Final gate/review/publication and full import/load/recovery remain pending.
+The supplement and functional coverage contract do not establish million-vector
+or full-scale acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
 delegation failure; its exact selector passed without explaining that failure.
 A single diagnostic topology did not reproduce it and had 18 other IPC failures.
@@ -1262,13 +1290,16 @@ do not satisfy the full production stress acceptance.
   observation and the failed single-setting control are diagnostics, not fixes
   or full-scale acceptance; preserve their confounds and unexplained IPC failures.
   PR #71 delivers the verified startup defaults; full corpus/load remains below.
-- [ ] Validate a small production corpus/coverage pilot before full-data admission.
+- [x] Validate a small production corpus/coverage pilot before full-data admission.
   Source chunks can be 64 KiB, while production claims are at most 32 KiB and
   vector input uses 4096-byte chunk means. Prove UTF-8-safe full-span coverage,
   original byte counts and real precomputed vector identity without silently
   changing the model policy or claiming fresh inference. Select a bounded seed
   path after verifying its production contract; measure disk amplification and
   indexing progress before allocating the full store.
+  The cohort archive distinguishes the failed initial witness from corrected
+  queries on the same store; index row counts alone do not prove every body is
+  searchable. Complete full-corpus lexical/vector coverage remains unchecked below.
 - [ ] Freeze source/binary, machine/filesystem/cgroup state, corpus manifest,
   source licenses/hash/seed, actual UTF-8 bytes, document/partition identities,
   vector distribution/dimension/coverage and 100,000-change history oracle.
