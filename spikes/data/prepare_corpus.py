@@ -93,7 +93,7 @@ def records(directory, counts, statistics, progress=None, wait=False):
                 "repository": source["repository"], "revision": source["revision"],
                 "license": source["license"]})
             columns = ["_id", "title", "text", "text-embedding-3-large-1536-embedding"] if group == 0 else ["text"]
-            for batch in parquet.ParquetFile(path).iter_batches(batch_size=64, columns=columns):
+            for batch in parquet.ParquetFile(path, pre_buffer=False).iter_batches(batch_size=64, columns=columns):
                 for row in batch.to_pylist():
                     statistics["source_rows"] += 1
                     vector = row["text-embedding-3-large-1536-embedding"] if group == 0 else None

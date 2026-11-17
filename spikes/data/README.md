@@ -74,6 +74,10 @@ output and verifies the complete statistics and stream hash at EOF. Consumers
 must reject an import if the producer fails; receiving a prefix is not acceptance.
 Run these commands with the pinned private PyArrow environment. Corpus preparation
 memory is separate from measured database RSS. Neither command claims indexing.
+Parquet prefetch is disabled to avoid retaining whole-file read buffers alongside
+the full-corpus deduplication sets. Source records and stream ordering are unchanged.
+Changing the preparer changes its manifest code hash: create a new manifest and
+compare its complete corpus statistics before using the new source to stream.
 
 `scan ... --wait-for-downloads` overlaps preparation with the managed downloader.
 Only fully published source files are consumed. A missing source waits only while

@@ -1,0 +1,171 @@
+{
+  "archive_bytes": 42560,
+  "archive_sha256": "d42693bce6d22031a802a8b6ba0b265b146b6c6e66852c291e3b2fb172f0c56a",
+  "members": {
+    "evidence/mvp024-full-prefetch-control-aggregation-failure-r1.json": {
+      "bytes": 277,
+      "sha256": "252948ad25620a5f0d54929d0d4713247c4a3ded6f75bae0c9c185979aacbc62"
+    },
+    "evidence/mvp024-full-prefetch-control-r1-verified.json": {
+      "bytes": 3270,
+      "sha256": "9dc497a5f1a9b9cc67de1a36a2bc0565d711c54e94e63bd2d017e6f9cabb6248"
+    },
+    "evidence/mvp024-full-prefetch-control-r1.collected.json": {
+      "bytes": 468,
+      "sha256": "738c5ab84ebbbdb3539a8381ebd4121b4a6461b7ec70d470899cc180a3e4c75e"
+    },
+    "evidence/mvp024-full-prefetch-control-r1.launch.json": {
+      "bytes": 446,
+      "sha256": "4da0aaf4ea40628a79e107c7e5cd0153e9c49de65997ad231755f24d970acc8f"
+    },
+    "evidence/mvp024-full-prefetch-control-r1.log": {
+      "bytes": 5041,
+      "sha256": "53dfc5ed068ca7c002113c7d5bca28a4faaa29fcf5686d2c1308332e370e5ea6"
+    },
+    "evidence/mvp024-full-prefetch-control-r1.py": {
+      "bytes": 6636,
+      "sha256": "bbe0341cbd5a170aa4c5d97fccdbb055c4b41510629ceeb67851c2c1c976fdcd"
+    },
+    "evidence/mvp024-full-prefetch-control-r1.terminal.json": {
+      "bytes": 236,
+      "sha256": "f4980c5512e4cd609f9fcc2ae9a6b47bff4d2c52de204bef7b0bc7671f52f286"
+    },
+    "evidence/mvp024-full-prefetch-control-reader-r1.py": {
+      "bytes": 438,
+      "sha256": "00bbde3368d88678d3de01c0b3c3ee0d75ab4176184818033362e3b6a355f424"
+    },
+    "evidence/mvp024-full-prefetch-control-verify-r2.py": {
+      "bytes": 2289,
+      "sha256": "5458897cebfea421cdad55b7755bb998ead0234b0856f10b5a4b234fb3291143"
+    },
+    "evidence/mvp024-full-preparation-focused-r1.json": {
+      "bytes": 485,
+      "sha256": "f90bccc5b54c7b91d6461f78ed34eb18d4f5762a039621830a6dd73b662f7d55"
+    },
+    "evidence/mvp024-full-preparation-focused-r1.log": {
+      "bytes": 892,
+      "sha256": "1d86ff28c963b559a21c907451bd60ad80feaa0a9cc7a1ddc4bf3b9fa8f12a10"
+    },
+    "evidence/mvp024-full-preparation-preflight-r1.json": {
+      "bytes": 585,
+      "sha256": "c56211fda8ea7a8cedd7ee22d28351bb0f1375dc347448917bb119d547dcfd37"
+    },
+    "evidence/mvp024-full-preparation-r1-verified-failure.json": {
+      "bytes": 1671,
+      "sha256": "dd4582683e6ee4f78488f7c046b02b4a61051c37d42690e6d444e82b11153ab4"
+    },
+    "evidence/mvp024-full-preparation-r1.collected.json": {
+      "bytes": 457,
+      "sha256": "b850dce8baa9e4900edef24cea5cf115d6d85475d6aae46a5a850d3b51b095b0"
+    },
+    "evidence/mvp024-full-preparation-r1.launch.json": {
+      "bytes": 436,
+      "sha256": "61da570a4a08dfcf798b5a2f71ddddc7085d093f6b5a5e85aa7c975812f37408"
+    },
+    "evidence/mvp024-full-preparation-r1.log": {
+      "bytes": 4560,
+      "sha256": "07c58ad075a3eb13651562fe0ad95e102427df2e50677ab3be85bced5e689a5f"
+    },
+    "evidence/mvp024-full-preparation-r1.py": {
+      "bytes": 6211,
+      "sha256": "cb79ff3b4d280dbdfafc3ed38e752dbe907db34b96e9c7217b93c6484398e85a"
+    },
+    "evidence/mvp024-full-preparation-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "3b0eadc17648c1e09445920d6b05d65ba29e41eb9a0af1bf6b0cec30a244e06f"
+    },
+    "runs/mvp024-full-prefetch-control-r1/OWNER": {
+      "bytes": 46,
+      "sha256": "feb048a6463066f6bffe95e192971c1f5a9540e30f643696140336da1a556fb9"
+    },
+    "runs/mvp024-full-prefetch-control-r1/admission.json": {
+      "bytes": 2739,
+      "sha256": "7cd8c7fa79864d163e1a0f8546a35a5e1a125e958c746c4938cece259ba9481b"
+    },
+    "runs/mvp024-full-prefetch-control-r1/child-process.json": {
+      "bytes": 57,
+      "sha256": "003f6fccff0dbf1e0e19f6e776bd93705db5271f143ca8518acb547107c3cab7"
+    },
+    "runs/mvp024-full-prefetch-control-r1/child-terminal.json": {
+      "bytes": 50,
+      "sha256": "b9f79071fc3292fda6238a6c8bd0bf25a55dafccfbc5b2f4fa28953558a68be9"
+    },
+    "runs/mvp024-full-prefetch-control-r1/result.json": {
+      "bytes": 823,
+      "sha256": "53ad08f9d0be4c71060aa865ecce346d87c071584dd4887144d3fa6d09b587b2"
+    },
+    "runs/mvp024-full-prefetch-control-r1/run.toml": {
+      "bytes": 107,
+      "sha256": "0a4443d4baddde31d09dde0829ab46b36192af945c4e06b78e3af8f7a5f824bb"
+    },
+    "runs/mvp024-full-prefetch-control-r1/state.json": {
+      "bytes": 823,
+      "sha256": "53ad08f9d0be4c71060aa865ecce346d87c071584dd4887144d3fa6d09b587b2"
+    },
+    "runs/mvp024-full-prefetch-control-r1/time.txt": {
+      "bytes": 1249,
+      "sha256": "75359900574ebeb0988bbf8ddd152f2c66674291432f2a3b7b6a88884ab0da80"
+    },
+    "runs/mvp024-full-prefetch-control-r1/verified-manifest.json": {
+      "bytes": 21052,
+      "sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66"
+    },
+    "runs/mvp024-full-prefetch-control-r1/verified-manifest.progress.json": {
+      "bytes": 286,
+      "sha256": "056b20f476ece8d41d642a8b249362fd9fcf957e494351d9985ced237fee971f"
+    },
+    "runs/mvp024-full-preparation-r1/OWNER": {
+      "bytes": 41,
+      "sha256": "6f4e7ca5166a3a10b56c12002b08ce5e3173db7261e0a729e09bc7625e19df90"
+    },
+    "runs/mvp024-full-preparation-r1/admission.json": {
+      "bytes": 2279,
+      "sha256": "6d05c105d32c08c46e1a0bce74aebacb44f225915bb44be18527c728c97fc296"
+    },
+    "runs/mvp024-full-preparation-r1/child-process.json": {
+      "bytes": 57,
+      "sha256": "66517c561458bedf262bd03f9f7059e0ce5a0d6fea9e5764ac189fbb382a0694"
+    },
+    "runs/mvp024-full-preparation-r1/child-terminal.json": {
+      "bytes": 49,
+      "sha256": "4142ac2b6619d3ce807263a2ffe7514de07bc325ac2a77b5be2fd0f2a2a63793"
+    },
+    "runs/mvp024-full-preparation-r1/failure.json": {
+      "bytes": 798,
+      "sha256": "50a37583dfd9e818650d05d0bef5cbe7c06df6f468de96ce9e4bfaabd7ca2c87"
+    },
+    "runs/mvp024-full-preparation-r1/run.toml": {
+      "bytes": 107,
+      "sha256": "0a4443d4baddde31d09dde0829ab46b36192af945c4e06b78e3af8f7a5f824bb"
+    },
+    "runs/mvp024-full-preparation-r1/state.json": {
+      "bytes": 798,
+      "sha256": "50a37583dfd9e818650d05d0bef5cbe7c06df6f468de96ce9e4bfaabd7ca2c87"
+    },
+    "runs/mvp024-full-preparation-r1/time.txt": {
+      "bytes": 1240,
+      "sha256": "dd90779c6074cae250c911af15a5fad1bbc3fcf3cfdc23eacc880fd464ac0050"
+    },
+    "runs/mvp024-full-preparation-r1/verified-manifest.json": {
+      "bytes": 21052,
+      "sha256": "0b38c64fd5f5d77571ef9c76af4ccea298a96e76720f577d2d0b5c88adc43a66"
+    },
+    "runs/mvp024-full-preparation-r1/verified-manifest.progress.json": {
+      "bytes": 285,
+      "sha256": "8d6d1b2adef8e2e787f2ba83ecaddb58e21ecd621193d9f0a43e23b4578b0575"
+    },
+    "source/candidate/prepare_corpus.py": {
+      "bytes": 11425,
+      "sha256": "0218ccfe3db90314683fccf7d914290d5c2a890ba330d8933f4aed5d0d3f8e56"
+    },
+    "source/original/prepare_corpus.py": {
+      "bytes": 11407,
+      "sha256": "d222cf1ee8601aa6f7e35832b7065a9534fbfeb7995a7bbf77059c1aa9748b02"
+    },
+    "source/unchanged/test_corpus.py": {
+      "bytes": 3782,
+      "sha256": "cbcf96e2d557c005cba84dcd4981232dea2ae7ef0a3ea9d690186092b01d7269"
+    }
+  },
+  "scope": "Original full reproduction resource failure and one explicit runtime prefetch control; not production acceptance."
+}

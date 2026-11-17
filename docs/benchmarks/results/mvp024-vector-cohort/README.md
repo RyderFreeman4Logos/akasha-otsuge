@@ -116,6 +116,28 @@ owned socket directory were removed. Earlier disk samples are retained and may
 be larger because native pruning continues during the run. Shared corpus,
 environment, target and caches remain intact.
 
-The final canonical gate, independent review and publication are separate from
-this archive. Full 50 GB import/coverage, one million production vectors,
-100,000 changes, 100-client load and the unchanged recovery criteria remain open.
+## Final publication
+
+[PR #73](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/73) merged as
+`1c6eed5d35569cd3f7427853fd0f0a0a47ac6275`, with the same tree as reviewed head
+`235884dc1d4d85039130697745c42cee49a698ac`. The exact canonical gate passed
+651 Rust executions / 39 intentional ignores, 35 Python and seven Node tests,
+including the installed lifecycle, private/peer UID and no-TCP checks.
+Hosted CI43993016887 passed on a checkout with the same tree.
+
+Independent review passed the source/evidence scope with zero actionable findings
+and ten fresh Python tests. Its fresh Rust command stopped before executing tests
+because the shared target was read-only in that review sandbox. That prerequisite
+failure remains explicit; four example tests passed separately in the parent
+environment and in the canonical gate. The complete immutable report is published
+in the PR description, not a separate review comment.
+
+`final-publication.zip` contains 89 members, 143,306 bytes, SHA-256
+`249dd3c759d87f7c2659124a2eb9bb92ff07b14aa42d4a80232bd4a3664dcd08`.
+`final-publication-manifest.json` gives every member hash. It retains complete
+gate/review/CI logs, the review prerequisite and parent aggregation failures,
+the separate parent test result, push/merge identities and public readbacks.
+These publication receipts supplement the earlier pilot archive.
+
+Full 50 GB import/coverage, one million production vectors, 100,000 changes,
+100-client load and the unchanged recovery criteria remain open in #65.
