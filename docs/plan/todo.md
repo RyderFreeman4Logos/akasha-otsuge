@@ -128,8 +128,11 @@ retains complete reports, logs and readbacks, including every earlier failure.
 - [x] Reproduce the complete original corpus manifest and isolate preparation
   memory through one unchanged-budget prefetch control. Preserve the baseline
   resource failure separately from the successful source reproduction.
-- [ ] Freeze the repaired preparer and generate its new code-bound manifest;
-  verify full corpus equality and production record/claim admission.
+- [x] Freeze the repaired preparer and generate its new code-bound manifest;
+  verify full corpus equality and its unchanged 2 GiB observed memory ceiling.
+- [ ] Resolve the 13 empty-claim splits found by the complete production record
+  census. Preserve source bytes and validator semantics; verify their exact
+  spans before selecting a repair. The overall admission run remains failed.
 - [ ] Stream the full eligible cohort and unchanged lexical source data through
   bounded preparation and production import; verify actual counts and byte
   coverage before full load/recovery admission. The source census is not import.
@@ -221,7 +224,11 @@ retains a byte-identical baseline with RSS 3,829,080,064 bytes above its 2 GiB
 ceiling, and a single prefetch-disabled control with the same complete manifest
 and RSS 2,012,385,280 bytes below that unchanged ceiling. Both stream hashes
 were computed without retaining the 84 GB JSONL expansion. Committed-source
-preparation and full production import/load/recovery remain pending.
+`af8eb1f` also reproduces the entire corpus with RSS 1,992,634,368 bytes. Its new
+manifest differs only in the preparer code hash. The complete shape census finds
+13 empty-claim splits, so the overall admission run remains failed and full
+production import/load/recovery remains pending. All 13 source identities and
+the unchanged failed terminal are retained in the source-validation archive.
 The supplement and functional coverage contract do not establish million-vector
 or full-scale acceptance.
 The first broader candidate regression had 167 daemon passes and one editor

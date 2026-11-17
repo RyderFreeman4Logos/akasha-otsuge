@@ -1,0 +1,87 @@
+{
+  "archive_bytes": 23920,
+  "archive_sha256": "9260e6fa170836b21e8426ca153af762b7e8ef5f2501a9a9c7de9c40b81d215e",
+  "members": {
+    "evidence/mvp024-full-preparation-commit-r1.json": {
+      "bytes": 749,
+      "sha256": "70202921bcd163bc6925d56a2be3269d79b55f5683d818445939c3f00509270b"
+    },
+    "evidence/mvp024-full-preparation-source-inspect-r1.py": {
+      "bytes": 3924,
+      "sha256": "1ed6ae375d3a94be261b2dd8ceb7169a1b0b15f120bcdcf675a8d245dc8c9f04"
+    },
+    "evidence/mvp024-full-preparation-source-r1-preflight.json": {
+      "bytes": 679,
+      "sha256": "0ba53447cfca16741cef63bf706b0cbda3c2b78bab5f49e6ca6317c8bda8c944"
+    },
+    "evidence/mvp024-full-preparation-source-r1-verified.json": {
+      "bytes": 7471,
+      "sha256": "490330f01eef29eb821dc71d875578dd446aa6ace6f733d774fd01d558237a48"
+    },
+    "evidence/mvp024-full-preparation-source-r1.collected.json": {
+      "bytes": 491,
+      "sha256": "fc8eb8d3ac9c1955e47c0a36e1adc1271dd6ab2ef430867ce2ab9926fc289181"
+    },
+    "evidence/mvp024-full-preparation-source-r1.launch.json": {
+      "bytes": 451,
+      "sha256": "c32cbb2dbf2cc7eb020626b6c1b2958ae67ab823607590279d516585623b21f9"
+    },
+    "evidence/mvp024-full-preparation-source-r1.log": {
+      "bytes": 4588,
+      "sha256": "ad5a4229dd9a717baed592a7d17783afc8effdc415db40f48c66e0748cbd7837"
+    },
+    "evidence/mvp024-full-preparation-source-r1.py": {
+      "bytes": 7713,
+      "sha256": "75c7967d8ec82e2b13a41a2f3394b7532d826cf0324023aea3b86015b6b6c2eb"
+    },
+    "evidence/mvp024-full-preparation-source-r1.terminal.json": {
+      "bytes": 237,
+      "sha256": "bec1f6b9d9b62c28b40e293d428b222e7f9ea6a4e5565565904e126b092ac2be"
+    },
+    "run/OWNER": {
+      "bytes": 48,
+      "sha256": "841dce7a083a3792459c85d56d091f414d6e3ab83d3c5bf594b93133af0925d6"
+    },
+    "run/admission.json": {
+      "bytes": 2515,
+      "sha256": "fbd50e3370691ef06fc5cf00ad09dc740ad47d9bb0e7cd2af99e33aff525eac6"
+    },
+    "run/child-process.json": {
+      "bytes": 58,
+      "sha256": "70d0186c6f7e28f517dbf166111a0667d63d82e021d09386e15ca9358a63646d"
+    },
+    "run/child-terminal.json": {
+      "bytes": 50,
+      "sha256": "9f989453339e67bc9949f22aeb829d6175e0c5c688d48a99d928b4539ced9501"
+    },
+    "run/failure.json": {
+      "bytes": 4815,
+      "sha256": "6e2277dade048a76303a1e3c649506b5b39fb1295a4dd163febf16233b2abd4c"
+    },
+    "run/production-shape.json": {
+      "bytes": 3897,
+      "sha256": "209a024fa35b7b2be35ab5ffb2ba9b4690809a6b2373213e01d0bf0d60e3bf87"
+    },
+    "run/run.toml": {
+      "bytes": 107,
+      "sha256": "0a4443d4baddde31d09dde0829ab46b36192af945c4e06b78e3af8f7a5f824bb"
+    },
+    "run/state.json": {
+      "bytes": 4815,
+      "sha256": "6e2277dade048a76303a1e3c649506b5b39fb1295a4dd163febf16233b2abd4c"
+    },
+    "run/time.txt": {
+      "bytes": 1254,
+      "sha256": "7115d3c8a8532515ee70e08ba2f1a4229c72f1ce3e767c8dfe94957d03e91a83"
+    },
+    "run/verified-manifest.json": {
+      "bytes": 21052,
+      "sha256": "88f767e86e790b0a1714b229bc0b3d047724ee7f2479596624c9daffacb9fd5d"
+    },
+    "run/verified-manifest.progress.json": {
+      "bytes": 286,
+      "sha256": "0169fab20cc4b9e868ddb380c389f00a2c7b5f4ad84eac78addb4f16079fdac0"
+    }
+  },
+  "scope": "Committed preparer exact corpus/memory success and all 13 production claim-shape rejections; overall failed run preserved"
+}
