@@ -24,8 +24,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on feat/mvp-024-vector-cohort, based on
-merged vector-coverage commit `c51f97b`. No additional corpus or Rust target is copied.
+The existing SSD worktree is reused on feat/mvp-024-full-preparation, based on
+merged cohort commit `1c6eed5`. No additional corpus or Rust target is copied.
 PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
@@ -122,8 +122,17 @@ retains complete reports, logs and readbacks, including every earlier failure.
 - [x] Resolve the 37 oversized vector documents through verified licensed inputs
   and documented model/vector identity, without increasing the product limit or
   downloading another full corpus.
-- [ ] Publish the cohort seeder, exact-input lookup and bounded real-vector
+- [x] Publish the cohort seeder, exact-input lookup and bounded real-vector
   evidence after the final canonical gate, independent review and hosted CI.
+  PR #73 merged with the reviewed tree; its final archive retains all limitations.
+- [x] Reproduce the complete original corpus manifest and isolate preparation
+  memory through one unchanged-budget prefetch control. Preserve the baseline
+  resource failure separately from the successful source reproduction.
+- [x] Freeze the repaired preparer and generate its new code-bound manifest;
+  verify full corpus equality and its unchanged 2 GiB observed memory ceiling.
+- [ ] Resolve the 13 empty-claim splits found by the complete production record
+  census. Preserve source bytes and validator semantics; verify their exact
+  spans before selecting a repair. The overall admission run remains failed.
 - [ ] Stream the full eligible cohort and unchanged lexical source data through
   bounded preparation and production import; verify actual counts and byte
   coverage before full load/recovery admission. The source census is not import.
@@ -175,7 +184,8 @@ A licensed 37-row dictionary-vector supplement is prepared. The 2026-11-16
 999,963 eligible complete inputs and 37 nonoverlapping supplementary vectors.
 All 999,963 eligible original inputs also have distinct text hashes. The full
 10,959,509-chunk text-shard overlap scan is a superset of the old cutoff; the
-historical 50,000,002,783-byte lexical dedup count was not recounted. Only 68,006
+historical lexical count was not recounted in that census. The subsequent
+full-preparation runs reproduce all 50,000,002,783 eligible bytes exactly. Only 68,006
 bytes of census receipts were retained, with no second corpus copy.
 PR #72 adds optional explicit vector scopes while retaining complete lexical indexing
 and the default all-claim policy. Its [focused evidence](../benchmarks/results/mvp024-vector-coverage/README.md)
@@ -202,7 +212,23 @@ replay. All sampled daemon limits were enforced; helper memory is reported
 separately. The 152,547,328-byte disposable store and owned socket were removed
 after complete file hashes, terminal-process and consumer checks. The 3.4 MB
 archive retains the failure and all receipts, without copying the raw corpus.
-Final gate/review/publication and full import/load/recovery remain pending.
+PR #73 merged as `1c6eed5` with the reviewed `235884d` tree. Its exact
+canonical gate and CI pass 651 Rust executions / 39 ignores, Python 35 and
+Node 7. Independent source/evidence review passes with zero findings and ten
+fresh Python tests; its Rust invocation failed the read-only shared-target
+prerequisite before tests. The canonical and separate parent example runs
+each pass four tests. The [final publication archive](../benchmarks/results/mvp024-vector-cohort/README.md#final-publication)
+retains these distinct results and complete public readbacks.
+The [full preparation evidence](../benchmarks/results/mvp024-full-preparation/README.md)
+retains a byte-identical baseline with RSS 3,829,080,064 bytes above its 2 GiB
+ceiling, and a single prefetch-disabled control with the same complete manifest
+and RSS 2,012,385,280 bytes below that unchanged ceiling. Both stream hashes
+were computed without retaining the 84 GB JSONL expansion. Committed-source
+`af8eb1f` also reproduces the entire corpus with RSS 1,992,634,368 bytes. Its new
+manifest differs only in the preparer code hash. The complete shape census finds
+13 empty-claim splits, so the overall admission run remains failed and full
+production import/load/recovery remains pending. All 13 source identities and
+the unchanged failed terminal are retained in the source-validation archive.
 The supplement and functional coverage contract do not establish million-vector
 or full-scale acceptance.
 The first broader candidate regression had 167 daemon passes and one editor
