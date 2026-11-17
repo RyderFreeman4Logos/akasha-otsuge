@@ -28,8 +28,9 @@ local owner's `corpus/pN` project scopes; they are not human-confirmed memories.
 requires the complete input to fit 4,096 UTF-8 bytes. It remains one unchanged
 claim. Configure `retrieval.embedding_scopes` with these eight project/branch
 scopes to embed the cohort while retaining every other claim in the lexical
-index. A vector query needs the corresponding branch scope; a project-only
-query retains keyword coverage. Changing the cohort flag on a previously
+index. Scored hits require the exact scope: a vector query uses the corresponding
+`vectors` branch, while a project-only query searches the null-branch records.
+Changing the cohort flag on a previously
 admitted binding/key conflicts, just as changing its body does.
 
 `spikes/data/precomputed.py` supplies the local benchmark lookup. Its manifest
@@ -147,3 +148,13 @@ The canonical workspace test command includes the example's real Domain tests:
 UTF-8 evidence and exact replay, acknowledged-prefix recovery/conflicting input,
 and bounded frame reads. Source shape checks and a pilot are preparation, not
 closure of the unchanged acceptance specification.
+
+The [cohort evidence](results/mvp024-vector-cohort/README.md) records a bounded
+production run with 8,229 sources, 8,359 current claims and 1,061 retained vectors.
+All current claim and vector input/output checks passed. Its initial keyword
+witness used the wrong branch and failed; the unchanged exact-scope contract was
+correct. Reopening the same store completed eight corrected keyword witnesses
+and eight vector self hits without reimport or reindex. The original failure,
+different release artifact identities, separate helper memory measurements and
+exact disposable-store cleanup remain recorded. This does not establish the
+million-vector, full lexical, load or recovery acceptance.
