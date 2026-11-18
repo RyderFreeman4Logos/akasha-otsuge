@@ -984,7 +984,12 @@ pub(super) struct Job {
 }
 impl Job {
     fn can_requeue(&self) -> bool {
-        self.model_plan.is_none() && self.retrieval_plan.is_none()
+        self.model_plan.is_none()
+            && self.retrieval_plan.is_none()
+            && self
+                .consult_plan
+                .as_ref()
+                .is_none_or(consult::Plan::is_editor)
     }
 
     fn queue_reservation(&self, content_bytes: usize) -> usize {
