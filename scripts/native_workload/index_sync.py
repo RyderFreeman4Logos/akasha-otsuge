@@ -13,7 +13,7 @@ from .operations import OperationError
 async def observe(ops, run_id, root, start, seconds, check_daemon):
     job_id = run_id + "/concurrent-index-sync"
     show = {"op": "job_show", "id": job_id}
-    status = {"op": "index_status", "include_queue": False}
+    status = {"op": "index_status", "include_build_epoch": True}
     result = {"job_id": job_id, "first_build_sample": None, "last_build_sample": None}
     try:
         await asyncio.sleep(max(0, start + seconds / 2 - time.monotonic()))

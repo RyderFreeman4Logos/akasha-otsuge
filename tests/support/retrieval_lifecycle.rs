@@ -28,7 +28,12 @@ fn generation_switch(jobs: usize) {
     daemon.cli(&["index", "sync", "--idempotency-key", "old-generation"]);
     let original = finished(&daemon, "old-generation");
     assert_eq!(original["state"], "succeeded", "{original}");
-    let before = daemon.cli(&["index", "status"])["data"].clone();
+    assert!(
+        daemon.cli(&["index", "status"])["data"]
+            .get("build_epoch")
+            .is_none()
+    );
+    let before = daemon.cli(&["index", "status", "--build-epoch"])["data"].clone();
     next.pause();
     daemon.configure(&settings(&next.address, 3));
     daemon.cli(&["config", "reload"]);
@@ -38,7 +43,7 @@ fn generation_switch(jobs: usize) {
         assert!(Instant::now() < until, "builder never sent its embedding");
         std::thread::sleep(Duration::from_millis(10));
     }
-    let during = daemon.cli(&["index", "status"])["data"].clone();
+    let during = daemon.cli(&["index", "status", "--build-epoch"])["data"].clone();
     daemon.cli(&[
         "search",
         "without network",
@@ -87,7 +92,7 @@ fn generation_switch(jobs: usize) {
         wait_for_storage_budget(&daemon, 1024);
     }
     let built = finished(&daemon, "new-generation");
-    let after = daemon.cli(&["index", "status"])["data"].clone();
+    let after = daemon.cli(&["index", "status", "--build-epoch"])["data"].clone();
     let job = finished(&daemon, "during-build");
     if jobs == 2 {
         daemon.cli(&[

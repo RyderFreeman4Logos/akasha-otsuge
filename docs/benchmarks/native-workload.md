@@ -45,8 +45,8 @@ An empty rule list requires a result without rules. Excluded IDs apply to
 both rules and hits.
 
 With `concurrent_index` enabled, the runner records when the daemon enters
-and leaves the build using the process-local `index_status.build_epoch`
-counter. It accepts a write or correction only if two samples from the same
+and leaves the build using the process-local counter exposed by
+`index status --build-epoch`. The counter continues across storage reopens. It accepts a write or correction only if two samples from the same
 active build bracket the entire request. The sync must succeed and advance
 the lexical watermark through its admitted target. If the submission reply
 is lost, the runner looks up the saved job ID. The intent and terminal
