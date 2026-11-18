@@ -167,3 +167,24 @@ python3 -B "$work/replay.py" --product "$AKASHA" --claude "$CLAUDE" \
 python3 -B "$work/replay.py" --product "$AKASHA" --claude "$CLAUDE" \
   --scratch "$SCRATCH" --output "$work/paired.json" --paired
 ```
+
+### Native thinking progress
+
+A second synthetic input on the same authenticated route produced two native
+stdout frames before the released daemon stopped its Runner. Replaying the init
+frame alone returned `RUNNER_INCOMPLETE`. Adding the second frame reproduced
+`PROTOCOL_INVALID` with zero provider requests. The fixture replaces the
+session and event identifiers in that second frame. It preserves the observed
+progress subtype and both estimates. The SDK defines these counters as
+per-block progress estimates. [Native progress frame](thinking-tokens.json),
+[SDK reference](https://code.claude.com/docs/en/agent-sdk/typescript#sdkthinkingtokensmessage).
+
+The adapter now accepts that progress subtype after the native session and
+parent checks and counts usage from the assistant and result frames. With the
+same two-frame prefix it reached end-of-stream and returned
+`RUNNER_INCOMPLETE`. A second offline test fed the complete retained provider
+response to the native CLI. The released package reproduced the rejection.
+The fixed daemon continued through the two requested tools, a search, and a
+read. Three locally generated follow-up responses completed the Consult with
+one verified original. The first authenticated case retained only aggregate
+fields, so its rejected frame remains unknown. [Case and replay counts](thinking-progress-r1.json).

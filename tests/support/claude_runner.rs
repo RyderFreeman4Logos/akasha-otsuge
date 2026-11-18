@@ -174,6 +174,7 @@ printf '%s\n' '{"type":"result","subtype":"success","is_error":false,"session_id
 }
 
 const INIT: &str = r#"{"type":"system","subtype":"init","session_id":"runner-session","claude_code_version":"2.1.311","tools":["ToolSearch","mcp__akasha-runner__context_describe","mcp__akasha-runner__context_list","mcp__akasha-runner__context_read","mcp__akasha-runner__context_search","mcp__akasha-runner__memory_search","mcp__akasha-runner__memory_get","mcp__akasha-runner__code_search","mcp__akasha-runner__code_read","mcp__akasha-runner__delegate"],"mcp_servers":[{"name":"akasha-runner","status":"connected","source":"plugin"}]}"#;
+const THINKING_TOKENS: &str = include_str!("../fixtures/claude/2.1.311/thinking-tokens.json");
 const DONE: &str = r#"{"type":"result","subtype":"success","is_error":false,"session_id":"runner-session","result":"final answer","usage":{"input_tokens":10,"output_tokens":2}}"#;
 
 fn no_live_process(pid: u32) -> bool {
@@ -272,6 +273,25 @@ async fn native_runner_cancellation_is_terminal_and_reaps_owned_process_group() 
 #[tokio::test]
 async fn native_runner_refuses_incomplete_mismatched_unsafe_and_failed_streams() {
     let cases = [
+        (
+            format!(
+                "printf '%s\\n' '{INIT}' '{}'",
+                THINKING_TOKENS.trim().replace(
+                    "\"estimated_tokens_delta\":1",
+                    "\"estimated_tokens_delta\":null"
+                )
+            ),
+            ErrorCode::ProtocolInvalid,
+        ),
+        (
+            format!(
+                "printf '%s\\n' '{INIT}' '{}'",
+                THINKING_TOKENS
+                    .trim()
+                    .replace("thinking_tokens", "unknown_progress")
+            ),
+            ErrorCode::ProtocolInvalid,
+        ),
         (
             format!(
                 "printf '%s\\n' '{INIT}' '{{\"type\":\"result\",\"session_id\":\"runner-session\",\"subtype\":\"error_during_execution\",\"is_error\":true}}'"
@@ -669,7 +689,7 @@ async fn native_runner_pairs_recorded_native_tool_results() {
 }
 
 #[tokio::test]
-async fn native_runner_reports_native_retry_without_exposing_provider_details() {
+async fn native_runner_accepts_thinking_estimates_and_reports_retry_without_provider_details() {
     let f = Fixture::new();
     let store = f.open().await;
     let invocation = origin(&f, &store).await;
@@ -677,7 +697,7 @@ async fn native_runner_reports_native_retry_without_exposing_provider_details() 
     std::fs::write(
         binary.with_extension("frames"),
         format!(
-            "{INIT}\n{}{DONE}\n",
+            "{INIT}\n{THINKING_TOKENS}{}{THINKING_TOKENS}{DONE}\n",
             include_str!("../fixtures/claude/2.1.311/api-retry.json")
         ),
     )
