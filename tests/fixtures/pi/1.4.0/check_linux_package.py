@@ -106,7 +106,7 @@ class Endpoint(BaseHTTPRequestHandler):
             self.close_connection = True
 
 
-def exercise(args, root, fixture):
+def exercise(args, root, fixture, rehearsal=None):
     package = args.archive.name.removesuffix(".tar.gz")
     checksum = args.archive.with_name(args.archive.name + ".sha256")
     assert checksum.read_text().split() == [args.sha256, args.archive.name]
@@ -128,10 +128,10 @@ def exercise(args, root, fixture):
                    '[retrieval]\nextraction="fixture"\n[models.fixture]\nkind="text"\nlocal=true\n'
                    f'endpoint="http://127.0.0.1:{fixture.server.server_port}/v1"\nmodel="fixture-extractor"\n')
 
-    def run(*cmd, cwd=workspace):
+    def run(*cmd, cwd=workspace, expected=0):
         p = subprocess.run([str(a) for a in cmd], cwd=cwd, env=env, stdin=subprocess.DEVNULL,
                            capture_output=True, text=True, timeout=120)
-        if p.returncode:
+        if p.returncode != expected:
             raise RuntimeError((str(cmd[0]), str(cmd[1]) if len(cmd) > 1 else "", p.returncode, p.stderr[-800:]))
         return p.stdout
 
@@ -177,6 +177,8 @@ def exercise(args, root, fixture):
     run("install", "-m", "0755", extracted / "bin/akasha-otsuge", app)
     binary_hash = sha(app)
     assert binary_hash == sha(extracted / "bin/akasha-otsuge")
+    if rehearsal:
+        shutil.copy2(extracted / "examples/notifier-file.py", root / "notifier-file.py")
     shutil.rmtree(extracted)
     assert run(app, "--version").strip().startswith("akasha-otsuge ")
     pi_version = run(args.pi, "--version").strip()
@@ -195,7 +197,7 @@ def exercise(args, root, fixture):
         run(args.pi, "--mode", "json", "--print", "--session", history, "--no-builtin-tools", "--no-extensions",
             "--no-mcp", "--no-skills", "--no-prompt-templates", "--no-themes", "--no-context-files", "--no-approve",
             "-e", extension, "--tools", "akasha_consult", MESSAGE)
-        jobs = [j["id"] for j in cli("job", "list")["items"] if j["id"].startswith("consult/")]
+        jobs = wait(lambda: [j["id"] for j in cli("job", "list")["items"] if j["id"].startswith("consult/")], bool)
         assert len(jobs) == 1
         job = finished(jobs[0])
         assert job["run_trace"]["runs"][0]["host"] == "pi"
@@ -243,6 +245,9 @@ def exercise(args, root, fixture):
         assert cli(*ack) == cli(*ack)
         assert cli("notify", "show", ident)["acknowledged_generation"] == gen
         assert cli("review", "show", review_id) == review
+        if rehearsal:
+            rehearsal(args, root, env, workspace, cfg, app, fixture, run, cli, finished, wait, stop,
+                      jobs[0], job, public, original, scope, item, review, history)
         stored_history_sha = sha(history)
         cli("adapter", "uninstall", "pi", "--agent-dir", profile)
         assert not extension.parent.exists() and before == [sha(p) for p in kept_paths]
