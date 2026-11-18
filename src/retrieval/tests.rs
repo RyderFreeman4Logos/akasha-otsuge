@@ -722,3 +722,53 @@ async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table(
         store.close().await.unwrap();
     }
 }
+
+#[tokio::test]
+async fn candidate_manifest_detects_missing_data_and_truncated_index_files() {
+    use lance::index::DatasetIndexExt;
+    for damage_index in [false, true] {
+        let fixture = Fixture::new();
+        let config = fixture.config();
+        let store = Storage::open(&config).await.unwrap();
+        let at = memory(&store, "first", "purple orchard", None).await;
+        let pending = Index::start_rebuild(&store, "candidate", 1, &|| Ok(()))
+            .await
+            .unwrap();
+        let table = table_name(&pending.generation);
+        let index = Index::open_generation(&config, pending, true)
+            .await
+            .unwrap();
+        sync(&index, &store, at).await;
+        index.check_candidate_files(&|| Ok(())).await.unwrap();
+        let root = config
+            .config()
+            .paths
+            .data_dir
+            .join("search")
+            .join(format!("{table}.lance"));
+        let dataset = index.table.dataset().unwrap().get().await.unwrap();
+        if damage_index {
+            let indices = dataset.load_indices().await.unwrap();
+            let segment = &indices[0];
+            let file = &segment.files.as_ref().unwrap()[0];
+            assert!(file.size_bytes > 1);
+            std::fs::OpenOptions::new()
+                .write(true)
+                .open(
+                    root.join("_indices")
+                        .join(segment.uuid.to_string())
+                        .join(&file.path),
+                )
+                .unwrap()
+                .set_len(1)
+                .unwrap();
+        } else {
+            let file = &dataset.iter_fragments().next().unwrap().files[0];
+            std::fs::remove_file(root.join("data").join(&file.path)).unwrap();
+        }
+        assert!(index.check_candidate_files(&|| Ok(())).await.is_err());
+        assert_eq!(status(&store).unwrap().generation, GENERATION);
+        drop(index);
+        store.close().await.unwrap();
+    }
+}

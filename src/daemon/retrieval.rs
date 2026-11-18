@@ -215,22 +215,45 @@ impl Service {
         match plan {
             RetrievalRequest::Sync | RetrievalRequest::Rebuild => {
                 let target = target.ok_or(Error("JOB_CORRUPT"))?;
-                let result = self
-                    .maintain_index(id, workflow, &index, &config, target, needs_retirement)
-                    .await;
-                if matches!(
-                    &result,
-                    Err(Error("INDEX_IO" | "INDEX_CORRUPT" | "INDEX_MISSING"))
-                ) && index.is_pending()
-                {
-                    // Some damaged data or index pages only fail during a native scan or prune.
-                    index
-                        .mark_damaged_candidate(&self.storage, config.generation(), &|| {
-                            self.authorize_index_work(id, workflow)
-                        })
-                        .await?;
+                let mut candidate = index;
+                let mut retry = matches!(plan, RetrievalRequest::Rebuild);
+                loop {
+                    let result = self
+                        .maintain_index(id, workflow, &candidate, &config, target, needs_retirement)
+                        .await;
+                    if !candidate.is_pending()
+                        || !matches!(
+                            &result,
+                            Err(Error("INDEX_IO" | "INDEX_CORRUPT" | "INDEX_MISSING"))
+                        )
+                    {
+                        return result;
+                    }
+                    let authorize = || self.authorize_index_work(id, workflow);
+                    if !candidate
+                        .mark_damaged_candidate(&self.storage, config.generation(), &authorize)
+                        .await?
+                        || !retry
+                    {
+                        return result;
+                    }
+                    retry = false;
+                    let damaged = crate::retrieval::pending_rebuild(&self.storage)?
+                        .ok_or(Error("INDEX_NOT_READY"))?;
+                    drop(candidate);
+                    candidate = Arc::new(
+                        Index::open_candidate(
+                            &self.storage,
+                            self.config.pin().resolved(),
+                            &config,
+                            damaged,
+                            id,
+                            false,
+                            &authorize,
+                        )
+                        .await?,
+                    );
                 }
-                result
             }
             plan @ RetrievalRequest::Search { .. } => {
                 self.search(id, workflow, index, config, vector_generation, plan)
@@ -321,6 +344,11 @@ impl Service {
                 windows_since_prune = 0;
             }
             if complete {
+                if index.is_pending() {
+                    index
+                        .check_candidate_files(&|| self.authorize_index_work(id, workflow))
+                        .await?;
+                }
                 crate::retrieval::activate_vector(
                     &self.storage,
                     &progress,

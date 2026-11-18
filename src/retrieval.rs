@@ -225,7 +225,7 @@ impl Index {
         storage: &Storage,
         generation: u64,
         authorize: &(impl Fn() -> Result<()> + Sync),
-    ) -> Result<()> {
+    ) -> Result<bool> {
         if let Some(mut candidate) = pending_rebuild(storage)?
             && self.generation == candidate.generation
             && candidate.generation != status(storage)?.generation
@@ -233,6 +233,75 @@ impl Index {
         {
             candidate.discarding = true;
             save_pending(storage, generation, Some(&candidate), authorize).await?;
+            return Ok(true);
+        }
+        Ok(false)
+    }
+
+    // Validate the current native manifests before making this generation readable.
+    // A cached schema, row count or FTS index can survive the loss of a data file.
+    pub(crate) async fn check_candidate_files(
+        &self,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        use lance::index::DatasetIndexExt;
+        let vector = self.vector.lock().await.clone();
+        for table in std::iter::once(&self.table).chain(vector.as_ref().map(|v| &v.table)) {
+            authorize()?;
+            let dataset = table
+                .dataset()
+                .ok_or_else(|| error("INDEX_CORRUPT"))?
+                .get()
+                .await
+                .map_err(index_error)?;
+            let store = dataset.object_store(None).await.map_err(index_error)?;
+            for fragment in dataset.iter_fragments() {
+                authorize()?;
+                if fragment.deletion_file.is_some()
+                    || fragment
+                        .referenced_lance_files()
+                        .any(|f| f.base_id.is_some())
+                {
+                    let fragment = dataset
+                        .get_fragment(fragment.id as usize)
+                        .ok_or_else(|| error("INDEX_CORRUPT"))?;
+                    fragment.validate().await.map_err(index_error)?;
+                }
+                for file in fragment
+                    .referenced_lance_files()
+                    .filter(|f| f.base_id.is_none())
+                {
+                    authorize()?;
+                    let size = store
+                        .size(&dataset.data_dir().join(file.path.as_str()))
+                        .await
+                        .map_err(index_error)?;
+                    if file.file_size_bytes.get().is_some_and(|n| n.get() != size) {
+                        return Err(error("INDEX_CORRUPT"));
+                    }
+                }
+            }
+            for segment in dataset.load_indices().await.map_err(index_error)?.iter() {
+                authorize()?;
+                let files = segment
+                    .files
+                    .as_ref()
+                    .ok_or_else(|| error("INDEX_CORRUPT"))?;
+                if segment.base_id.is_some() {
+                    return Err(error("INDEX_CORRUPT"));
+                }
+                let directory = dataset.indices_dir().join(segment.uuid.to_string());
+                for file in files {
+                    authorize()?;
+                    let size = store
+                        .size(&directory.clone().join(file.path.as_str()))
+                        .await
+                        .map_err(index_error)?;
+                    if size != file.size_bytes {
+                        return Err(error("INDEX_CORRUPT"));
+                    }
+                }
+            }
         }
         Ok(())
     }
