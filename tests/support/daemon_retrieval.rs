@@ -685,17 +685,18 @@ fn vector_sync_batch(wide: bool, alternating: bool) {
                     assert_eq!(revisions.value(row), (id as u64 + 1) * 2);
                     let vector = vectors.value(row);
                     let vector = vector.as_any().downcast_ref::<Float32Array>().unwrap();
+                    let expected = if wide {
+                        [0.5, 0.5]
+                    } else if alternating {
+                        [id as f32 + 1.0, -0.0]
+                    } else if id.is_multiple_of(2) {
+                        [1.0, 0.0]
+                    } else {
+                        [0.0, 1.0]
+                    };
                     assert_eq!(
-                        (vector.value(0), vector.value(1)),
-                        if wide {
-                            (0.5, 0.5)
-                        } else if alternating {
-                            (id as f32 + 1.0, 1.0)
-                        } else if id.is_multiple_of(2) {
-                            (1.0, 0.0)
-                        } else {
-                            (0.0, 1.0)
-                        }
+                        [vector.value(0), vector.value(1)].map(f32::to_bits),
+                        expected.map(f32::to_bits)
                     );
                 }
             }

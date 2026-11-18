@@ -352,7 +352,8 @@ impl VectorIndex {
         }
         let config = snapshot.resolved();
         let embedded = async {
-            let mut vectors = vec![vec![0f32; progress.dimension as usize]; rows.len()];
+            // Starting with -0.0 also preserves a provider's -0.0 for a single chunk.
+            let mut vectors = vec![vec![-0.0f32; progress.dimension as usize]; rows.len()];
             let mut chunks = Vec::new();
             // Provider calls follow first-seen scope order. Keep the original row index for
             // accumulation and native writes, including when response indices arrive out of order.

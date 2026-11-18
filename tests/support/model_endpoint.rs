@@ -134,7 +134,7 @@ impl Endpoint {
                                 match body["model"].as_str() {
                                     Some("vectors-id") => {
                                         let (_, id) = text.rsplit_once("item-").unwrap();
-                                        embedding = vec![id.parse::<f64>().unwrap() + 1.0, 1.0];
+                                        embedding = vec![id.parse::<f64>().unwrap() + 1.0, -0.0];
                                     }
                                     Some("invalid-zero") => embedding = vec![0.0, 0.0],
                                     Some("invalid-overflow") => embedding = vec![1e300, 1.0],
