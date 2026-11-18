@@ -134,7 +134,7 @@ async def submit(
     if preflight:
         assert (
             prepared["cold_search_error"] == "INDEX_NOT_READY"
-            if not case["sources"]
+            if not result.get("native_import")
             else prepared["prior_index_watermark"] > 0
         ) and prepared["concurrent_reservations_accepted"] == 2
         assert await state.wait() == 0

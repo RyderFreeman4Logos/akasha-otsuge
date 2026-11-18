@@ -73,7 +73,13 @@ def prepare(task, args, private, result):
         flags.append("historical snapshot binding")
     if case.get("changes_during_run"):
         flags.append("live change and publication barrier")
-    if case.get("missing_event_ids"):
+    missing = case.get("missing_event_ids", [])
+    if missing and (
+        len(missing) != 1
+        or case["sources"]
+        or case["memories"]
+        or native["missing"] != missing[0]
+    ):
         flags.append("unavailable historical originals")
     withdrawals = withdrawn_revisions(case, native)
     sources = case["sources"]
@@ -104,7 +110,7 @@ def prepare(task, args, private, result):
         flags.append("non-current or cross-scope Memory")
     if flags:
         raise EpisodeUnavailable(", ".join(flags))
-    if not (sources or case["memories"]):
+    if not (sources or case["memories"] or missing):
         return case, area
     if args.importer is None or args.import_build is None:
         raise EpisodeUnavailable(
@@ -155,7 +161,7 @@ def prepare(task, args, private, result):
         or observed["scope"] != caller["scope"]
         or observed["logical_fence"] != caller["fence_sequence"]
         or set(observed["native_visible_ids"]) != set(caller["allowed_event_ids"])
-        or observed["missing"] is not None
+        or observed["missing"] != (missing[0] if missing else None)
     ):
         raise EpisodeUnavailable("native scope or capture fence did not match")
     failures = [
@@ -189,6 +195,7 @@ def prepare(task, args, private, result):
             "native_visible_ids",
             "logical_fence",
             "capture_seq",
+            "missing",
         )
     }
     (area / "seed.json").write_bytes(canonical(seed))
@@ -196,6 +203,7 @@ def prepare(task, args, private, result):
         grant_commit=seed["grant"],
         capture_commit=seed["capture_seq"],
         retained_originals=len(seed["sources"]),
+        missing_parent=seed["missing"],
         active_revisions=len(observed["native_state_ids"]),
         withdrawn_revisions=len(withdrawals),
     )
