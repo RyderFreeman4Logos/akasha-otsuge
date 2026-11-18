@@ -1,0 +1,63 @@
+{
+  "scope": "Local Linux daemon and CLI with isolated synthetic data. One non-idempotent stdio sink writes each accepted effect to its own fsynced log. The incident executor is a local protocol fixture.",
+  "comparison_base": "f1521c66444e39c7fa00e173e93f4f1c2ff8d160",
+  "baseline_binary_sha256": "43ffb25b70e425e789251ca203edfee68823ab7304803dc8ec01b3efd4aafec7",
+  "fixed_binary_sha256": "311f58ff9e87c59934147b5d1556f626fa1b1980472d30c3332ca1565d1f7ccb",
+  "seeder_sha256": "78a4dc62e9b78c958fbee0f7e1d958bfee0d373d5a5127ea42aad63b87282284",
+  "private_tmpfs_bytes": 33554432,
+  "available_before_completion_bytes": 1048576,
+  "normal_entry_points": [
+    "review open",
+    "review state",
+    "notify show",
+    "daemon status",
+    "daemon stop",
+    "daemon run",
+    "outcome submit",
+    "incident show",
+    "job show"
+  ],
+  "local_channels": 55,
+  "accepted_external_delivery": {
+    "before_fix": {
+      "notice_len": 23008,
+      "read_available_while_low": false,
+      "daemon_exit_code": 4,
+      "actual_external_effects": 2,
+      "distinct_effect_keys": 1,
+      "attempt": 2,
+      "duplicate_risk": true,
+      "receipt_status": "sent"
+    },
+    "after_fix": {
+      "notice_len": 23008,
+      "read_available_while_low": true,
+      "actual_external_effects": 1,
+      "distinct_effect_keys": 1,
+      "attempt": 1,
+      "duplicate_risk": false,
+      "receipt_status": "sent",
+      "receipt_survived_restart_under_pressure": true
+    }
+  },
+  "new_claim": {
+    "baseline": "daemon exited 4",
+    "while_low": "daemon served reads; zero local deliveries admitted",
+    "after_release": "all 55 local deliveries recorded"
+  },
+  "outbox_projection": {
+    "notification_json_bytes": 21939,
+    "review_change_commit": 14,
+    "baseline": "daemon exited 4",
+    "while_low": "original notification remained open",
+    "after_release": "investigating, generation 2"
+  },
+  "incident_transition": {
+    "signal_reason_bytes": 4096,
+    "baseline": "daemon exited 4 with RESOURCE_BUSY",
+    "while_low": "incident remained running and the terminal job was readable",
+    "after_release": "same job, investigation finished, original RESOURCE_BUSY retained"
+  },
+  "repeat_external_delivery_check": "python3 scripts/check_low_disk.py target/debug/akasha-otsuge target/debug/examples/corpus_seed",
+  "limit": "The reserve check rejected these writes. Abrupt loss after a provider effect but before its receipt, or exhaustion of the physical reserve, still has the notifier protocol’s interrupted-send semantics."
+}

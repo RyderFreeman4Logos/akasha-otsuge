@@ -1130,14 +1130,17 @@ impl Service {
             expected_revision: previous,
             content: serde_json::to_string(job)?,
         });
-        self.storage
-            .commit(&CommitRequest {
-                request_id: format!("job/{}/{}", hash(job.id.as_bytes()), previous.unwrap_or(0)),
-                config_generation: job.config_generation,
-                policy_revision: None,
-                changes,
-            })
-            .await?;
+        let request = CommitRequest {
+            request_id: format!("job/{}/{}", hash(job.id.as_bytes()), previous.unwrap_or(0)),
+            config_generation: job.config_generation,
+            policy_revision: None,
+            changes,
+        };
+        if previous.is_some() && (job.terminal() || job.cancel_requested || job.state == "queued") {
+            self.storage.commit_with_reserved_space(request).await?;
+        } else {
+            self.storage.commit(&request).await?;
+        }
         Ok(())
     }
     fn authorize_job(&self, job: &Job) -> Result<()> {
@@ -1339,6 +1342,9 @@ impl Service {
                 retrieval_plan,
                 Some(crate::retrieval::Request::Sync | crate::retrieval::Request::Rebuild)
             ) {
+                service
+                    .storage
+                    .check_index_space(&snapshot.resolved().config().paths.data_dir)?;
                 Some(service.storage.sequence()?)
             } else {
                 None
@@ -1756,8 +1762,20 @@ impl Service {
         }
         job.lease_owner = Some(self.instance.clone());
         job.lease_until_ms = Some(now.saturating_add(30_000));
-        self.save_job(&job, Some(revision), vec![]).await?;
-        Ok(true)
+        match self.save_job(&job, Some(revision), vec![]).await {
+            Ok(()) => Ok(true),
+            Err(Error("RESOURCE_BUSY")) => Ok(false),
+            Err(error) => Err(error),
+        }
+    }
+    async fn finish_pressured_job(&self, id: &str) -> Result<()> {
+        let _guard = self.admission.lock().await;
+        let (revision, job) = self.job(id)?;
+        if job.state == "running" && job.lease_owner.as_deref() == Some(self.instance.as_str()) {
+            self.finish_job(job, revision, "failed", Some("RESOURCE_BUSY"))
+                .await?;
+        }
+        Ok(())
     }
     async fn execute_job(self: Arc<Self>, id: String) -> Result<()> {
         self.require_local_job(&id)?;
@@ -1988,7 +2006,10 @@ impl Service {
                         owned.insert(id.clone());
                         let service = self.clone();
                         running.spawn(async move {
-                            let result = service.execute_job(id.clone()).await;
+                            let result = match service.clone().execute_job(id.clone()).await {
+                                Err(Error("RESOURCE_BUSY")) => service.finish_pressured_job(&id).await,
+                                result => result,
+                            };
                             (id, result)
                         });
                     }

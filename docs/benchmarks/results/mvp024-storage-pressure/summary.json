@@ -1,0 +1,165 @@
+{
+  "binary_sha256": "ba92c5e936a171c922af741930e280a69a9ec476e900b618c1ac04ce3c4d2728",
+  "build": "cargo build --locked --offline --bin akasha-otsuge",
+  "kernel_enospc": {
+    "archive_export": {
+      "error": "STORAGE_IO",
+      "exit_code": 1,
+      "failed_write_target": "archive blobs.bin",
+      "failing_write_request_bytes": [
+        17104
+      ],
+      "free_bytes_at_operation": 4096,
+      "kernel_errno": 28,
+      "manifest_published": false,
+      "partial_bytes": {
+        "blobs.bin": 4096,
+        "commits.jsonl": 0
+      },
+      "prior_and_recovered_export": {
+        "commits": 9,
+        "manifest_sha256": "1c79bfaee48d63d98836dc77950139d4c694efd280f0223e399eb5e220a5ea64",
+        "verified_history": 2,
+        "verified_receipts": 1
+      },
+      "raw_receipt_sha256": "58544a3df3a32851b7a6f7a28d66ae6bcd86ee62877db12675f68b86a66dc865",
+      "volume_capacity_bytes": 2097152
+    },
+    "archive_import_extension": {
+      "error": "STORAGE_ERROR",
+      "exit_code": 1,
+      "failed_write_target": "unpublished import stage VLog",
+      "failing_write_request_bytes": [
+        3312
+      ],
+      "free_bytes_at_operation": 65536,
+      "kernel_errno": 28,
+      "previous_published_prefix_after_failure": {
+        "commits": 9,
+        "manifest_sha256": "53c32b74d0ebbeae15ddf839d9e25bdca3d6c9fa5d36932a9b82a5341182b7cb",
+        "verified_history": 2,
+        "verified_receipts": 1
+      },
+      "raw_receipt_sha256": "5429518dd165463793ac0c5097e5a5acad0f636efa98f1c2393862af1e299d05",
+      "same_command_retried": true,
+      "source_and_recovered_export": {
+        "commits": 25,
+        "manifest_sha256": "d0be5ee2bcc325b099e462fc3c17d23f3e6df3b82d4e9336ce77e2e18a49dd89",
+        "verified_history": 10,
+        "verified_receipts": 9
+      },
+      "source_extension_blob_bytes": 392993,
+      "volume_capacity_bytes": 2097152
+    },
+    "online_authority_commit": {
+      "acknowledged_memory_revisions": [
+        3,
+        8,
+        10
+      ],
+      "error": "STORAGE_ERROR",
+      "exit_code": 1,
+      "failed_request_absent_from_archive": true,
+      "failed_write_target": "authority VLog",
+      "failing_write_request_bytes": [
+        4941
+      ],
+      "free_bytes_at_operation": 0,
+      "identical_retry_receipt_after_reopen": true,
+      "kernel_errno": 28,
+      "prior_archive_after_failure": {
+        "commits": 9,
+        "manifest_sha256": "8784b5f50c12ecc49f46f08ab890472854ff65f6a137308ac733e984869c0b7f",
+        "verified_history": 2,
+        "verified_receipts": 1
+      },
+      "raw_receipt_sha256": "fa93d30c4dd2be9c72bf34fb0ae82d4e3e22b3b5e8df46e3be3ca4f93cd206bd",
+      "recovered_archive": {
+        "commits": 11,
+        "manifest_sha256": "42b7e34c52a063060692ad410374d641211ac94318fb7016ca70dd9f5304e0d8",
+        "verified_history": 3,
+        "verified_receipts": 2
+      },
+      "request_succeeded_while_full": false,
+      "volume_capacity_bytes": 33554432
+    }
+  },
+  "limits": [
+    "Capacity is sampled at submission and indexing-window boundaries. An admitted writer can exhaust remaining blocks.",
+    "Fresh and incremental storage were small. These checks do not measure full-corpus throughput or certify hardware power-loss durability."
+  ],
+  "method": [
+    "Use separate PID, user and mount namespaces. Only the executable, fixture, runtime libraries and seeder are mounted read-only. All store and filler paths live on bounded tmpfs volumes.",
+    "For near-full admission retain 1 MiB available and read a known unchanged fact through the published lexical index while fresh builds are refused. Remove only the filler and resubmit the original keys.",
+    "For complete exhaustion observe ENOSPC on a product file descriptor. Re-export closed data and compare every manifest member, historical blob and acknowledged receipt to the input or the pre-failure archive. The authority case uses a small transaction below the proactive large-write threshold.",
+    "The raw kernel receipts are retained locally under the listed SHA-256 digests. Only the near-full helper is included in this checkout."
+  ],
+  "near_full": {
+    "cases": {
+      "authority": {
+        "baseline_binary_sha256": "544b540d19adaf916b54a85362300f2f5892712da90354bf601de5239c67d4c5",
+        "baseline_commit": "30c4156f9cb5df84188739ff03d392841a3916d5",
+        "baseline_proof_sha256": "516f5db514bb775b24602f0cd7582382a92dd92a969d51b42badd563317762f7",
+        "exit_code": 4,
+        "native_proof_sha256": "edfde70ae35a65210a47896a1ca32e58a24b0266c91c129af0d623ff36b96f1d",
+        "new_build_ids_absent": true,
+        "now_refused_before_effect": [
+          "large_write",
+          "rebuild",
+          "sync"
+        ],
+        "previously_admitted": [
+          "large_write",
+          "rebuild",
+          "sync"
+        ],
+        "prior_and_historical_memory_read_verified": true,
+        "prior_idempotent_replays_verified": true,
+        "prior_published_index_query": {
+          "confirmed_revision": 5,
+          "expected_revision": 5,
+          "matches": 1,
+          "mode": "keyword"
+        },
+        "refusal": "RESOURCE_BUSY",
+        "same_key_after_space_release_succeeded": true
+      },
+      "search": {
+        "baseline_binary_sha256": "544b540d19adaf916b54a85362300f2f5892712da90354bf601de5239c67d4c5",
+        "baseline_commit": "30c4156f9cb5df84188739ff03d392841a3916d5",
+        "baseline_proof_sha256": "ca84345ecb50a38bb426024eecb251e763b75a7b8ca1c3e8931d3373328c0f15",
+        "exit_code": 4,
+        "native_proof_sha256": "eb8bfb1b8ca0fafa588ae7fb42ad9fc26b0f2889db0169672f19937b96d1baed",
+        "new_build_ids_absent": true,
+        "now_refused_before_effect": [
+          "rebuild",
+          "sync"
+        ],
+        "previously_admitted": [
+          "rebuild",
+          "sync"
+        ],
+        "prior_and_historical_memory_read_verified": true,
+        "prior_idempotent_replays_verified": true,
+        "prior_published_index_query": {
+          "confirmed_revision": 5,
+          "expected_revision": 5,
+          "matches": 1,
+          "mode": "keyword"
+        },
+        "refusal": "RESOURCE_BUSY",
+        "same_key_after_space_release_succeeded": true
+      }
+    },
+    "closeout_bytes": 8388608,
+    "initial_free_bytes": 1048576,
+    "large_serialized_commit_bytes": 16384,
+    "public_regression": "python3 scripts/check_low_disk.py target/debug/akasha-otsuge target/debug/examples/corpus_seed",
+    "volume_capacity_bytes": 33554432
+  },
+  "parent": "7a9c073e78e0f16949182bb3b20c38ccbd1a6a4d",
+  "scope": "Small private Linux tmpfs volumes and released local storage only.",
+  "source_commit": "81ae6dd74dee94967af2b68b3eda9030808ac759",
+  "source_tree": "284ea4742ddf8cc1eff73d2f78ddb5cc54774d6c",
+  "status": "passed"
+}

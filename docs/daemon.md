@@ -54,6 +54,31 @@ or idempotency key. Queued job snapshots and pending path configuration survive.
 Stop and production shutdown signals still end the daemon. See
 [memory budgets](memory-resources.md) for the remaining enforcement limits.
 
+## Low disk space
+
+A new authority commit of at least 16 KiB (serialized request) must leave
+8 MiB available to the daemon user on the authority volume. Index sync and
+rebuild require 8 MiB free on both the authority and search volumes. The daemon
+checks these volumes before queuing a new build, after acquiring its builder
+slot and before each indexing window. A refused submission returns
+`RESOURCE_BUSY` (exit 4). Free space and retry its original idempotency key.
+
+Current and historical memory reads, receipt replays, and status remain
+available. A queued job whose running record is too large stays queued until
+space returns or its original queue deadline expires. If a running job cannot
+save its result under pressure, it can finish with `RESOURCE_BUSY`. Its
+recovery, cancellation and terminal records can use the headroom. Inspect the
+job state before resubmission. These
+checks measure available blocks at admission. A native indexing window,
+table maintenance or another writer can still exhaust the volume later.
+
+On Linux, run the bounded-volume regression after building the binary and the
+`corpus_seed` example.
+
+```sh
+python3 scripts/check_low_disk.py target/debug/akasha-otsuge target/debug/examples/corpus_seed
+```
+
 ## Frames and bounds
 
 Each frame is a four-byte unsigned big-endian byte length followed by UTF-8 JSON.
@@ -178,3 +203,5 @@ stdout, and sends an acknowledgement bound to that receipt and hash. Only this
 acknowledgement moves Prepared to Delivered; failed stdout writes leave it
 Prepared. Lost acknowledgements remain uncertain, and a repeated successful replay
 is idempotent. Receipt viewing itself does not assert delivery.
+
+The [queued job controls](benchmarks/results/mvp024-storage-pressure/queued-job-recovery.json) exercise a large queued prompt and an in-flight response. The [notification controls](benchmarks/results/mvp024-storage-pressure/notification-recovery.json) include a non-idempotent external receiver across a pressured restart.

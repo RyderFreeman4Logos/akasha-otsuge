@@ -159,7 +159,7 @@ impl Service {
                 job.retrieval_vector_config_generation,
             )
         };
-        let _builder = if matches!(plan, RetrievalRequest::Sync | RetrievalRequest::Rebuild) {
+        let builder = if matches!(plan, RetrievalRequest::Sync | RetrievalRequest::Rebuild) {
             Some(tokio::select! {
                 guard=self.index_builder.lock()=>guard,
                 code=self.model_cancelled(id)=>return Err(Error(code)),
@@ -168,6 +168,10 @@ impl Service {
         } else {
             None
         };
+        if builder.is_some() {
+            self.storage
+                .check_index_space(&config.resolved().config().paths.data_dir)?;
+        }
         let pending = match &plan {
             RetrievalRequest::Rebuild => {
                 let mut owned = self
@@ -309,6 +313,8 @@ impl Service {
                     return Err(Error("WORKFLOW_TIMEOUT"));
                 }
             }
+            self.storage
+                .check_index_space(&config.resolved().config().paths.data_dir)?;
             let mut progress = index
                 .sync_batch(&self.storage, target, config.generation(), &authorize)
                 .await?;
