@@ -211,22 +211,31 @@ async def send(p, value):
     await p.stdin.drain()
 
 
-async def stop(p):
+async def stop(p, grace=4):
     if p is None:
         return
     p.stdin.close()
-    try:
-        await asyncio.wait_for(p.wait(), 4)
-    except TimeoutError:
-        try:
-            os.killpg(p.pid, signal.SIGTERM)
-        except ProcessLookupError:
+
+    async def finish():
+        # No more protocol frames are needed. A full stdout pipe can delay process exit.
+        while await p.stdout.read(65536):
             pass
-        try:
-            await asyncio.wait_for(p.wait(), 4)
-        except TimeoutError:
-            os.killpg(p.pid, signal.SIGKILL)
-            await p.wait()
+        await p.wait()
+
+    done = asyncio.create_task(finish())
+    try:
+        for sig in (signal.SIGTERM, signal.SIGKILL):
+            if (await asyncio.wait([done], timeout=grace))[0]:
+                return await done
+            try:
+                os.killpg(p.pid, sig)
+            except ProcessLookupError:
+                pass
+        await asyncio.wait_for(done, grace)
+    finally:
+        if not done.done():
+            done.cancel()
+            await asyncio.gather(done, return_exceptions=True)
 
 
 async def run(args, private, result):
@@ -557,14 +566,16 @@ async def run(args, private, result):
                 )
                 break
     finally:
-        await stop(host)
-        if drain_task:
-            await drain_task
-        await stop(state)
-        if service_stderr_task:
-            await service_stderr_task
-        result["native_stderr"] = error_stream
-        result["timing"] = dict(timers, total_s=clock() - started)
+        stopped = await asyncio.gather(stop(host), stop(state), return_exceptions=True)
+        try:
+            diagnostics = [task for task in (drain_task, service_stderr_task) if task]
+            await asyncio.wait_for(asyncio.gather(*diagnostics), timeout=4)
+        finally:
+            result["native_stderr"] = error_stream
+            result["timing"] = dict(timers, total_s=clock() - started)
+        for error in stopped:
+            if isinstance(error, BaseException):
+                raise error
 
 
 def main():

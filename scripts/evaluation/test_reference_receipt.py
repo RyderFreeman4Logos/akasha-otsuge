@@ -137,6 +137,43 @@ class ReceiptTests(unittest.TestCase):
             "no_hit",
         )
 
+    def test_shutdown_reads_native_frames_after_terminal(self):
+        async def check():
+            child = await asyncio.create_subprocess_exec(
+                sys.executable,
+                "-c",
+                "import sys;sys.stdin.read();sys.stdout.buffer.write(b'x'*1048576)",
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                limit=1024,
+                start_new_session=True,
+            )
+            await driver.stop(child, grace=2)
+            self.assertEqual(child.returncode, 0)
+
+        asyncio.run(check())
+
+    def test_already_exited_group_at_final_shutdown_signal(self):
+        async def check():
+            stdout = asyncio.StreamReader()
+            child = SimpleNamespace(
+                pid=42, stdin=io.BytesIO(), stdout=stdout, wait=lambda: asyncio.sleep(0)
+            )
+
+            def disappeared(pid, sig):
+                self.assertEqual(pid, 42)
+                if sig == driver.signal.SIGKILL:
+                    stdout.feed_eof()
+                raise ProcessLookupError
+
+            with patch.object(
+                driver.os, "killpg", side_effect=disappeared
+            ) as signal_group:
+                await driver.stop(child, grace=0.01)
+            self.assertEqual(signal_group.call_count, 2)
+
+        asyncio.run(check())
+
     def test_invalid_destination_rejects_before_start(self):
         self.output = self.root / "missing" / "result.json"
         with patch.object(sys, "argv", self.args()), patch.object(driver, "run") as run:
