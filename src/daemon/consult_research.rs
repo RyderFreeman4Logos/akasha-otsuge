@@ -1,7 +1,7 @@
 use super::*;
 use crate::adapter::{
     AdapterError, BoundWorkspace, CodeRead, ContextRequest, ContextResponse, ContextSource,
-    ErrorCode, MAX_FRAME_BYTES, RunLease,
+    ErrorCode, MAX_FRAME_BYTES, ReadBounds, RunLease,
 };
 use crate::domain::{Ingress, MemoryState, OriginalRange, SourceDraft, SourceSpan};
 use crate::storage::RevisionRef;
@@ -421,6 +421,7 @@ impl<'a> Research<'a> {
         &mut self,
         lease: &RunLease,
         request: ContextRequest,
+        bounds: &mut ReadBounds,
     ) -> Result<ContextResponse> {
         let value = match request {
             ContextRequest::Describe {} if self.incident.is_some() => {
@@ -439,7 +440,8 @@ impl<'a> Research<'a> {
                 max_bytes,
             } if handle.starts_with("incident:") => {
                 return Ok(ContextResponse::Text(
-                    self.incident_text(lease, &handle, start, max_bytes).await?,
+                    self.incident_text(lease, &handle, start, max_bytes, bounds)
+                        .await?,
                 ));
             }
             ContextRequest::Delegate { hint } => {
@@ -502,7 +504,10 @@ impl<'a> Research<'a> {
             }
             request => {
                 let searched = matches!(request, ContextRequest::Search { .. });
-                let response = self.captured.execute(lease, request).await?;
+                let response = self
+                    .captured
+                    .execute_with_bounds(lease, request, Some(bounds))
+                    .await?;
                 self.searched |= searched;
                 for source in self.captured.read_sources() {
                     if !self.sources.contains(source) {
@@ -587,11 +592,16 @@ impl ContextSource for Research<'_> {
                     }
                     _ => None,
                 };
-                let response = match self.dispatch(lease, request).await {
+                let mut bounds = ReadBounds::default();
+                let response = match self.dispatch(lease, request, &mut bounds).await {
                     Ok(response) => response,
                     Err(error) => {
-                        self.diagnostics
-                            .record(Stage::ContextDispatch, tool, error.0);
+                        self.diagnostics.record_reason(
+                            Stage::ContextDispatch,
+                            tool,
+                            error.0,
+                            bounds.rejection,
+                        );
                         self.gap(error.0);
                         ContextResponse::Error(adapter_error(error))
                     }

@@ -150,6 +150,50 @@ pub enum ContextResponse {
     Error(AdapterError),
 }
 
+#[derive(Clone, Copy, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum ReadRangeRejection {
+    MaxBytesZero,
+    MaxBytesAboveLimit,
+    StartPastEnd,
+    StartNotUtf8Boundary,
+    EmptyIncidentRange,
+}
+
+#[derive(Default)]
+pub(crate) struct ReadBounds {
+    pub(crate) rejection: Option<ReadRangeRejection>,
+}
+
+impl ReadBounds {
+    pub(crate) fn reject(&mut self, reason: ReadRangeRejection) -> AdapterError {
+        self.rejection = Some(reason);
+        ErrorCode::InvalidArgument.into()
+    }
+
+    pub(crate) fn check_size(&mut self, max_bytes: usize) -> Result<()> {
+        match max_bytes {
+            0 => Err(self.reject(ReadRangeRejection::MaxBytesZero)),
+            1..=16384 => Ok(()),
+            _ => Err(self.reject(ReadRangeRejection::MaxBytesAboveLimit)),
+        }
+    }
+
+    pub(crate) fn end(&mut self, text: &str, start: usize, max_bytes: usize) -> Result<usize> {
+        if start > text.len() {
+            return Err(self.reject(ReadRangeRejection::StartPastEnd));
+        }
+        if !text.is_char_boundary(start) {
+            return Err(self.reject(ReadRangeRejection::StartNotUtf8Boundary));
+        }
+        let mut end = start.saturating_add(max_bytes).min(text.len());
+        while !text.is_char_boundary(end) {
+            end -= 1;
+        }
+        Ok(end)
+    }
+}
+
 pub trait ContextSource: Send {
     fn execute<'a>(
         &'a mut self,
@@ -305,10 +349,9 @@ impl<'a> CapturedContext<'a> {
         handle: &str,
         start: usize,
         max_bytes: usize,
+        bounds: &mut ReadBounds,
     ) -> Result<ContextText> {
-        if max_bytes == 0 || max_bytes > 16 * 1024 {
-            return Err(ErrorCode::InvalidArgument.into());
-        }
+        bounds.check_size(max_bytes)?;
         let reference = self.handles.get(handle).ok_or(ErrorCode::ReadDenied)?;
         self.guarded(lease, || {
             let event = Capture::new(self.storage)
@@ -329,13 +372,7 @@ impl<'a> CapturedContext<'a> {
             // Capture verifies the whole immutable original before slicing it.
             lease.charge_read(event.event.text_bytes as u64)?;
             let text = Capture::new(self.storage).text(&event)?;
-            if start > text.len() || !text.is_char_boundary(start) {
-                return Err(ErrorCode::InvalidArgument.into());
-            }
-            let mut end = start.saturating_add(max_bytes).min(text.len());
-            while !text.is_char_boundary(end) {
-                end -= 1;
-            }
+            let end = bounds.end(&text, start, max_bytes)?;
             let mut offset = 0;
             let sources = event
                 .event
@@ -367,14 +404,15 @@ impl<'a> CapturedContext<'a> {
         })
         .await
     }
-}
-impl ContextSource for CapturedContext<'_> {
-    fn execute<'a>(
-        &'a mut self,
-        lease: &'a RunLease,
+    pub(crate) fn execute_with_bounds<'b>(
+        &'b mut self,
+        lease: &'b RunLease,
         request: ContextRequest,
-    ) -> BoxFuture<'a, Result<ContextResponse>> {
+        observed: Option<&'b mut ReadBounds>,
+    ) -> BoxFuture<'b, Result<ContextResponse>> {
         Box::pin(async move {
+            let mut unused = ReadBounds::default();
+            let bounds = observed.unwrap_or(&mut unused);
             let response = match request {
                 ContextRequest::Describe {} => {
                     lease.charge_read(2048)?;
@@ -401,7 +439,9 @@ impl ContextSource for CapturedContext<'_> {
                     handle,
                     start,
                     max_bytes,
-                } => ContextResponse::Text(self.text(lease, &handle, start, max_bytes).await?),
+                } => ContextResponse::Text(
+                    self.text(lease, &handle, start, max_bytes, bounds).await?,
+                ),
                 ContextRequest::Search {
                     cursor,
                     query,
@@ -433,5 +473,15 @@ impl ContextSource for CapturedContext<'_> {
             lease.charge_output(bytes as u64)?;
             Ok(response)
         })
+    }
+}
+
+impl ContextSource for CapturedContext<'_> {
+    fn execute<'a>(
+        &'a mut self,
+        lease: &'a RunLease,
+        request: ContextRequest,
+    ) -> BoxFuture<'a, Result<ContextResponse>> {
+        self.execute_with_bounds(lease, request, None)
     }
 }

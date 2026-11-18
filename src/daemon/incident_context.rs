@@ -1,5 +1,5 @@
 use super::*;
-use crate::adapter::ContextText;
+use crate::adapter::{ContextText, ReadRangeRejection};
 
 #[derive(serde::Serialize)]
 pub(super) struct Fragment {
@@ -87,10 +87,9 @@ impl Research<'_> {
         handle: &str,
         start: usize,
         max_bytes: usize,
+        bounds: &mut ReadBounds,
     ) -> Result<ContextText> {
-        if max_bytes == 0 || max_bytes > 16 * 1024 {
-            return Err(Error("INVALID_ARGUMENT"));
-        }
+        bounds.check_size(max_bytes)?;
         let service = self.service;
         let _guard = service.admission.lock().await;
         let (incident, outcome) = self.incident_view(lease).await?;
@@ -123,15 +122,9 @@ impl Research<'_> {
             }
             serde_json::to_string(&value)?
         };
-        if start > text.len() || !text.is_char_boundary(start) {
-            return Err(Error("INVALID_ARGUMENT"));
-        }
-        let mut end = start.saturating_add(max_bytes).min(text.len());
-        while !text.is_char_boundary(end) {
-            end -= 1;
-        }
+        let end = bounds.end(&text, start, max_bytes)?;
         if end == start {
-            return Err(Error("INVALID_ARGUMENT"));
+            return Err(bounds.reject(ReadRangeRejection::EmptyIncidentRange).into());
         }
         let sha256 = hash(text.as_bytes());
         let event_id = format!(
