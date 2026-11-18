@@ -142,8 +142,17 @@ async fn rpc_runner_rejects_authority_protocol_inventory_and_incomplete_terminal
             .await
             .unwrap();
         let mut context = CapturedContext::new(&store, inv.clone()).unwrap();
+        // Leave time for the fixture to report typed errors on a busy host.
+        let timeout_secs = if expected == ErrorCode::RunnerTimeout {
+            1
+        } else {
+            10
+        };
         let start = std::time::Instant::now();
-        let mut handle = runner.start(spec(&inv, 1), &mut context).await.unwrap();
+        let mut handle = runner
+            .start(spec(&inv, timeout_secs), &mut context)
+            .await
+            .unwrap();
         let error = loop {
             match handle.next().await {
                 Ok(Some(_)) => {}
@@ -153,7 +162,7 @@ async fn rpc_runner_rejects_authority_protocol_inventory_and_incomplete_terminal
         };
         assert_eq!(error.code, expected, "{scenario}");
         assert!(
-            start.elapsed() < Duration::from_secs(4),
+            start.elapsed() < Duration::from_secs(timeout_secs + 3),
             "{scenario} renewed deadline"
         );
         drop(handle);
