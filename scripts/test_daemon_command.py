@@ -1,3 +1,4 @@
+import io
 import json
 import os
 import pathlib
@@ -9,10 +10,30 @@ import time
 import unittest
 from unittest.mock import patch
 
-from check_daemon_command import command, identity, owned_daemons
+from check_daemon_command import command, identity, owned_daemons, run_suite
 
 
 class CommandOwnership(unittest.TestCase):
+    def test_suite_streams_both_outputs_and_keeps_running_with_progress(self):
+        log = io.BytesIO()
+        script = ('import sys,time\n'
+                  'for i in range(6):\n'
+                  ' print(i, file=sys.stderr if i % 2 else sys.stdout, flush=True)\n'
+                  ' time.sleep(0.25)')
+        run_suite([sys.executable, '-c', script], os.environ, log, idle_timeout=1, timeout=8)
+        self.assertEqual(log.getvalue().splitlines(), [str(i).encode() for i in range(6)])
+
+    def test_suite_checks_exit_status_and_absolute_limit_despite_output(self):
+        log = io.BytesIO()
+        with self.assertRaises(subprocess.CalledProcessError) as failed:
+            run_suite([sys.executable, '-c', 'raise SystemExit(7)'], os.environ, log)
+        self.assertEqual(failed.exception.returncode, 7)
+        script = 'import time\nwhile True: print("running", flush=True); time.sleep(0.1)'
+        with self.assertRaises(subprocess.TimeoutExpired) as expired:
+            run_suite([sys.executable, '-c', script], os.environ, log, idle_timeout=5, timeout=1)
+        self.assertEqual(expired.exception.timeout, 1)
+        self.assertIn(b'running', log.getvalue())
+
     def test_owned_census_identity_survives_normal_scheduling_changes(self):
         with tempfile.TemporaryDirectory(prefix='akasha-command-census-') as root:
             proc = pathlib.Path(root) / '123'
@@ -40,6 +61,12 @@ class CommandOwnership(unittest.TestCase):
                 identity(123)
 
     def test_timeout_collects_the_owned_subprocess_group(self):
+        self.check_group_cleanup(lambda argv: command(argv, timeout=2))
+
+    def test_suite_idle_timeout_collects_the_owned_subprocess_group(self):
+        self.check_group_cleanup(lambda argv: run_suite(argv, os.environ, io.BytesIO(), idle_timeout=2))
+
+    def check_group_cleanup(self, run):
         with tempfile.TemporaryDirectory(prefix='akasha-command-timeout-') as root:
             witness = pathlib.Path(root) / 'child.json'
             script = '''
@@ -51,7 +78,7 @@ time.sleep(60)
 '''
             try:
                 with self.assertRaises(subprocess.TimeoutExpired):
-                    command([sys.executable, '-c', script, str(witness)], timeout=2)
+                    run([sys.executable, '-c', script, str(witness)])
                 pid, start = json.loads(witness.read_text())
                 end = time.monotonic() + 2
                 while (current := identity(pid)) and current[0] == start and current[1] != 'Z':
