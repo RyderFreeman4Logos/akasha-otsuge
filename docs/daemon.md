@@ -54,6 +54,29 @@ or idempotency key. Queued job snapshots and pending path configuration survive.
 Stop and production shutdown signals still end the daemon. See
 [memory budgets](memory-resources.md) for the remaining enforcement limits.
 
+## Low disk space
+
+A new authority commit of at least 16 KiB (serialized request) must leave
+8 MiB available to the daemon user on the authority volume. Index sync and
+rebuild require 8 MiB free on both the authority and search volumes. The daemon
+checks these volumes before queuing a new build, after acquiring its builder
+slot and before each indexing window. A refused submission returns
+`RESOURCE_BUSY` (exit 4). Free space and retry its original idempotency key.
+
+Current and historical memory reads, receipt replays, and status remain
+available. Small commits and the cancellation or terminal record of an
+already admitted job can use the headroom. If space falls while a queued
+or running build waits, inspect its job state before resubmission. These
+checks measure available blocks at admission. A native indexing window,
+table maintenance or another writer can still exhaust the volume later.
+
+On Linux, run the bounded-volume regression after building the binary and the
+`corpus_seed` example.
+
+```sh
+python3 scripts/check_low_disk.py target/debug/akasha-otsuge target/debug/examples/corpus_seed
+```
+
 ## Frames and bounds
 
 Each frame is a four-byte unsigned big-endian byte length followed by UTF-8 JSON.

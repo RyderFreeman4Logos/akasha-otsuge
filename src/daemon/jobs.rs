@@ -1130,14 +1130,17 @@ impl Service {
             expected_revision: previous,
             content: serde_json::to_string(job)?,
         });
-        self.storage
-            .commit(&CommitRequest {
-                request_id: format!("job/{}/{}", hash(job.id.as_bytes()), previous.unwrap_or(0)),
-                config_generation: job.config_generation,
-                policy_revision: None,
-                changes,
-            })
-            .await?;
+        let request = CommitRequest {
+            request_id: format!("job/{}/{}", hash(job.id.as_bytes()), previous.unwrap_or(0)),
+            config_generation: job.config_generation,
+            policy_revision: None,
+            changes,
+        };
+        if previous.is_some() && (job.terminal() || job.cancel_requested) {
+            self.storage.commit_job_closeout(request).await?;
+        } else {
+            self.storage.commit(&request).await?;
+        }
         Ok(())
     }
     fn authorize_job(&self, job: &Job) -> Result<()> {
@@ -1339,6 +1342,9 @@ impl Service {
                 retrieval_plan,
                 Some(crate::retrieval::Request::Sync | crate::retrieval::Request::Rebuild)
             ) {
+                service
+                    .storage
+                    .check_index_space(&snapshot.resolved().config().paths.data_dir)?;
                 Some(service.storage.sequence()?)
             } else {
                 None

@@ -4,6 +4,7 @@ mod archive;
 mod backup;
 #[cfg(test)]
 pub(crate) mod crash_tests;
+mod disk;
 mod history;
 mod import;
 mod import_publish;
@@ -388,6 +389,23 @@ impl Storage {
         &self,
         prepare: impl FnOnce() -> Result<CommitPlan>,
     ) -> Result<CommitReceipt> {
+        self.commit_admitted(prepare, false).await
+    }
+
+    /// Cancel or finish an admitted job even when ordinary large writes are suspended.
+    pub(crate) async fn commit_job_closeout(
+        &self,
+        request: CommitRequest,
+    ) -> Result<CommitReceipt> {
+        self.commit_admitted(|| Ok(CommitPlan::Write(request)), true)
+            .await
+    }
+
+    async fn commit_admitted(
+        &self,
+        prepare: impl FnOnce() -> Result<CommitPlan>,
+        job_closeout: bool,
+    ) -> Result<CommitReceipt> {
         let writer = self.writer.clone().lock_owned().await;
         let mut request = match prepare()? {
             CommitPlan::Write(request) => request,
@@ -395,7 +413,10 @@ impl Storage {
         };
         request.validate()?;
         request.changes.sort_by(|a, b| a.key.cmp(&b.key));
-        let request_hash = hash(&serde_json::to_vec(&request)?);
+        let (request_hash, bytes) = {
+            let encoded = serde_json::to_vec(&request)?;
+            (hash(&encoded), encoded.len())
+        };
         let mut tx = self.tree.begin()?;
         let receipt_key = format!("receipt/{}", request.request_id);
         if let Some(bytes) = tx.get_for_update(receipt_key.as_bytes())? {
@@ -405,6 +426,9 @@ impl Storage {
             } else {
                 Err(StorageError::new("IDEMPOTENCY_CONFLICT"))
             };
+        }
+        if !job_closeout {
+            self.check_write_space(bytes)?;
         }
         let seq = sequence(tx.get_for_update(SEQUENCE)?)?
             .checked_add(1)
