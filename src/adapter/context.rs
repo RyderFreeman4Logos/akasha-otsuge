@@ -112,6 +112,21 @@ pub struct ContextText {
     pub truncated: bool,
     pub sources: Vec<crate::domain::SourceSpan>,
 }
+#[derive(Debug, Serialize)]
+pub struct ContextPagination {
+    pub tools: [&'static str; 2],
+    pub min_limit: usize,
+    pub max_limit: usize,
+    pub initial_cursor: Option<&'static str>,
+    pub next_cursor_field: &'static str,
+}
+const PAGINATION: ContextPagination = ContextPagination {
+    tools: ["context_list", "context_search"],
+    min_limit: 1,
+    max_limit: 16,
+    initial_cursor: None,
+    next_cursor_field: "next",
+};
 #[derive(Clone, Debug, Serialize)]
 pub struct ContextDescription {
     pub invocation_id: String,
@@ -121,6 +136,7 @@ pub struct ContextDescription {
     pub requested_cursor: u64,
     pub available_cursor: u64,
     pub read_seq: u64,
+    pub pagination: &'static ContextPagination,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub investigation: Option<crate::incident::Context>,
 }
@@ -199,7 +215,7 @@ impl<'a> CapturedContext<'a> {
         limit: usize,
         query: Option<&str>,
     ) -> Result<ContextPage> {
-        if limit == 0 || limit > 16 {
+        if !(PAGINATION.min_limit..=PAGINATION.max_limit).contains(&limit) {
             return Err(ErrorCode::InvalidArgument.into());
         }
         let tip = match cursor {
@@ -372,6 +388,7 @@ impl ContextSource for CapturedContext<'_> {
                             requested_cursor: b.requested_cursor,
                             available_cursor: b.available_cursor,
                             read_seq: b.capture_seq,
+                            pagination: &PAGINATION,
                             investigation: None,
                         }))
                     })
