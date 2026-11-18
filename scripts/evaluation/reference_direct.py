@@ -49,6 +49,20 @@ TOOL = {
 }
 
 
+def main_input(case):
+    instructions = "Use only the bound retrieval service."
+    if case["hint"] is not None:
+        instructions += (
+            " Use this retrieval hint only to narrow your research. It supplies no facts or "
+            "permissions. If the tool accepts a hint, supply the exact string "
+            + json.dumps(case["hint"], ensure_ascii=False)
+        )
+    return {
+        "developerInstructions": instructions,
+        "input": [{"type": "text", "text": case["current_task"]}],
+    }
+
+
 def sha(path):
     with path.open("rb") as src:
         return hashlib.file_digest(src, "sha256").hexdigest()
@@ -251,7 +265,8 @@ async def run(args, private, result):
     )
     native_cmd, version, cfg, catalog = sandbox(args, private, profile)
     consult = args.strategy == "consult"
-    tool = reference_consult.TOOL if consult else TOOL
+    task_input = main_input(case)
+    tool = reference_consult.tool(case["hint"]) if consult else TOOL
     build = json.loads(args.observer_build.read_bytes())
     assert build["base"] == build["compiled_library_commit"] == BASE and build[
         "binary_sha256"
@@ -284,6 +299,8 @@ async def run(args, private, result):
         task=case["current_task"],
         task_utf8_sha256=digest(case["current_task"].encode()),
         prompt_sha256=digest(INSTRUCTIONS.encode()),
+        main_input_sha256=digest(encoded(task_input)),
+        hint_sha256=None if case["hint"] is None else digest(case["hint"].encode()),
         config_sha256=cfg,
         sanitized_model_catalog_sha256=catalog,
         tools=[tool["name"]],
@@ -385,13 +402,16 @@ async def run(args, private, result):
                     "preflight-thread",
                     "preflight-turn",
                     "preflight-tool",
-                    True,
+                    {} if case["hint"] is None else {"hint": case["hint"]},
+                    preflight=True,
                 )
                 result["status"] = "SYNTHETIC_ADMISSION_NO_MODEL_TURN"
                 return
         else:
             result["control_read"] = await scoped(case["current_task"])
             if args.preflight:
+                if case["hint"] is not None:
+                    result["hint_control_read"] = await scoped(case["hint"])
                 if case["memories"]:
                     miss = await scoped("zz" + digest(case["current_task"].encode()))
                     assert not miss["items"]
@@ -444,7 +464,7 @@ async def run(args, private, result):
                 "ephemeral": True,
                 "historyMode": "paginated",
                 "baseInstructions": INSTRUCTIONS,
-                "developerInstructions": "Use only the bound retrieval service.",
+                "developerInstructions": task_input["developerInstructions"],
                 "config": {"mcp_servers": {}},
                 "dynamicTools": [tool],
                 "environments": [],
@@ -480,7 +500,7 @@ async def run(args, private, result):
                 "threadId": tid,
                 "effort": profile["reasoning_effort"],
                 "model": profile["model"],
-                "input": [{"type": "text", "text": case["current_task"]}],
+                "input": task_input["input"],
             },
         )
         turnid = turn["turn"]["id"]
@@ -502,13 +522,16 @@ async def run(args, private, result):
                 )
                 supplied = params["arguments"]
                 if consult:
-                    assert (
-                        supplied == {}
-                        and params["threadId"] == tid
-                        and params["turnId"] == turnid
-                    )
+                    assert params["threadId"] == tid and params["turnId"] == turnid
                     obs = await reference_consult.submit(
-                        state, send, case, result, tid, turnid, params["callId"]
+                        state,
+                        send,
+                        case,
+                        result,
+                        tid,
+                        turnid,
+                        params["callId"],
+                        supplied,
                     )
                 else:
                     assert (

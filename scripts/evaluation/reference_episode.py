@@ -12,6 +12,28 @@ class EpisodeUnavailable(ValueError):
     """A registered episode cannot yet be supplied through both equivalent native tools."""
 
 
+def withdrawn_revisions(case, native):
+    sources = {s["id"]: s for s in case["sources"]}
+    revisions = {(m["id"], m.get("commit")): m for m in native["memories"]}
+    withdrawn = {}
+    for change in native["transitions"]:
+        source = sources.get(change.get("original_id"), {})
+        prior = revisions.get(
+            (change.get("memory_id"), change.get("previous_commit")), {}
+        )
+        if (
+            change.get("operation") == source.get("kind") == "withdrawal"
+            and source.get("channel") == "verified_human"
+            and change.get("original_sha256") == source["sha256"]
+            and prior.get("frozen_status") == "retired"
+            and change.get("action") == "reject"
+            and change.get("revision_after") in {"rejected", "retired"}
+            and change["current_after"]["state"] in {"absent", "retired"}
+        ):
+            withdrawn[(prior["id"], prior["ordinal"])] = source["id"]
+    return withdrawn
+
+
 def prepare(task, args, private, result):
     case = input_only(task)
     caller = case["caller"]
@@ -53,8 +75,7 @@ def prepare(task, args, private, result):
         flags.append("live change and publication barrier")
     if case.get("missing_event_ids"):
         flags.append("unavailable historical originals")
-    if case["hint"] is not None:
-        flags.append("registered hint delivery")
+    withdrawals = withdrawn_revisions(case, native)
     sources = case["sources"]
     if (
         caller["thread"] != "root"
@@ -62,7 +83,7 @@ def prepare(task, args, private, result):
         or {s["id"] for s in sources} != set(caller["allowed_event_ids"])
         or any(
             s["thread"] != "root"
-            or s.get("kind")
+            or (s.get("kind") and s["id"] not in withdrawals.values())
             or not s["available"]
             or s["scope"] != caller["scope"]
             or s["sequence"] > caller["fence_sequence"]
@@ -71,7 +92,13 @@ def prepare(task, args, private, result):
     ):
         flags.append("caller lineage or source fence")
     if any(
-        m["scope"] != caller["scope"] or m["status"] != "active"
+        m["scope"] != caller["scope"]
+        or (
+            m["status"] != "active"
+            and not (
+                m["status"] == "retired" and (m["id"], m["revision"]) in withdrawals
+            )
+        )
         for m in case["memories"]
     ):
         flags.append("non-current or cross-scope Memory")
@@ -146,7 +173,9 @@ def prepare(task, args, private, result):
     if (
         registered != materialized
         or sorted(native["native_state_ids"]) != sorted(observed["native_state_ids"])
-        or set(observed["native_state_ids"]) != {m["id"] for m in case["memories"]}
+        or set(observed["native_state_ids"])
+        != {m["id"] for m in case["memories"] if m["status"] == "active"}
+        or withdrawn_revisions(case, observed) != withdrawals
         or any(s["scope_read"] != "allowed" for s in observed["sources"])
     ):
         raise EpisodeUnavailable("native authority or visible state did not match")
@@ -167,6 +196,7 @@ def prepare(task, args, private, result):
         grant_commit=seed["grant"],
         capture_commit=seed["capture_seq"],
         retained_originals=len(seed["sources"]),
-        active_revisions=len(seed["memories"]),
+        active_revisions=len(observed["native_state_ids"]),
+        withdrawn_revisions=len(withdrawals),
     )
     return case, area
