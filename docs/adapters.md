@@ -98,6 +98,24 @@ live permissions. Code results also retain the original workspace identity, so
 read-root revocation or replacement blocks publication and replay, even after
 restart. Historical receipt replay does not claim the old answer is current.
 
+After a new Consult run saves its trace, an authorized `job show` response includes `run_trace.diagnostics`.
+Each entry contains a stage, a canonical error code, a count, and the operation name when the context handler knows it.
+The table keeps the first 32 distinct combinations. `omitted` counts later observations whose combination did not fit. Each counter saturates at 65,535.
+A trace written by an earlier version can omit the diagnostics field.
+
+| Stage | Observation |
+| --- | --- |
+| `context_dispatch` | The requested context operation returned an error response. |
+| `context_boundary` | The context operation failed during authorization or response checks. |
+| `context_page` | A returned page reported a typed coverage gap. |
+| `recall_coverage` | A Memory search read a typed gap from its stored recall receipt. |
+| `conclusion` | An accepted runner conclusion explicitly listed a recognized code as a gap. |
+| `conclusion_validation` | Parsing or validating the runner conclusion failed. |
+| `runner` | The native run returned an error before producing a conclusion for validation. |
+
+One event can cross several stages. Model-supplied prose and tool arguments are excluded. The `runner` stage can record a propagated error before the context handler receives a typed operation.
+`consult show` continues to return the public result and its deduplicated coverage gaps.
+
 ## Framing, events and completion
 
 JSONL connections start with `FrameStream::handshake`: sequence zero is an
@@ -533,3 +551,5 @@ input/output to native files. Local command/queue notifications that may not be
 persisted cannot advance the file fence. Native permission metadata is skipped;
 turn-duration events retain their identity and session visibility. Authenticated
 model and the remaining TUI lifecycle acceptance remain separate.
+
+The [native diagnostic controls](benchmarks/results/mvp027/typed-diagnostics-r1.json) compare two tool errors, a conclusion that reported the same error, and their combination. They also cover failed submissions, revoked read access and previously stored Consult traces across an upgrade.

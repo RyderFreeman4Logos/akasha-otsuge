@@ -1,0 +1,45 @@
+{
+  "base": "84b65199917796fce945fa80976a23ec6f132dbd",
+  "head": "b227fd5b126140b646d41eb2851013c2d66268e7",
+  "tree": "b1ff432d3582f1e080b931b85660923efce96a28",
+  "model_requests": 0,
+  "native_controls": [
+    "two invalid zero-limit context_list operations",
+    "an accepted conclusion alone reports INVALID_ARGUMENT",
+    "both occur in the same job",
+    "controlled native authentication error",
+    "no_hit conclusion without prior search"
+  ],
+  "outcomes": {
+    "before": "first three had equal incomplete publication and INVALID_ARGUMENT gap, absent diagnostics",
+    "after": "three distinct stage/operation/count signatures; last two classified runner/AUTH_REQUIRED and conclusion_validation/PROTOCOL_INVALID",
+    "read_authorization": "revoking workspace read root refused job show and public receipt operations"
+  },
+  "jobs": {
+    "red": {
+      "exit_code": 101,
+      "log_sha256": "e8e65f17c8acc4d901814eb7f11bdcb2150cfa9c7eda3d53350ea09c807f0bae"
+    },
+    "green": {
+      "exit_code": 0,
+      "log_sha256": "1fcdca30a9caddf360a9e36e886b1225238701307f0fab1fcc0c4a683f312168"
+    },
+    "final": {
+      "exit_code": 0,
+      "log_sha256": "897f6199f161c97c8d10ddbe3e2f9eccad75d99ee42aeb3684ce265e85800dd9"
+    },
+    "legacy": {
+      "exit_code": 0,
+      "log_sha256": "789669372effee4c6ef96ff156896ba29c9699d3fa3f01e6ddd872000da2f197"
+    }
+  },
+  "actual_upgrade": {
+    "previous_source": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+    "previous_binary": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+    "current_binary": "9b8361a5ee050d2d763c35b712e612752178970ed778ee785bc55f126c49308c",
+    "original_trace_omitted_new_field": true,
+    "restored_job_trace_original_exact": true,
+    "restored_public_result_exact": true
+  },
+  "scope": "Focused real daemon and deterministic local Codex protocol runner. Historical model calls and their causes remain unobserved."
+}

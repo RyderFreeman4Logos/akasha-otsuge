@@ -3,7 +3,7 @@ use super::*;
 use crate::{
     adapter::{BindingLevel, CallerProof, ConsultArgs, Invocation, RuntimeBinding},
     capture::{
-        Capture, CaptureBinding, CoverageLevel, EventDraft, EventKind, MessagePhase,
+        Capture, CaptureBinding, CoverageLevel, EventDraft, EventKind, EventRef, MessagePhase,
         SourceIdentity, Visibility,
     },
     domain::{Domain, Ingress, Scope},
@@ -80,14 +80,19 @@ pub async fn run() -> Result<()> {
     let home = Path::new("/home/fixture/.codex");
     let case: Value = serde_json::from_slice(&fs::read(root.join("episode.json"))?)?;
     let caller = &case["caller"];
-    assert_eq!(case["id"], "H01");
-    assert!(case.get("oracle").is_none() && case["hint"].is_null());
-    for items in [
-        &case["sources"],
-        &case["memories"],
-        &caller["allowed_event_ids"],
-    ] {
-        assert_eq!(items.as_array().unwrap().len(), 0);
+    assert!(case.get("oracle").is_none());
+    let seed_path = root.join("seed.json");
+    let seed: Option<Value> = seed_path
+        .exists()
+        .then(|| serde_json::from_slice(&fs::read(&seed_path).unwrap()).unwrap());
+    assert_eq!(root.join("data").exists(), seed.is_some());
+    if let Some(seed) = &seed {
+        assert_eq!(seed["id"], case["id"]);
+    } else {
+        assert!(
+            case["sources"].as_array().unwrap().is_empty()
+                && case["memories"].as_array().unwrap().is_empty()
+        );
     }
     assert_eq!(caller["thread"], "root");
     let scope: Scope = serde_json::from_value(caller["scope"].clone())?;
@@ -114,14 +119,23 @@ pub async fn run() -> Result<()> {
     )
     .await?;
     let gen_id = service.config.pin().generation();
-    let grant = Domain::new(&service.storage)
-        .set_read_grant("bind-reference", &scope.user, Some(&scope), None, gen_id)
-        .await?;
+    let grant = if let Some(seed) = &seed {
+        let receipt = service
+            .storage
+            .receipt("fixture-grant")?
+            .ok_or(Error("REFERENCE_GRANT_MISSING"))?;
+        assert_eq!(receipt.commit_seq, seed["grant"].as_u64().unwrap());
+        receipt
+    } else {
+        Domain::new(&service.storage)
+            .set_read_grant("bind-reference", &scope.user, Some(&scope), None, gen_id)
+            .await?
+    };
     let mut capability = crate::adapter::codex::probe(binary).await?;
     assert_eq!(capability.version.as_deref(), Some("0.164.0"));
     emit(
         json!({"type":"bound","scope":scope,"thread":caller["thread"],"logical_fence":caller["fence_sequence"],"grant":grant,
-        "event_ordinals":[],"memory_revisions":[],"native_version": capability.version}),
+        "retained_sources":case["sources"].as_array().unwrap().len(),"native_version": capability.version}),
     )?;
 
     let line = std::io::stdin().lock().lines().next().transpose()?;
@@ -135,7 +149,9 @@ pub async fn run() -> Result<()> {
     let tool_call_id = get("call_id")?;
     let task = get("current_task")?;
     assert_eq!(task, case["current_task"]);
-    assert!(transport["hint"].is_null());
+    let hint: Option<String> = serde_json::from_value(transport["hint"].clone())?;
+    let args = ConsultArgs::new(hint)?;
+    assert_eq!(json!(args.hint), case["hint"]);
     let branch = thread_id.to_owned();
     let source = SourceIdentity {
         adapter: "codex".into(),
@@ -150,14 +166,36 @@ pub async fn run() -> Result<()> {
         "live-caller",
         CoverageLevel::VisibleText,
     )?;
-    // This accepted user input belongs to the new live turn; it is the only captured event.
+    // Use the actual parent of the offline request anchor. Only the new live request belongs in this turn.
+    let historical_parent = if let Some(seed) = &seed {
+        let anchor = EventRef {
+            event_id: "fixture-live-request".into(),
+            source: SourceIdentity {
+                adapter: "fixture".into(),
+                profile: "reference-v1".into(),
+                session: case["id"].as_str().unwrap().into(),
+                thread: caller["thread"].as_str().unwrap().into(),
+                agent: "main".into(),
+            },
+        };
+        let stored = Capture::new(&service.storage)
+            .event(&binding, &anchor, seed["capture_seq"].as_u64().unwrap())?
+            .ok_or(Error("HISTORY_GAP"))?;
+        assert_eq!(
+            stored.event.text_sha256,
+            crate::storage::hash(task.as_bytes())
+        );
+        stored.event.metadata.parent
+    } else {
+        None
+    };
     let draft = EventDraft {
         event_id: format!("user/{turn_id}"),
         source_version: "1".into(),
         runtime_instance: thread_id.into(),
         branch: branch.clone(),
-        parent: None,
-        fork_cutoff: None,
+        parent: historical_parent.clone(),
+        fork_cutoff: historical_parent,
         event_time_ms: None,
         observed_time_ms: i64::try_from(ipc::now_ms()?).unwrap(),
         visibility: Visibility::User,
@@ -178,6 +216,36 @@ pub async fn run() -> Result<()> {
         )
         .await?;
     let tip = captured.event.reference;
+    let lineage =
+        Capture::new(&service.storage).lineage(&binding, &tip, service.storage.sequence()?, 64)?;
+    assert!(lineage.next.is_none());
+    let missing = seed.as_ref().and_then(|seed| seed["missing"].as_str());
+    assert_eq!(
+        lineage.missing.as_ref().map(|r| r.event_id.as_str()),
+        missing
+    );
+    let retained: std::collections::BTreeSet<_> = lineage
+        .events
+        .iter()
+        .skip(1)
+        .map(|v| v.event.reference.event_id.as_str())
+        .collect();
+    let allowed: std::collections::BTreeSet<_> = caller["allowed_event_ids"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.as_str().unwrap())
+        .collect();
+    assert_eq!(retained, allowed);
+    let mut ordinals: Vec<_> = case["sources"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|s| retained.contains(s["id"].as_str().unwrap()))
+        .map(|s| s["sequence"].as_u64().unwrap())
+        .collect();
+    ordinals.sort_unstable();
+    let cursor = lineage.events.len() as u64;
     capability.binding = BindingLevel::ExactTurn;
     capability.history = CoverageLevel::VisibleText;
     let inv = Invocation::bind(
@@ -198,8 +266,8 @@ pub async fn run() -> Result<()> {
             branch,
             turn_id: Some(turn_id.into()),
             tool_call_id: Some(tool_call_id.into()),
-            requested_cursor: 1,
-            available_cursor: 1,
+            requested_cursor: cursor,
+            available_cursor: cursor,
             tip: Some(tip.clone()),
             capture_seq: service.storage.sequence()?,
             workspace: workspace.into(),
@@ -207,10 +275,45 @@ pub async fn run() -> Result<()> {
         },
     )
     .await?;
+    let history_probe = if transport["preflight"] == true && missing.is_some() {
+        use crate::adapter::{
+            BudgetLimits, CapturedContext, ContextRequest, ContextResponse, ContextSource,
+            RunBudget,
+        };
+        use crate::config::deadline::{Deadline, Layer};
+        let lease = RunBudget::new(
+            inv.id(),
+            &inv.fence_hash(),
+            Arc::new(tokio::sync::Semaphore::new(1)),
+            BudgetLimits::default(),
+            Deadline::start(Layer::Workflow, Duration::from_secs(60), None)?,
+        )?
+        .start()?;
+        let mut context = CapturedContext::new(&service.storage, inv.clone())?;
+        let ContextResponse::Page(page) = context
+            .execute(
+                &lease,
+                ContextRequest::List {
+                    cursor: None,
+                    limit: 2,
+                },
+            )
+            .await?
+        else {
+            return Err(Error("REFERENCE_CONTEXT_PAGE_MISSING"));
+        };
+        assert_eq!(page.events.len(), 1);
+        assert_eq!(page.events[0].reference, tip);
+        assert!(page.next.is_none());
+        assert_eq!(page.gaps, [crate::adapter::ErrorCode::HistoryGap]);
+        Some(json!({"gaps":page.gaps,"events":page.events.len(),"read_seq":page.read_seq}))
+    } else {
+        None
+    };
     emit(
         json!({"type":"invocation","revision":inv.revision(),"fence_sha256":inv.fence_hash(),"binding":inv.diagnostic(),
-        "current_request":{"event":tip,"utf8_sha256":crate::storage::hash(task.as_bytes())},"historical_ordinals":[],
-        "logical_fence":caller["fence_sequence"]}),
+        "current_request":{"event":tip,"utf8_sha256":crate::storage::hash(task.as_bytes())},"historical_ordinals":ordinals,
+        "logical_fence":caller["fence_sequence"],"context_list_probe":history_probe}),
     )?;
     let queued = service
         .submit_consult(
@@ -220,15 +323,23 @@ pub async fn run() -> Result<()> {
                 binary: binary.into(),
                 home: home.into(),
             },
-            ConsultArgs::new(None)?,
+            args,
         )
         .await?;
     let id = queued["id"].as_str().ok_or(Error("JOB_CORRUPT"))?;
-    emit(json!({"type":"queued","id":id,"state":queued["state"]}))?;
+    let persisted = service
+        .job(id)?
+        .1
+        .consult_plan
+        .ok_or(Error("JOB_CORRUPT"))?;
+    let persisted = serde_json::to_value(persisted)?;
+    let persisted_hint = &persisted["args"]["hint"];
+    assert_eq!(persisted_hint, &case["hint"]);
+    emit(json!({"type":"queued","id":id,"state":queued["state"],"persisted_hint":persisted_hint}))?;
     let snapshot = service.config.pin();
     let preflight = transport["preflight"] == true;
     let before = crate::retrieval::Index::status(&service.storage, snapshot.resolved())?;
-    let cold = if preflight {
+    let cold = if preflight && seed.is_none() {
         let actual = scoped_search(&service, id, &scope, task).await;
         match actual {
             Err(Error("INDEX_NOT_READY")) => Some("INDEX_NOT_READY"),
@@ -239,12 +350,15 @@ pub async fn run() -> Result<()> {
     };
     let sync = sync_private_index(&service).await?;
     let after = crate::retrieval::Index::status(&service.storage, snapshot.resolved())?;
-    assert!(before.lexical_watermark == 0 && after.lexical_watermark > 0);
+    assert!(after.lexical_watermark > 0 && after.lexical_watermark >= before.lexical_watermark);
     let ready = scoped_search(&service, id, &scope, task).await?;
-    assert_eq!(ready["status"], "no_hit");
+    assert!(matches!(ready["status"].as_str(), Some("no_hit" | "found")));
     assert_eq!(ready["scope"], json!(scope));
-    for key in ["items", "rules", "model_calls"] {
-        assert_eq!(ready[key], json!([]));
+    assert_eq!(ready["model_calls"], json!([]));
+    if seed.is_none() {
+        assert_eq!(ready["status"], "no_hit");
+        assert_eq!(ready["items"], json!([]));
+        assert_eq!(ready["rules"], json!([]));
     }
     assert_eq!(ready["coverage"], json!({"complete":true,"gaps":[]}));
     let runner_admission = if preflight {
@@ -260,7 +374,7 @@ pub async fn run() -> Result<()> {
         None
     };
     emit(
-        json!({"type":"prepared","cold_search_error":cold,"before":before,"after":after,"sync":sync,
+        json!({"type":"prepared","prior_index_watermark":before.lexical_watermark,"cold_search_error":cold,"before":before,"after":after,"sync":sync,
         "ready_search":ready,"concurrent_reservations_accepted":runner_admission,
         "max_concurrent_jobs":snapshot.resolved().config().runtime.max_concurrent_jobs,
         "service_total_budget_mib":snapshot.resolved().config().runtime.memory_limits().service_total_budget_mib}),

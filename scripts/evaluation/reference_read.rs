@@ -1,7 +1,9 @@
-//! Read one genuinely empty frozen episode through a production Domain grant.
+//! Direct keyword retrieval from the registered episode's scoped authority store.
 use akasha_otsuge::{
+    capture::{Capture, CaptureBinding, CoverageLevel, EventRef, SourceIdentity},
     config::{Paths, resolve},
-    domain::{Domain, PageBudget, ReadContext, Scope},
+    domain::{Domain, MemoryState, OriginalRange, PageBudget, ReadContext, Scope},
+    retrieval::Index,
     storage::Storage,
 };
 use serde_json::{Value, json};
@@ -9,71 +11,190 @@ use std::{
     io::{self, BufRead, Write},
     path::PathBuf,
 };
+
 fn emit(value: Value) {
     let mut out = io::stdout().lock();
     serde_json::to_writer(&mut out, &value).unwrap();
     writeln!(out).unwrap();
     out.flush().unwrap();
 }
+
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     let mut args = std::env::args_os().skip(1);
     let episode: Value =
         serde_json::from_slice(&std::fs::read(args.next().unwrap()).unwrap()).unwrap();
     let root = PathBuf::from(args.next().unwrap());
-    assert!(args.next().is_none() && !root.join("data").exists());
-    assert!(episode.get("oracle").is_none());
-    for field in ["sources", "memories"] {
-        assert!(episode[field].as_array().unwrap().is_empty());
-    }
+    assert!(args.next().is_none() && episode.get("oracle").is_none());
     let caller = &episode["caller"];
-    assert!(caller["allowed_event_ids"].as_array().unwrap().is_empty());
-    assert_eq!(caller["thread"], "root");
     let scope: Scope = serde_json::from_value(caller["scope"].clone()).unwrap();
+    let seed_path = root.join("seed.json");
+    let seed: Option<Value> = seed_path
+        .exists()
+        .then(|| serde_json::from_slice(&std::fs::read(seed_path).unwrap()).unwrap());
+    assert_eq!(root.join("data").exists(), seed.is_some());
     let cfg = resolve(
         "",
         None,
         "",
         &Paths {
             data_dir: root.join("data"),
-            socket_path: root.join("fixture.sock"),
+            socket_path: root.join("s"),
         },
     )
     .unwrap();
     let store = Storage::open(&cfg).await.unwrap();
-    assert_eq!(store.sequence().unwrap(), 0);
     let domain = Domain::new(&store);
-    let grant = domain
-        .set_read_grant("bind-reference", &scope.user, Some(&scope), None, 1)
-        .await
-        .unwrap();
     let context =
-        ReadContext::from_verified_binding(&scope.user, "reference-caller", "direct-state")
+        ReadContext::from_verified_binding(&scope.user, "reference-caller", "direct-search")
             .unwrap();
+    let (grant, at, index) = if let Some(seed) = &seed {
+        assert_eq!(seed["id"], episode["id"]);
+        let grant = store.receipt("fixture-grant").unwrap().unwrap();
+        assert_eq!(seed["grant"], grant.commit_seq);
+        (
+            grant,
+            seed["capture_seq"].as_u64().unwrap(),
+            Some(Index::open(&cfg, &store).await.unwrap()),
+        )
+    } else {
+        assert!(
+            episode["sources"].as_array().unwrap().is_empty()
+                && episode["memories"].as_array().unwrap().is_empty()
+        );
+        let grant = domain
+            .set_read_grant("bind-reference", &scope.user, Some(&scope), None, 1)
+            .await
+            .unwrap();
+        let at = grant.commit_seq;
+        (grant, at, None)
+    };
     emit(
-        json!({"type":"bound","scope":scope,"thread":caller["thread"],"logical_fence":caller["fence_sequence"],"event_ordinals":[],"memory_revisions":[],"grant":grant}),
+        json!({"type":"bound","scope":scope,"thread":caller["thread"],"logical_fence":caller["fence_sequence"],"grant":grant,"read_seq":at}),
     );
-    for line in io::stdin().lock().lines() {
-        let request: Value = serde_json::from_str(&line.unwrap()).unwrap();
-        let q = request["query"].as_str().unwrap();
+    // A missing parent in the imported request is observable even when the Memory index is empty.
+    let mut gaps = Vec::new();
+    if let Some(missing) = seed.as_ref().and_then(|seed| seed["missing"].as_str()) {
+        let source = SourceIdentity {
+            adapter: "fixture".into(),
+            profile: "reference-v1".into(),
+            session: episode["id"].as_str().unwrap().into(),
+            thread: caller["thread"].as_str().unwrap().into(),
+            agent: "main".into(),
+        };
+        let anchor = EventRef {
+            event_id: "fixture-live-request".into(),
+            source: source.clone(),
+        };
+        let binding = CaptureBinding::from_source(
+            source,
+            scope.clone(),
+            "original",
+            CoverageLevel::AvailablePayloads,
+        )
+        .unwrap();
+        let history = Capture::new(&store)
+            .lineage(&binding, &anchor, at, 2)
+            .unwrap();
+        assert_eq!(history.events.len(), 1);
+        assert_eq!(history.events[0].event.reference, anchor);
+        assert!(history.next.is_none());
+        assert_eq!(
+            history.missing.unwrap(),
+            EventRef {
+                event_id: missing.into(),
+                source: anchor.source
+            }
+        );
+        gaps.push("HISTORY_GAP");
+    }
+    for (i, line) in io::stdin().lock().lines().enumerate() {
+        let req: Value = serde_json::from_str(&line.unwrap()).unwrap();
+        let q = req["query"].as_str().unwrap();
         assert!(!q.is_empty() && q.len() <= 512);
-        let result = domain
+        let page = domain
             .state(
                 &context,
                 &scope,
-                grant.commit_seq,
+                at,
                 None,
                 PageBudget {
-                    limit: 16,
+                    limit: 32,
                     max_bytes: 65536,
                 },
             )
             .await
             .unwrap();
-        assert!(result.data.items.is_empty() && result.data.next.is_none());
-        emit(
-            json!({"type":"scoped_read","scope":scope,"items":result.data.items,"next_cursor":result.data.next,"read_seq":result.read_seq,"validated_at_seq":result.validated_at_seq}),
-        );
+        assert!(page.data.next.is_none());
+        let mut items = Vec::new();
+        if let (Some(index), Some(seed)) = (&index, &seed) {
+            for (mid, rev) in index.keyword(q, &scope, 32).await.unwrap() {
+                let Some(m) = page
+                    .data
+                    .items
+                    .iter()
+                    .map(|x| &x.memory)
+                    .find(|m| m.revision.key.id == mid && m.revision.commit_seq == rev)
+                else {
+                    continue;
+                };
+                let live = domain.get(&context, &mid, None).await.unwrap();
+                if !matches!(live.data,MemoryState::Active(ref current) if current.memory.revision==m.revision)
+                {
+                    continue;
+                }
+                let logical = seed["memories"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|v| v["id"] == mid && v["commit"] == rev)
+                    .unwrap();
+                let mut sources = Vec::new();
+                for (j, span) in m.record.draft.source_spans.iter().enumerate() {
+                    let original = seed["sources"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .find(|s| {
+                            s["native_source_id"] == span.event_id
+                                && s["source_revision"] == span.revision
+                        })
+                        .unwrap();
+                    assert!(
+                        seed["native_visible_ids"]
+                            .as_array()
+                            .unwrap()
+                            .contains(&original["id"])
+                    );
+                    let read = domain
+                        .original_range(
+                            &context,
+                            &OriginalRange {
+                                event_id: span.event_id.clone(),
+                                revision: span.revision,
+                                start: span.start,
+                                end: span.end,
+                            },
+                            &format!("direct/{i}/{mid}/{j}"),
+                            8192,
+                            1,
+                        )
+                        .await
+                        .unwrap();
+                    assert!(!read.truncated && original["sha256"] == read.output_sha256);
+                    sources.push(json!({"id":original["id"],"sha256":read.output_sha256,"text":read.output,"receipt":read.receipt_id}));
+                }
+                items.push(json!({"id":mid,"revision":logical["ordinal"],"native_commit":rev,"scope":m.record.draft.scope,"authority":m.record.authority,"claim":m.record.draft.claim,"conditions":m.record.draft.conditions,"sources":sources}));
+            }
+        } else {
+            assert!(page.data.items.is_empty());
+        }
+        let mut response = json!({"type":"scoped_read","scope":scope,"items":items,"next_cursor":null,"read_seq":page.read_seq,"validated_at_seq":store.sequence().unwrap()});
+        if !gaps.is_empty() {
+            response["history_coverage"] = json!({"complete":false,"gaps":gaps});
+        }
+        emit(response);
     }
+    drop(index);
     store.close().await.unwrap();
 }

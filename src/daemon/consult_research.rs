@@ -7,6 +7,9 @@ use crate::domain::{Ingress, MemoryState, OriginalRange, SourceDraft, SourceSpan
 use crate::storage::RevisionRef;
 use futures::future::BoxFuture;
 use std::collections::BTreeMap;
+#[path = "consult_diagnostics.rs"]
+mod diagnostics;
+use diagnostics::{Diagnostics, Stage};
 #[path = "incident_context.rs"]
 mod incidents;
 #[path = "consult_run.rs"]
@@ -32,6 +35,7 @@ pub(super) struct Research<'a> {
     incident_reads: BTreeMap<String, incidents::ReadEvidence>,
     budget: RunBudget,
     runs: Vec<Value>,
+    diagnostics: Diagnostics,
     current_run: Option<usize>,
     pub selected: Vec<RevisionRef>,
     pub sources: Vec<SourceSpan>,
@@ -85,6 +89,7 @@ impl<'a> Research<'a> {
             incident_reads: BTreeMap::new(),
             budget,
             runs: vec![],
+            diagnostics: Diagnostics::default(),
             current_run: None,
             selected: vec![],
             sources: vec![],
@@ -217,6 +222,8 @@ impl<'a> Research<'a> {
                 .insert(reference.key.id.clone(), reference.commit_seq);
         }
         for gap in &archived.record.coverage.gaps {
+            self.diagnostics
+                .record(Stage::RecallCoverage, Some("memory.search"), gap);
             self.gap(gap);
         }
         self.read_seq = self.read_seq.max(archived.record.read_seq);
@@ -492,6 +499,9 @@ impl<'a> Research<'a> {
         }
         // Descendant limitations survive even when a later parent answer omits them.
         self.gaps = self.coverage_gaps(&conclusion)?;
+        for gap in &conclusion.gaps {
+            self.diagnostics.record(Stage::Conclusion, None, gap);
+        }
         Ok(conclusion)
     }
 
@@ -530,6 +540,7 @@ impl ContextSource for Research<'_> {
         request: ContextRequest,
     ) -> BoxFuture<'b, crate::adapter::Result<ContextResponse>> {
         Box::pin(async move {
+            let tool = Some(request.tool());
             let response: crate::adapter::Result<_> = async {
                 self.authorize(lease).await.map_err(adapter_error)?;
                 self.operations += 1;
@@ -537,6 +548,7 @@ impl ContextSource for Research<'_> {
                 let response = match self.dispatch(lease, request).await {
                     Ok(response) => response,
                     Err(error) => {
+                        self.diagnostics.record(Stage::ContextDispatch, tool, error.0);
                         self.gap(error.0);
                         ContextResponse::Error(adapter_error(error))
                     }
@@ -544,7 +556,9 @@ impl ContextSource for Research<'_> {
                 match &response {
                     ContextResponse::Page(page) => {
                         for code in &page.gaps {
-                            self.gap(Error::from(AdapterError::from(*code)).0);
+                            let code = Error::from(AdapterError::from(*code)).0;
+                            self.diagnostics.record(Stage::ContextPage, tool, code);
+                            self.gap(code);
                         }
                     }
                     ContextResponse::Text(text) if text.truncated && !incident_read => {
@@ -564,12 +578,12 @@ impl ContextSource for Research<'_> {
             }
             .await;
             if let Err(error) = &response {
-                self.gap(
-                    error
-                        .source_code
-                        .as_deref()
-                        .unwrap_or_else(|| Error::from(error.clone()).0),
-                );
+                let code = error
+                    .source_code
+                    .as_deref()
+                    .unwrap_or_else(|| Error::from(error.clone()).0);
+                self.diagnostics.record(Stage::ContextBoundary, tool, code);
+                self.gap(code);
             }
             response
         })
