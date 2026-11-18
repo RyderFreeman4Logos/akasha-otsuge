@@ -157,6 +157,11 @@ def has_backlog_sample(row, *, require_status=True):
         return False
 
 
+def next_sample_tick(previous, elapsed_s):
+    # A slow observation can finish while the next sampling window is still open.
+    return max(previous + 1, math.floor(elapsed_s))
+
+
 def assess(report, samples, seconds, target, peak, interval):
     gaps = []
     if not report["complete"]:
@@ -427,9 +432,7 @@ async def run(plan_path, config_path, root):
                         config_epoch=admission["config_sha256"],
                     ),
                 )
-                number = max(
-                    number + 1, math.ceil(time.monotonic() - bounds["started_monotonic_s"])
-                )
+                number = next_sample_tick(number, time.monotonic() - bounds["started_monotonic_s"])
         if (
             sha(plan_path) != admission["plan_sha256"]
             or sha(config_path) != admission["config_sha256"]
