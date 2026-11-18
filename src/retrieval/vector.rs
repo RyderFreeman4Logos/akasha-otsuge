@@ -353,7 +353,6 @@ impl VectorIndex {
         let config = snapshot.resolved();
         let embedded = async {
             let mut vectors = vec![vec![0f32; progress.dimension as usize]; rows.len()];
-            let mut parts = vec![0usize; rows.len()];
             let mut chunks = Vec::new();
             // Provider calls follow first-seen scope order. Keep the original row index for
             // accumulation and native writes, including when response indices arrive out of order.
@@ -362,13 +361,16 @@ impl VectorIndex {
                 .sort_by_cached_key(|&row| rows.iter().position(|r| r.scope == rows[row].scope));
             for row in row_order {
                 let item = &rows[row];
+                if item.text.is_empty() {
+                    return Err(error("PROVIDER_OUTPUT_INVALID"));
+                }
                 let mut start = 0;
                 while start < item.text.len() {
                     let mut end = (start + 4096).min(item.text.len());
                     while !item.text.is_char_boundary(end) {
                         end -= 1;
                     }
-                    chunks.push((row, &item.text[start..end]));
+                    chunks.push((row, &item.text[start..end], end == item.text.len()));
                     start = end;
                 }
             }
@@ -377,12 +379,13 @@ impl VectorIndex {
                 / (progress.dimension as usize * 32 + 256))
                 .clamp(1, 8);
             let mut offset = 0;
+            let mut parts = 0;
             while offset < chunks.len() {
                 let scope = &rows[chunks[offset].0].scope;
                 let count = chunks[offset..]
                     .iter()
                     .take(limit)
-                    .take_while(|(row, _)| &rows[*row].scope == scope)
+                    .take_while(|(row, ..)| &rows[*row].scope == scope)
                     .count();
                 let mut end = offset + count;
                 let mut call = Call {
@@ -393,7 +396,7 @@ impl VectorIndex {
                     call.input = Input::Embedding {
                         texts: chunks[offset..end]
                             .iter()
-                            .map(|(_, text)| (*text).into())
+                            .map(|(_, text, _)| (*text).into())
                             .collect(),
                     };
                     if call.request(config).is_ok() || end == offset + 1 {
@@ -407,7 +410,7 @@ impl VectorIndex {
                             .serialized_read(|| {
                                 authorize()?;
                                 let domain = Domain::new(storage);
-                                for (row, _) in &chunks[offset..end] {
+                                for (row, ..) in &chunks[offset..end] {
                                     rows[*row].check_revision(&domain)?;
                                 }
                                 Ok(())
@@ -433,12 +436,13 @@ impl VectorIndex {
                     .as_array()
                     .filter(|items| items.len() == end - offset)
                     .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
-                for ((row, _), values) in chunks[offset..end].iter().zip(returned) {
+                for (&(row, _, last_chunk), values) in chunks[offset..end].iter().zip(returned) {
                     let values = values
                         .as_array()
                         .filter(|values| values.len() == progress.dimension as usize)
                         .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
-                    for (sum, value) in vectors[*row].iter_mut().zip(values) {
+                    let vector = &mut vectors[row];
+                    for (sum, value) in vector.iter_mut().zip(values) {
                         let value = value
                             .as_f64()
                             .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?
@@ -448,15 +452,16 @@ impl VectorIndex {
                         }
                         *sum += value;
                     }
-                    parts[*row] += 1;
+                    parts += 1;
+                    if last_chunk {
+                        for value in vector.iter_mut() {
+                            *value /= parts as f32;
+                        }
+                        validate_vector(vector, progress.dimension)?;
+                        parts = 0;
+                    }
                 }
                 offset = end;
-            }
-            for (vector, parts) in vectors.iter_mut().zip(parts) {
-                for value in vector.iter_mut() {
-                    *value /= parts as f32;
-                }
-                validate_vector(vector, progress.dimension)?;
             }
             Ok(vectors)
         }

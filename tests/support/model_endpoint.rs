@@ -173,7 +173,11 @@ impl Endpoint {
                     "/v1/rerank" => json!({"results":[{"index":1,"relevance_score":0.75},{"index":0,"relevance_score":0.25}]}),
                     _ => panic!("unexpected path {path}"),
                 }}.to_string();
-                let status = if matches!(mode, Mode::RateLimited) {
+                let status = if matches!(mode, Mode::RateLimited)
+                    || (matches!(mode, Mode::Retrieval)
+                        && body["model"] == "invalid-mean"
+                        && body["input"][0] == "rate-limited")
+                {
                     "429 Too Many Requests"
                 } else {
                     "200 OK"

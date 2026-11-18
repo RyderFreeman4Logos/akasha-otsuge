@@ -217,6 +217,35 @@ fn invalid_vector_batch_retains_diagnostic_without_publishing_earlier_rows() {
     invalid_vector("invalid-mean", true);
 }
 
+#[test]
+fn invalid_vector_stops_before_a_later_scope_can_mask_the_error() {
+    let endpoint = super::super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    let claim = format!("{}y", "x".repeat(4096));
+    seed_records(
+        &daemon,
+        &[
+            ("invalid", Some("alpha"), &claim),
+            ("unrelated", Some("beta"), "rate-limited"),
+        ],
+        1,
+    );
+    daemon.configure(&format!("[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel='invalid-mean'\ndimension=2\nlocal=true\ntimeout='2s'",endpoint.address));
+    daemon.start();
+    daemon.cli(&["index", "sync", "--idempotency-key", "invalid-build"]);
+    let job = finished(&daemon, "invalid-build");
+    let status = daemon.cli(&["index", "status"])["data"]["vector"].clone();
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    assert_eq!(job["error"], "PROVIDER_OUTPUT_INVALID", "{job}");
+    assert_eq!(status["last_call"]["error"], "PROVIDER_OUTPUT_INVALID");
+    assert_eq!(status["watermark"], 0);
+    assert_eq!(status["indexed_rows"], 0);
+    let requests = endpoint.requests.lock().unwrap();
+    assert_eq!(requests.len(), 1);
+    assert_eq!(requests[0].1["input"], json!([&claim[..4096], "y"]));
+}
+
 fn invalid_vector(model: &str, batch: bool) {
     let endpoint = super::super::model_tests::Endpoint::retrieval();
     let mut daemon = Daemon::new();
