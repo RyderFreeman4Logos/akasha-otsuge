@@ -7,7 +7,7 @@
 - mempal 只读转换器独立实现；`tests/fixtures/mempal21-28.sql` 和 `src/storage/mempal/schema.json` 来自实际 schema21/fork28 快照的表结构，不包含真实行。映射参照固定源 commit `4593a5c5e6a9ea1140256cd42fa5838511a24e14`，保留该 commit 的 [MIT 版权与许可文本](licenses/mempal-MIT.txt)。实际生产二进制的确切源码 commit 未知，不能由版本号推定。后续若移植实现代码，仍须登记源/目标路径、改动及适用许可。
 - 只读转换依赖固定的 rusqlite 0.37.0 与 libsqlite3-sys 0.35.0，二者包元数据声明 MIT；其余新增锁定依赖为 MIT 或 MIT/Apache-2.0 双许可。依赖沿用各自许可证，项目主体仍为 Apache-2.0；SQLite 仅用于读取旧快照。
 - Apache-2.0 许可证全文来自 GitHub licenses API 的 `apache-2.0` 模板；项目版权见 `NOTICE`。
-- 存储诊断的 `docs/benchmarks/results/visibility-diagnostic/*invalidation*/input.jsonl` 是八条公开数据的摘录，来源于 [Qdrant 的 DBpedia 数据集](https://huggingface.co/datasets/Qdrant/dbpedia-entities-openai3-text-embedding-3-large-1536-1M/tree/4a9731217921bc476a0f03544f11f22ae4903fa5)。原文标题与正文合并，向量转换为 float32，增加诊断 key/partition；未改写正文含义。数据集标记 MIT，DBpedia 原文遵循 CC-BY-SA-4.0；这些数据保留来源许可，不改为项目代码的 Apache-2.0。固定源文件与校验和见 [sources.json](../spikes/data/sources.json)，选取文件的校验和见相邻 `admission.json` 与 `result.json`。
+- 存储诊断的 `docs/benchmarks/results/visibility-diagnostic/*invalidation*/input.jsonl` 是八条公开数据的摘录，来源于 [Qdrant 的 DBpedia 数据集](https://huggingface.co/datasets/Qdrant/dbpedia-entities-openai3-text-embedding-3-large-1536-1M/tree/4a9731217921bc476a0f03544f11f22ae4903fa5)。原文标题与正文合并，向量转换为 float32，增加诊断 key/partition；未改写正文含义。数据集标记 MIT，DBpedia 原文遵循 CC-BY-SA-4.0；这些数据保留来源许可，不改为项目代码的 Apache-2.0。固定源文件与校验和见 [sources.json][source-sources]，选取文件的校验和见相邻 `admission.json` 与 `result.json`。
 - `docs/benchmarks/results/generation-diagnostic/` 的请求记录重用同一公开摘录与向量，适用上述来源许可；模型来源指纹绑定发布者仓库、固定版本、预计算时间与 float32 表示。该实验未调用模型提供商。
 - `docs/benchmarks/results/corpus-backfill-diagnostic/` 复用上述八条公开记录，并加入 17 条明确标为 synthetic 的小型回填测试文本；这些测试文本不计入完整语料规模。请求、原文一致性结果与向量结果保留相同数据来源许可。
 - `docs/benchmarks/results/corpus-views-diagnostic/` 延续上述公开摘录与 synthetic 测试文本，保留当前/历史视图、权限与并发诊断的请求及结果；适用相同来源许可，均不替代完整语料验收。
@@ -18,3 +18,6 @@
 - `docs/benchmarks/results/text-query-population/` 保存 FineWeb-Edu 固定版本的 512 个检索词、正文哈希和全局记录位置，不包含向量或完整正文。来源版本见 `spikes/data/sources.json`；FineWeb-Edu 数据集遵循 ODC-BY，原文权利仍归原权利人，不改为 Apache-2.0。
 - `docs/benchmarks/results/source-key-diagnostic/` 复用上述八条公开 DBpedia 记录、预计算向量和明确标记的合成测试文本，验证恢复后的来源、scope 与权限；沿用相同数据许可。
 - `docs/benchmarks/results/mixed-query-diagnostic/` 的负载使用上述八条公开 DBpedia 记录与八条明确标为 synthetic 的无向量文本。完整查询元数据另含 FineWeb-Edu 的来源哈希与检索词；沿用上述 MIT/CC-BY-SA-4.0 与 ODC-BY 来源许可，未调用模型或伪造测试负载向量。
+
+<!-- Source links for the Linux archive -->
+[source-sources]: <../spikes/data/sources.json>

@@ -5,7 +5,7 @@ are merged. Its authenticated CLI, interactive TUI and Runner receipts are retai
 below. `akasha_consult` now submits a durable Consult with verified identity and an
 optional hint. Public status/results and receipt continuation are documented in
 [the shared guide](../../adapters.md#consult-results-and-continuation); subsequent
-native Consult samples are in [MVP-016 evidence](../../benchmarks/results/mvp016/README.md).
+native Consult samples are in [MVP-016 evidence][source-mvp016].
 
 | Surface | Current evidence |
 | --- | --- |
@@ -138,7 +138,7 @@ These controlled receipts cover synthetic public messages and native interoperab
 The authenticated receipts below are separate. Exact-candidate gates and independent
 review remain required before closing MVP-014.
 
-The [authenticated Runner receipt](runner-acceptance.json) separately records two
+The [authenticated Runner receipt][source-runner-acceptance] separately records two
 native `gpt-6.1-sol` / `openai-codex` runs. Each invoked all four scoped context
 tools exactly once, returned the expected structured final result and exited
 successfully. Claude, Codex and Pi executables were absent from the child PATH.
@@ -146,9 +146,9 @@ This uses real model calls over synthetic captured context; it does not establis
 1700-second execution. The fixture allocated229,376
 bytes across27 files, and both native profiles and all scratch were removed.
 
-The [CLI receipt](cli-acceptance.json) records an actual
+The [CLI receipt][source-cli-acceptance] records an actual
 `hermes chat --oneshot --query-file REQUEST --format stream-json --toolsets akasha
---ignore-rules --in WORKSPACE` invocation. The [TUI receipt](tui-acceptance.json)
+--ignore-rules --in WORKSPACE` invocation. The [TUI receipt][source-tui-acceptance]
 records two simultaneous `hermes chat --tui --toolsets akasha --ignore-rules --in
 WORKSPACE` processes, each with a controlling PTY and its own native profile.
 Both profiles retain distinct session, invocation and profile hashes, bind at
@@ -167,7 +167,7 @@ The isolated Gateway fixture uses `gateway.standalone: true`; the older
 `multiplex_profiles: false` setting is ignored by this native build. No existing
 user Gateway was stopped or reconfigured.
 
-The [control receipt](control-acceptance.json) distinguishes actual native plugin
+The [control receipt][source-control-acceptance] distinguishes actual native plugin
 hook tests from authenticated requests. The native guard blocks terminal, file
 write/patch/read, web extraction/search, delegation and foreign MCP tool names.
 An authenticated Runner asking `context_read` for an unissued handle receives
@@ -186,6 +186,14 @@ cargo test --test hermes --locked runner::installed_native_cancellation_ends_exe
 ```
 
 Ordinary `just check` leaves these opt-in authenticated tests ignored. Compact
-[acceptance originals](acceptance-evidence.zip) include the actual supervised
+[acceptance originals][source-acceptance-evidence] include the actual supervised
 harnesses, command/terminal receipts and sanitized parent checkpoints; no native
 private reasoning, credentials or dependency copies are archived.
+
+<!-- Source links for the Linux archive -->
+[source-mvp016]: <../../benchmarks/results/mvp016/README.md>
+[source-runner-acceptance]: <runner-acceptance.json>
+[source-cli-acceptance]: <cli-acceptance.json>
+[source-tui-acceptance]: <tui-acceptance.json>
+[source-control-acceptance]: <control-acceptance.json>
+[source-acceptance-evidence]: <acceptance-evidence.zip>

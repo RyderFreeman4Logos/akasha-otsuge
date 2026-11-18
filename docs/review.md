@@ -127,7 +127,10 @@ audit, must fit 128 KiB. An oversized apply fails without partial changes. The C
 does not support batch approval or incident deduplication; incident workflows and
 notification delivery have separate Issues.
 
-The [MVP-019 evidence](benchmarks/results/mvp019/README.md) records real daemon/CLI
+The [MVP-019 evidence][source-mvp019] records real daemon/CLI
 flows driven by a synthetic PTY operator, controlled extractor responses and four
 SIGKILL recovery phases. These fixtures do not claim a physical human action or
 an authenticated model evaluation.
+
+<!-- Source links for the Linux archive -->
+[source-mvp019]: <benchmarks/results/mvp019/README.md>

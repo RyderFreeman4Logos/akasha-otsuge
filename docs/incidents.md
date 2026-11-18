@@ -158,4 +158,7 @@ does not replay its Runner; an operator can use a new explicit Editor request.
 Incident state, memory adoption and notification acknowledgement are separate.
 An incident update does not approve a candidate or send a notification. Persistent
 notification delivery is the following MVP-023 scope. Focused and native evidence
-is recorded in [the acceptance record](benchmarks/incident-acceptance.md).
+is recorded in [the acceptance record][source-incident-acceptance].
+
+<!-- Source links for the Linux archive -->
+[source-incident-acceptance]: <benchmarks/incident-acceptance.md>

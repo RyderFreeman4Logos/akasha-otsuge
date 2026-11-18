@@ -11,7 +11,7 @@ configuration, actual process memory samples and the current enforcement boundar
 
 See [example TOML](../examples/config.toml) and the complete
 [built-in defaults](../src/config/defaults.toml). MVP-003 selected the single
-[production backend](benchmarks/storage-decision.md); there is no backend switch.
+[production backend][source-storage-decision]; there is no backend switch.
 
 The daemon supplies absolute data/socket paths at startup. The library never reads
 project configuration, environment overrides, credentials or installed-host state
@@ -180,3 +180,6 @@ Dependency contracts were checked against current primary documentation:
 [TOML document deserialization](https://docs.rs/toml/latest/toml/fn.from_str.html)
 and [Tokio watch snapshots](https://docs.rs/tokio/latest/tokio/sync/watch/index.html).
 Versions are recorded in `Cargo.lock`.
+
+<!-- Source links for the Linux archive -->
+[source-storage-decision]: <benchmarks/storage-decision.md>

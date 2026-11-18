@@ -8,10 +8,13 @@ import itertools
 import json
 from pathlib import Path
 import platform
+import posixpath
+import re
 import subprocess
 import tarfile
 import tempfile
 import tomllib
+from urllib.parse import quote, unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +30,40 @@ def add(archive, name, stream, size, mode, timestamp):
     header.mode = mode
     header.mtime = timestamp
     archive.addfile(header, stream)
+
+
+# Guides keep repository-only reference definitions in a final paragraph. Their
+# Markdown links also work when reading the source checkout without a package.
+SOURCE_LINKS = "<!-- Source links for the Linux archive -->"
+SOURCE_REFERENCE = re.compile(r"(\[source-[a-z0-9-]+\]: <)([^<>\n]+)(>\n?)")
+
+
+def package_markdown(text, filename, members, paths, repository, commit):
+    trimmed = text.rstrip(" \t\r\n")
+    body, separator, footer = trimmed.rpartition("\n\n")
+    if not footer.startswith(SOURCE_LINKS + "\n"):
+        return text
+    lines = footer.splitlines(keepends=True)
+    for i in range(1, len(lines)):
+        definition = SOURCE_REFERENCE.fullmatch(lines[i])
+        if not definition:
+            raise ValueError(f"{filename}: invalid source link definition {lines[i]!r}")
+        prefix, destination, suffix = definition.groups()
+        url = urlsplit(destination)
+        if not url.path or url.scheme or url.netloc or url.path.startswith("/"):
+            raise ValueError(f"{filename}: expected a relative repository link: {destination}")
+        target = posixpath.normpath(posixpath.join(posixpath.dirname(filename), unquote(url.path)))
+        if target in members or any(name.startswith(target + "/") for name in members):
+            continue
+        if target not in paths:
+            raise ValueError(f"{filename}: missing repository link {destination}")
+        link = f"{repository}/{paths[target]}/{commit}/{quote(target)}"
+        if url.query:
+            link += "?" + url.query
+        if url.fragment:
+            link += "#" + url.fragment
+        lines[i] = prefix + link + suffix
+    return body + separator + "".join(lines) + text[len(trimmed):]
 
 
 def dependency_notices(compiled, native_builds):
@@ -150,6 +187,13 @@ def package(destination):
     documents.extend(p for p in output("git", "ls-tree", "-r", "--name-only", commit, "docs/adapters").splitlines()
                      if p.endswith("/README.md"))
     notices = dependency_notices({m["package_id"] for m in artifacts}, native_builds)
+    members = set(documents) | set(notices) | {"SOURCE_COMMIT", f"bin/{name}"}
+    tree = subprocess.check_output(["git", "ls-tree", "-rtz", commit], cwd=ROOT)
+    paths = {}
+    for entry in tree.decode().split("\0"):
+        if entry:
+            metadata, path = entry.split("\t", 1)
+            paths[path] = metadata.split()[1]
     destination.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=destination) as tmp:
         staged = Path(tmp) / release.name
@@ -159,6 +203,9 @@ def package(destination):
                 add(archive, f"{prefix}/bin/{name}", stream, binary.stat().st_size, 0o755, stamp)
             for path in sorted(documents):
                 content = subprocess.check_output(["git", "show", f"{commit}:{path}"], cwd=ROOT)
+                if path.endswith(".md"):
+                    content = package_markdown(content.decode(), path, members, paths,
+                                               manifest["repository"], commit).encode()
                 mode = 0o755 if path == "examples/notifier-file.py" else 0o644
                 add(archive, f"{prefix}/{path}", io.BytesIO(content), len(content), mode, stamp)
             for path, content in sorted(notices.items()):

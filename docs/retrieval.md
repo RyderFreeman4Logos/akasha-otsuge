@@ -3,7 +3,7 @@
 MVP-010 adds retrieval jobs to the existing private Linux daemon. The indexes
 contain **active Memory records**, not every captured message, source or historical
 revision. `searched_content: "active_memories"` makes that boundary explicit.
-The full acceptance queue and publication state are in [TODO](plan/todo.md).
+The full acceptance queue and publication state are in [TODO][source-todo].
 
 ## Commands
 
@@ -67,7 +67,7 @@ each piece uses this same command and retains its own exact hash/revision.
 
 ## Query and authority
 
-The selected [storage ADR](benchmarks/storage-decision.md) supplies LanceDB's native
+The selected [storage ADR][source-storage-decision] supplies LanceDB's native
 disk ICU full-text index and scope B-tree. Ordinary scored hits use the exact
 requested scope. Applicable human-confirmed decisions, preferences and procedures
 from that scope and its ancestors are returned separately in `rules`, even when
@@ -230,10 +230,17 @@ cargo test --locked --test domain --test config
 bash scripts/check.sh
 ```
 
-The [hashed development receipts](benchmarks/results/mvp010/README.md) retain
+The [hashed development receipts][source-mvp010] retain
 failed and successful runs with their actual commands and limits. The
-[review repair receipts](benchmarks/results/mvp010-review-fixes/README.md) preserve
+[review repair receipts][source-mvp010-review-fixes] preserve
 eight additional public regressions and two native authority controls.
 
 Focused passes, the final committed-HEAD gate, independent review, hosted CI and
-issue closure are separate evidence; [progress](plan/progress.md) records them.
+issue closure are separate evidence; [progress][source-progress] records them.
+
+<!-- Source links for the Linux archive -->
+[source-todo]: <plan/todo.md>
+[source-storage-decision]: <benchmarks/storage-decision.md>
+[source-mvp010]: <benchmarks/results/mvp010/README.md>
+[source-mvp010-review-fixes]: <benchmarks/results/mvp010-review-fixes/README.md>
+[source-progress]: <plan/progress.md>

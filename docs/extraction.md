@@ -90,5 +90,8 @@ it is not an atomic all-or-nothing batch.
 
 Approved records use the existing [index lifecycle](retrieval.md). Unapproved
 candidates are excluded from active-memory retrieval. See the
-[MVP-017 evidence](benchmarks/results/mvp017/README.md) for controlled crash and
+[MVP-017 evidence][source-mvp017] for controlled crash and
 boundary tests and the actual single-Pi extraction sample.
+
+<!-- Source links for the Linux archive -->
+[source-mvp017]: <benchmarks/results/mvp017/README.md>

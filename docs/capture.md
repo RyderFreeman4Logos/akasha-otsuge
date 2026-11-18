@@ -1,6 +1,6 @@
 # Capture protocol and recovery
 
-`capture` is the shared storage component for [MVP-007](spec/issues/MVP-007.md).
+`capture` is the shared storage component for [MVP-007][source-mvp-007].
 It stores exact payload bytes separately from normalized visible UTF-8 text and
 derived compaction events. It uses the sole [authority Storage](storage.md), not
 a second database. [Daemon/CLI integration](daemon.md) is implemented by #8; real host
@@ -159,3 +159,6 @@ with deterministic temporary-file changes immediately after saved-boundary and
 frame validation, plus an append-only control. The test-only caller supplies a
 private observation callback; the public operation supplies a no-op. There are
 no external scheduling controls in the production command.
+
+<!-- Source links for the Linux archive -->
+[source-mvp-007]: <spec/issues/MVP-007.md>

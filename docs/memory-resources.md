@@ -27,7 +27,7 @@ values remain inherited by the daemon and its children. An explicit
 [`glibc.malloc.arena_max` tunable](https://sourceware.org/glibc/manual/latest/html_node/Memory-Allocation-Tunables.html)
 supersedes `MALLOC_ARENA_MAX`; a different allocator can also ignore it. Actual
 procfs/cgroup observations remain authoritative. The
-[bounded corpus controls](benchmarks/results/mvp024-native-memory/README.md)
+[bounded corpus controls][source-mvp024-native-memory]
 do not establish the full production operating envelope.
 
 ```toml
@@ -174,3 +174,6 @@ These tests verify kernel readbacks, worker/guardian membership, retained peaks,
 safe lowering, same-PID reopen and normal cleanup. Full production corpus/load
 and recovery acceptance remain required in MVP-024. No new Daybreak or red-team
 campaign is represented by these functional tests.
+
+<!-- Source links for the Linux archive -->
+[source-mvp024-native-memory]: <benchmarks/results/mvp024-native-memory/README.md>

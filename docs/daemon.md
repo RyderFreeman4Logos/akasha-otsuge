@@ -1,7 +1,7 @@
 # Local daemon and management protocol
 
 The MVP-008 daemon is merged and validated; exact gate, independent review and
-installed acceptance are tracked in [the TODO](plan/todo.md). Provider jobs and
+installed acceptance are tracked in [the TODO][source-todo]. Provider jobs and
 [retrieval jobs](retrieval.md) reuse this management protocol. Host adapters,
 research workflows and full-scale product acceptance remain separately tracked.
 
@@ -209,4 +209,9 @@ acknowledgement moves Prepared to Delivered; failed stdout writes leave it
 Prepared. Lost acknowledgements remain uncertain, and a repeated successful replay
 is idempotent. Receipt viewing itself does not assert delivery.
 
-The [queued job controls](benchmarks/results/mvp024-storage-pressure/queued-job-recovery.json) exercise a large queued prompt and an in-flight response. The [notification controls](benchmarks/results/mvp024-storage-pressure/notification-recovery.json) include a non-idempotent external receiver across a pressured restart.
+The [queued job controls][source-queued-job-recovery] exercise a large queued prompt and an in-flight response. The [notification controls][source-notification-recovery] include a non-idempotent external receiver across a pressured restart.
+
+<!-- Source links for the Linux archive -->
+[source-todo]: <plan/todo.md>
+[source-queued-job-recovery]: <benchmarks/results/mvp024-storage-pressure/queued-job-recovery.json>
+[source-notification-recovery]: <benchmarks/results/mvp024-storage-pressure/notification-recovery.json>

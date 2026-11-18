@@ -110,4 +110,7 @@ links and [incidents](incidents.md) admit configured investigations through this
 same Editor. Notification delivery remains the separate MVP-023 scope.
 
 Controlled cases, crash recovery and a real native investigation are described
-in [the acceptance record](benchmarks/editor-acceptance.md).
+in [the acceptance record][source-editor-acceptance].
+
+<!-- Source links for the Linux archive -->
+[source-editor-acceptance]: <benchmarks/editor-acceptance.md>

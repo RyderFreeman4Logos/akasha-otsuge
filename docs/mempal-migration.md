@@ -166,7 +166,7 @@ establish absent original documents, missing historical versions or approvals.
 
 The structural SQL fixture contains no real rows and retains the source
 [MIT notice](licenses/mempal-MIT.txt). Controlled fixtures and real private-data
-acceptance remain separate in the [evidence archive](benchmarks/results/mvp025-mempal-reader/README.md).
+acceptance remain separate in the [evidence archive][source-mvp025-mempal-reader].
 The actual run retained 3,525,645 rows in 29 tables, with matching independent typed
 row digests and an unchanged source file. Its 5,984,986,114-byte archive contains
 27,511 commits and 1,687,022 revisions. Two fresh native imports, one duplicate
@@ -174,3 +174,6 @@ import and two complete exports preserved every archive byte, receipt and clock.
 Two isolated daemon starts then read three distinct candidates' original chunks,
 historical records and pending reviews; none became active and no legacy jobs ran.
 These results do not establish the separate resource/load or model-quality gates.
+
+<!-- Source links for the Linux archive -->
+[source-mvp025-mempal-reader]: <benchmarks/results/mvp025-mempal-reader/README.md>
