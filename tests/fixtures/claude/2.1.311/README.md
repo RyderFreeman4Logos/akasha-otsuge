@@ -188,3 +188,18 @@ The fixed daemon continued through the two requested tools, a search, and a
 read. Three locally generated follow-up responses completed the Consult with
 one verified original. The first authenticated case retained only aggregate
 fields, so its rejected frame remains unknown. [Case and replay counts](thinking-progress-r1.json).
+
+A third, distinct input exercised the fixed adapter with a fresh authenticated
+Runner. A local preflight on the first Caller turn returned
+`BINDING_UNAVAILABLE` before a job started. A fresh native session followed
+by normal resume completed the local control and then submitted the measured
+Consult. Its Runner handled 108 thinking-progress frames and three real HTTP
+200 responses. Nine requested tools produced five text results. One result
+matched the registered synthetic original byte for byte, and its source digest
+matched too.
+
+Before the fourth upstream request, the observer's pre-registered token
+admission limit stopped the run. The job returned `RUNNER_FAILED` after 20
+product reads. The actual model read the original. A final model answer,
+published Consult receipt and answer-quality score remain unobserved.
+[Multi-turn observation and budget](thinking-progress-multiturn-r1.json).
