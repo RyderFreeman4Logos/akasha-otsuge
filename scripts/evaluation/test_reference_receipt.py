@@ -37,6 +37,18 @@ class ReceiptTests(unittest.TestCase):
                 driver.main()
             run.assert_not_called()
 
+    def test_changed_reference_inputs_reject_before_reserving_output(self):
+        for path in driver.FROZEN_INPUTS:
+            with (
+                self.subTest(path=path),
+                patch.object(sys, "argv", self.args()),
+                patch.dict(driver.FROZEN_INPUTS, {path: "0" * 64}),
+                contextlib.redirect_stderr(io.StringIO()),
+                self.assertRaises(SystemExit),
+            ):
+                driver.main()
+            self.assertFalse(self.output.exists())
+
     def test_same_destination_only_starts_once(self):
         processes = get_context("fork")
         entered = processes.Event()
