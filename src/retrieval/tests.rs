@@ -170,7 +170,7 @@ async fn one_authority_batch_bounds_native_versions_and_keeps_every_lexical_row(
         expected
     );
     let versions = index.table.version().await.unwrap() - before;
-    // Includes native-index initialization and the first optimization.
+    // Includes native-index initialization.
     assert!(
         versions <= 8,
         "one bounded authority batch created {versions} native versions"
@@ -855,4 +855,487 @@ async fn published_and_candidate_share_one_native_session_across_budget_changes(
     let owner = cache.owner(&changed).await.unwrap();
     assert_eq!(owner.budget_mib, new_budget);
     store.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn maintenance_keeps_unindexed_reads_and_authority_progress() {
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let mut last = None;
+    for i in 0..128 {
+        let id = format!("maintenance-{i}");
+        let seq = memory(&store, &id, &format!("windowtoken{i}"), None).await;
+        last = Some((id, seq));
+    }
+    let target = store.sequence().unwrap();
+    let index = Index::open(&config, &store).await.unwrap();
+    let progress = sync(&index, &store, target).await;
+    let authority_seq = store.sequence().unwrap();
+    let expected = vec![last.unwrap()];
+    assert_eq!(
+        index.keyword("windowtoken127", &scope(), 20).await.unwrap(),
+        expected
+    );
+    let fragments = index
+        .table
+        .as_native()
+        .unwrap()
+        .count_fragments()
+        .await
+        .unwrap();
+    assert!(fragments > 2);
+    let version = index.table.version().await.unwrap();
+    let previous = index
+        .connection
+        .open_table(table_name(&index.generation))
+        .execute()
+        .await
+        .unwrap();
+    previous.checkout(version).await.unwrap();
+    let denied = index
+        .maintain_tables(None, &|| Err(error("READ_DENIED")))
+        .await;
+    assert!(matches!(denied, Err(e) if e.code == "READ_DENIED"));
+    assert_eq!(index.table.version().await.unwrap(), version);
+    index.maintain_tables(None, &|| Ok(())).await.unwrap();
+    assert!(
+        index
+            .table
+            .as_native()
+            .unwrap()
+            .count_fragments()
+            .await
+            .unwrap()
+            < fragments
+    );
+    assert_eq!(store.sequence().unwrap(), authority_seq);
+    let old_batches: Vec<_> = previous
+        .query()
+        .select(Select::Columns(vec!["id".into()]))
+        .execute()
+        .await
+        .unwrap()
+        .try_collect()
+        .await
+        .unwrap();
+    let old_ids: std::collections::BTreeSet<_> = old_batches
+        .iter()
+        .flat_map(|batch| {
+            let ids = batch
+                .column_by_name("id")
+                .unwrap()
+                .as_any()
+                .downcast_ref::<StringArray>()
+                .unwrap();
+            (0..batch.num_rows())
+                .map(|i| ids.value(i).to_owned())
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    assert_eq!(
+        old_ids,
+        (0..128).map(|i| format!("maintenance-{i}")).collect()
+    );
+    drop(previous);
+    let maintained_version = index.table.version().await.unwrap();
+    index.maintain_tables(None, &|| Ok(())).await.unwrap();
+    assert_eq!(index.table.version().await.unwrap(), maintained_version);
+    assert_eq!(
+        serde_json::to_value(status(&store).unwrap()).unwrap(),
+        serde_json::to_value(progress).unwrap()
+    );
+    assert_eq!(
+        index.keyword("windowtoken127", &scope(), 20).await.unwrap(),
+        expected
+    );
+    drop(index);
+    store.close().await.unwrap();
+    let store = Storage::open(&config).await.unwrap();
+    let index = Index::open(&config, &store).await.unwrap();
+    assert_eq!(status(&store).unwrap().lexical_watermark, target);
+    assert_eq!(
+        index.keyword("windowtoken127", &scope(), 20).await.unwrap(),
+        expected
+    );
+    drop(index);
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn maintenance_keeps_the_writer_generation_when_a_reader_replaces_the_cache() {
+    use arrow_array::{FixedSizeListArray, types::Float32Type};
+    use lancedb::{DistanceType, index::vector::IvfFlatIndexBuilder};
+
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let index = Index::open(&config, &store).await.unwrap();
+    let configs = ["reader", "writer"].map(|model| {
+        resolve(
+            &format!("[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint='http://127.0.0.1:1/v1'\nmodel='{model}'\ndimension=2\nlocal=true\ntimeout='2s'"),
+            None,
+            "",
+            &Paths { data_dir: fixture.0.join("data"), socket_path: fixture.0.join("run/socket") },
+        ).unwrap()
+    });
+    for config in &configs {
+        let vector = index.vector_index(&store, config).await.unwrap();
+        let schema = vector.table.schema().await.unwrap();
+        for wave in 0..4 {
+            let ids = (wave * 16..(wave + 1) * 16)
+                .map(|i| format!("vector-{i}"))
+                .collect::<Vec<_>>();
+            let batch = RecordBatch::try_new(
+                schema.clone(),
+                vec![
+                    Arc::new(StringArray::from(
+                        ids.iter().map(|id| hash(id.as_bytes())).collect::<Vec<_>>(),
+                    )),
+                    Arc::new(StringArray::from(ids)),
+                    Arc::new(UInt64Array::from(vec![1u64; 16])),
+                    Arc::new(StringArray::from(vec![
+                        hash(
+                            &serde_json::to_vec(&scope()).unwrap()
+                        );
+                        16
+                    ])),
+                    Arc::new(
+                        FixedSizeListArray::from_iter_primitive::<Float32Type, _, _>(
+                            (wave * 16..(wave + 1) * 16)
+                                .map(|i| Some(vec![Some(1.0), Some(i as f32 / 64.0)])),
+                            2,
+                        ),
+                    ),
+                ],
+            )
+            .unwrap();
+            vector
+                .table
+                .add(
+                    Box::new(RecordBatchIterator::new(vec![Ok(batch)], schema.clone()))
+                        as Box<dyn arrow_array::RecordBatchReader + Send>,
+                )
+                .execute()
+                .await
+                .unwrap();
+            if wave == 0 {
+                vector
+                    .table
+                    .create_index(
+                        &["vector"],
+                        NativeIndex::IvfFlat(
+                            IvfFlatIndexBuilder::default()
+                                .distance_type(DistanceType::Cosine)
+                                // Later waves concentrate above the original training range.
+                                .target_partition_size(8)
+                                .sample_rate(8),
+                        ),
+                    )
+                    .execute()
+                    .await
+                    .unwrap();
+            }
+        }
+    }
+    let writer = index.vector_index(&store, &configs[1]).await.unwrap();
+    let reader = index.vector_index(&store, &configs[0]).await.unwrap();
+    assert_ne!(writer.generation, reader.generation);
+    assert!(Arc::ptr_eq(
+        index.vector.lock().await.as_ref().unwrap(),
+        &reader
+    ));
+    let reader_version = reader.table.version().await.unwrap();
+    let native_index = writer.table.list_indices().await.unwrap()[0].name.clone();
+    let before = writer
+        .table
+        .index_stats(&native_index)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(before.num_unindexed_rows, 48);
+    index
+        .maintain_tables(Some(writer.as_ref()), &|| Ok(()))
+        .await
+        .unwrap();
+    let after = writer
+        .table
+        .index_stats(&native_index)
+        .await
+        .unwrap()
+        .unwrap();
+    let reader_after = reader.table.version().await.unwrap();
+    let reader_rows = reader
+        .search(&[1.0, 0.0], &scope(), 64, || Ok(()))
+        .await
+        .unwrap()
+        .len();
+    let writer_rows = writer
+        .search(&[1.0, 0.0], &scope(), 64, || Ok(()))
+        .await
+        .unwrap()
+        .len();
+    let sequence = store.sequence().unwrap();
+    drop(writer);
+    drop(reader);
+    drop(index);
+    store.close().await.unwrap();
+    assert_eq!(
+        after.num_unindexed_rows, 0,
+        "writer generation missed maintenance"
+    );
+    assert_eq!(after.num_indexed_rows, 64);
+    assert_eq!(before.num_indices, Some(1));
+    assert_eq!(
+        after.num_indices,
+        Some(2),
+        "crossing the IVF split threshold must preserve the base segment"
+    );
+    assert_eq!(
+        reader_after, reader_version,
+        "reader generation was maintained instead"
+    );
+    assert_eq!((reader_rows, writer_rows, sequence), (64, 64, 0));
+}
+
+#[tokio::test]
+async fn segmented_ann_preserves_unindexed_rows_and_snapshot_during_native_updates() {
+    use arrow_array::{FixedSizeListArray, types::Float32Type};
+    use lancedb::{
+        DistanceType,
+        index::vector::IvfFlatIndexBuilder,
+        table::{CompactionOptions, OptimizeAction, OptimizeOptions},
+    };
+
+    let fixture = Fixture::new();
+    let config = |budget| {
+        resolve(
+            &format!("[runtime]\nmemory_budget_mib={budget}\n[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint='http://127.0.0.1:1/v1'\nmodel='s'\ndimension=2\nlocal=true"),
+            None, "", &Paths { data_dir: fixture.0.join("data"), socket_path: fixture.0.join("run/socket") },
+        ).unwrap()
+    };
+    let cfg = config(512);
+    let storage = Storage::open(&cfg).await.unwrap();
+    let owner = Index::open(&cfg, &storage).await.unwrap();
+    let index = owner.vector_index(&storage, &cfg).await.unwrap();
+    let table = &index.table;
+    let schema = table.schema().await.unwrap();
+    let key = hash(&serde_json::to_vec(&scope()).unwrap());
+    let query = [1.0, 0.0];
+    let records = |start: usize, end: usize| {
+        let ids: Vec<_> = (start..end).map(|i| format!("r{i:03}")).collect();
+        let data = RecordBatch::try_new(
+            schema.clone(),
+            vec![
+                Arc::new(StringArray::from(ids.clone())),
+                Arc::new(StringArray::from(ids)),
+                Arc::new(UInt64Array::from(
+                    (start..end).map(|i| i as u64 + 1).collect::<Vec<_>>(),
+                )),
+                Arc::new(StringArray::from(
+                    (start..end)
+                        .map(|i| if i % 2 == 0 { key.as_str() } else { "excluded" })
+                        .collect::<Vec<_>>(),
+                )),
+                Arc::new(
+                    FixedSizeListArray::from_iter_primitive::<Float32Type, _, _>(
+                        (start..end).map(|i| Some(vec![Some(1.0), Some((321 - i) as f32 / 100.0)])),
+                        2,
+                    ),
+                ),
+            ],
+        )
+        .unwrap();
+        Box::new(RecordBatchIterator::new(vec![Ok(data)], schema.clone()))
+            as Box<dyn arrow_array::RecordBatchReader + Send>
+    };
+    let hits = |end: usize, excluded: &[usize]| {
+        (0..end)
+            .rev()
+            .filter(|i| i % 2 == 0 && !excluded.contains(i))
+            .take(8)
+            .map(|i| (format!("r{i:03}"), i as u64 + 1))
+            .collect::<Vec<_>>()
+    };
+    table.add(records(0, 32)).execute().await.unwrap();
+    assert_eq!(
+        index.search(&query, &scope(), 8, || Ok(())).await.unwrap(),
+        hits(32, &[])
+    );
+    table
+        .create_index(&["scope"], NativeIndex::BTree(BTreeIndexBuilder::default()))
+        .execute()
+        .await
+        .unwrap();
+    table
+        .create_index(
+            &["vector"],
+            NativeIndex::IvfFlat(
+                IvfFlatIndexBuilder::default()
+                    .distance_type(DistanceType::Cosine)
+                    .num_partitions(3),
+            ),
+        )
+        .execute()
+        .await
+        .unwrap();
+    for wave in 1..9 {
+        table
+            .add(records(32 * wave, 32 * (wave + 1)))
+            .execute()
+            .await
+            .unwrap();
+        table
+            .optimize(OptimizeAction::Index(OptimizeOptions::append()))
+            .await
+            .unwrap();
+    }
+    let s = table.index_stats("vector_idx").await.unwrap().unwrap();
+    assert_eq!(
+        (s.num_indices, s.num_indexed_rows, s.num_unindexed_rows),
+        (Some(9), 288, 0)
+    );
+    table.add(records(288, 294)).execute().await.unwrap();
+    let s = table.index_stats("vector_idx").await.unwrap().unwrap();
+    assert_eq!(s.num_unindexed_rows, 6);
+    let snapshot = table.query_snapshot().await.unwrap();
+    let previous = snapshot.dataset().unwrap().get().await.unwrap();
+    let previous_version = previous.version().version;
+    let filter = format!("scope = '{key}'");
+    // Three ANN groups, tail discovery, one flat group, then the final row fetch.
+    for (stop, code) in [(2, "CANCELLED"), (5, "WORKFLOW_TIMEOUT"), (6, "CANCELLED")] {
+        let calls = std::cell::Cell::new(0);
+        let stopped = vector::segments::search(&previous, &query, &filter, 8, &|| {
+            calls.set(calls.get() + 1);
+            if calls.get() == stop {
+                Err(error(code))
+            } else {
+                Ok(())
+            }
+        })
+        .await
+        .unwrap_err();
+        assert_eq!(stopped.code, code);
+        assert_eq!(calls.get(), stop);
+    }
+
+    // A reopened index uses the live owner budget even when reading an old model generation.
+    let high = Index::open(&config(2048), &storage).await.unwrap();
+    let old_generation = high.vector_index(&storage, &cfg).await.unwrap();
+    assert_eq!(old_generation.generation, index.generation);
+    let calls = std::cell::Cell::new(0);
+    let native_hits = old_generation
+        .search(&query, &scope(), 8, || {
+            calls.set(calls.get() + 1);
+            Ok(())
+        })
+        .await
+        .unwrap();
+    assert_eq!(native_hits, hits(294, &[]));
+    assert_eq!(
+        calls.get(),
+        1,
+        "ample budget should dispatch the ordinary scan"
+    );
+    drop(old_generation);
+    drop(high);
+    let old_query = async {
+        vector::segments::search(&previous, &query, &filter, 8, &|| Ok(()))
+            .await
+            .unwrap()
+            .unwrap()
+    };
+    let change = async {
+        // Remove a winner from each of the indexed and unindexed inputs.
+        table.delete("id IN ('r286','r292')").await.unwrap();
+        table.add(records(294, 300)).execute().await.unwrap();
+        table
+            .optimize(OptimizeAction::Compact {
+                options: CompactionOptions {
+                    target_rows_per_fragment: 128,
+                    ..Default::default()
+                },
+                remap_options: None,
+            })
+            .await
+            .unwrap();
+    };
+    let (old, ()) = tokio::join!(old_query, change);
+    assert_eq!(old, hits(294, &[]));
+    assert!(table.version().await.unwrap() > previous_version);
+    assert_eq!(
+        vector::segments::search(&previous, &query, &filter, 8, &|| Ok(()))
+            .await
+            .unwrap()
+            .unwrap(),
+        old
+    );
+    assert_eq!(
+        index.search(&query, &scope(), 8, || Ok(())).await.unwrap(),
+        hits(300, &[286, 292])
+    );
+    table
+        .optimize(OptimizeAction::Index(OptimizeOptions::append()))
+        .await
+        .unwrap();
+    assert_eq!(
+        index.search(&query, &scope(), 8, || Ok(())).await.unwrap(),
+        hits(300, &[286, 292])
+    );
+    // An unrelated scalar index whose segments name different columns cannot be
+    // described. The scoped vector scan itself can still use its healthy indices.
+    use lance::{Dataset, dataset::transaction::Operation, index::DatasetIndexExt};
+    for column in ["id", "key"] {
+        table
+            .create_index(&[column], NativeIndex::BTree(BTreeIndexBuilder::default()))
+            .execute()
+            .await
+            .unwrap();
+    }
+    let native = table.dataset().unwrap();
+    let current = native.get().await.unwrap();
+    let metadata = current.load_indices().await.unwrap();
+    let id = metadata.iter().find(|i| i.name == "id_idx").unwrap();
+    let key = metadata.iter().find(|i| i.name == "key_idx").unwrap();
+    let mut mixed = key.clone();
+    mixed.name.clone_from(&id.name);
+    let legacy = Dataset::commit(
+        current.uri(),
+        Operation::CreateIndex {
+            new_indices: vec![id.clone(), mixed],
+            removed_indices: vec![id.clone(), key.clone()],
+        },
+        Some(current.version().version),
+        None,
+        None,
+        current.session(),
+        false,
+    )
+    .await
+    .unwrap();
+    assert!(
+        legacy
+            .describe_indices(None)
+            .await
+            .err()
+            .unwrap()
+            .to_string()
+            .contains("Index fields")
+    );
+    native.update(legacy);
+    assert_eq!(
+        index.search(&query, &scope(), 8, || Ok(())).await.unwrap(),
+        hits(300, &[286, 292])
+    );
+    assert_eq!(
+        index
+            .search(&[1.0, 0.0, 0.0], &scope(), 8, || Ok(()))
+            .await
+            .unwrap_err()
+            .code,
+        "INDEX_IO"
+    );
+    drop(index);
+    drop(owner);
+    storage.close().await.unwrap();
 }

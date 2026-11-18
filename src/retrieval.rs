@@ -253,6 +253,7 @@ pub struct Index {
     pending: bool,
     table: Table,
     schema: Arc<Schema>,
+    maintained_version: std::sync::atomic::AtomicU64,
     vector: tokio::sync::Mutex<Option<Arc<vector::VectorIndex>>>,
 }
 impl IndexOwner {
@@ -432,6 +433,7 @@ impl Index {
             pending,
             table,
             schema,
+            maintained_version: std::sync::atomic::AtomicU64::new(0),
             vector: tokio::sync::Mutex::new(None),
         })
     }
@@ -640,6 +642,63 @@ impl Index {
         Ok(())
     }
 
+    // Native searches include newly appended rows until the next maintenance window.
+    pub(crate) async fn maintain_tables(
+        &self,
+        vector: Option<&vector::VectorIndex>,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        let buffer_mib = (self.budget_mib / 64).clamp(1, 8) as usize;
+        use lancedb::table::OptimizeOptions;
+        // A vector partition split can reload every existing delta under the daemon's memory limit.
+        let lexical = (
+            &self.table,
+            &self.maintained_version,
+            OptimizeOptions::default(),
+        );
+        let vector = vector.map(|v| (&v.table, &v.maintained_version, OptimizeOptions::append()));
+        for (table, maintained, options) in std::iter::once(lexical).chain(vector) {
+            authorize()?;
+            if maintained.load(std::sync::atomic::Ordering::Relaxed)
+                == table.version().await.map_err(index_error)?
+            {
+                continue;
+            }
+            table
+                .optimize(lancedb::table::OptimizeAction::Compact {
+                    options: lancedb::table::CompactionOptions {
+                        target_rows_per_fragment: 512,
+                        max_rows_per_group: 128,
+                        max_bytes_per_file: Some(
+                            (self.budget_mib as usize / 16).clamp(1, 32) * 1024 * 1024,
+                        ),
+                        num_threads: Some(1),
+                        batch_size: Some(buffer_mib * 2),
+                        io_buffer_size: Some((buffer_mib * 1024 * 1024) as u64),
+                        max_source_fragments: Some(64),
+                        max_source_rows: Some(1024),
+                        // Cover valid wide rows without increasing the scan buffer.
+                        max_source_bytes: Some(256 * 1024 * 1024),
+                        ..Default::default()
+                    },
+                    remap_options: None,
+                })
+                .await
+                .map_err(index_error)?;
+            authorize()?;
+            table
+                .optimize(lancedb::table::OptimizeAction::Index(options))
+                .await
+                .map_err(index_error)?;
+            // The daemon serializes native writers; metadata-only outbox work needs no repeat scan.
+            maintained.store(
+                table.version().await.map_err(index_error)?,
+                std::sync::atomic::Ordering::Relaxed,
+            );
+        }
+        Ok(())
+    }
+
     // The daemon holds the cache lock and proves no query owns this index before pruning.
     pub(crate) async fn prune_versions(
         &self,
@@ -673,8 +732,13 @@ impl Index {
             .is_none_or(|v| v.generation != progress.generation)
         {
             *vector = Some(Arc::new(
-                vector::VectorIndex::open(&self.owner.connection, &progress, &self.generation)
-                    .await?,
+                vector::VectorIndex::open(
+                    &self.owner.connection,
+                    &progress,
+                    &self.generation,
+                    self.owner.budget_mib,
+                )
+                .await?,
             ));
         }
         Ok(vector.as_ref().unwrap().clone())
@@ -844,10 +908,6 @@ impl Index {
                     .await
                     .map_err(index_error)?;
             }
-            self.table
-                .optimize(lancedb::table::OptimizeAction::Index(Default::default()))
-                .await
-                .map_err(index_error)?;
         }
         progress.indexed_rows = self.table.count_rows(None).await.map_err(index_error)?;
         #[cfg(test)]

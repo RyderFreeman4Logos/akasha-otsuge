@@ -132,8 +132,12 @@ fn scope_changes_pin_the_old_selection_until_activation_and_restore_all_claims()
     assert_eq!(alpha["vector"]["indexed_rows"], 2);
     assert_ne!(alpha["vector"]["generation"], all["vector"]["generation"]);
 
-    daemon.configure(&settings(&endpoint.address, Some(&["beta"])));
+    daemon.configure(&format!(
+        "[runtime]\nmemory_budget_mib=2048\n{}",
+        settings(&endpoint.address, Some(&["beta"]))
+    ));
     daemon.cli(&["config", "reload"]);
+    super::super::wait_for_storage_budget(&daemon, 2048);
     let during = search(&daemon, "alpha", "old-selected");
     assert_eq!(during["mode"], "hybrid", "{during}");
     assert_eq!(
@@ -179,6 +183,7 @@ fn scope_changes_pin_the_old_selection_until_activation_and_restore_all_claims()
 
     daemon.configure(&settings(&endpoint.address, None));
     daemon.cli(&["config", "reload"]);
+    super::super::wait_for_storage_budget(&daemon, 512);
     let restored = build(&daemon, "all-again");
     assert_eq!(
         restored["vector"]["generation"],
@@ -196,6 +201,73 @@ fn scope_changes_pin_the_old_selection_until_activation_and_restore_all_claims()
     );
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
+}
+
+#[test]
+fn interrupted_hybrid_searches_publish_no_recall_receipt() {
+    use sha2::{Digest, Sha256};
+
+    let endpoint = super::super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    seed(&daemon);
+    let config = settings(&endpoint.address, None);
+    daemon.configure(&config);
+    daemon.start();
+    build(&daemon, "ready");
+    let file = daemon.root.join("scope.json");
+    std::fs::write(&file, serde_json::to_vec(&scope("alpha")).unwrap()).unwrap();
+
+    for (id, code) in [
+        ("cancel-search", "CANCELLED"),
+        ("expire-search", "WORKFLOW_TIMEOUT"),
+    ] {
+        if code == "WORKFLOW_TIMEOUT" {
+            daemon.configure(&format!(
+                "{config}\n[timeouts]\nrunner='1ms'\nstartup='1ms'\ncleanup='1ms'\ntools='1ms'\nsummary='1ms'\nworkflow='1s'\n"
+            ));
+            daemon.cli(&["config", "reload"]);
+        }
+        endpoint.pause();
+        let before = endpoint.requests.lock().unwrap().len();
+        daemon.cli(&[
+            "search",
+            "offline",
+            "--scope",
+            file.to_str().unwrap(),
+            "--idempotency-key",
+            id,
+        ]);
+        if code == "CANCELLED" {
+            let until = Instant::now() + Duration::from_secs(10);
+            while endpoint.requests.lock().unwrap().len() == before {
+                assert!(
+                    Instant::now() < until,
+                    "hybrid search did not start embedding"
+                );
+                std::thread::sleep(Duration::from_millis(10));
+            }
+            daemon.cli(&["job", "cancel", id]);
+        }
+        let job = finished(&daemon, id);
+        endpoint.resume();
+        assert_eq!(job["error"], code, "{job}");
+        assert!(job["result"]["receipt_id"].is_null());
+        let key: String = Sha256::digest(id.as_bytes())
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect();
+        let receipt = format!("search/{key}");
+        let missing = daemon
+            .command()
+            .args(["receipt", "show", &receipt])
+            .output()
+            .unwrap();
+        assert!(!missing.status.success());
+        assert_eq!(
+            serde_json::from_slice::<Value>(&missing.stderr).unwrap()["error"]["code"],
+            "RECEIPT_NOT_FOUND"
+        );
+    }
 }
 
 #[test]

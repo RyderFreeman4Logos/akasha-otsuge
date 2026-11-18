@@ -24,8 +24,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on fix/mvp-024-claim-tail, based on
-merged preparation commit `bf15768`. No additional corpus or Rust target is copied.
+The existing SSD worktree is reused on fix/mvp-024-windowed-maintenance, based
+on PR #75 merge `a177d6e`. No additional corpus or Rust target is copied.
 PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
@@ -133,15 +133,42 @@ retains complete reports, logs and readbacks, including every earlier failure.
 - [x] Publish the preparation leaf with exact local gate, independent review and
   hosted CI. PR #74 merged with the reviewed tree; source reproduction and memory
   passed while the 13-record production admission failure remains preserved.
-- [ ] Resolve the 13 empty-claim splits found by the complete production record
+- [x] Resolve the 13 empty-claim splits found by the complete production record
   census. Exact diagnosis found one whitespace byte at each tail. The source
   repair passes unchanged RED/GREEN and all five seeder tests while preserving
   bytes, UTF-8 spans and irreducible rejection. All 13 real bodies passed
   byte-identical replay and all 39 daemon current reads. The
   [claim-tail archive](../benchmarks/results/mvp024-claim-tail/README.md) preserves
   the cleanup/environment failures and their completed reconciliation.
-  Canonical gate, independent review and publication remain pending. The
-  original full admission run remains failed.
+  PR #75 merged with the reviewed tree. Its canonical gate passed 652 Rust
+  executions, 35 Python tests and seven Node tests. Independent review reported
+  zero findings; hosted CI44016475601 passed. The final publication archive
+  retains the complete receipts. The original full admission run remains failed.
+- [x] Import a bounded prefix of 65,536 real sources and check all current claims,
+  original reads and 16 input-unit digests. This does not establish full coverage.
+- [x] Collect both incomplete prefix-index attempts. R1 failed its disappearing-file
+  observer. R2 ended through deliberate native cancellation after measured reclaim
+  and read amplification. All owned processes exited and the socket was removed.
+  The retained 2,354,728,960-byte store has a complete 14,079-file digest inventory.
+- [ ] Publish bounded windowed native maintenance after canonical gate and independent
+  review. The first candidate passed its canonical gate, but independent R1 found
+  maintenance could select the old query generation. A deterministic native RED
+  reproduced 48 writer rows left unindexed. The explicit writer-object correction
+  passes eleven retrieval tests with one intentional ignore. Its own canonical
+  gate and full-range review remain pending. The
+  [evidence archive](../benchmarks/results/mvp024-windowed-maintenance/README.md)
+  preserves the stopped baseline, diagnostics, rejected review and correction.
+- [x] Measure the R3 prefix rebuild, index-period memory and I/O, eight keyword
+  witnesses, read-only ANN recall and eight hybrid witnesses after reopening.
+  The [R3 report and replay](../benchmarks/results/mvp024-windowed-maintenance/README.md#r3-real-prefix-index-and-search-recovery)
+  retain the first warm hybrid timeout and the original job's recovered failure.
+- [x] Admit a separate importer source epoch and grow from 16 to 32 verified
+  units and 131,072 authority records. The derived search inventory stayed unchanged.
+- [ ] Verify the incremental index over the additional 65,536 records and
+  establish the cause and recovery behavior of the first warm hybrid stall.
+- [ ] Integrate the bounded capture reader and finish the real 100-client controller.
+  Focused native client, capture, current, scoped-history and correction fixtures
+  passed. These small fixtures do not establish the required workload duration.
 - [ ] Stream the full eligible cohort and unchanged lexical source data through
   bounded preparation and production import; verify actual counts and byte
   coverage before full load/recovery admission. The source census is not import.
@@ -1240,6 +1267,18 @@ Implement against the merged notifier candidate. Keep successor #65 open until t
 production acceptance below passes; #3 spike receipts remain historical evidence.
 Use the existing 42 SSD parquet shards and deterministic streaming preparation.
 Measure a small import before admitting full storage; retain no second raw JSONL.
+
+- [x] Verify all seven source-transition import cases with the retained seeder,
+  including changed inputs, bounded growth, complete replay and partial acknowledgment.
+- [ ] Qualify vector maintenance at the real partition split threshold. The
+  retained prefix timed out at 62,970 vectors. Verify full coverage and scoped
+  queries within the low memory profile before admitting the next input prefix.
+- [x] Exercise the workload client against a native daemon on a small fixture.
+  In 55 seconds, 100 clients finished 908 requests with 11 expected conflicts.
+  The offline export matched all 660 originals (2,703,360 bytes).
+- [ ] Publish provider batching after its 31 focused retrieval checks, integrate
+  the workload runner and measure the required 1,800-second real-corpus intervals.
+
 
 The first independent leaf adds backward-compatible target/peak/total configuration
 and on-demand process-tree RSS/PSS reporting, including guarded external children.

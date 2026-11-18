@@ -171,6 +171,13 @@ returned Memory text remains intact. Long embedding claims are split into bounde
 4096-byte UTF-8 chunks and mean pooled, with finite/nonzero dimension validation.
 This preprocessing identity is part of the vector generation.
 
+Vector indexing groups chunks from the same scope into requests of at most
+eight inputs. The model dimension and serialized request size can lower that
+limit. Before sending each request, the daemon checks that the selected
+revisions are still active. If a concurrent edit changes one, the daemon reads
+the unpublished window again. This can repeat an earlier embedding call.
+The completion ledger follows the original transaction order.
+
 Jobs retain the original workflow clock across all stages. Explicit workflow
 limits are honored. Automatic envelopes include configured queue/provider limits,
 the pinned query model, the sync transaction/change/chunk maximum or worst-case

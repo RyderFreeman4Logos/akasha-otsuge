@@ -53,3 +53,15 @@ FineWeb source attribution/license metadata and original rejection identities.
 `manifest.json` records all source snapshots, tests, build, acknowledgements,
 readback/oracle hashes, original failures and cleanup receipts. Neither archive
 contains a native database or an additional full corpus copy.
+
+## Final publication
+
+[PR #75](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/75) merged as
+`a177d6e23568b627ec9eef593d88289bc8634041`, with the reviewed `73a0911` tree.
+The exact canonical gate passed 652 Rust executions, 35 Python tests and seven
+Node tests. Independent review reported zero findings. Hosted CI44016475601 passed.
+
+`final-publication.zip` contains 235 members and 839,936 bytes, SHA-256
+`cc5d898942aaf3541c05cd871f61830d3ba5f30971a74b57d7574c7f259c55de`.
+Its manifest records each member hash. The archive retains full gate, review,
+CI and publication receipts. Full production import and indexing remain separate.
