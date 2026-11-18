@@ -87,6 +87,15 @@ the watermark for each named lexical, configured vector and active vector
 generation. Sampler calls have their own request IDs and throughput excludes
 them. A missing queue or generation measurement leaves a coverage gap.
 
+The initial status check must confirm the daemon and its resource limits.
+During the interval, a status reply of `RESOURCE_BUSY` records the sample
+number, error code and monotonic time in `metrics.jsonl`. Scheduled offers,
+the queue query, procfs readings and fresh cgroup OOM counters continue.
+That sample has a null daemon-group measurement and status sequence. Its
+queue observation contributes to the high-water counts when available.
+Resource coverage and the paired status/index coverage fail for the missing
+sample. RSS statistics use only measured daemon groups.
+
 Once the daemon and all other store users have exited, verify the durable
 raw and normalized bytes for the interval's acknowledged originals:
 

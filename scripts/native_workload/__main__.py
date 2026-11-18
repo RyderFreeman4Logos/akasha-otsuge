@@ -123,13 +123,18 @@ def backlog_sample(index):
     return result
 
 
-def has_backlog_sample(row):
+def has_backlog_sample(row, *, require_status=True):
     try:
         info = row["backlog"]
         seq = info["storage_seq"]
         return (
-            type(row.get("status_storage_seq")) is int
-            and 0 <= row["status_storage_seq"] <= seq
+            (
+                not require_status
+                or (
+                    type(row.get("status_storage_seq")) is int
+                    and 0 <= row["status_storage_seq"] <= seq
+                )
+            )
             and (info["queued"] == 0) == (info["queued_json_bytes"] == 0)
             and all(
                 type(info[k]) is int and info[k] >= 0
@@ -194,12 +199,17 @@ def assess(report, samples, seconds, target, peak, interval):
         if 0 <= r["number"] < seconds
         and start + r["number"] <= r["observed_monotonic_s"] < start + r["number"] + 1
     }
-    if len(ticks) != seconds or any("error" in r for r in samples):
+    measured = [r for r in valid if "status_error" not in r]
+    complete_status = len(ticks) == seconds and len(measured) == len(valid)
+    if not complete_status or any("error" in r for r in samples):
         gaps.append("resource sample coverage")
-    observed = [row["backlog"] for row in valid if has_backlog_sample(row)]
-    if len(ticks) != seconds or len(observed) != len(valid):
+    # Retain independent queue observations even when the sequence comparison is unavailable.
+    observed = [
+        r["backlog"] for r in valid if has_backlog_sample(r, require_status="status_error" not in r)
+    ]
+    if not complete_status or len(observed) != len(valid):
         gaps.append("queue and index sample coverage")
-    rss = sorted(daemon_rss(r["resources"]) for r in valid)
+    rss = sorted(daemon_rss(r["resources"]) for r in measured)
     if not rss or rss[math.ceil(0.99 * len(rss)) - 1] > target * 1024**2:
         gaps.append("RSS p99")
     if not rss or max(rss) > peak * 1024**2:
@@ -209,7 +219,8 @@ def assess(report, samples, seconds, target, peak, interval):
     return dict(
         gaps=gaps,
         interval_thresholds_pass=not gaps,
-        resource_samples=len(valid),
+        kernel_samples=len(valid),
+        resource_samples=len(measured),
         backlog_samples=len(observed),
         queue_high_water={
             k: max((r[k] for r in observed), default=None)
@@ -305,10 +316,18 @@ async def run(plan_path, config_path, root):
         finally:
             done.set()
 
-    async def sample(number):
-        status = await ops.request(dict(op="status"), f"{plan['run_id']}/metrics/{number}")
-        if status["pid"] != plan["daemon"]["pid"]:
-            raise RuntimeError("status daemon identity changed")
+    async def sample(number, group_path=None):
+        status_error = None
+        try:
+            status = await ops.request(dict(op="status"), f"{plan['run_id']}/metrics/{number}")
+        except OperationError as error:
+            if group_path is None or error.code != "RESOURCE_BUSY":
+                raise
+            status = None
+            status_error = {"code": error.code, "observed_monotonic_s": time.monotonic()}
+        else:
+            if status["pid"] != plan["daemon"]["pid"]:
+                raise RuntimeError("status daemon identity changed")
         # The authenticated index observer reads only the bounded active-job index.
         try:
             index = await ops.request(
@@ -320,9 +339,11 @@ async def run(plan_path, config_path, root):
         except (ValueError, TypeError, KeyError, OperationError, TransportError) as error:
             backlog = None
             backlog_error = str(error)[:500]
-        group_rss = daemon_rss(status["resources"])
-        native = status["resources"]["cgroup"]
-        group = native["daemon_group"]
+        if status is not None:
+            native = status["resources"]["cgroup"]
+            group = native["daemon_group"]
+            group_path = pathlib.Path(group["path"])
+            group_rss = daemon_rss(status["resources"])
         daemon, lookup = await asyncio.gather(
             asyncio.to_thread(process_sample, plan["daemon"]),
             asyncio.to_thread(process_sample, plan["lookup"]),
@@ -330,8 +351,7 @@ async def run(plan_path, config_path, root):
         events = {
             key: int(value)
             for key, value in (
-                line.split()
-                for line in (pathlib.Path(group["path"]) / "memory.events").read_text().splitlines()
+                line.split() for line in (group_path / "memory.events").read_text().splitlines()
             )
         }
         row = dict(
@@ -342,32 +362,42 @@ async def run(plan_path, config_path, root):
             utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             daemon=daemon,
             lookup=lookup,
-            resources=status["resources"],
-            status_storage_seq=status["storage_seq"],
+            resources=status["resources"] if status is not None else None,
+            status_storage_seq=status["storage_seq"] if status is not None else None,
             backlog=backlog,
             backlog_error=backlog_error,
             events=events,
             client_peak_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
             filesystem_free_bytes=shutil.disk_usage(root).free,
         )
+        if status_error is not None:
+            row["status_error"] = status_error
         await metrics.append(row)
-        if not native["enforced"] or not native["complete"]:
-            raise RuntimeError("missing owned kernel limits")
-        if (group["high_bytes"], group["max_bytes"], native["service_total"]["max_bytes"]) != (
-            target * 1024**2,
-            peak * 1024**2,
-            2048 * 1024**2,
-        ):
-            raise RuntimeError("native resource profile changed")
-        if events.get("oom_kill", 0) or max(daemon["VmHWM"], group_rss) > peak * 1024**2:
+        if status is not None:
+            if not native["enforced"] or not native["complete"]:
+                raise RuntimeError("missing owned kernel limits")
+            if (
+                group["high_bytes"],
+                group["max_bytes"],
+                native["service_total"]["max_bytes"],
+            ) != (
+                target * 1024**2,
+                peak * 1024**2,
+                2048 * 1024**2,
+            ):
+                raise RuntimeError("native resource profile changed")
+            if group_rss > peak * 1024**2:
+                raise RuntimeError("native peak or OOM")
+        if events.get("oom_kill", 0) or daemon["VmHWM"] > peak * 1024**2:
             raise RuntimeError("native peak or OOM")
         if row["client_peak_bytes"] > 512 * 1024**2 or lookup["VmHWM"] > 512 * 1024**2:
             raise RuntimeError("external helper ceiling")
         if row["filesystem_free_bytes"] < 30 * 1024**3:
             raise RuntimeError("free reserve crossed")
+        return group_path
 
     try:
-        await sample(-1)
+        group_path = await sample(-1)
         async with asyncio.TaskGroup() as running:
             running.create_task(interval())
             await ready.wait()
@@ -380,7 +410,7 @@ async def run(plan_path, config_path, root):
                     pass
                 if done.is_set():
                     break
-                await sample(number)
+                group_path = await sample(number, group_path)
                 elapsed = time.monotonic() - started
                 completed = counts["outcome"] + counts["not_dispatched"]
                 publish(
