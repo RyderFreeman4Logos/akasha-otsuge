@@ -412,9 +412,27 @@ fn budget_reload_drains_running_work_then_reopens_without_resetting_jobs() {
     submit_text(&daemon, "before-reopen");
     await_request(&endpoint);
     let running = daemon.cli(&["job", "show", "before-reopen"])["data"].clone();
-    let queued = submit_text(&daemon, "queued-before-reopen");
+    let queued_id = r#"queue"draft\retry"#;
+    let queued = submit_text(&daemon, queued_id);
     assert_eq!(running["state"], "running");
     assert_eq!(queued["state"], "queued");
+    let status =
+        super::notifier_tests::rpc(&daemon, json!({"op":"index_status","include_queue":true}));
+    assert_eq!(status["data"]["queue"]["queued"], 1, "{status}");
+    assert_eq!(status["data"]["queue"]["running"], 1);
+    assert_eq!(
+        status["data"]["queue"]["queued_json_bytes"],
+        serde_json::to_vec(&queued).unwrap().len()
+    );
+    assert!(
+        status["data"]["queue"]["storage_seq"].as_u64().unwrap()
+            >= status["data"]["lexical_watermark"].as_u64().unwrap()
+    );
+    assert!(
+        daemon.cli(&["index", "status"])["data"]
+            .get("queue")
+            .is_none()
+    );
     daemon.configure(&settings(512).replace("timeout='30s'", "timeout='2s'"));
     let reload = daemon.cli(&["config", "reload"])["data"].clone();
     assert_eq!(reload["status"], "applied");
@@ -446,14 +464,11 @@ fn budget_reload_drains_running_work_then_reopens_without_resetting_jobs() {
             .contains("original idempotency key")
     );
     assert_eq!(endpoint.requests.lock().unwrap().len(), 1);
-    assert_eq!(
-        daemon.cli(&["job", "show", "queued-before-reopen"])["data"],
-        queued
-    );
+    assert_eq!(daemon.cli(&["job", "show", queued_id])["data"], queued);
     endpoint.resume();
     wait_for_storage_budget(&daemon, 512);
     let first = terminal(&daemon, "before-reopen");
-    let second = terminal(&daemon, "queued-before-reopen");
+    let second = terminal(&daemon, queued_id);
     assert_eq!(first["state"], "succeeded");
     assert_eq!(second["state"], "succeeded");
     for field in [

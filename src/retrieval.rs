@@ -784,7 +784,6 @@ impl Index {
     ) -> Result<serde_json::Value> {
         let published = Self::status(storage, config)?;
         let mut value = serde_json::to_value(&published)?;
-        value["active_vector"] = serde_json::to_value(active_vector(storage)?)?;
         if let Some(mut pending) = pending_rebuild(storage)? {
             pending.vector = vector::status(storage, config, &pending.generation)?;
             value["rebuild"] = serde_json::to_value(&pending)?;
