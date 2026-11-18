@@ -32,6 +32,44 @@ class ReceiptTests(unittest.TestCase):
         flags = [part for name in names for part in ("--" + name, str(self.root))]
         return ["reference_direct", *flags, "--output", str(self.output)]
 
+    def test_withdrawal_requires_matching_native_rejection_and_frozen_original(self):
+        task = next(t for t in driver.read_reference()[1] if t["id"] == "C03")
+        case = driver.reference_episode.input_only(task)
+        root = driver.ROOT / "docs/benchmarks/results/mvp027"
+        archive = json.loads(
+            gzip.decompress((root / "offline-transitions-r1.json.gz").read_bytes())
+        )
+        native = next(row["native"] for row in archive["rows"] if row["id"] == "C03")
+        observed = driver.reference_episode.withdrawn_revisions
+        self.assertEqual(observed(case, native), {("C03-memory", 1): "C03-withdrawal"})
+        for changed in (
+            {"action": "approve"},
+            {"original_sha256": "wrong"},
+            {"previous_commit": 0},
+        ):
+            transition = dict(native["transitions"][0], **changed)
+            self.assertEqual(
+                observed(case, {**native, "transitions": [transition]}), {}
+            )
+        pair = json.loads(
+            gzip.decompress(
+                (root / "registered-withdrawal-preflights-r1.json.gz").read_bytes()
+            )
+        )
+        for item in pair["runs"]:
+            r = item["receipt"]
+            self.assertFalse(r["model_turn_submitted"] or r["model_turn_accepted"])
+            if r["task_id"] != "C03":
+                self.assertEqual(r["status"], "REGISTERED_INPUT_UNAVAILABLE")
+                continue
+            self.assertEqual(r["native_import"]["active_revisions"], 0)
+            self.assertEqual(r["native_import"]["withdrawn_revisions"], 1)
+            if r["strategy"] == "direct":
+                self.assertEqual(r["control_read"]["items"], [])
+            else:
+                self.assertEqual(r["preparation"]["ready_search"]["status"], "no_hit")
+                self.assertEqual(r["invocation"]["historical_ordinals"], [1, 2])
+
     def test_unavailable_registered_episode_writes_receipt_before_account_access(self):
         with (
             patch.object(sys, "argv", [*self.args(), "--task", "V02"]),
