@@ -356,6 +356,58 @@ fn import_runtime_boundary_rejects_invalid_metadata() {
     });
 }
 
+fn assert_only_current_sequence(store: &Storage, expected: u64) {
+    use surrealkv::LSMIterator;
+    let tx = store.tree.begin().unwrap();
+    let mut versions = tx.history(SEQUENCE, b"meta/commit_seq\0").unwrap();
+    assert!(versions.seek_first().unwrap());
+    assert_eq!(versions.value().unwrap(), expected.to_be_bytes());
+    assert!(
+        !versions.next().unwrap(),
+        "obsolete counter version retained"
+    );
+}
+
+#[test]
+fn commit_replaces_legacy_counter_history_and_preserves_active_readers() {
+    let root = std::env::temp_dir().join(format!("akasha-legacy-counter-{}", std::process::id()));
+    std::fs::create_dir(&root).unwrap();
+    let _fixture = OwnedFixture(root.clone());
+    runtime().block_on(async {
+        let config = config(&root);
+        let store = Storage::open(&config).await.unwrap();
+        let original = request("legacy");
+        let first = store.commit(&original).await.unwrap();
+        let mut legacy = store.tree.begin().unwrap();
+        legacy
+            .set(SEQUENCE, &first.commit_seq.to_be_bytes())
+            .unwrap();
+        legacy.commit().await.unwrap();
+        drop(legacy);
+        store.close().await.unwrap();
+        let store = Storage::open(&config).await.unwrap();
+        let snapshot = store.tree.begin().unwrap();
+        let mut update = request("update");
+        let memory = original.changes[1].key.clone();
+        update.changes = vec![Change {
+            key: memory.clone(),
+            expected_revision: Some(1),
+            content: "revised".into(),
+        }];
+        assert_eq!(store.commit(&update).await.unwrap().commit_seq, 2);
+        assert_eq!(sequence(snapshot.get(SEQUENCE).unwrap()).unwrap(), 1);
+        drop(snapshot);
+        assert_only_current_sequence(&store, 2);
+        assert_eq!(
+            store.at(&memory, 1).unwrap().unwrap().content,
+            original.changes[1].content
+        );
+        assert_eq!(store.at(&memory, 2).unwrap().unwrap().content, "revised");
+        assert_eq!(store.commit(&original).await.unwrap(), first);
+        store.close().await.unwrap();
+    });
+}
+
 #[test]
 fn killed_archive_import_resumes_staging_heads_and_publication_without_duplicates() {
     for phase in [
@@ -422,6 +474,7 @@ fn killed_archive_import_resumes_staging_heads_and_publication_without_duplicate
                     .unwrap();
                 let restored = Storage::open(&target).await.unwrap();
                 assert_eq!(restored.sequence().unwrap(), 3);
+                assert_only_current_sequence(&restored, 3);
                 for (seq, view) in views.iter().enumerate() {
                     assert_eq!(&restored.at(&memory, seq as u64).unwrap(), view);
                 }

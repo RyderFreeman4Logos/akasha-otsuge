@@ -565,7 +565,7 @@ impl Storage {
                 }
                 tx.set_at(reference.key.head().as_bytes(), &seq.to_be_bytes(), seq + 1)?;
             }
-            tx.set(super::SEQUENCE, &seq.to_be_bytes())?;
+            tx.replace(super::SEQUENCE, &seq.to_be_bytes())?;
             tx.commit().await?;
             #[cfg(test)]
             super::crash_tests::checkpoint("import-head");

@@ -485,7 +485,8 @@ impl Storage {
                 revisions: receipt.revisions.clone(),
             })?,
         )?;
-        tx.set(SEQUENCE, seq.to_be_bytes().as_slice())?;
+        // Only live snapshots need older counter values. Historical reads use timestamped record heads.
+        tx.replace(SEQUENCE, seq.to_be_bytes().as_slice())?;
         let recorded_at_ms = u64::try_from(
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
