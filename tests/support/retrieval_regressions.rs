@@ -199,24 +199,76 @@ fn large_memory(ancestor: bool, rule: bool) {
 
 #[test]
 fn invalid_vector_zero_retains_diagnostic() {
-    invalid_vector("invalid-zero");
+    invalid_vector("invalid-zero", false);
 }
 
 #[test]
 fn invalid_vector_overflow_retains_diagnostic() {
-    invalid_vector("invalid-overflow");
+    invalid_vector("invalid-overflow", false);
 }
 
 #[test]
 fn invalid_vector_cancelled_mean_retains_diagnostic() {
-    invalid_vector("invalid-mean");
+    invalid_vector("invalid-mean", false);
 }
 
-fn invalid_vector(model: &str) {
+#[test]
+fn invalid_vector_batch_retains_diagnostic_without_publishing_earlier_rows() {
+    invalid_vector("invalid-mean", true);
+}
+
+#[test]
+fn invalid_vector_stops_before_a_later_scope_can_mask_the_error() {
     let endpoint = super::super::model_tests::Endpoint::retrieval();
     let mut daemon = Daemon::new();
     let claim = format!("{}y", "x".repeat(4096));
-    seed_records(&daemon, &[("invalid", Some("alpha"), &claim)], 1);
+    seed_records(
+        &daemon,
+        &[
+            ("invalid", Some("alpha"), &claim),
+            ("unrelated", Some("beta"), "rate-limited"),
+        ],
+        1,
+    );
+    daemon.configure(&format!("[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel='invalid-mean'\ndimension=2\nlocal=true\ntimeout='2s'",endpoint.address));
+    daemon.start();
+    daemon.cli(&["index", "sync", "--idempotency-key", "invalid-build"]);
+    let job = finished(&daemon, "invalid-build");
+    let status = daemon.cli(&["index", "status"])["data"]["vector"].clone();
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    assert_eq!(job["error"], "PROVIDER_OUTPUT_INVALID", "{job}");
+    assert_eq!(status["last_call"]["error"], "PROVIDER_OUTPUT_INVALID");
+    assert_eq!(status["watermark"], 0);
+    assert_eq!(status["indexed_rows"], 0);
+    let requests = endpoint.requests.lock().unwrap();
+    assert_eq!(requests.len(), 1);
+    assert_eq!(requests[0].1["input"], json!([&claim[..4096], "y"]));
+}
+
+fn invalid_vector(model: &str, batch: bool) {
+    let endpoint = super::super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    let claim = format!("{}y", "x".repeat(4096));
+    let names = (0..if batch { 8 } else { 1 })
+        .map(|i| format!("invalid-{i}"))
+        .collect::<Vec<_>>();
+    let records = names
+        .iter()
+        .enumerate()
+        .map(|(i, id)| {
+            (
+                id.as_str(),
+                Some("alpha"),
+                if i + 1 == names.len() {
+                    claim.as_str()
+                } else {
+                    "x"
+                },
+            )
+        })
+        .collect::<Vec<_>>();
+    seed_records(&daemon, &records, 1);
     daemon.configure(&format!("[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel={model:?}\ndimension=2\nlocal=true\ntimeout='2s'",endpoint.address));
     daemon.start();
     daemon.cli(&["index", "sync", "--idempotency-key", "invalid-build"]);
@@ -232,6 +284,7 @@ fn invalid_vector(model: &str) {
     daemon.wait();
     assert_eq!(reopened, status);
     assert_eq!(status["watermark"], 0);
+    assert_eq!(status["indexed_rows"], 0);
     assert_eq!(
         status["last_call"]["error"], "PROVIDER_OUTPUT_INVALID",
         "{status}"
@@ -254,6 +307,8 @@ fn sync_stops_after_a_live_grant_shrinks() {
         &[
             ("first", Some("alpha"), "offline first"),
             ("forbidden", Some("beta"), "private forbidden"),
+            ("allowed-again", Some("alpha"), "offline allowed again"),
+            ("forbidden-again", Some("beta"), "private forbidden again"),
         ],
         1,
     );
@@ -271,6 +326,14 @@ fn sync_stops_after_a_live_grant_shrinks() {
     while endpoint.requests.lock().unwrap().is_empty() {
         assert!(Instant::now() < until, "first embedding never arrived");
         std::thread::sleep(Duration::from_millis(10));
+    }
+    {
+        let requests = endpoint.requests.lock().unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(
+            requests[0].1["input"],
+            serde_json::json!(["offline first", "offline allowed again"])
+        );
     }
     daemon.cli(&["access", "grant", scope_file.to_str().unwrap()]);
     // With one worker, this job cannot finish before the sync releases its slot.

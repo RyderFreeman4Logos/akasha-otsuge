@@ -179,7 +179,7 @@ impl Service {
                 };
                 self.index_epoch.fetch_add(1, Ordering::Release);
                 let _epoch = IndexBuild(&self.index_epoch);
-                let mut windows_since_prune = 0u8;
+                let mut windows_since_maintenance = 0u8;
                 loop {
                     {
                         let _guard = self.admission.lock().await;
@@ -198,11 +198,15 @@ impl Service {
                     let mut progress = index
                         .sync_batch(&self.storage, target, config.generation(), &authorize)
                         .await?;
-                    if config.resolved().config().retrieval.embedding.is_some() {
+                    // Queries can replace the cache while this writer awaits its own generation.
+                    let vector = if config.resolved().config().retrieval.embedding.is_some() {
+                        Some(index.vector_index(&self.storage, config.resolved()).await?)
+                    } else {
+                        None
+                    };
+                    if let Some(vector) = &vector {
                         progress.vector = Some(
-                            index
-                                .vector_index(&self.storage, config.resolved())
-                                .await?
+                            match vector
                                 .sync_batch(
                                     &self.storage,
                                     target,
@@ -212,7 +216,13 @@ impl Service {
                                     || self.model_cancelled(id),
                                     &authorize,
                                 )
-                                .await?,
+                                .await
+                            {
+                                Ok(progress) => progress,
+                                // A correction superseded a buffered revision. Reread this unpublished window.
+                                Err(e) if e.code == "INDEX_INPUT_CHANGED" => continue,
+                                Err(e) => return Err(e.into()),
+                            },
                         );
                     }
                     let complete = progress.lexical_watermark >= target
@@ -220,21 +230,24 @@ impl Service {
                             .vector
                             .as_ref()
                             .is_none_or(|v| v.watermark >= target);
-                    windows_since_prune = windows_since_prune.saturating_add(1);
-                    if (complete || windows_since_prune >= 32)
-                        && let Ok(owned) = self.search_index.try_lock()
-                        && owned.as_ref().is_some_and(|cached| {
-                            Arc::ptr_eq(cached, &index) && Arc::strong_count(cached) == 2
-                        })
-                    {
-                        // Keep new readers behind this lock until native cleanup has returned.
+                    windows_since_maintenance = windows_since_maintenance.saturating_add(1);
+                    if complete || windows_since_maintenance >= 32 {
+                        let authorize_native = || {
+                            authorize()?;
+                            self.authorize_index_work(id, workflow)
+                        };
                         index
-                            .prune_versions(&|| {
-                                authorize()?;
-                                self.authorize_index_work(id, workflow)
-                            })
+                            .maintain_tables(vector.as_deref(), &authorize_native)
                             .await?;
-                        windows_since_prune = 0;
+                        windows_since_maintenance = 0;
+                        if let Ok(owned) = self.search_index.try_lock()
+                            && owned.as_ref().is_some_and(|cached| {
+                                Arc::ptr_eq(cached, &index) && Arc::strong_count(cached) == 2
+                            })
+                        {
+                            // Keep new readers behind this lock until native cleanup has returned.
+                            index.prune_versions(&authorize_native).await?;
+                        }
                     }
                     if complete {
                         crate::retrieval::activate_vector(

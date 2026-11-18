@@ -114,15 +114,24 @@ impl Service {
                     {
                         return Err(Error("PROVIDER_OUTPUT_INVALID"));
                     }
-                    let semantic = index
-                        .vector_index(&self.storage, vector_config.resolved())
-                        .await?
-                        .search(
-                            &query_vector,
-                            &scope,
-                            config.resolved().config().retrieval.max_candidates,
-                        )
-                        .await?;
+                    let search = async {
+                        index
+                            .vector_index(&self.storage, vector_config.resolved())
+                            .await?
+                            .search(
+                                &query_vector,
+                                &scope,
+                                config.resolved().config().retrieval.max_candidates,
+                                || self.authorize_index_work(id, workflow),
+                            )
+                            .await
+                    };
+                    let semantic = tokio::select! {
+                        biased;
+                        code = self.model_cancelled(id) => return Err(Error(code)),
+                        _ = tokio::time::sleep(workflow.remaining()) => return Err(Error("WORKFLOW_TIMEOUT")),
+                        result = search => result?,
+                    };
                     for (rank, key) in semantic.into_iter().enumerate() {
                         *ranked.entry(key).or_default() += 1.0 / (60.0 + rank as f64);
                     }

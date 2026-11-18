@@ -91,6 +91,7 @@ dependencies = [
  "arrow-schema",
  "chrono",
  "futures",
+ "lance",
  "lance-index",
  "lance-io",
  "lancedb",

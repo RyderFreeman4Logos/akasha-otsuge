@@ -1,8 +1,9 @@
+pub(super) mod segments;
 use super::*;
 use crate::config::deadline::Deadline;
 use crate::provider::{Call, Client, Input};
 use arrow_array::{FixedSizeListArray, types::Float32Type};
-use lancedb::{DistanceType, index::vector::IvfFlatIndexBuilder, table::OptimizeAction};
+use lancedb::{DistanceType, index::vector::IvfFlatIndexBuilder};
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -75,11 +76,37 @@ pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<Vecto
 pub(crate) struct VectorIndex {
     pub generation: String,
     pub(super) table: Table,
+    group_search: bool,
     schema: Arc<Schema>,
+    pub(super) maintained_version: std::sync::atomic::AtomicU64,
+}
+
+struct EmbeddingRow {
+    key: String,
+    id: String,
+    revision: u64,
+    scope: String,
+    text: String,
+}
+
+impl EmbeddingRow {
+    fn check_revision(&self, domain: &Domain<'_>) -> Result<()> {
+        if domain
+            .active(&self.id)?
+            .is_some_and(|view| view.revision.commit_seq == self.revision)
+        {
+            return Ok(());
+        }
+        Err(error("INDEX_INPUT_CHANGED"))
+    }
 }
 
 impl VectorIndex {
-    pub async fn open(connection: &Connection, progress: &VectorStatus) -> Result<Self> {
+    pub async fn open(
+        connection: &Connection,
+        progress: &VectorStatus,
+        budget_mib: u32,
+    ) -> Result<Self> {
         let dimension =
             i32::try_from(progress.dimension).map_err(|_| error("INVALID_DIMENSION"))?;
         let schema = Arc::new(Schema::new(vec![
@@ -132,6 +159,9 @@ impl VectorIndex {
             generation: progress.generation.clone(),
             table,
             schema,
+            // Only the constrained (512 MiB) profile demonstrated a benefit from serial groups.
+            group_search: budget_mib <= 512,
+            maintained_version: std::sync::atomic::AtomicU64::new(0),
         })
     }
 
@@ -165,6 +195,7 @@ impl VectorIndex {
         let mut changed = false;
         let mut completions = Vec::new();
         let mut pending = NativeBatch::new(config.config().runtime.memory_budget_mib);
+        let mut embedding_rows = Vec::new();
         for seq in before + 1..=end {
             let entry = storage.outbox(seq)?.ok_or_else(|| error("OUTBOX_GAP"))?;
             let mut records = Vec::new();
@@ -191,120 +222,72 @@ impl VectorIndex {
                     outcome => outcome,
                 };
                 records.push(serde_json::json!({"key_hash":row_key,"revision":reference.commit_seq,"outcome":outcome}));
-                if outcome == "superseded" {
-                    continue;
-                }
-                if let Some(memory) = memory.filter(|_| required) {
-                    let embedded = async {
-                        let mut vector = vec![0f32; progress.dimension as usize];
-                        let text = &memory.record.draft.claim;
-                        let mut start = 0;
-                        let mut parts = 0;
-                        while start < text.len() {
-                            let mut end = (start + 4096).min(text.len());
-                            while !text.is_char_boundary(end) {
-                                end -= 1;
-                            }
-                            let outcome = client
-                                .call_guarded(
-                                    config,
-                                    &Call {
-                                        profile: config.config().retrieval.embedding.clone().unwrap(),
-                                        input: Input::Embedding {
-                                            texts: vec![text[start..end].into()],
-                                        },
-                                    },
-                                    workflow,
-                                    cancel(),
-                                    async {
-                                        storage
-                                            .serialized_read(authorize)
-                                            .await
-                                            .map_err(|e| crate::provider::Error(e.code))
-                                    },
-                                )
-                                .await;
-                            progress.last_call = Some(
-                                serde_json::json!({"profile":outcome.profile,"identity":outcome.identity,"error":outcome.error,"trace":outcome.trace}),
-                            );
-                            if let Some(code) = outcome.error {
-                                return Err(error(model_error(&code)));
-                            }
-                            let output = outcome
-                                .output
-                                .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
-                            let values = output["vectors"][0]
-                                .as_array()
-                                .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
-                            if values.len() != vector.len() {
-                                return Err(error("PROVIDER_OUTPUT_INVALID"));
-                            }
-                            for (sum, value) in vector.iter_mut().zip(values) {
-                                let value = value
-                                    .as_f64()
-                                    .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?
-                                    as f32;
-                                if !value.is_finite() {
-                                    return Err(error("PROVIDER_OUTPUT_INVALID"));
-                                }
-                                *sum += value;
-                            }
-                            parts += 1;
-                            start = end;
-                        }
-                        for value in &mut vector {
-                            *value /= parts as f32;
-                        }
-                        validate_vector(&vector, progress.dimension)?;
-                        Ok(vector)
-                    }.await;
-                    let vector = match embedded {
-                        Ok(vector) => vector,
-                        Err(error) => {
-                            progress.watermark = before;
-                            if let Some(call) = &mut progress.last_call
-                                && call["error"].is_null()
-                            {
-                                call["error"] = serde_json::json!(error.code);
-                            }
-                            publish_progress(
-                                storage,
-                                key(&progress.generation),
-                                snapshot.generation(),
-                                &progress,
-                                vec![],
-                                authorize,
-                            )
-                            .await?;
-                            return Err(error);
-                        }
-                    };
+                if let Some(memory) = memory.filter(|_| outcome == "indexed") {
                     let scope = hash(&serde_json::to_vec(&memory.record.draft.scope)?);
-                    let batch = RecordBatch::try_new(
-                        self.schema.clone(),
-                        vec![
-                            Arc::new(StringArray::from(vec![row_key.as_str()])),
-                            Arc::new(StringArray::from(vec![reference.key.id.as_str()])),
-                            Arc::new(UInt64Array::from(vec![memory.revision.commit_seq])),
-                            Arc::new(StringArray::from(vec![scope.as_str()])),
-                            Arc::new(
-                                FixedSizeListArray::from_iter_primitive::<Float32Type, _, _>(
-                                    [Some(vector.into_iter().map(Some))],
-                                    progress.dimension as i32,
-                                ),
-                            ),
-                        ],
-                    )
-                    .map_err(index_error)?;
-                    pending.push(&self.table, row_key, Some(batch)).await?;
+                    // Transactions can contain many Memory revisions. Bound lookahead independently.
+                    let buffered_bytes: usize = embedding_rows
+                        .iter()
+                        .map(|row: &EmbeddingRow| row.text.len())
+                        .sum();
+                    if embedding_rows.len() == 32
+                        || buffered_bytes + memory.record.draft.claim.len() > 128 * 1024
+                        || embedding_rows.iter().any(|row| row.key == row_key)
+                    {
+                        self.flush_embedding_rows(
+                            &mut embedding_rows,
+                            storage,
+                            snapshot,
+                            client,
+                            workflow,
+                            &cancel,
+                            authorize,
+                            &mut progress,
+                            &mut pending,
+                        )
+                        .await?;
+                    }
+                    embedding_rows.push(EmbeddingRow {
+                        key: row_key,
+                        id: reference.key.id.clone(),
+                        revision: memory.revision.commit_seq,
+                        scope,
+                        text: memory.record.draft.claim.clone(),
+                    });
                 } else {
+                    self.flush_embedding_rows(
+                        &mut embedding_rows,
+                        storage,
+                        snapshot,
+                        client,
+                        workflow,
+                        &cancel,
+                        authorize,
+                        &mut progress,
+                        &mut pending,
+                    )
+                    .await?;
+                    if outcome == "superseded" {
+                        continue;
+                    }
                     pending.push(&self.table, row_key, None).await?;
                 }
                 changed = true;
             }
             completions.push(completion_change(&progress.generation, seq, records)?);
-            progress.watermark = seq;
         }
+        self.flush_embedding_rows(
+            &mut embedding_rows,
+            storage,
+            snapshot,
+            client,
+            workflow,
+            &cancel,
+            authorize,
+            &mut progress,
+            &mut pending,
+        )
+        .await?;
+        progress.watermark = before.max(end);
         if progress.watermark == before {
             return Ok(progress);
         }
@@ -342,10 +325,6 @@ impl VectorIndex {
                     .await
                     .map_err(index_error)?;
             }
-            self.table
-                .optimize(OptimizeAction::Index(Default::default()))
-                .await
-                .map_err(index_error)?;
         }
         publish_progress(
             storage,
@@ -359,13 +338,212 @@ impl VectorIndex {
         Ok(progress)
     }
 
+    #[allow(clippy::too_many_arguments)]
+    async fn flush_embedding_rows<F, C>(
+        &self,
+        rows: &mut Vec<EmbeddingRow>,
+        storage: &Storage,
+        snapshot: &crate::config::Snapshot<()>,
+        client: &Client,
+        workflow: &Deadline,
+        cancel: &C,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+        progress: &mut VectorStatus,
+        pending: &mut NativeBatch,
+    ) -> Result<()>
+    where
+        F: std::future::Future<Output = &'static str>,
+        C: Fn() -> F,
+    {
+        if rows.is_empty() {
+            return Ok(());
+        }
+        let config = snapshot.resolved();
+        let embedded = async {
+            // Starting with -0.0 also preserves a provider's -0.0 for a single chunk.
+            let mut vectors = vec![vec![-0.0f32; progress.dimension as usize]; rows.len()];
+            let mut chunks = Vec::new();
+            // Provider calls follow first-seen scope order. Keep the original row index for
+            // accumulation and native writes, including when response indices arrive out of order.
+            let mut row_order: Vec<_> = (0..rows.len()).collect();
+            row_order
+                .sort_by_cached_key(|&row| rows.iter().position(|r| r.scope == rows[row].scope));
+            for row in row_order {
+                let item = &rows[row];
+                if item.text.is_empty() {
+                    return Err(error("PROVIDER_OUTPUT_INVALID"));
+                }
+                let mut start = 0;
+                while start < item.text.len() {
+                    let mut end = (start + 4096).min(item.text.len());
+                    while !item.text.is_char_boundary(end) {
+                        end -= 1;
+                    }
+                    chunks.push((row, &item.text[start..end], end == item.text.len()));
+                    start = end;
+                }
+            }
+            // Keep response headroom as dimensions grow; the provider still enforces its byte cap.
+            let limit = (crate::provider::MAX_RESPONSE_BYTES
+                / (progress.dimension as usize * 32 + 256))
+                .clamp(1, 8);
+            let mut offset = 0;
+            let mut parts = 0;
+            while offset < chunks.len() {
+                let scope = &rows[chunks[offset].0].scope;
+                let count = chunks[offset..]
+                    .iter()
+                    .take(limit)
+                    .take_while(|(row, ..)| &rows[*row].scope == scope)
+                    .count();
+                let mut end = offset + count;
+                let mut call = Call {
+                    profile: config.config().retrieval.embedding.clone().unwrap(),
+                    input: Input::Embedding { texts: Vec::new() },
+                };
+                loop {
+                    call.input = Input::Embedding {
+                        texts: chunks[offset..end]
+                            .iter()
+                            .map(|(_, text, _)| (*text).into())
+                            .collect(),
+                    };
+                    if call.request(config).is_ok() || end == offset + 1 {
+                        break;
+                    }
+                    end -= 1;
+                }
+                let outcome = client
+                    .call_guarded(config, &call, workflow, cancel(), async {
+                        storage
+                            .serialized_read(|| {
+                                authorize()?;
+                                let domain = Domain::new(storage);
+                                for (row, ..) in &chunks[offset..end] {
+                                    rows[*row].check_revision(&domain)?;
+                                }
+                                Ok(())
+                            })
+                            .await
+                            .map_err(|e| crate::provider::Error(e.code))
+                    })
+                    .await;
+                if outcome.error.as_deref() == Some("INDEX_INPUT_CHANGED") {
+                    return Err(error("INDEX_INPUT_CHANGED"));
+                }
+                progress.last_call = Some(serde_json::json!({
+                    "profile":outcome.profile,"identity":outcome.identity,
+                    "error":outcome.error,"trace":outcome.trace
+                }));
+                if let Some(code) = outcome.error {
+                    return Err(error(model_error(&code)));
+                }
+                let output = outcome
+                    .output
+                    .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
+                let returned = output["vectors"]
+                    .as_array()
+                    .filter(|items| items.len() == end - offset)
+                    .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
+                for (&(row, _, last_chunk), values) in chunks[offset..end].iter().zip(returned) {
+                    let values = values
+                        .as_array()
+                        .filter(|values| values.len() == progress.dimension as usize)
+                        .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?;
+                    let vector = &mut vectors[row];
+                    for (sum, value) in vector.iter_mut().zip(values) {
+                        let value = value
+                            .as_f64()
+                            .ok_or_else(|| error("PROVIDER_OUTPUT_INVALID"))?
+                            as f32;
+                        if !value.is_finite() {
+                            return Err(error("PROVIDER_OUTPUT_INVALID"));
+                        }
+                        *sum += value;
+                    }
+                    parts += 1;
+                    if last_chunk {
+                        for value in vector.iter_mut() {
+                            *value /= parts as f32;
+                        }
+                        validate_vector(vector, progress.dimension)?;
+                        parts = 0;
+                    }
+                }
+                offset = end;
+            }
+            Ok(vectors)
+        }
+        .await;
+        let vectors = match embedded {
+            Ok(vectors) => vectors,
+            Err(error) if error.code == "INDEX_INPUT_CHANGED" => return Err(error),
+            Err(error) => {
+                if let Some(call) = &mut progress.last_call
+                    && call["error"].is_null()
+                {
+                    call["error"] = serde_json::json!(error.code);
+                }
+                publish_progress(
+                    storage,
+                    key(&progress.generation),
+                    snapshot.generation(),
+                    progress,
+                    vec![],
+                    authorize,
+                )
+                .await?;
+                return Err(error);
+            }
+        };
+        for (row, vector) in std::mem::take(rows).into_iter().zip(vectors) {
+            storage
+                .serialized_read(|| {
+                    authorize()?;
+                    row.check_revision(&Domain::new(storage))
+                })
+                .await?;
+            let batch = RecordBatch::try_new(
+                self.schema.clone(),
+                vec![
+                    Arc::new(StringArray::from(vec![row.key.as_str()])),
+                    Arc::new(StringArray::from(vec![row.id.as_str()])),
+                    Arc::new(UInt64Array::from(vec![row.revision])),
+                    Arc::new(StringArray::from(vec![row.scope.as_str()])),
+                    Arc::new(
+                        FixedSizeListArray::from_iter_primitive::<Float32Type, _, _>(
+                            [Some(vector.into_iter().map(Some))],
+                            progress.dimension as i32,
+                        ),
+                    ),
+                ],
+            )
+            .map_err(index_error)?;
+            pending.push(&self.table, row.key, Some(batch)).await?;
+        }
+        Ok(())
+    }
+
     pub async fn search(
         &self,
         vector: &[f32],
         scope: &Scope,
         limit: usize,
+        authorize: impl Fn() -> Result<()>,
     ) -> Result<Vec<(String, u64)>> {
         let filter = format!("scope = '{}'", hash(&serde_json::to_vec(scope)?));
+        if self.group_search
+            && let Some(native) = self.table.dataset()
+        {
+            authorize()?;
+            let dataset = native.get().await.map_err(index_error)?;
+            if let Some(rows) =
+                segments::search(&dataset, vector, &filter, limit, &authorize).await?
+            {
+                return Ok(rows);
+            }
+        }
+        authorize()?;
         let stream = self
             .table
             .query()
