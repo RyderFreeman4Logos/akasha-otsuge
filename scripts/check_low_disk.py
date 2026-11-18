@@ -8,7 +8,9 @@ import json
 import os
 import subprocess
 import sys
+import threading
 import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
@@ -20,7 +22,7 @@ def cli(*args, error=None):
         timeout=20,
     )
     if error is None:
-        result.check_returncode()
+        assert result.returncode == 0, (args, result.returncode, result.stderr)
         return json.loads(result.stdout)["data"]
     assert result.returncode and not result.stdout, result
     observed = json.loads(result.stderr)["error"]
@@ -29,16 +31,157 @@ def cli(*args, error=None):
         assert result.returncode == 4 and observed["retry_when"] == "capacity_available"
 
 
-def job(verb, key):
-    cli("index", verb, "--idempotency-key", key)
+def terminal_job(key):
     end = time.monotonic() + 20
     while time.monotonic() < end:
         record = cli("job", "show", key)
         if record["state"] in ("failed", "succeeded", "cancelled"):
-            assert record["state"] == "succeeded", record
-            return
+            return record
         time.sleep(0.05)
     raise TimeoutError(key)
+
+
+def job(verb, key):
+    cli("index", verb, "--idempotency-key", key)
+    record = terminal_job(key)
+    assert record["state"] == "succeeded", record
+
+
+def fill_to_one_mib(path):
+    stats = os.statvfs(path)
+    filler = Path(path) / "owned-filler"
+    with filler.open("xb") as f:
+        os.posix_fallocate(f.fileno(), 0, stats.f_bavail * stats.f_frsize - 1024**2)
+    assert os.statvfs(path).f_bavail * stats.f_frsize == 1024**2
+    return filler
+
+
+def model_jobs_under_pressure(read_history):
+    entered, release, large_started = (threading.Event() for _ in range(3))
+    calls = []
+    large = "x" * 16000
+    cancelled = "y" * 16000
+
+    class Provider(BaseHTTPRequestHandler):
+        def log_message(self, *_):
+            pass
+
+        def do_POST(self):
+            request = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            prompt = request["messages"][0]["content"]
+            calls.append(prompt)
+            if prompt == "short":
+                entered.set()
+                assert release.wait(20)
+                content = "ordinary output " * 1536  # Exactly 24 KiB of valid text.
+            else:
+                large_started.set()
+                content = "done"
+            data = json.dumps(
+                {
+                    "choices": [
+                        {
+                            "index": 0,
+                            "message": {"role": "assistant", "content": content},
+                            "finish_reason": "stop",
+                        }
+                    ]
+                }
+            ).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+    def submit(key, prompt):
+        path = Path("/work") / key
+        path.write_text(
+            json.dumps(
+                {
+                    "calls": [
+                        {
+                            "profile": "local",
+                            "input": {
+                                "kind": "text",
+                                "prompt": prompt,
+                                "max_output_tokens": 8192,
+                            },
+                        }
+                    ]
+                }
+            )
+        )
+        assert path.stat().st_size < 16 * 1024
+        record = cli("model", "run", path, "--idempotency-key", key)
+        assert (
+            record["id"] == key
+            and record["state"] == "queued"
+            and record["attempt"] == 0
+        )
+        return record
+
+    with ThreadingHTTPServer(("127.0.0.1", 0), Provider) as server:
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with Path("/work/config.toml").open("a") as config:
+                config.write(
+                    '[runtime]\nmax_concurrent_jobs=1\n[models.local]\nkind="text"\nlocal=true\nmodel="disk-fixture"\n'
+                    f'endpoint="http://127.0.0.1:{server.server_port}/v1"\n'
+                )
+            cli("config", "reload")
+            daemon_pid = cli("daemon", "status")["pid"]
+            submit("large-result", "short")
+            assert (
+                entered.wait(8)
+                and cli("job", "show", "large-result")["state"] == "running"
+            )
+            queued = submit("resume-large", large)
+            submit("cancel-large", cancelled)
+            prior = read_history()
+            filler = fill_to_one_mib("/data")
+            try:
+                release.set()
+                failed = terminal_job("large-result")
+                assert (failed["state"], failed["error"], failed["result"]) == (
+                    "failed",
+                    "RESOURCE_BUSY",
+                    None,
+                ), (failed["state"], failed["error"])
+                assert (
+                    read_history() == prior
+                    and cli("daemon", "status")["pid"] == daemon_pid
+                )
+                stopped = cli("job", "cancel", "cancel-large")
+                assert (stopped["state"], stopped["error"], stopped["attempt"]) == (
+                    "cancelled",
+                    "CANCELLED",
+                    0,
+                )
+                # Allow the scheduler to tick after the running slot becomes free.
+                assert not large_started.wait(1.2)
+                waiting = cli("job", "show", "resume-large")
+                assert waiting == queued and waiting["started_at_ms"] is None
+            finally:
+                filler.unlink()
+            resumed = terminal_job("resume-large")
+            assert (
+                resumed["state"],
+                resumed["attempt"],
+                resumed["accepted_at_ms"],
+            ) == ("succeeded", 1, queued["accepted_at_ms"])
+            # The identical provider output can be persisted with free disk space.
+            submit("roomy-result", "short")
+            assert terminal_job("roomy-result")["state"] == "succeeded"
+            assert calls == ["short", large, "short"]
+            assert (
+                read_history() == prior and cli("daemon", "status")["pid"] == daemon_pid
+            )
+        finally:
+            release.set()
+            server.shutdown()
+            thread.join()
 
 
 def check(volume):
@@ -106,12 +249,7 @@ def check(volume):
     before = cli("index", "status")
 
     # Check the exact mount type and capacity before creating the filler.
-    path = Path(volume)
-    stats = os.statvfs(path)
-    filler = path / "owned-filler"
-    with filler.open("xb") as f:
-        os.posix_fallocate(f.fileno(), 0, stats.f_bavail * stats.f_frsize - 1024**2)
-    assert os.statvfs(path).f_bavail * stats.f_frsize == 1024**2
+    filler = fill_to_one_mib(volume)
 
     assert cli(*approved) == receipt
     assert (
@@ -147,6 +285,8 @@ def check(volume):
         and memory()["revision"]["commit_seq"] == accepted["commit_seq"]
     )
     assert memory("--at", original)["record"]["draft"] == draft
+    if volume == "/data":
+        model_jobs_under_pressure(lambda: memory("--at", original))
     cli("daemon", "stop")
 
 
