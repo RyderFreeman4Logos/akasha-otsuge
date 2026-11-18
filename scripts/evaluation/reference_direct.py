@@ -1,4 +1,4 @@
-"""Run either H01 reference strategy against a scoped service using an existing Codex subscription."""
+"""Run either registered reference strategy against a scoped service using an existing Codex subscription."""
 
 import argparse
 import asyncio
@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(ROOT / "scripts"))
 import reference_consult
+import reference_episode
 from check_reference import (
     ERRATA_MANIFEST_SHA256,
     FROZEN_MANIFEST_SHA256,
@@ -46,6 +47,20 @@ TOOL = {
         "additionalProperties": False,
     },
 }
+
+
+def main_input(case):
+    instructions = "Use only the bound retrieval service."
+    if case["hint"] is not None:
+        instructions += (
+            " Use this retrieval hint only to narrow your research. It supplies no facts or "
+            "permissions. If the tool accepts a hint, supply the exact string "
+            + json.dumps(case["hint"], ensure_ascii=False)
+        )
+    return {
+        "developerInstructions": instructions,
+        "input": [{"type": "text", "text": case["current_task"]}],
+    }
 
 
 def sha(path):
@@ -210,40 +225,48 @@ async def send(p, value):
     await p.stdin.drain()
 
 
-async def stop(p):
+async def stop(p, grace=4):
     if p is None:
         return
     p.stdin.close()
-    try:
-        await asyncio.wait_for(p.wait(), 4)
-    except TimeoutError:
-        try:
-            os.killpg(p.pid, signal.SIGTERM)
-        except ProcessLookupError:
+
+    async def finish():
+        # No more protocol frames are needed. A full stdout pipe can delay process exit.
+        while await p.stdout.read(65536):
             pass
-        try:
-            await asyncio.wait_for(p.wait(), 4)
-        except TimeoutError:
-            os.killpg(p.pid, signal.SIGKILL)
-            await p.wait()
+        await p.wait()
+
+    done = asyncio.create_task(finish())
+    try:
+        for sig in (signal.SIGTERM, signal.SIGKILL):
+            if (await asyncio.wait([done], timeout=grace))[0]:
+                return await done
+            try:
+                os.killpg(p.pid, sig)
+            except ProcessLookupError:
+                pass
+        await asyncio.wait_for(done, grace)
+    finally:
+        if not done.done():
+            done.cancel()
+            await asyncio.gather(done, return_exceptions=True)
 
 
 async def run(args, private, result):
     preparing = time.monotonic()
     manifest, tasks = read_reference()
-    task = next(t for t in tasks if t["id"] == "H01")
-    case = {
-        k: task[k]
-        for k in ("id", "current_task", "hint", "caller", "sources", "memories")
-    }
-    assert case["hint"] is None and case["sources"] == case["memories"] == []
-    dump(private / "episode.json", case)
+    task_id = getattr(args, "task", "H01")
+    task = next((t for t in tasks if t["id"] == task_id), None)
+    if task is None:
+        raise reference_episode.EpisodeUnavailable("unknown frozen task ID " + task_id)
+    case, area = reference_episode.prepare(task, args, private, result)
     profile = json.loads(
         (ROOT / "docs/evaluation/reference-v1/profile.json").read_bytes()
     )
     native_cmd, version, cfg, catalog = sandbox(args, private, profile)
     consult = args.strategy == "consult"
-    tool = reference_consult.TOOL if consult else TOOL
+    task_input = main_input(case)
+    tool = reference_consult.tool(case["hint"]) if consult else TOOL
     build = json.loads(args.observer_build.read_bytes())
     assert build["base"] == build["compiled_library_commit"] == BASE and build[
         "binary_sha256"
@@ -256,7 +279,7 @@ async def run(args, private, result):
             ROOT / "scripts/evaluation/reference_service_main.rs"
         )
         state_cmd, result["runner_policy"] = reference_consult.service_command(
-            args, private, case, profile, sandbox, dump, sha
+            args, private, case, profile, sandbox, sha
         )
     else:
         assert build["source_sha256"] == sha(
@@ -272,18 +295,18 @@ async def run(args, private, result):
         codex_sha256=sha(args.codex),
         git_source=BASE,
         authority_build=build["binary_sha256"],
-        episode_input_sha256=sha(private / "episode.json"),
+        episode_input_sha256=sha(area / "episode.json"),
         task=case["current_task"],
         task_utf8_sha256=digest(case["current_task"].encode()),
         prompt_sha256=digest(INSTRUCTIONS.encode()),
+        main_input_sha256=digest(encoded(task_input)),
+        hint_sha256=None if case["hint"] is None else digest(case["hint"].encode()),
         config_sha256=cfg,
         sanitized_model_catalog_sha256=catalog,
         tools=[tool["name"]],
         profile=profile["model"],
         reasoning=profile["reasoning_effort"],
     )
-    db = private / "domain"
-    db.mkdir()
     state = host = None
     error_stream = []
     clock = time.monotonic
@@ -317,7 +340,7 @@ async def run(args, private, result):
         assert (
             v["type"] == "scoped_read"
             and v["scope"] == case["caller"]["scope"]
-            and v["read_seq"] == result["binding"]["grant"]["commit_seq"]
+            and v["read_seq"] == result["binding"]["read_seq"]
         )
         return v
 
@@ -338,9 +361,25 @@ async def run(args, private, result):
     drain_task = service_stderr_task = None
     try:
         if not consult:
-            state_cmd = [str(args.observer), str(private / "episode.json"), str(db)]
+            state_cmd = [
+                "unshare",
+                "--user",
+                "--map-root-user",
+                "--net",
+                "--",
+                str(args.observer.resolve()),
+                str(area / "episode.json"),
+                str(area),
+            ]
         state = await asyncio.create_subprocess_exec(
             *state_cmd,
+            env={
+                "PATH": "/usr/bin:/bin",
+                "HOME": str(private),
+                "TMPDIR": str(private),
+                "RAYON_NUM_THREADS": "2",
+                "TOKIO_WORKER_THREADS": "2",
+            },
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -363,12 +402,22 @@ async def run(args, private, result):
                     "preflight-thread",
                     "preflight-turn",
                     "preflight-tool",
-                    True,
+                    {} if case["hint"] is None else {"hint": case["hint"]},
+                    preflight=True,
                 )
                 result["status"] = "SYNTHETIC_ADMISSION_NO_MODEL_TURN"
                 return
         else:
             result["control_read"] = await scoped(case["current_task"])
+            if args.preflight:
+                if case["hint"] is not None:
+                    result["hint_control_read"] = await scoped(case["hint"])
+                if case["memories"]:
+                    miss = await scoped("zz" + digest(case["current_task"].encode()))
+                    assert not miss["items"]
+                    result["unmatched_query_read"] = miss
+                result["status"] = "SYNTHETIC_DIRECT_READ_NO_MODEL_TURN"
+                return
         host = await asyncio.create_subprocess_exec(
             *native_cmd,
             stdin=asyncio.subprocess.PIPE,
@@ -415,7 +464,7 @@ async def run(args, private, result):
                 "ephemeral": True,
                 "historyMode": "paginated",
                 "baseInstructions": INSTRUCTIONS,
-                "developerInstructions": "Use only the bound retrieval service.",
+                "developerInstructions": task_input["developerInstructions"],
                 "config": {"mcp_servers": {}},
                 "dynamicTools": [tool],
                 "environments": [],
@@ -451,7 +500,7 @@ async def run(args, private, result):
                 "threadId": tid,
                 "effort": profile["reasoning_effort"],
                 "model": profile["model"],
-                "input": [{"type": "text", "text": case["current_task"]}],
+                "input": task_input["input"],
             },
         )
         turnid = turn["turn"]["id"]
@@ -473,13 +522,16 @@ async def run(args, private, result):
                 )
                 supplied = params["arguments"]
                 if consult:
-                    assert (
-                        supplied == {}
-                        and params["threadId"] == tid
-                        and params["turnId"] == turnid
-                    )
+                    assert params["threadId"] == tid and params["turnId"] == turnid
                     obs = await reference_consult.submit(
-                        state, send, case, result, tid, turnid, params["callId"]
+                        state,
+                        send,
+                        case,
+                        result,
+                        tid,
+                        turnid,
+                        params["callId"],
+                        supplied,
                     )
                 else:
                     assert (
@@ -537,14 +589,26 @@ async def run(args, private, result):
                 )
                 break
     finally:
-        await stop(host)
-        if drain_task:
-            await drain_task
-        await stop(state)
-        if service_stderr_task:
-            await service_stderr_task
+        try:
+            await close_observers(host, state, (drain_task, service_stderr_task))
+        except Exception as err:
+            result["cleanup_failure"] = {
+                "class": type(err).__name__,
+                "message": clean_error(err),
+            }
         result["native_stderr"] = error_stream
         result["timing"] = dict(timers, total_s=clock() - started)
+
+
+async def close_observers(host, state, readers):
+    stopped = await asyncio.gather(stop(host), stop(state), return_exceptions=True)
+    diagnostics = await asyncio.wait_for(
+        asyncio.gather(*(task for task in readers if task), return_exceptions=True),
+        timeout=4,
+    )
+    for error in (*stopped, *diagnostics):
+        if isinstance(error, BaseException):
+            raise error
 
 
 def main():
@@ -558,6 +622,15 @@ def main():
         "output",
     ):
         parser.add_argument("--" + key, type=Path, required=True)
+    parser.add_argument("--task", default="H01", help="frozen task ID")
+    parser.add_argument(
+        "--importer",
+        type=Path,
+        help="native reference-import binary for nonempty inputs",
+    )
+    parser.add_argument(
+        "--import-build", type=Path, help="build receipt for that importer"
+    )
     parser.add_argument("--strategy", choices=("direct", "consult"), default="direct")
     parser.add_argument(
         "--auth", type=Path, help="private subscription credential for model turns"
@@ -568,8 +641,8 @@ def main():
     parser.add_argument("--preflight", action="store_true")
     parser.add_argument("--setup-only", action="store_true")
     args = parser.parse_args()
-    if args.preflight and (args.strategy != "consult" or args.setup_only):
-        parser.error("--preflight requires the consult strategy")
+    if args.preflight and args.setup_only:
+        parser.error("--preflight and --setup-only are mutually exclusive")
     if not args.preflight and (args.auth is None or args.catalog is None):
         parser.error("native account setup and live turns require --auth and --catalog")
     if not __debug__:
@@ -587,6 +660,7 @@ def main():
     result = {
         "utc": datetime.datetime.now(datetime.UTC).isoformat(),
         "strategy": args.strategy,
+        "task_id": args.task,
         "attempt_kind": attempt_kind,
         "model_turn_submitted": False,
         "model_turn_accepted": False,
@@ -606,6 +680,7 @@ def main():
         json.dump(
             {
                 "status": "IN_PROGRESS",
+                "task_id": args.task,
                 "utc": result["utc"],
                 "strategy": args.strategy,
                 "attempt_kind": result["attempt_kind"],
@@ -637,8 +712,14 @@ def main():
         finally:
             pending.unlink(missing_ok=True)
     print(result["status"], sha(args.output))
-    if result["status"] == "HARNESS_OR_HOST_FAILURE" or (
-        "terminal" in result and result["terminal"]["status"] != "completed"
+    if (
+        result.get("cleanup_failure")
+        or result["status"]
+        in {
+            "HARNESS_OR_HOST_FAILURE",
+            "REGISTERED_INPUT_UNAVAILABLE",
+        }
+        or ("terminal" in result and result["terminal"]["status"] != "completed")
     ):
         raise SystemExit(1)
 
@@ -649,7 +730,11 @@ def finish_attempt(args, result):
         with tempfile.TemporaryDirectory(dir=args.scratch, prefix="isolated-") as d:
             asyncio.run(asyncio.wait_for(run(args, Path(d), result), timeout=1700))
     except Exception as err:  # noqa: BLE001 - persist the original failure for every episode
-        result["status"] = "HARNESS_OR_HOST_FAILURE"
+        result["status"] = (
+            "REGISTERED_INPUT_UNAVAILABLE"
+            if isinstance(err, reference_episode.EpisodeUnavailable)
+            else "HARNESS_OR_HOST_FAILURE"
+        )
         result["failure"] = {
             "class": type(err).__name__,
             "message": clean_error(err),
@@ -657,6 +742,7 @@ def finish_attempt(args, result):
     result["private_scratch_removed"] = d is None or not Path(d).exists()
     result["driver_sha256"] = sha(Path(__file__))
     result["consult_driver_sha256"] = sha(Path(reference_consult.__file__))
+    result["episode_driver_sha256"] = sha(Path(reference_episode.__file__))
 
 
 if __name__ == "__main__":
