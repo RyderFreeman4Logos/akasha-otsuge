@@ -91,7 +91,7 @@ fn claude_plugin_install_is_reversible_and_preserves_unrelated_configuration() {
         Fixture(std::env::temp_dir().join(format!("akasha-claude-install-{}", std::process::id())));
     fs::create_dir(&root.0).unwrap();
     let native = root.0.join("claude");
-    executable::write(&native, "#!/bin/sh\nprintf '2.1.311 (Claude Code)\\n'\n");
+    executable::write(&native, "#!/bin/sh\nprintf '2.1.322 (Claude Code)\\n'\n");
     let config = root.0.join("user-settings.json");
     let original = br#"{"hooks":{"SessionStart":[{"hooks":[{"type":"command","command":"keep-me"}]}]},"custom":"untouched"}"#;
     fs::write(&config, original).unwrap();
@@ -140,7 +140,11 @@ fn claude_plugin_install_is_reversible_and_preserves_unrelated_configuration() {
         String::from_utf8_lossy(&status.stderr)
     );
     let status: Value = serde_json::from_slice(&status.stdout).unwrap();
-    assert_eq!(status["data"]["version"], "2.1.311");
+    assert_eq!(status["data"]["version"], "2.1.322");
+    assert_eq!(
+        status["coverage"]["supported_versions"],
+        serde_json::json!(["2.1.311", "2.1.322"])
+    );
     assert_eq!(status["data"]["self_test"]["status"], "not_run");
     assert_eq!(status["installation"]["state"], "verified");
     assert_eq!(status["coverage"]["version_supported"], true);

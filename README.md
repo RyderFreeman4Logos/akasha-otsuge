@@ -4,6 +4,8 @@ A local, traceable memory system for coding agents, written in Rust.
 
 面向 Claude Code、Codex、Hermes Agent 和 pi 的跨 Agent 记忆系统：保留原始证据、版本历史、用户决策和实际召回记录。
 
+Linux 用户可查阅[二进制包安装、升级与卸载](docs/linux-install.md)，并在其中选择自己的宿主 CLI。
+
 **状态：MVP 开发中。** 当前实现权威存储、来源与版本历史、原文采集，以及 [私有 daemon 和管理 CLI](docs/daemon.md)。模型调用和磁盘检索已接入；四个宿主等后续工作按 [28 个 Issues](docs/plan/issues-index.md) 逐项实施；验收进度见 [TODO](docs/plan/todo.md)。完整范围和验收门槛保存在 [规格快照](docs/spec/README.md)。CLI 名称统一为 `akasha-otsuge`，替代规格中的 `mem` 占位名。
 
 构建与验证见 [开发说明](docs/development.md)。配置库的版本切换、资源准备与时间预算见 [配置契约](docs/configuration.md)。

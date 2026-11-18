@@ -73,7 +73,7 @@ pub struct ClaudeCaller {
 impl CallerAdapter for ClaudeCaller {
     fn probe(&self) -> Result<CapabilityReport> {
         let mut report = self.registration.capability.clone();
-        if report.host != Host::ClaudeCode || report.version.as_deref() != Some("2.1.311") {
+        if report.host != Host::ClaudeCode || !super::supports_version(report.version.as_deref()) {
             return Err(ErrorCode::AdapterUnsupported.into());
         }
         report.binding = BindingLevel::ExactTurn;

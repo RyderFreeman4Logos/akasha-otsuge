@@ -286,6 +286,10 @@ async fn native_runner_refuses_incomplete_mismatched_unsafe_and_failed_streams()
             ErrorCode::BudgetExhausted,
         ),
         (
+            format!("printf '%s\\n' '{}'", INIT.replace("2.1.311", "2.1.322")),
+            ErrorCode::AdapterUnsupported,
+        ),
+        (
             format!("printf '%s\\n' '{DONE}'"),
             ErrorCode::ProtocolInvalid,
         ),
