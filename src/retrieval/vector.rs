@@ -1,3 +1,4 @@
+pub(super) mod segments;
 use super::*;
 use crate::config::deadline::Deadline;
 use crate::provider::{Call, Client, Input};
@@ -364,6 +365,12 @@ impl VectorIndex {
         limit: usize,
     ) -> Result<Vec<(String, u64)>> {
         let filter = format!("scope = '{}'", hash(&serde_json::to_vec(scope)?));
+        if let Some(native) = self.table.dataset() {
+            let dataset = native.get().await.map_err(index_error)?;
+            if let Some(rows) = segments::search(&dataset, vector, &filter, limit).await? {
+                return Ok(rows);
+            }
+        }
         let stream = self
             .table
             .query()
