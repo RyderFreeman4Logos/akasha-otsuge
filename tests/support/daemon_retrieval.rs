@@ -691,7 +691,7 @@ fn vector_sync_batch(wide: bool, alternating: bool) {
                             (0.5, 0.5)
                         } else if alternating {
                             (id as f32 + 1.0, 1.0)
-                        } else if id % 2 == 0 {
+                        } else if id.is_multiple_of(2) {
                             (1.0, 0.0)
                         } else {
                             (0.0, 1.0)
