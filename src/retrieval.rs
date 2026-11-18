@@ -456,6 +456,22 @@ impl Index {
         Ok(progress)
     }
 
+    pub(crate) fn remaining_sync(
+        storage: &Storage,
+        config: &ResolvedConfig,
+        target: u64,
+    ) -> Result<u64> {
+        let progress = match pending_rebuild(storage)? {
+            Some(candidate) if candidate.generation != status(storage)?.generation => candidate,
+            _ => status(storage)?,
+        };
+        let watermark = vector::status(storage, config, &progress.generation)?
+            .map_or(progress.lexical_watermark, |v| {
+                v.watermark.min(progress.lexical_watermark)
+            });
+        Ok(target.saturating_sub(watermark))
+    }
+
     pub(crate) fn status_report(
         storage: &Storage,
         config: &ResolvedConfig,
