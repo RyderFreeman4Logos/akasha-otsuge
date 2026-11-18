@@ -1,0 +1,227 @@
+{
+  "product_source": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+  "product_sha256": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+  "native_cli": "2.1.311 (Claude Code)",
+  "native_cli_sha256": "86dc1fcc69498159eaf15f446613e847010f9036bfbbdffd4c49350be8489ada",
+  "case_sha256": "1643cf287e1cc7b3c69ab8bfd7bc5df450b0ebc75c232c63262b17e9d3d912ac",
+  "caller": "native Claude print with deterministic Messages",
+  "runner": "native Claude print",
+  "protocol": "Anthropic Messages SSE",
+  "live_requested_model": "grok-4.7",
+  "limits": {
+    "runner_timeout_s": 120,
+    "upstream_timeout_s": 45,
+    "max_requests_per_job": 6,
+    "max_output_tokens_per_request": 1400
+  },
+  "allowed_runner_tools": [
+    "context_describe",
+    "context_list",
+    "context_read",
+    "context_search",
+    "memory_get",
+    "memory_search"
+  ],
+  "frozen_benchmark": false,
+  "runs": {
+    "live": {
+      "observer_sha256": "fed08b20d0d98e0bab4fb8da662e0cb041b8711953c999da5e6888b226013e10",
+      "observer_exit": 0,
+      "real_native_jobs": 1,
+      "job_state": "failed",
+      "runner_state": "failed",
+      "typed_error": "PROTOCOL_INVALID",
+      "origin_and_fence_verified": true,
+      "stored_hint_verified": true,
+      "product_usage": {
+        "output_bytes": 3214,
+        "read_bytes": 0,
+        "reads": 0,
+        "starts": 1,
+        "tokens": 0
+      },
+      "upstream": [
+        {
+          "number": 1,
+          "http_status": 200,
+          "requested_tools": [
+            "context_describe",
+            "context_list"
+          ],
+          "usage": {
+            "input_tokens": 1500,
+            "output_tokens": 77,
+            "cache_read_input_tokens": 1152
+          },
+          "reported_model": "grok-4.7-build",
+          "stop_reason": "tool_use",
+          "event_count": 16,
+          "elapsed_ms": 1751
+        }
+      ],
+      "guard_rejections": 0,
+      "answer": null
+    },
+    "serial_control": {
+      "observer_sha256": "45e832df1aa9f0bcdcaac595773da361ae81f5cc5eddf64612bd02ba4108f82e",
+      "observer_exit": 0,
+      "real_native_jobs": 0,
+      "job_state": "succeeded",
+      "runner_state": "succeeded",
+      "typed_error": null,
+      "origin_and_fence_verified": true,
+      "stored_hint_verified": true,
+      "product_usage": {
+        "output_bytes": 14054,
+        "read_bytes": 34212,
+        "reads": 10,
+        "starts": 1,
+        "tokens": 57
+      },
+      "upstream": [
+        {
+          "number": 1,
+          "http_status": 200,
+          "requested_tools": [
+            "context_search"
+          ],
+          "usage": {
+            "input_tokens": 15,
+            "output_tokens": 4
+          },
+          "reported_model": "grok-4.7",
+          "stop_reason": "tool_use",
+          "event_count": 6,
+          "elapsed_ms": 1
+        },
+        {
+          "number": 2,
+          "http_status": 200,
+          "requested_tools": [
+            "context_read"
+          ],
+          "usage": {
+            "input_tokens": 15,
+            "output_tokens": 4
+          },
+          "reported_model": "grok-4.7",
+          "stop_reason": "tool_use",
+          "event_count": 6,
+          "elapsed_ms": 1
+        },
+        {
+          "number": 3,
+          "http_status": 200,
+          "requested_tools": [],
+          "usage": {
+            "input_tokens": 15,
+            "output_tokens": 4
+          },
+          "reported_model": "grok-4.7",
+          "stop_reason": "end_turn",
+          "event_count": 6,
+          "elapsed_ms": 1
+        }
+      ],
+      "guard_rejections": 0,
+      "answer": {
+        "public_status": "found",
+        "source_count": 1,
+        "gap_count": 0,
+        "original_verified": true,
+        "scope_user_verified": true,
+        "public_receipt_verified": true,
+        "answer_mentions_expected_crossing": true
+      }
+    },
+    "paired_control": {
+      "observer_sha256": "447fa706622a5b67ba95ba611ec6380639d682e84da35aa978e45da2b79b680d",
+      "observer_exit": 0,
+      "real_native_jobs": 0,
+      "job_state": "succeeded",
+      "runner_state": "succeeded",
+      "typed_error": null,
+      "origin_and_fence_verified": true,
+      "stored_hint_verified": true,
+      "product_usage": {
+        "output_bytes": 33315,
+        "read_bytes": 52644,
+        "reads": 12,
+        "starts": 1,
+        "tokens": 2786
+      },
+      "upstream": [
+        {
+          "number": 1,
+          "http_status": 200,
+          "requested_tools": [
+            "context_describe",
+            "context_list"
+          ],
+          "usage": {
+            "input_tokens": 1500,
+            "output_tokens": 77,
+            "cache_read_input_tokens": 1152
+          },
+          "reported_model": "grok-4.7",
+          "stop_reason": "tool_use",
+          "event_count": 9,
+          "elapsed_ms": 1
+        },
+        {
+          "number": 2,
+          "http_status": 200,
+          "requested_tools": [
+            "context_search"
+          ],
+          "usage": {
+            "input_tokens": 15,
+            "output_tokens": 4
+          },
+          "reported_model": "grok-4.7",
+          "stop_reason": "tool_use",
+          "event_count": 6,
+          "elapsed_ms": 1
+        },
+        {
+          "number": 3,
+          "http_status": 200,
+          "requested_tools": [
+            "context_read"
+          ],
+          "usage": {
+            "input_tokens": 15,
+            "output_tokens": 4
+          },
+          "reported_model": "grok-4.7",
+          "stop_reason": "tool_use",
+          "event_count": 6,
+          "elapsed_ms": 1
+        },
+        {
+          "number": 4,
+          "http_status": 200,
+          "requested_tools": [],
+          "usage": {
+            "input_tokens": 15,
+            "output_tokens": 4
+          },
+          "reported_model": "grok-4.7",
+          "stop_reason": "end_turn",
+          "event_count": 6,
+          "elapsed_ms": 1
+        }
+      ],
+      "guard_rejections": 0,
+      "answer": {
+        "public_status": "found",
+        "source_count": 1,
+        "gap_count": 0,
+        "original_verified": true,
+        "scope_user_verified": true,
+        "public_receipt_verified": true,
+        "answer_mentions_expected_crossing": true
+      }
+    }
+  }
+}

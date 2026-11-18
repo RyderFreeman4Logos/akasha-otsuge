@@ -120,3 +120,50 @@ native input/output UUIDs and a captured compaction boundary. The daemon
 regression separately restarts during an unfinished native backfill, supplies
 the delayed original, and verifies completion under the original deadline;
 cancellation is checked with a separate missing-target job.
+
+### Native Consult through an authenticated Messages provider
+
+On 2026-11-18 the hosted Linux package from commit
+`4e7b3a2799ebc2055750eb044b056cc1d887625a` ran one new synthetic Consult
+with Claude Code 2.1.311 as both Caller and Runner. The native Caller used a
+deterministic reply to submit the request with a short hint. The independent
+native Runner called an authenticated loopback provider serving Grok 4.7
+through Anthropic Messages. Each process ran with a fresh home and private
+network. Only the outer relay held the provider credential. The relay allowed
+six scoped read tools, up to six requests and 1,400 output tokens per request.
+The Runner timeout was 120 seconds.
+
+| Runner provider | HTTP 200 responses | Product job | Product reads | Public evidence |
+| --- | ---: | --- | ---: | --- |
+| Authenticated Grok 4.7 | 1 | Failed, `PROTOCOL_INVALID` | 0 | No answer |
+| Local serial control | 3 | Succeeded | 10 | `found`, one verified original |
+| Local paired-tool control | 4 | Succeeded | 12 | `found`, one verified original |
+
+The real provider completed a 16-event stream in 1.751 seconds. It requested
+`context_describe` and `context_list` and reported 1,500 input tokens, 1,152
+cache-read input tokens and 77 output tokens. The product recorded one start,
+zero tokens and zero read bytes. The observer exited successfully after it
+verified the saved invocation, fence, hint and failed job state. The provider
+charge was unobserved.
+
+The paired control requested the same two tools in its first response and
+reported the same three token counts. Its native Runner completed the reads,
+published a receipt and recovered the scoped original. The redacted live
+observation does not identify the rejected native frame. These runs measured
+one CLI version, one new input and one authenticated third-party route.
+Model quality and Claude subscription behavior were unmeasured.
+[Redacted observations and executable hashes](native-messages-r1.json).
+
+Repeat the two local controls on Linux with Python 3.11+, Bubblewrap, the
+verified package executable and the Claude executable identified in the
+observations. Set `SCRATCH` to an existing writable SSD directory. Both
+commands use a local synthetic Messages server with no provider credentials.
+
+```sh
+work=$(mktemp -d "$SCRATCH/messages.XXXXXX")
+tar -xzf tests/fixtures/claude/2.1.311/native-messages-replay-r1.tar.gz -C "$work"
+python3 -B "$work/replay.py" --product "$AKASHA" --claude "$CLAUDE" \
+  --scratch "$SCRATCH" --output "$work/serial.json"
+python3 -B "$work/replay.py" --product "$AKASHA" --claude "$CLAUDE" \
+  --scratch "$SCRATCH" --output "$work/paired.json" --paired
+```
