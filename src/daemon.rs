@@ -296,7 +296,10 @@ impl Service {
                 })
                 .await
             }
-            Command::IndexStatus { include_queue } => {
+            Command::IndexStatus {
+                include_queue,
+                include_build_epoch,
+            } => {
                 crate::domain::Domain::new(&self.storage)
                     .permission(&jobs::context()?, Some(&jobs::owner_scope()))?;
                 let snapshot = self.config.pin();
@@ -334,8 +337,11 @@ impl Service {
                         Ok(value)
                     })
                     .await?;
-                value["building"] =
-                    json!(self.index_epoch.load(std::sync::atomic::Ordering::Acquire) % 2 == 1);
+                let epoch = self.index_epoch.load(std::sync::atomic::Ordering::Acquire);
+                if include_build_epoch {
+                    value["build_epoch"] = json!(epoch);
+                }
+                value["building"] = json!(epoch % 2 == 1);
                 if include_queue {
                     value["queue"] = self.queue_observation().await?;
                 }
@@ -704,7 +710,7 @@ pub async fn run(
     private_dir(&config.config().paths.data_dir)?;
     let (listener, _owner) = listen(&config.config().paths.socket_path)?;
     let resources = Arc::new(resources::Resources::open().await);
-    let service = open_service(config, config_path, profile, None, resources).await?;
+    let service = open_service(config, config_path, profile, None, resources, 0).await?;
     serve(service, || listener.accept()).await
 }
 
@@ -714,6 +720,7 @@ async fn open_service(
     profile: Option<String>,
     last_config: Option<(String, serde_json::Value)>,
     resources: Arc<resources::Resources>,
+    index_epoch: u64,
 ) -> Result<Arc<Service>> {
     let reconcile_input = last_config.is_none();
     resources
@@ -754,7 +761,7 @@ async fn open_service(
         notification_slots: Arc::new(Semaphore::new(1)),
         search_index: Mutex::default(),
         index_builder: Mutex::new(()),
-        index_epoch: std::sync::atomic::AtomicU64::new(0),
+        index_epoch: std::sync::atomic::AtomicU64::new(index_epoch),
         #[cfg(test)]
         batch_gate: Mutex::new(None),
         #[cfg(test)]
@@ -901,11 +908,21 @@ where
             let profile = service.profile.clone();
             let last_config = service.last_config.lock().await.clone();
             let resources = service.resources.clone();
+            let index_epoch = service
+                .index_epoch
+                .load(std::sync::atomic::Ordering::Acquire);
             drop(service);
             // Native initialization and filesystem sync must not block the listener runtime.
             let runtime = tokio::runtime::Handle::current();
             tokio::task::spawn_blocking(move || {
-                runtime.block_on(open_service(config, path, profile, last_config, resources))
+                runtime.block_on(open_service(
+                    config,
+                    path,
+                    profile,
+                    last_config,
+                    resources,
+                    index_epoch,
+                ))
             })
             .await
             .map_err(|_| Error("JOB_ERROR"))?

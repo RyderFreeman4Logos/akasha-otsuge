@@ -181,6 +181,8 @@ pub enum Command {
     IndexStatus {
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         include_queue: bool,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        include_build_epoch: bool,
     },
     OriginalShow {
         range: crate::domain::OriginalRange,

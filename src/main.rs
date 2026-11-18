@@ -37,7 +37,7 @@ Commands:
   grill resume JOB_ID --idempotency-key ID
   index sync --idempotency-key ID
   index rebuild --idempotency-key ID
-  index status
+  index status [--build-epoch]
   search QUERY --scope JSON_FILE --idempotency-key ID
   show SOURCE_ID --revision COMMIT --range START_BYTE END_BYTE
   job show|cancel ID
@@ -463,8 +463,9 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
                 },
             })
         }
-        ["index", "status"] => Some(Command::IndexStatus {
+        ["index", "status"] | ["index", "status", "--build-epoch"] => Some(Command::IndexStatus {
             include_queue: false,
+            include_build_epoch: command.len() == 3,
         }),
         ["index", "sync", "--idempotency-key", id] => Some(Command::RetrievalRun {
             plan: akasha_otsuge::retrieval::Request::Sync,

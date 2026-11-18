@@ -26,6 +26,7 @@ The run plan JSON includes these fields:
 | `socket`, `daemon_config`, `scale_receipt` | Absolute paths to the Unix socket, effective daemon TOML, and the seed/coverage evidence for this store. |
 | `daemon`, `lookup` | Linux process identities with `pid` and `start_ticks` from procfs. |
 | `daemon_sha256`, `daemon_config_sha256`, `scale_receipt_sha256` | SHA-256 of the running executable and the two admitted files. |
+| `concurrent_index` | Set to `true` for the mixed-load index-build check. The runner submits an incremental sync halfway through the interval. |
 | `oracles.current` | Nonempty list of stable memories, each with `id`, `revision`, `scope` and UTF-8 `claim_sha256`. |
 | `oracles.lexical`, `oracles.hybrid_vector` | Lists with `query`, `mode` (`keyword` or `hybrid`), `scope`, `top_k` equal to 20, one or more `required_refs` pairs of memory ID and revision, and optional `expected_rules` and `excluded_ids`. |
 | `oracles.scoped_history` | List of snapshots with `scope`, fixed sequence `at`, and `members`, a map from each of 100 distinct IDs to its expected current-memory fields at that sequence. |
@@ -42,6 +43,14 @@ checks scored hits in the query scope. For older plans that omit the list,
 a rule in the query scope can satisfy an explicit `required_refs` entry.
 An empty rule list requires a result without rules. Excluded IDs apply to
 both rules and hits.
+
+With `concurrent_index` enabled, the runner records when the daemon enters
+and leaves the build using the process-local counter exposed by
+`index status --build-epoch`. The counter continues across storage reopens. It accepts a write or correction only if two samples from the same
+active build bracket the entire request. The sync must succeed and advance
+the lexical watermark through its admitted target. If the submission reply
+is lost, the runner looks up the saved job ID. The intent and terminal
+receipts identify the job for later reconciliation.
 
 Example low-memory interval:
 

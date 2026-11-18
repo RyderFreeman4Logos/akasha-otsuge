@@ -242,6 +242,9 @@ async def run(plan_path, config_path, root):
     plan = json.loads(plan_path.read_text())
     config = tomllib.loads(config_path.read_text())
     seconds, target, peak = validate_config(config)
+    concurrent = plan.get("concurrent_index", False)
+    if type(concurrent) is not bool:
+        raise ValueError("concurrent_index must be a boolean")
     if not plan["run_id"] or any(
         c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
         for c in plan["run_id"]
@@ -281,6 +284,10 @@ async def run(plan_path, config_path, root):
         "ipc.py",
         "schedule.py",
     ]
+    if concurrent:
+        from . import index_sync
+
+        source_names.append("index_sync.py")
     admission = dict(
         utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
         process=process_identity(os.getpid()),
@@ -406,6 +413,13 @@ async def run(plan_path, config_path, root):
         async with asyncio.TaskGroup() as running:
             running.create_task(interval())
             await ready.wait()
+            if concurrent:
+                index_task = running.create_task(
+                    index_sync.observe(
+                        ops, plan["run_id"], root, bounds["started_monotonic_s"], seconds,
+                        lambda: exact(plan["daemon"]),
+                    )
+                )
             number = 0
             while not done.is_set():
                 due = bounds["started_monotonic_s"] + number
@@ -474,6 +488,13 @@ async def run(plan_path, config_path, root):
         plan["oracles"]["corrections"],
     )
     assessed = assess(report, list(records(root / "metrics.jsonl")), seconds, target, peak, bounds)
+    if concurrent:
+        observation = index_task.result()
+        writes = index_sync.completed_writes(observation, records(root / "requests.jsonl"))
+        assessed["concurrent_index"] = dict(observation=observation, writes=writes)
+        if "error" in observation or not any(writes["counts"].values()):
+            assessed["gaps"].append("index build overlapping a confirmed write")
+            assessed["interval_thresholds_pass"] = False
     result = dict(
         status="INTERVAL_EXECUTED_PENDING_OFFLINE_ORACLES"
         if assessed["interval_thresholds_pass"]

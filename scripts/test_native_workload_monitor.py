@@ -89,6 +89,9 @@ class WorkloadMonitor(unittest.IsolatedAsyncioTestCase):
                         },
                     },
                 }
+            if command["op"] == "job_show":
+                self.assertEqual(command["id"], "test/concurrent-index-sync")
+                return {"id": command["id"]}
             self.assertEqual(command, {"op": "index_status", "include_queue": True})
             queued = 2 if request_id == "test/metrics/0/indexes" else 0
             return {
@@ -155,6 +158,23 @@ class WorkloadMonitor(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(assessment["resource_samples"], 1)
         self.assertEqual(assessment["backlog_samples"], 2)
         self.assertEqual(assessment["queue_high_water"]["queued"], 2)
+
+    async def test_opt_in_sync_failure_is_recorded_without_losing_offers(self):
+        plan = json.loads(self.plan.read_text())
+        plan["concurrent_index"] = True
+        self.plan.write_text(json.dumps(plan))
+        result = await self.run_fixture("RESOURCE_BUSY")
+        assessment = result["assessment"]
+        self.assertIn("index build overlapping a confirmed write", assessment["gaps"])
+        self.assertFalse(assessment["interval_thresholds_pass"])
+        observation = assessment["concurrent_index"]["observation"]
+        self.assertIn("already exists", observation["error"]["message"])
+        admission = json.loads((self.output / "admission.json").read_text())
+        self.assertIn("index_sync.py", admission["source_sha256"])
+        offers = {
+            r["identity"] for r in records(self.output / "requests.jsonl") if r["event"] == "offered"
+        }
+        self.assertEqual(len(offers), admission["planned"])
 
     async def test_busy_preflight_still_refuses_an_unadmitted_interval(self):
         with self.assertRaisesRegex(OperationError, "RESOURCE_BUSY"):
