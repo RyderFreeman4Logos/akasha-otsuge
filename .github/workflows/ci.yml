@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   linux:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -19,6 +19,9 @@ jobs:
           sudo apt-get install --yes --no-install-recommends protobuf-compiler libprotobuf-dev nodejs
           protoc --version
           node --version
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.11'
       - name: Install pinned Rust
         run: rustup show active-toolchain
       - name: Reuse Cargo dependencies and build artifacts
@@ -31,7 +34,7 @@ jobs:
             ~/.cargo/git/db
             ~/.cargo/git/checkouts
             target
-          key: ${{ runner.os }}-${{ runner.arch }}-cargo-v1-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'Cargo.toml') }}
+          key: ubuntu-22.04-${{ runner.arch }}-cargo-v1-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'Cargo.toml') }}
       - name: Check
         run: bash scripts/check.sh
       - name: Package native Linux archive
@@ -50,6 +53,18 @@ jobs:
           (( ${#files[@]} == 2 ))
           test -f "$archive" && test -f "$archive.sha256"
           sha256sum -- "$archive" | cmp - "$archive.sha256"
+          # Debian 12's loader can start a newer binary while warning about weak glibc symbols on stderr.
+          docker run --rm --network none -v "$dest:/dist:ro" \
+            debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc \
+            sh -ec '
+              cd /tmp
+              app="${1%.tar.gz}/bin/akasha-otsuge"
+              tar xzf "/dist/$1" "$app"
+              "./$app" --version >version 2>diagnostics
+              cat diagnostics >&2
+              test ! -s diagnostics
+              grep -Fx "akasha-otsuge $2" version
+            ' sh "$archive" "$version"
           echo "archive=$dest/$archive" >> "$GITHUB_OUTPUT"
           echo "checksum=$dest/$archive.sha256" >> "$GITHUB_OUTPUT"
       - name: Upload Linux candidate and checksum
