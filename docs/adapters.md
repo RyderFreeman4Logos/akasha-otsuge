@@ -551,3 +551,5 @@ input/output to native files. Local command/queue notifications that may not be
 persisted cannot advance the file fence. Native permission metadata is skipped;
 turn-duration events retain their identity and session visibility. Authenticated
 model and the remaining TUI lifecycle acceptance remain separate.
+
+The [native diagnostic controls](benchmarks/results/mvp027/typed-diagnostics-r1.json) compare two tool errors, a conclusion that reported the same error, and their combination. They also cover failed submissions, revoked read access and previously stored Consult traces across an upgrade.
