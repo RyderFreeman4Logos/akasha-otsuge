@@ -4,25 +4,26 @@ Choose the archive for your Linux architecture. Its filename includes the packag
 
 ## Install and start
 
-Work in a fresh download directory as the daemon user. Set `archive` to the downloaded basename. Run this block in Bash for both installations and upgrades. A missing file, unexpected filename or digest mismatch stops extraction.
+Work in a fresh download directory as the daemon user. Set `archive` to the downloaded basename. Run this block in Bash for both installations and upgrades. Leave `opts` empty for the default daemon. For custom startup options, replace `opts=()` with the original selection, for example `opts=(--config /absolute/config.toml --profile work)`. Keep that selection through removal. A missing file, unexpected filename or digest mismatch stops extraction.
 
 ```bash
 set -euo pipefail
 sha256sum -- "$archive" | cmp - "$archive.sha256"
 tar -xzf "$archive"
 package=${archive%.tar.gz}
+app="$HOME/.local/bin/akasha-otsuge"
+opts=()
 ```
 
 For a first installation, continue in the same shell. For an existing installation, go to [Upgrade and restore](#upgrade-and-restore).
 
 ```bash
 install -d "$HOME/.local/bin"
-install -m 0755 "$package/bin/akasha-otsuge" "$HOME/.local/bin/akasha-otsuge"
-app="$HOME/.local/bin/akasha-otsuge"
+install -m 0755 "$package/bin/akasha-otsuge" "$app"
 "$app" --version
-"$app" daemon start
-"$app" daemon status
-"$app" doctor --json
+"$app" "${opts[@]}" daemon start
+"$app" "${opts[@]}" daemon status
+"$app" "${opts[@]}" doctor --json
 ```
 
 The daemon uses a private Unix socket and stores its data under the XDG data directory. The archive contains an example TOML file. Use `--config /absolute/path/to/config.toml` before the subcommand when selecting your own configuration. See [daemon paths and permissions](daemon.md) and [configuration](configuration.md).
@@ -40,12 +41,10 @@ The daemon starts independently of these integrations. Configure model endpoints
 
 ## Upgrade and restore
 
-Verify and extract the archive above. Run the helper on Linux with Python 3.9+ and GNU coreutils, under the same user and XDG environment as the running daemon. Suspend automatic restarts and clients for the maintenance window. For custom settings, put the original startup options in the Bash array, for example `opts=(--config /absolute/config.toml --profile work)`. Choose a fresh rollback directory next to the active native data directory. The example uses the default paths.
+Verify and extract the archive above. Run the helper on Linux with Python 3.9+ and GNU coreutils, under the same user and XDG environment as the running daemon. Suspend automatic restarts and clients for the maintenance window. Use the same `app` and `opts` from the first block. Choose a fresh rollback directory next to the active native data directory.
 
 ```bash
 set -euo pipefail
-app="$HOME/.local/bin/akasha-otsuge"
-opts=()
 store=$("$app" "${opts[@]}" config show --effective | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["config"]["paths"]["data_dir"])')
 backup="$(dirname -- "$store")/akasha-otsuge.rollback.$(date +%s)"
 python3 "$package/scripts/linux-upgrade.py" upgrade "$package/bin/akasha-otsuge" "$backup" --app "$app" "${opts[@]}"
@@ -66,10 +65,11 @@ python3 "$package/scripts/linux-upgrade.py" restore "$backup"
 
 ## Remove
 
-Before removing the CLI, run the uninstall command for each integration you installed. Each command takes the same launcher, plugin directory or host home used for installation. See the [adapter guide](adapters.md). Then stop the daemon and remove the executable you installed.
+Before removing the CLI, run the uninstall command for each integration you installed. Each command takes the same launcher, plugin directory or host home used for installation. See the [adapter guide](adapters.md). Use the same `app` and `opts` as at startup. In a new Bash shell, set those two variables first. Stop the selected daemon before removing the executable.
 
-```sh
-"$app" daemon stop
+```bash
+set -euo pipefail
+"$app" "${opts[@]}" daemon stop
 rm -- "$app"
 ```
 
