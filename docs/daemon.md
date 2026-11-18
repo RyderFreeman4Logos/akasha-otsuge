@@ -83,9 +83,11 @@ python3 scripts/check_low_disk.py target/debug/akasha-otsuge target/debug/exampl
 
 Each frame is a four-byte unsigned big-endian byte length followed by UTF-8 JSON.
 The server first sends `protocol_version`, `capabilities`, and
-`max_message_bytes` (2 MiB). A full connection pool sends `RESOURCE_BUSY` in that
-initial greeting, before accepting a request. There are 16 connection slots and
-a ten-second management exchange timeout. At most 16 mutation operations can
+`max_message_bytes` (2 MiB). The daemon accepts up to 100 client connections.
+Sixteen can exchange frames concurrently. Other clients wait up to one second
+for a slot before the daemon reads a frame. A full pool, an expired wait or a
+storage reopen returns `RESOURCE_BUSY` in the greeting. The ten-second
+management exchange timeout includes the wait. At most 16 mutation operations can
 remain owned, including requests whose clients disconnected; excess work returns
 `RESOURCE_BUSY`. Long jobs return durable handles;
 this transport timeout is not a job/provider/runner deadline.
