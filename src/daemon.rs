@@ -343,7 +343,7 @@ impl Service {
                 }
                 value["building"] = json!(epoch % 2 == 1);
                 if include_queue {
-                    value["queue"] = self.queue_observation().await?;
+                    value["queue"] = self.queue_observation(self.storage.sequence()?)?;
                 }
                 value["searched_content"] = json!("active_memories");
                 Ok(value)
