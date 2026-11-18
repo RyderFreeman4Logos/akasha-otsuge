@@ -1,0 +1,96 @@
+{
+  "package_source": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+  "package_sha256": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+  "isolated_linux_namespaces": true,
+  "other_three_host_clis_absent": true,
+  "transport": "controlled synthetic local HTTP",
+  "hermes_tui_bundle_sha256": "b29e382a252df6e3d4db9e7c154e9aedba11a445cec62df3c254c83b5d593160",
+  "replay_archive_sha256": "c13bfba0ea771b05dcb40ca7f0007beda9d76f85594ac03370f9c89a2b820cd8",
+  "observations": [
+    {
+      "host": "claude",
+      "private_receipt_sha256": "93dcd882cac10a33f64725f92d0bf29d0a357ceb33424cc817bcafa0c5278806",
+      "external_model_requests": 0,
+      "native_version": "2.1.311",
+      "native_executable_sha256": "86dc1fcc69498159eaf15f446613e847010f9036bfbbdffd4c49350be8489ada",
+      "tui_capture_jobs": 5,
+      "all_installed_caller_probe_jobs": 13,
+      "resumed_and_compacted": true,
+      "initial_terminal_output_sha256": "11707133352b876751715cc2c2c8c619682b76f587c2d581b8ecbee40d6b5520",
+      "resumed_terminal_output_sha256": "c3ac5f78863ee1b931ca7a719341d820f50a3e48e1adda0a1615b1acf8672eea",
+      "original_verification": "native input and output UUIDs, SHA-256 capture tail and persisted checkpoint in release-matched Caller script"
+    },
+    {
+      "host": "codex",
+      "private_receipt_sha256": "a34cfb77eb705c5a6863398419c0428d78b50570e4fe69e30caf4be8c91639a6",
+      "external_model_requests": 0,
+      "native_version": "codex-cli 0.164.0",
+      "caller": "codex",
+      "runner": "codex",
+      "absent": [
+        "claude",
+        "hermes",
+        "pi"
+      ],
+      "hint": "short",
+      "interactive_input_submitted": true,
+      "foreground_process_group": true,
+      "terminal_exit": 0,
+      "consult_state": "succeeded",
+      "public_status": "found",
+      "original_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "requested_cursor": 10,
+      "available_cursor": 10,
+      "trace_read_seq": 45,
+      "published_read_seq": 45
+    },
+    {
+      "host": "hermes",
+      "private_receipt_sha256": "32274e29f34e4628691b91fc06a2370b5a74f0642af04915620037fda11119db",
+      "external_model_requests": 0,
+      "native_version": "Hermes Agent v0.22.5+1915.g4960e41 (2026.9.24) \u00b7 upstream 226e8de8 \u00b7 local 4960e41c (+44275 carried commits)",
+      "caller": "hermes",
+      "runner": "hermes",
+      "absent": [
+        "claude",
+        "codex",
+        "pi"
+      ],
+      "hint": "none",
+      "interactive_input_submitted": true,
+      "foreground_process_group": true,
+      "terminal_exit": 0,
+      "consult_state": "succeeded",
+      "public_status": "found",
+      "original_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "requested_cursor": 3,
+      "available_cursor": 3,
+      "trace_read_seq": 25,
+      "published_read_seq": 25
+    },
+    {
+      "host": "pi",
+      "private_receipt_sha256": "5644315f5816c62dab459442fa2cdea48c7e7670342cfdff05a6628ade4eab54",
+      "external_model_requests": 0,
+      "native_version": "1.4.0",
+      "caller": "pi",
+      "runner": "pi",
+      "absent": [
+        "claude",
+        "codex",
+        "hermes"
+      ],
+      "hint": "none",
+      "interactive_input_submitted": true,
+      "foreground_process_group": true,
+      "terminal_exit": 0,
+      "consult_state": "succeeded",
+      "public_status": "found",
+      "original_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "requested_cursor": 6,
+      "available_cursor": 6,
+      "trace_read_seq": 26,
+      "published_read_seq": 26
+    }
+  ]
+}
