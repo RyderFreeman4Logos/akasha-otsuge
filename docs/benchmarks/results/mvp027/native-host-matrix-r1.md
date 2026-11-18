@@ -13,7 +13,9 @@ Every cell passed the same external Rust API contract. It supplies a private mar
 
 ¹ The released binary completed the Claude Runner cases with a 45-second executor budget. At the default 1,700 seconds, the first local context-tool read failed. A separate native diagnostic isolated the Claude Code 2.1.311 subprocess timeout limit. A 600,000-ms timeout succeeded and 600,001 ms failed. The hosted package SHA-256 remains the same for both product controls.
 
-## Scope of the single-host results
+## Scope of the first eight runs
+
+The subsequent isolated workflows completed the second hint mode, native extraction, Auto-Grill, review, local notification and configuration diagnostics on each host. The report also identifies earlier interactive captures. [Follow-up workflows and replay](isolated-workflows-r1.md)
 
 | Capability observed with other CLIs absent | Claude Code | Codex | Hermes | Pi |
 | --- | --- | --- | --- | --- |

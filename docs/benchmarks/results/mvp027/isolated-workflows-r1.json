@@ -1,0 +1,95 @@
+{
+  "package_source": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+  "package_binary_sha256": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+  "transport": "isolated deterministic local HTTP",
+  "external_model_calls": 0,
+  "replay_sha256": "8a2813e9f51589b87c5469f5b8c22900e40766a6e7823af9099fa7cfce71e905",
+  "current_package_single_host_runs": [
+    {
+      "host": "claude",
+      "version": "2.1.311 (Claude Code)",
+      "hint": "none",
+      "source_sha256": "3961940a85edc6b8a8d047b9c604a1f5739bc804609f2eace0cf4558a4b10ecd",
+      "receipt_sha256": "4f433033bb28d6dcbf657fd416a117812802b13195e57729ba7d610acf68f605",
+      "absent": [
+        "codex",
+        "hermes",
+        "pi"
+      ],
+      "consult_state": "succeeded",
+      "grill_stop": "resolved",
+      "grill_candidates": 2,
+      "review_state": "investigating",
+      "local_ack_idempotent": true
+    },
+    {
+      "host": "codex",
+      "version": "codex-cli 0.164.0",
+      "hint": "short",
+      "source_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "receipt_sha256": "26464d4da11602269c4abcd0615fad9630d0e0c1bf00fc5054b653018e1e1fb2",
+      "absent": [
+        "claude",
+        "hermes",
+        "pi"
+      ],
+      "consult_state": "succeeded",
+      "grill_stop": "resolved",
+      "grill_candidates": 2,
+      "review_state": "investigating",
+      "local_ack_idempotent": true
+    },
+    {
+      "host": "hermes",
+      "version": "Hermes Agent v0.22.5+1915.g4960e41 (2026.9.24) \u00b7 upstream 226e8de8 \u00b7 local 4960e41c (+44275 carried commits)",
+      "hint": "none",
+      "source_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "receipt_sha256": "bbd3fe3a0c795eaee3e7f8292462acdfc45e905cf31681adc9c0074a4e29ee42",
+      "absent": [
+        "claude",
+        "codex",
+        "pi"
+      ],
+      "consult_state": "succeeded",
+      "grill_stop": "resolved",
+      "grill_candidates": 2,
+      "review_state": "investigating",
+      "local_ack_idempotent": true
+    },
+    {
+      "host": "pi",
+      "version": "1.4.0",
+      "hint": "none",
+      "source_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "receipt_sha256": "b26f92a69d9678b184c876c1032d673afec5302987cda196fce6e2d3fcd1e39f",
+      "absent": [
+        "claude",
+        "codex",
+        "hermes"
+      ],
+      "consult_state": "succeeded",
+      "grill_stop": "resolved",
+      "grill_candidates": 2,
+      "review_state": "investigating",
+      "local_ack_idempotent": true
+    }
+  ],
+  "prior_versioned_controlling_terminal_receipts": [
+    {
+      "host": "claude",
+      "receipt_sha256": "9716fe6da1193fda1283675976d111d48bc2ef3062b1952ff57bdb283c750e69"
+    },
+    {
+      "host": "codex",
+      "receipt_sha256": "d09c0d1f824adf2229e556b8011a70702d82cd7f767a1a88569b01cb1936261c"
+    },
+    {
+      "host": "hermes",
+      "receipt_sha256": "00db92509f35bf619aaaee501db709f5eb9574034e6cd29d8d8726ea0c831dd0"
+    },
+    {
+      "host": "pi",
+      "receipt_sha256": "04306848cffa6ae15b28bf2e9ab641d031a8f8fa9e19678191f0e45de327c1aa"
+    }
+  ]
+}
