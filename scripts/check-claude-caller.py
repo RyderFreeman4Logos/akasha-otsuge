@@ -6,7 +6,8 @@ import datetime, fcntl, hashlib, http.server, json, os, pathlib, pty, re, select
 REPO=pathlib.Path(__file__).resolve().parents[1]
 NATIVE, AKASHA, ROOT = [pathlib.Path(value).resolve() for value in sys.argv[1:]]
 assert NATIVE.is_file() and AKASHA.is_file() and not ROOT.exists()
-assert subprocess.check_output([str(NATIVE),'--version'],text=True,timeout=10).strip()=='2.1.311 (Claude Code)', 'unsupported native Claude version'
+native_version = subprocess.check_output([str(NATIVE), '--version'], text=True, timeout=10).strip()
+assert native_version in ('2.1.311 (Claude Code)', '2.1.322 (Claude Code)'), native_version
 KEY='akasha-caller-fixture-not-real'
 ROOT.mkdir(mode=0o700)
 for name in ['home','config','workspace','plugin/.claude-plugin','plugin/hooks']:(ROOT/name).mkdir(parents=True,exist_ok=True)
@@ -16,6 +17,12 @@ config=ROOT/'akasha.toml';config.write_text('[paths]\ndata_dir='+json.dumps(str(
 argv=[str(AKASHA),'--config',str(config),'--socket',str(socket)]
 wrapper=ROOT/'bridge';wrapper.write_text('#!/usr/bin/python3\n'+'''import json,subprocess,sys,pathlib
 event=json.load(sys.stdin)
+if event.get('hook_event_name')=='SessionStart':
+ if event.get('source')=='fork':
+  observed={'op':'fork_fields','session':event['session_id'],'fields':sorted(event)}
+  with LOG.open('a') as f:f.write(json.dumps({'event':observed})+'\\n')
+ print('{}')
+ sys.exit(0)
 consult_probe=event['op']=='consult'
 if consult_probe:event=dict(event['call'],op='bind')
 result=subprocess.run(ARGV+['adapter','claude-call'],input=json.dumps(event).encode(),stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=12)
@@ -29,12 +36,12 @@ else:sys.stdout.buffer.write(result.stdout)
 sys.stderr.buffer.write(result.stderr);sys.exit(result.returncode)
 '''.replace('ARGV',repr(argv)).replace('LOG',"pathlib.Path("+repr(str(ROOT/'bridge.jsonl'))+")"));wrapper.chmod(0o700)
 (ROOT/'plugin/.claude-plugin/plugin.json').write_text('{"name":"akasha-otsuge","version":"0.1.0","description":"Native caller protocol fixture"}')
-(ROOT/'plugin/hooks/hooks.json').write_text('{"modules":["./entry.js"]}')
+(ROOT/'plugin/hooks/hooks.json').write_text(json.dumps({'modules':['./entry.js'], 'hooks':{'SessionStart':[{'matcher':'fork','hooks':[{'type':'command','command':str(wrapper)}]}]}}))
 shutil.copyfile(REPO/'src/adapter/claude/caller.js',ROOT/'plugin/hooks/caller.js')
 (ROOT/'plugin/hooks/config.js').write_text('export const bridge='+json.dumps(str(wrapper))+';\nexport const binary='+json.dumps(str(NATIVE))+';\nexport const args=[];\n')
 (ROOT/'plugin/hooks/entry.js').write_text("import {register as callerRegister} from './caller.js';\nexport function register(on){callerRegister(on);}")
 workspace=str((ROOT/'workspace').resolve())
-(ROOT/'config/.claude.json').write_text(json.dumps({'hasCompletedOnboarding':True,'lastOnboardingVersion':'2.1.311','customApiKeyResponses':{'approved':[KEY[-20:]],'rejected':[]},'projects':{workspace:{'hasTrustDialogAccepted':True}}}))
+(ROOT/'config/.claude.json').write_text(json.dumps({'hasCompletedOnboarding':True,'lastOnboardingVersion':native_version.split()[0],'customApiKeyResponses':{'approved':[KEY[-20:]],'rejected':[]},'projects':{workspace:{'hasTrustDialogAccepted':True}}}))
 stage = ''
 count = 0
 child_called = False
@@ -139,7 +146,7 @@ try:
  daemon=subprocess.Popen(argv+['daemon','run'],env=env,stdin=subprocess.DEVNULL,stdout=daemon_log,stderr=subprocess.STDOUT,start_new_session=True)
  validation=subprocess.run([str(NATIVE),'plugin','validate',str(ROOT/'plugin')],env=env,capture_output=True,timeout=10)
  (ROOT/'plugin-validation.log').write_bytes(validation.stdout+validation.stderr)
- assert validation.returncode==0,'native plugin validation failed'
+ assert validation.returncode==0,('native plugin validation failed', (validation.stdout+validation.stderr)[-2000:].decode(errors='replace'))
  end=time.monotonic()+10
  while not socket.exists():
   assert daemon.poll() is None and time.monotonic()<end,'daemon readiness';time.sleep(.02)
@@ -162,6 +169,8 @@ try:
   checks.append({'stage':stage,'pid':child.pid,'requests':count,'stdout_sha256':hashlib.sha256(stdout).hexdigest()})
  assert not errors,errors
  records=[json.loads(l) for l in (ROOT/'bridge.jsonl').read_text().splitlines()] if (ROOT/'bridge.jsonl').exists() else []
+ fork_events=[r['event'] for r in records if r['event']['op']=='fork_fields']
+ assert len(fork_events)==1 and fork_events[0]['session']==fork_session
  bindings=[r for r in records if r['event']['op']=='bind'];assert len(bindings)==5,'native hook did not create all immutable calls'
  for r,expected_session in zip(bindings[:4],[session,session,fork_session,session],strict=True):
   assert 'error' not in r['response'],r['response']
@@ -265,7 +274,7 @@ try:
  tui_check['capture_jobs']=sum(j['binding']['source']['session']==tui_session for j in jobs);checks.append(tui_check)
  checks.append(tui_resume)
  assert not errors,errors
- print(json.dumps({'native_sha256':hashlib.sha256(NATIVE.read_bytes()).hexdigest(),'akasha_sha256':hashlib.sha256(AKASHA.read_bytes()).hexdigest(),'native_bindings':len(bindings),'native_backfill_jobs':len(syncs),'checks':checks,'traces':traces,'authenticated_model_acceptance':False,'consult_execution':'not_exercised_caller_probe_only'}),flush=True)
+ print(json.dumps({'native_sha256':hashlib.sha256(NATIVE.read_bytes()).hexdigest(),'akasha_sha256':hashlib.sha256(AKASHA.read_bytes()).hexdigest(),'native_version':native_version.split()[0],'fork_session_start_fields':fork_events[0]['fields'],'native_bindings':len(bindings),'native_backfill_jobs':len(syncs),'checks':checks,'traces':traces,'authenticated_model_acceptance':False,'consult_execution':'not_exercised_caller_probe_only'}),flush=True)
 finally:
  server.shutdown();thread.join(timeout=2);server.server_close()
  try:

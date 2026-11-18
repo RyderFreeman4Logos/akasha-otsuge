@@ -422,7 +422,7 @@ Independent Runner and authenticated CLI/TUI acceptance remain pending in MVP-01
 
 `adapter claude-call` accepts a bounded host-only JSON envelope on stdin and uses
 the existing private daemon IPC. It is not a model tool schema. Registration
-checks the installed2.1.311 executable and configured read roots, then retains
+checks the supported native executable and configured read roots, then retains
 only a hash of its random bearer token with the session, source and workspace.
 The token response is for the native bridge; it must never become a tool result.
 The same-UID local management boundary remains the declared trust boundary.
@@ -449,10 +449,10 @@ against current read roots before use; diagnostic Bind requests remain supported
 `scripts/check-claude-caller.py` verifies startup/resume bindings and completed
 backfill with the actual CLI, production hook and daemon under local synthetic
 SSE. That probe replaces Consult with diagnostic Bind and explicitly does not
-qualify Runner execution or authenticated model use. Claude2.1.311 requires at
+qualify Runner execution or authenticated model use. Claude Code 2.1.311 requires at
 least one native builtin (such as `ToolSearch`) to register plugin tools;
 `--tools ""` refuses Consult registration. Native children are identified by append/turn events and the host's agent
-registry. Only a known registered parent can admit a child. The pinned2.1.311
+registry. Only a known registered parent can admit a child. The native
 transcript layout and each frame's session/agent/sidechain identity are checked;
 an unknown or mismatched child cannot fall back to the root. Parent identity is
 immutable across registration retries. Ordinary child transcripts have their
@@ -471,13 +471,14 @@ remains available. Malformed frames before the target fail with `HISTORY_GAP`.
 Manual imports without a target retain their existing partial/gap reports.
 Native startup/resume/clear/compact/fork reasons are retained in registration
 evidence. A CLI fork copies its retained UUID chain into the new session; those
-originals remain readable within that branch. The2.1.311 SessionStart contract
-does not expose a fork's parent session ID, so that relationship stays unknown.
+originals remain readable within that branch. In native versions 2.1.311 and 2.1.322,
+SessionStart reports the new session ID and the fork reason. The parent session ID stays unknown.
 No later parent or sibling events are imported into the branch.
 
 ### Claude session plugin installation
 
-The supported native version is2.1.311. Install into a new directory whose parent
+Supported Claude Code versions are 2.1.311 and 2.1.322. See the
+[2.1.322 native compatibility receipt](../tests/fixtures/claude/2.1.322/README.md). Install into a new directory whose parent
 already exists, using the same executable/configuration as the running daemon:
 
 ```sh

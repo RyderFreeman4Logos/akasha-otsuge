@@ -5,11 +5,13 @@ NATIVE, TEST, ROOT = [pathlib.Path(arg).resolve() for arg in sys.argv[1:]]
 OUT = ROOT
 NAME = 'protocol'
 assert NATIVE.is_file() and TEST.is_file() and not ROOT.exists()
+native_version = subprocess.check_output([str(NATIVE), '--version'], text=True, timeout=10).strip()
+assert native_version in ('2.1.311 (Claude Code)', '2.1.322 (Claude Code)'), native_version
 KEY = 'akasha-protocol-fixture-not-real'
 ROOT.mkdir(mode=0o700)
 for name in ('home', 'config', 'tmp'):
     (ROOT / name).mkdir(mode=0o700)
-(ROOT / 'config/.claude.json').write_text(json.dumps({'hasCompletedOnboarding': True, 'lastOnboardingVersion': '2.1.311', 'customApiKeyResponses': {'approved': [KEY[-20:]], 'rejected': []}}))
+(ROOT / 'config/.claude.json').write_text(json.dumps({'hasCompletedOnboarding': True, 'lastOnboardingVersion': native_version.split()[0], 'customApiKeyResponses': {'approved': [KEY[-20:]], 'rejected': []}}))
 wrapper = ROOT / 'claude'
 wrapper.write_text('#!/bin/bash\nset -o pipefail\nif [ "$1" = --version ]; then exec ' + shlex.quote(str(NATIVE)) + ' "$@"; fi\n' + shlex.quote(str(NATIVE)) + ' "$@" | /usr/bin/tee ' + shlex.quote(str(ROOT / 'native.stdout')) + '\n')
 wrapper.chmod(0o700)
