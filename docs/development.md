@@ -57,6 +57,11 @@ and monotonic deadline contracts. Its controlled consumers are tested in
 Version output uses Cargo's compiled package version. The immutable Git commit and
 CI run identify the exact source; no changing wall-clock timestamp enters the binary.
 
+To package a clean checkout on Linux, run `python3 scripts/package-linux.py target/dist`.
+The output directory receives a source-identified native archive and its SHA-256 file.
+The archive includes the executable, operator documentation, configuration example,
+license and source commit. See [Linux binary installation](linux-install.md).
+
 Errors use one JSON line on stderr:
 
 ```json
