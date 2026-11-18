@@ -1,6 +1,6 @@
 # Linux binary installation
 
-Choose the archive for your Linux architecture. Its filename includes the package version, source commit and architecture. Download the adjacent `.sha256` file into the same directory. A release's support matrix identifies the platforms and host versions exercised on that build.
+Choose the archive for your Linux architecture. Its filename includes the package version, source commit and architecture. Download the adjacent `.sha256` file into the same directory. The archive includes the full source revision in `SOURCE_COMMIT` and the compiled third-party package inventory in `THIRD-PARTY.json`.
 
 ## Install and start
 

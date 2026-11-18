@@ -28,6 +28,46 @@ def add(archive, name, stream, size, mode, timestamp):
     archive.addfile(header, stream)
 
 
+def dependency_notices(compiled):
+    host = next(line.removeprefix("host: ") for line in output("rustc", "-vV").splitlines()
+                if line.startswith("host: "))
+    packages = json.loads(output("cargo", "metadata", "--locked", "--format-version", "1",
+                                 "--filter-platform", host))["packages"]
+    unknown = compiled.difference(p["id"] for p in packages)
+    if unknown:
+        raise SystemExit(f"Cargo metadata omits compiled packages: {sorted(unknown)}")
+    entries, texts = [], {}
+    def notice_files(directory):
+        return [p for p in directory.iterdir() if p.is_file() and
+                p.name.upper().startswith(("LICENSE", "LICENCE", "COPYING", "NOTICE", "UNLICENSE"))]
+
+    for pkg in sorted(packages, key=lambda p: p["id"]):
+        if pkg["id"] not in compiled or pkg["source"] is None:
+            continue
+        root = Path(pkg["manifest_path"]).parent
+        boundary = root
+        if pkg["source"].startswith("git+"):
+            boundary = Path(output("git", "-C", str(root), "rev-parse", "--show-toplevel"))
+        files = notice_files(root)
+        if pkg["license_file"]:
+            files.append(root / pkg["license_file"])
+        if not files and boundary != root:
+            files = notice_files(boundary)
+        entry = {key: pkg[key] for key in ("name", "version", "license", "authors", "repository", "source")}
+        entry["files"] = {}
+        for path in sorted(set(files)):
+            if not path.resolve(strict=True).is_relative_to(boundary.resolve()):
+                raise SystemExit(f"{pkg['id']} declares a notice outside its source directory.")
+            content = path.read_bytes()
+            digest = hashlib.sha256(content).hexdigest()
+            texts[digest] = content
+            entry["files"][path.name] = f"licenses/{digest}.txt"
+        entries.append(entry)
+    notices = {"THIRD-PARTY.json": (json.dumps(entries, sort_keys=True, indent=2) + "\n").encode()}
+    notices.update({f"licenses/{key}.txt": value for key, value in texts.items()})
+    return notices
+
+
 def package(destination):
     if platform.system() != "Linux":
         raise SystemExit("Run the native package build on Linux.")
@@ -39,8 +79,8 @@ def package(destination):
     name, version = manifest["name"], manifest["version"]
     messages = output("cargo", "build", "--locked", "--release", "--bin", name,
                       "--message-format=json-render-diagnostics")
-    binaries = [m["executable"] for m in map(json.loads, messages.splitlines())
-                if m.get("reason") == "compiler-artifact" and m.get("executable")
+    artifacts = [m for m in map(json.loads, messages.splitlines()) if m.get("reason") == "compiler-artifact"]
+    binaries = [m["executable"] for m in artifacts if m.get("executable")
                 and m["target"]["kind"] == ["bin"] and m["target"]["name"] == name]
     if len(binaries) != 1 or output(binaries[0], "--version") != f"{name} {version}":
         raise SystemExit("Cargo must produce one runnable release binary with the package version.")
@@ -64,6 +104,7 @@ def package(destination):
                  "docs/mempal-migration.md", "docs/licenses/mempal-MIT.txt",
                  "examples/config.toml", "examples/notifier-file.py", "src/config/defaults.toml"]
     documents.extend(output("git", "ls-tree", "-r", "--name-only", commit, "docs/adapters").splitlines())
+    notices = dependency_notices({m["package_id"] for m in artifacts})
     destination.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=destination) as tmp:
         staged = Path(tmp) / release.name
@@ -75,6 +116,8 @@ def package(destination):
                 content = subprocess.check_output(["git", "show", f"{commit}:{path}"], cwd=ROOT)
                 mode = 0o755 if path == "examples/notifier-file.py" else 0o644
                 add(archive, f"{prefix}/{path}", io.BytesIO(content), len(content), mode, stamp)
+            for path, content in sorted(notices.items()):
+                add(archive, f"{prefix}/{path}", io.BytesIO(content), len(content), 0o644, stamp)
             content = (commit + "\n").encode()
             add(archive, f"{prefix}/SOURCE_COMMIT", io.BytesIO(content), len(content), 0o644, stamp)
         if output("git", "rev-parse", "HEAD") != commit or output("git", "diff", "HEAD", "--name-only"):
