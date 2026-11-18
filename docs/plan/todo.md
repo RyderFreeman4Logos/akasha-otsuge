@@ -1265,6 +1265,18 @@ production acceptance below passes; #3 spike receipts remain historical evidence
 Use the existing 42 SSD parquet shards and deterministic streaming preparation.
 Measure a small import before admitting full storage; retain no second raw JSONL.
 
+- [x] Verify all seven source-transition import cases with the retained seeder,
+  including changed inputs, bounded growth, complete replay and partial acknowledgment.
+- [ ] Qualify vector maintenance at the real partition split threshold. The
+  retained prefix timed out at 62,970 vectors. Verify full coverage and scoped
+  queries within the low memory profile before admitting the next input prefix.
+- [x] Exercise the workload client against a native daemon on a small fixture.
+  In 55 seconds, 100 clients finished 908 requests with 11 expected conflicts.
+  The offline export matched all 660 originals (2,703,360 bytes).
+- [ ] Publish provider batching after its 31 focused retrieval checks, integrate
+  the workload runner and measure the required 1,800-second real-corpus intervals.
+
+
 The first independent leaf adds backward-compatible target/peak/total configuration
 and on-demand process-tree RSS/PSS reporting, including guarded external children.
 It truthfully reports current enforcement as absent and retains the budget used

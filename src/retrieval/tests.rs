@@ -664,7 +664,8 @@ async fn maintenance_keeps_the_writer_generation_when_a_reader_replaces_the_cach
                         NativeIndex::IvfFlat(
                             IvfFlatIndexBuilder::default()
                                 .distance_type(DistanceType::Cosine)
-                                .num_partitions(2)
+                                // Later waves concentrate above the original training range.
+                                .target_partition_size(8)
                                 .sample_rate(8),
                         ),
                     )
@@ -721,6 +722,12 @@ async fn maintenance_keeps_the_writer_generation_when_a_reader_replaces_the_cach
         "writer generation missed maintenance"
     );
     assert_eq!(after.num_indexed_rows, 64);
+    assert_eq!(before.num_indices, Some(1));
+    assert_eq!(
+        after.num_indices,
+        Some(2),
+        "crossing the IVF split threshold must preserve the base segment"
+    );
     assert_eq!(
         reader_after, reader_version,
         "reader generation was maintained instead"

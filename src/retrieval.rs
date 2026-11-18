@@ -308,9 +308,15 @@ impl Index {
         authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<()> {
         let buffer_mib = (self.budget_mib / 64).clamp(1, 8) as usize;
-        for (table, maintained) in std::iter::once((&self.table, &self.maintained_version))
-            .chain(vector.map(|v| (&v.table, &v.maintained_version)))
-        {
+        use lancedb::table::OptimizeOptions;
+        // A vector partition split can reload every existing delta under the daemon's memory limit.
+        let lexical = (
+            &self.table,
+            &self.maintained_version,
+            OptimizeOptions::default(),
+        );
+        let vector = vector.map(|v| (&v.table, &v.maintained_version, OptimizeOptions::append()));
+        for (table, maintained, options) in std::iter::once(lexical).chain(vector) {
             authorize()?;
             if maintained.load(std::sync::atomic::Ordering::Relaxed)
                 == table.version().await.map_err(index_error)?
@@ -340,7 +346,7 @@ impl Index {
                 .map_err(index_error)?;
             authorize()?;
             table
-                .optimize(lancedb::table::OptimizeAction::Index(Default::default()))
+                .optimize(lancedb::table::OptimizeAction::Index(options))
                 .await
                 .map_err(index_error)?;
             // The daemon serializes native writers; metadata-only outbox work needs no repeat scan.

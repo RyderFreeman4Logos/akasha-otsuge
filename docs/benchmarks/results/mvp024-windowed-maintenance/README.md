@@ -78,9 +78,20 @@ Both used an 8-MiB scan buffer. The successful case reached 626,792 kB process
 high-water RSS, close to the 640-MiB peak limit. This is diagnostic evidence,
 not a steady-state memory result. All disposable diagnostic binaries and stores were removed.
 
-The old fragmented production store needs an explicit native rebuild.
-Real-prefix rebuild, source-transition qualification and measured growth remain pending.
-The small diagnostics do not establish full-scale speed, memory or ANN recall.
+The retained prefix rebuild at `6bc6efd` reached 62,975 lexical rows and
+62,970 of 65,531 eligible vectors before daemon status timed out. Both the
+graceful shutdown and the subsequent SIGTERM wait timed out. After the original
+deadline expired, the daemon was still reclaiming memory. Its cgroup had
+recorded over 18 million soft-limit events and zero OOM kills. The daemon
+exited after the soft limit was raised for cleanup. The closed store contains
+732 files using 1,795,784,704 allocated bytes.
+
+The last completed fragment held 512 more vectors. In the existing index,
+the largest of the five partitions contained 16,300 rows. Those additions
+raised the partition to 16,432 rows under cosine assignment ([partition counts](ivf-partition-threshold.json)).
+This crossed Lance's 16,384-row split threshold, where the default optimization
+can merge every existing delta. Complete coverage, query witnesses and
+measured growth remain open in [issue #65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65).
 
 ## Evidence
 

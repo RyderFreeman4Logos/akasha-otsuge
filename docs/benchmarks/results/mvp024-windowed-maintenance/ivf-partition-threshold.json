@@ -1,0 +1,62 @@
+{
+  "scope": "PR 76 frozen 6bc6efd real-prefix last successful publication",
+  "before": [
+    15425,
+    11599,
+    10901,
+    8233,
+    16300
+  ],
+  "after": {
+    "cosine": [
+      15553,
+      11675,
+      11000,
+      8310,
+      16432
+    ],
+    "normalized_vector_l2": [
+      15550,
+      11676,
+      10998,
+      8307,
+      16439
+    ]
+  },
+  "assignments": {
+    "cosine": [
+      128,
+      76,
+      99,
+      77,
+      132
+    ],
+    "normalized_vector_l2": [
+      125,
+      77,
+      97,
+      74,
+      139
+    ]
+  },
+  "pinned_dependency_source_sha256": {
+    "lance-index-core/src/lib.rs": "deec64bab32c1663714e799d08fcc6bcb56eddc45b0fa79f9e1cbbedc86ba0ae",
+    "lance-index/src/lib.rs": "1e530f77767e0aa0376208142c811c41fe0be754fcbbae54de7c58c14b4bb9f3",
+    "lance/src/index/vector/builder.rs": "54a0a60f574053051e11f4d8014d8abaf605ed335d16c6e20c4399e0e0f988bf"
+  },
+  "ivf_delta_pairs": 90,
+  "matched_audit_vectors": 512,
+  "target": 4096,
+  "split_factor": 4,
+  "strict_greater_than": 16384,
+  "center_float32_sha256": "aa7445baefadee96e08b98895acd8e3ecd05de6672097378697bb2ea46d46f4b",
+  "footer_entry_and_ivf_buffer_manifest_sha256": "a42741fff378c79ce5db0107fba1a2f26d12e6934d1c78cf252b6ed16aef691b",
+  "fragment": "1110011110011111000100005407814166be8dedf302630637.lance",
+  "fragment_bytes": 3195042,
+  "fragment_sha256": "f62443d082394d768fec63f06141237b54d16f09faa1c62304631f822351bf32",
+  "audit_sha256": "ee0be9ac56bf4c457fa3959e767e2188b9eb02e3ed5c040103919b601333c1ac",
+  "last_512_pairs_sha256": "b257f8c38cc1b4c41c6b98e72ed8fda61916351333800ced3af16dea1f17d379",
+  "failure_sha256": "1f2357375dd367dbc67138b8ee65297e3844f35a8389014c50cf1d638e48d454",
+  "conclusion": "The concentrated partition crosses the default split threshold on either score. Default IVF optimization on this input selects full-delta adjustment. No thread stack establishes how much time individual native operations spent during the stall.",
+  "script_sha256": "2891da39d53b0c7e3c4c08e9374a671db4aa6e7ce09bcb9eef10588e8c696880"
+}
