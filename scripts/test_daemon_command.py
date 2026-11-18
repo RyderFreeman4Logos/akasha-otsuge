@@ -10,7 +10,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from check_daemon_command import command, identity, owned_daemons, run_suite
+from check_daemon_command import command, identity, kill_owned, owned_daemons, run_suite
 
 
 class CommandOwnership(unittest.TestCase):
@@ -44,12 +44,21 @@ class CommandOwnership(unittest.TestCase):
             (proc / 'exe').symlink_to(sys.executable)
             with patch('check_daemon_command.pathlib.Path.iterdir', return_value=[proc]), \
                     patch('check_daemon_command.identity', side_effect=[
-                        (111, 'S'), (111, 'R'), (112, 'S'), (111, 'Z'), None]):
+                        (111, 'S'), (111, 'R'), (111, 'R'), (111, 'S'),
+                        (111, 'S'), (112, 'S'), (111, 'Z'), None]):
                 original = owned_daemons(base)
                 self.assertEqual(len(original), 1)
                 self.assertEqual(owned_daemons(base), original)
-                self.assertNotEqual(owned_daemons(base), original)
                 self.assertEqual(owned_daemons(base), [])
+                self.assertEqual(owned_daemons(base), [])
+                self.assertEqual(owned_daemons(base), [])
+
+            expected = (proc / 'cmdline').read_bytes()
+            with patch('check_daemon_command.pathlib.Path.iterdir', return_value=[proc]), \
+                    patch('check_daemon_command.identity', return_value=(112, 'S')):
+                with patch('pathlib.Path.read_bytes', side_effect=[expected, b'unrelated\0']):
+                    self.assertEqual(owned_daemons(base), [])
+                (proc / 'exe').unlink()
                 self.assertEqual(owned_daemons(base), [])
 
     def test_proc_identity_disappearance_is_terminal_but_access_failure_is_not(self):
@@ -62,6 +71,32 @@ class CommandOwnership(unittest.TestCase):
 
     def test_timeout_collects_the_owned_subprocess_group(self):
         self.check_group_cleanup(lambda argv: command(argv, timeout=2))
+
+    def test_cleanup_uses_the_witnessed_process_and_waits_for_exit(self):
+        with subprocess.Popen([sys.executable, '-c', 'input()'], stdin=subprocess.PIPE) as child:
+            started, _ = identity(child.pid)
+            kill_owned(child.pid, started + 1, timeout=1)
+            self.assertIsNone(child.poll())
+            with patch('signal.pidfd_send_signal', side_effect=PermissionError()):
+                with self.assertRaises(PermissionError):
+                    kill_owned(child.pid, started, timeout=1)
+            kill_owned(child.pid, started, timeout=2)
+            self.assertEqual(child.poll(), -signal.SIGKILL)
+
+    def test_cleanup_accepts_exit_between_identity_check_and_signal(self):
+        with subprocess.Popen([sys.executable, '-c', 'input()'], stdin=subprocess.PIPE) as child:
+            start, state = identity(child.pid)
+
+            def exit_after_read(pid):
+                self.assertEqual(pid, child.pid)
+                child.stdin.write(b'\n')
+                child.stdin.flush()
+                self.assertEqual(child.wait(timeout=2), 0)
+                return start, state
+
+            with patch('check_daemon_command.identity', side_effect=exit_after_read):
+                kill_owned(child.pid, start, timeout=1)
+            kill_owned(child.pid, start, timeout=1)
 
     def test_suite_idle_timeout_collects_the_owned_subprocess_group(self):
         self.check_group_cleanup(lambda argv: run_suite(argv, os.environ, io.BytesIO(), idle_timeout=2))
@@ -88,12 +123,7 @@ time.sleep(60)
             finally:
                 if witness.exists():
                     pid, start = json.loads(witness.read_text())
-                    if (current := identity(pid)) and current[0] == start and current[1] != 'Z':
-                        os.kill(pid, signal.SIGKILL)
-                        end = time.monotonic() + 2
-                        while (current := identity(pid)) and current[0] == start and current[1] != 'Z':
-                            assert time.monotonic() < end
-                            time.sleep(0.01)
+                    kill_owned(pid, start, timeout=2)
 
 
 if __name__ == '__main__':

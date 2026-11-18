@@ -69,17 +69,25 @@ def run_suite(argv, env, output, idle_timeout=300, timeout=1800):
 
 def owned_daemons(base):
     expected = [os.fsencode(arg) for arg in [*base, 'daemon', 'run']]
+    expected_exe = pathlib.Path(base[0]).resolve(strict=True)
     found = []
     for proc in pathlib.Path('/proc').iterdir():
         if not proc.name.isdigit():
             continue
         try:
             if (proc / 'cmdline').read_bytes().rstrip(b'\0').split(b'\0') == expected:
-                assert (proc / 'exe').resolve() == pathlib.Path(base[0]).resolve()
-                current = identity(int(proc.name))
-                if current and current[1] != 'Z':
-                    # Scheduling state can change between two reads of the same process.
-                    found.append((int(proc.name), current[0]))
+                pid = int(proc.name)
+                before = identity(pid)
+                if not before or before[1] == 'Z':
+                    continue
+                # Recheck ownership between two reads of the candidate's start time.
+                if (proc / 'cmdline').read_bytes().rstrip(b'\0').split(b'\0') != expected:
+                    continue
+                if (proc / 'exe').resolve(strict=True) != expected_exe:
+                    continue
+                after = identity(pid)
+                if after and after[0] == before[0] and after[1] != 'Z':
+                    found.append((pid, before[0]))
         except (FileNotFoundError, ProcessLookupError, PermissionError):
             continue
     return found
@@ -91,6 +99,26 @@ def identity(pid):
         return int(fields[19]), fields[0]
     except (FileNotFoundError, ProcessLookupError):
         return None
+
+
+def kill_owned(pid, started_ticks, timeout):
+    try:
+        fd = os.pidfd_open(pid)
+    except ProcessLookupError:
+        return
+    try:
+        current = identity(pid)
+        if current is None or current[0] != started_ticks or current[1] == 'Z':
+            return
+        try:
+            signal.pidfd_send_signal(fd, signal.SIGKILL)
+        except ProcessLookupError:
+            return
+        with selectors.DefaultSelector() as watcher:
+            watcher.register(fd, selectors.EVENT_READ)
+            assert watcher.select(timeout), 'owned process did not exit after cleanup'
+    finally:
+        os.close(fd)
 
 
 def another_uid():
@@ -227,13 +255,7 @@ print('peer_denied')
         finally:
             # A timed out start can detach successfully before returning its PID.
             for owned_pid, started_ticks in owned_daemons(base):
-                current = identity(owned_pid)
-                if current and current[0] == started_ticks and current[1] != 'Z':
-                    os.kill(owned_pid, signal.SIGKILL)
-                    end = time.monotonic() + 10
-                    while (current := identity(owned_pid)) and current[0] == started_ticks and current[1] != 'Z':
-                        assert time.monotonic() < end, 'owned daemon did not exit after cleanup'
-                        time.sleep(0.02)
+                kill_owned(owned_pid, started_ticks, timeout=10)
 
 
 if __name__ == '__main__':
