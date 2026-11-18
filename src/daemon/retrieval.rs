@@ -23,7 +23,7 @@ impl Service {
         self.submit_job(id, JobInput::Retrieval(plan)).await
     }
 
-    pub(super) fn retrieval_snapshot(
+    pub(in crate::daemon) fn retrieval_snapshot(
         &self,
         generation: u64,
     ) -> Result<Arc<crate::config::Snapshot<()>>> {

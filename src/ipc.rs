@@ -178,7 +178,10 @@ pub enum Command {
         plan: crate::retrieval::Request,
         idempotency_key: String,
     },
-    IndexStatus,
+    IndexStatus {
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        include_queue: bool,
+    },
     OriginalShow {
         range: crate::domain::OriginalRange,
     },

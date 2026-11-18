@@ -463,7 +463,9 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
                 },
             })
         }
-        ["index", "status"] => Some(Command::IndexStatus),
+        ["index", "status"] => Some(Command::IndexStatus {
+            include_queue: false,
+        }),
         ["index", "sync", "--idempotency-key", id] => Some(Command::RetrievalRun {
             plan: akasha_otsuge::retrieval::Request::Sync,
             idempotency_key: (*id).into(),
