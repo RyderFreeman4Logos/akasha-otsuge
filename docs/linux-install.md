@@ -1,6 +1,6 @@
 # Linux binary installation
 
-Choose the archive for your Linux architecture. Its filename includes the package version, source commit and architecture. Download the adjacent `.sha256` file into the same directory. The archive includes the full source revision in `SOURCE_COMMIT` and the compiled third-party package inventory in `THIRD-PARTY.json`.
+Choose the archive for your Linux architecture. Its filename includes the package version, source commit and architecture. Download the adjacent `.sha256` file into the same directory. The x86_64 release workflow builds on Ubuntu 22.04 and checks the packaged executable on Debian 12 before upload. The archive includes the full source revision in `SOURCE_COMMIT` and the compiled third-party package inventory in `THIRD-PARTY.json`.
 
 ## Install and start
 
