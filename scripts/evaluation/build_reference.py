@@ -1,4 +1,4 @@
-"""Build isolated H01 observers from the frozen tree using an existing Cargo target directory."""
+"""Build selected reference observers from the frozen tree using an existing Cargo target directory."""
 
 import argparse
 import hashlib
@@ -11,6 +11,13 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASE = "a177d6e23568b627ec9eef593d88289bc8634041"
+
+
+OBSERVERS = {
+    "reference-read": "reference_read.rs",
+    "reference-import": "reference_import.rs",
+    "reference-service": "reference_service_main.rs",
+}
 
 
 def sha(path):
@@ -31,7 +38,18 @@ def main():
         action="store_true",
         help="export and validate Cargo targets without compiling",
     )
+    p.add_argument(
+        "--observer",
+        choices=sorted(OBSERVERS),
+        action="append",
+        help="build only these observers",
+    )
     args = p.parse_args()
+    inputs = {
+        k: v
+        for k, v in OBSERVERS.items()
+        if args.observer is None or k in args.observer
+    }
     os.umask(0o077)
     output = args.output.resolve()
     output.mkdir(mode=0o700)
@@ -58,19 +76,18 @@ def main():
     )
     subprocess.run(["tar", "xf", str(archive), "-C", str(tree)], check=True)
     archive.unlink()
-    fixtures = tree / "src/daemon/jobs"
-    fixtures.mkdir(exist_ok=True)
-    shutil.copyfile(HERE / "reference_service.rs", fixtures / "reference_fixture.rs")
-    with (tree / "src/daemon/jobs.rs").open("a") as f:
-        f.write("\npub mod reference_fixture;\n")
-    with (tree / "src/daemon.rs").open("a") as f:
-        f.write("\npub use jobs::reference_fixture;\n")
+    if "reference-service" in inputs:
+        fixtures = tree / "src/daemon/jobs"
+        fixtures.mkdir(exist_ok=True)
+        shutil.copyfile(
+            HERE / "reference_service.rs", fixtures / "reference_fixture.rs"
+        )
+        with (tree / "src/daemon/jobs.rs").open("a") as f:
+            f.write("\npub mod reference_fixture;\n")
+        with (tree / "src/daemon.rs").open("a") as f:
+            f.write("\npub use jobs::reference_fixture;\n")
     binaries = tree / "src/bin"
     binaries.mkdir(exist_ok=True)
-    inputs = {
-        "reference-read": "reference_read.rs",
-        "reference-service": "reference_service_main.rs",
-    }
     for name, source in inputs.items():
         shutil.copyfile(HERE / source, binaries / (name + ".rs"))
     meta = json.loads(
