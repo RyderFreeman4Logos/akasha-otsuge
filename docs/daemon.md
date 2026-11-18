@@ -122,6 +122,18 @@ plan is a conflict. A job pins configuration generation/digest, acceptance/queue
 clock and execution budget. Reconciliation uses the configured `timeouts.tools`;
 future provider and runner clocks are separate. The hard envelope is 256 active
 jobs and 16 executing jobs, additionally restricted by current configuration.
+New jobs also share a queue byte allowance of 1/64 of the current daemon memory
+target, with a 128 KiB minimum. The 512, 1024 and 2048 MiB profiles allow 8, 16
+and 32 MiB respectively. Model, retrieval and ordinary consult jobs charge their
+stored JSON size until execution starts. Editor consults and other jobs that can
+return to the queue each reserve one full 128 KiB storage record through
+completion. The reservation covers checkpoint growth while the job runs.
+Admission recomputes these charges from active jobs on disk. The separate
+`runtime.max_queued_jobs` setting counts waiting jobs when accepting new work.
+A full queue returns `RESOURCE_BUSY` with `retry_when=capacity_available`.
+The CLI exits with status 4. Retry the request with its original idempotency key
+after waiting for capacity.
+
 Capture batches share the admission boundary so cancellation, permissions and
 configuration cannot be changed halfway through a batch.
 The current concurrency cap is checked while claiming a queued job under that

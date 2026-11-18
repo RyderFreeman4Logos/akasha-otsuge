@@ -155,6 +155,12 @@ pub(super) struct Plan {
     pub(in crate::daemon::jobs) incident: Option<String>,
 }
 
+impl Plan {
+    pub(super) fn is_editor(&self) -> bool {
+        self.editor.is_some()
+    }
+}
+
 impl Service {
     pub(super) fn authorize_consult_result(&self, trace: &Value) -> Result<()> {
         if !trace["workspace"].is_null() {
@@ -210,7 +216,7 @@ impl Service {
             Invocation::load_verified(&self.storage, &plan.invocation_id, &plan.principal)?;
         if invocation.revision() != plan.invocation_revision
             || invocation.fence_hash() != plan.fence
-            || plan.editor.is_none()
+            || !plan.is_editor()
                 && invocation.diagnostic().config_generation != plan.config_generation
         {
             return Err(Error("BINDING_CONFLICT"));
@@ -238,7 +244,7 @@ impl Service {
             .1
             .consult_plan
             .as_ref()
-            .is_some_and(|p| p.editor.is_some())
+            .is_some_and(Plan::is_editor)
         {
             return self.editor_result(id, workflow).await;
         }
