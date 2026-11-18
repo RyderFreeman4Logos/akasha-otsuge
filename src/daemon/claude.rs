@@ -121,7 +121,7 @@ impl Service {
                     }
                     service.check_process_memory().await?;
                     let capability = crate::adapter::claude::probe(&binary).await?;
-                    if capability.version.as_deref() != Some("2.1.311") {
+                    if !crate::adapter::claude::supports_version(capability.version.as_deref()) {
                         return Err(Error("ADAPTER_UNSUPPORTED"));
                     }
                     let registration = Registration {

@@ -1,0 +1,72 @@
+{
+  "blake3": {
+    "notices": {},
+    "version": "1.8.7"
+  },
+  "lance-linalg": {
+    "notices": {
+      "src/simd/dist_table.c": [1, 2]
+    },
+    "version": "13.0.0"
+  },
+  "libsqlite3-sys": {
+    "notices": {
+      "sqlite3/sqlite3.h": [1, 9]
+    },
+    "version": "0.35.0"
+  },
+  "lz4-sys": {
+    "notices": {
+      "liblz4/lib/LICENSE": null,
+      "liblz4/lib/lz4.c": [1, 33],
+      "liblz4/lib/lz4frame.c": [1, 33],
+      "liblz4/lib/lz4hc.c": [1, 33],
+      "liblz4/lib/xxhash.c": [1, 33]
+    },
+    "version": "1.11.1+lz4-1.10.0"
+  },
+  "ring": {
+    "notices": {
+      "crypto/chacha/asm/chacha-x86_64.pl": [2, 14],
+      "crypto/cipher/asm/chacha20_poly1305_x86_64.pl": [3, 15],
+      "crypto/cpu_intel.c": [1, 13],
+      "crypto/crypto.c": [1, 13],
+      "crypto/curve25519/curve25519.c": [1, 13],
+      "crypto/curve25519/curve25519_64_adx.c": [1, 13],
+      "crypto/fipsmodule/aes/aes_nohw.c": [1, 13],
+      "crypto/fipsmodule/aes/asm/aes-gcm-avx2-x86_64.pl": [2, 14],
+      "crypto/fipsmodule/aes/asm/aesni-gcm-x86_64.pl": [2, 14],
+      "crypto/fipsmodule/aes/asm/aesni-x86_64.pl": [2, 14],
+      "crypto/fipsmodule/aes/asm/ghash-x86_64.pl": [2, 14],
+      "crypto/fipsmodule/aes/asm/vpaes-x86_64.pl": [2, 14],
+      "crypto/fipsmodule/bn/asm/x86_64-mont.pl": [2, 14],
+      "crypto/fipsmodule/bn/asm/x86_64-mont5.pl": [2, 14],
+      "crypto/fipsmodule/bn/montgomery.c": [1, 13],
+      "crypto/fipsmodule/bn/montgomery_inv.c": [1, 13],
+      "crypto/fipsmodule/ec/asm/p256-x86_64-asm.pl": [2, 21],
+      "crypto/fipsmodule/ec/ecp_nistz.c": [1, 13],
+      "crypto/fipsmodule/ec/ecp_nistz.h": [1, 13],
+      "crypto/fipsmodule/ec/gfp_p256.c": [1, 13],
+      "crypto/fipsmodule/ec/gfp_p384.c": [1, 13],
+      "crypto/fipsmodule/ec/p256.c": [1, 13],
+      "crypto/fipsmodule/sha/asm/sha512-x86_64.pl": [2, 14],
+      "crypto/limbs/limbs.c": [1, 13],
+      "crypto/mem.c": [1, 13],
+      "crypto/poly1305/poly1305.c": [1, 13],
+      "src/polyfill/once_cell/LICENSE-APACHE": null,
+      "src/polyfill/once_cell/LICENSE-MIT": null,
+      "third_party/fiat/LICENSE": null
+    },
+    "version": "0.17.14"
+  },
+  "zstd-sys": {
+    "notices": {
+      "zstd/LICENSE": null,
+      "zstd/lib/common/threading.c": [1, 12],
+      "zstd/lib/common/xxhash.h": [1, 10],
+      "zstd/lib/dictBuilder/divsufsort.c": [1, 25],
+      "zstd/lib/legacy/zstd_v01.c": [1, 9]
+    },
+    "version": "2.1.2+zstd.1.5.7"
+  }
+}

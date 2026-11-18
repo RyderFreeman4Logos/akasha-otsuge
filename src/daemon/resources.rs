@@ -101,7 +101,7 @@ impl Service {
         let requested = config.resolved().config().runtime.memory_limits();
         let index = match self.search_index.try_lock() {
             Ok(index) => {
-                json!({"inspected":true,"open_budget_mib":index.as_ref().map(|i|i.budget_mib)})
+                json!({"inspected":true,"open_budget_mib":index.open_budget_mib()})
             }
             Err(_) => json!({"inspected":false,"open_budget_mib":null}),
         };

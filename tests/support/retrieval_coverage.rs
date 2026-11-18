@@ -132,8 +132,12 @@ fn scope_changes_pin_the_old_selection_until_activation_and_restore_all_claims()
     assert_eq!(alpha["vector"]["indexed_rows"], 2);
     assert_ne!(alpha["vector"]["generation"], all["vector"]["generation"]);
 
-    daemon.configure(&settings(&endpoint.address, Some(&["beta"])));
+    daemon.configure(&format!(
+        "[runtime]\nmemory_budget_mib=2048\n{}",
+        settings(&endpoint.address, Some(&["beta"]))
+    ));
     daemon.cli(&["config", "reload"]);
+    super::super::wait_for_storage_budget(&daemon, 2048);
     let during = search(&daemon, "alpha", "old-selected");
     assert_eq!(during["mode"], "hybrid", "{during}");
     assert_eq!(
@@ -179,6 +183,7 @@ fn scope_changes_pin_the_old_selection_until_activation_and_restore_all_claims()
 
     daemon.configure(&settings(&endpoint.address, None));
     daemon.cli(&["config", "reload"]);
+    super::super::wait_for_storage_budget(&daemon, 512);
     let restored = build(&daemon, "all-again");
     assert_eq!(
         restored["vector"]["generation"],
@@ -196,6 +201,73 @@ fn scope_changes_pin_the_old_selection_until_activation_and_restore_all_claims()
     );
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
+}
+
+#[test]
+fn interrupted_hybrid_searches_publish_no_recall_receipt() {
+    use sha2::{Digest, Sha256};
+
+    let endpoint = super::super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    seed(&daemon);
+    let config = settings(&endpoint.address, None);
+    daemon.configure(&config);
+    daemon.start();
+    build(&daemon, "ready");
+    let file = daemon.root.join("scope.json");
+    std::fs::write(&file, serde_json::to_vec(&scope("alpha")).unwrap()).unwrap();
+
+    for (id, code) in [
+        ("cancel-search", "CANCELLED"),
+        ("expire-search", "WORKFLOW_TIMEOUT"),
+    ] {
+        if code == "WORKFLOW_TIMEOUT" {
+            daemon.configure(&format!(
+                "{config}\n[timeouts]\nrunner='1ms'\nstartup='1ms'\ncleanup='1ms'\ntools='1ms'\nsummary='1ms'\nworkflow='1s'\n"
+            ));
+            daemon.cli(&["config", "reload"]);
+        }
+        endpoint.pause();
+        let before = endpoint.requests.lock().unwrap().len();
+        daemon.cli(&[
+            "search",
+            "offline",
+            "--scope",
+            file.to_str().unwrap(),
+            "--idempotency-key",
+            id,
+        ]);
+        if code == "CANCELLED" {
+            let until = Instant::now() + Duration::from_secs(10);
+            while endpoint.requests.lock().unwrap().len() == before {
+                assert!(
+                    Instant::now() < until,
+                    "hybrid search did not start embedding"
+                );
+                std::thread::sleep(Duration::from_millis(10));
+            }
+            daemon.cli(&["job", "cancel", id]);
+        }
+        let job = finished(&daemon, id);
+        endpoint.resume();
+        assert_eq!(job["error"], code, "{job}");
+        assert!(job["result"]["receipt_id"].is_null());
+        let key: String = Sha256::digest(id.as_bytes())
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect();
+        let receipt = format!("search/{key}");
+        let missing = daemon
+            .command()
+            .args(["receipt", "show", &receipt])
+            .output()
+            .unwrap();
+        assert!(!missing.status.success());
+        assert_eq!(
+            serde_json::from_slice::<Value>(&missing.stderr).unwrap()["error"]["code"],
+            "RECEIPT_NOT_FOUND"
+        );
+    }
 }
 
 #[test]
@@ -260,4 +332,105 @@ fn all_excluded_records_complete_the_prefix_without_embedding_calls() {
             assert_eq!(excluded, 3);
             store.close().await.unwrap();
         });
+}
+
+#[test]
+fn failed_explicit_rebuild_keeps_published_search_and_resumes_after_restart() {
+    let endpoint = super::super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    seed(&daemon);
+    let retrieval =
+        settings(&endpoint.address, Some(&["beta"])).replace("timeout='2s'", "timeout='30s'");
+    daemon.configure(&format!("[runtime]\nmax_concurrent_jobs=2\n{retrieval}"));
+    daemon.start();
+    let old = build(&daemon, "published");
+    let count = endpoint.requests.lock().unwrap().len();
+    endpoint.pause();
+    daemon.cli(&["index", "rebuild", "--idempotency-key", "replacement"]);
+    let until = Instant::now() + Duration::from_secs(10);
+    while endpoint.requests.lock().unwrap().len() == count {
+        assert!(Instant::now() < until, "candidate did not reach embedding");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let building = daemon.cli(&["index", "status"])["data"].clone();
+    assert_eq!(building["generation"], old["generation"]);
+    assert_eq!(building["rebuild"]["phase"], "building");
+    assert_ne!(building["rebuild"]["generation"], old["generation"]);
+    assert_eq!(
+        building["vector"]["generation"],
+        old["vector"]["generation"]
+    );
+    let during = search(&daemon, "alpha", "during");
+    assert_eq!(
+        during["items"][0]["memory"]["revision"]["key"]["id"],
+        "offline"
+    );
+    daemon.cli(&["job", "cancel", "replacement"]);
+    endpoint.resume();
+    let cancelled = finished(&daemon, "replacement");
+    assert_ne!(cancelled["state"], "succeeded", "{cancelled}");
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    let original = search(&daemon, "alpha", "after-restart");
+    assert_eq!(original["items"], during["items"]);
+    let replacement = build(&daemon, "resume");
+    assert_eq!(replacement["generation"], building["rebuild"]["generation"]);
+    assert_ne!(replacement["generation"], old["generation"]);
+    assert_ne!(
+        replacement["vector"]["generation"],
+        old["vector"]["generation"]
+    );
+    assert_eq!(replacement["vector"]["indexed_rows"], 1);
+    let active = daemon.cli(&["index", "status"])["data"].clone();
+    assert_eq!(
+        active["active_vector"]["generation"],
+        replacement["vector"]["generation"]
+    );
+    assert!(active.get("rebuild").is_none());
+    let final_result = search(&daemon, "alpha", "after-publication");
+    assert_eq!(final_result["items"], during["items"]);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
+fn failed_rebuilds_with_new_keys_reuse_one_native_candidate() {
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let mut daemon = Daemon::new();
+    seed(&daemon);
+    daemon.start();
+    let published = build(&daemon, "first");
+    let settings = settings(
+        &format!("http://{}/v1", listener.local_addr().unwrap()),
+        None,
+    )
+    .replace("timeout='2s'", "timeout='100ms'");
+    daemon.configure(&settings);
+    daemon.cli(&["config", "reload"]);
+    let mut candidate = None;
+    for id in ["attempt-a", "attempt-b", "attempt-c"] {
+        daemon.cli(&["index", "rebuild", "--idempotency-key", id]);
+        let job = finished(&daemon, id);
+        assert_eq!(job["state"], "failed", "{job}");
+        assert_eq!(job["error"], "PROVIDER_TIMEOUT", "{job}");
+        let status = daemon.cli(&["index", "status"])["data"].clone();
+        assert_eq!(status["generation"], published["generation"]);
+        let tables: std::collections::BTreeSet<_> =
+            std::fs::read_dir(daemon.root.join("data/search"))
+                .unwrap()
+                .map(|entry| entry.unwrap().path())
+                .filter(|path| path.extension().is_some_and(|ext| ext == "lance"))
+                .collect();
+        assert_eq!(tables.len(), 3);
+        let current = (status["rebuild"]["generation"].clone(), tables);
+        assert_eq!(candidate.get_or_insert_with(|| current.clone()), &current);
+    }
+    daemon.configure("");
+    daemon.cli(&["config", "reload"]);
+    let resumed = build(&daemon, "resume");
+    assert_eq!(resumed["generation"], candidate.unwrap().0);
+    assert_eq!(resumed["indexed_rows"], published["indexed_rows"]);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
 }

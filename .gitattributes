@@ -1,3 +1,4 @@
 # Preserve byte-exact native output and source diffs.
 docs/benchmarks/results/**/*.log whitespace=-blank-at-eof,-blank-at-eol
 docs/benchmarks/results/**/*.patch whitespace=-blank-at-eof,-blank-at-eol
+docs/licenses/upstream/kanaria-LICENSE.txt -text whitespace=cr-at-eol

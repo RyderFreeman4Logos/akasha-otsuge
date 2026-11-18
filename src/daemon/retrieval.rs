@@ -23,7 +23,7 @@ impl Service {
         self.submit_job(id, JobInput::Retrieval(plan)).await
     }
 
-    pub(super) fn retrieval_snapshot(
+    pub(in crate::daemon) fn retrieval_snapshot(
         &self,
         generation: u64,
     ) -> Result<Arc<crate::config::Snapshot<()>>> {
@@ -55,34 +55,41 @@ impl Service {
         Ok(requested.clone())
     }
 
+    async fn index_cache(
+        &self,
+        id: &str,
+        workflow: &Deadline,
+    ) -> Result<tokio::sync::MutexGuard<'_, crate::retrieval::IndexCache>> {
+        tokio::select! {
+            guard=self.search_index.lock()=>Ok(guard),
+            code=self.model_cancelled(id)=>Err(Error(code)),
+            _=tokio::time::sleep(workflow.remaining())=>Err(Error("WORKFLOW_TIMEOUT")),
+        }
+    }
+
+    async fn index_owner(
+        &self,
+        id: &str,
+        workflow: &Deadline,
+    ) -> Result<Arc<crate::retrieval::IndexOwner>> {
+        let mut cache = self.index_cache(id, workflow).await?;
+        Ok(cache.owner(self.config.pin().resolved()).await?)
+    }
+
     pub(super) async fn retrieval_index(
         &self,
         id: &str,
         workflow: &Deadline,
     ) -> Result<Arc<Index>> {
-        let index = {
-            let mut owned = tokio::select! {
-                guard=self.search_index.lock()=>guard,
-                code=self.model_cancelled(id)=>return Err(Error(code)),
-                _=tokio::time::sleep(workflow.remaining())=>return Err(Error("WORKFLOW_TIMEOUT")),
-            };
-            let live = self.config.pin();
-            let budget = live.resolved().config().runtime.memory_budget_mib;
-            if owned
-                .as_ref()
-                .is_none_or(|index| index.budget_mib != budget)
-            {
-                if owned
-                    .as_ref()
-                    .is_some_and(|index| Arc::strong_count(index) > 1)
-                {
-                    return Err(Error("RESOURCE_BUSY"));
-                }
-                *owned = None;
-                *owned = Some(Arc::new(Index::open(live.resolved(), &self.storage).await?));
-            }
-            owned.as_ref().ok_or(Error("INDEX_MISSING"))?.clone()
-        };
+        let mut cache = self.index_cache(id, workflow).await?;
+        let owner = cache.owner(self.config.pin().resolved()).await?;
+        if let Some(index) = &cache.published {
+            return Ok(index.clone());
+        }
+        let index = Arc::new(
+            Index::open_generation(owner, crate::retrieval::status(&self.storage)?, false).await?,
+        );
+        cache.published = Some(index.clone());
         Ok(index)
     }
 
@@ -107,30 +114,33 @@ impl Service {
         code.map_or(Ok(()), |code| Err(crate::storage::StorageError::new(code)))
     }
 
-    async fn rebuild_index(
+    async fn finish_rebuild(
         &self,
         id: &str,
-        generation: u64,
         workflow: &Deadline,
-    ) -> Result<Arc<Index>> {
-        let mut owned = tokio::select! {
-            guard=self.search_index.lock()=>guard,
-            code=self.model_cancelled(id)=>return Err(Error(code)),
-            _=tokio::time::sleep(workflow.remaining())=>return Err(Error("WORKFLOW_TIMEOUT")),
-        };
-        if owned
-            .as_ref()
-            .is_some_and(|index| Arc::strong_count(index) > 1)
-        {
-            return Err(Error("RESOURCE_BUSY"));
-        }
+        index: &Arc<Index>,
+        progress: &crate::retrieval::Status,
+        generation: u64,
+        target: u64,
+    ) -> Result<()> {
+        let mut owned = self.index_cache(id, workflow).await?;
         let authorize = || self.authorize_index_work(id, workflow);
-        Index::begin_rebuild(&self.storage, id, generation, &authorize).await?;
-        *owned = None;
-        let index = Arc::new(Index::open(self.config.pin().resolved(), &self.storage).await?);
-        index.retire_previous_tables(&authorize).await?;
-        *owned = Some(index.clone());
-        Ok(index)
+        // Existing reads own their Arc until their last native query completes.
+        while owned.published.as_ref().is_some_and(|cached| {
+            Arc::strong_count(cached) > 1 + usize::from(Arc::ptr_eq(index, cached))
+        }) {
+            authorize()?;
+            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+        }
+        if index.is_pending() {
+            Index::publish_rebuild(&self.storage, progress, generation, target, &authorize).await?;
+            owned.published = None;
+        }
+        index
+            .owner
+            .finish_retirement(&self.storage, generation, &authorize)
+            .await?;
+        Ok(())
     }
 
     async fn retrieval_result(&self, id: &str, workflow: &Deadline) -> Result<Value> {
@@ -158,11 +168,58 @@ impl Service {
         } else {
             None
         };
-        let index = if matches!(plan, RetrievalRequest::Rebuild) {
-            self.rebuild_index(id, config.generation(), workflow)
-                .await?
-        } else {
-            self.retrieval_index(id, workflow).await?
+        let pending = match &plan {
+            RetrievalRequest::Rebuild => {
+                let mut owned = self
+                    .search_index
+                    .try_lock()
+                    .map_err(|_| Error("RESOURCE_BUSY"))?;
+                if owned
+                    .published
+                    .as_ref()
+                    .is_some_and(|cached| Arc::strong_count(cached) > 1)
+                {
+                    return Err(Error("RESOURCE_BUSY"));
+                }
+                let authorize = || self.authorize_index_work(id, workflow);
+                if let Some(pending) = crate::retrieval::pending_rebuild(&self.storage)?
+                    && pending.generation == crate::retrieval::status(&self.storage)?.generation
+                {
+                    // Activation survived a stop. Release its old files before admitting another generation.
+                    let owner = owned.owner(self.config.pin().resolved()).await?;
+                    owner
+                        .finish_retirement(&self.storage, config.generation(), &authorize)
+                        .await?;
+                }
+                drop(owned);
+                Some(
+                    Index::start_rebuild(&self.storage, id, config.generation(), &authorize)
+                        .await?,
+                )
+            }
+            RetrievalRequest::Sync => crate::retrieval::pending_rebuild(&self.storage)?,
+            _ => None,
+        };
+        let needs_retirement = pending.is_some();
+        let index = match pending {
+            Some(progress)
+                if progress.generation != crate::retrieval::status(&self.storage)?.generation =>
+            {
+                let owner = self.index_owner(id, workflow).await?;
+                Arc::new(
+                    Index::open_candidate(
+                        &self.storage,
+                        &owner,
+                        &config,
+                        progress,
+                        id,
+                        matches!(plan, RetrievalRequest::Rebuild),
+                        &|| self.authorize_index_work(id, workflow),
+                    )
+                    .await?,
+                )
+            }
+            _ => self.retrieval_index(id, workflow).await?,
         };
         if workflow.expired().is_some() {
             return Err(Error("WORKFLOW_TIMEOUT"));
@@ -170,88 +227,173 @@ impl Service {
         match plan {
             RetrievalRequest::Sync | RetrievalRequest::Rebuild => {
                 let target = target.ok_or(Error("JOB_CORRUPT"))?;
-                let context = context()?;
-                let scope = owner_scope();
-                let authorize = || {
-                    Domain::new(&self.storage)
-                        .permission(&context, Some(&scope))
-                        .map(|_| ())
-                };
-                self.index_epoch.fetch_add(1, Ordering::Release);
-                let _epoch = IndexBuild(&self.index_epoch);
-                let mut windows_since_prune = 0u8;
+                let mut candidate = index;
+                let mut retry = matches!(plan, RetrievalRequest::Rebuild);
                 loop {
+                    let result = self
+                        .maintain_index(id, workflow, &candidate, &config, target, needs_retirement)
+                        .await;
+                    if !candidate.is_pending()
+                        || !matches!(
+                            &result,
+                            Err(Error("INDEX_IO" | "INDEX_CORRUPT" | "INDEX_MISSING"))
+                        )
                     {
-                        let _guard = self.admission.lock().await;
-                        let (_, job) = self.job(id)?;
-                        self.authorize_job(&job)?;
-                        if job.cancel_requested {
-                            return Err(Error("CANCELLED"));
-                        }
-                        if self.stopping.load(std::sync::atomic::Ordering::Acquire) {
-                            return Err(Error("INDEX_INTERRUPTED"));
-                        }
-                        if workflow.expired().is_some() {
-                            return Err(Error("WORKFLOW_TIMEOUT"));
-                        }
+                        return result;
                     }
-                    let mut progress = index
-                        .sync_batch(&self.storage, target, config.generation(), &authorize)
-                        .await?;
-                    if config.resolved().config().retrieval.embedding.is_some() {
-                        progress.vector = Some(
-                            index
-                                .vector_index(&self.storage, config.resolved())
-                                .await?
-                                .sync_batch(
-                                    &self.storage,
-                                    target,
-                                    &config,
-                                    &self.providers,
-                                    workflow,
-                                    || self.model_cancelled(id),
-                                    &authorize,
-                                )
-                                .await?,
-                        );
-                    }
-                    let complete = progress.lexical_watermark >= target
-                        && progress
-                            .vector
-                            .as_ref()
-                            .is_none_or(|v| v.watermark >= target);
-                    windows_since_prune = windows_since_prune.saturating_add(1);
-                    if (complete || windows_since_prune >= 32)
-                        && let Ok(owned) = self.search_index.try_lock()
-                        && owned.as_ref().is_some_and(|cached| {
-                            Arc::ptr_eq(cached, &index) && Arc::strong_count(cached) == 2
-                        })
+                    let authorize = || self.authorize_index_work(id, workflow);
+                    if !candidate
+                        .mark_damaged_candidate(&self.storage, config.generation(), &authorize)
+                        .await?
+                        || !retry
                     {
-                        // Keep new readers behind this lock until native cleanup has returned.
-                        index
-                            .prune_versions(&|| {
-                                authorize()?;
-                                self.authorize_index_work(id, workflow)
-                            })
-                            .await?;
-                        windows_since_prune = 0;
+                        return result;
                     }
-                    if complete {
-                        crate::retrieval::activate_vector(
+                    retry = false;
+                    let damaged = crate::retrieval::pending_rebuild(&self.storage)?
+                        .ok_or(Error("INDEX_NOT_READY"))?;
+                    let owner = self.index_owner(id, workflow).await?;
+                    drop(candidate);
+                    candidate = Arc::new(
+                        Index::open_candidate(
                             &self.storage,
-                            &progress,
+                            &owner,
                             &config,
-                            target,
+                            damaged,
+                            id,
+                            false,
                             &authorize,
                         )
-                        .await?;
-                        return Ok(serde_json::to_value(progress)?);
-                    }
+                        .await?,
+                    );
                 }
             }
             plan @ RetrievalRequest::Search { .. } => {
                 self.search(id, workflow, index, config, vector_generation, plan)
                     .await
+            }
+        }
+    }
+
+    async fn maintain_index(
+        &self,
+        id: &str,
+        workflow: &Deadline,
+        index: &Arc<Index>,
+        config: &crate::config::Snapshot<()>,
+        target: u64,
+        needs_retirement: bool,
+    ) -> Result<Value> {
+        let context = context()?;
+        let scope = owner_scope();
+        let authorize = || {
+            Domain::new(&self.storage)
+                .permission(&context, Some(&scope))
+                .map(|_| ())
+        };
+        self.index_epoch.fetch_add(1, Ordering::Release);
+        let _epoch = IndexBuild(&self.index_epoch);
+        let mut windows_since_maintenance = 0u8;
+        loop {
+            {
+                let _guard = self.admission.lock().await;
+                let (_, job) = self.job(id)?;
+                self.authorize_job(&job)?;
+                if job.cancel_requested {
+                    return Err(Error("CANCELLED"));
+                }
+                if self.stopping.load(std::sync::atomic::Ordering::Acquire) {
+                    return Err(Error("INDEX_INTERRUPTED"));
+                }
+                if workflow.expired().is_some() {
+                    return Err(Error("WORKFLOW_TIMEOUT"));
+                }
+            }
+            let mut progress = index
+                .sync_batch(&self.storage, target, config.generation(), &authorize)
+                .await?;
+            // Keep the writer's pinned vector even if a search opens another generation.
+            let vector = if config.resolved().config().retrieval.embedding.is_some() {
+                Some(index.vector_index(&self.storage, config.resolved()).await?)
+            } else {
+                None
+            };
+            if let Some(vector) = &vector {
+                progress.vector = Some(
+                    match vector
+                        .sync_batch(
+                            &self.storage,
+                            target,
+                            config,
+                            &self.providers,
+                            workflow,
+                            || self.model_cancelled(id),
+                            &authorize,
+                        )
+                        .await
+                    {
+                        Ok(progress) => progress,
+                        Err(err) if err.code == "INDEX_INPUT_CHANGED" => continue,
+                        Err(err) => return Err(err.into()),
+                    },
+                );
+            }
+            let complete = progress.lexical_watermark >= target
+                && progress
+                    .vector
+                    .as_ref()
+                    .is_none_or(|v| v.watermark >= target);
+            windows_since_maintenance = windows_since_maintenance.saturating_add(1);
+            if complete || windows_since_maintenance >= 32 {
+                let authorize_native = || {
+                    authorize()?;
+                    self.authorize_index_work(id, workflow)
+                };
+                index
+                    .maintain_tables(vector.as_deref(), &authorize_native)
+                    .await?;
+                windows_since_maintenance = 0;
+                if index.is_pending() {
+                    index.prune_versions(&authorize_native).await?;
+                } else if let Ok(owned) = self.search_index.try_lock()
+                    && owned.published.as_ref().is_some_and(|cached| {
+                        Arc::ptr_eq(cached, index) && Arc::strong_count(cached) == 2
+                    })
+                {
+                    // New readers wait for native pruning behind this cache lock.
+                    index.prune_versions(&authorize_native).await?;
+                }
+            }
+            if complete {
+                if index.is_pending() {
+                    index
+                        .check_candidate_files(&|| self.authorize_index_work(id, workflow))
+                        .await?;
+                }
+                crate::retrieval::activate_vector(
+                    &self.storage,
+                    &progress,
+                    config,
+                    target,
+                    &|| {
+                        authorize()?;
+                        self.authorize_index_work(id, workflow)
+                    },
+                )
+                .await?;
+                if needs_retirement {
+                    self.finish_rebuild(
+                        id,
+                        workflow,
+                        index,
+                        &progress,
+                        config.generation(),
+                        target,
+                    )
+                    .await?;
+                    progress = Index::status(&self.storage, config.resolved())?;
+                }
+                return Ok(serde_json::to_value(progress)?);
             }
         }
     }

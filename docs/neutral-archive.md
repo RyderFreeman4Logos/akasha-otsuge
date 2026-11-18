@@ -5,14 +5,42 @@ original UTF-8 bytes. Reading this format needs neither SurrealKV nor LanceDB.
 It is separate from the native database checkpoint API and from `memory export`,
 which displays one memory.
 
-Stop the daemon before exporting. Use the same config/profile as the stopped
-store and a new destination whose parent directory already exists:
+Use the same configuration and profile as the running daemon. Set `opts` to its
+startup options and choose a new archive path whose parent directory exists.
+`daemon stop` acknowledges the drain while the process can still hold the
+database lock. This Bash example uses Linux and Python 3.9+ to wait for that
+process to exit before exporting. For a named profile, append `--profile NAME`
+to `opts`.
 
-```sh
-akasha-otsuge --config /path/config.toml daemon stop
-akasha-otsuge --config /path/config.toml archive export /path/new-archive
-akasha-otsuge --config /path/config.toml daemon start
+```bash
+set -euo pipefail
+opts=(--config /path/config.toml)
+python3 - "${opts[@]}" <<'PY'
+import json
+import os
+import select
+import subprocess
+import sys
+
+def daemon(action):
+    raw = subprocess.check_output(["akasha-otsuge", *sys.argv[1:], "daemon", action])
+    return json.loads(raw)["data"]
+
+pidfd = os.pidfd_open(daemon("status")["pid"])
+try:
+    exited = select.poll()
+    exited.register(pidfd, select.POLLIN)
+    if daemon("stop")["state"] != "draining" or not exited.poll(120_000):
+        raise SystemExit("Daemon did not finish draining. Inspect the daemon log.")
+finally:
+    os.close(pidfd)
+PY
+akasha-otsuge "${opts[@]}" archive export /path/new-archive
+akasha-otsuge "${opts[@]}" daemon start
 ```
+
+If the daemon is already stopped, run the export and start commands with the
+same options.
 
 The native database lock prevents export while another process owns the store.
 Export requires an existing store, rejects destinations inside or above its

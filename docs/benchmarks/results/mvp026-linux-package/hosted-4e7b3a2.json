@@ -1,0 +1,49 @@
+{
+  "head": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+  "artifact_id": 14431926383,
+  "expires_at": "2026-11-25T13:26:24Z",
+  "zip_sha256": "38094d581d231c4cdfa9cfa734bcfcc3233d30b270d98f1333ba3ba10a19dcf7",
+  "archive_sha256": "4cc09f4c5d0cb51f7d778d181bdf74747bf4876402c2ee136e8b5652b07509a8",
+  "archive_bytes": 100403500,
+  "tar_entries": 365,
+  "binary_sha256": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+  "workflow_url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/44311528619",
+  "artifact_url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/44311528619/artifacts/14431926383",
+  "consumer": "Debian 12 x86_64 in isolated PID, network and mount namespaces",
+  "pi": {
+    "pi_version": "1.4.0",
+    "installed_exe_sha256": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+    "other_hosts_absent_on_path": true,
+    "consult_status": "found",
+    "review_state": "investigating",
+    "delivery": "sent",
+    "ack_replayed": true,
+    "user_settings_preserved": true,
+    "real_model_calls": 0
+  },
+  "upgrade": {
+    "source_commit": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+    "rollback_binary_and_config_exact": true,
+    "rollback_native_files": 7,
+    "rollback_original_events": 129,
+    "rollback_pending_after": "succeeded",
+    "rollback_prior_commits": 30,
+    "original_events": 129,
+    "pending_before": "queued",
+    "pending_after": "succeeded",
+    "unchanged_prior_commits": 30,
+    "config_preserved": true,
+    "history_after_uninstall": true,
+    "failed_store_preserved": true
+  },
+  "neutral_restore": {
+    "export_commit_seq": 15,
+    "backup_digest": {
+      "blobs.bin": "0116aaa4d4157ba7ad9b247cfd1ad8158c70ed13d89c0f5e99b503e798af126d",
+      "commits.jsonl": "4c2745b9cd8fa2063ae91fa4902fbd7d5f52fb6dadfee62f7116dd85f652eab9",
+      "manifest.json": "1414bbbb200ad4191fbb98cd2534ebeb58810996d96879adcefd0d1f05fbd3c1"
+    },
+    "fresh_restored_daemon_started": true,
+    "unmodified_reexport": true
+  }
+}

@@ -13,6 +13,12 @@ pub use runner::ClaudeRunner;
 use std::{path::Path, time::Duration};
 pub(crate) use transcript::transcript_frame;
 
+pub const SUPPORTED_VERSIONS: &[&str] = &["2.1.311", "2.1.322"];
+
+pub fn supports_version(version: Option<&str>) -> bool {
+    version.is_some_and(|v| SUPPORTED_VERSIONS.contains(&v))
+}
+
 /// Runs only the CLI version query; it does not certify a model or caller binding.
 pub async fn probe(binary: &Path) -> Result<CapabilityReport> {
     let (executable, text) = super::native::version_output(binary, Duration::from_secs(5)).await?;

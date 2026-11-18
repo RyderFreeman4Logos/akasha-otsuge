@@ -1,8 +1,15 @@
 # Active work and complete remaining checklist
 
-Rechecked 2026-11-17 UTC: **23 original Issues completed, 5 Issues open
-(#12, #26, #27, #28 and #65)**. #50 is also completed and closed. No completed
-acceptance is waiting for issue closure.
+At the 2026-11-18 14:00 UTC check, 23 original issues had passed their acceptance criteria. Six GitHub issues were open.
+
+| Issue | Verified work and outstanding acceptance |
+| --- | --- |
+| [#12](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) | [#88](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/88) verified Claude Code 2.1.311 and 2.1.322 with the local protocol fixture. The authenticated native run and a trusted fork-parent identity remain open. |
+| [#26](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26) | The [downloaded package](../benchmarks/results/mvp026-linux-package/hosted-4e7b3a2.json) passed Pi installation, upgrade, rollback and neutral restore. The [guide command checks](../benchmarks/results/mvp026-linux-package/four-host-guide-commands.json) passed for default and custom settings and all four hosts. The explicit Claude and full-scale dependencies remain open in #12 and #65. |
+| [#27](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) | [#87](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/87) published 60 frozen imports and three historical controls. The first 13 tasks have receipts for both model strategies. Native preflights cover 24 tasks. Complete the remaining input mappings, model runs, blind judgments, cost comparisons and host combinations. |
+| [#28](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/28) | The [24-requirement matrix](acceptance-matrix.md) tracks acceptance, final release and artifact readback. |
+| [#65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65) | [#76](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/76) and [#82](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/82) delivered native index maintenance and the workload runner. Complete the full import, index and recall checks, 100,000 history changes, resource profiles, two 30-minute 100-client runs and recovery criteria. |
+| [#84](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/84) | [#86](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/86) covers preservation of the published index during rebuild, interrupted activation and retirement. The final integrated commit passed local checks, including 186 installed daemon tests. The hosted check is pending. |
 
 Post-merge readback found #24 automatically marked completed at
 2026-11-11T07:31:41Z even though PR64 covered only software controls.
@@ -24,8 +31,8 @@ it is not a claim that private source records were modified for this acceptance.
 PRs #57 through #61 and their historical gates, failures and real-data identities
 remain linked from the final archive.
 
-The existing SSD worktree is reused on fix/mvp-024-claim-tail, based on
-merged preparation commit `bf15768`. No additional corpus or Rust target is copied.
+The existing SSD worktree is reused on fix/mvp-024-windowed-maintenance, based
+on PR #75 merge `a177d6e`. No additional corpus or Rust target is copied.
 PR #67 is merged as b71b18d. PR #63 completed controlled budget-change drain/reopen and published
 the migration evidence/TODO documentation from d6552b9. The merged tree matches
 reviewed 0de2704 exactly; its canonical gate, independent R2 review and CI passed.
@@ -133,15 +140,42 @@ retains complete reports, logs and readbacks, including every earlier failure.
 - [x] Publish the preparation leaf with exact local gate, independent review and
   hosted CI. PR #74 merged with the reviewed tree; source reproduction and memory
   passed while the 13-record production admission failure remains preserved.
-- [ ] Resolve the 13 empty-claim splits found by the complete production record
+- [x] Resolve the 13 empty-claim splits found by the complete production record
   census. Exact diagnosis found one whitespace byte at each tail. The source
   repair passes unchanged RED/GREEN and all five seeder tests while preserving
   bytes, UTF-8 spans and irreducible rejection. All 13 real bodies passed
   byte-identical replay and all 39 daemon current reads. The
   [claim-tail archive](../benchmarks/results/mvp024-claim-tail/README.md) preserves
   the cleanup/environment failures and their completed reconciliation.
-  Canonical gate, independent review and publication remain pending. The
-  original full admission run remains failed.
+  PR #75 merged with the reviewed tree. Its canonical gate passed 652 Rust
+  executions, 35 Python tests and seven Node tests. Independent review reported
+  zero findings; hosted CI44016475601 passed. The final publication archive
+  retains the complete receipts. The original full admission run remains failed.
+- [x] Import a bounded prefix of 65,536 real sources and check all current claims,
+  original reads and 16 input-unit digests. This does not establish full coverage.
+- [x] Collect both incomplete prefix-index attempts. R1 failed its disappearing-file
+  observer. R2 ended through deliberate native cancellation after measured reclaim
+  and read amplification. All owned processes exited and the socket was removed.
+  The retained 2,354,728,960-byte store has a complete 14,079-file digest inventory.
+- [ ] Publish bounded windowed native maintenance after canonical gate and independent
+  review. The first candidate passed its canonical gate, but independent R1 found
+  maintenance could select the old query generation. A deterministic native RED
+  reproduced 48 writer rows left unindexed. The explicit writer-object correction
+  passes eleven retrieval tests with one intentional ignore. Its own canonical
+  gate and full-range review remain pending. The
+  [evidence archive](../benchmarks/results/mvp024-windowed-maintenance/README.md)
+  preserves the stopped baseline, diagnostics, rejected review and correction.
+- [x] Measure the R3 prefix rebuild, index-period memory and I/O, eight keyword
+  witnesses, read-only ANN recall and eight hybrid witnesses after reopening.
+  The [R3 report and replay](../benchmarks/results/mvp024-windowed-maintenance/README.md#r3-real-prefix-index-and-search-recovery)
+  retain the first warm hybrid timeout and the original job's recovered failure.
+- [x] Admit a separate importer source epoch and grow from 16 to 32 verified
+  units and 131,072 authority records. The derived search inventory stayed unchanged.
+- [ ] Verify the incremental index over the additional 65,536 records and
+  establish the cause and recovery behavior of the first warm hybrid stall.
+- [ ] Integrate the bounded capture reader and finish the real 100-client controller.
+  Focused native client, capture, current, scoped-history and correction fixtures
+  passed. These small fixtures do not establish the required workload duration.
 - [ ] Stream the full eligible cohort and unchanged lexical source data through
   bounded preparation and production import; verify actual counts and byte
   coverage before full load/recovery admission. The source census is not import.
@@ -1241,6 +1275,18 @@ production acceptance below passes; #3 spike receipts remain historical evidence
 Use the existing 42 SSD parquet shards and deterministic streaming preparation.
 Measure a small import before admitting full storage; retain no second raw JSONL.
 
+- [x] Verify all seven source-transition import cases with the retained seeder,
+  including changed inputs, bounded growth, complete replay and partial acknowledgment.
+- [ ] Qualify vector maintenance at the real partition split threshold. The
+  retained prefix timed out at 62,970 vectors. Verify full coverage and scoped
+  queries within the low memory profile before admitting the next input prefix.
+- [x] Exercise the workload client against a native daemon on a small fixture.
+  In 55 seconds, 100 clients finished 908 requests with 11 expected conflicts.
+  The offline export matched all 660 originals (2,703,360 bytes).
+- [ ] Publish provider batching after its 31 focused retrieval checks, integrate
+  the workload runner and measure the required 1,800-second real-corpus intervals.
+
+
 The first independent leaf adds backward-compatible target/peak/total configuration
 and on-demand process-tree RSS/PSS reporting, including guarded external children.
 It truthfully reports current enforcement as absent and retains the budget used
@@ -1633,10 +1679,10 @@ complete. Daybreak/new red-team work remains temporarily deferred by the owner.
 
 ### Remaining release acceptance
 
-- [ ] #26: build the Linux release candidate and checksums, recording the platforms
+- [x] #26: build the Linux release candidate and checksums, recording the platforms
   actually executed; test a clean install and one selected CLI through capture,
   consult, review and notification.
-- [ ] #26: execute upgrade with configuration, history and pending jobs preserved;
+- [x] #26: execute upgrade with configuration, history and pending jobs preserved;
   verify backup/recovery and uninstall only owned integrations, preserving existing
   hooks, configuration and all user history.
 - [ ] #26: provide four host guides and execute their commands, including paths,

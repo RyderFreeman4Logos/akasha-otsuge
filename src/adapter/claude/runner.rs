@@ -59,7 +59,11 @@ impl ClaudeRunner {
             return Err(ErrorCode::InvalidArgument.into());
         }
         let mut report = probe(binary).await?;
-        if report.version.as_deref() != Some("2.1.311") {
+        let version = report
+            .version
+            .as_deref()
+            .ok_or(ErrorCode::AdapterUnsupported)?;
+        if !super::supports_version(Some(version)) {
             return Err(ErrorCode::AdapterUnsupported.into());
         }
         let workspace = workspace
@@ -68,7 +72,7 @@ impl ClaudeRunner {
         if !workspace.is_dir() {
             return Err(ErrorCode::SourceUnavailable.into());
         }
-        report.machine_protocol = Some("claude-stream-json/2.1.311".into());
+        report.machine_protocol = Some(format!("claude-stream-json/{version}"));
         report.cancellation = true;
         report.outer_timeout = true;
         report.capabilities.extend(
@@ -216,6 +220,11 @@ impl AgentRunner for ClaudeRunner {
                 directory,
                 _directory_fd: directory_fd,
                 listener,
+                version: self
+                    .report
+                    .version
+                    .as_deref()
+                    .ok_or(ErrorCode::AdapterUnsupported)?,
                 stdout,
                 stderr,
                 spec,
@@ -254,6 +263,7 @@ impl AgentRunner for ClaudeRunner {
 }
 
 struct Handle<'a> {
+    version: &'a str,
     child: Option<Child>,
     group: Option<ProcessGroup>,
     directory: PathBuf,
@@ -343,7 +353,7 @@ impl Handle<'_> {
                 TOOLS.into_iter().chain(["ToolSearch"]).collect();
             let actual: std::collections::BTreeSet<_> =
                 tools.iter().filter_map(Value::as_str).collect();
-            if value["claude_code_version"] != "2.1.311"
+            if value["claude_code_version"] != self.version
                 || tools.len() != expected.len()
                 || actual != expected
                 || value["mcp_servers"]

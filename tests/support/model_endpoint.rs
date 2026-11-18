@@ -127,11 +127,15 @@ impl Endpoint {
                     match path {
                         "/v1/embeddings" => {
                             let dimension = if body["model"] == "vectors-3" { 3 } else { 2 };
-                            let data: Vec<_> = body["input"].as_array().unwrap().iter().enumerate().map(|(index,text)| {
+                            let mut data: Vec<_> = body["input"].as_array().unwrap().iter().enumerate().map(|(index,text)| {
                                 let text = text.as_str().unwrap();
                                 let offline = text.contains("offline") || text.contains("network") || text.contains("离线");
                                 let mut embedding = vec![if offline { 1.0 } else { 0.0 }, if offline { 0.0 } else { 1.0 }];
                                 match body["model"].as_str() {
+                                    Some("vectors-id") => {
+                                        let (_, id) = text.rsplit_once("item-").unwrap();
+                                        embedding = vec![id.parse::<f64>().unwrap() + 1.0, -0.0];
+                                    }
                                     Some("invalid-zero") => embedding = vec![0.0, 0.0],
                                     Some("invalid-overflow") => embedding = vec![1e300, 1.0],
                                     Some("invalid-mean") => embedding = vec![if text.starts_with('x') { 1.0 } else { -1.0 }, 0.0],
@@ -140,6 +144,7 @@ impl Endpoint {
                                 if dimension == 3 { embedding.push(0.0); }
                                 json!({"index":index,"embedding":embedding})
                             }).collect();
+                            data.reverse();
                             json!({"data":data})
                         }
                         "/v1/rerank" => {
@@ -168,7 +173,11 @@ impl Endpoint {
                     "/v1/rerank" => json!({"results":[{"index":1,"relevance_score":0.75},{"index":0,"relevance_score":0.25}]}),
                     _ => panic!("unexpected path {path}"),
                 }}.to_string();
-                let status = if matches!(mode, Mode::RateLimited) {
+                let status = if matches!(mode, Mode::RateLimited)
+                    || (matches!(mode, Mode::Retrieval)
+                        && body["model"] == "invalid-mean"
+                        && body["input"][0] == "rate-limited")
+                {
                     "429 Too Many Requests"
                 } else {
                     "200 OK"
