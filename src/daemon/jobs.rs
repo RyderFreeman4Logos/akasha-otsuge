@@ -407,6 +407,45 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn committed_job_status_remains_readable_during_admission_and_checks_the_live_grant() {
+        let (fixture, service, binding) = fixture("job-observation", "").await;
+        service
+            .submit("capture".into(), binding, fixture.0.join("input.jsonl"))
+            .await
+            .unwrap();
+        assert!(service.claim("capture", 0).await.unwrap());
+        service
+            .submit_retrieval(
+                "search".into(),
+                crate::retrieval::Request::Search {
+                    query: "saved".into(),
+                    scope: owner_scope(),
+                },
+            )
+            .await
+            .unwrap();
+        let observe = |id: &str| service.dispatch("observe", Command::JobShow { id: id.into() });
+        let guard = service.admission.lock().await;
+        for (id, state) in [("capture", "running"), ("search", "queued")] {
+            let observed = tokio::time::timeout(Duration::from_millis(250), observe(id))
+                .await
+                .expect("a committed job status can be read during a physical batch")
+                .unwrap();
+            assert_eq!(observed["state"], state);
+            assert_eq!(observed["id"], id);
+        }
+        drop(guard);
+        service
+            .dispatch("revoke", Command::AccessSet { scope: None })
+            .await
+            .unwrap();
+        for id in ["capture", "search"] {
+            assert_eq!(observe(id).await.unwrap_err().0, "READ_DENIED");
+        }
+        service.storage.close().await.unwrap();
+    }
+
+    #[tokio::test]
     async fn scheduler_error_collects_a_sibling_physical_batch() {
         let (fixture, service, binding) = fixture("sibling-owner", "").await;
         let path = fixture.0.join("capture.jsonl");
@@ -1504,6 +1543,21 @@ impl Service {
         .await
     }
     pub(super) async fn show_job(&self, id: &str) -> Result<Value> {
+        // Capture and pending retrieval jobs carry their complete visible state in one
+        // committed revision. Check the live grant before returning that revision.
+        match self.job(id) {
+            Ok((_, job))
+                if job.binding.is_some()
+                    || (job.retrieval_plan.is_some() && job.result.is_none()) =>
+            {
+                self.authorize_job(&job)?;
+                return Ok(serde_json::to_value(job)?);
+            }
+            Ok(_) | Err(Error("JOB_NOT_FOUND")) => {}
+            Err(error) => return Err(error),
+        }
+        // Other responses can join trace, model or archived receipt data. Re-read
+        // under admission so their existing multi-record checks remain serialized.
         let _guard = self.admission.lock().await;
         let (revision, job) = self.job(id)?;
         self.authorize_job(&job)?;

@@ -163,6 +163,9 @@ after waiting for capacity.
 
 Capture batches share the admission boundary so cancellation, permissions and
 configuration cannot be changed halfway through a batch.
+While a batch is running, `job show` can read a committed capture job or a
+retrieval job that is still waiting for its result. Each read checks the current
+scope permission. Jobs with archived results retain their serialized checks.
 The current concurrency cap is checked while claiming a queued job under that
 same boundary; lowering it allows existing jobs to drain without admitting extra
 work from a stale scheduling decision.
