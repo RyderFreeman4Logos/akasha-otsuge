@@ -163,6 +163,7 @@ pub type Result<T> = std::result::Result<T, StorageError>;
 const SEQUENCE: &[u8] = b"meta/commit_seq";
 const SCHEMA: &[u8] = b"meta/schema_version";
 pub const FORMAT_VERSION: u8 = 2;
+pub(crate) const MAX_RECORD_CONTENT_BYTES: usize = 128 * 1024;
 const MIB: usize = 1024 * 1024;
 
 fn valid_id(id: &str) -> bool {
@@ -197,7 +198,7 @@ impl CommitRequest {
             || self.changes.iter().any(|change| {
                 !valid_id(&change.key.id)
                     || change.expected_revision == Some(0)
-                    || change.content.len() > 128 * 1024
+                    || change.content.len() > MAX_RECORD_CONTENT_BYTES
                     || !keys.insert(&change.key)
             })
             || self
@@ -272,7 +273,7 @@ fn read_revision(tx: &Transaction, key: &RecordKey, seq: u64) -> Result<Option<R
             let revision: Revision = serde_json::from_slice(&bytes)?;
             if revision.key != *key
                 || revision.commit_seq != seq
-                || revision.content.len() > 128 * 1024
+                || revision.content.len() > MAX_RECORD_CONTENT_BYTES
                 || revision
                     .previous
                     .is_some_and(|previous| previous == 0 || previous >= seq)

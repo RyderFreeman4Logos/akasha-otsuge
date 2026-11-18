@@ -4,7 +4,9 @@ use crate::capture::ReconcileReport;
 use crate::capture::{Capture, PendingReason};
 use crate::domain::{Domain, ReadContext, Scope};
 use crate::ipc::CaptureInput;
-use crate::storage::{Change, CommitRequest, RecordKey, RecordKind, hash};
+use crate::storage::{
+    Change, CommitRequest, MAX_RECORD_CONTENT_BYTES, RecordKey, RecordKind, hash,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeSet;
@@ -490,6 +492,122 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn queue_bytes_concurrent_recoverable_jobs_keep_their_reservation() {
+        let config = "[runtime]\nmemory_budget_mib=8\nmax_queued_jobs=2";
+        let (fixture, service, binding) = fixture("queue-bytes-restart", config).await;
+        let path = fixture.0.join("transcript.jsonl");
+        let (a, b) = tokio::join!(
+            service.submit("a".into(), binding.clone(), path.clone()),
+            service.submit("b".into(), binding.clone(), path.clone())
+        );
+        let (winner, loser, failure) = match (a, b) {
+            (Ok(_), Err(error)) => ("a", "b", error),
+            (Err(error), Ok(_)) => ("b", "a", error),
+            _ => panic!("one recoverable reservation should fit in 128 KiB"),
+        };
+        assert_eq!(failure.0, "RESOURCE_BUSY");
+        assert!(service.claim(winner, 0).await.unwrap());
+        assert_eq!(
+            service
+                .submit(loser.into(), binding.clone(), path.clone())
+                .await
+                .unwrap_err()
+                .0,
+            "RESOURCE_BUSY"
+        );
+        let replay = service
+            .submit(winner.into(), binding.clone(), path.clone())
+            .await
+            .unwrap();
+        assert_eq!(replay["state"], "running");
+        service.storage.close().await.unwrap();
+        drop(service);
+        let (service, binding) = service_at(&fixture.0, config).await;
+        service.recover().await.unwrap();
+        assert_eq!(service.job(winner).unwrap().1.state, "queued");
+        assert_eq!(
+            service
+                .submit(loser.into(), binding.clone(), path.clone())
+                .await
+                .unwrap_err()
+                .0,
+            "RESOURCE_BUSY"
+        );
+        assert_eq!(service.job(loser).err().unwrap().0, "JOB_NOT_FOUND");
+        assert_eq!(
+            service.cancel_job(winner.into()).await.unwrap()["state"],
+            "cancelled"
+        );
+        assert_eq!(
+            service.submit(loser.into(), binding, path).await.unwrap()["state"],
+            "queued"
+        );
+        service.storage.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn queue_bytes_charge_serialized_models_and_release_on_claim() {
+        let (_fixture, service, _) = fixture(
+            "queue-bytes-model",
+            "[runtime]\nmemory_budget_mib=8\nmax_queued_jobs=10\n[models.text]\nkind='text'\nendpoint='http://127.0.0.1:1/v1'\nmodel='fixture'\nlocal=true",
+        ).await;
+        let plan = crate::provider::Plan {
+            calls: vec![crate::provider::Call {
+                profile: "text".into(),
+                input: crate::provider::Input::Text {
+                    prompt: "sample ".repeat(2143),
+                    max_output_tokens: 1,
+                },
+            }],
+        };
+        let mut bytes = 0;
+        for n in 0..8 {
+            let id = format!("model-{n}");
+            service
+                .submit_model(id.clone(), plan.clone())
+                .await
+                .unwrap();
+            bytes += service
+                .storage
+                .current(&job_key(&id))
+                .unwrap()
+                .unwrap()
+                .content
+                .len();
+        }
+        assert!(bytes <= 128 * 1024 && bytes + bytes / 8 > 128 * 1024);
+        assert!(
+            matches!(
+                service.submit_model("model-8".into(), plan.clone()).await,
+                Err(Error("RESOURCE_BUSY"))
+            ),
+            "a ninth model fits the item limit but exceeds 128 KiB of queued bytes"
+        );
+        assert_eq!(service.job("model-8").err().unwrap().0, "JOB_NOT_FOUND");
+        assert_eq!(
+            service
+                .submit_retrieval("small".into(), crate::retrieval::Request::Sync)
+                .await
+                .unwrap()["state"],
+            "queued"
+        );
+        assert!(service.claim("model-0", 0).await.unwrap());
+        service.submit_model("model-8".into(), plan).await.unwrap();
+        // Running model work leaves its waiting slot available. Cap counts waiters.
+        service
+            .submit_retrieval("last".into(), crate::retrieval::Request::Sync)
+            .await
+            .unwrap();
+        assert!(matches!(
+            service
+                .submit_retrieval("count".into(), crate::retrieval::Request::Sync)
+                .await,
+            Err(Error("RESOURCE_BUSY"))
+        ));
+        service.storage.close().await.unwrap();
+    }
+
+    #[tokio::test]
     async fn memory_pressure_preserves_replay_and_queued_deadlines() {
         let (fixture, service, binding) = fixture("memory-pressure", "").await;
         let path = fixture.0.join("missing.jsonl");
@@ -865,6 +983,26 @@ pub(super) struct Job {
     result: Option<Value>,
 }
 impl Job {
+    fn can_requeue(&self) -> bool {
+        self.model_plan.is_none()
+            && self.retrieval_plan.is_none()
+            && self
+                .consult_plan
+                .as_ref()
+                .is_none_or(consult::Plan::is_editor)
+    }
+
+    fn queue_reservation(&self, content_bytes: usize) -> usize {
+        // A resumable job can requeue with a larger durable checkpoint.
+        if self.can_requeue() {
+            MAX_RECORD_CONTENT_BYTES
+        } else if self.state == "queued" {
+            content_bytes
+        } else {
+            0
+        }
+    }
+
     fn terminal(&self) -> bool {
         matches!(self.state.as_str(), "succeeded" | "failed" | "cancelled")
     }
@@ -909,6 +1047,11 @@ impl Service {
     }
 
     fn job(&self, id: &str) -> Result<(u64, Job)> {
+        let (seq, job, _) = self.job_with_size(id)?;
+        Ok((seq, job))
+    }
+
+    fn job_with_size(&self, id: &str) -> Result<(u64, Job, usize)> {
         if !ipc::identifier(id) {
             return Err(Error("INVALID_REQUEST"));
         }
@@ -961,7 +1104,7 @@ impl Service {
         {
             return Err(Error("JOB_CORRUPT"));
         }
-        Ok((revision.commit_seq, job))
+        Ok((revision.commit_seq, job, revision.content.len()))
     }
     fn active(&self) -> Result<(Option<u64>, Vec<String>)> {
         let Some(revision) = self.storage.current(&active_key())? else {
@@ -1166,10 +1309,13 @@ impl Service {
             let runtime = &live.resolved().config().runtime;
             let (previous, mut ids) = service.active()?;
             let mut queued = 0;
+            let mut reserved_bytes = 0;
             for id in &ids {
-                if service.job(id)?.1.state == "queued" {
+                let (_, job, content_bytes) = service.job_with_size(id)?;
+                if job.state == "queued" {
                     queued += 1;
                 }
+                reserved_bytes += job.queue_reservation(content_bytes);
             }
             if service.stopping.load(std::sync::atomic::Ordering::Acquire)
                 || service.storage_reopen_required()
@@ -1321,6 +1467,12 @@ impl Service {
                 error: None,
                 result: None,
             };
+            let byte_limit = (runtime.memory_budget_mib as usize * (1024 * 1024 / 64))
+                .max(MAX_RECORD_CONTENT_BYTES);
+            if reserved_bytes + job.queue_reservation(serde_json::to_vec(&job)?.len()) > byte_limit
+            {
+                return Err(Error("RESOURCE_BUSY"));
+            }
             ids.push(id);
             service
                 .save_job(
@@ -1474,8 +1626,7 @@ impl Service {
                 return Err(Error("CONFIG_CORRUPT"));
             }
             if job.state == "running" {
-                if job.model_plan.is_some()
-                    || job.retrieval_plan.is_some()
+                if !job.can_requeue()
                     || job.consult_plan.is_some() && !self.editor_checkpoint(&job)
                     || (job.grill_plan.is_some()
                         && self.grill_checkpoint(&job, revision)?.inflight.is_some())
