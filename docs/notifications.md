@@ -56,7 +56,10 @@ grouping and priority rules remain those documented in [incidents](incidents.md)
 ## Bounds and recovery
 
 The worker processes bounded outbox and inbox pages. It advances past its own
-records without repeatedly committing idle cursor updates. Startup replays only
+records without repeatedly committing idle cursor updates. A page containing a
+review or incident checkpoints its projection immediately. For unrelated source
+revisions, the worker saves its position after 32 outbox positions accumulate.
+Startup replays only
 uncheckpointed outbox entries, using each item's recorded source revision to
 avoid duplicate projection. Under authority disk pressure, a refused projection
 keeps its outbox cursor for replay, and a refused channel claim waits for the

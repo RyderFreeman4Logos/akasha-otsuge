@@ -131,6 +131,25 @@ fn local_notifications_are_durable_and_ack_cannot_approve_or_close_review() {
     );
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
+    extraction_tests::runtime().block_on(async {
+        use akasha_otsuge::storage::{RecordKey, RecordKind, Storage};
+        let store = Storage::open(&extraction_tests::storage_config(&daemon))
+            .await
+            .unwrap();
+        let state = |id: String| {
+            store
+                .current(&RecordKey {
+                    kind: RecordKind::State,
+                    id,
+                })
+                .unwrap()
+                .unwrap()
+        };
+        let cursor: u64 =
+            serde_json::from_str(&state("notification/cursor".into()).content).unwrap();
+        assert!(cursor >= state(format!("review/{review_id}")).commit_seq);
+        store.close().await.unwrap();
+    });
     daemon.start();
     assert_eq!(daemon.cli(&["notify", "show", id])["data"], shown);
     assert_eq!(wait_local(&daemon, 1)["data"]["items"][0], shown);
