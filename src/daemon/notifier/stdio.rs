@@ -543,7 +543,11 @@ impl Service {
         }
         item.deliveries
             .insert(dispatch.channel.clone(), dispatch.delivery.clone());
-        self.save_notification(&item, Some(revision)).await
+        // The claim is durable. Record its send intent and outcome even while
+        // fresh large claims are suspended, so an accepted effect has its receipt.
+        let request = self.notification_write(&item, Some(revision))?;
+        self.storage.commit_job_closeout(request).await?;
+        Ok(())
     }
 
     async fn call_notifier(&self, dispatch: &Dispatch, request: Value) -> Result<Vec<u8>> {
