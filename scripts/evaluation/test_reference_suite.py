@@ -196,6 +196,137 @@ class ReferenceSuiteTests(unittest.TestCase):
             },
         )
 
+    def test_archived_transition_inputs_and_outputs(self):
+        archive = ROOT / "docs/benchmarks/results/mvp027/offline-transitions-r1.json.gz"
+        report = json.loads(gzip.decompress(archive.read_bytes()))
+        self.assertEqual([r["id"] for r in report["rows"]], list(BY_ID))
+        self.assertEqual(report["summary"]["native_failures"], 0)
+        self.assertEqual(report["summary"]["model_turns_in_this_command"], 0)
+        self.assertEqual(
+            report["native_build"]["source_sha256"],
+            hashlib.sha256(
+                (ROOT / "scripts/evaluation/reference_import.rs").read_bytes()
+            ).hexdigest(),
+        )
+        refused = Counter()
+
+        def verify_stdout(raw):
+            n = copy.deepcopy(raw)
+            expected = n.pop("observer_stdout_sha256")
+            n.pop("outside_lineage_keyword_candidates", None)
+            for m in n["memories"]:
+                m.pop("declared_input", None)
+            self.assertEqual(hashlib.sha256(canonical(n) + b"\n").hexdigest(), expected)
+
+        for r in report["rows"]:
+            t = BY_ID[r["id"]]
+            n = r["native"]
+            self.assertEqual(
+                r["subject_sha256"],
+                hashlib.sha256(canonical(input_only(t))).hexdigest(),
+            )
+            verify_stdout(n)
+            originals = {s["id"]: s for s in t["sources"]}
+            for m in n["memories"]:
+                if "error" not in m:
+                    continue
+                d = m["declared_input"]
+                self.assertEqual(d["authority"], "human_confirmed")
+                self.assertTrue(d["conditions_count"] > 0)
+                self.assertEqual(d["channels"], ["verified_human"])
+                self.assertEqual(
+                    d["source_sha256"],
+                    [originals[k]["sha256"] for k in d["source_ids"]],
+                )
+                refused[
+                    m["error"],
+                    d["conditions_in_original_text"],
+                    d["claim_is_whole_original"],
+                ] += 1
+        self.assertEqual(
+            refused,
+            {
+                ("AUTHORITY_DENIED", True, False): 33,
+                ("PREDECESSOR_NOT_IMPORTED", False, True): 1,
+            },
+        )
+        for c in report["ungraded_verbatim_controls"]:
+            t = BY_ID[c["registered_task"]]
+            v = copy.deepcopy(input_only(t))
+            self.assertEqual(
+                hashlib.sha256(canonical(v)).hexdigest(), c["registered_input_sha256"]
+            )
+            v["id"] = "control-" + v["id"]
+            for m in v["memories"]:
+                s = next(s for s in t["sources"] if s["id"] == m["source_ids"][0])
+                m["claim"] = s["text"]
+                m["conditions"] = []
+            self.assertEqual(
+                hashlib.sha256(canonical(v)).hexdigest(), c["control_input_sha256"]
+            )
+            self.assertEqual(c["registered_result_credit"], 0)
+            verify_stdout(c["observation"])
+
+    def test_archived_granted_historical_reads_and_terminal_transitions(self):
+        raw = (
+            ROOT / "docs/benchmarks/results/mvp027/offline-transitions-r1.json.gz"
+        ).read_bytes()
+        report = json.loads(gzip.decompress(raw))
+        native = {r["id"]: r["native"] for r in report["rows"]}
+        controls = {
+            c["registered_task"]: c["observation"]
+            for c in report["ungraded_verbatim_controls"]
+        }
+        self.assertEqual(set(controls), {"V02", "V03", "A04"})
+        for n in (native["V02"], controls["V02"]):
+            h = n["historical_read"]
+            self.assertEqual(h["as_of_ordinal"], 1)
+            self.assertLessEqual(h["source_commit"], h["physical_cutoff"])
+            self.assertEqual(
+                (h["historical"]["read_seq"], h["historical"]["mode"]),
+                (h["physical_cutoff"], "historical_state"),
+            )
+            self.assertGreater(h["current"]["read_seq"], h["physical_cutoff"])
+            self.assertEqual(
+                h["historical"]["validated_at_seq"], h["current"]["validated_at_seq"]
+            )
+        self.assertEqual(
+            native["V02"]["historical_read"]["historical"]["state"], "absent"
+        )
+        h = controls["V02"]["historical_read"]
+        self.assertEqual(
+            [m["commit"] for m in controls["V02"]["memories"]],
+            [h["historical"]["commit"], h["current"]["commit"]],
+        )
+        self.assertNotEqual(
+            h["historical"]["semantic_sha256"], h["current"]["semantic_sha256"]
+        )
+        self.assertEqual(
+            native["V03"]["transitions"][0]["outcome"], "predecessor_not_imported"
+        )
+        for n, old, new in [
+            (native["C03"], "candidate", "rejected"),
+            (controls["V03"], "active", "retired"),
+        ]:
+            (x,) = n["transitions"]
+            self.assertEqual(
+                (x["previous_lifecycle"], x["action"], x["revision_after"]),
+                (old, "reject", new),
+            )
+            self.assertLess(x["previous_commit"], x["commit"])
+        for n, state in ((native["A04"], "absent"), (controls["A04"], "active")):
+            x = n["rescope_attempt"]
+            self.assertLess(x["grant_commit"], x["first_read_commit"])
+            self.assertGreaterEqual(x["receipt_validated_at"], x["first_read_commit"])
+            self.assertEqual(x["before"]["state"], state)
+            self.assertEqual(x["after"], x["before"])
+            self.assertEqual(
+                (x["mutation_error"], x["private_read_error"]),
+                ("SCOPE_DENIED", "READ_DENIED"),
+            )
+            self.assertIsNone(x["mutation_commit"])
+            self.assertIsNone(x["model_publication"])
+
 
 if __name__ == "__main__":
     unittest.main()
