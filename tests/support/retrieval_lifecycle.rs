@@ -28,6 +28,7 @@ fn generation_switch(jobs: usize) {
     daemon.cli(&["index", "sync", "--idempotency-key", "old-generation"]);
     let original = finished(&daemon, "old-generation");
     assert_eq!(original["state"], "succeeded", "{original}");
+    let before = daemon.cli(&["index", "status"])["data"].clone();
     next.pause();
     daemon.configure(&settings(&next.address, 3));
     daemon.cli(&["config", "reload"]);
@@ -86,6 +87,7 @@ fn generation_switch(jobs: usize) {
         wait_for_storage_budget(&daemon, 1024);
     }
     let built = finished(&daemon, "new-generation");
+    let after = daemon.cli(&["index", "status"])["data"].clone();
     let job = finished(&daemon, "during-build");
     if jobs == 2 {
         daemon.cli(&[
@@ -107,6 +109,10 @@ fn generation_switch(jobs: usize) {
         "search blocked behind a provider call in the builder: {job}"
     );
     assert_eq!(built["state"], "succeeded", "{built}");
+    let epoch = before["build_epoch"].as_u64().unwrap();
+    assert_eq!(epoch % 2, 0);
+    assert_eq!(during["build_epoch"], epoch + 1);
+    assert_eq!(after["build_epoch"], epoch + 2);
     assert_eq!(during["building"], true, "{during}");
     assert_eq!(during["searched_content"], "active_memories");
     assert_eq!(

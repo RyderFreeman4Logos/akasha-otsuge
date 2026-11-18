@@ -334,8 +334,9 @@ impl Service {
                         Ok(value)
                     })
                     .await?;
-                value["building"] =
-                    json!(self.index_epoch.load(std::sync::atomic::Ordering::Acquire) % 2 == 1);
+                let epoch = self.index_epoch.load(std::sync::atomic::Ordering::Acquire);
+                value["build_epoch"] = json!(epoch);
+                value["building"] = json!(epoch % 2 == 1);
                 if include_queue {
                     value["queue"] = self.queue_observation().await?;
                 }
