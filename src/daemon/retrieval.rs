@@ -107,30 +107,38 @@ impl Service {
         code.map_or(Ok(()), |code| Err(crate::storage::StorageError::new(code)))
     }
 
-    async fn rebuild_index(
+    async fn finish_rebuild(
         &self,
         id: &str,
-        generation: u64,
         workflow: &Deadline,
-    ) -> Result<Arc<Index>> {
+        index: &Arc<Index>,
+        progress: &crate::retrieval::Status,
+        generation: u64,
+        target: u64,
+    ) -> Result<()> {
         let mut owned = tokio::select! {
             guard=self.search_index.lock()=>guard,
             code=self.model_cancelled(id)=>return Err(Error(code)),
             _=tokio::time::sleep(workflow.remaining())=>return Err(Error("WORKFLOW_TIMEOUT")),
         };
-        if owned
-            .as_ref()
-            .is_some_and(|index| Arc::strong_count(index) > 1)
-        {
-            return Err(Error("RESOURCE_BUSY"));
-        }
         let authorize = || self.authorize_index_work(id, workflow);
-        Index::begin_rebuild(&self.storage, id, generation, &authorize).await?;
-        *owned = None;
-        let index = Arc::new(Index::open(self.config.pin().resolved(), &self.storage).await?);
-        index.retire_previous_tables(&authorize).await?;
-        *owned = Some(index.clone());
-        Ok(index)
+        // Existing reads own their Arc until their last native query completes.
+        while owned.as_ref().is_some_and(|cached| {
+            Arc::strong_count(cached) > 1 + usize::from(Arc::ptr_eq(index, cached))
+        }) {
+            authorize()?;
+            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+        }
+        if index.is_pending() {
+            Index::publish_rebuild(&self.storage, progress, generation, target, &authorize).await?;
+            *owned = None;
+        }
+        let vector = crate::retrieval::active_vector(&self.storage)?;
+        index
+            .retire_previous_tables(vector.as_ref().map(|v| v.generation.as_str()), &authorize)
+            .await?;
+        Index::finish_retirement(&self.storage, generation, &authorize).await?;
+        Ok(())
     }
 
     async fn retrieval_result(&self, id: &str, workflow: &Deadline) -> Result<Value> {
@@ -158,11 +166,39 @@ impl Service {
         } else {
             None
         };
-        let index = if matches!(plan, RetrievalRequest::Rebuild) {
-            self.rebuild_index(id, config.generation(), workflow)
-                .await?
-        } else {
-            self.retrieval_index(id, workflow).await?
+        let pending = match &plan {
+            RetrievalRequest::Rebuild => {
+                let owned = self
+                    .search_index
+                    .try_lock()
+                    .map_err(|_| Error("RESOURCE_BUSY"))?;
+                if owned
+                    .as_ref()
+                    .is_some_and(|cached| Arc::strong_count(cached) > 1)
+                {
+                    return Err(Error("RESOURCE_BUSY"));
+                }
+                drop(owned);
+                Some(
+                    Index::start_rebuild(&self.storage, id, config.generation(), &|| {
+                        self.authorize_index_work(id, workflow)
+                    })
+                    .await?,
+                )
+            }
+            RetrievalRequest::Sync => crate::retrieval::pending_rebuild(&self.storage)?,
+            _ => None,
+        };
+        let needs_retirement = pending.is_some();
+        let index = match pending {
+            Some(progress)
+                if progress.generation != crate::retrieval::status(&self.storage)?.generation =>
+            {
+                Arc::new(
+                    Index::open_generation(self.config.pin().resolved(), progress, true).await?,
+                )
+            }
+            _ => self.retrieval_index(id, workflow).await?,
         };
         if workflow.expired().is_some() {
             return Err(Error("WORKFLOW_TIMEOUT"));
@@ -221,7 +257,13 @@ impl Service {
                             .as_ref()
                             .is_none_or(|v| v.watermark >= target);
                     windows_since_prune = windows_since_prune.saturating_add(1);
-                    if (complete || windows_since_prune >= 32)
+                    if index.is_pending() && (complete || windows_since_prune >= 32) {
+                        // This private candidate is inaccessible to searches until publication.
+                        index
+                            .prune_versions(&|| self.authorize_index_work(id, workflow))
+                            .await?;
+                        windows_since_prune = 0;
+                    } else if (complete || windows_since_prune >= 32)
                         && let Ok(owned) = self.search_index.try_lock()
                         && owned.as_ref().is_some_and(|cached| {
                             Arc::ptr_eq(cached, &index) && Arc::strong_count(cached) == 2
@@ -242,9 +284,23 @@ impl Service {
                             &progress,
                             &config,
                             target,
-                            &authorize,
+                            &|| {
+                                authorize()?;
+                                self.authorize_index_work(id, workflow)
+                            },
                         )
                         .await?;
+                        if needs_retirement {
+                            self.finish_rebuild(
+                                id,
+                                workflow,
+                                &index,
+                                &progress,
+                                config.generation(),
+                                target,
+                            )
+                            .await?;
+                        }
                         return Ok(serde_json::to_value(progress)?);
                     }
                 }

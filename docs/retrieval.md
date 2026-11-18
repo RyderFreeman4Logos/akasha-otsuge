@@ -38,15 +38,19 @@ Set `runtime.paused = true` and reload to stop new admissions/claims, including
 across daemon restart. Restore it to false and submit `index sync` with a new key
 to resume from the durable prefix. A running model call is not replayed implicitly.
 
-`index rebuild` starts a fresh lexical/vector generation from authoritative
-records, including when completed native index files are missing. It requires no
-active reader of the index cache (`RESOURCE_BUSY` otherwise). The generation
-change is durable before native tables change. Old owned native index tables are
-retired, while source/memory revisions, receipts and progress history remain.
-Queries report not-ready/partial coverage until the new generation catches up.
-After interrupted rebuilding, a new sync resumes its saved prefix; another
-explicit rebuild also reclaims any tables left by an interrupted retirement.
-This maintenance operation does not promise uninterrupted old-generation service.
+`index rebuild` builds a replacement from authoritative records. Searches keep
+using the published generation while the replacement advances through its
+lexical and configured vector prefixes. The initial request can return
+`RESOURCE_BUSY` while another reader holds the cache. `index status` shows
+the candidate under `rebuild` during backfill and retirement. Each search checks current
+authority and scope. After an interruption, use `index sync` with a fresh key
+to resume the saved candidate. An explicit rebuild with a fresh key starts a
+new candidate, including when a derived table is missing.
+
+Once both prefixes cover the job's target, publication waits for current
+readers, switches the active generation and reclaims the superseded native
+tables. A sync after a restart can complete an interrupted retirement. Neutral
+archive imports initialize local derived state from the imported authority.
 
 `show` accepts UTF-8 **byte** boundaries and a half-open range. It returns actual
 `start`, `end`, `requested_end`, `total_bytes`, `truncated`, output and receipt ID.

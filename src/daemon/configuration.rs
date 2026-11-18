@@ -294,11 +294,10 @@ async fn initialize_imported_controls(storage: &Storage, generation: u64) -> Res
             .current(&key("search/lexical-v1"))?
             .map_or(0, |r| r.commit_seq),
     )? {
-        crate::retrieval::Index::begin_rebuild(
+        crate::retrieval::Index::reset_imported_generation(
             storage,
-            &format!("import/{}", identity.archive_sha256),
+            &identity.archive_sha256,
             generation,
-            &|| Ok(()),
         )
         .await?;
         #[cfg(test)]

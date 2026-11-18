@@ -261,3 +261,62 @@ fn all_excluded_records_complete_the_prefix_without_embedding_calls() {
             store.close().await.unwrap();
         });
 }
+
+#[test]
+fn failed_explicit_rebuild_keeps_published_search_and_resumes_after_restart() {
+    let endpoint = super::super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    seed(&daemon);
+    let retrieval =
+        settings(&endpoint.address, Some(&["beta"])).replace("timeout='2s'", "timeout='30s'");
+    daemon.configure(&format!("[runtime]\nmax_concurrent_jobs=2\n{retrieval}"));
+    daemon.start();
+    let old = build(&daemon, "published");
+    let count = endpoint.requests.lock().unwrap().len();
+    endpoint.pause();
+    daemon.cli(&["index", "rebuild", "--idempotency-key", "replacement"]);
+    let until = Instant::now() + Duration::from_secs(10);
+    while endpoint.requests.lock().unwrap().len() == count {
+        assert!(Instant::now() < until, "candidate did not reach embedding");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let building = daemon.cli(&["index", "status"])["data"].clone();
+    assert_eq!(building["generation"], old["generation"]);
+    assert_eq!(building["rebuild"]["phase"], "building");
+    assert_ne!(building["rebuild"]["generation"], old["generation"]);
+    assert_eq!(
+        building["vector"]["generation"],
+        old["vector"]["generation"]
+    );
+    let during = search(&daemon, "alpha", "during");
+    assert_eq!(
+        during["items"][0]["memory"]["revision"]["key"]["id"],
+        "offline"
+    );
+    daemon.cli(&["job", "cancel", "replacement"]);
+    endpoint.resume();
+    let cancelled = finished(&daemon, "replacement");
+    assert_ne!(cancelled["state"], "succeeded", "{cancelled}");
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    daemon.start();
+    let original = search(&daemon, "alpha", "after-restart");
+    assert_eq!(original["items"], during["items"]);
+    let replacement = build(&daemon, "resume");
+    assert_ne!(replacement["generation"], old["generation"]);
+    assert_ne!(
+        replacement["vector"]["generation"],
+        old["vector"]["generation"]
+    );
+    assert_eq!(replacement["vector"]["indexed_rows"], 1);
+    let active = daemon.cli(&["index", "status"])["data"].clone();
+    assert_eq!(
+        active["active_vector"]["generation"],
+        replacement["vector"]["generation"]
+    );
+    assert!(active.get("rebuild").is_none());
+    let final_result = search(&daemon, "alpha", "after-publication");
+    assert_eq!(final_result["items"], during["items"]);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}

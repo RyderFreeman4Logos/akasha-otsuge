@@ -295,14 +295,15 @@ impl Service {
             Command::IndexStatus => {
                 crate::domain::Domain::new(&self.storage)
                     .permission(&jobs::context()?, Some(&jobs::owner_scope()))?;
-                let mut value = serde_json::to_value(crate::retrieval::Index::status(
-                    &self.storage,
-                    self.config.pin().resolved(),
-                )?)?;
+                let snapshot = self.config.pin();
+                let mut value = self
+                    .storage
+                    .serialized_read(|| {
+                        crate::retrieval::Index::status_report(&self.storage, snapshot.resolved())
+                    })
+                    .await?;
                 value["building"] =
                     json!(self.index_epoch.load(std::sync::atomic::Ordering::Acquire) % 2 == 1);
-                value["active_vector"] =
-                    serde_json::to_value(crate::retrieval::active_vector(&self.storage)?)?;
                 value["searched_content"] = json!("active_memories");
                 Ok(value)
             }

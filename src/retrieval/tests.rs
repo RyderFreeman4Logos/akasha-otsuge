@@ -436,60 +436,126 @@ async fn missing_native_index_does_not_reuse_a_completed_watermark() {
 }
 
 #[tokio::test]
-async fn rebuild_generation_survives_restart_and_reclaims_only_old_native_tables() {
-    let fixture = Fixture::new();
-    let config = fixture.config();
-    let store = Storage::open(&config).await.unwrap();
-    let target = memory(&store, "original", "rebuild searchable text", None).await;
-    let original = Domain::new(&store).memory("original").unwrap().unwrap();
-    let index = Index::open(&config, &store).await.unwrap();
-    sync(&index, &store, target).await;
-    drop(index);
-    Index::begin_rebuild(&store, "rebuild-1", 1, &|| Ok(()))
+#[ignore = "launched only by the crash supervisor with an isolated database"]
+async fn rebuild_activation_child() {
+    let root = PathBuf::from(std::env::var_os("AKASHA_TEST_CRASH_ROOT").unwrap());
+    let fixture = std::mem::ManuallyDrop::new(Fixture(root));
+    let store = Storage::open(&fixture.config()).await.unwrap();
+    let pending = pending_rebuild(&store).unwrap().unwrap();
+    Index::publish_rebuild(&store, &pending, 1, pending.lexical_watermark, &|| Ok(()))
         .await
         .unwrap();
-    let pending = status(&store).unwrap();
-    assert_eq!(pending.lexical_watermark, 0);
-    assert_ne!(pending.generation, GENERATION);
-    store.close().await.unwrap();
-    let store = Storage::open(&config).await.unwrap();
-    assert_eq!(status(&store).unwrap().generation, pending.generation);
-    let index = Index::open(&config, &store).await.unwrap();
-    assert_eq!(
-        index
-            .connection
-            .table_names()
-            .execute()
+    panic!("rebuild activation checkpoint not reached");
+}
+
+#[tokio::test]
+async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publication() {
+    for phase in ["rebuild-before-activation", "rebuild-after-activation"] {
+        let fixture = Fixture::new();
+        let config = fixture.config();
+        let store = Storage::open(&config).await.unwrap();
+        let orig = memory(&store, "original", "marmalade original", None).await;
+        let active = Index::open(&config, &store).await.unwrap();
+        sync(&active, &store, orig).await;
+        let added = memory(&store, "later", "watercress later", None).await;
+        let pending = Index::start_rebuild(&store, "replacement", 1, &|| Ok(()))
             .await
-            .unwrap()
-            .len(),
-        2
-    );
-    index.retire_previous_tables(&|| Ok(())).await.unwrap();
-    assert_eq!(
-        index.connection.table_names().execute().await.unwrap(),
-        [table_name(&pending.generation)]
-    );
-    let progress = sync(&index, &store, target).await;
-    assert_eq!(progress.indexed_rows, 1);
-    assert_eq!(
-        index.keyword("rebuild", &scope(), 10).await.unwrap(),
-        [("original".into(), original.revision.commit_seq)]
-    );
-    assert_eq!(
-        Domain::new(&store)
-            .memory("original")
-            .unwrap()
-            .unwrap()
-            .revision,
-        original.revision
-    );
-    let sequence = store.sequence().unwrap();
-    Index::begin_rebuild(&store, "rebuild-1", 1, &|| Ok(()))
-        .await
-        .unwrap();
-    assert_eq!(store.sequence().unwrap(), sequence);
-    assert_eq!(status(&store).unwrap().lexical_watermark, target);
-    drop(index);
-    store.close().await.unwrap();
+            .unwrap();
+        assert_eq!(status(&store).unwrap().generation, GENERATION);
+        assert_eq!(
+            Index::publish_rebuild(&store, &pending, 1, added, &|| Ok(()))
+                .await
+                .unwrap_err()
+                .code,
+            "INDEX_NOT_READY"
+        );
+        let candidate = Index::open_generation(&config, pending, true)
+            .await
+            .unwrap();
+        let ready = sync(&candidate, &store, added).await;
+        assert_eq!(
+            active.keyword("marmalade", &scope(), 10).await.unwrap(),
+            [("original".into(), orig)]
+        );
+        assert!(
+            active
+                .keyword("watercress", &scope(), 10)
+                .await
+                .unwrap()
+                .is_empty()
+        );
+        assert_eq!(
+            candidate.keyword("watercress", &scope(), 10).await.unwrap(),
+            [("later".into(), added)]
+        );
+        drop((active, candidate));
+        store.close().await.unwrap();
+        crate::storage::crash_tests::kill_at(
+            &fixture.0,
+            phase,
+            "retrieval::tests::rebuild_activation_child",
+        );
+        let store = Storage::open(&config).await.unwrap();
+        let published = phase == "rebuild-after-activation";
+        let active = Index::open(&config, &store).await.unwrap();
+        assert_eq!(active.generation == ready.generation, published);
+        assert_eq!(
+            active.keyword("marmalade", &scope(), 10).await.unwrap(),
+            [("original".into(), orig)]
+        );
+        assert_eq!(
+            active
+                .keyword("watercress", &scope(), 10)
+                .await
+                .unwrap()
+                .len(),
+            usize::from(published)
+        );
+        assert_eq!(
+            active
+                .connection
+                .table_names()
+                .execute()
+                .await
+                .unwrap()
+                .len(),
+            2
+        );
+        drop(active);
+        if !published {
+            let resumed = pending_rebuild(&store).unwrap().unwrap();
+            assert_eq!(resumed.lexical_watermark, added);
+            Index::publish_rebuild(&store, &resumed, 1, added, &|| Ok(()))
+                .await
+                .unwrap();
+        }
+        let active = Index::open(&config, &store).await.unwrap();
+        active
+            .retire_previous_tables(None, &|| Ok(()))
+            .await
+            .unwrap();
+        Index::finish_retirement(&store, 1, &|| Ok(()))
+            .await
+            .unwrap();
+        assert!(pending_rebuild(&store).unwrap().is_none());
+        assert_eq!(
+            active.connection.table_names().execute().await.unwrap(),
+            [table_name(&ready.generation)]
+        );
+        assert_eq!(
+            active.keyword("watercress", &scope(), 10).await.unwrap(),
+            [("later".into(), added)]
+        );
+        assert_eq!(
+            Domain::new(&store)
+                .memory("original")
+                .unwrap()
+                .unwrap()
+                .revision
+                .commit_seq,
+            orig
+        );
+        drop(active);
+        store.close().await.unwrap();
+    }
 }

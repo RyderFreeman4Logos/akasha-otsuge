@@ -131,21 +131,51 @@ pub struct Status {
     pub vector: Option<VectorStatus>,
 }
 
-pub fn status(storage: &Storage) -> Result<Status> {
-    let status = storage
-        .current(&state_key())?
-        .map(|r| serde_json::from_str::<Status>(&r.content))
-        .transpose()?;
-    let status = status.unwrap_or(Status {
-        generation: GENERATION.into(),
+fn pending_key() -> RecordKey {
+    RecordKey {
+        kind: RecordKind::State,
+        id: "search/lexical-rebuild".into(),
+    }
+}
+
+fn empty_progress(generation: String) -> Status {
+    Status {
+        generation,
         lexical_watermark: 0,
         indexed_rows: 0,
         vector: None,
-    });
-    if !valid_generation(&status.generation) || status.lexical_watermark > storage.sequence()? {
+    }
+}
+
+fn validate_progress(storage: &Storage, progress: &Status) -> Result<()> {
+    if !valid_generation(&progress.generation) || progress.lexical_watermark > storage.sequence()? {
         return Err(error("INDEX_CORRUPT"));
     }
-    Ok(status)
+    Ok(())
+}
+
+pub fn status(storage: &Storage) -> Result<Status> {
+    let progress = storage
+        .current(&state_key())?
+        .map(|row| serde_json::from_str::<Status>(&row.content))
+        .transpose()?
+        .unwrap_or_else(|| empty_progress(GENERATION.into()));
+    validate_progress(storage, &progress)?;
+    Ok(progress)
+}
+
+pub(crate) fn pending_rebuild(storage: &Storage) -> Result<Option<Status>> {
+    let Some(row) = storage.current(&pending_key())? else {
+        return Ok(None);
+    };
+    if !storage.locally_written(row.commit_seq)? {
+        return Ok(None);
+    }
+    let pending = serde_json::from_str::<Option<Status>>(&row.content)?;
+    if let Some(progress) = &pending {
+        validate_progress(storage, progress)?;
+    }
+    Ok(pending)
 }
 
 fn valid_generation(generation: &str) -> bool {
@@ -166,14 +196,26 @@ fn table_name(generation: &str) -> String {
 pub struct Index {
     pub budget_mib: u32,
     generation: String,
+    pending: bool,
     connection: Connection,
     table: Table,
     schema: Arc<Schema>,
     vector: tokio::sync::Mutex<Option<Arc<vector::VectorIndex>>>,
 }
 impl Index {
+    pub(crate) fn is_pending(&self) -> bool {
+        self.pending
+    }
+
     pub async fn open(config: &ResolvedConfig, storage: &Storage) -> Result<Self> {
-        let progress = status(storage)?;
+        Self::open_generation(config, status(storage)?, false).await
+    }
+
+    pub(crate) async fn open_generation(
+        config: &ResolvedConfig,
+        progress: Status,
+        pending: bool,
+    ) -> Result<Self> {
         let name = table_name(&progress.generation);
         let root = config.config().paths.data_dir.join("search");
         crate::daemon::private_dir(&root).map_err(|e| error(e.0))?;
@@ -233,6 +275,7 @@ impl Index {
         Ok(Self {
             budget_mib,
             generation: progress.generation,
+            pending,
             connection,
             table,
             schema,
@@ -240,27 +283,94 @@ impl Index {
         })
     }
 
-    pub(crate) async fn begin_rebuild(
+    pub(crate) async fn start_rebuild(
         storage: &Storage,
         id: &str,
         config_generation: u64,
         authorize: &(impl Fn() -> Result<()> + Sync),
-    ) -> Result<()> {
+    ) -> Result<Status> {
         let generation = format!("{GENERATION}-{}", hash(id.as_bytes()));
-        if status(storage)?.generation == generation {
-            return Ok(());
+        if let Some(pending) = pending_rebuild(storage)?
+            && pending.generation == generation
+        {
+            return Ok(pending);
         }
-        let progress = Status {
-            generation,
-            lexical_watermark: 0,
-            indexed_rows: 0,
-            vector: None,
-        };
+        let progress = empty_progress(generation);
+        publish_progress(
+            storage,
+            pending_key(),
+            config_generation,
+            &progress,
+            vec![],
+            authorize,
+        )
+        .await?;
+        Ok(progress)
+    }
+
+    pub(crate) async fn reset_imported_generation(
+        storage: &Storage,
+        archive: &str,
+        config_generation: u64,
+    ) -> Result<()> {
+        let generation = format!(
+            "{GENERATION}-{}",
+            hash(format!("import/{archive}").as_bytes())
+        );
         publish_progress(
             storage,
             state_key(),
             config_generation,
-            &progress,
+            &empty_progress(generation),
+            vec![],
+            &|| Ok(()),
+        )
+        .await
+    }
+
+    pub(crate) async fn publish_rebuild(
+        storage: &Storage,
+        progress: &Status,
+        config_generation: u64,
+        target: u64,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        let pending = pending_rebuild(storage)?.ok_or_else(|| error("INDEX_NOT_READY"))?;
+        if pending.generation != progress.generation
+            || pending.lexical_watermark < target
+            || progress
+                .vector
+                .as_ref()
+                .is_some_and(|v| v.watermark < target)
+        {
+            return Err(error("INDEX_NOT_READY"));
+        }
+        #[cfg(test)]
+        crate::storage::crash_tests::checkpoint("rebuild-before-activation");
+        publish_progress(
+            storage,
+            state_key(),
+            config_generation,
+            &pending,
+            vec![],
+            authorize,
+        )
+        .await?;
+        #[cfg(test)]
+        crate::storage::crash_tests::checkpoint("rebuild-after-activation");
+        Ok(())
+    }
+
+    pub(crate) async fn finish_retirement(
+        storage: &Storage,
+        config_generation: u64,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        publish_progress(
+            storage,
+            pending_key(),
+            config_generation,
+            &None::<Status>,
             vec![],
             authorize,
         )
@@ -270,9 +380,11 @@ impl Index {
     // The daemon holds exclusive cache ownership before discarding any old native table.
     pub(crate) async fn retire_previous_tables(
         &self,
+        keep_vector: Option<&str>,
         authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<()> {
         let current = table_name(&self.generation);
+        let vector_table = keep_vector.map(|generation| format!("memory_vector_{generation}"));
         for name in self
             .connection
             .table_names()
@@ -288,7 +400,7 @@ impl Index {
                             v.len() == 64 && v.bytes().all(|b| b.is_ascii_hexdigit())
                         })
                     });
-            if derived && name != current {
+            if derived && name != current && Some(&name) != vector_table.as_ref() {
                 authorize()?;
                 self.connection
                     .drop_table(&name, &[])
@@ -324,15 +436,15 @@ impl Index {
         storage: &Storage,
         config: &ResolvedConfig,
     ) -> Result<Arc<vector::VectorIndex>> {
-        let progress =
-            vector::status(storage, config)?.ok_or_else(|| error("MODEL_NOT_CONFIGURED"))?;
+        let progress = vector::status(storage, config, &self.generation)?
+            .ok_or_else(|| error("MODEL_NOT_CONFIGURED"))?;
         let mut vector = self.vector.lock().await;
         if vector
             .as_ref()
             .is_none_or(|v| v.generation != progress.generation)
         {
             *vector = Some(Arc::new(
-                vector::VectorIndex::open(&self.connection, &progress).await?,
+                vector::VectorIndex::open(&self.connection, &progress, &self.generation).await?,
             ));
         }
         Ok(vector.as_ref().unwrap().clone())
@@ -340,8 +452,28 @@ impl Index {
 
     pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Status> {
         let mut progress = status(storage)?;
-        progress.vector = vector::status(storage, config)?;
+        progress.vector = vector::status(storage, config, &progress.generation)?;
         Ok(progress)
+    }
+
+    pub(crate) fn status_report(
+        storage: &Storage,
+        config: &ResolvedConfig,
+    ) -> Result<serde_json::Value> {
+        let published = Self::status(storage, config)?;
+        let mut value = serde_json::to_value(&published)?;
+        value["active_vector"] = serde_json::to_value(active_vector(storage)?)?;
+        if let Some(mut pending) = pending_rebuild(storage)? {
+            pending.vector = vector::status(storage, config, &pending.generation)?;
+            value["rebuild"] = serde_json::to_value(&pending)?;
+            value["rebuild"]["phase"] = if pending.generation == published.generation {
+                "retiring"
+            } else {
+                "building"
+            }
+            .into();
+        }
+        Ok(value)
     }
 
     /// Apply at most 32 complete authority transactions. Replays replace the same primary keys.
@@ -355,7 +487,11 @@ impl Index {
         let mut progress = storage
             .serialized_read(|| {
                 authorize()?;
-                status(storage)
+                if self.pending {
+                    pending_rebuild(storage)?.ok_or_else(|| error("INDEX_NOT_READY"))
+                } else {
+                    status(storage)
+                }
             })
             .await?;
         let before = progress.lexical_watermark;
@@ -458,7 +594,11 @@ impl Index {
         crate::storage::crash_tests::checkpoint("index-before-progress");
         publish_progress(
             storage,
-            state_key(),
+            if self.pending {
+                pending_key()
+            } else {
+                state_key()
+            },
             config_generation,
             &progress,
             completions,
