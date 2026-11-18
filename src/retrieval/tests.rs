@@ -547,13 +547,9 @@ async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publi
                 .unwrap();
         }
         let active = Index::open(&config, &store).await.unwrap();
-        assert_eq!(
-            Index::start_rebuild(&store, "fresh-key-before-retirement", 1, &|| Ok(()))
-                .await
-                .unwrap_err()
-                .code,
-            "INDEX_NOT_READY"
-        );
+        let retry =
+            Index::start_rebuild(&store, "fresh-key-before-retirement", 1, &|| Ok(())).await;
+        assert!(matches!(retry, Err(e) if e.code == "INDEX_NOT_READY"));
         active
             .owner
             .finish_retirement(&store, 1, &|| Ok(()))
@@ -892,6 +888,7 @@ async fn maintenance_keeps_unindexed_reads_and_authority_progress() {
     assert!(fragments > 2);
     let version = index.table.version().await.unwrap();
     let previous = index
+        .owner
         .connection
         .open_table(table_name(&index.generation))
         .execute()

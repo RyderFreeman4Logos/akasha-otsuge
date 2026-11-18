@@ -304,29 +304,27 @@ impl Service {
                             snapshot.resolved(),
                         )?;
                         let active = crate::retrieval::active_vector(&self.storage)?;
-                        if include_queue {
-                            if let Some(active) = &active {
-                                value["active_vector_watermark"] = if value["vector"]["generation"]
-                                    .as_str()
-                                    == Some(&active.generation)
-                                {
-                                    value["vector"]["watermark"].clone()
-                                } else {
-                                    let snapshot = self
-                                        .retrieval_snapshot(active.config_generation)
-                                        .map_err(|e| crate::storage::StorageError::new(e.0))?;
-                                    let previous = crate::retrieval::Index::status(
-                                        &self.storage,
-                                        snapshot.resolved(),
-                                    )?;
-                                    json!(
-                                        previous
-                                            .vector
-                                            .filter(|v| v.generation == active.generation)
-                                            .map(|v| v.watermark)
-                                    )
-                                };
-                            }
+                        if include_queue && let Some(active) = &active {
+                            value["active_vector_watermark"] = if value["vector"]["generation"]
+                                .as_str()
+                                == Some(&active.generation)
+                            {
+                                value["vector"]["watermark"].clone()
+                            } else {
+                                let snapshot = self
+                                    .retrieval_snapshot(active.config_generation)
+                                    .map_err(|e| crate::storage::StorageError::new(e.0))?;
+                                let previous = crate::retrieval::Index::status(
+                                    &self.storage,
+                                    snapshot.resolved(),
+                                )?;
+                                json!(
+                                    previous
+                                        .vector
+                                        .filter(|v| v.generation == active.generation)
+                                        .map(|v| v.watermark)
+                                )
+                            };
                         }
                         value["active_vector"] = serde_json::to_value(active)?;
                         Ok(value)
