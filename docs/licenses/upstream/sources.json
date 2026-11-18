@@ -1,0 +1,50 @@
+{
+  "0923349baa19fd9af776b7d4626dc758dc610c80": {
+    "files": {
+      "LICENSE": "lance13-LICENSE.txt"
+    },
+    "upstream": "https://github.com/lance-format/lance/blob/0923349baa19fd9af776b7d4626dc758dc610c80/"
+  },
+  "24d578702d5a1dd3cb0ee1e249b4eeacc1e3dc5c": {
+    "files": {
+      "LICENSE": "lance58-LICENSE.txt"
+    },
+    "upstream": "https://github.com/lance-format/lance/blob/24d578702d5a1dd3cb0ee1e249b4eeacc1e3dc5c/"
+  },
+  "541379959bf197057a7c04eeca7f1d976f5ba7c6": {
+    "files": {
+      "LICENSE": "tonic-LICENSE.txt"
+    },
+    "upstream": "https://github.com/grpc/grpc-rust/blob/541379959bf197057a7c04eeca7f1d976f5ba7c6/"
+  },
+  "7e163021e59cca4f8e1e35a7c828b5c6b7915953": {
+    "files": {
+      "LICENSE": "flatbuffers-LICENSE.txt"
+    },
+    "upstream": "https://github.com/google/flatbuffers/blob/7e163021e59cca4f8e1e35a7c828b5c6b7915953/"
+  },
+  "8528f9f250336e608d6d592287af6ad67a0ef30e": {
+    "files": {
+      "LICENSE": "lance-namespace-LICENSE.txt"
+    },
+    "upstream": "https://github.com/lance-format/lance-namespace/blob/8528f9f250336e608d6d592287af6ad67a0ef30e/"
+  },
+  "9faccca490d8e797a14d6daffed2a96de9629df7": {
+    "files": {
+      "LICENSE": "jieba-LICENSE.txt"
+    },
+    "upstream": "https://github.com/messense/jieba-rs/blob/9faccca490d8e797a14d6daffed2a96de9629df7/"
+  },
+  "c994ccf06d179851a1c7c3285c3a408ccb6279ec": {
+    "files": {
+      "LICENSE.txt": "kanaria-LICENSE.txt"
+    },
+    "upstream": "https://github.com/samunohito/kanaria/blob/c994ccf06d179851a1c7c3285c3a408ccb6279ec/"
+  },
+  "d135c2821f65eb1becbbd4835cf2c1a5d0c2045e": {
+    "files": {
+      "LICENSE": "lindera-LICENSE.txt"
+    },
+    "upstream": "https://github.com/lindera/lindera/blob/d135c2821f65eb1becbbd4835cf2c1a5d0c2045e/"
+  }
+}
