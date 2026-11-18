@@ -1,0 +1,110 @@
+{
+  "sdk_source": "https://github.com/anthropics/claude-agent-sdk-python/blob/cd08fa086187e7f938775621e39da7ec70995fae/src/claude_agent_sdk/_internal/session_mutations.py#L429-L440",
+  "sdk_version": "0.2.184",
+  "platform": "Linux x86_64",
+  "provider": "private loopback deterministic Anthropic-compatible SSE",
+  "external_model_calls": 0,
+  "release_binary_sha256": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+  "regression_fixture_sha256": "6b2cc99b312410e9fb607e8e2dc53813db0bf3439cd514fcb5aa5796ad848e07",
+  "versions": [
+    {
+      "cli_version": "2.1.311",
+      "executable_sha256": "86dc1fcc69498159eaf15f446613e847010f9036bfbbdffd4c49350be8489ada",
+      "ordinary_fork_hook_fields": [
+        "context_tokens",
+        "cwd",
+        "estimated_cache_write_usd",
+        "hook_event_name",
+        "prompt_cache_likely_expired",
+        "seconds_since_last_response",
+        "session_id",
+        "source",
+        "transcript_path"
+      ],
+      "ordinary_fork_parent_session_id_in_hook": false,
+      "ordinary_fork_parent_session_id_in_transcript": false,
+      "ordinary_fork_origin_rows": 0,
+      "ordinary_fork_total_rows": 32,
+      "sdk_remapped_originals": 9,
+      "sdk_supplied_cutoff_matched_last_origin": true,
+      "resume_kept_original_markers": true,
+      "later_parent_turn_absent_from_native_request": true,
+      "new_native_messages": 2,
+      "raw_transcript_sha256": {
+        "plain": "db0abfaffa0d3877e6a189198644d2d0280f959c660dfc16ac14596beaf0e50f",
+        "sdk": "b56797f49004d65f5363842fc8de791c91aced0b57e630e9f29d384e32110d44"
+      },
+      "previous_capture_checkpoint": {
+        "plain": null,
+        "sdk": "invalid_frame"
+      },
+      "fixed_capture_checkpoint": {
+        "plain": null,
+        "sdk": null
+      }
+    },
+    {
+      "cli_version": "2.1.322",
+      "executable_sha256": "bfb3703ad5380242328459bc62ada4bde8ae7ba57c6e1eeadb9c00e08874c478",
+      "ordinary_fork_hook_fields": [
+        "context_tokens",
+        "cwd",
+        "estimated_cache_write_usd",
+        "hook_event_name",
+        "prompt_cache_likely_expired",
+        "seconds_since_last_response",
+        "session_id",
+        "source",
+        "transcript_path"
+      ],
+      "ordinary_fork_parent_session_id_in_hook": false,
+      "ordinary_fork_parent_session_id_in_transcript": false,
+      "ordinary_fork_origin_rows": 0,
+      "ordinary_fork_total_rows": 31,
+      "sdk_remapped_originals": 8,
+      "sdk_supplied_cutoff_matched_last_origin": true,
+      "resume_kept_original_markers": true,
+      "later_parent_turn_absent_from_native_request": true,
+      "new_native_messages": 2,
+      "raw_transcript_sha256": {
+        "plain": "04355b9d58864e308edc634586fcde4f10a9bf7dc3ffb85a5cc7d661ebc279de",
+        "sdk": "c77ea83483517009286db880ed9907b9685ffd9b324eb5f1df6e4ed9f15abfc5"
+      },
+      "previous_capture_checkpoint": {
+        "plain": null,
+        "sdk": "invalid_frame"
+      },
+      "fixed_capture_checkpoint": {
+        "plain": null,
+        "sdk": null
+      }
+    }
+  ],
+  "fixed_binary_sha256": "f5eba245e913f24a2f4f564550dac2c76c2f3499c11dfb0e8cd8bf554a014eaa",
+  "same_store_upgrade": [
+    {
+      "phase": "old",
+      "version": "2.1.311",
+      "pending": "invalid_frame",
+      "state": "succeeded"
+    },
+    {
+      "phase": "old",
+      "version": "2.1.322",
+      "pending": "invalid_frame",
+      "state": "succeeded"
+    },
+    {
+      "phase": "new",
+      "version": "2.1.311",
+      "pending": null,
+      "state": "succeeded"
+    },
+    {
+      "phase": "new",
+      "version": "2.1.322",
+      "pending": null,
+      "state": "succeeded"
+    }
+  ]
+}
