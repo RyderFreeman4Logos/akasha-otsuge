@@ -853,6 +853,140 @@ mod tests {
         service.storage.close().await.unwrap();
     }
 
+    #[tokio::test]
+    async fn index_queue_observation_preserves_its_point_across_claim_and_cancellation() {
+        let (dir, service, binding) = fixture("queue-observation-history", "").await;
+        let empty = service.storage.sequence().unwrap();
+        let id = "changes-state";
+        service
+            .submit(id.into(), binding, dir.0.join("capture.jsonl"))
+            .await
+            .unwrap();
+        let queued = service.storage.sequence().unwrap();
+        let bytes = service
+            .storage
+            .current(&job_key(id))
+            .unwrap()
+            .unwrap()
+            .content
+            .len();
+        assert!(service.claim(id, 0).await.unwrap());
+        let running = service.storage.sequence().unwrap();
+        service.cancel_job(id.into()).await.unwrap();
+        service.clone().execute_job(id.into()).await.unwrap();
+        let cancelled = service.storage.sequence().unwrap();
+        assert_eq!(service.job(id).unwrap().1.state, "cancelled");
+        for (at, queued, running, size) in [
+            (empty, 0, 0, 0),
+            (queued, 1, 0, bytes),
+            (running, 0, 1, 0),
+            (cancelled, 0, 0, 0),
+        ] {
+            assert_eq!(
+                service.queue_observation(at).unwrap(),
+                json!({"storage_seq":at, "queued":queued, "running":running, "queued_json_bytes":size})
+            );
+        }
+        assert_eq!(
+            service.queue_observation(cancelled + 1).unwrap_err().0,
+            "INVALID_READ_POINT"
+        );
+        service.storage.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn index_queue_observation_rejects_broken_active_rows() {
+        let (dir, service, binding) = fixture("queue-observation-corrupt", "").await;
+        let id = "listed";
+        service
+            .submit(id.into(), binding, dir.0.join("capture.jsonl"))
+            .await
+            .unwrap();
+        for (case, (key, content)) in [
+            (job_key(id), json!({"id":"wrong","state":"queued"})),
+            (job_key(id), json!({"id":id,"state":"succeeded"})),
+            (active_key(), json!(["missing"])),
+            (active_key(), json!([id, id])),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let previous = service.storage.current(&key).unwrap().unwrap().commit_seq;
+            let receipt = service
+                .storage
+                .commit(&CommitRequest {
+                    request_id: format!("break-queue-{case}"),
+                    config_generation: 1,
+                    policy_revision: None,
+                    changes: vec![Change {
+                        key,
+                        expected_revision: Some(previous),
+                        content: content.to_string(),
+                    }],
+                })
+                .await
+                .unwrap();
+            assert_eq!(
+                service.queue_observation(receipt.commit_seq).unwrap_err().0,
+                "JOB_CORRUPT"
+            );
+        }
+        service.storage.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn index_queue_observation_returns_during_an_active_capture_page() {
+        let (fixture, service, binding) = fixture("queue-observation-batch", "").await;
+        let path = fixture.0.join("capture.jsonl");
+        std::fs::write(&path, "").unwrap();
+        for id in ["working", "waiting"] {
+            service
+                .submit(id.into(), binding.clone(), path.clone())
+                .await
+                .unwrap();
+        }
+        assert!(service.claim("working", 0).await.unwrap());
+        let (reached, ready) = tokio::sync::oneshot::channel();
+        let (resume, release) = tokio::sync::oneshot::channel();
+        *service.batch_gate.lock().await = Some(BatchGate {
+            reached,
+            resume: release,
+        });
+        let worker = tokio::spawn(service.clone().execute_job("working".into()));
+        ready.await.unwrap();
+        let point = service.storage.sequence().unwrap();
+        let waiting_bytes = service
+            .storage
+            .current(&job_key("waiting"))
+            .unwrap()
+            .unwrap()
+            .content
+            .len();
+        let result = tokio::time::timeout(
+            Duration::from_secs(2),
+            service.dispatch(
+                "queue-read",
+                Command::IndexStatus {
+                    include_queue: true,
+                    include_build_epoch: true,
+                },
+            ),
+        )
+        .await;
+        resume.send(()).unwrap();
+        worker.await.unwrap().unwrap();
+        service.cancel_job("waiting".into()).await.unwrap();
+        service.storage.close().await.unwrap();
+        let result = result
+            .expect("queue observation waited behind the capture page")
+            .unwrap();
+        assert_eq!(result["build_epoch"], 0);
+        assert_eq!(
+            result["queue"],
+            json!({"storage_seq":point,"running":1,"queued":1,"queued_json_bytes":waiting_bytes})
+        );
+    }
+
     #[tokio::test(start_paused = true)]
     async fn final_physical_batch_obeys_the_original_execution_deadline() {
         let (fixture, service, binding) = fixture("final-deadline", "").await;
@@ -1202,7 +1336,11 @@ impl Service {
         Ok((revision.commit_seq, job, revision.content.len()))
     }
     fn active(&self) -> Result<(Option<u64>, Vec<String>)> {
-        let Some(revision) = self.storage.current(&active_key())? else {
+        Self::decode_active(self.storage.current(&active_key())?)
+    }
+
+    fn decode_active(row: Option<crate::storage::Revision>) -> Result<(Option<u64>, Vec<String>)> {
+        let Some(revision) = row else {
             return Ok((None, Vec::new()));
         };
         let ids: Vec<String> = serde_json::from_str(&revision.content)?;
@@ -1653,22 +1791,21 @@ impl Service {
         }
         Ok(value)
     }
-    pub(super) async fn queue_observation(&self) -> Result<Value> {
+    pub(super) fn queue_observation(&self, at: u64) -> Result<Value> {
         #[derive(Deserialize)]
         struct State<'a> {
             id: String,
             state: &'a str,
         }
 
-        let _guard = self.admission.lock().await;
-        let (_, ids) = self.active()?;
+        let (_, ids) = Self::decode_active(self.storage.at(&active_key(), at)?)?;
         let mut queued = 0;
         let mut queued_bytes = 0;
         let mut running = 0;
         for id in ids {
             let row = self
                 .storage
-                .current(&job_key(&id))?
+                .at(&job_key(&id), at)?
                 .ok_or(Error("JOB_CORRUPT"))?;
             let job: State = serde_json::from_str(&row.content)?;
             if job.id != id {
@@ -1683,10 +1820,8 @@ impl Service {
                 _ => return Err(Error("JOB_CORRUPT")),
             }
         }
-        Ok(
-            json!({"storage_seq":self.storage.sequence()?, "queued":queued,
-                  "running":running, "queued_json_bytes":queued_bytes}),
-        )
+        Ok(json!({"storage_seq":at, "queued":queued,
+                  "running":running, "queued_json_bytes":queued_bytes}))
     }
 
     pub(super) async fn list_jobs(&self, after: Option<&str>) -> Result<Value> {
