@@ -562,6 +562,28 @@ fn private_daemon_lifecycle_and_bounded_versioned_protocol() {
         String::from_utf8_lossy(&busy.stderr)
     );
     assert!(String::from_utf8_lossy(&busy.stderr).contains("RESOURCE_BUSY"));
+    let mut waiting = daemon.connect();
+    waiting
+        .set_read_timeout(Some(Duration::from_millis(100)))
+        .unwrap();
+    let early = waiting
+        .read(&mut [0_u8; 1])
+        .expect_err("transient saturation rejected a waiting client");
+    assert!(matches!(
+        early.kind(),
+        std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
+    ));
+    drop(held.pop().unwrap());
+    waiting
+        .set_read_timeout(Some(Duration::from_secs(5)))
+        .unwrap();
+    let hello = receive(&mut waiting);
+    assert!(hello.get("error").is_none(), "{hello}");
+    send(
+        &mut waiting,
+        &json!({"protocol_version":1,"request_id":"waiting-client","command":{"op":"status"}}),
+    );
+    assert_eq!(receive(&mut waiting)["data"]["state"], "running");
     drop(held);
     let second = daemon.command().args(["daemon", "run"]).output().unwrap();
     assert!(!second.status.success());

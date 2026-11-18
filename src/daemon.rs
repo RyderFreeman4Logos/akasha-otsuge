@@ -23,6 +23,10 @@ mod pi;
 mod resources;
 mod review;
 
+const MAX_IPC_CLIENTS: usize = 100;
+const MAX_ACTIVE_EXCHANGES: usize = 16;
+const IPC_SLOT_WAIT: Duration = Duration::from_secs(1);
+
 pub(crate) fn private_dir(path: &Path) -> Result<()> {
     if !path.is_absolute()
         || path
@@ -814,7 +818,7 @@ where
         let mut scheduler = tokio::spawn(service.clone().jobs());
         let mut scheduler_collected = false;
         let mut reopen = false;
-        let slots = Arc::new(Semaphore::new(16));
+        let slots = Arc::new(Semaphore::new(MAX_ACTIVE_EXCHANGES));
         let mut tasks = JoinSet::new();
         let mut watcher = tokio::time::interval(Duration::from_millis(500));
         watcher.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
@@ -846,18 +850,26 @@ where
                         Err(error) => break Err(error.into()),
                     };
                     if !stream.peer_cred().is_ok_and(|peer| peer.uid() == rustix::process::geteuid().as_raw()) { continue; }
-                    if let Ok(permit) = slots.clone().try_acquire_owned() {
-                        let service = service.clone();
-                        tasks.spawn(async move {
-                            let _permit = permit;
-                            let _ = tokio::time::timeout(ipc::TRANSPORT_TIMEOUT, service.connection(&mut stream)).await;
-                        });
-                    } else {
+                    if tasks.len() >= MAX_IPC_CLIENTS {
                         reject_busy(stream).await;
+                        continue;
                     }
+                    let service = service.clone();
+                    let slots = slots.clone();
+                    let accepted_at = tokio::time::Instant::now();
+                    tasks.spawn(async move {
+                        // Waiting clients hold a socket only. Frame reads start after admission.
+                        let Ok(Ok(_permit)) = tokio::time::timeout_at(
+                            accepted_at + IPC_SLOT_WAIT, slots.acquire_owned(),
+                        ).await else { return reject_busy(stream).await; };
+                        let _ = tokio::time::timeout_at(
+                            accepted_at + ipc::TRANSPORT_TIMEOUT, service.connection(&mut stream),
+                        ).await;
+                    });
                 }
             }
         };
+        slots.close();
         let first_error = std::sync::Mutex::new(outcome.as_ref().err().copied());
         let transition_error = &first_error;
         let transition = async move {
