@@ -46,7 +46,8 @@ Verify and extract the archive above. Run the helper on Linux with Python 3.9+ a
 set -euo pipefail
 app="$HOME/.local/bin/akasha-otsuge"
 opts=()
-backup="${XDG_DATA_HOME:-$HOME/.local/share}/akasha-otsuge.rollback.$(date +%s)"
+store=$("$app" "${opts[@]}" config show --effective | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["config"]["paths"]["data_dir"])')
+backup="$(dirname -- "$store")/akasha-otsuge.rollback.$(date +%s)"
 python3 "$package/scripts/linux-upgrade.py" upgrade "$package/bin/akasha-otsuge" "$backup" --app "$app" "${opts[@]}"
 "$app" "${opts[@]}" daemon start
 "$app" "${opts[@]}" doctor --json
@@ -54,7 +55,7 @@ python3 "$package/scripts/linux-upgrade.py" upgrade "$package/bin/akasha-otsuge"
 
 The helper identifies the running executable and its active store, requests a normal stop, and waits up to 120 seconds for process exit. It saves the old binary, configuration (including its absence) and complete stopped store into the private rollback directory before switching the executable. GNU `cp` uses reflinks when available. Other filesystems need space for a full copy. A store mounted directly at its data directory requires a filesystem-level snapshot and restore. Keep the backup path and verified extracted package through acceptance.
 
-If startup or validation fails, use the same package, backup path and startup options. This also works with a damaged candidate configuration. The helper drains a running candidate through its saved socket, preserves its store in `failed-store`, and restores the saved installation. Jobs and writes after the snapshot stay in the preserved candidate store. The original snapshot remains available.
+If startup or validation fails, use the same package, backup path and startup options. This also works with a damaged candidate configuration. The helper drains a running candidate through its saved socket. If a daemon is serving the data directory on a different socket, stop it through that socket before restoring. The helper checks the native writer lock and restores the saved installation even if the candidate directory has been moved away. When the candidate directory exists, the helper keeps it in `failed-store`, including jobs and writes made after the snapshot. The original snapshot remains available.
 
 ```bash
 set -euo pipefail
