@@ -1,4 +1,5 @@
 import asyncio
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,6 +9,148 @@ from scripts.native_workload import __main__ as runner
 from scripts.native_workload.journal import Journal, records
 from scripts.native_workload.operations import NativeOperations, OperationError
 from scripts.native_workload.schedule import run_schedule, summarize
+
+
+class SearchRules(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.scope = dict(user="owner", project="alpha", branch_or_version="main", session="one")
+        self.parent = dict(self.scope, branch_or_version=None, session=None)
+        self.global_scope = dict(self.parent, project=None)
+        self.expected = dict(
+            mode="keyword",
+            query="offline",
+            scope=self.scope,
+            top_k=20,
+            required_refs=[["fact", 2]],
+            excluded_ids=["blocked"],
+            expected_rules=[
+                dict(id="global", revision=4, scope=self.global_scope),
+                dict(id="project", revision=6, scope=self.parent),
+                dict(id="local", revision=8, scope=self.scope),
+            ],
+        )
+
+    def item(self, key, seq, scope, kind="preference", authority="human_confirmed"):
+        return dict(
+            memory=dict(
+                revision=dict(key=dict(id=key), commit_seq=seq),
+                record=dict(draft=dict(scope=scope, kind=kind), authority=authority),
+            )
+        )
+
+    async def search(self, *, oracle=None, rules=None, hits=None):
+        expected = self.expected if oracle is None else oracle
+        if rules is None:
+            rules = [
+                self.item(r["id"], r["revision"], r["scope"])
+                for r in self.expected["expected_rules"]
+            ]
+        if hits is None:
+            hits = [self.item("fact", 2, self.scope, "fact")]
+        output = dict(
+            mode=expected["mode"],
+            query="offline",
+            scope=self.scope,
+            items=hits,
+            rules=rules,
+            coverage=dict(complete=True, gaps=[]),
+        )
+        ops = NativeOperations("unused")
+        ops.job = AsyncMock(
+            return_value=dict(result=dict(receipt_id="receipt", output=json.dumps(output)))
+        )
+        return await ops.search(expected, "job")
+
+    async def test_admitted_rules_and_exact_scored_scope(self):
+        for mode in ["keyword", "hybrid"]:
+            result = await self.search(oracle=dict(self.expected, mode=mode))
+            self.assertEqual(
+                result["refs"], [("fact", 2), ("global", 4), ("local", 8), ("project", 6)]
+            )
+        with self.assertRaisesRegex(OperationError, "SEARCH_REQUIRED_HIT_MISSING"):
+            await self.search(oracle=dict(self.expected, required_refs=[["local", 8]]))
+        with self.assertRaisesRegex(OperationError, "SEARCH_REQUIRED_RULE_MISSING"):
+            await self.search(rules=[])
+        with self.assertRaisesRegex(OperationError, "SEARCH_AUTHORITY_OR_SCOPE_MISMATCH"):
+            await self.search(hits=[self.item("fact", 2, self.parent, "fact")])
+
+    async def test_rule_witnesses_reject_extra_wrong_or_duplicate_results(self):
+        real = [
+            self.item(r["id"], r["revision"], r["scope"]) for r in self.expected["expected_rules"]
+        ]
+        for bad in [
+            self.item("unknown", 9, self.global_scope),
+            self.item("unknown", 9, self.scope),
+            self.item("blocked", 4, self.global_scope),
+            self.item("fact", 2, self.scope),
+            self.item("global", 4, self.global_scope),
+            self.item("global", 5, self.global_scope),
+        ]:
+            with (
+                self.subTest(bad=bad),
+                self.assertRaisesRegex(OperationError, "SEARCH_AUTHORITY_OR_SCOPE_MISMATCH"),
+            ):
+                await self.search(rules=[*real, bad])
+        for bad in [
+            self.item("global", 5, self.global_scope),
+            self.item("global", 4, self.parent),
+            self.item("global", 4, dict(self.parent, project="beta")),
+            self.item("global", 4, self.global_scope, "fact"),
+            self.item("global", 4, self.global_scope, authority="candidate"),
+        ]:
+            with (
+                self.subTest(bad=bad),
+                self.assertRaisesRegex(OperationError, "SEARCH_AUTHORITY_OR_SCOPE_MISMATCH"),
+            ):
+                await self.search(rules=[bad, *real[1:]])
+        for bad_hit in [self.item("fact", 3, self.scope), self.item("blocked", 1, self.scope)]:
+            with (
+                self.subTest(bad_hit=bad_hit),
+                self.assertRaisesRegex(OperationError, "SEARCH_AUTHORITY_OR_SCOPE_MISMATCH"),
+            ):
+                await self.search(hits=[self.item("fact", 2, self.scope), bad_hit])
+
+    async def test_rule_oracle_cannot_admit_a_sibling_or_excluded_id(self):
+        rule = self.expected["expected_rules"][0]
+        for scope in [
+            dict(self.parent, user="other"),
+            dict(self.parent, project="beta"),
+            dict(self.scope, session="two"),
+            dict(self.scope, branch_or_version="next"),
+            dict(self.scope, project=None),
+        ]:
+            with (
+                self.subTest(scope=scope),
+                self.assertRaisesRegex(ValueError, "invalid search rule oracle"),
+            ):
+                await self.search(
+                    oracle=dict(self.expected, expected_rules=[dict(rule, scope=scope)])
+                )
+        for invalid in [[dict(rule, id="blocked")], [rule, rule]]:
+            with (
+                self.subTest(invalid=invalid),
+                self.assertRaisesRegex(ValueError, "invalid search rule oracle"),
+            ):
+                await self.search(oracle=dict(self.expected, expected_rules=invalid))
+
+    async def test_legacy_query_keeps_pinned_same_scope_rule(self):
+        legacy = self.expected.copy()
+        del legacy["expected_rules"]
+        self.assertEqual((await self.search(oracle=legacy, rules=[]))["refs"], [("fact", 2)])
+        local = self.item("local", 8, self.scope)
+        legacy["required_refs"] = [["fact", 2], ["local", 8]]
+        self.assertEqual(
+            (await self.search(oracle=legacy, rules=[local]))["refs"], [("fact", 2), ("local", 8)]
+        )
+        for unexpected in [
+            self.item("unknown", 4, self.scope),
+            self.item("local", 8, self.global_scope),
+        ]:
+            with (
+                self.subTest(unexpected=unexpected),
+                self.assertRaisesRegex(OperationError, "SEARCH_AUTHORITY_OR_SCOPE_MISMATCH"),
+            ):
+                await self.search(oracle=legacy, rules=[unexpected])
 
 
 class WorkloadBounds(unittest.IsolatedAsyncioTestCase):

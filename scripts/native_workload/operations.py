@@ -13,6 +13,16 @@ def digest(value):
     return hashlib.sha256(value).hexdigest()
 
 
+def rule_applies(rule_scope, query_scope):
+    """Match the native Scope::contains constraints for a rule and its query."""
+    fields = ("project", "branch_or_version", "session")
+    return (
+        rule_scope["user"] == query_scope["user"]
+        and (rule_scope.get("branch_or_version") is None or rule_scope.get("project") is not None)
+        and all(rule_scope.get(k) is None or rule_scope[k] == query_scope.get(k) for k in fields)
+    )
+
+
 class OperationError(Exception):
     def __init__(self, code, detail=None):
         self.code, self.detail = code, detail
@@ -193,6 +203,20 @@ class NativeOperations:
             raise ValueError("admitted workload requires native top-20 lexical or hybrid retrieval")
         if not 1 <= len(expected["required_refs"]) <= 20:
             raise ValueError("search requires admitted positive references")
+        required = set(map(tuple, expected["required_refs"]))
+        forbidden = set(expected.get("excluded_ids", []))
+        rule_oracle = {}
+        for rule in expected.get("expected_rules", []):
+            key = rule["id"]
+            if (
+                key in rule_oracle
+                or key in forbidden
+                or type(rule["revision"]) is not int
+                or rule["revision"] <= 0
+                or not rule_applies(rule["scope"], expected["scope"])
+            ):
+                raise ValueError("invalid search rule oracle: " + key)
+            rule_oracle[key] = (rule["revision"], rule["scope"])
         job = await self.job(
             dict(
                 op="retrieval_run",
@@ -206,24 +230,43 @@ class NativeOperations:
             raise OperationError("SEARCH_MODE_MISMATCH", dict(actual=output["mode"]))
         if len(output["items"]) + len(output.get("rules", [])) > expected["top_k"]:
             raise OperationError("SEARCH_TOP_K_MISMATCH")
-        memories = [item["memory"] for item in output["items"]] + [
-            item["memory"] for item in output.get("rules", [])
-        ]
-        references = set()
-        forbidden = set(expected.get("excluded_ids", []))
-        for memory in memories:
-            revision, draft = memory["revision"], memory["record"]["draft"]
-            ref = (revision["key"]["id"], revision["commit_seq"])
-            if ref in references or ref[0] in forbidden or draft["scope"] != expected["scope"]:
-                raise OperationError("SEARCH_AUTHORITY_OR_SCOPE_MISMATCH")
-            references.add(ref)
-        if not set(map(tuple, expected["required_refs"])).issubset(references):
+        if output["scope"] != expected["scope"] or output["query"] != expected["query"]:
+            raise OperationError("SEARCH_AUTHORITY_OR_SCOPE_MISMATCH")
+        seen_ids, scored, rules = set(), set(), set()
+        for group, references in (("items", scored), ("rules", rules)):
+            for item in output[group]:
+                memory = item["memory"]
+                revision, record = memory["revision"], memory["record"]
+                key, seq = revision["key"]["id"], revision["commit_seq"]
+                scope = record["draft"]["scope"]
+                if key in seen_ids or key in forbidden or type(seq) is not int or seq <= 0:
+                    raise OperationError("SEARCH_AUTHORITY_OR_SCOPE_MISMATCH")
+                seen_ids.add(key)
+                if group == "items":
+                    allowed = scope == expected["scope"] and key not in rule_oracle
+                else:
+                    if "expected_rules" in expected:
+                        allowed = rule_oracle.get(key) == (seq, scope)
+                    else:
+                        allowed = scope == expected["scope"] and (key, seq) in required
+                    allowed = (
+                        allowed
+                        and record["authority"] == "human_confirmed"
+                        and record["draft"]["kind"] in ("decision", "preference", "procedure")
+                    )
+                if not allowed:
+                    raise OperationError("SEARCH_AUTHORITY_OR_SCOPE_MISMATCH")
+                references.add((key, seq))
+        if "expected_rules" in expected and {key for key, _ in rules} != rule_oracle.keys():
+            raise OperationError("SEARCH_REQUIRED_RULE_MISSING")
+        positives = scored if "expected_rules" in expected else scored | rules
+        if not required.issubset(positives):
             raise OperationError("SEARCH_REQUIRED_HIT_MISSING")
         return dict(
             job_id=identity,
             receipt_id=job["result"]["receipt_id"],
             mode=output["mode"],
-            refs=sorted(references),
+            refs=sorted(scored | rules),
             coverage=output["coverage"],
             ann_relevance_measured=False,
         )

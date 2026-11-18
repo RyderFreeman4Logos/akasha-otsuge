@@ -27,12 +27,23 @@ The run plan JSON includes these fields:
 | `daemon`, `lookup` | Linux process identities with `pid` and `start_ticks` from procfs. |
 | `daemon_sha256`, `daemon_config_sha256`, `scale_receipt_sha256` | SHA-256 of the running executable and the two admitted files. |
 | `oracles.current` | Nonempty list of stable memories, each with `id`, `revision`, `scope` and UTF-8 `claim_sha256`. |
-| `oracles.lexical`, `oracles.hybrid_vector` | Lists with `query`, `mode` (`keyword` or `hybrid`), `scope`, `top_k` equal to 20, one or more `required_refs` pairs of memory ID and revision, and optional `excluded_ids`. |
+| `oracles.lexical`, `oracles.hybrid_vector` | Lists with `query`, `mode` (`keyword` or `hybrid`), `scope`, `top_k` equal to 20, one or more `required_refs` pairs of memory ID and revision, and optional `expected_rules` and `excluded_ids`. |
 | `oracles.scoped_history` | List of snapshots with `scope`, fixed sequence `at`, and `members`, a map from each of 100 distinct IDs to its expected current-memory fields at that sequence. |
 | `oracles.corrections` | Four distinct writable test targets, each with `id` and `scope`. Use separate memories for stable current reads. |
 
 Use the native scope representation, including the user, project, session
-and branch/version. Example low-memory interval:
+and branch/version. Freeze `expected_rules` from the seeded memories and
+the query's read grant before running the workload. Each entry contains
+`id`, `revision` and the rule's own `scope`. The list specifies exactly
+which confirmed rules must appear. A rule may omit a project, branch or
+session constraint held by the query, provided its remaining constraints
+match and the grant permits reading that scope. With this list, `required_refs`
+checks scored hits in the query scope. For older plans that omit the list,
+a rule in the query scope can satisfy an explicit `required_refs` entry.
+An empty rule list requires a result without rules. Excluded IDs apply to
+both rules and hits.
+
+Example low-memory interval:
 
 ```toml
 [execution]
