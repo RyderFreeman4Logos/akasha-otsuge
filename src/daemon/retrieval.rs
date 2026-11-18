@@ -215,109 +215,136 @@ impl Service {
         match plan {
             RetrievalRequest::Sync | RetrievalRequest::Rebuild => {
                 let target = target.ok_or(Error("JOB_CORRUPT"))?;
-                let context = context()?;
-                let scope = owner_scope();
-                let authorize = || {
-                    Domain::new(&self.storage)
-                        .permission(&context, Some(&scope))
-                        .map(|_| ())
-                };
-                self.index_epoch.fetch_add(1, Ordering::Release);
-                let _epoch = IndexBuild(&self.index_epoch);
-                let mut windows_since_prune = 0u8;
-                loop {
-                    {
-                        let _guard = self.admission.lock().await;
-                        let (_, job) = self.job(id)?;
-                        self.authorize_job(&job)?;
-                        if job.cancel_requested {
-                            return Err(Error("CANCELLED"));
-                        }
-                        if self.stopping.load(std::sync::atomic::Ordering::Acquire) {
-                            return Err(Error("INDEX_INTERRUPTED"));
-                        }
-                        if workflow.expired().is_some() {
-                            return Err(Error("WORKFLOW_TIMEOUT"));
-                        }
-                    }
-                    let mut progress = index
-                        .sync_batch(&self.storage, target, config.generation(), &authorize)
-                        .await?;
-                    if config.resolved().config().retrieval.embedding.is_some() {
-                        progress.vector = Some(
-                            index
-                                .vector_index(&self.storage, config.resolved())
-                                .await?
-                                .sync_batch(
-                                    &self.storage,
-                                    target,
-                                    &config,
-                                    &self.providers,
-                                    workflow,
-                                    || self.model_cancelled(id),
-                                    &authorize,
-                                )
-                                .await?,
-                        );
-                    }
-                    let complete = progress.lexical_watermark >= target
-                        && progress
-                            .vector
-                            .as_ref()
-                            .is_none_or(|v| v.watermark >= target);
-                    windows_since_prune = windows_since_prune.saturating_add(1);
-                    if index.is_pending() && (complete || windows_since_prune >= 32) {
-                        // This private candidate is inaccessible to searches until publication.
-                        index
-                            .prune_versions(&|| self.authorize_index_work(id, workflow))
-                            .await?;
-                        windows_since_prune = 0;
-                    } else if (complete || windows_since_prune >= 32)
-                        && let Ok(owned) = self.search_index.try_lock()
-                        && owned.as_ref().is_some_and(|cached| {
-                            Arc::ptr_eq(cached, &index) && Arc::strong_count(cached) == 2
+                let result = self
+                    .maintain_index(id, workflow, &index, &config, target, needs_retirement)
+                    .await;
+                if matches!(
+                    &result,
+                    Err(Error("INDEX_IO" | "INDEX_CORRUPT" | "INDEX_MISSING"))
+                ) && index.is_pending()
+                {
+                    // Some damaged data or index pages only fail during a native scan or prune.
+                    index
+                        .mark_damaged_candidate(&self.storage, config.generation(), &|| {
+                            self.authorize_index_work(id, workflow)
                         })
-                    {
-                        // Keep new readers behind this lock until native cleanup has returned.
-                        index
-                            .prune_versions(&|| {
-                                authorize()?;
-                                self.authorize_index_work(id, workflow)
-                            })
-                            .await?;
-                        windows_since_prune = 0;
-                    }
-                    if complete {
-                        crate::retrieval::activate_vector(
-                            &self.storage,
-                            &progress,
-                            &config,
-                            target,
-                            &|| {
-                                authorize()?;
-                                self.authorize_index_work(id, workflow)
-                            },
-                        )
                         .await?;
-                        if needs_retirement {
-                            self.finish_rebuild(
-                                id,
-                                workflow,
-                                &index,
-                                &progress,
-                                config.generation(),
-                                target,
-                            )
-                            .await?;
-                            progress = Index::status(&self.storage, config.resolved())?;
-                        }
-                        return Ok(serde_json::to_value(progress)?);
-                    }
                 }
+                result
             }
             plan @ RetrievalRequest::Search { .. } => {
                 self.search(id, workflow, index, config, vector_generation, plan)
                     .await
+            }
+        }
+    }
+
+    async fn maintain_index(
+        &self,
+        id: &str,
+        workflow: &Deadline,
+        index: &Arc<Index>,
+        config: &crate::config::Snapshot<()>,
+        target: u64,
+        needs_retirement: bool,
+    ) -> Result<Value> {
+        let context = context()?;
+        let scope = owner_scope();
+        let authorize = || {
+            Domain::new(&self.storage)
+                .permission(&context, Some(&scope))
+                .map(|_| ())
+        };
+        self.index_epoch.fetch_add(1, Ordering::Release);
+        let _epoch = IndexBuild(&self.index_epoch);
+        let mut windows_since_prune = 0u8;
+        loop {
+            {
+                let _guard = self.admission.lock().await;
+                let (_, job) = self.job(id)?;
+                self.authorize_job(&job)?;
+                if job.cancel_requested {
+                    return Err(Error("CANCELLED"));
+                }
+                if self.stopping.load(std::sync::atomic::Ordering::Acquire) {
+                    return Err(Error("INDEX_INTERRUPTED"));
+                }
+                if workflow.expired().is_some() {
+                    return Err(Error("WORKFLOW_TIMEOUT"));
+                }
+            }
+            let mut progress = index
+                .sync_batch(&self.storage, target, config.generation(), &authorize)
+                .await?;
+            if config.resolved().config().retrieval.embedding.is_some() {
+                progress.vector = Some(
+                    index
+                        .vector_index(&self.storage, config.resolved())
+                        .await?
+                        .sync_batch(
+                            &self.storage,
+                            target,
+                            config,
+                            &self.providers,
+                            workflow,
+                            || self.model_cancelled(id),
+                            &authorize,
+                        )
+                        .await?,
+                );
+            }
+            let complete = progress.lexical_watermark >= target
+                && progress
+                    .vector
+                    .as_ref()
+                    .is_none_or(|v| v.watermark >= target);
+            windows_since_prune = windows_since_prune.saturating_add(1);
+            if index.is_pending() && (complete || windows_since_prune >= 32) {
+                // This private candidate is inaccessible to searches until publication.
+                index
+                    .prune_versions(&|| self.authorize_index_work(id, workflow))
+                    .await?;
+                windows_since_prune = 0;
+            } else if (complete || windows_since_prune >= 32)
+                && let Ok(owned) = self.search_index.try_lock()
+                && owned.as_ref().is_some_and(|cached| {
+                    Arc::ptr_eq(cached, index) && Arc::strong_count(cached) == 2
+                })
+            {
+                // Keep new readers behind this lock until native cleanup has returned.
+                index
+                    .prune_versions(&|| {
+                        authorize()?;
+                        self.authorize_index_work(id, workflow)
+                    })
+                    .await?;
+                windows_since_prune = 0;
+            }
+            if complete {
+                crate::retrieval::activate_vector(
+                    &self.storage,
+                    &progress,
+                    config,
+                    target,
+                    &|| {
+                        authorize()?;
+                        self.authorize_index_work(id, workflow)
+                    },
+                )
+                .await?;
+                if needs_retirement {
+                    self.finish_rebuild(
+                        id,
+                        workflow,
+                        index,
+                        &progress,
+                        config.generation(),
+                        target,
+                    )
+                    .await?;
+                    progress = Index::status(&self.storage, config.resolved())?;
+                }
+                return Ok(serde_json::to_value(progress)?);
             }
         }
     }

@@ -1311,8 +1311,11 @@ impl Service {
             let mut queued = 0;
             let mut reserved_bytes = 0;
             let mut rebuild_admitted = false;
+            let mut sync_admitted = false;
             for id in &ids {
                 let (_, job, content_bytes) = service.job_with_size(id)?;
+                sync_admitted |=
+                    matches!(job.retrieval_plan, Some(crate::retrieval::Request::Sync));
                 rebuild_admitted |=
                     matches!(job.retrieval_plan, Some(crate::retrieval::Request::Rebuild));
                 if job.state == "queued" {
@@ -1364,6 +1367,7 @@ impl Service {
                         &service.storage,
                         snapshot.resolved(),
                         target,
+                        sync_admitted,
                     )?
                 }
             } else {

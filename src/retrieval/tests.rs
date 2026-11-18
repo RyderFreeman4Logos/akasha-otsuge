@@ -463,7 +463,7 @@ async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publi
             .unwrap();
         assert_eq!(status(&store).unwrap().generation, GENERATION);
         assert_eq!(
-            Index::remaining_sync(&store, &config, added).unwrap(),
+            Index::remaining_sync(&store, &config, added, false).unwrap(),
             added
         );
         assert_eq!(
@@ -477,7 +477,14 @@ async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publi
             .await
             .unwrap();
         let ready = sync(&candidate, &store, added).await;
-        assert_eq!(Index::remaining_sync(&store, &config, added).unwrap(), 0);
+        assert_eq!(
+            Index::remaining_sync(&store, &config, added, true).unwrap(),
+            added
+        );
+        assert_eq!(
+            Index::remaining_sync(&store, &config, added, false).unwrap(),
+            0
+        );
         assert_eq!(
             active.keyword("marmalade", &scope(), 10).await.unwrap(),
             [("original".into(), orig)]

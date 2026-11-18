@@ -302,46 +302,6 @@ fn failed_explicit_rebuild_keeps_published_search_and_resumes_after_restart() {
     daemon.start();
     let original = search(&daemon, "alpha", "after-restart");
     assert_eq!(original["items"], during["items"]);
-    let calls = endpoint.requests.lock().unwrap().len();
-    endpoint.pause();
-    daemon.cli(&[
-        "index",
-        "rebuild",
-        "--idempotency-key",
-        "replacement-second-key",
-    ]);
-    let until = Instant::now() + Duration::from_secs(10);
-    while endpoint.requests.lock().unwrap().len() == calls {
-        assert!(
-            Instant::now() < until,
-            "replacement did not resume embedding"
-        );
-        std::thread::sleep(Duration::from_millis(10));
-    }
-    let retried = daemon.cli(&["index", "status"])["data"].clone();
-    assert_eq!(
-        retried["rebuild"]["generation"],
-        building["rebuild"]["generation"]
-    );
-    assert_eq!(
-        retried["rebuild"]["vector"]["generation"],
-        building["rebuild"]["vector"]["generation"]
-    );
-    let table_count = std::fs::read_dir(daemon.root.join("data/search"))
-        .unwrap()
-        .filter_map(|p| p.unwrap().path().extension().map(|e| e == "lance"))
-        .filter(|is_table| *is_table)
-        .count();
-    assert_eq!(
-        table_count, 4,
-        "only the published and candidate lexical/vector pairs are live"
-    );
-    daemon.cli(&["job", "cancel", "replacement-second-key"]);
-    endpoint.resume();
-    assert_eq!(
-        finished(&daemon, "replacement-second-key")["state"],
-        "cancelled"
-    );
     let replacement = build(&daemon, "resume");
     assert_eq!(replacement["generation"], building["rebuild"]["generation"]);
     assert_ne!(replacement["generation"], old["generation"]);
@@ -358,6 +318,47 @@ fn failed_explicit_rebuild_keeps_published_search_and_resumes_after_restart() {
     assert!(active.get("rebuild").is_none());
     let final_result = search(&daemon, "alpha", "after-publication");
     assert_eq!(final_result["items"], during["items"]);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
+fn failed_rebuilds_with_new_keys_reuse_one_native_candidate() {
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let mut daemon = Daemon::new();
+    seed(&daemon);
+    daemon.start();
+    let published = build(&daemon, "first");
+    let settings = settings(
+        &format!("http://{}/v1", listener.local_addr().unwrap()),
+        None,
+    )
+    .replace("timeout='2s'", "timeout='100ms'");
+    daemon.configure(&settings);
+    daemon.cli(&["config", "reload"]);
+    let mut candidate = None;
+    for id in ["attempt-a", "attempt-b", "attempt-c"] {
+        daemon.cli(&["index", "rebuild", "--idempotency-key", id]);
+        let job = finished(&daemon, id);
+        assert_eq!(job["state"], "failed", "{job}");
+        assert_eq!(job["error"], "PROVIDER_TIMEOUT", "{job}");
+        let status = daemon.cli(&["index", "status"])["data"].clone();
+        assert_eq!(status["generation"], published["generation"]);
+        let tables: std::collections::BTreeSet<_> =
+            std::fs::read_dir(daemon.root.join("data/search"))
+                .unwrap()
+                .map(|entry| entry.unwrap().path())
+                .filter(|path| path.extension().is_some_and(|ext| ext == "lance"))
+                .collect();
+        assert_eq!(tables.len(), 3);
+        let current = (status["rebuild"]["generation"].clone(), tables);
+        assert_eq!(candidate.get_or_insert_with(|| current.clone()), &current);
+    }
+    daemon.configure("");
+    daemon.cli(&["config", "reload"]);
+    let resumed = build(&daemon, "resume");
+    assert_eq!(resumed["generation"], candidate.unwrap().0);
+    assert_eq!(resumed["indexed_rows"], published["indexed_rows"]);
     daemon.cli(&["daemon", "stop"]);
     daemon.wait();
 }

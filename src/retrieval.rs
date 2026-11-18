@@ -220,6 +220,23 @@ impl Index {
         self.pending
     }
 
+    pub(crate) async fn mark_damaged_candidate(
+        &self,
+        storage: &Storage,
+        generation: u64,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        if let Some(mut candidate) = pending_rebuild(storage)?
+            && self.generation == candidate.generation
+            && candidate.generation != status(storage)?.generation
+            && !candidate.discarding
+        {
+            candidate.discarding = true;
+            save_pending(storage, generation, Some(&candidate), authorize).await?;
+        }
+        Ok(())
+    }
+
     pub async fn open(config: &ResolvedConfig, storage: &Storage) -> Result<Self> {
         Self::open_generation(config, status(storage)?, false).await
     }
@@ -551,9 +568,16 @@ impl Index {
         storage: &Storage,
         config: &ResolvedConfig,
         target: u64,
+        another_sync: bool,
     ) -> Result<u64> {
         let progress = match pending_rebuild(storage)? {
-            Some(candidate) if candidate.generation != status(storage)?.generation => candidate,
+            Some(candidate) if candidate.generation != status(storage)?.generation => {
+                // Another admitted sync may retire this candidate for its own pinned model.
+                if another_sync {
+                    return Ok(target);
+                }
+                candidate
+            }
             _ => status(storage)?,
         };
         let vector = vector::status(storage, config, &progress.generation)?;
