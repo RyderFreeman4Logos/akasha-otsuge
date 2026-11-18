@@ -392,8 +392,8 @@ impl Storage {
         self.commit_admitted(prepare, false).await
     }
 
-    /// Requeue, cancel or finish an admitted job even when large writes are suspended.
-    pub(crate) async fn commit_job_closeout(
+    /// Persist admitted job transitions and notification delivery receipts under disk pressure.
+    pub(crate) async fn commit_with_reserved_space(
         &self,
         request: CommitRequest,
     ) -> Result<CommitReceipt> {
@@ -404,7 +404,7 @@ impl Storage {
     async fn commit_admitted(
         &self,
         prepare: impl FnOnce() -> Result<CommitPlan>,
-        job_closeout: bool,
+        use_reserved_space: bool,
     ) -> Result<CommitReceipt> {
         let writer = self.writer.clone().lock_owned().await;
         let mut request = match prepare()? {
@@ -427,7 +427,7 @@ impl Storage {
                 Err(StorageError::new("IDEMPOTENCY_CONFLICT"))
             };
         }
-        if !job_closeout {
+        if !use_reserved_space {
             self.check_write_space(bytes)?;
         }
         let seq = sequence(tx.get_for_update(SEQUENCE)?)?

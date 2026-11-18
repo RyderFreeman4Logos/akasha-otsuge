@@ -113,27 +113,28 @@ impl Service {
         )?)
     }
 
-    async fn save_notification(&self, item: &Notification, previous: Option<u64>) -> Result<()> {
-        self.storage
-            .commit(&CommitRequest {
-                request_id: format!(
-                    "notification/{}/{}/{}/{}/{}",
-                    item.notification_id,
-                    item.source_revision,
-                    previous.unwrap_or(0),
-                    self.instance,
-                    ipc::now_ms()?
-                ),
-                config_generation: self.config.pin().generation(),
-                policy_revision: None,
-                changes: vec![Change {
-                    key: key(&item.notification_id)?,
-                    expected_revision: previous,
-                    content: serde_json::to_string(item)?,
-                }],
-            })
-            .await?;
-        Ok(())
+    fn notification_write(
+        &self,
+        item: &Notification,
+        previous: Option<u64>,
+    ) -> Result<CommitRequest> {
+        Ok(CommitRequest {
+            request_id: format!(
+                "notification/{}/{}/{}/{}/{}",
+                item.notification_id,
+                item.source_revision,
+                previous.unwrap_or(0),
+                self.instance,
+                ipc::now_ms()?
+            ),
+            config_generation: self.config.pin().generation(),
+            policy_revision: None,
+            changes: vec![Change {
+                key: key(&item.notification_id)?,
+                expected_revision: previous,
+                content: serde_json::to_string(item)?,
+            }],
+        })
     }
 
     // Revision outbox entries are committed atomically with their source review.
@@ -259,7 +260,9 @@ impl Service {
                         .as_str()
                         .ok_or(Error("NOTIFICATION_CORRUPT"))?
                 );
-                self.save_notification(&item, previous).await?;
+                self.storage
+                    .commit(&self.notification_write(&item, previous)?)
+                    .await?;
             }
         }
         // Our own writes also enter the outbox; never checkpoint only those writes.
@@ -288,11 +291,15 @@ impl Service {
         allow_stdio: bool,
     ) -> Result<Option<Dispatch>> {
         let _guard = self.admission.lock().await;
-        self.project_notifications(scan).await?;
+        match self.project_notifications(scan).await {
+            // Keep the cursor before the refused projection so the next tick can replay it.
+            Err(Error("RESOURCE_BUSY")) => return Ok(None),
+            result => result?,
+        }
         let keys = self.notification_keys(after.as_deref())?;
         let more = keys.len() > 32;
-        let mut dispatch = None;
         for key in keys.into_iter().take(32) {
+            let mut dispatch = None;
             let id = key
                 .id
                 .rsplit('/')
@@ -386,13 +393,21 @@ impl Service {
                 changed = true;
             }
             if changed {
-                self.save_notification(&item, Some(revision)).await?;
+                let request = self.notification_write(&item, Some(revision))?;
+                match self.storage.commit(&request).await {
+                    Err(error) if error.code == "RESOURCE_BUSY" => continue,
+                    result => result?,
+                };
+                if dispatch.is_some() {
+                    // Hand off this persisted claim before another inbox row can fail.
+                    return Ok(dispatch);
+                }
             }
         }
         if !more {
             *after = None;
         }
-        Ok(dispatch)
+        Ok(None)
     }
 
     pub(super) async fn list_notifications(

@@ -47,7 +47,9 @@ include cached input and are not a currency estimate. Explicit fallback and
 delegation use this same budget. The automatic workflow deadline includes the
 slowest selected executor/fallback and the full start budget. Admission has a
 256-item pending bound. An unavailable executor, exhausted admission capacity,
-timeout or interrupted run leaves a visible item with its error.
+timeout or interrupted run leaves a visible item with its error. If a disk-space
+check defers an investigation state update, the daemon retains the pending item
+and reconciles its original job when space becomes available.
 
 ## Report a signal
 

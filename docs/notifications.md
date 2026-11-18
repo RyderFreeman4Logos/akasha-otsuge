@@ -58,7 +58,10 @@ grouping and priority rules remain those documented in [incidents](incidents.md)
 The worker processes bounded outbox and inbox pages. It advances past its own
 records without repeatedly committing idle cursor updates. Startup replays only
 uncheckpointed outbox entries, using each item's recorded source revision to
-avoid duplicate projection. Local delivery and its success record are one storage
+avoid duplicate projection. Under authority disk pressure, a refused projection
+keeps its outbox cursor for replay, and a refused channel claim waits for the
+next pass. An admitted stdio attempt can use reserved space to record its send
+intent and delivery result. Local delivery and its success record are one storage
 commit, so the local channel has no external-send/receipt ambiguity.
 
 Channel names contain 1–128 bytes without control characters. Each notification

@@ -288,14 +288,19 @@ impl Service {
                 content: serde_json::to_string(&pending)?,
             });
         }
-        self.storage
-            .commit(&CommitRequest {
-                request_id: format!("incident-state/{}/{revision}", record.id),
-                config_generation: self.config.pin().generation(),
-                policy_revision: None,
-                changes,
-            })
-            .await?;
+        let request = CommitRequest {
+            request_id: format!("incident-state/{}/{revision}", record.id),
+            config_generation: self.config.pin().generation(),
+            policy_revision: None,
+            changes,
+        };
+        // The pending list and deterministic job ID retain everything needed to
+        // retry this transition on the next tick, including after a restart.
+        if let Err(error) = self.storage.commit(&request).await
+            && error.code != "RESOURCE_BUSY"
+        {
+            return Err(error.into());
+        }
         Ok(())
     }
 

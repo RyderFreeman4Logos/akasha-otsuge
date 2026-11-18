@@ -1137,7 +1137,7 @@ impl Service {
             changes,
         };
         if previous.is_some() && (job.terminal() || job.cancel_requested || job.state == "queued") {
-            self.storage.commit_job_closeout(request).await?;
+            self.storage.commit_with_reserved_space(request).await?;
         } else {
             self.storage.commit(&request).await?;
         }
