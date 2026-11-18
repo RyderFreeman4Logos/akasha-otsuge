@@ -37,6 +37,9 @@ def dependency_notices(compiled):
     if unknown:
         raise SystemExit(f"Cargo metadata omits compiled packages: {sorted(unknown)}")
     entries, texts = [], {}
+    saved = ROOT / "docs/licenses/upstream"
+    sources = json.loads((saved / "sources.json").read_text())
+
     def notice_files(directory):
         return [p for p in directory.iterdir() if p.is_file() and
                 p.name.upper().startswith(("LICENSE", "LICENCE", "COPYING", "NOTICE", "UNLICENSE"))]
@@ -54,14 +57,23 @@ def dependency_notices(compiled):
         if not files and boundary != root:
             files = notice_files(boundary)
         entry = {key: pkg[key] for key in ("name", "version", "license", "authors", "repository", "source")}
+        named = {path.name: path for path in files}
+        if not named:
+            vcs = root / ".cargo_vcs_info.json"
+            revision = json.loads(vcs.read_text())["git"]["sha1"] if vcs.is_file() else None
+            if revision not in sources:
+                raise SystemExit(f"Missing license text for {pkg['id']} at {revision}")
+            entry["upstream_notice_url"] = sources[revision]["upstream"]
+            boundary = saved
+            named = {name: saved / filename for name, filename in sources[revision]["files"].items()}
         entry["files"] = {}
-        for path in sorted(set(files)):
+        for name, path in sorted(named.items()):
             if not path.resolve(strict=True).is_relative_to(boundary.resolve()):
                 raise SystemExit(f"{pkg['id']} declares a notice outside its source directory.")
             content = path.read_bytes()
             digest = hashlib.sha256(content).hexdigest()
             texts[digest] = content
-            entry["files"][path.name] = f"licenses/{digest}.txt"
+            entry["files"][name] = f"licenses/{digest}.txt"
         entries.append(entry)
     notices = {"THIRD-PARTY.json": (json.dumps(entries, sort_keys=True, indent=2) + "\n").encode()}
     notices.update({f"licenses/{key}.txt": value for key, value in texts.items()})
@@ -98,12 +110,12 @@ def package(destination):
     checksum = release.with_name(release.name + ".sha256")
     if release.exists() or checksum.exists():
         raise SystemExit(f"Package already exists in {destination}")
-    documents = ["LICENSE", "NOTICE", "Cargo.lock", "docs/linux-install.md", "docs/daemon.md",
-                 "docs/adapters.md", "docs/configuration.md", "docs/memory-resources.md",
-                 "docs/review.md", "docs/notifications.md", "docs/neutral-archive.md",
-                 "docs/mempal-migration.md", "docs/licenses/mempal-MIT.txt",
+    documents = ["LICENSE", "NOTICE", "Cargo.lock", "docs/licenses/mempal-MIT.txt",
                  "examples/config.toml", "examples/notifier-file.py", "src/config/defaults.toml"]
-    documents.extend(output("git", "ls-tree", "-r", "--name-only", commit, "docs/adapters").splitlines())
+    documents.extend(f"docs/{p}" for p in output("git", "ls-tree", "--name-only", f"{commit}:docs").splitlines()
+                     if p.endswith(".md"))
+    documents.extend(p for p in output("git", "ls-tree", "-r", "--name-only", commit, "docs/adapters").splitlines()
+                     if p.endswith("/README.md"))
     notices = dependency_notices({m["package_id"] for m in artifacts})
     destination.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=destination) as tmp:
