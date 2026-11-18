@@ -27,10 +27,11 @@ from check_reference import (
 )
 
 BASE = "a177d6e23568b627ec9eef593d88289bc8634041"
-# File contents from BASE, also available in shallow checkouts and source archives.
+# Preserve the policy from BASE when the live host tools change, including in source archives.
+FROZEN_CODEX_POLICY = "scripts/evaluation/fixtures/a177d6e-codex-runner-policy.rs.txt"
 FROZEN_INPUTS = {
     "scripts/check_reference.py": "f4d3444bd4bfeac9ba1b8a20d5e3b54c4d6dd7ff2e5cb6cb631bcc3cc32a1dbb",
-    "src/adapter/codex/runner_policy.rs": "ec288a8408c54422cb3620e2ca652a0a77b71a5744ee23b04bd992eca7a91085",
+    FROZEN_CODEX_POLICY: "ec288a8408c54422cb3620e2ca652a0a77b71a5744ee23b04bd992eca7a91085",
 }
 INSTRUCTIONS = (
     "Answer the user's current request using the available scoped retrieval service. "
@@ -125,7 +126,7 @@ def sandbox(args, private, profile):
         tool_mode="direct",
     )
     dump(private / "catalog.json", {"models": [model]})
-    policy = (ROOT / "src/adapter/codex/runner_policy.rs").read_text()
+    policy = (ROOT / FROZEN_CODEX_POLICY).read_text()
     disabled = re.findall(
         r'"([^"]+)"',
         policy.split("pub(super) const DISABLED: &[&str] = &[")[1].split("];")[0],

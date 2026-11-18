@@ -19,7 +19,7 @@ export default function (pi: ExtensionAPI) {
       context_describe: object({}),
       context_list: object({ cursor, limit }),
       context_read: object({ handle: Type.String(), start: Type.Integer({ minimum: 0 }), max_bytes: Type.Integer({ minimum: 1, maximum: 16384 }) }),
-      context_search: object({ cursor, query: Type.String(), limit }),
+      context_search: object({ cursor, query: Type.String({ minLength: 1, maxLength: 512, description: 'Include at least one non-whitespace character.' }), limit }),
     });
     return;
   }
