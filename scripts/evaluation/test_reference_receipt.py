@@ -61,9 +61,9 @@ class ReceiptTests(unittest.TestCase):
         others = [
             x
             for x in prior["remaining_registered_inputs"]
-            if x["task"] not in {"C03", "H02"} and not x["task"].endswith("-hint")
+            if x["task"] not in {"C03", "H02", "C02", "H04"} and not x["task"].endswith("-hint")
         ]
-        self.assertEqual(len(others), 35)
+        self.assertEqual(len(others), 33)
         for old in others:
             with (
                 tempfile.TemporaryDirectory(dir=self.root) as d,
@@ -231,6 +231,37 @@ class ReceiptTests(unittest.TestCase):
                 for arm in ("direct", "consult")
             },
         )
+
+    def test_candidate_input_is_preserved_when_ordinary_search_returns_no_hits(self):
+        artifact = driver.ROOT / "docs/benchmarks/results/mvp027/registered-candidate-preflights-r1.json.gz"
+        runs = json.loads(gzip.decompress(artifact.read_bytes()))["runs"]
+        seen = set()
+        for row in runs:
+            r = row["receipt"]
+            key = (r["task_id"], r["strategy"])
+            self.assertNotIn(key, seen)
+            seen.add(key)
+            self.assertFalse(r["model_turn_submitted"] or r["model_turn_accepted"])
+            self.assertNotIn("auth", r)
+            if key[0] in {"A04", "V03"}:
+                self.assertEqual(row["exit_code"], 1)
+                self.assertEqual(r["status"], "REGISTERED_INPUT_UNAVAILABLE")
+                continue
+            self.assertEqual(row["exit_code"], 0)
+            imported = r["native_import"]
+            self.assertEqual(imported["candidate_revisions"], 1)
+            self.assertEqual(imported["active_revisions"], 0)
+            self.assertEqual(imported["retained_originals"], 1)
+            self.assertEqual(imported["refused_revisions"], [])
+            if key[1] == "direct":
+                self.assertEqual(r["control_read"]["items"], [])
+            else:
+                self.assertEqual(r["preparation"]["ready_search"]["status"], "no_hit")
+                self.assertEqual(r["invocation"]["historical_ordinals"], [1])
+        self.assertEqual(seen, {
+            (task, arm) for task in ("C02", "H04", "A04", "V03")
+            for arm in ("direct", "consult")
+        })
 
     def test_withdrawal_requires_matching_native_rejection_and_frozen_original(self):
         task = next(t for t in driver.read_reference()[1] if t["id"] == "C03")

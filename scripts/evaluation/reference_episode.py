@@ -34,6 +34,14 @@ def withdrawn_revisions(case, native):
     return withdrawn
 
 
+def recorded_candidates(native):
+    return {
+        (m["id"], m["ordinal"])
+        for m in native["memories"]
+        if m.get("authority") == m.get("native_lifecycle_at_write") == "candidate"
+    }
+
+
 def prepare(task, args, private, result):
     case = input_only(task)
     caller = case["caller"]
@@ -97,10 +105,15 @@ def prepare(task, args, private, result):
         )
     ):
         flags.append("caller lineage or source fence")
+    candidates = recorded_candidates(native)
     if any(
         m["scope"] != caller["scope"]
         or (
             m["status"] != "active"
+            and not (
+                m["status"] == m["authority"] == "candidate"
+                and (m["id"], m["revision"]) in candidates
+            )
             and not (
                 m["status"] == "retired" and (m["id"], m["revision"]) in withdrawals
             )
@@ -181,6 +194,7 @@ def prepare(task, args, private, result):
         or sorted(native["native_state_ids"]) != sorted(observed["native_state_ids"])
         or set(observed["native_state_ids"])
         != {m["id"] for m in case["memories"] if m["status"] == "active"}
+        or recorded_candidates(observed) != candidates
         or withdrawn_revisions(case, observed) != withdrawals
         or any(s["scope_read"] != "allowed" for s in observed["sources"])
     ):
@@ -206,5 +220,6 @@ def prepare(task, args, private, result):
         missing_parent=seed["missing"],
         active_revisions=len(observed["native_state_ids"]),
         withdrawn_revisions=len(withdrawals),
+        candidate_revisions=len(candidates),
     )
     return case, area
