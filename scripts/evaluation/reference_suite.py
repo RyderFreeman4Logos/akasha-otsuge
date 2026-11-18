@@ -1,6 +1,7 @@
 """Plan and inspect the frozen 60 reference episodes without starting a model."""
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -148,6 +149,7 @@ def native_case(observer, scratch, episode):
             or observed["current_task_sha256"] != sha(episode["current_task"].encode())
         ):
             raise ValueError("native task identity mismatch")
+        observed["observer_stdout_sha256"] = sha(p.stdout)
         return observed
 
 
@@ -159,12 +161,22 @@ def assess(task, actual):
     if errors:
         pending.append("native_authority_or_predecessor")
     if any(m["status"] == "retired" for m in task["memories"]):
-        pending.append("retirement_or_withdrawal_replay")
+        replayed = any(t.get("commit") for t in actual.get("transitions", []))
+        if not replayed:
+            pending.append("retirement_or_withdrawal_replay")
+        elif any(t.get("revision_after") == "rejected" for t in actual["transitions"]):
+            pending.append("candidate_rejected_without_prior_adoption")
     if task["retrieval_mode"] == "historical_state":
-        pending.append("historical_as_of_commit")
+        pending.append(
+            "historical_memory_revision_import"
+            if actual.get("historical_read")
+            else "historical_as_of_commit"
+        )
     if task.get("changes_during_run"):
         if actual["grant_barrier"]:
             pending.append("model_tool_read_and_publication_barrier")
+        elif actual.get("rescope_attempt"):
+            pending.append("rescope_commit_and_publication_barrier")
         else:
             pending.append("live_rescope_and_publication_barrier")
     if task.get("missing_event_ids"):
@@ -178,6 +190,52 @@ def assess(task, actual):
     return pending
 
 
+def audit_refused_revisions(task, observed):
+    memories = {(m["id"], m["revision"]): m for m in task["memories"]}
+    originals = {s["id"]: s for s in task["sources"]}
+    for row in observed["memories"]:
+        if "error" not in row:
+            continue
+        memory = memories[row["id"], row["ordinal"]]
+        sources = [originals[key] for key in memory["source_ids"]]
+        row["declared_input"] = {
+            "authority": memory["authority"],
+            "source_ids": memory["source_ids"],
+            "source_sha256": [s["sha256"] for s in sources],
+            "channels": [s["channel"] for s in sources],
+            "claim_is_whole_original": any(
+                s["text"] == memory["claim"] for s in sources
+            ),
+            "conditions_count": len(memory["conditions"]),
+            "conditions_in_original_text": all(
+                any(c in s["text"] for s in sources) for c in memory["conditions"]
+            ),
+        }
+
+
+def verbatim_control(task, observer, scratch):
+    # Reuse only the declared verified original. Direct adoption accepts its full text without structured conditions.
+    original = input_only(task)
+    episode = copy.deepcopy(original)
+    episode["id"] = "control-" + original["id"]
+    sources = {s["id"]: s for s in original["sources"]}
+    for memory in episode["memories"]:
+        (source_id,) = memory["source_ids"]
+        source = sources[source_id]
+        assert (
+            source["channel"] == "verified_human"
+            and memory["authority"] == "human_confirmed"
+        )
+        memory.update(claim=source["text"], conditions=[])
+    return {
+        "registered_task": original["id"],
+        "registered_input_sha256": sha(canonical(original)),
+        "control_input_sha256": sha(canonical(episode)),
+        "registered_result_credit": 0,
+        "observation": native_case(observer, scratch, episode),
+    }
+
+
 def run(observer, build, scratch, tasks, keep_native):
     rows = []
     for task in tasks:
@@ -185,6 +243,7 @@ def run(observer, build, scratch, tasks, keep_native):
         if observer:
             actual = native_case(observer, scratch, input_only(task))
             if "native_error" not in actual:
+                audit_refused_revisions(task, actual)
                 visible = set(actual["native_visible_ids"])
                 logical = {
                     (m["id"], m["ordinal"]): m
@@ -218,6 +277,10 @@ def run(observer, build, scratch, tasks, keep_native):
                     "outside_lineage_keyword_candidates": actual[
                         "outside_lineage_keyword_candidates"
                     ],
+                    "observer_stdout_sha256": actual["observer_stdout_sha256"],
+                    "transitions": actual["transitions"],
+                    "historical_read": actual["historical_read"],
+                    "rescope_attempt": actual["rescope_attempt"],
                     "grant_barrier": actual["grant_barrier"],
                     "native_state_ids": actual["native_state_ids"],
                 }
@@ -318,7 +381,14 @@ def main():
         action="store_true",
         help="retain all logical-to-native source mappings",
     )
+    parser.add_argument(
+        "--verbatim-controls",
+        action="store_true",
+        help="also run isolated full-statement controls for selected V02, V03 and A04 cases",
+    )
     args = parser.parse_args()
+    if args.verbatim_controls and not args.observer:
+        parser.error("--verbatim-controls requires a native observer")
     if bool(args.observer) != bool(args.build) or bool(args.observer) != bool(
         args.scratch
     ):
@@ -349,11 +419,22 @@ def main():
     if args.output.exists():
         parser.error("result already exists")
     result = run(args.observer, build, args.scratch, tasks, args.full_native)
+    controls = []
+    if args.verbatim_controls:
+        controls = [
+            verbatim_control(t, args.observer, args.scratch)
+            for t in tasks
+            if t["id"] in {"V02", "V03", "A04"}
+        ]
+        result["ungraded_verbatim_controls"] = controls
     with args.output.open("x") as stream:
         json.dump(result, stream, indent=2, ensure_ascii=False)
         stream.write("\n")
     print(json.dumps(result["summary"], sort_keys=True))
-    return int(result["summary"]["native_failures"] != 0)
+    return int(
+        result["summary"]["native_failures"] != 0
+        or any("native_error" in c["observation"] for c in controls)
+    )
 
 
 if __name__ == "__main__":
