@@ -214,5 +214,36 @@
       "host_credentials_mounted": false,
       "network_namespace": "isolated"
     }
+  },
+  "historical_accounting": {
+    "elapsed_seconds_boundary": "Each original total_s starts after fixture validation, hashing the native executables and probing their versions. It ends after native subprocess teardown. The independent supervisor clock measures the entire command.",
+    "preparation_seconds": null,
+    "preparation_visibility": "The original drivers did not separately time work before the inner clock. The difference between clocks also includes process and receipt overhead.",
+    "model_arm_supervisor_wall": {
+      "direct": {
+        "seconds": 21.324,
+        "supervisor_receipt_sha256": "55dda000586c08f53ebef8d687cbe0bfff50ba3365260299ef199dec168d071a"
+      },
+      "consult": {
+        "seconds": 39.328,
+        "supervisor_receipt_sha256": "0548ff0eedec78d5e113aa1a64dde69b2422bb58a6eb99a9b84009f85cf89a68"
+      }
+    },
+    "separate_setup_only_attempt": {
+      "private_result_sha256": "825599bcc52add9bf91eb16cfd849d9c59056b4ba19f899db50f582f449caff8",
+      "submitted_model_turns": 0,
+      "accepted_model_turns": 0,
+      "elapsed_seconds": {
+        "setup_s": 43.301,
+        "total_s": 43.326
+      },
+      "supervisor_wall": {
+        "seconds": 44.303,
+        "supervisor_receipt_sha256": "f0ec5891c04b034448e6afd5c150a22af45acbcae575b53a06865bdaeed584a9"
+      },
+      "monetary_charge": null,
+      "account_quota_delta": null
+    },
+    "credential_visibility": "In the live consult, the trusted service observer and its native client shared a read-only subscription credential mount. The offline repeat omitted this mount."
   }
 }
