@@ -1,0 +1,110 @@
+{
+  "workflow": "After a controlled native Hermes Caller submitted one new synthetic Consult, the native Hermes Runner made its own requests to the configured loopback Grok model.",
+  "host": "Hermes Agent v0.22.5+1915.g4960e41 (2026.9.24) \u00b7 upstream 226e8de8 \u00b7 local 4960e41c (+44275 carried commits)",
+  "plugin_protocol": "akasha-hermes-plugin/1",
+  "product_source": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+  "package_sha256": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+  "synthetic_input_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+  "caller_transport": "deterministic",
+  "runner_transport": "real operator-configured OpenAI-compatible loopback",
+  "requested_model": "grok-4.7",
+  "returned_model": "grok-4.7-build",
+  "request_limit": 6,
+  "max_output_tokens_per_request": 1200,
+  "runner_tools_offered": [
+    "context_describe",
+    "context_list",
+    "context_read",
+    "context_search",
+    "memory_get",
+    "memory_search"
+  ],
+  "other_native_clis_absent": [
+    "claude",
+    "codex",
+    "pi"
+  ],
+  "requests": [
+    {
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 88,
+        "total_tokens": 4284,
+        "prompt_tokens": 4196
+      },
+      "elapsed_ms": 2339
+    },
+    {
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 185,
+        "total_tokens": 5465,
+        "prompt_tokens": 5280
+      },
+      "elapsed_ms": 5426
+    },
+    {
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 144,
+        "total_tokens": 6359,
+        "prompt_tokens": 6215
+      },
+      "elapsed_ms": 2813
+    },
+    {
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 149,
+        "total_tokens": 6582,
+        "prompt_tokens": 6433
+      },
+      "elapsed_ms": 2356
+    },
+    {
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 797,
+        "total_tokens": 7996,
+        "prompt_tokens": 7199
+      },
+      "elapsed_ms": 10292
+    }
+  ],
+  "total_usage": {
+    "prompt_tokens": 29323,
+    "completion_tokens": 1363,
+    "total_tokens": 30686
+  },
+  "product_usage": {
+    "output_bytes": 22785,
+    "read_bytes": 404778,
+    "reads": 48,
+    "starts": 1,
+    "tokens": 30686
+  },
+  "runner_state": "failed",
+  "job_state": "failed",
+  "typed_error": "PROTOCOL_INVALID",
+  "observer_exit": 0,
+  "receipt_proof": "no successful public result available for original readback",
+  "stored_hint_verified": true,
+  "origin_and_fence_verified": true,
+  "billing_observed": null,
+  "product_tool_error_source": "not available from this release receipt",
+  "semantic_adjudication": "unscored",
+  "private_receipt_sha256": "a801620149b3aeb337f87d19df3482abdf681bdbfe4d3b8602e1ac2ba9366790",
+  "sources_sha256": "69371ab38f56a11438f74f4925a3ca319249400cd888351e0e5e75fe52f778d2",
+  "controls": {
+    "first_allowlist_before_upstream": {
+      "upstream_requests": 0,
+      "job_error": "RUNNER_FAILED"
+    },
+    "archived_observer_synthetic_bad_final": {
+      "upstream_requests": 1,
+      "external_inference_requests": 0,
+      "job_error": "PROTOCOL_INVALID",
+      "observer_exit": 0
+    }
+  }
+}

@@ -1,0 +1,508 @@
+{
+  "additional_pi_single_package": {
+    "ack_replayed": true,
+    "billed_usd": 0,
+    "consult_status": "found",
+    "delivery": "sent",
+    "other_hosts_absent_on_path": true,
+    "pi_version": "1.4.0",
+    "proposal_authority": "candidate",
+    "real_model_calls": 0,
+    "review_state": "investigating"
+  },
+  "claude_subprocess_timeout_control": {
+    "boundary_receipt_sha256": "f2227b5d2d704fedbb26d7c46aa56df6c56eaec2467ceed4e40dff6e2115cfbc",
+    "host": "Claude Code 2.1.311",
+    "local_subprocess_timeout_accepted_ms": 600000,
+    "local_subprocess_timeout_rejected_ms": 600001,
+    "native_tool_error": "AKASHA_READ_FAILED",
+    "unchanged_product_default_runner_seconds": 1700,
+    "unchanged_product_result": "RUNNER_FAILED"
+  },
+  "contract": {
+    "hosted": {
+      "count_matching_log_lines": 1,
+      "head": "84b65199917796fce945fa80976a23ec6f132dbd",
+      "job_log_sha256": "3327933f2a01fb4138bc85e4163a4baacb4b14d9fdb524e9e2585cf5a7cf00d2",
+      "job_url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/44323738249/job/134869300156",
+      "run_url": "https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/44323738249"
+    },
+    "local": {
+      "command": [
+        "just",
+        "check"
+      ],
+      "exit_code": 0,
+      "head": "7a9c073e78e0f16949182bb3b20c38ccbd1a6a4d",
+      "log_sha256": "340e502d9f0113663e2ca3e4de54cde476ec44e7212aec6b63b27d34acdcb894",
+      "tree": "ba1e970b14d8c2b0209b30b0b39db106da163744"
+    },
+    "test": "test matrix::all_sixteen_caller_runner_pairs_use_scoped_context_and_terminal_contract ... ok"
+  },
+  "model_transport": "Deterministic private loopback. Real native CLI software, zero external inference or charges.",
+  "native_runs": [
+    {
+      "caller": "pi",
+      "configured_runner_seconds": 45,
+      "harness_sha256": "6f95e1a560d417863f68bc14af81bf33512c29770bd8af52e36d95de39ba07c0",
+      "original_source_matches": true,
+      "other_clis_absent": [
+        "codex",
+        "hermes"
+      ],
+      "persisted_hint": null,
+      "public_harness_replay_sha256": "f4f400ba3d24eca38824af7fc4334376c253706d83102dece55430a4d9a3301c",
+      "public_status": "found",
+      "receipt_matches_public": true,
+      "receipt_sha256": "6fc406edcb66d12115a91992f2bc7a294784a66d85a53bd830ca2cf72dd6df21",
+      "runner": "claude",
+      "saved_origin_and_fence_match": true,
+      "scope_verified": true,
+      "source_bytes": 35,
+      "source_sha256": "3961940a85edc6b8a8d047b9c604a1f5739bc804609f2eace0cf4558a4b10ecd",
+      "steps": [
+        {
+          "preceding_results": 0,
+          "role": "caller",
+          "tool": "consult"
+        },
+        {
+          "preceding_results": 1,
+          "role": "caller",
+          "tool": null
+        },
+        {
+          "preceding_results": 0,
+          "role": "runner",
+          "tool": "context_search"
+        },
+        {
+          "preceding_results": 1,
+          "role": "runner",
+          "tool": "context_read"
+        },
+        {
+          "preceding_results": 2,
+          "role": "runner",
+          "tool": null
+        }
+      ],
+      "terminal": "succeeded",
+      "versions": {
+        "claude": "2.1.311 (Claude Code)",
+        "pi": "1.4.0"
+      }
+    },
+    {
+      "caller": "claude",
+      "harness_sha256": "6f95e1a560d417863f68bc14af81bf33512c29770bd8af52e36d95de39ba07c0",
+      "original_source_matches": true,
+      "other_clis_absent": [
+        "hermes",
+        "pi"
+      ],
+      "persisted_hint": "offline mirror",
+      "public_harness_replay_sha256": "e6f195c4c912d1dcdae8b79d855aa7b460ed26fec1dd8c4c68de6b56504d6698",
+      "public_status": "found",
+      "receipt_matches_public": true,
+      "receipt_sha256": "d376213d0587bcd74d5a8744144e6965b4ebd304c5b3175fabd44570e432ac50",
+      "runner": "codex",
+      "saved_origin_and_fence_match": true,
+      "scope_verified": true,
+      "source_bytes": 35,
+      "source_sha256": "3961940a85edc6b8a8d047b9c604a1f5739bc804609f2eace0cf4558a4b10ecd",
+      "steps": [
+        {
+          "preceding_results": 0,
+          "role": "caller",
+          "tool": "consult"
+        },
+        {
+          "preceding_results": 1,
+          "role": "caller",
+          "tool": null
+        },
+        {
+          "preceding_results": 0,
+          "role": "runner",
+          "tool": "context_search"
+        },
+        {
+          "preceding_results": 1,
+          "role": "runner",
+          "tool": "context_read"
+        },
+        {
+          "preceding_results": 2,
+          "role": "runner",
+          "tool": null
+        }
+      ],
+      "terminal": "succeeded",
+      "versions": {
+        "claude": "2.1.311 (Claude Code)",
+        "codex": "codex-cli 0.164.0"
+      }
+    },
+    {
+      "available_cursor": 10,
+      "bound_cursor": 10,
+      "bound_read_seq": 41,
+      "caller": "codex",
+      "harness_sha256": "56218a5df71f15f01ca0099461b6f0641af7833af4797dda532de8a7eac4fa4d",
+      "original_source_matches": true,
+      "other_clis_absent": [
+        "pi",
+        "claude"
+      ],
+      "persisted_hint": "offline mirrors",
+      "public_harness_replay_sha256": "10028a102c2faa2b8d72a7820f93ca6e22d492ca8a45268d486858d84d2485dd",
+      "public_status": "found",
+      "published_read_seq": 41,
+      "receipt_matches_public": true,
+      "receipt_sha256": "29af7ffd941ef761fde1a42bce68c5e2e19b7fe9feaadeaab765bc7a601500d7",
+      "runner": "hermes",
+      "saved_origin_and_fence_match": true,
+      "scope_verified": true,
+      "source_bytes": 60,
+      "source_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "steps": [
+        [
+          "caller",
+          "exec_command",
+          0
+        ],
+        [
+          "caller",
+          "final",
+          1
+        ],
+        [
+          "runner",
+          "context_describe",
+          0
+        ],
+        [
+          "runner",
+          "context_search",
+          1
+        ],
+        [
+          "runner",
+          "context_read",
+          2
+        ],
+        [
+          "runner",
+          "final",
+          3
+        ]
+      ],
+      "terminal": "succeeded",
+      "versions": {
+        "codex": "codex-cli 0.164.0",
+        "hermes": "Hermes Agent v0.22.5+1915.g4960e41 (2026.9.24) \u00b7 upstream 226e8de8 \u00b7 local 4960e41c (+44275 carried commits)"
+      }
+    },
+    {
+      "available_cursor": 3,
+      "bound_cursor": 3,
+      "bound_read_seq": 25,
+      "caller": "hermes",
+      "harness_sha256": "56218a5df71f15f01ca0099461b6f0641af7833af4797dda532de8a7eac4fa4d",
+      "original_source_matches": true,
+      "other_clis_absent": [
+        "claude",
+        "codex"
+      ],
+      "persisted_hint": null,
+      "public_harness_replay_sha256": "26b0d06a9f2df31ce13116e2862336a0f7a20ad58fe562ce052e90c14abaf1b4",
+      "public_status": "found",
+      "published_read_seq": 25,
+      "receipt_matches_public": true,
+      "receipt_sha256": "6dd3dfb5df818db7a03d6debcd21de3494cd53bb164fe3ce9864d2f72cf24da8",
+      "runner": "pi",
+      "saved_origin_and_fence_match": true,
+      "scope_verified": true,
+      "source_bytes": 60,
+      "source_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "steps": [
+        [
+          "caller",
+          "akasha_consult",
+          0
+        ],
+        [
+          "caller",
+          "final",
+          1
+        ],
+        [
+          "runner",
+          "context_describe",
+          0
+        ],
+        [
+          "runner",
+          "context_search",
+          1
+        ],
+        [
+          "runner",
+          "context_read",
+          2
+        ],
+        [
+          "runner",
+          "final",
+          3
+        ]
+      ],
+      "terminal": "succeeded",
+      "versions": {
+        "hermes": "Hermes Agent v0.22.5+1915.g4960e41 (2026.9.24) \u00b7 upstream 226e8de8 \u00b7 local 4960e41c (+44275 carried commits)",
+        "pi": "1.4.0"
+      }
+    },
+    {
+      "caller": "claude",
+      "configured_runner_seconds": 45,
+      "harness_sha256": "6f95e1a560d417863f68bc14af81bf33512c29770bd8af52e36d95de39ba07c0",
+      "original_source_matches": true,
+      "other_clis_absent": [
+        "codex",
+        "hermes",
+        "pi"
+      ],
+      "persisted_hint": "offline mirror",
+      "public_harness_replay_sha256": "f19a0ba00240e88bda7deb13bc60e0e1cd69863fcea440628445733c256a31f5",
+      "public_status": "found",
+      "receipt_matches_public": true,
+      "receipt_sha256": "d07c2f21d8bcdd511d7918f54325f5661cc26a285f013f90aee09aefd2020334",
+      "runner": "claude",
+      "saved_origin_and_fence_match": true,
+      "scope_verified": true,
+      "source_bytes": 35,
+      "source_sha256": "3961940a85edc6b8a8d047b9c604a1f5739bc804609f2eace0cf4558a4b10ecd",
+      "steps": [
+        {
+          "preceding_results": 0,
+          "role": "caller",
+          "tool": "consult"
+        },
+        {
+          "preceding_results": 1,
+          "role": "caller",
+          "tool": null
+        },
+        {
+          "preceding_results": 0,
+          "role": "runner",
+          "tool": "context_search"
+        },
+        {
+          "preceding_results": 1,
+          "role": "runner",
+          "tool": "context_read"
+        },
+        {
+          "preceding_results": 2,
+          "role": "runner",
+          "tool": null
+        }
+      ],
+      "terminal": "succeeded",
+      "versions": {
+        "claude": "2.1.311 (Claude Code)"
+      }
+    },
+    {
+      "available_cursor": 10,
+      "bound_cursor": 10,
+      "bound_read_seq": 44,
+      "caller": "codex",
+      "harness_sha256": "478a9103e56b21b5148042afc347bbcb35dd24101d1a2f55f2d8b534fbfa7f80",
+      "original_source_matches": true,
+      "other_clis_absent": [
+        "pi",
+        "hermes",
+        "claude"
+      ],
+      "persisted_hint": null,
+      "public_harness_replay_sha256": "a2e25649f941ea17986dd755cf70ae4f75442fa46f2cf5ee60d490925adac4f1",
+      "public_status": "found",
+      "published_read_seq": 44,
+      "receipt_matches_public": true,
+      "receipt_sha256": "d0f1ed9a5fc99f34f2be546031c4478c3277502159b7034b58505f4448824cdc",
+      "runner": "codex",
+      "saved_origin_and_fence_match": true,
+      "scope_verified": true,
+      "source_bytes": 60,
+      "source_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "steps": [
+        [
+          "caller",
+          "exec_command",
+          0
+        ],
+        [
+          "caller",
+          "final",
+          1
+        ],
+        [
+          "runner",
+          "context_describe",
+          0
+        ],
+        [
+          "runner",
+          "context_search",
+          1
+        ],
+        [
+          "runner",
+          "context_read",
+          2
+        ],
+        [
+          "runner",
+          "final",
+          3
+        ]
+      ],
+      "terminal": "succeeded",
+      "versions": {
+        "codex": "codex-cli 0.164.0"
+      }
+    },
+    {
+      "available_cursor": 3,
+      "bound_cursor": 3,
+      "bound_read_seq": 25,
+      "caller": "hermes",
+      "harness_sha256": "56218a5df71f15f01ca0099461b6f0641af7833af4797dda532de8a7eac4fa4d",
+      "original_source_matches": true,
+      "other_clis_absent": [
+        "pi",
+        "claude",
+        "codex"
+      ],
+      "persisted_hint": "offline mirrors",
+      "public_harness_replay_sha256": "6c8241e4191e4b477d272265e7074db0fcb3af8439566e2da4ed45482d8f9c2b",
+      "public_status": "found",
+      "published_read_seq": 25,
+      "receipt_matches_public": true,
+      "receipt_sha256": "a2f8a7ab1913a346ae4624ab61286a8fbc94078561c5efe79c129c473bb68378",
+      "runner": "hermes",
+      "saved_origin_and_fence_match": true,
+      "scope_verified": true,
+      "source_bytes": 60,
+      "source_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "steps": [
+        [
+          "caller",
+          "akasha_consult",
+          0
+        ],
+        [
+          "caller",
+          "final",
+          1
+        ],
+        [
+          "runner",
+          "context_describe",
+          0
+        ],
+        [
+          "runner",
+          "context_search",
+          1
+        ],
+        [
+          "runner",
+          "context_read",
+          2
+        ],
+        [
+          "runner",
+          "final",
+          3
+        ]
+      ],
+      "terminal": "succeeded",
+      "versions": {
+        "hermes": "Hermes Agent v0.22.5+1915.g4960e41 (2026.9.24) \u00b7 upstream 226e8de8 \u00b7 local 4960e41c (+44275 carried commits)"
+      }
+    },
+    {
+      "available_cursor": 6,
+      "bound_cursor": 6,
+      "bound_read_seq": 26,
+      "caller": "pi",
+      "harness_sha256": "478a9103e56b21b5148042afc347bbcb35dd24101d1a2f55f2d8b534fbfa7f80",
+      "original_source_matches": true,
+      "other_clis_absent": [
+        "hermes",
+        "claude",
+        "codex"
+      ],
+      "persisted_hint": "offline mirrors",
+      "public_harness_replay_sha256": "2695528f677c3fa927cfe2b55c85c2db221e25aa8eebb9bd53423542abdefc03",
+      "public_status": "found",
+      "published_read_seq": 26,
+      "receipt_matches_public": true,
+      "receipt_sha256": "57091815b9873b35e9446e1d0428c74564c55ce603a2d36c1bd1fe98edc20b15",
+      "runner": "pi",
+      "saved_origin_and_fence_match": true,
+      "scope_verified": true,
+      "source_bytes": 60,
+      "source_sha256": "a95bdc915923f85ab96f838d3dce2febe209178ec68087df013ee00942fcf37b",
+      "steps": [
+        [
+          "caller",
+          "akasha_consult",
+          0
+        ],
+        [
+          "caller",
+          "final",
+          1
+        ],
+        [
+          "runner",
+          "context_describe",
+          0
+        ],
+        [
+          "runner",
+          "context_search",
+          1
+        ],
+        [
+          "runner",
+          "context_read",
+          2
+        ],
+        [
+          "runner",
+          "final",
+          3
+        ]
+      ],
+      "terminal": "succeeded",
+      "versions": {
+        "pi": "1.4.0"
+      }
+    }
+  ],
+  "package_binary_sha256": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+  "product_source": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+  "remaining": [
+    "Other three hosts absent for the native capture, Consult and original round trip on each diagonal. This batch did not separately run the entire extraction, Auto-Grill, review and notification sequence for every diagonal.",
+    "No authenticated Claude subscription inference, production model-quality scoring, quota measurement or new full-size reference run."
+  ],
+  "replay_archive_sha256": "1a761f792ba4265295ad6c1fb9f9a44146daccf608d9b5d4c8bc88366b9da56e",
+  "schema_version": 1
+}
