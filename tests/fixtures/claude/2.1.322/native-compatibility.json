@@ -1,0 +1,341 @@
+{
+  "authenticated_model_calls": 0,
+  "branch": {
+    "fork_start_events": [
+      {
+        "fields": [
+          "context_tokens",
+          "cwd",
+          "estimated_cache_write_usd",
+          "hook_event_name",
+          "prompt_cache_likely_expired",
+          "seconds_since_last_response",
+          "session_id",
+          "source",
+          "transcript_path"
+        ],
+        "kind": "classic.SessionStart",
+        "props": {
+          "session_id": "22222222-2222-4222-8222-222222222222",
+          "source": "fork"
+        },
+        "refs": [
+          [
+            [
+              "session_id"
+            ],
+            "22222222-2222-4222-8222-222222222222"
+          ]
+        ],
+        "stage": "fork"
+      },
+      {
+        "fields": [
+          "cwd",
+          "isInteractive",
+          "surface"
+        ],
+        "kind": "session.start",
+        "props": {},
+        "refs": [],
+        "stage": "fork"
+      },
+      {
+        "fields": [
+          "text",
+          "turnId"
+        ],
+        "kind": "turn.start",
+        "props": {},
+        "refs": [],
+        "stage": "fork"
+      }
+    ],
+    "parent_session_observed": false,
+    "request_markers": {
+      "fork": [
+        [
+          "ROOT_INPUT",
+          "RESUME_INPUT",
+          "FORK_INPUT"
+        ]
+      ],
+      "parent_later": [
+        [
+          "ROOT_INPUT",
+          "RESUME_INPUT",
+          "LATER_INPUT"
+        ]
+      ],
+      "resume": [
+        [
+          "ROOT_INPUT",
+          "RESUME_INPUT"
+        ]
+      ],
+      "start": [
+        [
+          "ROOT_INPUT"
+        ]
+      ]
+    },
+    "transcripts": {
+      "11111111-1111-4111-8111-111111111111": {
+        "explicit_parent_fields": [
+          "sessionId"
+        ],
+        "fork_references_to_parent": [],
+        "sha256": "1949f76abd664a25431f15a7e639466407a068f3cde4791afb41442c1117d495",
+        "types": [
+          "api-request",
+          "api-request-blob",
+          "api-request-shape",
+          "assistant",
+          "atis-latch",
+          "attachment",
+          "cost-state",
+          "last-prompt",
+          "mode",
+          "queue-operation",
+          "user"
+        ]
+      },
+      "22222222-2222-4222-8222-222222222222": {
+        "explicit_parent_fields": [
+          "sessionId"
+        ],
+        "fork_references_to_parent": [],
+        "sha256": "b656f709b5b8637fde7b085ef8566a201d56a4042290f2666a895f7f4052b748",
+        "types": [
+          "api-request",
+          "api-request-blob",
+          "api-request-shape",
+          "assistant",
+          "atis-latch",
+          "attachment",
+          "cost-state",
+          "last-prompt",
+          "mode",
+          "queue-operation",
+          "user"
+        ]
+      }
+    }
+  },
+  "caller": {
+    "backfill_jobs": 13,
+    "binary_sha256": "9fe510b9bea7ab2566d1cb1cd29cbf76db69f4f7fa406f10c2550149c0829302",
+    "bindings": 5,
+    "checks": [
+      {
+        "requests": 2,
+        "stage": "start",
+        "stdout_sha256": "137a3d860e02e32d9ac30a99043a5edd0a82cbb38911764a543d8dd0b0e9a844"
+      },
+      {
+        "requests": 2,
+        "stage": "resume",
+        "stdout_sha256": "fec0e55a916402b913b062c161089e8588411bde921ae61df13db909b655ed53"
+      },
+      {
+        "requests": 2,
+        "stage": "fork",
+        "stdout_sha256": "a8dbb77dd74872fdf09ba9be08eafff96a39c8a0c300aec99d5680286a7d861d"
+      },
+      {
+        "requests": 2,
+        "stage": "parent_later",
+        "stdout_sha256": "fb3974f3eb2c5afc341b0784d2e8f04e2bf63e267de9db5a4b4bb8d0fffa0369"
+      },
+      {
+        "requests": 5,
+        "stage": "child",
+        "stdout_sha256": "1e0f979d91c41d84a109050e580c8b1012ba7510db1fee0f86fb4c37cecbd28f"
+      },
+      {
+        "stage": "parallel_A",
+        "stdout_sha256": "4a199993e285daae4f21647bb11b1489ec209aa7a718651fbd43dada40d418c3"
+      },
+      {
+        "stage": "parallel_B",
+        "stdout_sha256": "ee9fc9294a120dcc72cadc1af34f93558e494b795378a10bfc4fe604af4ad699"
+      },
+      {
+        "capture_jobs": 1,
+        "requests": 1,
+        "stage": "installed",
+        "stdout_sha256": "50bb570f259b97419f4569b3a877a4492c0c594841f1a07e2feaa3726a42ec57",
+        "uninstalled": true
+      },
+      {
+        "capture_jobs": 5,
+        "requests": 1,
+        "stage": "tui",
+        "stdout_sha256": "0543225d87e89b6a72922ea0e5b2a94d6ab10aec45c501e398acbfb4bd2f72f9",
+        "steps": [
+          {
+            "requests": 1,
+            "stage": "tui"
+          }
+        ],
+        "tty_nr": "34816"
+      },
+      {
+        "requests": 4,
+        "stage": "tui_resume",
+        "stdout_sha256": "abaeec647c2fb858d69768b1d7cce23a07dac34d9b081ef47157a5c904f00546",
+        "steps": [
+          {
+            "requests": 1,
+            "stage": "tui_resume"
+          },
+          {
+            "requests": 2,
+            "stage": "tui_compact"
+          },
+          {
+            "requests": 1,
+            "stage": "tui_after_compact"
+          }
+        ],
+        "tty_nr": "34816"
+      }
+    ],
+    "consult_execution": "not_exercised_caller_probe_only",
+    "traceable_capture": [
+      {
+        "captured_bytes": 28807,
+        "captured_sha256": "adc571656a7d482227693f4970f3571a9ec6d9afee224fc7cccb57e478df9006",
+        "checkpoint_revision": 523,
+        "input_uuid": "ab663519-1925-41f5-8d4f-0478a7822c45",
+        "output_uuid": "cb599145-33b8-4655-9e28-271f1062a050",
+        "session": "44444444-4444-4444-8444-444444444444"
+      },
+      {
+        "captured_bytes": 75631,
+        "captured_sha256": "fad7cea5a5db8c16aa362f1f4a022dd73acd8908eaadb58e1899681a086b1f8a",
+        "checkpoint_revision": 872,
+        "input_uuid": "2026f783-3e67-4697-97f3-e8aeccec2c6b",
+        "output_uuid": "aca8e920-8e88-4af9-997d-9eb418a49c2f",
+        "session": "55555555-5555-4555-8555-555555555555"
+      },
+      {
+        "captured_bytes": 75631,
+        "captured_sha256": "fad7cea5a5db8c16aa362f1f4a022dd73acd8908eaadb58e1899681a086b1f8a",
+        "checkpoint_revision": 872,
+        "input_uuid": "9a2dfe63-1d43-48a1-ba4b-086c0a821f00",
+        "output_uuid": "9dd1c050-6eb1-4dfc-80ff-3810310e49e8",
+        "session": "55555555-5555-4555-8555-555555555555"
+      },
+      {
+        "captured_bytes": 75631,
+        "captured_sha256": "fad7cea5a5db8c16aa362f1f4a022dd73acd8908eaadb58e1899681a086b1f8a",
+        "checkpoint_revision": 872,
+        "input_uuid": "729ddc73-6c10-432b-95b8-5dd581b71bc2",
+        "output_uuid": "e1e77b67-b232-4392-8fc8-8126df07dc4f",
+        "session": "55555555-5555-4555-8555-555555555555"
+      },
+      {
+        "captured_bytes": 28734,
+        "captured_sha256": "411e40d3c93e7caf8d3442c9aed569960514132dd311d204bdfa39d549b4516b",
+        "checkpoint_revision": 592,
+        "input_uuid": "e2b6f5db-d135-471c-ab43-93c738abb165",
+        "output_uuid": "b089b23b-24c6-46f2-9276-969d10d8a053",
+        "session": "66666666-6666-4666-8666-666666666666"
+      },
+      {
+        "captured_bytes": 28733,
+        "captured_sha256": "a541fcbb1d8d01925ad254d164c0260d215912932cbcf98a79e0b56bedf7be64",
+        "checkpoint_revision": 661,
+        "input_uuid": "46ab99be-ebe3-4278-a9c5-ea46209e0a0a",
+        "output_uuid": "bc12200a-6e40-4b9a-be2d-01cd8979c456",
+        "session": "77777777-7777-4777-8777-777777777777"
+      }
+    ]
+  },
+  "native_executable_sha256": "bfb3703ad5380242328459bc62ada4bde8ae7ba57c6e1eeadb9c00e08874c478",
+  "network": "private network namespace with synthetic loopback Anthropic SSE",
+  "other_agent_clis_on_path": [],
+  "other_observations": {
+    "earlier_311_debug_bind": "HISTORY_GAP",
+    "first_322_debug_start_tool_result": "BINDING_UNAVAILABLE",
+    "timed_322_debug_success_ms": [
+      {
+        "bind_elapsed_ms": 468,
+        "file_tip_observed_ms": 62
+      },
+      {
+        "bind_elapsed_ms": 164,
+        "file_tip_observed_ms": 79
+      },
+      {
+        "bind_elapsed_ms": 726,
+        "file_tip_observed_ms": 62
+      },
+      {
+        "bind_elapsed_ms": 135,
+        "file_tip_observed_ms": 80
+      },
+      {
+        "bind_elapsed_ms": 346,
+        "file_tip_observed_ms": 31
+      }
+    ]
+  },
+  "platform": "Linux x86_64",
+  "runner": {
+    "frames": [
+      {
+        "subtype": "init",
+        "tool_result_ids": [],
+        "type": "system",
+        "version": "2.1.322"
+      },
+      {
+        "subtype": null,
+        "tool_result_ids": [],
+        "type": "assistant",
+        "version": null
+      },
+      {
+        "subtype": null,
+        "tool_result_ids": [
+          "toolu_list"
+        ],
+        "type": "user",
+        "version": null
+      },
+      {
+        "subtype": null,
+        "tool_result_ids": [],
+        "type": "assistant",
+        "version": null
+      },
+      {
+        "subtype": null,
+        "tool_result_ids": [
+          "toolu_read"
+        ],
+        "type": "user",
+        "version": null
+      },
+      {
+        "subtype": null,
+        "tool_result_ids": [],
+        "type": "assistant",
+        "version": null
+      },
+      {
+        "subtype": "success",
+        "tool_result_ids": [],
+        "type": "result",
+        "version": null
+      }
+    ],
+    "requests": 3,
+    "result": "native authorized original verified",
+    "stream_sha256": "f9c336f77d44f63b70e2c8e3f7a6c09828d29acd5c4fa363b4ce3855179a9683",
+    "test_sha256": "c99e3dfceaab7850d79a61ee696d547f49239c1fc88aaefaa382b65064a9661a"
+  },
+  "version": "2.1.322"
+}

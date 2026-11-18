@@ -216,7 +216,7 @@ impl Drop for Staging {
 /// Installs an owned session plugin; native user/project settings are not edited.
 pub async fn install(binary: &Path, path: &Path, args: Vec<String>) -> Result<Value> {
     let capability = super::probe(binary).await?;
-    if capability.version.as_deref() != Some("2.1.311") {
+    if !super::supports_version(capability.version.as_deref()) {
         return Err(Error("ADAPTER_UNSUPPORTED"));
     }
     let binary = capability.executable.ok_or(Error("EXECUTOR_UNAVAILABLE"))?;

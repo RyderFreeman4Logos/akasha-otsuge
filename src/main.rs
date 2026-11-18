@@ -332,8 +332,8 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
                     })
                     .transpose()?;
                 let coverage = serde_json::json!({
-                    "version_supported":report.version.as_deref()==Some("2.1.311"),
-                    "supported_versions":["2.1.311"],
+                    "version_supported":akasha_otsuge::adapter::claude::supports_version(report.version.as_deref()),
+                    "supported_versions":akasha_otsuge::adapter::claude::SUPPORTED_VERSIONS,
                     "session_loading":"explicit_plugin_dir",
                     "fork_parent":"unavailable",
                     "model_auth":"not_checked"
