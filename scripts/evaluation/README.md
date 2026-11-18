@@ -86,7 +86,40 @@ The per-revision audit found 34 unimported human-confirmed revisions with struct
 
 Each ungraded control runs in its own store. It retains the same original bytes, scopes and requested change, uses a distinct episode ID, and exercises direct adoption with the complete unabridged statement and empty structured conditions. V02 read the earlier adoption at 7 and the successor at 13 through the same current grant. V03 retired the active adoption through the original withdrawal and retained the previous version for a historical read. In A04, the Atlas adoption stayed active after the denied rescope, and the Private read remained denied. The original source is scoped to Atlas, and the production Memory write API requires a new ID for a scope change. The controls establish those API behaviors. Their registered-result credit is zero. The run made zero model calls or public model publications.
 
-B01 and B03 returned raw keyword candidates backed by an original after the allowed ancestral cutoff. Their captured lineage excluded that original. The final caller-visible publication requires separate verification. H02 reproduced the missing original in lineage. Interactive handling of that gap also requires a real run. H01 has one observed model pair. The other 59 episodes still require paired model observations, and the unsupported inputs also need their missing mappings.
+B01 and B03 returned raw keyword candidates backed by an original after the allowed ancestral cutoff. Their captured lineage excluded that original. The final caller-visible publication requires separate verification. H02 reproduced the missing original in lineage. Interactive handling of that gap also requires a real run. The terminal pairs below cover 13 of the 60 frozen episodes. The remaining 47 are outside this batch. Unsupported inputs also need their missing mappings.
+
+## Registered terminal pairs
+
+The [public extraction](../../docs/benchmarks/results/mvp027/terminal-pairs-r1.json.gz) covers A01, A03 and I01-none through I10-none, plus the original published H01. It groups 26 completed main-model turns by frozen subject. I10-none Direct retained the completed turn and usage before its observer recorded `HARNESS_OR_HOST_FAILURE` with `ProcessLookupError`. Only the 34.682-second invocation clock survived for that arm. Driver status and model terminal are separate fields. These model receipts do not contain supervisor exit codes.
+
+| Observation across the 13 pairs | Direct | Consult |
+| --- | ---: | ---: |
+| Main input tokens (cached subset) | 45,533 (9,856) | 30,882 (0) |
+| Main output tokens | 2,120 | 1,340 |
+| Main tool calls | 28 scoped searches | 13 Consult calls |
+| External starts / charged reads | 0 / 0 | 13 / 158 |
+| Observed tokens including external runs | 47,653 | 503,883 |
+
+The external traces account for 471,661 tokens, including 16,404 on the failed A03 job. They report cumulative usage without separate input, output, cache, or per-operation call counts. A charged read is a budget unit. Provider round trips and per-turn subscription charges are unavailable. Each arm's main usage and timers are included in the extraction. Job setup and the historical H01 setup-only attempt retain their original accounting in the [first-pair receipt](../../docs/benchmarks/results/mvp027/h01-subscription-r1.json). These pairs exercised a fixture-scoped adapter on Codex 0.164.0 with gpt-6.1-sol/high.
+
+| Frozen subject | Required publication | Observed publication |
+| --- | --- | --- |
+| H01 | `no_hit`, empty gaps | `incomplete`, six gaps including `INDEX_NOT_READY`, `DELEGATION_UNAVAILABLE` and `INVALID_ARGUMENT`. |
+| A03 | `no_hit`, empty gaps | The job failed with `PROTOCOL_INVALID` and published an error without a successful receipt. |
+| A01 and ten no-hint intent cases | `found`, empty gaps | All eleven published `incomplete` with `INVALID_ARGUMENT`. I01-none and I03-none also included `SOURCE_UNAVAILABLE`. |
+
+The eleven Consult publications returned all 21 required Memory IDs with the registered authority, conditions, scope and full-source content hashes and byte ranges. The frozen source ID and the runtime event ID use separate namespaces. Direct searches exposed eight of the 21 required Memory revisions, counting each revision once per task. Returned required revisions matched their registered metadata and source references. The archive lists exactly which revisions each Direct arm missed, all extra registered codes, counts of other gaps, and per-query result sizes. These comparisons describe tool-visible data. Factual use, entailment, relevance and the quality of both main answers await blind adjudication.
+
+For `INVALID_ARGUMENT`, the production context handler records a deduplicated error code. Publication merges those codes with gaps from the research conclusion and earlier coverage. An individual request, its operation and the validation which rejected it cannot be recovered from the merged gap and charged-read count. To distinguish these sources in a subsequent controlled run, record the context operation enum and returned error code at the handler boundary and distinguish them from conclusion-supplied gaps. A count by operation and code requires no query text, paths, handles or model output. [Context handler](https://github.com/RyderFreeman4Logos/akasha-otsuge/blob/a177d6e23568b627ec9eef593d88289bc8634041/src/daemon/consult_research.rs#L526) · [Gap aggregation](https://github.com/RyderFreeman4Logos/akasha-otsuge/blob/a177d6e23568b627ec9eef593d88289bc8634041/src/daemon/consult_research.rs#L134) · [Publication status](https://github.com/RyderFreeman4Logos/akasha-otsuge/blob/a177d6e23568b627ec9eef593d88289bc8634041/src/daemon/consult.rs#L308)
+
+To reproduce the extraction, supply the private receipt directory and the frozen subjects. The extractor reads only the named pairs and writes a new file. The archived public H01 can be included once with the flag below. Use the same command with different episode IDs for a subsequent batch of registered terminal pairs.
+
+```sh
+python3 -B scripts/evaluation/reference_results.py "$PRIVATE_RECEIPTS" \
+    A01 A03 I01-none I02-none I03-none I04-none I05-none \
+    I06-none I07-none I08-none I09-none I10-none \
+    --with-public-h01 --output "$PRIVATE_SCRATCH/terminal-pairs.json.gz"
+```
 
 ## Blind quality and costs
 
