@@ -156,10 +156,28 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
             'changed':value.get('changed'),'originals':len(value.get('originals', []))}))
         return response
     if scenario in ('conclusion_diag_tool', 'conclusion_diag_both'):
-        for _ in range(2):
-            rejected = tool('context_list', {'cursor':None,'limit':0})
+        for limit in (0, 17):
+            rejected = tool('context_list', {'cursor':None,'limit':limit})
             assert rejected['kind'] == 'error' and rejected['value']['code'] == 'INVALID_ARGUMENT'
-    if scenario == 'editor_history_search_gap':
+    if scenario == 'conclusion_pagination':
+        pagination = json.loads(result['result']['contentItems'][0]['text'])['value']['pagination']
+        assert pagination['tools'] == ['context_list', 'context_search']
+        assert (pagination['min_limit'], pagination['max_limit']) == (1, 16)
+        assert pagination['initial_cursor'] is None
+        for name in pagination['tools']:
+            args = {'query':'Run the synthetic native hook fixture.'} if name == 'context_search' else {}
+            first = tool(name, dict(args, cursor=pagination['initial_cursor'], limit=pagination['min_limit']))['value']
+            cursor = first[pagination['next_cursor_field']]
+            assert isinstance(cursor, str) and cursor
+            last = tool(name, dict(args, cursor=cursor, limit=pagination['max_limit']))['value']
+            assert last[pagination['next_cursor_field']] is None
+            if name == 'context_list':
+                assert len(first['events']) == 1 and last['events'][0]['handle'] == cursor
+                assert first['events'][0]['handle'] != cursor
+            else:
+                assert first['events'] == [] and last['events']
+                page = last
+    elif scenario == 'editor_history_search_gap':
         page = tool('context_search', {'cursor':None,'query':'controlled','limit':4})['value']
     else:
         page = tool('context_list', {'cursor':None,'limit':4})['value']
@@ -168,6 +186,8 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
     short = scenario in ('editor_context_gap', 'conclusion_context_gap')
     text = tool('context_read', {'handle':page['events'][0]['handle'],'start':0,'max_bytes':1 if short else 1024})
     assert text['kind'] == 'text'
+    if scenario == 'conclusion_pagination':
+        assert text['value']['text'] == 'Run the synthetic native hook fixture.'
     if short: assert text['value']['truncated'] is True
 if scenario in ('editor_delegate_gap', 'editor_delegate_conflict_gap', 'conclusion_delegate_gap') and not hint:
     child = tool('delegate', {'hint':'child-with-limitation'})

@@ -188,8 +188,11 @@ to be an OS sandbox.
 `CapturedContext` is a real implementation over retained Storage/Capture records.
 It mints handles only along the bound branch and ancestor cutoffs, at the fixed
 capture sequence. Forged, sibling or another invocation's handles fail. List and
-search pages hold at most 16 events with at most 4096 retained handles. Search
-examines only those authorized originals, exposing a continuation when needed.
+search share the inclusive limit range in `context_describe.value.pagination`
+(currently 1–16 events) and retain at most 4096 handles. Pass `initial_cursor`
+(null) for the first page. For later pages, pass the preceding page's `value.next`
+as the cursor until it is null. Search filters each page of authorized originals,
+so a page with zero matches can still have a continuation.
 Read verifies the full immutable original hash, then returns a UTF-8 boundary-safe
 window of at most 16 KiB. Metadata-only/deleted/unavailable originals are gaps,
 not fabricated text. The current grant is checked under the storage read guard

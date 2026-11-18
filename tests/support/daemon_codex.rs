@@ -1059,6 +1059,20 @@ fn consult_public_result(large: bool) {
 }
 
 #[test]
+fn consult_discovers_pagination_and_reads_the_next_page() {
+    let (daemon, event, _) = consult_fixture("conclusion_pagination");
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["state"], "succeeded", "{job}");
+    let public = daemon.cli(&["consult", "show", job["id"].as_str().unwrap()]);
+    assert_eq!(public["data"]["status"], "found", "{public}");
+    assert_eq!(public["data"]["gaps"], json!([]));
+    assert_eq!(
+        job["run_trace"]["diagnostics"],
+        json!({"entries": [], "omitted": 0})
+    );
+}
+
+#[test]
 fn consult_trace_distinguishes_context_errors_from_reported_gaps() {
     let tool = json!({"stage":"context_dispatch", "tool":"context.list", "code":"INVALID_ARGUMENT", "count":2});
     let report = json!({"stage":"conclusion", "code":"INVALID_ARGUMENT", "count":1});
