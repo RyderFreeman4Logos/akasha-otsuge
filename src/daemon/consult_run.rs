@@ -5,7 +5,7 @@ use crate::adapter::{
 
 impl Research<'_> {
     pub fn trace(&self) -> Result<Value> {
-        let mut trace = json!({"usage":self.budget.usage()?,"deadline":self.workflow.trace(),"runs":self.runs,
+        let mut trace = json!({"usage":self.budget.usage()?,"deadline":self.workflow.trace(),"runs":self.runs,"diagnostics":self.diagnostics,
             "workspace":self.workspace.as_ref().map(BoundWorkspace::proof)});
         if self.incident.is_some() {
             trace["incident"] = json!(self.incident);
@@ -95,7 +95,13 @@ impl Research<'_> {
                             error
                         }
                     })
-                    .and_then(|text| self.conclusion(&text));
+                    .inspect_err(|error| self.diagnostics.record(Stage::Runner, None, error.0))
+                    .and_then(|text| {
+                        self.conclusion(&text).inspect_err(|error| {
+                            self.diagnostics
+                                .record(Stage::ConclusionValidation, None, error.0);
+                        })
+                    });
                 self.current_run = parent;
                 self.runs[index]["state"] = json!(if outcome.is_ok() {
                     "succeeded"
