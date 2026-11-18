@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "episode": "H01",
+  "product_source_commit": "a177d6e23568b627ec9eef593d88289bc8634041",
+  "reference": {
+    "base_commit": "7356d17f0a373ade3520e6e1a1249fc52e17ba8d",
+    "base_manifest_sha256": "6b6dffd7882dc703e393686d327f8aaae6becad1f5566e761b8cae8f4fad6ac7",
+    "errata_commit": "f0dcef99bdc6aaae9635aa77054df525b688f5aa",
+    "errata_manifest_sha256": "09bbd47c0080af5b9982438f6e75a1af40c8d57e7eb394d36c93767dab82db16",
+    "profile_sha256": "55f6b7c1c23f46e23bcffda3e5c00f58d73a2b16736300ac043ca51500bbd263"
+  },
+  "native": {
+    "version": "codex-cli 0.164.0",
+    "binary_sha256": "b93f6811d3f653f0fb83be4050d857fb9abbb111dfa2ce160563327daff7f306",
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "provider": "openai",
+    "auth_type": "chatgpt",
+    "main_route_proof": "Local effective settings, thread/start response and accepted turn request.",
+    "external_route_proof": "The isolated native home pins the same provider and reasoning effort. The production Codex runner checked the reported model against a one-model catalog.",
+    "tool_sandbox": "readOnly",
+    "source_access": "Only the fixture workspace and scoped data were available through model tools."
+  },
+  "shared_input": {
+    "current_task": "Find a decision about a lunar data center.",
+    "task_sha256": "bf49ba8dd396615ce779112009d6df8eb756ca1508274212fe2c07c9d8e96de6",
+    "hint": null,
+    "scope": {
+      "branch_or_version": null,
+      "project": "Atlas",
+      "session": null,
+      "user": "fixture-user"
+    },
+    "thread": "root",
+    "logical_fence": 2,
+    "retained_sources": 0,
+    "memories": 0,
+    "main_instructions_sha256": "77b381ea8a87fdb5a02fd45ea8e2fa8c6640592b3021dc2967b38a10e9d87cc5",
+    "episode_sha256": "9f101b122bccfe9b37ab9afc12dd7534418d6956c97716f2c620021a6758857f",
+    "live_request": "The host submitted the same user input to both model arms. The consult bridge captured it as the sole live turn event."
+  },
+  "direct": {
+    "utc": "2026-11-18T11:32:44.599843+00:00",
+    "source_driver_sha256": "7a03f67f0386996fcee99d993d95680c0083d8cf138b74e6c0df1250bd7f5b36",
+    "authority_binary_sha256": "846cb901e0b41b2bdb585f5afaff3f420d8ae35f30697ab607c7c2b96dd94305",
+    "private_result_sha256": "a93fd5c52a80ceb144fb6c8f6379ae7f2e75c5f7c0af2bff1b02bf6422a05171",
+    "main_turn_status": "completed",
+    "main_messages": [
+      "I couldn’t find a decision about a lunar data center in the available Atlas records. Searches for “lunar,” “data center,” and both together returned no matches.\n\nIf you share a project name or related phrase, I can try a more targeted search."
+    ],
+    "main_token_usage": {
+      "totalTokens": 4385,
+      "inputTokens": 4265,
+      "cachedInputTokens": 2048,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 120,
+      "reasoningOutputTokens": 0
+    },
+    "elapsed_seconds": {
+      "setup_s": 12.249,
+      "model_turn_s": 8.62,
+      "total_s": 20.903
+    },
+    "tool": "memory_search",
+    "read_implementation": "Each call reads Domain::state for the wholly empty authorized scope. Matching on nonempty stores is outside this observation.",
+    "actual_queries": [
+      "\"lunar\" \"data center\" decision",
+      "lunar",
+      "data center"
+    ],
+    "per_query_returned_item_counts": [
+      0,
+      0,
+      0
+    ]
+  },
+  "consult": {
+    "utc": "2026-11-18T11:45:36.152015+00:00",
+    "source_driver_sha256": "c748b45269452d99f513976b10591d9c7d3b2738864835be83bc4489ea9d3cbe",
+    "authority_binary_sha256": "b38009efeaa66ebfbb031ab16d65264bc2839aafab44f103b38e86e63c7f7d1d",
+    "private_result_sha256": "d7f9b1b581b48342d572d3fd77844c9b8475a14e180f7f6150b55723e8722b34",
+    "main_turn_status": "completed",
+    "main_messages": [
+      "I couldn’t locate a decision about a lunar data center. The memory search index wasn’t ready, and no documents were available to check.\n\nShare a project name, document, or link so I can narrow it down."
+    ],
+    "main_token_usage": {
+      "totalTokens": 2170,
+      "inputTokens": 2106,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 64,
+      "reasoningOutputTokens": 0
+    },
+    "elapsed_seconds": {
+      "setup_s": 1.257,
+      "model_turn_s": 37.147,
+      "total_s": 38.435
+    },
+    "tool": "akasha_consult",
+    "arguments": {},
+    "binding": "Test bridge from the live app-server root thread, turn and tool call to Invocation::bind, then Service::submit_consult.",
+    "native_external": {
+      "executor_profile": "caller",
+      "host": "codex",
+      "status": "succeeded",
+      "starts": 1,
+      "elapsed_seconds": 32.852,
+      "run_trace_usage": {
+        "output_bytes": 98943,
+        "read_bytes": 305236,
+        "reads": 7,
+        "starts": 1,
+        "tokens": 28030
+      },
+      "usage_detail": "The external run trace stores cumulative input plus output tokens without a cache/input/output breakdown."
+    },
+    "publication": {
+      "status": "incomplete",
+      "answer": "I couldn’t locate a decision about a lunar data center in the available context.",
+      "evidence": [],
+      "memories": [],
+      "gaps": [
+        "INVALID_ARGUMENT",
+        "INDEX_NOT_READY",
+        "DELEGATION_UNAVAILABLE",
+        "The bound context contains only the request, not a decision.",
+        "Memory search was unavailable because its index was not ready.",
+        "No workspace file paths were available to inspect."
+      ]
+    },
+    "receipt": {
+      "status": "incomplete",
+      "output_sha256": "e63c8d5cf1a7bebf58b6e46431cd4aa068e8c2d476b69811c6f666cec54a2b34",
+      "output_bytes": 707,
+      "read_seq": 8,
+      "validated_at_seq": 16,
+      "permission_revision": 4,
+      "scope": {
+        "branch_or_version": null,
+        "project": "Atlas",
+        "session": null,
+        "user": "fixture-user"
+      },
+      "selected": [],
+      "sources": []
+    }
+  },
+  "cost_visibility": {
+    "monetary_charge": null,
+    "account_quota_delta": null,
+    "main_token_difference_consult_minus_direct": -2215,
+    "observed_total_tokens_direct": 4385,
+    "observed_total_tokens_consult_including_runner": 30200,
+    "note": "Token counts come from the native host and production trace. The subscription exposes no per-turn invoice in these receipts."
+  },
+  "evaluation": {
+    "matched_terminal_pairs": 1,
+    "reference_tasks": 60,
+    "other_pairs_in_this_run": 0,
+    "typed_oracle": "no_hit with no gaps",
+    "consult_invariant": "failed: published incomplete with gaps",
+    "blind_semantic_adjudication": "pending",
+    "public_host_registration_matrix_credit": 0,
+    "public_registration_limits": "The production Codex registration selects the local OS reader. This test-only adapter bound the frozen fixture-user/Atlas scope."
+  },
+  "no_model_preflight": {
+    "private_result_sha256": "3bc4b7750cc69cbb68b6e78a22cd2cf53f66c9cf32e624baa66a2cc655142be7",
+    "authority_binary_sha256": "d6fe92d886de45dcaeb1628b1c5cb49771bc99eea3ea78b2010e8bb86472000e",
+    "synthetic_caller_ids": true,
+    "model_turns": 0,
+    "cold_search_error": "INDEX_NOT_READY",
+    "before": {
+      "generation": "lexical-icu-v1",
+      "indexed_rows": 0,
+      "lexical_watermark": 0,
+      "vector": null
+    },
+    "after_sync": {
+      "generation": "lexical-icu-v1",
+      "indexed_rows": 0,
+      "lexical_watermark": 10,
+      "vector": null
+    },
+    "prepared_search": {
+      "status": "no_hit",
+      "items": [],
+      "rules": [],
+      "model_calls": [],
+      "coverage": {
+        "complete": true,
+        "gaps": []
+      },
+      "scope": {
+        "branch_or_version": null,
+        "project": "Atlas",
+        "session": null,
+        "user": "fixture-user"
+      },
+      "permission_revision": 4
+    },
+    "original_daemon_concurrent_job_limit": 1,
+    "corrected_concurrent_job_limit": 2,
+    "service_budget_mib": 3072,
+    "concurrent_native_reservations_accepted": 2,
+    "attribution": [
+      "INDEX_NOT_READY was reproduced on the unsynchronized empty index and resolved by the production sync job.",
+      "The production concurrency check rejects nested delegation when its sole slot is occupied. Two native reservations were accepted under the revised fixture configuration. No child model ran in preflight.",
+      "The first receipt retained INVALID_ARGUMENT without the individual failing tool arguments. Its exact cause remains unresolved."
+    ],
+    "revision_policy": "This separate preflight prepares a future registered run. The first paid model outputs and their original failure are retained.",
+    "offline_repeat": {
+      "private_result_sha256": "113d86279170fab88fff4ae9a180a224318857312e76fc85235341b5fa9c5bb3",
+      "model_turns": 0,
+      "host_credentials_mounted": false,
+      "network_namespace": "isolated"
+    }
+  },
+  "historical_accounting": {
+    "elapsed_seconds_boundary": "Each original total_s starts after fixture validation, hashing the native executables and probing their versions. It ends after native subprocess teardown. The independent supervisor clock measures the entire command.",
+    "preparation_seconds": null,
+    "preparation_visibility": "The original drivers did not separately time work before the inner clock. The difference between clocks also includes process and receipt overhead.",
+    "model_arm_supervisor_wall": {
+      "direct": {
+        "seconds": 21.324,
+        "supervisor_receipt_sha256": "55dda000586c08f53ebef8d687cbe0bfff50ba3365260299ef199dec168d071a"
+      },
+      "consult": {
+        "seconds": 39.328,
+        "supervisor_receipt_sha256": "0548ff0eedec78d5e113aa1a64dde69b2422bb58a6eb99a9b84009f85cf89a68"
+      }
+    },
+    "separate_setup_only_attempt": {
+      "private_result_sha256": "825599bcc52add9bf91eb16cfd849d9c59056b4ba19f899db50f582f449caff8",
+      "submitted_model_turns": 0,
+      "accepted_model_turns": 0,
+      "elapsed_seconds": {
+        "setup_s": 43.301,
+        "total_s": 43.326
+      },
+      "supervisor_wall": {
+        "seconds": 44.303,
+        "supervisor_receipt_sha256": "f0ec5891c04b034448e6afd5c150a22af45acbcae575b53a06865bdaeed584a9"
+      },
+      "monetary_charge": null,
+      "account_quota_delta": null
+    },
+    "credential_visibility": "In the live consult, the trusted service observer and its native client shared a read-only subscription credential mount. The offline repeat omitted this mount."
+  }
+}
