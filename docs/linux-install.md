@@ -4,12 +4,18 @@ Choose the archive for your Linux architecture. Its filename includes the packag
 
 ## Install and start
 
-Set `archive` to the downloaded filename. Run the following commands as the user who will run the daemon.
+Work in a fresh download directory as the daemon user. Set `archive` to the downloaded basename. Run this block in Bash for both installations and upgrades. A missing file, unexpected filename or digest mismatch stops extraction.
 
-```sh
-sha256sum -c "$archive.sha256"
+```bash
+set -euo pipefail
+sha256sum -- "$archive" | cmp - "$archive.sha256"
 tar -xzf "$archive"
 package=${archive%.tar.gz}
+```
+
+For a first installation, continue in the same shell. For an existing installation, go to [Upgrade and restore](#upgrade-and-restore).
+
+```bash
 install -d "$HOME/.local/bin"
 install -m 0755 "$package/bin/akasha-otsuge" "$HOME/.local/bin/akasha-otsuge"
 app="$HOME/.local/bin/akasha-otsuge"
@@ -32,22 +38,32 @@ Choose one host and follow its installation and removal instructions.
 
 The daemon starts independently of these integrations. Configure model endpoints and review settings before submitting work that needs them. See [review](review.md) and [notifications](notifications.md).
 
-## Upgrade and remove
+## Upgrade and restore
 
-Verify and extract the new archive first. Keep the old executable and the current configuration until you have checked the new installation. The stop command acknowledges draining. The daemon releases its Unix socket after closing storage. Set `socket` to the path used by this installation. The commands below use the default. The wait exits after 120 seconds if shutdown is still in progress. Inspect the private daemon log before continuing in that case. Use the same configuration and profile on restart.
+Verify and extract the archive above. Run the helper on Linux with Python 3.9+ and GNU coreutils, under the same user and XDG environment as the running daemon. Suspend automatic restarts and clients for the maintenance window. For custom settings, put the original startup options in the Bash array, for example `opts=(--config /absolute/config.toml --profile work)`. Choose a fresh rollback directory next to the active native data directory. The example uses the default paths.
 
-```sh
-set -e
-socket="${XDG_RUNTIME_DIR:-$HOME/.local/run}/akasha-otsuge/service.sock"
-"$app" daemon stop
-timeout 120 sh -c 'while test -S "$1"; do sleep 0.2; done' sh "$socket"
-install -m 0755 "$package/bin/akasha-otsuge" "$app.new"
-mv -f "$app.new" "$app"
-"$app" daemon start
-"$app" doctor --json
+```bash
+set -euo pipefail
+app="$HOME/.local/bin/akasha-otsuge"
+opts=()
+backup="${XDG_DATA_HOME:-$HOME/.local/share}/akasha-otsuge.rollback.$(date +%s)"
+python3 "$package/scripts/linux-upgrade.py" upgrade "$package/bin/akasha-otsuge" "$backup" --app "$app" "${opts[@]}"
+"$app" "${opts[@]}" daemon start
+"$app" "${opts[@]}" doctor --json
 ```
 
-For a backup, copy your configuration and export the stopped store to a fresh private directory. See [backup and restore commands](neutral-archive.md).
+The helper identifies the running executable and its active store, requests a normal stop, and waits up to 120 seconds for process exit. It saves the old binary, configuration (including its absence) and complete stopped store into the private rollback directory before switching the executable. GNU `cp` uses reflinks when available. Other filesystems need space for a full copy. A store mounted directly at its data directory requires a filesystem-level snapshot and restore. Keep the backup path and verified extracted package through acceptance.
+
+If startup or validation fails, use the same package, backup path and startup options. This also works with a damaged candidate configuration. The helper drains a running candidate through its saved socket, preserves its store in `failed-store`, and restores the saved installation. Jobs and writes after the snapshot stay in the preserved candidate store. The original snapshot remains available.
+
+```bash
+set -euo pipefail
+python3 "$package/scripts/linux-upgrade.py" restore "$backup"
+"$app" "${opts[@]}" daemon start
+"$app" "${opts[@]}" doctor --json
+```
+
+## Remove
 
 Before removing the CLI, run the uninstall command for each integration you installed. Each command takes the same launcher, plugin directory or host home used for installation. See the [adapter guide](adapters.md). Then stop the daemon and remove the executable you installed.
 

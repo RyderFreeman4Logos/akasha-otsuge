@@ -4,6 +4,7 @@ import argparse
 import gzip
 import hashlib
 import io
+import itertools
 import json
 from pathlib import Path
 import platform
@@ -28,7 +29,7 @@ def add(archive, name, stream, size, mode, timestamp):
     archive.addfile(header, stream)
 
 
-def dependency_notices(compiled):
+def dependency_notices(compiled, native_builds):
     host = next(line.removeprefix("host: ") for line in output("rustc", "-vV").splitlines()
                 if line.startswith("host: "))
     packages = json.loads(output("cargo", "metadata", "--locked", "--format-version", "1",
@@ -39,6 +40,7 @@ def dependency_notices(compiled):
     entries, texts = [], {}
     saved = ROOT / "docs/licenses/upstream"
     sources = json.loads((saved / "sources.json").read_text())
+    native = json.loads((saved / "native-components.json").read_text())
 
     def notice_files(directory):
         return [p for p in directory.iterdir() if p.is_file() and
@@ -57,6 +59,10 @@ def dependency_notices(compiled):
         if not files and boundary != root:
             files = notice_files(boundary)
         entry = {key: pkg[key] for key in ("name", "version", "license", "authors", "repository", "source")}
+        if pkg["id"] in native_builds:
+            if pkg["name"] not in native:
+                raise SystemExit(f"Review the bundled native sources in {pkg['id']}")
+            entry["build_static_archives"] = native_builds[pkg["id"]]
         named = {path.name: path for path in files}
         if not named:
             vcs = root / ".cargo_vcs_info.json"
@@ -66,11 +72,30 @@ def dependency_notices(compiled):
             entry["upstream_notice_url"] = sources[revision]["upstream"]
             boundary = saved
             named = {name: saved / filename for name, filename in sources[revision]["files"].items()}
-        entry["files"] = {}
+        content_by_name = {}
         for name, path in sorted(named.items()):
             if not path.resolve(strict=True).is_relative_to(boundary.resolve()):
                 raise SystemExit(f"{pkg['id']} declares a notice outside its source directory.")
-            content = path.read_bytes()
+            content_by_name[name] = path.read_bytes()
+        if pkg["name"] in native:
+            component = native[pkg["name"]]
+            if pkg["version"] != component["version"]:
+                raise SystemExit(f"Recheck the native notices for {pkg['id']}")
+            for name, lines in component["notices"].items():
+                path = (root / name).resolve(strict=True)
+                if not path.is_relative_to(root.resolve()):
+                    raise SystemExit(f"Native notice outside {root}: {name}")
+                if lines:
+                    start, end = lines
+                    with path.open("rb") as f:
+                        content = b"".join(itertools.islice(f, start - 1, end))
+                    if b"opyright" not in content:
+                        raise SystemExit(f"Missing copyright declaration in {path}")
+                    content_by_name[f"{name}#L{start}-L{end}"] = content
+                else:
+                    content_by_name[name] = path.read_bytes()
+        entry["files"] = {}
+        for name, content in sorted(content_by_name.items()):
             digest = hashlib.sha256(content).hexdigest()
             texts[digest] = content
             entry["files"][name] = f"licenses/{digest}.txt"
@@ -91,7 +116,14 @@ def package(destination):
     name, version = manifest["name"], manifest["version"]
     messages = output("cargo", "build", "--locked", "--release", "--bin", name,
                       "--message-format=json-render-diagnostics")
-    artifacts = [m for m in map(json.loads, messages.splitlines()) if m.get("reason") == "compiler-artifact"]
+    messages = list(map(json.loads, messages.splitlines()))
+    artifacts = [m for m in messages if m.get("reason") == "compiler-artifact"]
+    native_builds = {}
+    for message in messages:
+        if message.get("reason") == "build-script-executed":
+            archives = sorted(p.name for p in Path(message["out_dir"]).glob("*.a"))
+            if archives:
+                native_builds[message["package_id"]] = archives
     binaries = [m["executable"] for m in artifacts if m.get("executable")
                 and m["target"]["kind"] == ["bin"] and m["target"]["name"] == name]
     if len(binaries) != 1 or output(binaries[0], "--version") != f"{name} {version}":
@@ -111,12 +143,13 @@ def package(destination):
     if release.exists() or checksum.exists():
         raise SystemExit(f"Package already exists in {destination}")
     documents = ["LICENSE", "NOTICE", "Cargo.lock", "docs/licenses/mempal-MIT.txt",
-                 "examples/config.toml", "examples/notifier-file.py", "src/config/defaults.toml"]
+                 "examples/config.toml", "examples/notifier-file.py", "scripts/linux-upgrade.py",
+                 "src/config/defaults.toml"]
     documents.extend(f"docs/{p}" for p in output("git", "ls-tree", "--name-only", f"{commit}:docs").splitlines()
                      if p.endswith(".md"))
     documents.extend(p for p in output("git", "ls-tree", "-r", "--name-only", commit, "docs/adapters").splitlines()
                      if p.endswith("/README.md"))
-    notices = dependency_notices({m["package_id"] for m in artifacts})
+    notices = dependency_notices({m["package_id"] for m in artifacts}, native_builds)
     destination.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=destination) as tmp:
         staged = Path(tmp) / release.name

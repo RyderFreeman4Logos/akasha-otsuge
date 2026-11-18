@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+import sys
 
 
 def digest(data):
@@ -20,6 +21,10 @@ def digest(data):
 def file_hash(path):
     with path.open("rb") as handle:
         return hashlib.file_digest(handle, "sha256").hexdigest()
+
+
+def store_hashes(directory):
+    return {str(p.relative_to(directory)): file_hash(p) for p in directory.rglob("*") if p.is_file()}
 
 
 def read_archive(directory):
@@ -170,9 +175,34 @@ def exercise(args, root):
                 bundled[name] = file_hash(path)
             assert bundled[name] == path.stem
     assert len(bundled) == len(list((package / "licenses").iterdir()))
+    native = {dep["name"]: dep["files"] for dep in inventory}
+    lz4 = "8b58c446121a109ccf32edc094bba3010a3d85e4ee3702950db55e4d3e87736c"
+    assert bundled[native["lz4-sys"]["liblz4/lib/LICENSE"]] == lz4
+    assert b"Yuta Mori" in (package / next(value for key, value in native["zstd-sys"].items()
+                             if key.startswith("zstd/lib/dictBuilder/divsufsort.c#"))).read_bytes()
+    assert bundled[native["ring"]["third_party/fiat/LICENSE"]] == (
+        "9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f")
     expected = {**write_capture(root, "before", 1), **write_capture(root, "pending", 128)}
 
     run("install", "-m", "0755", args.baseline, app)
+    guide = (package / "docs/linux-install.md").read_text().split("```bash\n")
+    verify_download = guide[1].split("```")[0]
+    first_install = guide[2].split("```")[0]
+    download = root / "download"
+    download.mkdir()
+    (download / args.archive.name).symlink_to(args.archive)
+    bad_sums = download / checksum.name
+    for line in (f"{'0' * 64}  {args.archive.name}\n", f"{args.sha256}  other.tar.gz\n", None):
+        if line:
+            bad_sums.write_text(line)
+        else:
+            bad_sums.unlink()
+        attempt = subprocess.run(["bash", "-c", verify_download + first_install], cwd=download,
+                                 env={**env, "archive": args.archive.name}, capture_output=True, timeout=30)
+        assert attempt.returncode and not (download / package.name).exists()
+        assert file_hash(app) == args.baseline_sha256
+    helper = package / "scripts/linux-upgrade.py"
+    backup = root / "rollback"
     cli("daemon", "start")
     try:
         cli("doctor", "--json")
@@ -180,18 +210,21 @@ def exercise(args, root):
         before = finished("before")
         accepted = capture("pending")
         assert accepted["state"] in ("queued", "running")
+        run(sys.executable, helper, "upgrade", new, backup, "--app", app, "--config", config)
     finally:
-        stop()
+        if socket.exists():
+            stop()
 
+    assert not socket.exists() and file_hash(backup / "binary") == args.baseline_sha256
+    assert file_hash(backup / "config") == config_hash and (backup.stat().st_mode & 0o777) == 0o700
+    snapshot = store_hashes(backup / "store")
+    assert snapshot and snapshot == store_hashes(store)
     cli("archive", "export", root / "pre")
     pre_commits, pre = read_archive(root / "pre")
     paused = job_record(pre, "pending")
     assert paused["state"] in ("queued", "running")
-    run("install", "-m", "0755", new, app.with_suffix(".new"))
-    os.replace(app.with_suffix(".new"), app)
     binary_hash = file_hash(app)
     assert binary_hash == file_hash(new) and file_hash(config) == config_hash
-    shutil.rmtree(package)
     cli("daemon", "start")
     try:
         cli("doctor", "--json")
@@ -213,6 +246,32 @@ def exercise(args, root):
     assert all(post[ref] == value for ref, value in pre.items())
     assert job_record(post, "pending") == done
     verify_originals(post, expected)
+    cli("daemon", "start")
+    try:
+        # The saved socket and binary must still drain a running candidate after a bad config edit.
+        config.write_text("[broken")
+        run(sys.executable, helper, "restore", backup)
+    finally:
+        if socket.exists():
+            run(backup / "binary", "--socket", socket, "daemon", "stop")
+    assert not socket.exists() and file_hash(app) == args.baseline_sha256 and file_hash(config) == config_hash
+    assert (backup / "failed-config").read_text() == "[broken"
+    assert store_hashes(backup / "failed-store") != snapshot
+    assert store_hashes(store) == snapshot == store_hashes(backup / "store")
+    shutil.rmtree(package)
+    cli("daemon", "start")
+    try:
+        cli("doctor", "--json")
+        recovered = finished("pending")
+        assert cli("job", "show", "before") == before and capture("pending") == recovered
+        for field in ("id", "request_sha256", "config_digest", "config_generation", "accepted_at_ms"):
+            assert recovered[field] == paused[field]
+    finally:
+        stop()
+    cli("archive", "export", root / "restored")
+    restored_commits, restored = read_archive(root / "restored")
+    assert all(restored_commits[seq] == commit for seq, commit in pre_commits.items())
+    verify_originals(restored, expected)
     app.unlink()
     assert not app.exists() and (store / "authority").is_dir() and file_hash(config) == config_hash
     return dict(source_commit=args.commit, archive_sha256=args.sha256, baseline_sha256=args.baseline_sha256,
@@ -220,7 +279,10 @@ def exercise(args, root):
                 pending_before=paused["state"], pending_after=done["state"], idempotent_replay=True,
                 unchanged_prior_commits=len(pre_commits), final_commits=len(post_commits), original_events=len(expected),
                 raw_bytes=sum(len(v[2]) for v in expected.values()), normalized_bytes=sum(len(v[3]) for v in expected.values()),
-                config_preserved=True, history_after_uninstall=True)
+                config_preserved=True, history_after_uninstall=True, rejected_checksum_cases=3,
+                native_lz4_sha256=lz4, rollback_native_files=len(snapshot), rollback_prior_commits=len(pre_commits),
+                rollback_pending_after=recovered["state"], rollback_original_events=len(expected),
+                rollback_binary_and_config_exact=True, failed_store_preserved=True)
 
 
 if __name__ == "__main__":
