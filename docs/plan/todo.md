@@ -1652,8 +1652,9 @@ complete. Daybreak/new red-team work remains temporarily deferred by the owner.
   substitution and keep actual Claude authentication unverified.
 - [ ] #27: require zero scope/retraction/authority violations, every critical
   decision, at least 90% relevant coverage and no more than 10% irrelevant output.
-- [ ] #28: map REQ-01 through REQ-24 to implementation, issues, PRs, tests and
-  immutable release artifacts. Execute capture → consult → candidate/Auto-Grill
+- [x] Map all 24 original requirements to issues, merged commits, tests, public
+  evidence and outstanding acceptance in the [MVP-028 matrix](acceptance-matrix.md).
+- [ ] #28: bind the matrix to immutable release artifacts. Execute capture → consult → candidate/Auto-Grill
   → policy/review → outcome → investigation/edit → notification → history →
   backup/restore.
 - [ ] #28: audit defaults, dependencies, the sole formal backend, no required MCP,
