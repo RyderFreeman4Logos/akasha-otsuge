@@ -155,6 +155,19 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
             'items':[item['memory']['revision']['key']['id'] for item in value.get('items', [])],
             'changed':value.get('changed'),'originals':len(value.get('originals', []))}))
         return response
+    if scenario == 'conclusion_read_bounds':
+        page = tool('context_search', {'query':'Run the synthetic native hook fixture.', 'limit':4})['value']
+        handle = page['events'][0]['handle']
+        def read_range(start, count):
+            return tool('context_read', {'handle':handle, 'start':start, 'max_bytes':count})
+        original = read_range(0, 16384)['value']
+        assert original['text'].startswith('甲')
+        size = original['total_bytes']
+        assert read_range(size, 1)['value']['text'] == ''
+        assert read_range(0, 1)['value']['text'] == ''
+        for start, count in [(0,0), (0,16385), (size+1,1), (1,1), (size+1,1)]:
+            rejected = read_range(start, count)
+            assert rejected['kind'] == 'error' and rejected['value']['code'] == 'INVALID_ARGUMENT'
     if scenario in ('conclusion_diag_tool', 'conclusion_diag_both'):
         for limit in (0, 17):
             rejected = tool('context_list', {'cursor':None,'limit':limit})
@@ -275,6 +288,12 @@ if scenario.startswith('editor'):
                     break
                 assert value['end'] > start, value
                 start = value['end']
+            if handle == investigation['outcome'] and (root / 'probe-incident-read-bounds').exists():
+                eof = tool('context_read', {'handle':handle, 'start':value['total_bytes'], 'max_bytes':1})
+                assert eof['kind'] == 'error' and eof['value']['code'] == 'INVALID_ARGUMENT'
+                missing = 'incident:log:' + str(len(investigation['logs']))
+                denied = tool('context_read', {'handle':missing, 'start':value['total_bytes']+1, 'max_bytes':1})
+                assert denied['kind'] == 'error' and denied['value']['code'] == 'READ_DENIED'
             if handle != investigation['outcome']:
                 log = json.loads(text)
                 raw = log['text'].encode() if log['encoding'] == 'utf8' else bytes.fromhex(log['raw_hex'])

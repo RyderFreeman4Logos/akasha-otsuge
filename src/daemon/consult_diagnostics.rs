@@ -1,4 +1,5 @@
 use super::{AdapterError, Error, ErrorCode};
+use crate::adapter::ReadRangeRejection;
 use serde::Serialize;
 
 #[derive(Clone, Copy, Eq, PartialEq, Serialize)]
@@ -19,6 +20,8 @@ struct Entry {
     #[serde(skip_serializing_if = "Option::is_none")]
     tool: Option<&'static str>,
     code: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reason: Option<ReadRangeRejection>,
     count: u16,
 }
 
@@ -30,6 +33,16 @@ pub(super) struct Diagnostics {
 
 impl Diagnostics {
     pub(super) fn record(&mut self, stage: Stage, tool: Option<&'static str>, value: &str) {
+        self.record_reason(stage, tool, value, None);
+    }
+
+    pub(super) fn record_reason(
+        &mut self,
+        stage: Stage,
+        tool: Option<&'static str>,
+        value: &str,
+        reason: Option<ReadRangeRejection>,
+    ) {
         // A conclusion or a stored coverage gap can contain arbitrary user text.
         // Keep only canonical adapter codes and the native index readiness code.
         if value.len() > 32 {
@@ -44,17 +57,19 @@ impl Diagnostics {
                 Error::from(AdapterError::from(code)).0
             }
         };
-        if let Some(entry) = self
-            .entries
-            .iter_mut()
-            .find(|entry| entry.stage == stage && entry.tool == tool && entry.code == code)
-        {
+        if let Some(entry) = self.entries.iter_mut().find(|entry| {
+            entry.stage == stage
+                && entry.tool == tool
+                && entry.code == code
+                && entry.reason == reason
+        }) {
             entry.count = entry.count.saturating_add(1);
         } else if self.entries.len() < 32 {
             self.entries.push(Entry {
                 stage,
                 tool,
                 code,
+                reason,
                 count: 1,
             });
         } else {

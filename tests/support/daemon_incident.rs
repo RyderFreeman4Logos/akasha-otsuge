@@ -157,11 +157,12 @@ fn configured_incident_investigation_runs_once_and_keeps_environment_reports_sep
 
 #[test]
 fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair() {
-    for (auto_repair, completeness, authority, binary) in [
-        (true, "complete", "delegated_approved", false),
-        (false, "complete", "candidate", false),
-        (true, "partial", "candidate", false),
-        (true, "complete", "delegated_approved", true),
+    for (auto_repair, completeness, authority, binary, probe_read_bounds) in [
+        (true, "complete", "delegated_approved", false, false),
+        (false, "complete", "candidate", false, false),
+        (true, "partial", "candidate", false, false),
+        (true, "complete", "delegated_approved", true, false),
+        (false, "complete", "candidate", false, true),
     ] {
         let (daemon, _, bound) = super::codex_tests::consult_fixture_with(
             "editor_incident",
@@ -173,6 +174,9 @@ fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair(
                 )
             },
         );
+        if probe_read_bounds {
+            std::fs::write(daemon.root.join("probe-incident-read-bounds"), "").unwrap();
+        }
         let original = daemon.cli(&["memory", "export", "editable"])["data"].clone();
         let now = akasha_otsuge::ipc::now_ms().unwrap();
         let mut raw = "controlled fixture failure: only Linux was verified\n"
@@ -239,7 +243,16 @@ fn incident_context_reads_outcome_and_full_logs_before_policy_controlled_repair(
         let job =
             daemon.cli(&["job", "show", result["record"]["job_id"].as_str().unwrap()])["data"]
                 .clone();
-        if completeness == "partial" {
+        if probe_read_bounds {
+            let entries = json!([
+                {"stage":"context_dispatch","tool":"context.read","code":"INVALID_ARGUMENT","reason":"empty_incident_range","count":1},
+                {"stage":"context_dispatch","tool":"context.read","code":"READ_DENIED","count":1}
+            ]);
+            assert_eq!(
+                job["result"]["diagnostics"],
+                json!({"entries":entries,"omitted":0})
+            );
+        } else if completeness == "partial" {
             assert!(
                 job["result"]["gaps"]
                     .as_array()

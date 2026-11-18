@@ -1093,6 +1093,39 @@ fn consult_discovers_pagination_and_reads_the_next_page() {
 }
 
 #[test]
+fn consult_trace_classifies_read_range_rejections() {
+    let (daemon, event, _) = consult_fixture_prepared(
+        "conclusion_read_bounds",
+        |_| String::new(),
+        |daemon| {
+            let path = daemon.root.join("workspace/native.jsonl");
+            let raw = std::fs::read_to_string(&path).unwrap();
+            std::fs::write(
+                path,
+                raw.replace("Run the synthetic", "甲Run the synthetic"),
+            )
+            .unwrap();
+        },
+    );
+    let job = named_terminal(&daemon, event);
+    assert_eq!(job["state"], "succeeded", "{job}");
+    let reasons = [
+        ("max_bytes_zero", 1),
+        ("max_bytes_above_limit", 1),
+        ("start_past_end", 2),
+        ("start_not_utf8_boundary", 1),
+    ];
+    let entries = reasons.map(|(reason,count)| json!({"stage":"context_dispatch","tool":"context.read","code":"INVALID_ARGUMENT","reason":reason,"count":count}));
+    assert_eq!(
+        job["run_trace"]["diagnostics"],
+        json!({"entries":entries,"omitted":0})
+    );
+    let public = daemon.cli(&["consult", "show", job["id"].as_str().unwrap()]);
+    assert_eq!(public["data"]["status"], "incomplete");
+    assert_eq!(public["data"]["gaps"], json!(["INVALID_ARGUMENT"]));
+}
+
+#[test]
 fn consult_trace_distinguishes_context_errors_from_reported_gaps() {
     let tool = json!({"stage":"context_dispatch", "tool":"context.list", "code":"INVALID_ARGUMENT", "count":2});
     let report = json!({"stage":"conclusion", "code":"INVALID_ARGUMENT", "count":1});
