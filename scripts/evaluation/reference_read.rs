@@ -1,5 +1,6 @@
 //! Direct keyword retrieval from the registered episode's scoped authority store.
 use akasha_otsuge::{
+    capture::{Capture, CaptureBinding, CoverageLevel, EventRef, SourceIdentity},
     config::{Paths, resolve},
     domain::{Domain, MemoryState, OriginalRange, PageBudget, ReadContext, Scope},
     retrieval::Index,
@@ -71,6 +72,42 @@ async fn main() {
     emit(
         json!({"type":"bound","scope":scope,"thread":caller["thread"],"logical_fence":caller["fence_sequence"],"grant":grant,"read_seq":at}),
     );
+    // A missing parent in the imported request is observable even when the Memory index is empty.
+    let mut gaps = Vec::new();
+    if let Some(missing) = seed.as_ref().and_then(|seed| seed["missing"].as_str()) {
+        let source = SourceIdentity {
+            adapter: "fixture".into(),
+            profile: "reference-v1".into(),
+            session: episode["id"].as_str().unwrap().into(),
+            thread: caller["thread"].as_str().unwrap().into(),
+            agent: "main".into(),
+        };
+        let anchor = EventRef {
+            event_id: "fixture-live-request".into(),
+            source: source.clone(),
+        };
+        let binding = CaptureBinding::from_source(
+            source,
+            scope.clone(),
+            "original",
+            CoverageLevel::AvailablePayloads,
+        )
+        .unwrap();
+        let history = Capture::new(&store)
+            .lineage(&binding, &anchor, at, 2)
+            .unwrap();
+        assert_eq!(history.events.len(), 1);
+        assert_eq!(history.events[0].event.reference, anchor);
+        assert!(history.next.is_none());
+        assert_eq!(
+            history.missing.unwrap(),
+            EventRef {
+                event_id: missing.into(),
+                source: anchor.source
+            }
+        );
+        gaps.push("HISTORY_GAP");
+    }
     for (i, line) in io::stdin().lock().lines().enumerate() {
         let req: Value = serde_json::from_str(&line.unwrap()).unwrap();
         let q = req["query"].as_str().unwrap();
@@ -152,9 +189,11 @@ async fn main() {
         } else {
             assert!(page.data.items.is_empty());
         }
-        emit(
-            json!({"type":"scoped_read","scope":scope,"items":items,"next_cursor":null,"read_seq":page.read_seq,"validated_at_seq":store.sequence().unwrap()}),
-        );
+        let mut response = json!({"type":"scoped_read","scope":scope,"items":items,"next_cursor":null,"read_seq":page.read_seq,"validated_at_seq":store.sequence().unwrap()});
+        if !gaps.is_empty() {
+            response["history_coverage"] = json!({"complete":false,"gaps":gaps});
+        }
+        emit(response);
     }
     drop(index);
     store.close().await.unwrap();

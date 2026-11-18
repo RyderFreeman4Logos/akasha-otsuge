@@ -61,9 +61,9 @@ class ReceiptTests(unittest.TestCase):
         others = [
             x
             for x in prior["remaining_registered_inputs"]
-            if x["task"] != "C03" and not x["task"].endswith("-hint")
+            if x["task"] not in {"C03", "H02"} and not x["task"].endswith("-hint")
         ]
-        self.assertEqual(len(others), 36)
+        self.assertEqual(len(others), 35)
         for old in others:
             with (
                 tempfile.TemporaryDirectory(dir=self.root) as d,
@@ -162,6 +162,74 @@ class ReceiptTests(unittest.TestCase):
         ]
         self.assertEqual(
             seen, {(tid, arm) for tid in expected for arm in ("direct", "consult")}
+        )
+
+    def test_missing_parent_is_visible_to_both_arms_and_differs_from_empty_history(
+        self,
+    ):
+        p = (
+            driver.ROOT
+            / "docs/benchmarks/results/mvp027/registered-missing-preflights-r1.json.gz"
+        )
+        archive = json.loads(gzip.decompress(p.read_bytes()))
+        tasks = {t["id"]: t for t in driver.read_reference()[1]}
+        seen = set()
+        for item in archive["runs"]:
+            r = item["receipt"]
+            key = r["task_id"], r["strategy"]
+            self.assertNotIn(key, seen)
+            seen.add(key)
+            self.assertFalse(r["model_turn_submitted"] or r["model_turn_accepted"])
+            self.assertNotIn("auth", r)
+            task = tasks[key[0]]
+            if key[0] in {"C02", "H04", "V02"}:
+                self.assertEqual(item["exit_code"], 1)
+                self.assertEqual(r["status"], "REGISTERED_INPUT_UNAVAILABLE")
+                continue
+            self.assertEqual(item["exit_code"], 0)
+            self.assertEqual(
+                r["task_utf8_sha256"], driver.digest(task["current_task"].encode())
+            )
+            self.assertEqual(r["binding"]["scope"], task["caller"]["scope"])
+            if key[0] == "H02":
+                self.assertEqual(
+                    r["native_import"]["missing_parent"], task["missing_event_ids"][0]
+                )
+                self.assertEqual(r["native_import"]["retained_originals"], 0)
+            if key[1] == "direct":
+                result = r["control_read"]
+                if key[0] == "H02":
+                    self.assertEqual(result["items"], [])
+                    self.assertEqual(
+                        result["history_coverage"],
+                        {"complete": False, "gaps": ["HISTORY_GAP"]},
+                    )
+                else:
+                    self.assertNotIn("history_coverage", result)
+            else:
+                probe = r["invocation"]["context_list_probe"]
+                if key[0] == "H02":
+                    self.assertEqual(probe["gaps"], ["HISTORY_GAP"])
+                    self.assertEqual(probe["events"], 1)
+                    self.assertEqual(
+                        probe["read_seq"], r["invocation"]["binding"]["capture_seq"]
+                    )
+                    self.assertEqual(r["invocation"]["historical_ordinals"], [])
+                    self.assertEqual(
+                        r["preparation"]["ready_search"]["status"], "no_hit"
+                    )
+                    self.assertEqual(
+                        r["preparation"]["ready_search"]["model_calls"], []
+                    )
+                else:
+                    self.assertIsNone(probe)
+        self.assertEqual(
+            seen,
+            {
+                (tid, arm)
+                for tid in ("H02", "H01", "A01", "C03", "C02", "H04", "V02")
+                for arm in ("direct", "consult")
+            },
         )
 
     def test_withdrawal_requires_matching_native_rejection_and_frozen_original(self):

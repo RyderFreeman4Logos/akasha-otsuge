@@ -218,7 +218,12 @@ pub async fn run() -> Result<()> {
     let tip = captured.event.reference;
     let lineage =
         Capture::new(&service.storage).lineage(&binding, &tip, service.storage.sequence()?, 64)?;
-    assert!(lineage.missing.is_none() && lineage.next.is_none());
+    assert!(lineage.next.is_none());
+    let missing = seed.as_ref().and_then(|seed| seed["missing"].as_str());
+    assert_eq!(
+        lineage.missing.as_ref().map(|r| r.event_id.as_str()),
+        missing
+    );
     let retained: std::collections::BTreeSet<_> = lineage
         .events
         .iter()
@@ -270,10 +275,45 @@ pub async fn run() -> Result<()> {
         },
     )
     .await?;
+    let history_probe = if transport["preflight"] == true && missing.is_some() {
+        use crate::adapter::{
+            BudgetLimits, CapturedContext, ContextRequest, ContextResponse, ContextSource,
+            RunBudget,
+        };
+        use crate::config::deadline::{Deadline, Layer};
+        let lease = RunBudget::new(
+            inv.id(),
+            &inv.fence_hash(),
+            Arc::new(tokio::sync::Semaphore::new(1)),
+            BudgetLimits::default(),
+            Deadline::start(Layer::Workflow, Duration::from_secs(60), None)?,
+        )?
+        .start()?;
+        let mut context = CapturedContext::new(&service.storage, inv.clone())?;
+        let ContextResponse::Page(page) = context
+            .execute(
+                &lease,
+                ContextRequest::List {
+                    cursor: None,
+                    limit: 2,
+                },
+            )
+            .await?
+        else {
+            return Err(Error("REFERENCE_CONTEXT_PAGE_MISSING"));
+        };
+        assert_eq!(page.events.len(), 1);
+        assert_eq!(page.events[0].reference, tip);
+        assert!(page.next.is_none());
+        assert_eq!(page.gaps, [crate::adapter::ErrorCode::HistoryGap]);
+        Some(json!({"gaps":page.gaps,"events":page.events.len(),"read_seq":page.read_seq}))
+    } else {
+        None
+    };
     emit(
         json!({"type":"invocation","revision":inv.revision(),"fence_sha256":inv.fence_hash(),"binding":inv.diagnostic(),
         "current_request":{"event":tip,"utf8_sha256":crate::storage::hash(task.as_bytes())},"historical_ordinals":ordinals,
-        "logical_fence":caller["fence_sequence"]}),
+        "logical_fence":caller["fence_sequence"],"context_list_probe":history_probe}),
     )?;
     let queued = service
         .submit_consult(
