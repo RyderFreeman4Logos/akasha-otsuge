@@ -206,7 +206,7 @@ impl Service {
                     };
                     if let Some(vector) = &vector {
                         progress.vector = Some(
-                            vector
+                            match vector
                                 .sync_batch(
                                     &self.storage,
                                     target,
@@ -216,7 +216,13 @@ impl Service {
                                     || self.model_cancelled(id),
                                     &authorize,
                                 )
-                                .await?,
+                                .await
+                            {
+                                Ok(progress) => progress,
+                                // A correction superseded a buffered revision. Reread this unpublished window.
+                                Err(e) if e.code == "INDEX_INPUT_CHANGED" => continue,
+                                Err(e) => return Err(e.into()),
+                            },
                         );
                     }
                     let complete = progress.lexical_watermark >= target

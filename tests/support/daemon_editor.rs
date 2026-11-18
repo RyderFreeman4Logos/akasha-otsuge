@@ -992,3 +992,53 @@ fn patch_policy_modes_and_human_procedure_protection_use_the_shared_adoption_rul
         before["data"]["data"]
     );
 }
+
+#[test]
+fn vector_sync_does_not_send_superseded_text_buffered_behind_another_scope() {
+    let endpoint = super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    let stale = "private outdated fixture";
+    let corrected = "private corrected fixture";
+    let seq = super::retrieval_tests::seed_records(
+        &daemon,
+        &[
+            ("first", Some("beta"), "offline first"),
+            ("edited", Some("alpha"), stale),
+        ],
+        1,
+    );
+    daemon.configure(&format!(
+        "[review]\nmode='automatic'\n[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel='vectors-2'\ndimension=2\nlocal=true\ntimeout='10s'",
+        endpoint.address
+    ));
+    daemon.start();
+    let edit = patch(&daemon, "edited", seq, corrected);
+    endpoint.pause();
+    daemon.cli(&["index", "sync", "--idempotency-key", "before-correction"]);
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while endpoint.requests.lock().unwrap().is_empty() {
+        assert!(Instant::now() < deadline, "first embedding never arrived");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let applied = submit(&daemon, "replace-text", &edit);
+    endpoint.resume();
+    assert!(applied["data"]["commit_seq"].is_u64(), "{applied}");
+    let original = finished(&daemon, "before-correction");
+    assert_eq!(original["state"], "succeeded", "{original}");
+    daemon.cli(&["index", "sync", "--idempotency-key", "after-correction"]);
+    let current = finished(&daemon, "after-correction");
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+    assert_eq!(current["state"], "succeeded", "{current}");
+    assert_eq!(current["result"]["vector"]["indexed_rows"], 2);
+    let requests = endpoint.requests.lock().unwrap();
+    let texts: Vec<_> = requests
+        .iter()
+        .flat_map(|(_, body)| body["input"].as_array().unwrap())
+        .collect();
+    assert!(
+        !texts.iter().any(|text| text.as_str() == Some(stale)),
+        "superseded text reached the provider"
+    );
+    assert!(texts.iter().any(|text| text.as_str() == Some(corrected)));
+}

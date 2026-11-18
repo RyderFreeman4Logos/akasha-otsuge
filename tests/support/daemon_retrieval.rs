@@ -430,23 +430,155 @@ mod rules;
 
 #[test]
 fn vector_sync_bounds_native_versions_for_one_authority_batch() {
+    vector_sync_batch(false, false);
+}
+
+#[test]
+fn vector_sync_batches_utf8_chunks_within_the_json_wire_budget() {
+    vector_sync_batch(true, false);
+}
+
+#[test]
+fn vector_batches_stop_at_excluded_superseded_and_retracted_memories() {
+    let endpoint = super::model_tests::Endpoint::retrieval();
+    let mut daemon = Daemon::new();
+    let records = [
+        ("first", Some("alpha"), "first"),
+        ("excluded", Some("beta"), "excluded"),
+        ("second", Some("alpha"), "second"),
+        ("approved", Some("alpha"), "approved"),
+        ("third", Some("alpha"), "third"),
+        ("retired", Some("alpha"), "retired"),
+        ("fourth", Some("alpha"), "fourth"),
+    ];
+    assert_eq!(seed_records(&daemon, &records, 1), 14);
+    super::extraction_tests::review_extracted(&daemon, "approved", ReviewAction::Approve);
+    super::extraction_tests::review_extracted(&daemon, "retired", ReviewAction::Reject);
+    daemon.configure(&format!(
+        "[retrieval]\nembedding='embed'\nembedding_scopes=[{{user={:?},project='alpha'}}]\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel='vectors-2'\ndimension=2\nlocal=true\ntimeout='2s'",
+        scope("alpha").user, endpoint.address,
+    ));
+    daemon.start();
+    daemon.cli(&["index", "sync", "--idempotency-key", "barrier-build"]);
+    let built = finished(&daemon, "barrier-build");
+    assert_eq!(built["state"], "succeeded", "{built}");
+    assert_eq!(built["result"]["vector"]["indexed_rows"], 5);
+    {
+        let requests = endpoint.requests.lock().unwrap();
+        let calls: Vec<_> = requests.iter().map(|(_, body)| &body["input"]).collect();
+        assert_eq!(
+            serde_json::json!(calls),
+            serde_json::json!([["first"], ["second"], ["third"], ["fourth", "approved"]])
+        );
+    }
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
+fn vector_sync_groups_alternating_scopes_in_authority_order() {
+    vector_sync_batch(false, true);
+}
+
+fn vector_sync_batch(wide: bool, alternating: bool) {
     let endpoint = super::model_tests::Endpoint::retrieval();
     let mut daemon = Daemon::new();
     let names = (0..16).map(|i| format!("batch-{i}")).collect::<Vec<_>>();
+    let bodies = (0..16)
+        .map(|i| {
+            if wide {
+                format!(
+                    "offline {}界{} private-{i}",
+                    "中".repeat(1362),
+                    "\"".repeat(4000)
+                )
+            } else {
+                format!(
+                    "nativebatch {} item-{i}",
+                    if i % 2 == 0 { "offline" } else { "private" }
+                )
+            }
+        })
+        .collect::<Vec<_>>();
     let records = names
         .iter()
-        .map(|id| (id.as_str(), Some("alpha"), "nativebatch searchable body"))
+        .zip(&bodies)
+        .enumerate()
+        .map(|(i, (id, body))| {
+            let scope = if alternating && i % 2 == 1 {
+                "beta"
+            } else {
+                "alpha"
+            };
+            (id.as_str(), Some(scope), body.as_str())
+        })
         .collect::<Vec<_>>();
     assert_eq!(seed_records(&daemon, &records, 1), 32);
     daemon.configure(&format!(
-        "[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel='vectors-2'\ndimension=2\nlocal=true\ntimeout='2s'",
-        endpoint.address,
+        "[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint={:?}\nmodel='{}'\ndimension=2\nlocal=true\ntimeout='2s'",
+        endpoint.address, if alternating { "vectors-id" } else { "vectors-2" },
     ));
     daemon.start();
     daemon.cli(&["index", "sync", "--idempotency-key", "batch-build"]);
     let built = finished(&daemon, "batch-build");
     assert_eq!(built["state"], "succeeded", "{built}");
     assert_eq!(built["result"]["vector"]["indexed_rows"], 16);
+    {
+        let requests = endpoint.requests.lock().unwrap();
+        let actual = requests
+            .iter()
+            .flat_map(|(_, body)| {
+                body["input"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|text| text.as_str().unwrap().to_owned())
+            })
+            .collect::<Vec<_>>();
+        for (path, body) in requests.iter() {
+            assert_eq!(path, "/v1/embeddings");
+            assert!(serde_json::to_vec(body).unwrap().len() <= 32 * 1024);
+            let input = body["input"].as_array().unwrap();
+            assert!(!input.is_empty() && input.len() <= 8);
+            assert!(
+                input
+                    .iter()
+                    .all(|text| text.as_str().unwrap().len() <= 4096)
+            );
+        }
+        if wide {
+            assert!(requests.len() > 4 && requests.len() < 16);
+            let expected = bodies
+                .iter()
+                .flat_map(|text| {
+                    assert!(text.is_char_boundary(4094) && !text.is_char_boundary(4096));
+                    assert!(text.len() - 4094 <= 4096);
+                    [text[..4094].to_owned(), text[4094..].to_owned()]
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(actual, expected);
+        } else {
+            assert_eq!(
+                requests.len(),
+                2,
+                "sixteen memories must use two bounded embedding requests"
+            );
+            assert!(
+                requests
+                    .iter()
+                    .all(|(_, body)| body["input"].as_array().unwrap().len() == 8)
+            );
+            if alternating {
+                // Provider audit order is first-seen scope, then original revision order in each scope.
+                let expected = (0..2)
+                    .flat_map(|parity| bodies.iter().skip(parity).step_by(2).cloned())
+                    .collect::<Vec<_>>();
+                assert_eq!(actual, expected);
+            } else {
+                assert_eq!(actual, bodies);
+            }
+        }
+    }
     let generation = built["result"]["vector"]["generation"]
         .as_str()
         .unwrap()
@@ -458,6 +590,43 @@ fn vector_sync_bounds_native_versions_for_one_authority_batch() {
         .build()
         .unwrap()
         .block_on(async {
+            if alternating {
+                use akasha_otsuge::storage::{RecordKey, RecordKind};
+                use sha2::{Digest, Sha256};
+                let config = super::extraction_tests::storage_config(&daemon);
+                let store = Storage::open(&config).await.unwrap();
+                assert!(built["result"]["vector"]["watermark"].as_u64().unwrap() >= 32);
+                for seq in 1..=32_u64 {
+                    let record = store
+                        .current(&RecordKey {
+                            kind: RecordKind::State,
+                            id: format!("search/completion/{generation}/{seq:020}"),
+                        })
+                        .unwrap()
+                        .unwrap();
+                    let completion: Value = serde_json::from_str(&record.content).unwrap();
+                    assert_eq!(completion["seq"], seq);
+                    assert_eq!(completion["generation"], generation);
+                    if seq % 2 == 0 {
+                        let id = &names[(seq / 2 - 1) as usize];
+                        let key: String = Sha256::digest(id.as_bytes())
+                            .iter()
+                            .map(|byte| format!("{byte:02x}"))
+                            .collect();
+                        assert_eq!(completion["reason"], "processed");
+                        assert_eq!(
+                            completion["records"],
+                            serde_json::json!([
+                                {"key_hash": key, "revision": seq, "outcome": "indexed"}
+                            ])
+                        );
+                    } else {
+                        assert_eq!(completion["reason"], "not_required");
+                        assert_eq!(completion["records"], serde_json::json!([]));
+                    }
+                }
+                store.close().await.unwrap();
+            }
             let root = daemon.root.join("data/search");
             let connection = lancedb::connect(root.to_str().unwrap())
                 .execute()
@@ -469,6 +638,68 @@ fn vector_sync_bounds_native_versions_for_one_authority_batch() {
                 .await
                 .unwrap();
             assert_eq!(table.count_rows(None).await.unwrap(), 16);
+            use arrow_array::{FixedSizeListArray, Float32Array, StringArray, UInt64Array};
+            use futures::TryStreamExt;
+            use lancedb::query::{ExecutableQuery, QueryBase, Select};
+            let batches: Vec<_> = table
+                .query()
+                .select(Select::Columns(vec![
+                    "id".into(),
+                    "revision".into(),
+                    "vector".into(),
+                ]))
+                .execute()
+                .await
+                .unwrap()
+                .try_collect()
+                .await
+                .unwrap();
+            let mut seen = std::collections::BTreeSet::new();
+            for batch in batches {
+                let ids = batch
+                    .column_by_name("id")
+                    .unwrap()
+                    .as_any()
+                    .downcast_ref::<StringArray>()
+                    .unwrap();
+                let revisions = batch
+                    .column_by_name("revision")
+                    .unwrap()
+                    .as_any()
+                    .downcast_ref::<UInt64Array>()
+                    .unwrap();
+                let vectors = batch
+                    .column_by_name("vector")
+                    .unwrap()
+                    .as_any()
+                    .downcast_ref::<FixedSizeListArray>()
+                    .unwrap();
+                for row in 0..batch.num_rows() {
+                    let id: usize = ids
+                        .value(row)
+                        .strip_prefix("batch-")
+                        .unwrap()
+                        .parse()
+                        .unwrap();
+                    assert!(id < 16 && seen.insert(id));
+                    assert_eq!(revisions.value(row), (id as u64 + 1) * 2);
+                    let vector = vectors.value(row);
+                    let vector = vector.as_any().downcast_ref::<Float32Array>().unwrap();
+                    assert_eq!(
+                        (vector.value(0), vector.value(1)),
+                        if wide {
+                            (0.5, 0.5)
+                        } else if alternating {
+                            (id as f32 + 1.0, 1.0)
+                        } else if id % 2 == 0 {
+                            (1.0, 0.0)
+                        } else {
+                            (0.0, 1.0)
+                        }
+                    );
+                }
+            }
+            assert_eq!(seen.len(), 16);
             let versions = table.version().await.unwrap() - 1;
             assert!(
                 versions <= 8,

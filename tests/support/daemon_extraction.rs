@@ -220,7 +220,7 @@ fn native_extraction_cannot_expand_its_evidence_with_research_tools() {
     assert!(job["result"]["candidates"].is_null());
 }
 
-fn review_extracted(daemon: &Daemon, id: &str, action: ReviewAction) {
+pub(super) fn review_extracted(daemon: &Daemon, id: &str, action: ReviewAction) {
     runtime().block_on(async {
         let store = Storage::open(&storage_config(daemon)).await.unwrap();
         let domain = Domain::new(&store);
