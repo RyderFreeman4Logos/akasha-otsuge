@@ -1,0 +1,146 @@
+{
+  "case_sha256": "552e168b1c2dc31e138956787f16b188a3e99ea63bb4f3f72fe1663900c191f9",
+  "product_source_before": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+  "product_sha256_before": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+  "product_sha256_after": "754c0d701523c7d99949df26a41492bfc17c13124f170174c03141a36d1319b9",
+  "native_cli": "2.1.311 (Claude Code)",
+  "native_cli_sha256": "86dc1fcc69498159eaf15f446613e847010f9036bfbbdffd4c49350be8489ada",
+  "requested_model": "grok-4.7",
+  "live_response": {
+    "request_bytes": 5958,
+    "number": 1,
+    "http_status": 200,
+    "requested_tools": [
+      "context_describe",
+      "context_list"
+    ],
+    "usage": {
+      "input_tokens": 1493,
+      "output_tokens": 83,
+      "cache_read_input_tokens": 1152
+    },
+    "reported_model": "grok-4.7",
+    "stop_reason": "tool_use",
+    "event_count": 53,
+    "elapsed_ms": 1822
+  },
+  "retained_sse_sha256": "0cadf8ee6207ea0b2f3eba81b00649b31357a826e689cec7f4aacb86fa6c9e48",
+  "pre_registered_caps": {
+    "real_jobs_max": 1,
+    "requests_max": 4,
+    "requested_output_tokens_max_each": 768,
+    "requested_output_tokens_max_total": 3072,
+    "request_utf8_bytes_max_each": 28000,
+    "request_utf8_bytes_max_total": 72000,
+    "upstream_timeout_s": 45,
+    "runner_timeout_s": 120
+  },
+  "before_fix_prefixes": {
+    "liveBefore": "RUNNER_INCOMPLETE",
+    "liveThrough": "PROTOCOL_INVALID",
+    "rejected_frame": 2,
+    "frame_sha256": "dad54b37e21186287842b95ebf81bcfd33312eb8f23d59932aeabebe7e94a32b",
+    "observed_types": [
+      "system/init",
+      "system/thinking_tokens"
+    ],
+    "estimated_tokens": 1,
+    "estimated_tokens_delta": 1
+  },
+  "rehearsal": {
+    "case_sha256": "552e168b1c2dc31e138956787f16b188a3e99ea63bb4f3f72fe1663900c191f9",
+    "exact_offline_rejection": true,
+    "unmodified_positive_control": true,
+    "fault": "test_only_session_id_change",
+    "first_rejected_frame": 2,
+    "frame_sha256": "bd37adbe83bb4257c235fbd1c47625b1369e431102affac3c3fd4ccab1714a59",
+    "replays": {
+      "before": "RUNNER_INCOMPLETE",
+      "through": "PROTOCOL_INVALID",
+      "full": "PROTOCOL_INVALID"
+    }
+  },
+  "runs": {
+    "live": {
+      "upstream_live_requests": 1,
+      "retained_responses_replayed": 0,
+      "synthetic_followup_responses": 0,
+      "native_job": "failed",
+      "native_runner": "failed",
+      "error": "PROTOCOL_INVALID",
+      "observer_exit": 0,
+      "origin_and_fence_verified": true,
+      "hint_verified": true,
+      "product_usage": {
+        "output_bytes": 3214,
+        "read_bytes": 0,
+        "reads": 0,
+        "starts": 1,
+        "tokens": 0
+      }
+    },
+    "oldSSE": {
+      "upstream_live_requests": 0,
+      "retained_responses_replayed": 1,
+      "synthetic_followup_responses": 0,
+      "native_job": "failed",
+      "native_runner": "failed",
+      "error": "PROTOCOL_INVALID",
+      "observer_exit": 0,
+      "origin_and_fence_verified": true,
+      "hint_verified": true,
+      "product_usage": {
+        "output_bytes": 3214,
+        "read_bytes": 0,
+        "reads": 0,
+        "starts": 1,
+        "tokens": 0
+      }
+    },
+    "fixedPrefix": {
+      "upstream_live_requests": 0,
+      "retained_responses_replayed": 0,
+      "synthetic_followup_responses": 0,
+      "native_job": "failed",
+      "native_runner": "failed",
+      "error": "RUNNER_INCOMPLETE",
+      "observer_exit": 0,
+      "origin_and_fence_verified": true,
+      "hint_verified": true,
+      "product_usage": {
+        "output_bytes": 3214,
+        "read_bytes": 0,
+        "reads": 0,
+        "starts": 1,
+        "tokens": 0
+      }
+    },
+    "fixedSSE": {
+      "upstream_live_requests": 0,
+      "retained_responses_replayed": 1,
+      "synthetic_followup_responses": 3,
+      "native_job": "succeeded",
+      "native_runner": "succeeded",
+      "error": null,
+      "observer_exit": 0,
+      "origin_and_fence_verified": true,
+      "hint_verified": true,
+      "product_usage": {
+        "output_bytes": 42027,
+        "read_bytes": 69013,
+        "reads": 12,
+        "starts": 1,
+        "tokens": 2785
+      },
+      "answer": {
+        "public_status": "found",
+        "source_count": 1,
+        "gap_count": 0,
+        "scope_user_verified": true,
+        "original_verified": true,
+        "public_receipt_verified": true,
+        "answer_mentions_expected_tag": true
+      }
+    }
+  }
+}

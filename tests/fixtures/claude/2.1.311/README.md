@@ -120,3 +120,86 @@ native input/output UUIDs and a captured compaction boundary. The daemon
 regression separately restarts during an unfinished native backfill, supplies
 the delayed original, and verifies completion under the original deadline;
 cancellation is checked with a separate missing-target job.
+
+### Native Consult through an authenticated Messages provider
+
+On 2026-11-18 the hosted Linux package from commit
+`4e7b3a2799ebc2055750eb044b056cc1d887625a` ran one new synthetic Consult
+with Claude Code 2.1.311 as both Caller and Runner. The native Caller used a
+deterministic reply to submit the request with a short hint. The independent
+native Runner called an authenticated loopback provider serving Grok 4.7
+through Anthropic Messages. Each process ran with a fresh home and private
+network. Only the outer relay held the provider credential. The relay allowed
+six scoped read tools, up to six requests and 1,400 output tokens per request.
+The Runner timeout was 120 seconds.
+
+| Runner provider | HTTP 200 responses | Product job | Product reads | Public evidence |
+| --- | ---: | --- | ---: | --- |
+| Authenticated Grok 4.7 | 1 | Failed, `PROTOCOL_INVALID` | 0 | No answer |
+| Local serial control | 3 | Succeeded | 10 | `found`, one verified original |
+| Local paired-tool control | 4 | Succeeded | 12 | `found`, one verified original |
+
+The real provider completed a 16-event stream in 1.751 seconds. It requested
+`context_describe` and `context_list` and reported 1,500 input tokens, 1,152
+cache-read input tokens and 77 output tokens. The product recorded one start,
+zero tokens and zero read bytes. The observer exited successfully after it
+verified the saved invocation, fence, hint and failed job state. The provider
+charge was unobserved.
+
+The paired control requested the same two tools in its first response and
+reported the same three token counts. Its native Runner completed the reads,
+published a receipt and recovered the scoped original. The redacted live
+observation does not identify the rejected native frame. These runs measured
+one CLI version, one new input and one authenticated third-party route.
+Model quality and Claude subscription behavior were unmeasured.
+[Redacted observations and executable hashes](native-messages-r1.json).
+
+Repeat the two local controls on Linux with Python 3.11+, Bubblewrap, the
+verified package executable and the Claude executable identified in the
+observations. Set `SCRATCH` to an existing writable SSD directory. Both
+commands use a local synthetic Messages server with no provider credentials.
+
+```sh
+work=$(mktemp -d "$SCRATCH/messages.XXXXXX")
+tar -xzf tests/fixtures/claude/2.1.311/native-messages-replay-r1.tar.gz -C "$work"
+python3 -B "$work/replay.py" --product "$AKASHA" --claude "$CLAUDE" \
+  --scratch "$SCRATCH" --output "$work/serial.json"
+python3 -B "$work/replay.py" --product "$AKASHA" --claude "$CLAUDE" \
+  --scratch "$SCRATCH" --output "$work/paired.json" --paired
+```
+
+### Native thinking progress
+
+A second synthetic input on the same authenticated route produced two native
+stdout frames before the released daemon stopped its Runner. Replaying the init
+frame alone returned `RUNNER_INCOMPLETE`. Adding the second frame reproduced
+`PROTOCOL_INVALID` with zero provider requests. The fixture replaces the
+session and event identifiers in that second frame. It preserves the observed
+progress subtype and both estimates. The SDK defines these counters as
+per-block progress estimates. [Native progress frame](thinking-tokens.json),
+[SDK reference](https://code.claude.com/docs/en/agent-sdk/typescript#sdkthinkingtokensmessage).
+
+The adapter now accepts that progress subtype after the native session and
+parent checks and counts usage from the assistant and result frames. With the
+same two-frame prefix it reached end-of-stream and returned
+`RUNNER_INCOMPLETE`. A second offline test fed the complete retained provider
+response to the native CLI. The released package reproduced the rejection.
+The fixed daemon continued through the two requested tools, a search, and a
+read. Three locally generated follow-up responses completed the Consult with
+one verified original. The first authenticated case retained only aggregate
+fields, so its rejected frame remains unknown. [Case and replay counts](thinking-progress-r1.json).
+
+A third, distinct input exercised the fixed adapter with a fresh authenticated
+Runner. A local preflight on the first Caller turn returned
+`BINDING_UNAVAILABLE` before a job started. A fresh native session followed
+by normal resume completed the local control and then submitted the measured
+Consult. Its Runner handled 108 thinking-progress frames and three real HTTP
+200 responses. Nine requested tools produced five text results. One result
+matched the registered synthetic original byte for byte, and its source digest
+matched too.
+
+Before the fourth upstream request, the observer's pre-registered token
+admission limit stopped the run. The job returned `RUNNER_FAILED` after 20
+product reads. The actual model read the original. A final model answer,
+published Consult receipt and answer-quality score remain unobserved.
+[Multi-turn observation and budget](thinking-progress-multiturn-r1.json).

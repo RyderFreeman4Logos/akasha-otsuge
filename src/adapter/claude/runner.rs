@@ -374,6 +374,14 @@ impl Handle<'_> {
             return Err(ErrorCode::ProtocolInvalid.into());
         }
         match value["type"].as_str() {
+            Some("system")
+                if value["subtype"] == "thinking_tokens"
+                    && value["estimated_tokens"].is_u64()
+                    && value["estimated_tokens_delta"].is_u64() =>
+            {
+                // These are progress estimates. The assistant and result frames report usage.
+                Ok(None)
+            }
             Some("system") if value["subtype"] == "api_retry" => {
                 let attempt = value["attempt"]
                     .as_u64()

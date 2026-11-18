@@ -1,0 +1,118 @@
+{
+  "product_source": "c7456e6ae2b5bd38e5a21411a1b13e13fd53e6a3",
+  "product_sha256": "888c59c818f6f735dd8c5dfd56c2882ae0a4a7de4e07a7b4f427fb495a676f31",
+  "native_cli": "2.1.311 (Claude Code)",
+  "native_cli_sha256": "86dc1fcc69498159eaf15f446613e847010f9036bfbbdffd4c49350be8489ada",
+  "case_sha256": "20e408a4cbcdeab70780bc61b03534cd2e626447d716ef3ca52e7b15c91b4346",
+  "protocol": "anthropic messages",
+  "model": "grok-4.7",
+  "real_jobs": 1,
+  "observer_exit": 0,
+  "trace_sha256": "80507c308f6106717857ea210872edcb262343cf63418b43947e2c01c91e7493",
+  "budget": {
+    "case_sha256": "20e408a4cbcdeab70780bc61b03534cd2e626447d716ef3ca52e7b15c91b4346",
+    "jobs_max": 1,
+    "requests_max": 6,
+    "max_output_tokens_each": 768,
+    "max_output_tokens_total": 4608,
+    "input_bytes_max_each": 32000,
+    "input_bytes_max_total": 100000,
+    "request_admission_token_budget": 32000,
+    "admission": "Previously reported input, cache and output counters + UTF-8 request byte length + max output + 1024 slack",
+    "raw_recording": "isolated Runner stdout and Messages response bytes only",
+    "provider": "same authenticated loopback Messages route"
+  },
+  "local_preflight": {
+    "first_attempt": "caller_binding_unavailable_before_job",
+    "first_attempt_upstream_count": 0,
+    "resumed_session_control": "succeeded",
+    "control_synthetic_request_count": 3,
+    "control_original_verified": true
+  },
+  "authenticated_responses": [
+    {
+      "request_bytes": 5961,
+      "number": 1,
+      "http_status": 200,
+      "requested_tools": [
+        "context_describe",
+        "context_list"
+      ],
+      "usage": {
+        "input_tokens": 1491,
+        "output_tokens": 82,
+        "cache_read_input_tokens": 1152
+      },
+      "reported_model": "grok-4.7",
+      "stop_reason": "tool_use",
+      "event_count": 56,
+      "elapsed_ms": 4248
+    },
+    {
+      "request_bytes": 11965,
+      "number": 2,
+      "http_status": 200,
+      "requested_tools": [
+        "context_search",
+        "context_read",
+        "context_read"
+      ],
+      "usage": {
+        "input_tokens": 3195,
+        "output_tokens": 285,
+        "cache_read_input_tokens": 2560
+      },
+      "reported_model": "grok-4.7",
+      "stop_reason": "tool_use",
+      "event_count": 51,
+      "elapsed_ms": 2256
+    },
+    {
+      "request_bytes": 15068,
+      "number": 3,
+      "http_status": 200,
+      "requested_tools": [
+        "memory_search",
+        "context_read",
+        "context_read",
+        "context_read"
+      ],
+      "usage": {
+        "input_tokens": 4078,
+        "output_tokens": 310,
+        "cache_read_input_tokens": 4864
+      },
+      "reported_model": "grok-4.7",
+      "stop_reason": "tool_use",
+      "event_count": 53,
+      "elapsed_ms": 3075
+    }
+  ],
+  "relay_rejections": [
+    "token_admission_cap"
+  ],
+  "job": "failed",
+  "runner": "failed",
+  "typed_error": "RUNNER_FAILED",
+  "origin_and_fence_verified": true,
+  "stored_hint_verified": true,
+  "usage": {
+    "output_bytes": 74959,
+    "read_bytes": 200298,
+    "reads": 20,
+    "starts": 1,
+    "tokens": 8462
+  },
+  "native_events": {
+    "progress_frames": 108,
+    "tool_result_kinds": {
+      "description": 1,
+      "page": 2,
+      "text": 5,
+      "error": 1
+    },
+    "original_text_and_source_digest_verified": 1
+  },
+  "published_answer": null,
+  "semantic_score": null
+}
