@@ -1375,6 +1375,42 @@ impl Service {
         }
         Ok(value)
     }
+    pub(super) async fn queue_observation(&self) -> Result<Value> {
+        #[derive(Deserialize)]
+        struct State<'a> {
+            id: &'a str,
+            state: &'a str,
+        }
+
+        let _guard = self.admission.lock().await;
+        let (_, ids) = self.active()?;
+        let mut queued = 0;
+        let mut queued_bytes = 0;
+        let mut running = 0;
+        for id in ids {
+            let row = self
+                .storage
+                .current(&job_key(&id))?
+                .ok_or(Error("JOB_CORRUPT"))?;
+            let job: State = serde_json::from_str(&row.content)?;
+            if job.id != id {
+                return Err(Error("JOB_CORRUPT"));
+            }
+            match job.state {
+                "queued" => {
+                    queued += 1;
+                    queued_bytes += row.content.len();
+                }
+                "running" => running += 1,
+                _ => return Err(Error("JOB_CORRUPT")),
+            }
+        }
+        Ok(
+            json!({"storage_seq":self.storage.sequence()?, "queued":queued,
+                  "running":running, "queued_json_bytes":queued_bytes}),
+        )
+    }
+
     pub(super) async fn list_jobs(&self, after: Option<&str>) -> Result<Value> {
         let _guard = self.admission.lock().await;
         let keys = self.storage.head_keys(

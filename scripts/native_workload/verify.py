@@ -13,7 +13,7 @@ from spikes.helix.run_case import digest
 
 from .journal import records
 from .operations_by_role import body
-from .schedule import clients, offers
+from .schedule import clients, offers, summarize
 
 
 def original_oracles(run, admission, result):
@@ -27,7 +27,7 @@ def original_oracles(run, admission, result):
     }
     originals = {}
     offered = set()
-    accepted = set()
+    accepted = {}
     conflicts = 0
     for row in records(run / "requests.jsonl"):
         event = row["event"]
@@ -51,7 +51,14 @@ def original_oracles(run, admission, result):
                     row["ordinal"] % 10 == 9
                 ):
                     raise ValueError("inconsistent original receipt")
-                accepted.add(key)
+                outcome = row["outcome"]
+                if (
+                    outcome["receipt"]["id"] != key
+                    or outcome["receipt"]["state"] != "succeeded"
+                    or outcome["unique_original_bytes"] != 4096
+                ):
+                    raise ValueError("incorrect original job receipt")
+                accepted[key] = outcome["original_oracle"]
             elif row["kind"] == "correction" and row["outcome"]["status"] == "conflict":
                 conflicts += 1
     if offered != expected.keys() or not result["requests"]["complete"]:
@@ -66,7 +73,8 @@ def original_oracles(run, admission, result):
         client, kind, n = expected[key]
         raw = body(key).encode()
         if (
-            len(raw) != 4096
+            oracle != accepted[key]
+            or len(raw) != 4096
             or oracle["raw_sha256"] != hashlib.sha256(raw).hexdigest()
             or oracle["text_sha256"] != oracle["raw_sha256"]
             or oracle["source"]
@@ -89,7 +97,7 @@ def original_oracles(run, admission, result):
         ):
             raise ValueError("original expectation differs from offered source")
         originals[key] = oracle
-    if not originals or originals.keys() != accepted:
+    if not originals or originals.keys() != accepted.keys():
         raise ValueError("missing original preparations")
     return originals, conflicts
 
@@ -97,11 +105,17 @@ def original_oracles(run, admission, result):
 def verify(run: Path, reader: Path):
     admission = json.loads((run / "admission.json").read_bytes())
     result = json.loads((run / "result.json").read_bytes())
-    if not result["assessment"]["interval_thresholds_pass"]:
-        raise ValueError("reconcile the failed interval before verifying accepted writes")
     for name in ("requests.jsonl", "preparations.jsonl", "metrics.jsonl"):
         if digest(run / name) != result["journal_sha256"][name]:
             raise ValueError(f"journal changed: {name}")
+    summary = summarize(
+        records(run / "requests.jsonl"),
+        admission["config"]["execution"]["seconds"],
+        records(run / "preparations.jsonl"),
+        admission["plan"]["oracles"]["corrections"],
+    )
+    if not summary["complete"] or summary["correction_races"]["invalid"]:
+        raise ValueError("unreconciled interval or correction outcomes")
     cfg = Path(admission["plan"]["daemon_config"])
     if digest(cfg) != admission["plan"]["daemon_config_sha256"]:
         raise ValueError("admitted daemon configuration changed")
@@ -138,6 +152,9 @@ def verify(run: Path, reader: Path):
         if replies.read(1):
             raise ValueError("unexpected extra acknowledgment")
     return dict(
+        interval_thresholds_pass=result["assessment"]["interval_thresholds_pass"],
+        interval_gaps=result["assessment"]["gaps"],
+        full_native_acceptance=False,
         verified_originals=len(originals),
         verified_bytes=len(originals) * 4096,
         read_seq=snapshot,

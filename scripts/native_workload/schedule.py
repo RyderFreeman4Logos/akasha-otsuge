@@ -162,12 +162,101 @@ async def run_schedule(run_id, seconds, execute, emit, selected=None):
     )
 
 
-def summarize(events, seconds):
+def correction_races(entries, preparations, targets):
+    """Check each scheduled pair against its common pinned revision and durable submission."""
+    prepared = {}
+    if preparations is not None:
+        for row in preparations:
+            if row["kind"] != "correction":
+                continue
+            key, command = row["identity"], row["command"]
+            changes = command["patch"]["changes"]
+            if key in prepared or command["idempotency_key"] != key or len(changes) != 1:
+                raise ValueError("invalid correction preparation")
+            change = changes[0]
+            prepared[key] = (
+                row["pair"],
+                row["ordinal"],
+                change["memory_id"],
+                change["expected_revision"],
+            )
+    counts = collections.Counter()
+    invalid = []
+    incomplete = []
+    for (pair, ordinal), members in sorted(entries.items()):
+        outcomes = []
+        bases = set()
+        valid = True
+        for key, outcome in members.values():
+            prep = prepared.pop(key, None)
+            if outcome is None:
+                valid &= prep is None
+                continue
+            status = outcome["status"]
+            outcomes.append(status)
+            # Older complete journals carry this binding in the prepared command only.
+            race = (
+                outcome.get("race", {})
+                if prep is None
+                else outcome.get("race", dict(target=prep[2], base_revision=prep[3]))
+            )
+            target, base = race.get("target"), race.get("base_revision")
+            if not isinstance(target, str) or type(base) is not int or base <= 0:
+                valid = False
+                continue
+            bases.add((target, base))
+            if preparations is not None:
+                valid &= prep == (pair, ordinal, target, base)
+            if targets is not None:
+                valid &= target == targets[pair]["id"]
+            if status == "success":
+                revision = outcome["receipt"]["commit_seq"]
+                valid &= (
+                    type(revision) is int
+                    and revision > base
+                    and outcome["expected"]["id"] == target
+                    and outcome["expected"]["revision"] == revision
+                )
+            elif status == "conflict":
+                valid &= outcome.get("code") == "REVISION_CONFLICT"
+            else:
+                valid = False
+        if len(outcomes) == 2:
+            valid &= sorted(outcomes) == ["conflict", "success"] and len(bases) == 1
+            counts["contested"] += 1
+        else:
+            counts["partial" if outcomes else "undispatched"] += 1
+            incomplete.append(
+                dict(
+                    pair=pair,
+                    ordinal=ordinal,
+                    dispatched=[c for c, (_, outcome) in members.items() if outcome is not None],
+                )
+            )
+        if not valid:
+            invalid.append(dict(pair=pair, ordinal=ordinal))
+    if prepared:
+        raise ValueError("unmatched correction preparation")
+    return dict(counts=dict(counts), invalid=invalid, incomplete=incomplete)
+
+
+def summarize(events, seconds, preparations=None, correction_targets=None):
     """Fail closed on missing, duplicated or reordered logical request records."""
     if seconds <= 0:
         raise ValueError("positive duration required")
     pending, tallies = {}, collections.defaultdict(collections.Counter)
     interval, drained = None, False
+    races = collections.defaultdict(dict)
+    windows = [
+        dict(
+            start_s=start,
+            end_s=min(start + 60, seconds),
+            offered=collections.Counter(),
+            successes=collections.Counter(),
+        )
+        for start in range(0, math.ceil(seconds), 60)
+    ]
+    in_flight_at_end = []
     latencies, offered_latencies = collections.defaultdict(list), collections.defaultdict(list)
     for row in events:
         event = row["event"]
@@ -175,6 +264,11 @@ def summarize(events, seconds):
             if interval is not None or pending or row["duration_s"] != seconds:
                 raise ValueError("invalid interval identity")
             interval = row
+            population = {c["client"]: c for c in row["clients"]}
+            if len(population) != len(row["clients"]) or row["planned"] != sum(
+                1 for c in population.values() for _ in offers(c, seconds)
+            ):
+                raise ValueError("incorrect admitted schedule")
             continue
         if interval is None or drained:
             raise ValueError("request outside its interval journal")
@@ -187,7 +281,27 @@ def summarize(events, seconds):
         if event == "offered":
             if identity in pending:
                 raise ValueError("duplicate offer")
-            pending[identity] = dict(kind=row["kind"], state="offered")
+            client, ordinal, kind, due = row["client"], row["ordinal"], row["kind"], row["due_s"]
+            role = population.get(client)
+            if (
+                role is None
+                or kind != role["kind"]
+                or type(ordinal) is not int
+                or ordinal < 0
+                or identity != f"{interval['run_id']}/client/{client}/request/{ordinal}"
+                or due != role["offset_s"] + ordinal * role["period_s"]
+                or not 0 <= due < seconds
+            ):
+                raise ValueError("offer outside admitted schedule")
+            windows[int(due // 60)]["offered"][kind] += 1
+            pending[identity] = dict(kind=kind, state="offered", client=client, ordinal=ordinal)
+            if kind == "correction":
+                if not 92 <= client < 100:
+                    raise ValueError("invalid correction client")
+                members = races[((client - 92) // 2, ordinal)]
+                if client in members:
+                    raise ValueError("duplicate correction offer")
+                members[client] = (identity, None)
             tallies[row["kind"]]["offered"] += 1
             continue
         if identity not in pending:
@@ -223,14 +337,29 @@ def summarize(events, seconds):
                 and math.isclose(row["offered_latency_s"], finished - due, abs_tol=1e-8)
             ):
                 raise ValueError("invalid latency observation")
+            if (row["client"], row["ordinal"], row["kind"]) != (
+                item["client"],
+                item["ordinal"],
+                kind,
+            ):
+                raise ValueError("outcome differs from offered role")
+            if (finished < seconds) != row["within_interval"]:
+                raise ValueError("completion window mismatch")
+            if dispatched < seconds <= finished:
+                in_flight_at_end.append(identity)
+            if kind == "correction":
+                races[((row["client"] - 92) // 2, row["ordinal"])][row["client"]] = (
+                    identity,
+                    outcome,
+                )
             tallies[kind][status] += 1
             if status == "success":
                 latencies[kind].append(row["latency_s"])
                 offered_latencies[kind].append(row["offered_latency_s"])
                 # Recompute the window boundary; never trust the supplied flag alone.
                 within = 0 <= row["finished_s"] < seconds
-                if within != row["within_interval"]:
-                    raise ValueError("completion window mismatch")
+                if within:
+                    windows[int(finished // 60)]["successes"][kind] += 1
                 tallies[kind]["success_within_interval" if within else "late_success"] += 1
         else:
             raise ValueError("duplicate or reordered request event")
@@ -254,6 +383,9 @@ def summarize(events, seconds):
     planned = None if interval is None else interval["planned"]
     return dict(
         kinds=result,
+        progress_windows=windows,
+        in_flight_at_interval_end=in_flight_at_end,
+        correction_races=correction_races(races, preparations, correction_targets),
         unfinished=unfinished,
         complete=bool(interval) and drained and not unfinished and len(pending) == planned,
         full_native_acceptance=False,

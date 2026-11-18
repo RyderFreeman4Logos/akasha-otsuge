@@ -308,6 +308,23 @@ fn budget_reload_drains_running_work_then_reopens_without_resetting_jobs() {
     let queued = submit_text(&daemon, "queued-before-reopen");
     assert_eq!(running["state"], "running");
     assert_eq!(queued["state"], "queued");
+    let status =
+        super::notifier_tests::rpc(&daemon, json!({"op":"index_status","include_queue":true}));
+    assert_eq!(status["data"]["queue"]["queued"], 1, "{status}");
+    assert_eq!(status["data"]["queue"]["running"], 1);
+    assert_eq!(
+        status["data"]["queue"]["queued_json_bytes"],
+        serde_json::to_vec(&queued).unwrap().len()
+    );
+    assert!(
+        status["data"]["queue"]["storage_seq"].as_u64().unwrap()
+            >= status["data"]["lexical_watermark"].as_u64().unwrap()
+    );
+    assert!(
+        daemon.cli(&["index", "status"])["data"]
+            .get("queue")
+            .is_none()
+    );
     daemon.configure(&settings(512).replace("timeout='30s'", "timeout='2s'"));
     let reload = daemon.cli(&["config", "reload"])["data"].clone();
     assert_eq!(reload["status"], "applied");

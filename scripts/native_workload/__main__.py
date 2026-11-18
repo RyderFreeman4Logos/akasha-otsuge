@@ -17,7 +17,8 @@ from spikes.helix.run_case import digest as sha
 from spikes.helix.run_case import process_identity, publish
 
 from .journal import Journal, records
-from .operations import NativeOperations
+from .ipc import TransportError
+from .operations import NativeOperations, OperationError
 from .operations_by_role import NativeWorkload
 from .schedule import clients, offers, run_schedule, summarize
 
@@ -97,6 +98,60 @@ def daemon_rss(resources):
     return rss
 
 
+def backlog_sample(index):
+    queue = index["queue"]
+    seq = queue["storage_seq"]
+    fields = ("queued", "running", "queued_json_bytes", "storage_seq")
+    if any(type(queue[k]) is not int or queue[k] < 0 for k in fields):
+        raise ValueError("invalid durable queue measurement")
+
+    def progress(generation, watermark):
+        if not generation or type(watermark) is not int or not 0 <= watermark <= seq:
+            raise ValueError("invalid generation watermark")
+        return dict(generation=generation, watermark=watermark, lag=seq - watermark)
+
+    vector = index["vector"]
+    result = {k: queue[k] for k in fields}
+    result["lexical"] = progress(index["generation"], index["lexical_watermark"])
+    result["vector"] = progress(vector["generation"], vector["watermark"])
+    active = index["active_vector"]
+    result["active_vector"] = (
+        progress(active["generation"], index["active_vector_watermark"])
+        if active is not None
+        else None
+    )
+    return result
+
+
+def has_backlog_sample(row):
+    try:
+        info = row["backlog"]
+        seq = info["storage_seq"]
+        return (
+            type(row.get("status_storage_seq")) is int
+            and 0 <= row["status_storage_seq"] <= seq
+            and (info["queued"] == 0) == (info["queued_json_bytes"] == 0)
+            and all(
+                type(info[k]) is int and info[k] >= 0
+                for k in ("queued", "running", "queued_json_bytes", "storage_seq")
+            )
+            and all(
+                isinstance(info[k]["generation"], str)
+                and info[k]["generation"]
+                and type(info[k]["watermark"]) is int
+                and 0 <= info[k]["watermark"] <= seq
+                and info[k]["lag"] == seq - info[k]["watermark"]
+                for k in (
+                    ("lexical", "vector", "active_vector")
+                    if info["active_vector"] is not None
+                    else ("lexical", "vector")
+                )
+            )
+        )
+    except (KeyError, TypeError):
+        return False
+
+
 def assess(report, samples, seconds, target, peak, interval):
     gaps = []
     if not report["complete"]:
@@ -110,6 +165,26 @@ def assess(report, samples, seconds, target, peak, interval):
         latency = report["kinds"].get(kind, {}).get("success_offered_latency_s", {}).get("95")
         if kind in P95 and (latency is None or latency > P95[kind]):
             gaps.append(kind + " p95")
+    races = report.get("correction_races", {})
+    if races.get("invalid") or (
+        report["kinds"].get("correction", {}).get("counts", {}).get("offered")
+        and not races.get("counts", {}).get("contested")
+    ):
+        gaps.append("correction race outcomes")
+    # One minute covers the slowest specified aggregate cadence (ten corrections/minute).
+    # The final partial minute remains visible but is judged with the whole interval.
+    windows = report.get("progress_windows", [])
+    if [(w["start_s"], w["end_s"]) for w in windows] != [
+        (start, min(start + 60, seconds)) for start in range(0, math.ceil(seconds), 60)
+    ]:
+        gaps.append("progress window coverage")
+    for kind, minimum in MINIMUMS.items():
+        if any(
+            w["end_s"] - w["start_s"] == 60
+            and w["successes"].get(kind, 0) < math.ceil(60 * minimum)
+            for w in windows
+        ):
+            gaps.append(kind + " sustained throughput")
     start = interval["started_monotonic_s"]
     end = start + seconds
     valid = [r for r in samples if "daemon" in r and start <= r["observed_monotonic_s"] < end]
@@ -121,6 +196,9 @@ def assess(report, samples, seconds, target, peak, interval):
     }
     if len(ticks) != seconds or any("error" in r for r in samples):
         gaps.append("resource sample coverage")
+    observed = [row["backlog"] for row in valid if has_backlog_sample(row)]
+    if len(ticks) != seconds or len(observed) != len(valid):
+        gaps.append("queue and index sample coverage")
     rss = sorted(daemon_rss(r["resources"]) for r in valid)
     if not rss or rss[math.ceil(0.99 * len(rss)) - 1] > target * 1024**2:
         gaps.append("RSS p99")
@@ -132,6 +210,11 @@ def assess(report, samples, seconds, target, peak, interval):
         gaps=gaps,
         interval_thresholds_pass=not gaps,
         resource_samples=len(valid),
+        backlog_samples=len(observed),
+        queue_high_water={
+            k: max((r[k] for r in observed), default=None)
+            for k in ("queued", "running", "queued_json_bytes")
+        },
         sampled_rss_p99_bytes=rss[math.ceil(0.99 * len(rss)) - 1] if rss else None,
         sampled_rss_max_bytes=max(rss) if rss else None,
         required_duration_executed=seconds >= 1800,
@@ -226,6 +309,17 @@ async def run(plan_path, config_path, root):
         status = await ops.request(dict(op="status"), f"{plan['run_id']}/metrics/{number}")
         if status["pid"] != plan["daemon"]["pid"]:
             raise RuntimeError("status daemon identity changed")
+        # The authenticated index observer reads only the bounded active-job index.
+        try:
+            index = await ops.request(
+                dict(op="index_status", include_queue=True),
+                f"{plan['run_id']}/metrics/{number}/indexes",
+            )
+            backlog = backlog_sample(index)
+            backlog_error = None
+        except (ValueError, TypeError, KeyError, OperationError, TransportError) as error:
+            backlog = None
+            backlog_error = str(error)[:500]
         group_rss = daemon_rss(status["resources"])
         native = status["resources"]["cgroup"]
         group = native["daemon_group"]
@@ -249,6 +343,9 @@ async def run(plan_path, config_path, root):
             daemon=daemon,
             lookup=lookup,
             resources=status["resources"],
+            status_storage_seq=status["storage_seq"],
+            backlog=backlog,
+            backlog_error=backlog_error,
             events=events,
             client_peak_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
             filesystem_free_bytes=shutil.disk_usage(root).free,
@@ -337,7 +434,12 @@ async def run(plan_path, config_path, root):
                 admission_sha256=sha(root / "admission.json"),
             ),
         )
-    report = summarize(records(root / "requests.jsonl"), seconds)
+    report = summarize(
+        records(root / "requests.jsonl"),
+        seconds,
+        records(root / "preparations.jsonl"),
+        plan["oracles"]["corrections"],
+    )
     assessed = assess(report, list(records(root / "metrics.jsonl")), seconds, target, peak, bounds)
     result = dict(
         status="INTERVAL_EXECUTED_PENDING_OFFLINE_ORACLES"

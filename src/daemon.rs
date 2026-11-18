@@ -292,7 +292,7 @@ impl Service {
                 })
                 .await
             }
-            Command::IndexStatus => {
+            Command::IndexStatus { include_queue } => {
                 crate::domain::Domain::new(&self.storage)
                     .permission(&jobs::context()?, Some(&jobs::owner_scope()))?;
                 let mut value = serde_json::to_value(crate::retrieval::Index::status(
@@ -301,8 +301,29 @@ impl Service {
                 )?)?;
                 value["building"] =
                     json!(self.index_epoch.load(std::sync::atomic::Ordering::Acquire) % 2 == 1);
-                value["active_vector"] =
-                    serde_json::to_value(crate::retrieval::active_vector(&self.storage)?)?;
+                let active = crate::retrieval::active_vector(&self.storage)?;
+                if include_queue {
+                    if let Some(active) = &active {
+                        value["active_vector_watermark"] =
+                            if value["vector"]["generation"].as_str() == Some(&active.generation) {
+                                value["vector"]["watermark"].clone()
+                            } else {
+                                let snapshot = self.retrieval_snapshot(active.config_generation)?;
+                                let previous = crate::retrieval::Index::status(
+                                    &self.storage,
+                                    snapshot.resolved(),
+                                )?;
+                                json!(
+                                    previous
+                                        .vector
+                                        .filter(|v| v.generation == active.generation)
+                                        .map(|v| v.watermark)
+                                )
+                            };
+                    }
+                    value["queue"] = self.queue_observation().await?;
+                }
+                value["active_vector"] = serde_json::to_value(active)?;
                 value["searched_content"] = json!("active_memories");
                 Ok(value)
             }

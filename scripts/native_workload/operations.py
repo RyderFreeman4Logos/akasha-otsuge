@@ -6,7 +6,7 @@ import json
 import os
 import time
 
-from .ipc import call
+from .ipc import TransportError, call
 
 
 def digest(value):
@@ -43,16 +43,38 @@ class NativeOperations:
         if command["idempotency_key"] != identity:
             raise ValueError("job identity must equal admitted idempotency key")
         deadline = asyncio.get_running_loop().time() + self.job_timeout_s
+        submitted = False
         try:
             async with asyncio.timeout_at(deadline):
                 job = await self.request(command, identity + "/submit")
+                submitted = True
                 polls = 0
-                while job["state"] not in ("succeeded", "failed", "cancelled"):
+                while True:
+                    if job.get("id") != identity:
+                        raise OperationError("JOB_ID_MISMATCH")
+                    if job["state"] in ("succeeded", "failed", "cancelled"):
+                        break
                     await asyncio.sleep(0.05)
                     polls += 1
                     job = await self.request(
                         dict(op="job_show", id=identity), identity + "/observe/" + str(polls)
                     )
+        except (OperationError, TransportError) as error:
+            if not submitted and not getattr(error, "effect_may_have_started", False):
+                raise
+            code = (
+                error.code
+                if isinstance(error, OperationError)
+                else "TRANSPORT_" + error.phase.upper()
+            )
+            raise OperationError(
+                code,
+                dict(
+                    job_id=identity,
+                    effect_may_have_started=True,
+                    cause=getattr(error, "detail", str(error)),
+                ),
+            ) from error
         except TimeoutError as error:
             raise OperationError(
                 "JOB_COMPLETION_TIMEOUT", dict(job_id=identity, effect_may_have_started=True)
@@ -66,8 +88,6 @@ class NativeOperations:
             raise OperationError(
                 "JOB_" + job["state"].upper(), dict(job_id=identity, error=job.get("error"))
             )
-        if job["id"] != identity:
-            raise OperationError("JOB_ID_MISMATCH")
         return job
 
     async def original_write(self, path, binding, identity):

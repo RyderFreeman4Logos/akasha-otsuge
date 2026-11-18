@@ -88,6 +88,7 @@ class NativeWorkload:
             dict(
                 identity=identity,
                 kind="original_write",
+                job_id=identity,
                 oracle=oracle,
                 frame_sha256=hashlib.sha256(frame).hexdigest(),
                 path=str(path),
@@ -170,7 +171,15 @@ class NativeWorkload:
         await self.prepare(
             dict(identity=identity, kind="correction", pair=pair, ordinal=ordinal, command=command)
         )
-        receipt = await self.operations.correction(command, identity)
+        race = dict(
+            target=memory["revision"]["key"]["id"], base_revision=memory["revision"]["commit_seq"]
+        )
+        try:
+            receipt = await self.operations.correction(command, identity)
+        except OperationError as error:
+            if error.code != "REVISION_CONFLICT":
+                raise
+            return dict(status="conflict", code=error.code, detail=error.detail, race=race)
         if receipt["commit_seq"] <= memory["revision"]["commit_seq"]:
             raise OperationError("CORRECTION_SEQUENCE_MISMATCH")
         expected = dict(
@@ -184,7 +193,12 @@ class NativeWorkload:
             expected, identity + "/verify", at=receipt["commit_seq"]
         )
         return dict(
-            status="success", receipt=receipt, expected=expected, verified=verified, pair=pair
+            status="success",
+            receipt=receipt,
+            expected=expected,
+            verified=verified,
+            pair=pair,
+            race=race,
         )
 
     async def __call__(self, client, ordinal, identity):
@@ -202,6 +216,7 @@ class NativeWorkload:
                     identity=identity,
                     kind=kind,
                     oracle_sha256=hashlib.sha256(encoded(expected)).hexdigest(),
+                    **({"job_id": identity} if kind in ("lexical", "hybrid_vector") else {}),
                 )
             )
             if kind == "current":
@@ -217,10 +232,12 @@ class NativeWorkload:
                 raise ValueError("unknown native operation")
             return dict(status="success", receipt=result)
         except OperationError as error:
-            if kind == "correction" and error.code == "REVISION_CONFLICT":
-                return dict(status="conflict", code=error.code, detail=error.detail)
             # A failed write can have an accepted event or an applied revision.
-            quarantine = kind in ("original_write", "correction")
+            uncertain_job = (
+                isinstance(error.detail, dict)
+                and error.detail.get("effect_may_have_started") is True
+            )
+            quarantine = kind in ("original_write", "correction") or uncertain_job
             if kind == "correction":
                 self.failed_pairs.add((number - 92) // 2)
             return dict(
@@ -235,6 +252,9 @@ class NativeWorkload:
                 self.failed_pairs.add((number - 92) // 2)
             return dict(
                 status="error",
+                detail=dict(job_id=identity)
+                if kind in ("lexical", "hybrid_vector", "original_write")
+                else None,
                 code="TRANSPORT_" + error.phase.upper(),
                 cause=error.cause,
                 quarantine=True,
