@@ -139,17 +139,19 @@ impl Service {
 
     // Revision outbox entries are committed atomically with their source review.
     async fn project_notifications(&self, scan: &mut u64) -> Result<()> {
+        const PAGE: u64 = 32;
         let cursor_key = state_key("notification/cursor".into());
         let cursor = self.storage.current(&cursor_key)?;
-        let start = cursor
+        let durable = cursor
             .as_ref()
             .map(|r| serde_json::from_str::<u64>(&r.content))
             .transpose()?
             .unwrap_or(0)
-            .max(*scan)
             .max(self.storage.import_identity()?.map_or(0, |i| i.commit_seq));
-        let end = self.storage.sequence()?.min(start.saturating_add(32));
+        let start = durable.max(*scan);
+        let end = self.storage.sequence()?.min(start.saturating_add(PAGE));
         let mut external = start;
+        let mut saw_notification_source = false;
         for seq in start + 1..=end {
             let entry = self
                 .storage
@@ -169,6 +171,7 @@ impl Service {
                 } else {
                     continue;
                 };
+                saw_notification_source = true;
                 let id = hash(reference.key.id.as_bytes());
                 let existing = match self.notification(&id) {
                     Ok(value) => Some(value),
@@ -265,8 +268,9 @@ impl Service {
                     .await?;
             }
         }
-        // Our own writes also enter the outbox; never checkpoint only those writes.
-        if external > start {
+        // A short tail of unrelated revisions is cheap to replay after restart.
+        // Checkpoint notification sources immediately and never advance just for our own writes.
+        if external > start && (saw_notification_source || external - durable >= PAGE) {
             self.storage
                 .commit(&CommitRequest {
                     request_id: format!("notification/cursor/{start}/{external}"),

@@ -446,6 +446,62 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn unrelated_notification_tail_replays_after_reopen_with_bounded_cursor_writes() {
+        let (directory, mut service, _) = fixture("notification-tail", "").await;
+        let cursor = RecordKey {
+            kind: RecordKind::State,
+            id: "notification/cursor".into(),
+        };
+        let first = service.storage.sequence().unwrap();
+        let mut scan = 0;
+        let mut last_source = 0;
+        let mut tail_replayed = false;
+        for i in 0..72 {
+            if i == 12 {
+                tail_replayed = service.storage.current(&cursor).unwrap().is_none();
+                service.storage.close().await.unwrap();
+                drop(service);
+                (service, _) = service_at(&directory.0, "").await;
+                scan = 0;
+            }
+            let committed = service
+                .storage
+                .commit(&CommitRequest {
+                    request_id: format!("unrelated/{i}"),
+                    config_generation: 1,
+                    policy_revision: None,
+                    changes: vec![Change {
+                        key: RecordKey {
+                            kind: RecordKind::State,
+                            id: format!("unrelated/{i}"),
+                        },
+                        expected_revision: None,
+                        content: "{}".into(),
+                    }],
+                })
+                .await
+                .unwrap();
+            last_source = committed.commit_seq;
+            service
+                .advance_notifications(&mut scan, &mut None, true)
+                .await
+                .unwrap();
+            assert!(scan >= last_source);
+        }
+        let writes = (first + 1..=service.storage.sequence().unwrap())
+            .map(|seq| service.storage.outbox(seq).unwrap().unwrap())
+            .filter(|entry| entry.revisions.len() == 1 && entry.revisions[0].key == cursor)
+            .count();
+        assert_eq!(writes, 2);
+        assert!(tail_replayed);
+        let durable: u64 =
+            serde_json::from_str(&service.storage.current(&cursor).unwrap().unwrap().content)
+                .unwrap();
+        assert!(durable < last_source && last_source - durable < 32);
+        service.storage.close().await.unwrap();
+    }
+
+    #[tokio::test]
     async fn scheduler_error_collects_a_sibling_physical_batch() {
         let (fixture, service, binding) = fixture("sibling-owner", "").await;
         let path = fixture.0.join("capture.jsonl");
