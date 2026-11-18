@@ -75,8 +75,6 @@ def prepare(task, args, private, result):
         flags.append("live change and publication barrier")
     if case.get("missing_event_ids"):
         flags.append("unavailable historical originals")
-    if case["hint"] is not None:
-        flags.append("registered hint delivery")
     withdrawals = withdrawn_revisions(case, native)
     sources = case["sources"]
     if (

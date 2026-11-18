@@ -80,7 +80,7 @@ pub async fn run() -> Result<()> {
     let home = Path::new("/home/fixture/.codex");
     let case: Value = serde_json::from_slice(&fs::read(root.join("episode.json"))?)?;
     let caller = &case["caller"];
-    assert!(case.get("oracle").is_none() && case["hint"].is_null());
+    assert!(case.get("oracle").is_none());
     let seed_path = root.join("seed.json");
     let seed: Option<Value> = seed_path
         .exists()
@@ -149,7 +149,9 @@ pub async fn run() -> Result<()> {
     let tool_call_id = get("call_id")?;
     let task = get("current_task")?;
     assert_eq!(task, case["current_task"]);
-    assert!(transport["hint"].is_null());
+    let hint: Option<String> = serde_json::from_value(transport["hint"].clone())?;
+    let args = ConsultArgs::new(hint)?;
+    assert_eq!(json!(args.hint), case["hint"]);
     let branch = thread_id.to_owned();
     let source = SourceIdentity {
         adapter: "codex".into(),
@@ -281,11 +283,19 @@ pub async fn run() -> Result<()> {
                 binary: binary.into(),
                 home: home.into(),
             },
-            ConsultArgs::new(None)?,
+            args,
         )
         .await?;
     let id = queued["id"].as_str().ok_or(Error("JOB_CORRUPT"))?;
-    emit(json!({"type":"queued","id":id,"state":queued["state"]}))?;
+    let persisted = service
+        .job(id)?
+        .1
+        .consult_plan
+        .ok_or(Error("JOB_CORRUPT"))?;
+    let persisted = serde_json::to_value(persisted)?;
+    let persisted_hint = &persisted["args"]["hint"];
+    assert_eq!(persisted_hint, &case["hint"]);
+    emit(json!({"type":"queued","id":id,"state":queued["state"],"persisted_hint":persisted_hint}))?;
     let snapshot = service.config.pin();
     let preflight = transport["preflight"] == true;
     let before = crate::retrieval::Index::status(&service.storage, snapshot.resolved())?;

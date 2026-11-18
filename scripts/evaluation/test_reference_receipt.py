@@ -32,6 +32,138 @@ class ReceiptTests(unittest.TestCase):
         flags = [part for name in names for part in ("--" + name, str(self.root))]
         return ["reference_direct", *flags, "--output", str(self.output)]
 
+    def test_unregistered_consult_argument_stops_before_service_submission(self):
+        for registered, supplied in (
+            (None, {"hint": "extra"}),
+            ("exact", {}),
+            ("exact", {"hint": "other"}),
+        ):
+            with self.assertRaisesRegex(ValueError, "registered hint"):
+                asyncio.run(
+                    driver.reference_consult.submit(
+                        None,
+                        None,
+                        {"hint": registered},
+                        {},
+                        "thread",
+                        "turn",
+                        "tool",
+                        supplied,
+                    )
+                )
+
+    def test_hint_never_changes_registered_task_or_other_unavailable_inputs(self):
+        tasks = {t["id"]: t for t in driver.read_reference()[1]}
+        results = driver.ROOT / "docs/benchmarks/results/mvp027"
+        prior = json.loads(
+            gzip.decompress((results / "registered-arms-r1.json.gz").read_bytes())
+        )
+        others = [
+            x
+            for x in prior["remaining_registered_inputs"]
+            if x["task"] != "C03" and not x["task"].endswith("-hint")
+        ]
+        self.assertEqual(len(others), 36)
+        for old in others:
+            with (
+                tempfile.TemporaryDirectory(dir=self.root) as d,
+                self.assertRaises(
+                    driver.reference_episode.EpisodeUnavailable
+                ) as caught,
+            ):
+                driver.reference_episode.prepare(tasks[old["task"]], None, Path(d), {})
+            self.assertEqual(str(caught.exception), old["reason"])
+        for i in range(1, 11):
+            none, hinted = [tasks[f"I{i:02}-{v}"] for v in ("none", "hint")]
+            left, right = [
+                driver.main_input(driver.reference_episode.input_only(t))
+                for t in (none, hinted)
+            ]
+            self.assertEqual(left["input"], right["input"])
+            self.assertEqual(
+                right["input"], [{"type": "text", "text": hinted["current_task"]}]
+            )
+            self.assertTrue(
+                right["developerInstructions"].endswith(
+                    json.dumps(hinted["hint"], ensure_ascii=False)
+                )
+            )
+            self.assertEqual(
+                driver.reference_consult.tool(hinted["hint"])["inputSchema"][
+                    "required"
+                ],
+                ["hint"],
+            )
+            self.assertEqual(
+                driver.reference_consult.tool(None)["inputSchema"]["properties"], {}
+            )
+
+    def test_all_native_hint_pairs_share_main_input_and_bind_only_scoped_originals(
+        self,
+    ):
+        results = driver.ROOT / "docs/benchmarks/results/mvp027"
+        archive = json.loads(
+            gzip.decompress(
+                (results / "registered-hint-preflights-r1.json.gz").read_bytes()
+            )
+        )
+        tasks = {t["id"]: t for t in driver.read_reference()[1]}
+        seen = set()
+        for entry in archive["runs"]:
+            r = entry["receipt"]
+            key = r["task_id"], r["strategy"]
+            self.assertNotIn(key, seen)
+            seen.add(key)
+            task = tasks[key[0]]
+            self.assertEqual(entry["exit_code"], 0)
+            self.assertFalse(r["model_turn_submitted"] or r["model_turn_accepted"])
+            self.assertNotIn("auth", r)
+            self.assertEqual(
+                r["main_input_sha256"],
+                driver.digest(driver.encoded(driver.main_input(task))),
+            )
+            self.assertEqual(
+                r["task_utf8_sha256"], driver.digest(task["current_task"].encode())
+            )
+            self.assertEqual(
+                r["hint_sha256"],
+                None if task["hint"] is None else driver.digest(task["hint"].encode()),
+            )
+            self.assertEqual(r["binding"]["scope"], task["caller"]["scope"])
+            if key[1] == "consult":
+                self.assertEqual(r["queued"]["persisted_hint"], task["hint"])
+                self.assertEqual(
+                    r["invocation"]["current_request"]["utf8_sha256"],
+                    r["task_utf8_sha256"],
+                )
+                self.assertEqual(
+                    r["invocation"]["historical_ordinals"],
+                    [s["sequence"] for s in task["sources"]],
+                )
+                ready = r["preparation"]["ready_search"]
+                self.assertEqual(
+                    ready["permission_revision"], r["binding"]["grant"]["commit_seq"]
+                )
+                self.assertEqual(ready["model_calls"], [])
+            elif task["hint"]:
+                control = r["hint_control_read"]
+                self.assertEqual(control["scope"], task["caller"]["scope"])
+                sources = {s["id"]: s for s in task["sources"]}
+                for item in control["items"]:
+                    self.assertEqual(item["scope"], control["scope"])
+                    for src in item["sources"]:
+                        self.assertIn(src["id"], task["caller"]["allowed_event_ids"])
+                        self.assertEqual(src["text"], sources[src["id"]]["text"])
+                        self.assertEqual(src["sha256"], sources[src["id"]]["sha256"])
+                        self.assertTrue(src["receipt"])
+        expected = [
+            "C03",
+            *(f"I{i:02}-{v}" for i in range(1, 11) for v in ("none", "hint")),
+        ]
+        self.assertEqual(
+            seen, {(tid, arm) for tid in expected for arm in ("direct", "consult")}
+        )
+
     def test_withdrawal_requires_matching_native_rejection_and_frozen_original(self):
         task = next(t for t in driver.read_reference()[1] if t["id"] == "C03")
         case = driver.reference_episode.input_only(task)
