@@ -1,15 +1,15 @@
 # Active work and complete remaining checklist
 
-At the 2026-11-18 13:30 UTC check, 23 original issues had passed their acceptance criteria. Six GitHub issues were open.
+At the 2026-11-18 14:00 UTC check, 23 original issues had passed their acceptance criteria. Six GitHub issues were open.
 
 | Issue | Verified work and outstanding acceptance |
 | --- | --- |
 | [#12](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) | [#88](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/88) verified Claude Code 2.1.311 and 2.1.322 with the local protocol fixture. The authenticated native run and a trusted fork-parent identity remain open. |
-| [#26](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26) | The [downloaded package](../benchmarks/results/mvp026-linux-package/hosted-4e7b3a2.json) passed Pi installation, upgrade, rollback and neutral restore. Verify the complete set of published guide commands. |
-| [#27](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) | [#87](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/87) published 60 frozen imports and three historical controls. Verify the remaining fixture gaps, model responses, blind judgments, costs and host combinations. |
+| [#26](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26) | The [downloaded package](../benchmarks/results/mvp026-linux-package/hosted-4e7b3a2.json) passed Pi installation, upgrade, rollback and neutral restore. The [guide command checks](../benchmarks/results/mvp026-linux-package/four-host-guide-commands.json) passed for default and custom settings and all four hosts. The explicit Claude and full-scale dependencies remain open in #12 and #65. |
+| [#27](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) | [#87](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/87) published 60 frozen imports and three historical controls. The first 13 tasks have receipts for both model strategies. Native preflights cover 24 tasks. Complete the remaining input mappings, model runs, blind judgments, cost comparisons and host combinations. |
 | [#28](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/28) | The [24-requirement matrix](acceptance-matrix.md) tracks acceptance, final release and artifact readback. |
 | [#65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65) | [#76](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/76) and [#82](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/82) delivered native index maintenance and the workload runner. Complete the full import, index and recall checks, 100,000 history changes, resource profiles, two 30-minute 100-client runs and recovery criteria. |
-| [#84](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/84) | [#86](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/86) covers preservation of the published index during rebuild, interrupted activation and retirement. Final integration checks remain open. |
+| [#84](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/84) | [#86](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/86) covers preservation of the published index during rebuild, interrupted activation and retirement. The final integrated commit passed local checks, including 186 installed daemon tests. The hosted check is pending. |
 
 Post-merge readback found #24 automatically marked completed at
 2026-11-11T07:31:41Z even though PR64 covered only software controls.

@@ -1,0 +1,115 @@
+{
+  "archive_sha256": "4cc09f4c5d0cb51f7d778d181bdf74747bf4876402c2ee136e8b5652b07509a8",
+  "guides": {
+    "linux_install": "20ccb610f42c55a6d217c792f54107e43ebb8d71",
+    "neutral": "e364aee7fcd60a59b14f9cc5220cdd48dd2d2ea4"
+  },
+  "guides_at_runtime": {
+    "linux_install_sha256": "9d05b454b937969ab86ae7d0ff7fd408965d66870ba3e990db0a1e0785f804ce",
+    "neutral_sha256": "c8e0ec9ebfee2b5518519eec3608e14fbe0509f1a846b54f9198387899d57bd7"
+  },
+  "hosted_run": "https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/44311528619",
+  "hosts": {
+    "claude": {
+      "doctor_sha256": "6e79ac121ecafa1638217bb2a061acba1ae8364be09ef79039d83b9b01ec28d5",
+      "install_sha256": "7ac9159b682f081c5a0c2f839ac109a5c03ac99f964300af81a51ad1e6f3be3f",
+      "model_calls": 0,
+      "offline_launch": {
+        "exit": 1,
+        "no_prompt_submitted": true,
+        "terminal": "WelcometoClaudeCode",
+        "terminal_sha256": "2b37e42352be4a277cf98adb6a3b44bd08f3e26d3ff1d0b6c3a572a286e77efa"
+      },
+      "offline_result": "Welcome shown. An offline run reported that api.anthropic.com could not be reached. No authenticated inference was exercised.",
+      "source_receipt_sha256": "eb6667342be08323390dc71a16a9f4f121f655d73276ce72b6fb0aeeada158f6",
+      "uninstall_sha256": "aa88c2f661777c494b5109d585c41819b12a118dc868e133514375f318ecdb07",
+      "user_sentinel_preserved": true,
+      "version": "2.1.311 (Claude Code)"
+    },
+    "codex": {
+      "install_sha256": "2ac3aeb97fc2339b9a20af7d29b1386dbe6dde2fe1f4aa9fbb954e3e0116fe4f",
+      "model_calls": 0,
+      "offline_launch": {
+        "exit": 0,
+        "no_prompt_submitted": true,
+        "terminal": "OpenAI Codex",
+        "terminal_sha256": "b09540f38551e93b7900e5536b7df9e6cf76fd957f859b8792140d5795fe06c6"
+      },
+      "source_receipt_sha256": "807b59ac91f73c8463aa723429fc38417cab2a321066b6efd70a2431b2de0668",
+      "uninstall_sha256": "c64f90cde3b5eba21cf580460161fdecd7f289b46d14e35b111acd97b010738a",
+      "user_sentinel_preserved": true,
+      "version": "codex-cli 0.164.0"
+    },
+    "hermes": {
+      "install_sha256": "83e26ae59e83f65ddde2f6e81751f28835d0e559edc91cb75aa4dee9016e475b",
+      "model_calls": 0,
+      "profile_settings": "Native enable and disable were observed in isolated legacy plug-in manager settings.",
+      "source_receipt_sha256": "56c613b5d9090a2a94a3a9d79c4ea20e32c0981fdad848e7f7326d2dd9fa9a58",
+      "uninstall_sha256": "9be283fa6c7393d86773312987e46944f8a5483bca9d8d925506eb51b0cd983f",
+      "user_sentinel_preserved": true,
+      "version": "Hermes Agent v0.22.5+1915.g4960e41 (2026.9.24) · upstream 226e8de8 · local 4960e41c (+44275 carried commits)"
+    },
+    "pi": {
+      "doctor_sha256": "73ee0777337711411a068a0990b51a4da89f41ceae530134ab1fb0986e8773a0",
+      "install_sha256": "34afaaa903cc3c668dabca26be6f41b653da0fcf6bba34cb0c0b80ed94c89372",
+      "model_calls": 0,
+      "source_receipt_sha256": "8b780c692de04b7da8fe0518a7599a169a74ff9571f7302e75de437b52a8865b",
+      "uninstall_sha256": "83f790ea87e967575838a3981e7d1f18d020c7306c7b638fcfbb20d281e0bf73",
+      "user_sentinel_preserved": true,
+      "version": "1.4.0"
+    }
+  },
+  "installed_binary_sha256": "8c0114b2803df101fcebb934a9c1bd170abf67b522b5775c820b14e69c1c1133",
+  "linux_install_examples": {
+    "before_fix_custom_stop_negative_sha256": "7085d3b0491455d7c6e16e460edf6140341f3745ecaefd61c3378f654a0bfad9",
+    "custom": {
+      "all_five_blocks": "passed",
+      "config_preserved": true,
+      "selected_daemon_exited": true,
+      "source_receipt_sha256": "c28a38169133699f2cec54a910c70a9f3a9cb2b0452ff3eec6042c8d297fbc9b",
+      "store_and_rollback_preserved": true,
+      "unrelated_default_preserved": true
+    },
+    "default": {
+      "all_five_blocks": "passed",
+      "config_preserved": true,
+      "selected_daemon_exited": true,
+      "source_receipt_sha256": "7fcab836b29a43a5b3227fcdd06852abb4d17194d0dcfdd749e41df73e8aaa70",
+      "store_and_rollback_preserved": true,
+      "unrelated_default_preserved": null
+    }
+  },
+  "neutral_examples": {
+    "before_fix_negative_log_sha256": "3899ac7f13a23ffa3a5bafbbcb1bea26ba94491d57001905c4dc785a79edb4f1",
+    "block_count": 3,
+    "socket_mode": "0600",
+    "source_receipt_sha256": "42df668f68bdf487e08e9c0daa5aea282dc70876a7d83bab24736f36ba8d5de6",
+    "store_mode": "0700"
+  },
+  "package_upgrade_and_restore": {
+    "config_preserved": true,
+    "normalized_bytes": 528384,
+    "original_events": 129,
+    "raw_bytes": 528384,
+    "rollback_binary_and_config_exact": true,
+    "unchanged_prior_commits": 30
+  },
+  "published_source": "4e7b3a2799ebc2055750eb044b056cc1d887625a",
+  "schema_version": 1,
+  "scope": "Issue 26 Linux x86_64 operator examples on the published artifact; each host ran with its own isolated home.",
+  "separate_acceptance": {
+    "12": "Authenticated Claude subscription. This run used no credentials.",
+    "65": "50 GB / 100-client scaling and recovery."
+  },
+  "single_host": {
+    "ack_replayed": true,
+    "billed_usd": 0,
+    "consult_status": "found",
+    "delivery": "sent",
+    "other_hosts_absent_on_path": true,
+    "pi_version": "1.4.0",
+    "proposal_authority": "candidate",
+    "real_model_calls": 0,
+    "review_state": "investigating"
+  }
+}

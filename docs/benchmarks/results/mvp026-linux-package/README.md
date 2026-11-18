@@ -4,6 +4,7 @@ The [hosted download receipt](hosted-4e7b3a2.json) records a clean Linux x86_64 
 
 Pi 1.4.0 captured an event, obtained a consult result, entered review and delivered a notification from this archive. The upgrade and rollback preserved 129 originals, 30 earlier commits and the queued job. Restoring the neutral archive in a fresh store reproduced all three exported files byte for byte. The Pi fixture used its local test provider.
 
+The five installation examples passed with both default and custom settings. Removing the custom instance left the default daemon running at its original PID. All three neutral archive examples passed after the guide was corrected to wait for shutdown. Codex and Claude opened their native welcome screens, Hermes enabled and disabled the plugin, and Pi completed a single-host workflow. Each uninstall preserved an unrelated user file. Claude subscription inference is tracked in issue #12. [Four-host command receipt](four-host-guide-commands.json)
 
 The [x86_64 receipt](candidate-3961ac0.json) records two byte-identical packaging runs on 2026-11-18 from source `3961ac03819c23b179beb0ac4512ad67c51f3be9`. Both used the same toolchain, checkout and Cargo cache. A fresh Linux namespace with a read-only host userland, private network, empty HOME/XDG directories and the real Pi 1.4.0 installation ran the archive's binary. The manifest contained 487 compiled third-party packages and 293 distinct notice texts. The upgrade test verified the digest of every referenced text.
 
