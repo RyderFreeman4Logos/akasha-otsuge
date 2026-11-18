@@ -11,6 +11,7 @@ import signal
 import stat
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -227,6 +228,7 @@ async def stop(p):
 
 
 async def run(args, private, result):
+    preparing = time.monotonic()
     manifest, tasks = read_reference()
     task = next(t for t in tasks if t["id"] == "H01")
     case = {
@@ -275,7 +277,6 @@ async def run(args, private, result):
         prompt_sha256=digest(INSTRUCTIONS.encode()),
         config_sha256=cfg,
         sanitized_model_catalog_sha256=catalog,
-        strategy=args.strategy,
         tools=[tool["name"]],
         profile=profile["model"],
         reasoning=profile["reasoning_effort"],
@@ -284,9 +285,9 @@ async def run(args, private, result):
     db.mkdir()
     state = host = None
     error_stream = []
-    timers = {}
     clock = time.monotonic
     started = clock()
+    timers = {"preparation_s": started - preparing}
 
     async def frame():
         line = await host.stdout.readline()
@@ -546,6 +547,7 @@ async def run(args, private, result):
 
 
 def main():
+    invocation_start = time.monotonic()
     parser = argparse.ArgumentParser(description=__doc__)
     for key in (
         "codex",
@@ -583,12 +585,17 @@ def main():
         cwd=ROOT,
         check=True,
     )
-    assert not args.output.exists()
     os.umask(0o077)
-    import tempfile
+    attempt_kind = "model_arm"
+    if args.preflight:
+        attempt_kind = "offline_preflight"
+    elif args.setup_only:
+        attempt_kind = "setup_only"
 
     result = {
         "utc": datetime.datetime.now(datetime.UTC).isoformat(),
+        "strategy": args.strategy,
+        "attempt_kind": attempt_kind,
         "model_turn_submitted": False,
         "model_turn_accepted": False,
         "reads": [],
@@ -598,22 +605,66 @@ def main():
         "incremental_billed_cost": None,
         "incremental_cost_visibility": "No per-turn monetary invoice or account-level quota delta is exposed by this harness.",
     }
-    with tempfile.TemporaryDirectory(dir=args.scratch, prefix="isolated-") as d:
+    # Claim once before any account access. A killed process leaves this receipt for inspection.
+    try:
+        claim = args.output.open("x")
+    except OSError as err:
+        parser.exit(2, f"Cannot reserve receipt {args.output}: {err.strerror}\n")
+    with claim as claimed:
+        json.dump(
+            {
+                "status": "IN_PROGRESS",
+                "utc": result["utc"],
+                "strategy": args.strategy,
+                "attempt_kind": result["attempt_kind"],
+            },
+            claimed,
+        )
+        claimed.write("\n")
+        claimed.flush()
+        os.fsync(claimed.fileno())
+
+    # Allocate the sibling before the turn and publish atomically over our own claim.
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        dir=args.output.parent,
+        prefix="." + args.output.name + "-",
+        delete=False,
+    ) as final:
+        pending = Path(final.name)
         try:
+            finish_attempt(args, result)
+            result.setdefault("timing", {})["invocation_wall_s"] = (
+                time.monotonic() - invocation_start
+            )
+            json.dump(result, final, indent=2, ensure_ascii=False)
+            final.write("\n")
+            final.flush()
+            os.fsync(final.fileno())
+            os.replace(pending, args.output)
+        finally:
+            pending.unlink(missing_ok=True)
+    print(result["status"], sha(args.output))
+    if result["status"] == "HARNESS_OR_HOST_FAILURE" or (
+        "terminal" in result and result["terminal"]["status"] != "completed"
+    ):
+        raise SystemExit(1)
+
+
+def finish_attempt(args, result):
+    d = None
+    try:
+        with tempfile.TemporaryDirectory(dir=args.scratch, prefix="isolated-") as d:
             asyncio.run(asyncio.wait_for(run(args, Path(d), result), timeout=1700))
-        except Exception as err:  # noqa: BLE001 - persist the original failure for every episode
-            result["status"] = "HARNESS_OR_HOST_FAILURE"
-            result["failure"] = {
-                "class": type(err).__name__,
-                "message": clean_error(err),
-            }
-    result["private_scratch_removed"] = not Path(d).exists()
+    except Exception as err:  # noqa: BLE001 - persist the original failure for every episode
+        result["status"] = "HARNESS_OR_HOST_FAILURE"
+        result["failure"] = {
+            "class": type(err).__name__,
+            "message": clean_error(err),
+        }
+    result["private_scratch_removed"] = d is None or not Path(d).exists()
     result["driver_sha256"] = sha(Path(__file__))
     result["consult_driver_sha256"] = sha(Path(reference_consult.__file__))
-    dump(args.output, result)
-    print(result["status"], sha(args.output))
-    if result["status"] == "HARNESS_OR_HOST_FAILURE":
-        raise SystemExit(1)
 
 
 if __name__ == "__main__":

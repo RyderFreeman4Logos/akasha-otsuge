@@ -60,7 +60,7 @@ def service_command(args, private, case, profile, sandbox, dump, sha):
         "route_validation": "isolated config, exclusive catalog; native runner checks returned model against catalog",
         "global_auth": "absent"
         if args.preflight
-        else "read-only subscription credential mounted only for the native client",
+        else "read-only subscription credential shared by the service observer and its native client in their OS namespace",
         "workspace": "/work",
         "history_count": len(case["sources"]),
     }
