@@ -1,0 +1,74 @@
+{
+  "source_commit": "69b007ea012442b93e1445a9ccbd5fbd38677649",
+  "tree": "008d681fcc2f5c80671ddf4e99e07bf0e6c6c202",
+  "ci_run": 44394901524,
+  "github_artifact_id": 14472371047,
+  "archive_sha256": "e510cb8beeb6babbd154a2b777686fdebc64053f1383dc1c225ab92dceccfa5c",
+  "binary_sha256": "68e2a7bde7349ca035175d4c1aa6bdd19c69859e2b84936544909836667539e5",
+  "local_endpoints_only": true,
+  "external_model_requests": 0,
+  "process_driver_sha256": "baa93e0220591af285e17b0cc45bb13dcf702d3c5b48ec9c71b2a1bbb93a6e86",
+  "approval_sha256": "816b874219bcc573e0df716ececd7b2fc105fa19d92d76fcecfdc3e5719d7259",
+  "terminal_sha256": "45801ff25522dda1e59fd9ea8e362758e5da26e580eef45c0e1f3bf982be30e4",
+  "outcomes": {
+    "provider": {
+      "started_utc": "2026-11-18T21:06:21.417318+00:00",
+      "finished_utc": "2026-11-18T21:34:48.669691+00:00",
+      "harness_elapsed_s": 1707.2429148685187,
+      "raw_receipt_sha256": "b8f77620c889dbbcb165ab6ce9a8d1ed8022ab7c65a093c24799a0fc454cde42",
+      "endpoint": "two independently controlled loopback HTTP endpoints",
+      "observed_provider_requests": {
+        "success": 1,
+        "over": 1
+      },
+      "jobs": {
+        "over": {
+          "terminal": "failed",
+          "error": "PROVIDER_TIMEOUT",
+          "provider_configured_ms": 1700000,
+          "provider_effective_ms": 1700000,
+          "provider_elapsed_ms": 1700001,
+          "job_terminal_observed_s": 1705.960698311,
+          "triggered_layer": "provider",
+          "attempt": 1
+        },
+        "success": {
+          "terminal": "succeeded",
+          "error": null,
+          "provider_configured_ms": 1700000,
+          "provider_effective_ms": 1700000,
+          "provider_elapsed_ms": 1605170,
+          "job_terminal_observed_s": 1610.659724421,
+          "triggered_layer": null,
+          "attempt": 1
+        }
+      },
+      "actual_endpoint_overlap": {
+        "observed_after_both_jobs_terminal": true,
+        "over_request_after_success_ms": 99,
+        "success_request_after_over_ms": 0,
+        "success_response_ms": 1605064
+      },
+      "owned_processes_and_endpoint_threads_ended": true
+    },
+    "runner": {
+      "started_utc": "2026-11-18T21:06:20.337364+00:00",
+      "finished_utc": "2026-11-18T21:33:14.564663+00:00",
+      "harness_elapsed_s": 1614.2180387014523,
+      "raw_receipt_sha256": "a2b2ba12714fa6e6d28265781ff56dd31983f4266ad0f8be0bf7fbbf09f90138",
+      "native_host": "Pi 1.4.0",
+      "endpoint": "deterministic private loopback with no HTTP response for 1605 seconds",
+      "configured_runner_s": 1700,
+      "effective_remaining_at_native_launch_s": 1699.9807963371277,
+      "observed_response_wait_s": 1605.000705522485,
+      "native_launch_to_observed_terminal_s": 1606.4460723204538,
+      "job_state": "succeeded",
+      "native_runs": 1,
+      "result": "found",
+      "scope_user_bound": true,
+      "verified_original_bytes": 57,
+      "source_sha256": "1eb2ff11c39af2d8e60e2f9f8d019ff3581ef98086e24b2e508190337b72afbf",
+      "scratch_removed": true
+    }
+  }
+}

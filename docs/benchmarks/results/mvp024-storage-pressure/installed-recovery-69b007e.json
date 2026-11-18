@@ -1,0 +1,204 @@
+{
+  "artifact": {
+    "source_commit": "69b007ea012442b93e1445a9ccbd5fbd38677649",
+    "tree": "008d681fcc2f5c80671ddf4e99e07bf0e6c6c202",
+    "ci_run": 44394901524,
+    "github_artifact_id": 14472371047,
+    "archive_sha256": "e510cb8beeb6babbd154a2b777686fdebc64053f1383dc1c225ab92dceccfa5c",
+    "binary_sha256": "68e2a7bde7349ca035175d4c1aa6bdd19c69859e2b84936544909836667539e5"
+  },
+  "scope": "Six isolated recovery checks on writable clones of one closed store. All six ended with independent native verification of the same 630 original sources. These counts overlap. The 50 GB import and full-scale workload have separate acceptance criteria.",
+  "source": {
+    "files": 43,
+    "apparent_bytes": 24753943,
+    "tree_sha256": "d6d03375642856ef5f20bc0f298f407d3ea8f6a31a2fbfce9cc8c49acd218b8e"
+  },
+  "cold_reopen_after_sigkill": {
+    "opened_budget": 2048,
+    "reopened_budget": 512,
+    "process_cold": true,
+    "host_page_cache_evicted": false,
+    "target": 6852,
+    "retry_target": 6864,
+    "retry_state": "succeeded",
+    "current_reads_per_phase": 8,
+    "scoped_searches_after_build": 16,
+    "history": {
+      "members": 100,
+      "page_lengths": [
+        32,
+        32,
+        32,
+        4
+      ],
+      "read_seq": 243
+    },
+    "originals": {
+      "bytes": 2580480,
+      "count": 630,
+      "response_sha": "adeb0ef9b431ca19c625417aebbcdfbb1320dc9fa153520c3f22baaf50ebdd28",
+      "snapshot": 7379
+    },
+    "budget_unit": "MiB",
+    "published_lexical_watermark": 2119,
+    "published_vector_watermark": 2119,
+    "candidate_lexical_watermark": 32,
+    "candidate_vector_watermark": 0,
+    "recovered_job_error": "PROVIDER_INTERRUPTED",
+    "final_candidate_matches_interrupted_build": true,
+    "final_lexical_watermark": 6864,
+    "final_vector_watermark": 6864,
+    "private_receipt_sha256": "427b14d72eb78917508ec2d61fca043283d166d7a2531b343e034cb4d9ce16aa"
+  },
+  "hot_budget_decrease_during_build": {
+    "storage_open_during_mib": 2048,
+    "requested_mib": 512,
+    "effective_low_mib": 512,
+    "same_pid": true,
+    "pressure": {
+      "code": "RESOURCE_BUSY",
+      "retry_when": "capacity_available"
+    },
+    "new_key_initially_absent": true,
+    "old_task_state": "succeeded",
+    "retried_state": "succeeded",
+    "drain_observations": 47,
+    "seconds_from_release_until_low": 4.8904,
+    "low_cgroup_high_bytes": 536870912,
+    "low_cgroup_max_bytes": 671088640,
+    "originals": {
+      "bytes": 2580480,
+      "count": 630,
+      "response_sha": "a8139b383e9ae3723787ffa8e28c0811ff198748761b9ba8532c43074c05431b",
+      "snapshot": 7405
+    },
+    "private_receipt_sha256": "ebf374a2f7c1899570f9a84255c94377ca4a29d5920f448d1347e792f6007ea2"
+  },
+  "damaged_storage": [
+    {
+      "kind": "authority-format",
+      "history": {
+        "members": 100,
+        "page_lengths": [
+          32,
+          32,
+          32,
+          4
+        ],
+        "read_seq": 243
+      },
+      "originals": {
+        "bytes": 2580480,
+        "count": 630,
+        "response_sha": "9dac4c2d3d35154b50dbb548da7648bd1350840067a7fe41c3bd187f78eb4ca3",
+        "snapshot": 6918
+      },
+      "socket_published": false,
+      "first_exit": 1,
+      "typed_error": "UNSUPPORTED_STORAGE_FORMAT",
+      "current_witnesses": 8,
+      "scoped_queries": 16
+    },
+    {
+      "kind": "published-lexical",
+      "history": {
+        "members": 100,
+        "page_lengths": [
+          32,
+          32,
+          32,
+          4
+        ],
+        "read_seq": 243
+      },
+      "originals": {
+        "bytes": 2580480,
+        "count": 630,
+        "response_sha": "5358759842e7d7901c88eb975262900fad7060fc70287d81bf5358689aec6a24",
+        "snapshot": 7373
+      },
+      "damaged_query_error": "INDEX_IO",
+      "damaged_query_state": "failed",
+      "rebuild_state": "succeeded",
+      "final_lexical": 149,
+      "final_vectors": 121,
+      "healthy_manifest_bytes": 2353,
+      "fault_bytes": 28,
+      "old_table_retired": true,
+      "current_witnesses": 8,
+      "scoped_queries": 16
+    },
+    {
+      "kind": "published-vector",
+      "history": {
+        "members": 100,
+        "page_lengths": [
+          32,
+          32,
+          32,
+          4
+        ],
+        "read_seq": 243
+      },
+      "originals": {
+        "bytes": 2580480,
+        "count": 630,
+        "response_sha": "5358759842e7d7901c88eb975262900fad7060fc70287d81bf5358689aec6a24",
+        "snapshot": 7373
+      },
+      "damaged_query_error": "INDEX_IO",
+      "damaged_query_state": "failed",
+      "rebuild_state": "succeeded",
+      "final_lexical": 149,
+      "final_vectors": 121,
+      "healthy_manifest_bytes": 1851,
+      "fault_bytes": 28,
+      "old_table_retired": true,
+      "current_witnesses": 8,
+      "scoped_queries": 16
+    },
+    {
+      "kind": "authority-value",
+      "history": {
+        "members": 100,
+        "page_lengths": [
+          32,
+          32,
+          32,
+          4
+        ],
+        "read_seq": 243
+      },
+      "originals": {
+        "bytes": 2580480,
+        "count": 630,
+        "response_sha": "c44b3bcabc4a6ba373199db145b1a65b291e8b6628a034deb0dc16bb8bf45b90",
+        "snapshot": 6852
+      },
+      "one_changed_byte": true,
+      "affected_revision": 25,
+      "unaffected_revision": 33,
+      "typed_errors": [
+        [
+          "current",
+          "STORAGE_ERROR"
+        ],
+        [
+          "historical",
+          "STORAGE_ERROR"
+        ]
+      ],
+      "restored_state": true
+    }
+  ],
+  "damaged_storage_receipt_sha256": {
+    "format_and_manifests": "51525cec60f769a38979ea882589f161c4fadfeb58b456877ee80d4f3a1f9af0",
+    "authority_value": "635f357f9dfb36fb1130476915b4f0a703c338434494ea722211d63266d5bee1"
+  },
+  "limitations": [
+    "A fresh process reopened the store with the host page cache intact.",
+    "The hot-reload observer first assumed the first status sample must already be at the lower budget. The repeated run observed the full drain.",
+    "The first two manifest harness launches stopped during environment setup. The published observations use the corrected third run.",
+    "The runs used loopback lookup of retained embeddings. Hardware power loss, full-corpus recovery and a final published release remain outside these observations."
+  ]
+}
