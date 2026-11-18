@@ -1,4 +1,4 @@
-"""Run either H01 reference strategy against a scoped service using an existing Codex subscription."""
+"""Run either registered reference strategy against a scoped service using an existing Codex subscription."""
 
 import argparse
 import asyncio
@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(ROOT / "scripts"))
 import reference_consult
+import reference_episode
 from check_reference import (
     ERRATA_MANIFEST_SHA256,
     FROZEN_MANIFEST_SHA256,
@@ -231,13 +232,11 @@ async def stop(p):
 async def run(args, private, result):
     preparing = time.monotonic()
     manifest, tasks = read_reference()
-    task = next(t for t in tasks if t["id"] == "H01")
-    case = {
-        k: task[k]
-        for k in ("id", "current_task", "hint", "caller", "sources", "memories")
-    }
-    assert case["hint"] is None and case["sources"] == case["memories"] == []
-    dump(private / "episode.json", case)
+    task_id = getattr(args, "task", "H01")
+    task = next((t for t in tasks if t["id"] == task_id), None)
+    if task is None:
+        raise reference_episode.EpisodeUnavailable("unknown frozen task ID " + task_id)
+    case, area = reference_episode.prepare(task, args, private, result)
     profile = json.loads(
         (ROOT / "docs/evaluation/reference-v1/profile.json").read_bytes()
     )
@@ -256,7 +255,7 @@ async def run(args, private, result):
             ROOT / "scripts/evaluation/reference_service_main.rs"
         )
         state_cmd, result["runner_policy"] = reference_consult.service_command(
-            args, private, case, profile, sandbox, dump, sha
+            args, private, case, profile, sandbox, sha
         )
     else:
         assert build["source_sha256"] == sha(
@@ -272,7 +271,7 @@ async def run(args, private, result):
         codex_sha256=sha(args.codex),
         git_source=BASE,
         authority_build=build["binary_sha256"],
-        episode_input_sha256=sha(private / "episode.json"),
+        episode_input_sha256=sha(area / "episode.json"),
         task=case["current_task"],
         task_utf8_sha256=digest(case["current_task"].encode()),
         prompt_sha256=digest(INSTRUCTIONS.encode()),
@@ -282,8 +281,6 @@ async def run(args, private, result):
         profile=profile["model"],
         reasoning=profile["reasoning_effort"],
     )
-    db = private / "domain"
-    db.mkdir()
     state = host = None
     error_stream = []
     clock = time.monotonic
@@ -317,7 +314,7 @@ async def run(args, private, result):
         assert (
             v["type"] == "scoped_read"
             and v["scope"] == case["caller"]["scope"]
-            and v["read_seq"] == result["binding"]["grant"]["commit_seq"]
+            and v["read_seq"] == result["binding"]["read_seq"]
         )
         return v
 
@@ -338,9 +335,25 @@ async def run(args, private, result):
     drain_task = service_stderr_task = None
     try:
         if not consult:
-            state_cmd = [str(args.observer), str(private / "episode.json"), str(db)]
+            state_cmd = [
+                "unshare",
+                "--user",
+                "--map-root-user",
+                "--net",
+                "--",
+                str(args.observer.resolve()),
+                str(area / "episode.json"),
+                str(area),
+            ]
         state = await asyncio.create_subprocess_exec(
             *state_cmd,
+            env={
+                "PATH": "/usr/bin:/bin",
+                "HOME": str(private),
+                "TMPDIR": str(private),
+                "RAYON_NUM_THREADS": "2",
+                "TOKIO_WORKER_THREADS": "2",
+            },
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -369,6 +382,13 @@ async def run(args, private, result):
                 return
         else:
             result["control_read"] = await scoped(case["current_task"])
+            if args.preflight:
+                if case["memories"]:
+                    miss = await scoped("zz" + digest(case["current_task"].encode()))
+                    assert not miss["items"]
+                    result["unmatched_query_read"] = miss
+                result["status"] = "SYNTHETIC_DIRECT_READ_NO_MODEL_TURN"
+                return
         host = await asyncio.create_subprocess_exec(
             *native_cmd,
             stdin=asyncio.subprocess.PIPE,
@@ -558,6 +578,15 @@ def main():
         "output",
     ):
         parser.add_argument("--" + key, type=Path, required=True)
+    parser.add_argument("--task", default="H01", help="frozen task ID")
+    parser.add_argument(
+        "--importer",
+        type=Path,
+        help="native reference-import binary for nonempty inputs",
+    )
+    parser.add_argument(
+        "--import-build", type=Path, help="build receipt for that importer"
+    )
     parser.add_argument("--strategy", choices=("direct", "consult"), default="direct")
     parser.add_argument(
         "--auth", type=Path, help="private subscription credential for model turns"
@@ -568,8 +597,8 @@ def main():
     parser.add_argument("--preflight", action="store_true")
     parser.add_argument("--setup-only", action="store_true")
     args = parser.parse_args()
-    if args.preflight and (args.strategy != "consult" or args.setup_only):
-        parser.error("--preflight requires the consult strategy")
+    if args.preflight and args.setup_only:
+        parser.error("--preflight and --setup-only are mutually exclusive")
     if not args.preflight and (args.auth is None or args.catalog is None):
         parser.error("native account setup and live turns require --auth and --catalog")
     if not __debug__:
@@ -587,6 +616,7 @@ def main():
     result = {
         "utc": datetime.datetime.now(datetime.UTC).isoformat(),
         "strategy": args.strategy,
+        "task_id": args.task,
         "attempt_kind": attempt_kind,
         "model_turn_submitted": False,
         "model_turn_accepted": False,
@@ -606,6 +636,7 @@ def main():
         json.dump(
             {
                 "status": "IN_PROGRESS",
+                "task_id": args.task,
                 "utc": result["utc"],
                 "strategy": args.strategy,
                 "attempt_kind": result["attempt_kind"],
@@ -637,9 +668,10 @@ def main():
         finally:
             pending.unlink(missing_ok=True)
     print(result["status"], sha(args.output))
-    if result["status"] == "HARNESS_OR_HOST_FAILURE" or (
-        "terminal" in result and result["terminal"]["status"] != "completed"
-    ):
+    if result["status"] in {
+        "HARNESS_OR_HOST_FAILURE",
+        "REGISTERED_INPUT_UNAVAILABLE",
+    } or ("terminal" in result and result["terminal"]["status"] != "completed"):
         raise SystemExit(1)
 
 
@@ -649,7 +681,11 @@ def finish_attempt(args, result):
         with tempfile.TemporaryDirectory(dir=args.scratch, prefix="isolated-") as d:
             asyncio.run(asyncio.wait_for(run(args, Path(d), result), timeout=1700))
     except Exception as err:  # noqa: BLE001 - persist the original failure for every episode
-        result["status"] = "HARNESS_OR_HOST_FAILURE"
+        result["status"] = (
+            "REGISTERED_INPUT_UNAVAILABLE"
+            if isinstance(err, reference_episode.EpisodeUnavailable)
+            else "HARNESS_OR_HOST_FAILURE"
+        )
         result["failure"] = {
             "class": type(err).__name__,
             "message": clean_error(err),
@@ -657,6 +693,7 @@ def finish_attempt(args, result):
     result["private_scratch_removed"] = d is None or not Path(d).exists()
     result["driver_sha256"] = sha(Path(__file__))
     result["consult_driver_sha256"] = sha(Path(reference_consult.__file__))
+    result["episode_driver_sha256"] = sha(Path(reference_episode.__file__))
 
 
 if __name__ == "__main__":

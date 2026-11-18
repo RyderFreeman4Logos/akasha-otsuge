@@ -1,4 +1,4 @@
-"""Run the H01 scoped subscription comparison through the frozen daemon's consult service."""
+"""Run the registered scoped subscription comparison through the frozen daemon's consult service."""
 
 import json
 import re
@@ -13,7 +13,7 @@ TOOL = {
 }
 
 
-def service_command(args, private, case, profile, sandbox, dump, sha):
+def service_command(args, private, case, profile, sandbox, sha):
     from_dir = private / "service"
     from_dir.mkdir(mode=0o700)
     command, version, config_sha, catalog_sha = sandbox(args, from_dir, profile)
@@ -24,8 +24,6 @@ def service_command(args, private, case, profile, sandbox, dump, sha):
         from_dir / "catalog.json", from_dir / "home/.codex/models_cache.json"
     )
     area = private / "authority"
-    area.mkdir(mode=0o700)
-    dump(area / "episode.json", case)
     # Only the evaluator's dynamic loader and its three runtime libraries are shared.
     deps = subprocess.check_output(["ldd", str(args.observer)], text=True)
     library_paths = re.findall(
@@ -100,7 +98,7 @@ async def submit(state, send, case, result, tid, turnid, callid, preflight=False
         and inv["current_request"]["utf8_sha256"] == result["task_utf8_sha256"]
     )
     assert (
-        inv["historical_ordinals"] == []
+        inv["historical_ordinals"] == sorted(s["sequence"] for s in case["sources"])
         and inv["logical_fence"] == case["caller"]["fence_sequence"]
     )
     result["invocation"] = inv
@@ -116,8 +114,9 @@ async def submit(state, send, case, result, tid, turnid, callid, preflight=False
     if preflight:
         assert (
             prepared["cold_search_error"] == "INDEX_NOT_READY"
-            and prepared["concurrent_reservations_accepted"] == 2
-        )
+            if not case["sources"]
+            else prepared["prior_index_watermark"] > 0
+        ) and prepared["concurrent_reservations_accepted"] == 2
         assert await state.wait() == 0
         return None
     terminal = await next_line()

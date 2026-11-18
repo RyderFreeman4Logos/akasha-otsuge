@@ -1,7 +1,9 @@
-"""Offline checks for H01 receipt ownership and native terminal reporting."""
+"""Offline checks for registered model-arm inputs, receipt ownership and native terminal reporting."""
 
 import asyncio
 import contextlib
+import gzip
+import hashlib
 import io
 import json
 import os
@@ -29,6 +31,111 @@ class ReceiptTests(unittest.TestCase):
         names = ("codex", "observer", "observer-build", "auth", "catalog", "scratch")
         flags = [part for name in names for part in ("--" + name, str(self.root))]
         return ["reference_direct", *flags, "--output", str(self.output)]
+
+    def test_unavailable_registered_episode_writes_receipt_before_account_access(self):
+        with (
+            patch.object(sys, "argv", [*self.args(), "--task", "V02"]),
+            patch.object(driver, "sandbox") as sandbox,
+            self.assertRaises(SystemExit) as result,
+        ):
+            driver.main()
+        self.assertEqual(result.exception.code, 1)
+        sandbox.assert_not_called()
+        record = json.loads(self.output.read_bytes())
+        self.assertEqual(record["status"], "REGISTERED_INPUT_UNAVAILABLE")
+        self.assertEqual(record["task_id"], "V02")
+        self.assertEqual(len(record["prior_import"]["refused_revisions"]), 2)
+        self.assertFalse(record["model_turn_submitted"])
+
+    def test_registered_arm_preflights_and_original_receipt_hashes(self):
+        archive = (
+            driver.ROOT / "docs/benchmarks/results/mvp027/registered-arms-r1.json.gz"
+        )
+        data = json.loads(gzip.decompress(archive.read_bytes()))
+        tasks = {t["id"]: t for t in driver.read_reference()[1]}
+        observed = {}
+        for entry in data["runs"]:
+            r = entry["receipt"]
+            payload = (json.dumps(r, ensure_ascii=False, indent=2) + "\n").encode()
+            self.assertEqual(
+                hashlib.sha256(payload).hexdigest(), entry["private_result_sha256"]
+            )
+            t = tasks[r["task_id"]]
+            key = (t["id"], r["strategy"])
+            self.assertNotIn(key, observed)
+            observed[key] = r
+            case = driver.reference_episode.input_only(t)
+            self.assertNotIn("oracle", case)
+            self.assertEqual(
+                r["registered_input_sha256"],
+                driver.reference_episode.sha(driver.reference_episode.canonical(case)),
+            )
+            self.assertFalse(r["model_turn_submitted"] or r["model_turn_accepted"])
+            self.assertNotIn("auth", r)
+            if r["status"] == "REGISTERED_INPUT_UNAVAILABLE":
+                self.assertEqual(entry["exit_code"], 1)
+                continue
+            self.assertEqual(entry["exit_code"], 0)
+            self.assertEqual(r["binding"]["scope"], case["caller"]["scope"])
+            self.assertEqual(
+                r["binding"]["logical_fence"], case["caller"]["fence_sequence"]
+            )
+            if r["strategy"] == "consult":
+                self.assertEqual(r["runner_policy"]["global_auth"], "absent")
+                self.assertEqual(
+                    r["invocation"]["historical_ordinals"],
+                    sorted(s["sequence"] for s in case["sources"]),
+                )
+                search = r["preparation"]["ready_search"]
+                self.assertEqual(
+                    search["permission_revision"], r["binding"]["grant"]["commit_seq"]
+                )
+                self.assertEqual(search["model_calls"], [])
+            elif case["memories"]:
+                self.assertEqual(r["unmatched_query_read"]["items"], [])
+        registered = {
+            tid
+            for (tid, arm), r in observed.items()
+            if r["status"] != "REGISTERED_INPUT_UNAVAILABLE"
+        }
+        self.assertEqual(
+            registered, {"H01", "A01", "A03", *(f"I{i:02d}-none" for i in range(1, 11))}
+        )
+        pending = {row["task"] for row in data["remaining_registered_inputs"]}
+        self.assertEqual(pending, set(tasks) - registered)
+        self.assertTrue(
+            all(row["reason"] for row in data["remaining_registered_inputs"])
+        )
+        self.assertEqual(data["native_arm_preflights"], 26)
+        self.assertEqual(data["model_turns"], 0)
+        human = observed["I01-none", "direct"]["control_read"]["items"][0]
+        self.assertEqual(
+            (human["id"], human["authority"]), ("I01-none-second", "human_confirmed")
+        )
+        self.assertEqual(
+            observed["I01-none", "consult"]["invocation"]["historical_ordinals"], [1, 2]
+        )
+        for tid in registered:
+            self.assertIn((tid, "direct"), observed)
+            self.assertIn((tid, "consult"), observed)
+        a = observed["A01", "direct"]["control_read"]["items"][0]
+        c = observed["A01", "consult"]["preparation"]["ready_search"]["items"][0][
+            "memory"
+        ]
+        self.assertEqual(
+            (a["id"], a["authority"]),
+            (c["revision"]["key"]["id"], "delegated_approved"),
+        )
+        self.assertEqual(a["authority"], c["record"]["authority"])
+        self.assertEqual(
+            a["sources"][0]["sha256"], tasks["A01"]["sources"][0]["sha256"]
+        )
+        self.assertTrue(a["sources"][0]["receipt"])
+        self.assertEqual(observed["H01", "direct"]["control_read"]["items"], [])
+        self.assertEqual(
+            observed["H01", "consult"]["preparation"]["ready_search"]["status"],
+            "no_hit",
+        )
 
     def test_invalid_destination_rejects_before_start(self):
         self.output = self.root / "missing" / "result.json"

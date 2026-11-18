@@ -1,6 +1,6 @@
-# H01 frozen-profile fixture
+# Frozen-profile model arms
 
-The H01 fixture runs the current request in Codex 0.164.0 with the model and reasoning effort from `reference-v1/profile.json`. The historical comparison and its costs are in the [first pair receipt](../../docs/benchmarks/results/mvp027/h01-subscription-r1.json).
+The single-episode driver runs a registered current request in Codex 0.164.0 with the model and reasoning effort from `reference-v1/profile.json`. The historical comparison and its costs are in the [first pair receipt](../../docs/benchmarks/results/mvp027/h01-subscription-r1.json).
 
 Use a dedicated Linux SSD directory for the observers and reuse a Cargo target directory with the locked dependencies. The builder reads the frozen product source from the local Git object database and adds the evaluation module in its private source export. Pass `--prepare-only` to check the Cargo targets without compiling.
 
@@ -9,20 +9,31 @@ python3 -B scripts/evaluation/build_reference.py \
     --output "$OBSERVERS" --target-dir "$CARGO_TARGET_DIR"
 ```
 
-With the physical Codex executable, run the local preflight in a new result path. It uses a fresh private store, one synthetic invocation and no network or credentials. The diagnostic runs the production scoped search before and after an index sync. It also checks capacity for two native runner reservations.
+Select a task by its frozen ID. The driver defaults to H01. Run each preflight in its own output path. This example uses A01's registered delegated technical conclusion.
 
 ```sh
-python3 -B scripts/evaluation/reference_direct.py --strategy consult --preflight \
-    --codex "$PINNED_CODEX" --scratch "$PRIVATE_SCRATCH" \
-    --observer "$OBSERVERS/reference-service" --observer-build "$OBSERVERS/reference-service.json" \
-    --output "$PRIVATE_SCRATCH/preflight.json"
+for arm in direct consult; do
+    observer=reference-read
+    if [ "$arm" = consult ]; then observer=reference-service; fi
+    python3 -B scripts/evaluation/reference_direct.py --task A01 --strategy "$arm" --preflight \
+        --codex "$PINNED_CODEX" --scratch "$PRIVATE_SCRATCH" \
+        --observer "$OBSERVERS/$observer" --observer-build "$OBSERVERS/$observer.json" \
+        --importer "$OBSERVERS/reference-import" --import-build "$OBSERVERS/reference-import.json" \
+        --output "$PRIVATE_SCRATCH/A01-$arm.json"
+done
 ```
+
+For a nonempty supported episode, each arm starts with its own private store. The coordinator verifies the registered input against the prior native observation. The native importer stores the frozen originals and revisions, checks grants and fences, and synchronizes the index before account setup. The model receives the frozen current request and its arm's scoped tool. The coordinator retains the oracle separately. On a registered input that needs an unavailable mapping, the driver writes `REGISTERED_INPUT_UNAVAILABLE` with the reason and exits before account access.
+
+The direct tool uses the caller's grant and native keyword index. It matches adopted revisions at the input cutoff and rechecks their current visibility before returning the cited original spans and read receipts. Consult connects the one new request to the genuine retained parent at the frozen cutoff, verifies the captured lineage and calls the production consult service. The cold-index diagnostic is available on an empty store. For an imported store the observer records its prior watermark and checks the prepared search and capacity for two simultaneous native reservations.
+
+The [registered preflight receipts](../../docs/benchmarks/results/mvp027/registered-arms-r1.json.gz) cover both arms of H01, A01, A03 and the ten `I*-none` episodes. On A01 both arms returned the original delegated authority. On I01-none both found the existing human-confirmed Memory and consult bound both historical originals. H01 returned no hits in either arm. The archive includes the original JSON receipt hashes, four concrete pre-submission refusals, and the reason each of the other 47 inputs remains unavailable to this driver. It records zero model turns. Nonempty episodes currently support ordinary current-state root calls with all originals inside the same grant and fence, active imported revisions, and no registered hint or mutable grant. These entry points do not establish model quality or live host registration.
 
 For a registered model run, choose `--strategy direct` with `reference-read` or `--strategy consult` with `reference-service`. Replace `--preflight` with `--auth` and `--catalog` paths from the existing subscription profile. Each model arm consumes subscription usage. The driver creates an ephemeral Linux mount namespace, pins the native executable hash, selects one model descriptor, and mounts the credential read-only in the main app-server namespace. Consult also mounts it read-only in the separate namespace shared by the trusted service observer and its native client. Model tools read the caller's fixture scope and bound workspace.
 
-The direct H01 tool reads the empty scope with `Domain::state`. The consult fixture binds the native main thread, accepted turn and tool-call identity to the frozen principal using `Invocation::bind`. It calls `Service::submit_consult` and reads the published result and receipt. The current request is a live event alongside zero retained historical inputs. The public registration path uses the OS user and has separate integration coverage.
+On the empty H01 input, the direct tool reads the empty scope with `Domain::state`. The consult fixture binds the native main thread, accepted turn and tool-call identity to the frozen principal using `Invocation::bind`. It calls `Service::submit_consult` and reads the published result and receipt. For H01 the current request is a live event alongside zero retained historical inputs. The public registration path uses the OS user and has separate integration coverage.
 
-The revised fixture syncs its empty index and permits two native reservations before opening the scheduled consult. The first pair's original response and failing status remain in the receipt. Episodes with retained history, persisted memories or changing grants require their own import and fence mappings.
+The revised fixture syncs its empty index and permits two native reservations before opening the scheduled consult. The first pair's original response and failing status remain in the receipt. Episodes with changing grants, historical queries or unresolved Memory imports need further mapping before either model arm starts.
 
 Each attempt needs a new output filename in an existing writable private directory. Before account access the driver exclusively claims that filename with an `IN_PROGRESS` receipt. The terminal receipt atomically replaces the claim. After an interruption, inspect the existing receipt and check whether the attempt still runs before starting another paid turn. A failed or interrupted main-model turn retains its native terminal status and exits unsuccessfully. A completed turn may still fail the quality oracle recorded in its result.
 
@@ -71,7 +82,7 @@ The per-revision audit found 34 unimported human-confirmed revisions with struct
 
 Each ungraded control runs in its own store. It retains the same original bytes, scopes and requested change, uses a distinct episode ID, and exercises direct adoption with the complete unabridged statement and empty structured conditions. V02 read the earlier adoption at 7 and the successor at 13 through the same current grant. V03 retired the active adoption through the original withdrawal and retained the previous version for a historical read. In A04, the Atlas adoption stayed active after the denied rescope, and the Private read remained denied. The original source is scoped to Atlas, and the production Memory write API requires a new ID for a scope change. The controls establish those API behaviors. Their registered-result credit is zero. The run made zero model calls or public model publications.
 
-B01 and B03 returned raw keyword candidates backed by an original after the allowed ancestral cutoff. Their captured lineage excluded that original. The final caller-visible publication requires separate verification. H02 reproduced the missing original in lineage. Interactive handling of that gap also requires a real run. H01 has one observed model pair. The other 59 episodes still require paired model entry points and their applicable import mappings.
+B01 and B03 returned raw keyword candidates backed by an original after the allowed ancestral cutoff. Their captured lineage excluded that original. The final caller-visible publication requires separate verification. H02 reproduced the missing original in lineage. Interactive handling of that gap also requires a real run. H01 has one observed model pair. The other 59 episodes still require paired model observations, and the unsupported inputs also need their missing mappings.
 
 ## Blind quality and costs
 
