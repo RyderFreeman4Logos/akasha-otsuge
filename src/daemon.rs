@@ -128,7 +128,7 @@ struct Service {
     providers: crate::provider::Client,
     runner_slots: Arc<Semaphore>,
     notification_slots: Arc<Semaphore>,
-    search_index: Mutex<Option<Arc<crate::retrieval::Index>>>,
+    search_index: Mutex<crate::retrieval::IndexCache>,
     index_builder: Mutex<()>,
     index_epoch: std::sync::atomic::AtomicU64,
     #[cfg(test)]
@@ -179,7 +179,7 @@ impl Service {
                     .get_or_insert(Error("JOB_ERROR"));
             }
         }
-        self.search_index.lock().await.take();
+        self.search_index.lock().await.published.take();
         if let Err(error) = self.storage.close().await {
             first_error.lock().unwrap().get_or_insert(error.into());
         }
@@ -717,7 +717,7 @@ async fn open_service(
         providers,
         runner_slots: Arc::new(Semaphore::new(16)),
         notification_slots: Arc::new(Semaphore::new(1)),
-        search_index: Mutex::new(None),
+        search_index: Mutex::default(),
         index_builder: Mutex::new(()),
         index_epoch: std::sync::atomic::AtomicU64::new(0),
         #[cfg(test)]

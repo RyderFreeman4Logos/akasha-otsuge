@@ -429,7 +429,7 @@ async fn missing_native_index_does_not_reuse_a_completed_watermark() {
     let target = memory(&store, "durable", "durable searchable text", None).await;
     let index = Index::open(&config, &store).await.unwrap();
     sync(&index, &store, target).await;
-    index.connection.drop_table(TABLE, &[]).await.unwrap();
+    index.owner.connection.drop_table(TABLE, &[]).await.unwrap();
     drop(index);
     assert!(matches!(Index::open(&config, &store).await, Err(e) if e.code == "INDEX_MISSING"));
     store.close().await.unwrap();
@@ -473,9 +473,13 @@ async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publi
                 .code,
             "INDEX_NOT_READY"
         );
-        let candidate = Index::open_generation(&config, pending, true)
-            .await
-            .unwrap();
+        let candidate = Index::open_generation(
+            Arc::new(IndexOwner::open(&config).await.unwrap()),
+            pending,
+            true,
+        )
+        .await
+        .unwrap();
         let ready = sync(&candidate, &store, added).await;
         assert_eq!(
             Index::remaining_sync(&store, &config, added, true).unwrap(),
@@ -525,6 +529,7 @@ async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publi
         );
         assert_eq!(
             active
+                .owner
                 .connection
                 .table_names()
                 .execute()
@@ -551,7 +556,13 @@ async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publi
             .unwrap();
         assert!(pending_rebuild(&store).unwrap().is_none());
         assert_eq!(
-            active.connection.table_names().execute().await.unwrap(),
+            active
+                .owner
+                .connection
+                .table_names()
+                .execute()
+                .await
+                .unwrap(),
             [table_name(&ready.generation)]
         );
         assert_eq!(
@@ -592,12 +603,17 @@ async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table(
             .await
             .unwrap();
         let old = pending.generation.clone();
-        let candidate =
-            Index::open_candidate(&store, &config, &snapshot, pending, "first", true, &|| {
-                Ok(())
-            })
-            .await
-            .unwrap();
+        let candidate = Index::open_candidate(
+            &store,
+            &active.owner,
+            &snapshot,
+            pending,
+            "first",
+            true,
+            &|| Ok(()),
+        )
+        .await
+        .unwrap();
         sync(&candidate, &store, at).await;
         drop(candidate);
         let pending = Index::start_rebuild(&store, "another-key", 1, &|| Ok(()))
@@ -613,7 +629,12 @@ async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table(
         } else {
             table_name(&old)
         };
-        active.connection.drop_table(&name, &[]).await.unwrap();
+        active
+            .owner
+            .connection
+            .drop_table(&name, &[])
+            .await
+            .unwrap();
         if damaged != "missing lexical" {
             let schema = Arc::new(Schema::new(vec![Field::new(
                 "wrong",
@@ -623,6 +644,7 @@ async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table(
             let batches =
                 RecordBatchIterator::new(vec![Ok(RecordBatch::new_empty(schema.clone()))], schema);
             active
+                .owner
                 .connection
                 .create_table(
                     &name,
@@ -634,7 +656,7 @@ async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table(
         }
         let err = Index::open_candidate(
             &store,
-            &config,
+            &active.owner,
             &snapshot,
             pending.clone(),
             "sync",
@@ -664,7 +686,7 @@ async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table(
         };
         let err = Index::open_candidate(
             &store,
-            &config,
+            &active.owner,
             &snapshot,
             pending,
             "repair",
@@ -686,7 +708,7 @@ async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table(
         assert!(pending.discarding);
         let replacement = Index::open_candidate(
             &store,
-            &config,
+            &Arc::new(IndexOwner::open(&config).await.unwrap()),
             &snapshot,
             pending,
             "reopen",
@@ -700,6 +722,7 @@ async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table(
             .unwrap()
             .unwrap();
         let names: std::collections::BTreeSet<_> = replacement
+            .owner
             .connection
             .table_names()
             .execute()
@@ -735,9 +758,13 @@ async fn candidate_manifest_detects_missing_data_and_truncated_index_files() {
             .await
             .unwrap();
         let table = table_name(&pending.generation);
-        let index = Index::open_generation(&config, pending, true)
-            .await
-            .unwrap();
+        let index = Index::open_generation(
+            Arc::new(IndexOwner::open(&config).await.unwrap()),
+            pending,
+            true,
+        )
+        .await
+        .unwrap();
         sync(&index, &store, at).await;
         index.check_candidate_files(&|| Ok(())).await.unwrap();
         let root = config
@@ -771,4 +798,61 @@ async fn candidate_manifest_detects_missing_data_and_truncated_index_files() {
         drop(index);
         store.close().await.unwrap();
     }
+}
+
+#[tokio::test]
+async fn published_and_candidate_share_one_native_session_across_budget_changes() {
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let mut cache = IndexCache::default();
+    let published = Arc::new(
+        Index::open_generation(
+            cache.owner(&config).await.unwrap(),
+            status(&store).unwrap(),
+            false,
+        )
+        .await
+        .unwrap(),
+    );
+    cache.published = Some(published.clone());
+    let pending = Index::start_rebuild(&store, "candidate", 1, &|| Ok(()))
+        .await
+        .unwrap();
+    let candidate = Index::open_generation(cache.owner(&config).await.unwrap(), pending, true)
+        .await
+        .unwrap();
+    assert!(Arc::ptr_eq(&published.owner, &candidate.owner));
+    let session =
+        |table: Table| async move { table.dataset().unwrap().get().await.unwrap().session() };
+    assert!(Arc::ptr_eq(
+        &session(published.table.clone()).await,
+        &session(candidate.table.clone()).await
+    ));
+    let new_budget = if published.budget_mib == 512 {
+        1024
+    } else {
+        512
+    };
+    let changed = resolve(
+        &format!("[runtime]\nmemory_budget_mib={new_budget}"),
+        None,
+        "",
+        &config.config().paths,
+    )
+    .unwrap();
+    assert_eq!(
+        cache.owner(&changed).await.err().unwrap().code,
+        "RESOURCE_BUSY"
+    );
+    drop(published);
+    assert_eq!(
+        cache.owner(&changed).await.err().unwrap().code,
+        "RESOURCE_BUSY"
+    );
+    assert_eq!(cache.open_budget_mib(), Some(candidate.budget_mib));
+    drop(candidate);
+    let owner = cache.owner(&changed).await.unwrap();
+    assert_eq!(owner.budget_mib, new_budget);
+    store.close().await.unwrap();
 }

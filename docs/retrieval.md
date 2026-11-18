@@ -50,8 +50,10 @@ If a candidate table cannot be opened, an explicit rebuild reclaims the
 candidate's tables and starts a replacement. Selecting a different embedding
 generation for an unfinished candidate also starts a replacement.
 
-Once both prefixes cover the job's target, publication waits for current
-readers, switches the active generation and reclaims the superseded native
+Published reads, candidate writes and table retirement use one daemon Lance
+session and spill allowance. Once both prefixes cover the job's target,
+the daemon checks the native data and index files referenced by the candidate
+manifests. Publication waits for current readers, switches the active generation and reclaims the superseded native
 tables. A sync after a restart can complete an interrupted retirement. Neutral
 archive imports initialize local derived state from the imported authority.
 

@@ -206,15 +206,80 @@ fn table_name(generation: &str) -> String {
     }
 }
 
+pub(crate) struct IndexOwner {
+    budget_mib: u32,
+    connection: Connection,
+}
+
+#[derive(Default)]
+pub(crate) struct IndexCache {
+    pub(crate) published: Option<Arc<Index>>,
+    owner: std::sync::Weak<IndexOwner>,
+}
+
+impl IndexCache {
+    pub(crate) fn open_budget_mib(&self) -> Option<u32> {
+        self.owner.upgrade().map(|owner| owner.budget_mib)
+    }
+
+    pub(crate) async fn owner(&mut self, config: &ResolvedConfig) -> Result<Arc<IndexOwner>> {
+        let budget = config.config().runtime.memory_budget_mib;
+        if let Some(owner) = self.owner.upgrade() {
+            if owner.budget_mib == budget {
+                return Ok(owner);
+            }
+            if self
+                .published
+                .as_ref()
+                .is_some_and(|index| Arc::strong_count(index) > 1)
+            {
+                return Err(error("RESOURCE_BUSY"));
+            }
+            self.published = None;
+            if Arc::strong_count(&owner) > 1 {
+                return Err(error("RESOURCE_BUSY"));
+            }
+        }
+        let owner = Arc::new(IndexOwner::open(config).await?);
+        self.owner = Arc::downgrade(&owner);
+        Ok(owner)
+    }
+}
+
 pub struct Index {
     pub budget_mib: u32,
+    owner: Arc<IndexOwner>,
     generation: String,
     pending: bool,
-    connection: Connection,
     table: Table,
     schema: Arc<Schema>,
     vector: tokio::sync::Mutex<Option<Arc<vector::VectorIndex>>>,
 }
+impl IndexOwner {
+    async fn open(config: &ResolvedConfig) -> Result<Self> {
+        let root = config.config().paths.data_dir.join("search");
+        crate::daemon::private_dir(&root).map_err(|e| error(e.0))?;
+        let bytes = config.config().runtime.memory_budget_mib as usize * 1024 * 1024;
+        let session = Session::new(
+            bytes / 32,
+            bytes / 64,
+            Arc::new(ObjectStoreRegistry::default()),
+        )
+        .with_spill_store(Arc::new(
+            lance_io::spill::LocalSpillStore::with_cap((bytes / 8) as u64).map_err(index_error)?,
+        ));
+        let connection = lancedb::connect(root.to_str().ok_or_else(|| error("INVALID_PATH"))?)
+            .session(Arc::new(session))
+            .execute()
+            .await
+            .map_err(index_error)?;
+        Ok(Self {
+            budget_mib: config.config().runtime.memory_budget_mib,
+            connection,
+        })
+    }
+}
+
 impl Index {
     pub(crate) fn is_pending(&self) -> bool {
         self.pending
@@ -307,17 +372,21 @@ impl Index {
     }
 
     pub async fn open(config: &ResolvedConfig, storage: &Storage) -> Result<Self> {
-        Self::open_generation(config, status(storage)?, false).await
+        Self::open_generation(
+            Arc::new(IndexOwner::open(config).await?),
+            status(storage)?,
+            false,
+        )
+        .await
     }
 
     pub(crate) async fn open_generation(
-        config: &ResolvedConfig,
+        owner: Arc<IndexOwner>,
         progress: Status,
         pending: bool,
     ) -> Result<Self> {
         let name = table_name(&progress.generation);
-        let budget_mib = config.config().runtime.memory_budget_mib;
-        let connection = Self::connection(config).await?;
+        let connection = &owner.connection;
         let schema = Arc::new(Schema::new(vec![
             Field::new("key", DataType::Utf8, false),
             Field::new("id", DataType::Utf8, false),
@@ -357,33 +426,14 @@ impl Index {
             return Err(error("INDEX_CORRUPT"));
         }
         Ok(Self {
-            budget_mib,
+            budget_mib: owner.budget_mib,
+            owner,
             generation: progress.generation,
             pending,
-            connection,
             table,
             schema,
             vector: tokio::sync::Mutex::new(None),
         })
-    }
-
-    async fn connection(config: &ResolvedConfig) -> Result<Connection> {
-        let root = config.config().paths.data_dir.join("search");
-        crate::daemon::private_dir(&root).map_err(|e| error(e.0))?;
-        let bytes = config.config().runtime.memory_budget_mib as usize * 1024 * 1024;
-        let session = Session::new(
-            bytes / 32,
-            bytes / 64,
-            Arc::new(ObjectStoreRegistry::default()),
-        )
-        .with_spill_store(Arc::new(
-            lance_io::spill::LocalSpillStore::with_cap((bytes / 8) as u64).map_err(index_error)?,
-        ));
-        lancedb::connect(root.to_str().ok_or_else(|| error("INVALID_PATH"))?)
-            .session(Arc::new(session))
-            .execute()
-            .await
-            .map_err(index_error)
     }
 
     pub(crate) async fn start_rebuild(
@@ -408,7 +458,7 @@ impl Index {
     // acquire search readers until its generation becomes the published one.
     pub(crate) async fn open_candidate(
         storage: &Storage,
-        live: &ResolvedConfig,
+        owner: &Arc<IndexOwner>,
         config: &crate::config::Snapshot<()>,
         mut pending: Status,
         job: &str,
@@ -430,7 +480,7 @@ impl Index {
                 }
                 authorize()?;
                 let opened = async {
-                    let index = Self::open_generation(live, pending.clone(), true).await?;
+                    let index = Self::open_generation(owner.clone(), pending.clone(), true).await?;
                     if vector.is_some() {
                         index.vector_index(storage, config.resolved()).await?;
                     }
@@ -445,7 +495,7 @@ impl Index {
                     result => return result,
                 }
             }
-            Self::discard_candidate(storage, live, config.generation(), &mut pending, authorize)
+            Self::discard_candidate(storage, owner, config.generation(), &mut pending, authorize)
                 .await?;
             let next = hash(&serde_json::to_vec(&("repair", &pending.generation, job))?);
             pending = empty_progress(format!("{GENERATION}-{next}"));
@@ -457,7 +507,7 @@ impl Index {
 
     async fn discard_candidate(
         storage: &Storage,
-        live: &ResolvedConfig,
+        owner: &Arc<IndexOwner>,
         generation: u64,
         pending: &mut Status,
         authorize: &(impl Fn() -> Result<()> + Sync),
@@ -473,7 +523,7 @@ impl Index {
             pending.discarding = true;
             save_pending(storage, generation, Some(pending), authorize).await?;
         }
-        let connection = Self::connection(live).await?;
+        let connection = &owner.connection;
         let vector_table = pending
             .candidate_vector
             .as_ref()
@@ -563,6 +613,7 @@ impl Index {
         let current = table_name(&self.generation);
         let vector_table = keep_vector.map(|generation| format!("memory_vector_{generation}"));
         for name in self
+            .owner
             .connection
             .table_names()
             .execute()
@@ -579,7 +630,8 @@ impl Index {
                     });
             if derived && name != current && Some(&name) != vector_table.as_ref() {
                 authorize()?;
-                self.connection
+                self.owner
+                    .connection
                     .drop_table(&name, &[])
                     .await
                     .map_err(index_error)?;
@@ -621,7 +673,8 @@ impl Index {
             .is_none_or(|v| v.generation != progress.generation)
         {
             *vector = Some(Arc::new(
-                vector::VectorIndex::open(&self.connection, &progress, &self.generation).await?,
+                vector::VectorIndex::open(&self.owner.connection, &progress, &self.generation)
+                    .await?,
             ));
         }
         Ok(vector.as_ref().unwrap().clone())
@@ -708,7 +761,7 @@ impl Index {
         let end = target.min(before.saturating_add(32));
         let mut changed = false;
         let mut completions = Vec::new();
-        let mut pending = NativeBatch::new(self.budget_mib);
+        let mut pending = NativeBatch::new(self.owner.budget_mib);
         for seq in before + 1..=end {
             let entry = storage.outbox(seq)?.ok_or_else(|| error("OUTBOX_GAP"))?;
             let mut records = Vec::new();
@@ -782,7 +835,7 @@ impl Index {
                                 .base_tokenizer("icu".into())
                                 .stem(false)
                                 .remove_stop_words(false)
-                                .memory_limit_mb((self.budget_mib as u64 / 16).clamp(1, 32))
+                                .memory_limit_mb((self.owner.budget_mib as u64 / 16).clamp(1, 32))
                                 .num_workers(1)
                                 .with_position(false),
                         ),

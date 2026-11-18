@@ -99,7 +99,7 @@ mod tests {
             providers: crate::provider::Client::new().unwrap(),
             runner_slots: Arc::new(Semaphore::new(16)),
             notification_slots: Arc::new(Semaphore::new(1)),
-            search_index: Mutex::new(None),
+            search_index: Mutex::default(),
             index_builder: Mutex::new(()),
             index_epoch: std::sync::atomic::AtomicU64::new(0),
             batch_gate: Mutex::new(None),
