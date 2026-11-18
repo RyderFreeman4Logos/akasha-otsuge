@@ -884,6 +884,26 @@ fn consult_progressive_research_keeps_source_versions_and_workspace_changes() {
 }
 
 #[test]
+fn consult_recognizes_full_context_read_across_pages_and_keeps_holes() {
+    for (scenario, expected) in [
+        ("conclusion_read_pages", "found"),
+        ("conclusion_read_hole", "incomplete"),
+    ] {
+        let (daemon, event, _) = consult_fixture(scenario);
+        let job = named_terminal(&daemon, event);
+        assert_eq!(job["state"], "succeeded", "{scenario}: {job}");
+        let result = daemon.cli(&["consult", "show", job["id"].as_str().unwrap()]);
+        assert_eq!(result["data"]["status"], expected, "{scenario}: {result}");
+        let gaps = if expected == "found" {
+            json!([])
+        } else {
+            json!(["context_read_budget"])
+        };
+        assert_eq!(result["data"]["gaps"], gaps);
+    }
+}
+
+#[test]
 fn consult_conclusions_validate_evidence_no_hit_conditions_and_conflicts() {
     for scenario in [
         "conclusion_found",

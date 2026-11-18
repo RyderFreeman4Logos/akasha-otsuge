@@ -15,6 +15,27 @@ mod incidents;
 #[path = "consult_run.rs"]
 mod runs;
 
+struct CapturedRead {
+    truncated: bool,
+    total_bytes: usize,
+    ranges: Vec<(usize, usize)>,
+}
+
+fn covers_text(total_bytes: usize, mut ranges: Vec<(usize, usize)>) -> bool {
+    if ranges.is_empty() {
+        return false;
+    }
+    ranges.sort_unstable();
+    let mut end = 0;
+    for (start, next) in ranges {
+        if start > end {
+            return false;
+        }
+        end = end.max(next);
+    }
+    end == total_bytes
+}
+
 pub(super) struct Research<'a> {
     service: &'a Service,
     id: &'a str,
@@ -22,6 +43,7 @@ pub(super) struct Research<'a> {
     config: Arc<crate::config::Snapshot<()>>,
     workflow: &'a Deadline,
     captured: CapturedContext<'a>,
+    captured_reads: BTreeMap<String, CapturedRead>,
     workspace: Option<BoundWorkspace<'a, ()>>,
     handles: BTreeMap<String, u64>,
     expanded: BTreeMap<String, (u64, Value)>,
@@ -57,6 +79,7 @@ impl<'a> Research<'a> {
     ) -> Result<Self> {
         Ok(Self {
             captured: CapturedContext::new(&service.storage, invocation.clone())?,
+            captured_reads: BTreeMap::new(),
             read_seq: invocation.diagnostic().capture_seq,
             service,
             id,
@@ -140,6 +163,18 @@ impl<'a> Research<'a> {
         &self,
         answer: &crate::adapter::ResearchConclusion,
     ) -> Result<Vec<String>> {
+        let incomplete = self
+            .captured_reads
+            .values()
+            .any(|read| read.truncated && !covers_text(read.total_bytes, read.ranges.clone()));
+        self.conclusion_gaps(answer, incomplete.then_some("context_read_budget"))
+    }
+
+    fn conclusion_gaps(
+        &self,
+        answer: &crate::adapter::ResearchConclusion,
+        read_gap: Option<&str>,
+    ) -> Result<Vec<String>> {
         let mut gaps = self.gaps.clone();
         if self.incident.is_some() {
             for handle in &self.incident_expected {
@@ -171,6 +206,7 @@ impl<'a> Research<'a> {
                     .then_some("history_gap"),
             )
             .chain((!answer.conflicts.is_empty()).then_some("unresolved_conflict"))
+            .chain(read_gap)
         {
             if !gaps.iter().any(|g| g == gap) {
                 if gaps.len() == 32 {
@@ -498,7 +534,8 @@ impl<'a> Research<'a> {
             return Err(Error("PROTOCOL_INVALID"));
         }
         // Descendant limitations survive even when a later parent answer omits them.
-        self.gaps = self.coverage_gaps(&conclusion)?;
+        // Later reads can complete a document after a delegated answer returns.
+        self.gaps = self.conclusion_gaps(&conclusion, None)?;
         for gap in &conclusion.gaps {
             self.diagnostics.record(Stage::Conclusion, None, gap);
         }
@@ -544,11 +581,17 @@ impl ContextSource for Research<'_> {
             let response: crate::adapter::Result<_> = async {
                 self.authorize(lease).await.map_err(adapter_error)?;
                 self.operations += 1;
-                let incident_read = matches!(&request, ContextRequest::Read { handle, .. } if handle.starts_with("incident:"));
+                let capture_handle = match &request {
+                    ContextRequest::Read { handle, .. } if !handle.starts_with("incident:") => {
+                        Some(handle.clone())
+                    }
+                    _ => None,
+                };
                 let response = match self.dispatch(lease, request).await {
                     Ok(response) => response,
                     Err(error) => {
-                        self.diagnostics.record(Stage::ContextDispatch, tool, error.0);
+                        self.diagnostics
+                            .record(Stage::ContextDispatch, tool, error.0);
                         self.gap(error.0);
                         ContextResponse::Error(adapter_error(error))
                     }
@@ -561,8 +604,19 @@ impl ContextSource for Research<'_> {
                             self.gap(code);
                         }
                     }
-                    ContextResponse::Text(text) if text.truncated && !incident_read => {
-                        self.gap("context_read_budget")
+                    ContextResponse::Text(text) => {
+                        if let Some(handle) = capture_handle {
+                            let read =
+                                self.captured_reads
+                                    .entry(handle)
+                                    .or_insert_with(|| CapturedRead {
+                                        truncated: false,
+                                        total_bytes: text.total_bytes,
+                                        ranges: Vec::new(),
+                                    });
+                            read.truncated |= text.truncated;
+                            read.ranges.push((text.start, text.end));
+                        }
                     }
                     _ => (),
                 }

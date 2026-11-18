@@ -17,19 +17,10 @@ pub(super) struct ReadEvidence {
 
 impl ReadEvidence {
     pub(super) fn complete(&self) -> bool {
-        let mut ranges: Vec<_> = self.fragments.iter().map(|f| (f.start, f.end)).collect();
-        if ranges.is_empty() {
-            return false;
-        }
-        ranges.sort_unstable();
-        let mut end = 0;
-        for (start, next) in ranges {
-            if start > end {
-                return false;
-            }
-            end = end.max(next);
-        }
-        end == self.total_bytes
+        covers_text(
+            self.total_bytes,
+            self.fragments.iter().map(|f| (f.start, f.end)).collect(),
+        )
     }
 }
 
