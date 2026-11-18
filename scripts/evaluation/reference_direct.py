@@ -566,16 +566,26 @@ async def run(args, private, result):
                 )
                 break
     finally:
-        stopped = await asyncio.gather(stop(host), stop(state), return_exceptions=True)
         try:
-            diagnostics = [task for task in (drain_task, service_stderr_task) if task]
-            await asyncio.wait_for(asyncio.gather(*diagnostics), timeout=4)
-        finally:
-            result["native_stderr"] = error_stream
-            result["timing"] = dict(timers, total_s=clock() - started)
-        for error in stopped:
-            if isinstance(error, BaseException):
-                raise error
+            await close_observers(host, state, (drain_task, service_stderr_task))
+        except Exception as err:
+            result["cleanup_failure"] = {
+                "class": type(err).__name__,
+                "message": clean_error(err),
+            }
+        result["native_stderr"] = error_stream
+        result["timing"] = dict(timers, total_s=clock() - started)
+
+
+async def close_observers(host, state, readers):
+    stopped = await asyncio.gather(stop(host), stop(state), return_exceptions=True)
+    diagnostics = await asyncio.wait_for(
+        asyncio.gather(*(task for task in readers if task), return_exceptions=True),
+        timeout=4,
+    )
+    for error in (*stopped, *diagnostics):
+        if isinstance(error, BaseException):
+            raise error
 
 
 def main():
@@ -679,10 +689,15 @@ def main():
         finally:
             pending.unlink(missing_ok=True)
     print(result["status"], sha(args.output))
-    if result["status"] in {
-        "HARNESS_OR_HOST_FAILURE",
-        "REGISTERED_INPUT_UNAVAILABLE",
-    } or ("terminal" in result and result["terminal"]["status"] != "completed"):
+    if (
+        result.get("cleanup_failure")
+        or result["status"]
+        in {
+            "HARNESS_OR_HOST_FAILURE",
+            "REGISTERED_INPUT_UNAVAILABLE",
+        }
+        or ("terminal" in result and result["terminal"]["status"] != "completed")
+    ):
         raise SystemExit(1)
 
 

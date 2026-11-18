@@ -271,6 +271,29 @@ class ReceiptTests(unittest.TestCase):
                 asyncio.run(driver.run(args, self.root, result))
         self.assertEqual(result["timing"], {"preparation_s": 3, "total_s": 2})
 
+    def test_completed_turn_is_kept_when_cleanup_fails(self):
+        async def completed(args, private, result):
+            result.update(
+                status="NATIVE_DIRECT_TERMINAL_COMPLETED",
+                terminal={"status": "completed"},
+                cleanup_failure={
+                    "class": "TimeoutError",
+                    "message": "observer cleanup",
+                },
+            )
+
+        with (
+            patch.object(sys, "argv", self.args()),
+            patch.object(driver, "run", completed),
+        ):
+            with self.assertRaises(SystemExit) as exit_status:
+                driver.main()
+        self.assertEqual(exit_status.exception.code, 1)
+        receipt = json.loads(self.output.read_bytes())
+        self.assertEqual(receipt["terminal"]["status"], "completed")
+        self.assertEqual(receipt["cleanup_failure"]["class"], "TimeoutError")
+        self.assertEqual(receipt["status"], "NATIVE_DIRECT_TERMINAL_COMPLETED")
+
     def test_failed_and_interrupted_main_turns_retain_raw_terminal_and_exit_unsuccessfully(
         self,
     ):
