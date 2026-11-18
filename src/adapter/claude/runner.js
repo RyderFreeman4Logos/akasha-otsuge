@@ -1,6 +1,34 @@
 const prefix = 'mcp__akasha-runner__';
 const names = ['context_describe', 'context_list', 'context_read', 'context_search', 'memory_search', 'memory_get', 'code_search', 'code_read', 'delegate'];
 
+// Both bridge endpoints enforce the absolute runner deadline. Use the streaming
+// host API when that deadline is outside process.run's 1..600000 ms range.
+async function readBridge($, argv, input, remaining) {
+  if (remaining <= 600000) {
+    const response = await $.process.run(argv, { stdin: input, timeoutMs: remaining });
+    if (response.exitCode !== 0 || response.isStdoutTruncated || response.isStderrTruncated) throw new Error('bridge failed');
+    return response.stdout;
+  }
+  const stream = $.process.spawn({ argv, input });
+  const encoder = new TextEncoder();
+  const bytes = { stdout: 0, stderr: 0 };
+  let stdout = '';
+  try {
+    for (;;) {
+      const { done, value } = await stream.next();
+      if (done) {
+        if (value.code !== 0 || value.signal) throw new Error('bridge failed');
+        return stdout;
+      }
+      bytes[value.stream] += encoder.encode(value.text).byteLength;
+      if (bytes[value.stream] > 4 * 1024 * 1024) throw new Error('bridge output limit');
+      if (value.stream === 'stdout') stdout += value.text;
+    }
+  } finally {
+    await stream.return();
+  }
+}
+
 export function register(on) {
   on('session.start', async ($, e, next) => {
     const fields = {
@@ -41,9 +69,7 @@ export function register(on) {
     if (!Number.isSafeInteger(deadline) || deadline <= 0) return { deny: 'CONFIG_INVALID' };
     const remaining = deadline - Date.now();
     if (remaining <= 0) return { deny: 'RUNNER_TIMEOUT' };
-    const response = await $.process.run([binary, 'adapter', 'claude-read'], { stdin: JSON.stringify(request), timeoutMs: remaining });
-    if (response.exitCode !== 0 || response.isStdoutTruncated || response.isStderrTruncated) return { deny: 'AKASHA_READ_FAILED' };
-    const value = JSON.parse(response.stdout);
+    const value = JSON.parse(await readBridge($, [binary, 'adapter', 'claude-read'], JSON.stringify(request), remaining));
     if (value.error) return { deny: JSON.stringify(value.error) };
     return { result: JSON.stringify(value.data) };
   }).catch(() => ({ deny: 'AKASHA_READ_FAILED' }));
