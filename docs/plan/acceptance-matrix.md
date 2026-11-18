@@ -1,16 +1,16 @@
 # MVP-028 逐项验收记录
 
-核对日期为 2026-11-18 UTC。证据基线为 [a177d6e23568][baseline]。本表按产品契约列出 24 项结果。测试源码给出可运行入口，公开结果链接到报告或回执，各自保留实际运行的提交、环境和限制。[该提交的公开 CI][main-ci] 通过。正式发行包、同一发行提交的完整验收和下载复测均待 [#28][i28]，当前没有可填写的 release 产物。
+核对日期为 2026-11-18 UTC。初版证据基线为 [a177d6e23568][baseline]。本表按产品契约列出 24 项结果。测试源码给出可运行入口，公开结果链接到报告或回执，各自保留实际运行的提交、环境和限制。[该提交的公开 CI][main-ci] 通过。正式发行包、同一发行提交的完整验收和下载复测均待 [#28][i28]，当前没有可填写的 release 产物。
 
 “组件通过”表示已有公开运行覆盖该行的组件行为。“局部通过”列出已证实的部分和剩余判据。“发行待测”表示仍需从正式候选包执行。每行的发行状态均为待测。[验收组与产品门槛][docs-spec-09-md] · [MVP-028 原始验收][docs-spec-issues-mvp-028-md] · [计划与真实 Issue 索引][docs-plan-issues-index-md]
 
 | 原始需求与验收判据 | 计划事项 | 回归用例 | 公开运行或基准 | 结论与缺项 |
 | --- | --- | --- | --- | --- |
-| [REQ-01][docs-spec-01-md-l17] 新项目与 KISS。新名称、新仓库、Rust 核心；只迁移需要的能力；只保留一种正式存储后端。 | [#1][i1] [#26][i26] | [CLI][tests-cli-rs] | [后端选型][docs-benchmarks-storage-decision-md] | 局部通过。Rust 核心和唯一正式后端可核对，干净安装及依赖盘点待 #26。 |
-| [REQ-02][docs-spec-01-md-l18] 按需求助。consult 可带一句短 hint，也可省略；不要求调用方输出上下文包；不自动逐轮注入记忆。 | [#10][i10] [#16][i16] [#27][i27] | [无 hint][no-hint] · [短 hint][short-hint] | [原生 consult][docs-benchmarks-results-mvp016-readme-md] | 局部通过。已有可选 hint 的真实调用；#27 待做成对意图区分、主上下文开销与相关性计分。 |
-| [REQ-03][docs-spec-01-md-l19] 调用现场。准确绑定会话、子 Agent、分支和事件截止点；同 cwd 多 Agent 不串线；历史覆盖范围可检查。 | [#7][i7] [#11][i11] [#12][i12] [#13][i13] [#14][i14] [#15][i15] [#16][i16] [#21][i21] | [身份与分支][tests-adapter-context-rs] | [采集与 SIGKILL][docs-plan-progress-md-l206-l217] | 局部通过。原文与截止点有回归，[Codex][codex-host]、[Hermes][hermes-host]、[pi][pi-host] 有实接记录。#12 待补真实 Claude 同机隔离、恢复与身份。 |
-| [REQ-04][docs-spec-01-md-l20] 四工具兼容。Claude Code、Codex、Hermes、pi 各自同时提供 CallerAdapter 与 AgentRunner；任一单独安装可使用，组合可配置。 | [#11][i11] [#12][i12] [#13][i13] [#14][i14] [#15][i15] [#16][i16] [#18][i18] [#26][i26] [#27][i27] | [路由契约][tests-support-adapter-matrix-rs] | [原生宿主样本][docs-benchmarks-results-mvp016-readme-md] | 局部通过。#12 缺 Claude 原生认证。#26/#27 待交四个隔离单宿主和覆盖全部 Caller、Runner 的真实交叉记录。 |
-| [REQ-05][docs-spec-01-md-l21] 原始历史。持续采集可访问的用户消息、可见回复、工具记录；保存多轮压缩和分支的原始依据；增量、去重、可恢复。 | [#7][i7] [#12][i12] [#13][i13] [#14][i14] [#15][i15] [#17][i17] | [原文、分支、恢复][tests-capture-rs] | [采集与重放][docs-plan-progress-md-l206-l217] | 局部通过。已记录增量与真实进程中断。#12 尚缺已认证 Claude 的完整采集、压缩和恢复链。 |
+| [REQ-01][docs-spec-01-md-l17] 新项目与 KISS。新名称、新仓库、Rust 核心；只迁移需要的能力；只保留一种正式存储后端。 | [#1][i1] [#26][i26] | [CLI][tests-cli-rs] | [后端选型][docs-benchmarks-storage-decision-md] | 局部通过。Rust 核心和唯一正式后端可核对，下载的 Linux 候选包已验证干净安装及 487 个依赖的许可清单。[安装记录][pkg] |
+| [REQ-02][docs-spec-01-md-l18] 按需求助。consult 可带一句短 hint，也可省略；不要求调用方输出上下文包；不自动逐轮注入记忆。 | [#10][i10] [#16][i16] [#27][i27] | [无 hint][no-hint] · [短 hint][short-hint] | [原生 consult][docs-benchmarks-results-mvp016-readme-md] | 局部通过。已有可选 hint 的真实调用；10 组意图已有 Direct 和 Consult 结果，54 份回答待真人盲评。[实测][pairs] |
+| [REQ-03][docs-spec-01-md-l19] 调用现场。准确绑定会话、子 Agent、分支和事件截止点；同 cwd 多 Agent 不串线；历史覆盖范围可检查。 | [#7][i7] [#11][i11] [#12][i12] [#13][i13] [#14][i14] [#15][i15] [#16][i16] [#21][i21] | [身份与分支][tests-adapter-context-rs] | [采集与 SIGKILL][docs-plan-progress-md-l206-l217] | 局部通过。原文与截止点有回归，[Codex][codex-host]、[Hermes][hermes-host]、[pi][pi-host] 有实接记录。Claude 单宿主实接验证了身份、截止点和重开后的原文回执，SDK 分支来源另有独立核对。[实接][claude] · [分支][fork] |
+| [REQ-04][docs-spec-01-md-l20] 四工具兼容。Claude Code、Codex、Hermes、pi 各自同时提供 CallerAdapter 与 AgentRunner；任一单独安装可使用，组合可配置。 | [#11][i11] [#12][i12] [#13][i13] [#14][i14] [#15][i15] [#16][i16] [#18][i18] [#26][i26] [#27][i27] | [路由契约][tests-support-adapter-matrix-rs] | [原生宿主样本][docs-benchmarks-results-mvp016-readme-md] | 局部通过。四个原生单宿主、四条交叉路径和 16 个契约单元已通过。八条原生路径用了确定性本地响应。Claude 单宿主另有认证模型实测。真实回答质量仍待 #27。[宿主矩阵][hosts] · [Claude][claude] |
+| [REQ-05][docs-spec-01-md-l21] 原始历史。持续采集可访问的用户消息、可见回复、工具记录；保存多轮压缩和分支的原始依据；增量、去重、可恢复。 | [#7][i7] [#12][i12] [#13][i13] [#14][i14] [#15][i15] [#17][i17] | [原文、分支、恢复][tests-capture-rs] | [采集与重放][docs-plan-progress-md-l206-l217] | 局部通过。已记录增量与真实进程中断。Claude 原生 TUI 采集和 SDK 分支恢复均有独立记录，认证单宿主还验证了重开后的原文与回执。[采集][hosts] · [分支][fork] · [实接][claude] |
 | [REQ-06][docs-spec-01-md-l22] 渐进调研。外部 Agent/workflow 自主读取历史与代码，按需搜索，可委派子孙任务；整棵任务树共享预算。 | [#11][i11] [#16][i16] [#18][i18] [#20][i20] [#27][i27] | [共享预算][tests-adapter-budget-rs] | [调研与委派记录][docs-benchmarks-results-mvp016-readme-md] | 局部通过。已见受限原文工具与实际调用。#27 尚待证明参考任务中调研的正确覆盖、调用成本和轨迹隔离。 |
 | [REQ-07][docs-spec-01-md-l23] 来源与权威。原文、用户确认、用户 taste、代理建议、Auto-Grill 产物、推断均有来源；不能伪造人的认可。 | [#5][i5] [#17][i17] [#18][i18] [#19][i19] [#20][i20] [#25][i25] [#27][i27] | [授权与来源][tests-domain-rs] | [三种策略和 PTY 确认][docs-benchmarks-results-mvp019-readme-md] | 局部通过。已验证来源、确认和采纳分离。#27 待在冻结样本中证明全体零越权和零伪造。 |
 | [REQ-08][docs-spec-01-md-l24] 可配置模型处理。提取、embedding、reranker、调研模型可分别配置；无向量服务时基础检索仍可用；没有额外付费 API 的强依赖。 | [#9][i9] [#10][i10] [#17][i17] | [混合与降级][tests-support-daemon-retrieval-rs] | [无 Akasha 模型 profile 的提取][docs-benchmarks-results-mvp017-readme-md] | 组件通过。独立 provider 配置和无向量时的基础检索有回归，单 pi 实测有原始读回。发行包重放待 #28。 |
@@ -20,20 +20,20 @@
 | [REQ-12][docs-spec-01-md-l28] 外部编辑。外部 Agent 使用受控 patch 接口修正记忆；expected\_revision 防止覆盖并发修改；回滚产生新版本。 | [#20][i20] [#22][i22] | [受控 patch 与回滚][tests-support-daemon-editor-rs] | [Editor 接口及原生执行][docs-benchmarks-editor-acceptance-md] | 组件通过。已验证并发冲突、审计、撤回及追加新版本的回滚。发行端到端复核待 #28。 |
 | [REQ-13][docs-spec-01-md-l29] 运行反馈。测试、运行事件与人工纠正可以创建调查；关联 receipt 和执行产物；暴露不直接等于因果。 | [#21][i21] [#22][i22] | [失败调查][tests-support-daemon-incident-rs] | [实际 Codex 调查][docs-benchmarks-incident-acceptance-md] | 组件通过。真实失败关联执行记录与 recall，调查可给出有证据的操作或转人工；发行串联待 #28。 |
 | [REQ-14][docs-spec-01-md-l30] 通知扩展。统一 Notifier，持久 outbox、去重、重试；可用的本地通知输出与 stdio 插件接入。 | [#23][i23] | [outbox、重试与 ack][tests-support-daemon-notifier-rs] | [本地与 stdio 验收][docs-benchmarks-results-mvp023-final-readme-md] | 组件通过。独立投递和确认、重启与插件失败均有回执；发行链中的最终通知待 #28。 |
-| [REQ-15][docs-spec-01-md-l31] 配置热重载。校验、原子应用、版本号、失败保留旧配置；定义进行中任务语义及少数需重启项。 | [#2][i2] [#9][i9] [#19][i19] [#22][i22] [#23][i23] [#26][i26] | [热重载契约][tests-config-rs] | [在途与新任务的策略][docs-benchmarks-results-mvp019-readme-md] | 局部通过。运行中任务沿用旧代、新任务采用新代。#26 待验升级后配置、历史和 pending jobs 的保留。 |
-| [REQ-16][docs-spec-01-md-l32] 本地长超时。本地 provider 请求及本地 runner 默认 timeout 1700 秒；外层不得无意截短；排队、执行、取消语义明确。 | [#2][i2] [#9][i9] [#16][i16] [#24][i24] [#26][i26] [#27][i27] [#65][i65] | [Runner 剩余预算][tests-support-runner-bridge-deadlines-rs] | [生产 provider 墙钟][docs-providers-acceptance-md] | 局部通过。provider 和真实 pi Runner 分别做过长测（见下文）；正式发行身份、宿主组合与规模中的截止点待 #26/#27/#65。 |
-| [REQ-17][docs-spec-01-md-l33] CLI 与本地通信。CLI + daemon + 私有 IPC；MVP 核心不依赖 MCP 或 TCP 服务；调研轨迹不回灌主 Agent。 | [#8][i8] [#11][i11] [#12][i12] [#13][i13] [#14][i14] [#15][i15] [#26][i26] | [私有 socket、CLI][tests-daemon-rs] | [安装版 IPC 及跨 UID][docs-plan-progress-md-l186-l205] | 局部通过。私有 IPC 与隔离已实测；#12/#26 待补 Claude、单宿主安装及发行包的无 MCP 核心流程。 |
+| [REQ-15][docs-spec-01-md-l31] 配置热重载。校验、原子应用、版本号、失败保留旧配置；定义进行中任务语义及少数需重启项。 | [#2][i2] [#9][i9] [#19][i19] [#22][i22] [#23][i23] [#26][i26] | [热重载契约][tests-config-rs] | [在途与新任务的策略][docs-benchmarks-results-mvp019-readme-md] | 局部通过。运行中任务沿用旧代、新任务采用新代。Linux 候选包升级和回滚保留了排队任务、129 份原文和 30 个既有提交。[升级回执][pkg] |
+| [REQ-16][docs-spec-01-md-l32] 本地长超时。本地 provider 请求及本地 runner 默认 timeout 1700 秒；外层不得无意截短；排队、执行、取消语义明确。 | [#2][i2] [#9][i9] [#16][i16] [#24][i24] [#26][i26] [#27][i27] [#65][i65] | [Runner 剩余预算][tests-support-runner-bridge-deadlines-rs] | [生产 provider 墙钟][docs-providers-acceptance-md] | 局部通过。provider、原生 pi 及 Claude Runner 均有独立长测。正式发行身份与满载时的截止点待复核。[Claude 超时实测][wall] |
+| [REQ-17][docs-spec-01-md-l33] CLI 与本地通信。CLI + daemon + 私有 IPC；MVP 核心不依赖 MCP 或 TCP 服务；调研轨迹不回灌主 Agent。 | [#8][i8] [#11][i11] [#12][i12] [#13][i13] [#14][i14] [#15][i15] [#26][i26] | [私有 socket、CLI][tests-daemon-rs] | [安装版 IPC 及跨 UID][docs-plan-progress-md-l186-l205] | 局部通过。私有 IPC 与隔离已实测；Linux 下载件通过独立 Pi 流程，Claude 单宿主已跑通 Caller 和 Runner。正式发行包仍待 #28。[候选包][pkg] · [Claude][claude] |
 | [REQ-18][docs-spec-01-md-l34] 磁盘存储。不采用 SQLite 作为正式运行后端；先验证现代磁盘检索引擎；完整版本和数据不以缓存为唯一副本。 | [#3][i3] [#4][i4] [#10][i10] [#24][i24] [#65][i65] | [权威存储][tests-storage-rs] | [存储候选与历史 oracle][docs-benchmarks-storage-evidence-matrix-md] | 局部通过。单一权威后端及磁盘检索已有证据。#65 仍需生产规模的实际索引、内存和冷开记录。 |
 | [REQ-19][docs-spec-01-md-l35] 资源与并发。daemon 存储组默认 512MiB 目标、最高 2GiB 配置档；100 客户端、50GB 可检索数据验收；不足时磁盘/排队/背压。 | [#3][i3] [#8][i8] [#24][i24] [#65][i65] | [资源控制][tests-support-daemon-resources-rs] | [生产默认值与小规模对照][docs-benchmarks-results-mvp024-native-memory-readme-md] | 局部通过。#65 仍需满足两档内存、50 GB 实索引、100 活跃客户端持续负载和延迟/积压门槛。 |
 | [REQ-20][docs-spec-01-md-l36] 检索一致性。修订和派生任务原子登记；索引有进度；撤回版本不再错误返回；新修订可等待或查增量。 | [#3][i3] [#10][i10] [#17][i17] [#20][i20] [#24][i24] [#27][i27] [#65][i65] | [撤回和版本过滤][tests-support-retrieval-regressions-rs] | [队列重放及索引重建][docs-benchmarks-results-mvp017-readme-md] | 局部通过。提交和派生工作、进度、已撤回内容的受控回归已有记录。#65 规模并发与 #27 冻结评测待验。 |
 | [REQ-21][docs-spec-01-md-l37] 恢复与备份。持久确认、崩溃恢复、备份还原、磁盘满受控失败；不得静默丢失已确认写入。 | [#3][i3] [#4][i4] [#6][i6] [#7][i7] [#8][i8] [#17][i17] [#23][i23] [#24][i24] [#25][i25] [#65][i65] | [崩溃和备份][tests-storage-rs] | [备份、恢复及故障结果][docs-storage-validation-md] | 局部通过。恢复、已确认写入和还原有单组件证据。#65 待在规定规模、冷开及故障矩阵验证。 |
 | [REQ-22][docs-spec-01-md-l38] 迁移与退出。mempal 数据只读导入、幂等、来源与导入报告；中立格式导出，不强制继承旧实现。 | [#25][i25] [#26][i26] | [只读、幂等、增量][tests-support-mempal-incremental-rs] | [旧数据转换][docs-benchmarks-results-mvp025-mempal-final-readme-md] · [中立导入][neutral-import] | 局部通过。#25 的真实只读迁移、中立导出与重导入已合入。#26/#28 仍需从发行包重跑并保留原存储。 |
-| [REQ-23][docs-spec-01-md-l39] 证据与评测。需求—Issue—测试—提交可追踪；必要运行数据不塞回主上下文；使用真实任务评测。 | [#1][i1] [#2][i2] [#3][i3] [#10][i10] [#11][i11] [#21][i21] [#22][i22] [#24][i24] [#27][i27] [#65][i65] | [冻结集合校验][scripts-check-reference-py] | [参考集和勘误][docs-evaluation-reference-v1-errata-1-readme-md] | 局部通过。已冻结 60 项和 10 组混淆意图。#27 待按参考 profile 计分并公开失败、上下文开销、外部开销；#65 待补规模数据。 |
-| [REQ-24][docs-spec-01-md-l40] 可安装 MVP。安装、首次配置、四宿主连接、日常操作和恢复文档完整；最终验收以可运行产品及证据为准。 | [#1][i1] [#26][i26] | [安装实物与 UID][scripts-check-daemon-command-py] | [本机安装版控制][docs-plan-progress-md-l186-l205] | 发行待测。本机安装版有检查；#26 的干净 Linux 首装、升级、卸载、四宿主指南实跑以及 #28 下载发行包重测仍待完成。 |
+| [REQ-23][docs-spec-01-md-l39] 证据与评测。需求—Issue—测试—提交可追踪；必要运行数据不塞回主上下文；使用真实任务评测。 | [#1][i1] [#2][i2] [#3][i3] [#10][i10] [#11][i11] [#21][i21] [#22][i22] [#24][i24] [#27][i27] [#65][i65] | [冻结集合校验][scripts-check-reference-py] | [参考集和勘误][docs-evaluation-reference-v1-errata-1-readme-md] | 局部通过。已冻结 60 项和 10 组混淆意图。已公布 27 组成对结果、token 和失败；33 个任务仍缺权威输入映射，54 份回答待盲评。#65 待补规模数据。[成对结果][pairs] |
+| [REQ-24][docs-spec-01-md-l40] 可安装 MVP。安装、首次配置、四宿主连接、日常操作和恢复文档完整；最终验收以可运行产品及证据为准。 | [#1][i1] [#26][i26] | [安装实物与 UID][scripts-check-daemon-command-py] | [本机安装版控制][docs-plan-progress-md-l186-l205] | 发行待测。干净 Linux 首装、升级、回滚、卸载和四宿主指南已有候选包回执。#26 等待 #65，#28 仍需从正式发行包下载重测。[安装和操作记录][pkg] |
 
 ## Issue 与合入提交
 
-下表把每行的计划事项接到实际合入的 PR 和不可变提交。一个事项有多个 PR 时列出实现和独立验收所需的主要合入点。所有列出的提交均为上述基线的祖先。[#12][i12] 和 [#65][i65] 的已合入部分仍有公开的未完成验收。
+下表把每行的计划事项接到实际合入的 PR 和不可变提交。一个事项有多个 PR 时列出实现和独立验收所需的主要合入点。下表记录初版基线的祖先。后续完成的 [#12 实接][claude] 及仍开放的 [#65][i65] 按各自回执核对。
 
 | 计划事项 | 已合入的 PR 与提交 |
 | --- | --- |
@@ -69,16 +69,16 @@
 
 ## 仍需执行的验收
 
-- 四宿主与质量。[#12][i12] 缺已认证的 Claude Code 单宿主实接。Codex 或 pi/Hermes 的代跑结果按实际宿主记录。[#27][i27] 需四个独立 Caller/Runner、全部 16 条契约、覆盖四种角色的真实交叉路径，并按冻结参考集公开零身份/权限/撤回违规、全部关键决定和适用条件、正确条目覆盖率至少 90%、实质无关条目至多 10% 及至少 10 组有无 hint 对照。保留读数、token、费用、延迟和失败。依赖 Daybreak 的测试暂缓。[宿主替代及暂缓记录][docs-plan-todo-md-l1632-l1654]
+- 四宿主运行结果已公开。冻结评测中 27 组均未命中预期 Consult 状态，33 个任务仍缺条件与权威来源的映射。保留全部 60 项和 10 组意图对照，待真人盲评 54 份匿名答案。安全、覆盖率至少 90%、实质无关至多 10% 和调用开销均按冻结规则计分。依赖 Daybreak 的测试暂缓。[宿主矩阵][hosts] · [冻结实测][pairs] · [原始范围][docs-plan-todo-md-l1632-l1654]
 - 两次墙钟记录的路径不同。生产 daemon/provider 对 1605 秒延迟在 1605.030 秒成功，超时对照在 1700.001 秒失败。真实 pi 1.4.0 Runner 使用受控本地端点，1605 秒延迟在 1612.327485 秒成功，另有超时清理对照。发行前把适用的原始回执绑定到候选包，注明重测和沿用证据的身份。[provider 原始结果][docs-providers-acceptance-md] · [pi Runner 长测][docs-benchmarks-results-mvp016-readme-md]
 - 规模与恢复。[#65][i65] 承接 [#24][i24]。保留已公开的存储试验、受控内存与生产前缀成绩。仍需可追溯 50 GB 数据与实际索引、100 个活跃客户端至少 30 分钟、512 MiB / 2 GiB 两档的资源组采样、吞吐与延迟、积压、降预算、冷开、磁盘满、崩溃恢复和正确性。[原始负载与门槛][docs-spec-08-md-l136-l154] · [生产样本范围][docs-benchmarks-production-scale-md]
-- 发行。[#26][i26] 从干净 Linux 安装、保存配置及 pending jobs 升级，再验证卸载保留用户历史、恢复与四宿主操作说明。[#28][i28] 还需同一候选包完成采集、consult、提取与 Auto-Grill、策略或 review、真实软件 outcome、调查修订、通知、历史原文核对及备份恢复，发布不可变标签和校验和，再从下载件复验。[完整九步流程][docs-spec-09-md-l64-l78]
+- 发行。Linux 下载件已完成干净首装、升级、回滚、卸载、恢复和 Pi 九步演练。#26 仍依赖 #65。#28 待同一发行提交通过完整矩阵、发布不可变标签与校验和，再从正式下载件重测。[候选包][pkg] · [九步演练](../benchmarks/results/mvp028-pi-rehearsal/README.md) · [发行要求][docs-spec-09-md-l64-l78]
 
 ## 已关闭事项复核
 
-核对时原计划 28 项中 24 项已标为 COMPLETED。17 项的 GitHub 关闭记录列有 PR，另外 7 项（[#1][i1], [#2][i2], [#6][i6], [#7][i7], [#10][i10], [#20][i20], [#25][i25]）已按上表人工核对合入提交。额外关闭的 [#50][i50] 是测试监督修正，见 [PR 51][p51] [6319cb5][c51]。当前五个开放事项为 [#12][i12]、[#26][i26]、[#27][i27]、[#28][i28]、[#65][i65]。这些数字描述跟踪状态。
+初版核对时原计划 28 项中 24 项已标为 COMPLETED。17 项的 GitHub 关闭记录列有 PR，另外 7 项（[#1][i1], [#2][i2], [#6][i6], [#7][i7], [#10][i10], [#20][i20], [#25][i25]）已按上表人工核对合入提交。额外关闭的 [#50][i50] 是测试监督修正，见 [PR 51][p51] [6319cb5][c51]。原计划目前有 25 项标为 COMPLETED。当前开放事项为 [#26][i26]、[#27][i27]、[#28][i28] 和 [#65][i65]。
 
-[#24][i24] 于 2026-11-11 07:31 UTC 随 [PR 64][p64] 关闭，该 PR 交付软件准入和 worker 预留。08:28 UTC 创建的 [#65][i65] 保留了未满足的生产内存、规模及恢复门槛。[#12][i12] 则在 [PR 41][p41] 合入后保持开放，给出了实现合入与真实宿主验收分开跟踪的实例。后续关闭以每个原始判据、实际测试环境和可读取回执为依据，分项合入应更新对应行并保留未通过项。
+[#24][i24] 于 2026-11-11 07:31 UTC 随 [PR 64][p64] 关闭，该 PR 交付软件准入和 worker 预留。08:28 UTC 创建的 [#65][i65] 保留了未满足的生产内存、规模及恢复门槛。[#12][i12] 在 [PR 41][p41] 合入后保持开放，直至 Claude 单宿主通过原生端到端验收，已于 11 月 18 日关闭。[关闭依据][claude]后续关闭以每个原始判据、实际测试环境和可读取回执为依据，分项合入应更新对应行并保留未通过项。
 
 [docs-spec-09-md]: https://github.com/RyderFreeman4Logos/akasha-otsuge/blob/a177d6e23568b627ec9eef593d88289bc8634041/docs/spec/09.md
 [docs-spec-issues-mvp-028-md]: https://github.com/RyderFreeman4Logos/akasha-otsuge/blob/a177d6e23568b627ec9eef593d88289bc8634041/docs/spec/issues/MVP-028.md
@@ -278,3 +278,10 @@
 [hermes-host]: https://github.com/RyderFreeman4Logos/akasha-otsuge/blob/a177d6e23568b627ec9eef593d88289bc8634041/docs/adapters/hermes-0.22.5/README.md
 [pi-host]: https://github.com/RyderFreeman4Logos/akasha-otsuge/blob/a177d6e23568b627ec9eef593d88289bc8634041/docs/adapters/pi-1.4.0/README.md
 [neutral-import]: https://github.com/RyderFreeman4Logos/akasha-otsuge/blob/a177d6e23568b627ec9eef593d88289bc8634041/docs/benchmarks/results/mvp025-neutral-import-final/README.md
+
+[claude]: https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12#issuecomment-6986770692
+[fork]: https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/102
+[hosts]: https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/98
+[wall]: https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/94
+[pkg]: ../benchmarks/results/mvp026-linux-package/README.md
+[pairs]: ../benchmarks/results/mvp027/terminal-pairs-r2.json.gz
