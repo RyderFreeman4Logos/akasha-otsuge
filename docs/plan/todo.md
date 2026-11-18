@@ -158,11 +158,14 @@ retains complete reports, logs and readbacks, including every earlier failure.
   gate and full-range review remain pending. The
   [evidence archive](../benchmarks/results/mvp024-windowed-maintenance/README.md)
   preserves the stopped baseline, diagnostics, rejected review and correction.
-- [ ] Rebuild the retained real prefix with an explicit source transition; measure
-  index completion, query witnesses, memory, time and native I/O before more growth.
-- [ ] Qualify the changed-source importer transition, preserving completed input
-  units, original admissions, identities and deadlines. The qualified observer-only
-  transition does not authorize a new source epoch.
+- [x] Measure the R3 prefix rebuild, index-period memory and I/O, eight keyword
+  witnesses, read-only ANN recall and eight hybrid witnesses after reopening.
+  The [R3 report and replay](../benchmarks/results/mvp024-windowed-maintenance/README.md#r3-real-prefix-index-and-search-recovery)
+  retain the first warm hybrid timeout and the original job's recovered failure.
+- [x] Admit a separate importer source epoch and grow from 16 to 32 verified
+  units and 131,072 authority records. The derived search inventory stayed unchanged.
+- [ ] Verify the incremental index over the additional 65,536 records and
+  establish the cause and recovery behavior of the first warm hybrid stall.
 - [ ] Integrate the bounded capture reader and finish the real 100-client controller.
   Focused native client, capture, current, scoped-history and correction fixtures
   passed. These small fixtures do not establish the required workload duration.

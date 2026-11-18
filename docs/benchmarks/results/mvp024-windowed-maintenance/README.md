@@ -1,8 +1,8 @@
 # Windowed native index maintenance
 
 The production prefix contains 65,536 real sources and 65,531 eligible vectors.
-All original and current reads passed before indexing. The two index attempts
-remain incomplete. [Issue #65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65)
+All original and current reads passed before indexing. The first two index attempts
+ended incomplete. R3 subsequently indexed the entire prefix. [Issue #65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65)
 retains the full corpus, workload and recovery requirements.
 
 R1 stopped because the disk observer encountered a file removed by native pruning.
@@ -90,8 +90,41 @@ The last completed fragment held 512 more vectors. In the existing index,
 the largest of the five partitions contained 16,300 rows. Those additions
 raised the partition to 16,432 rows under cosine assignment ([partition counts](ivf-partition-threshold.json)).
 This crossed Lance's 16,384-row split threshold, where the default optimization
-can merge every existing delta. Complete coverage, query witnesses and
-measured growth remain open in [issue #65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65).
+can merge every existing delta. The later R3 run and growth measurement follow.
+
+## R3 real-prefix index and search recovery
+
+At commit `4b9545216449d0ea6202785ae1e748f0711f8ffa`, R3 rebuilt 65,536 lexical rows
+and 65,531 vectors in 6,812.94 seconds. Both watermarks reached 225,057. The
+provider's first 65,531 ordered input/vector pairs exactly matched the source
+oracle. Eight scoped keyword witnesses passed. During indexing, 1,350 samples
+gave a daemon-group RSS P99 of 385,900,544 bytes and a maximum of 386,342,912
+bytes. The daemon read 987,680,768 and wrote 7,064,563,712 physical bytes
+between the first and last samples.
+
+| Observation | Recorded outcome |
+| --- | --- |
+| First hybrid request on the warm daemon | The lookup prepared one query vector. Job observation returned `IPC_TIMEOUT`. Shutdown advanced through SIGTERM to SIGKILL. Kernel samples end before this interval. The cause is unresolved. |
+| Reopened daemon | The original job recovered as `failed/PROVIDER_INTERRUPTED`. All eight fresh scoped hybrid queries returned the expected memory and revision using the same lexical and vector generations. Responses retained the `rule_scan_budget` and `index_lag` coverage gaps. |
+| Independent native ANN diagnostic | The raw vector leg at Lance table version 4,491 returned all 640 exact top-20 neighbors across 32 queries and eight scopes. The read-only probe used 1,792/2,048 MiB cgroup soft/hard limits. |
+| 130-delta synthetic control | At 512/640 MiB, the staged 8,192-row fixture returned 100/100 in 1.961 s. With 488 MiB of touched anonymous memory in the same cgroup, it obtained a native result stream but had no completed rows at the 65 s deadline. The paired runs gave 100/100 in 0.685 s and a censored 105 s respectively. Neither pressured run recorded an OOM kill. |
+
+The closed failure inventory contained 1,150 files and 2,196,033,536 allocated
+bytes. The recovery inventory contained 1,151 files and 2,196,242,432 bytes.
+Three authority files changed. The search files retained their identities.
+A separately admitted import then doubled the authority to 131,072 records in
+32 units, with 131,063 eligible vectors and 2,569,203,712 allocated bytes.
+Its seal retains the identical search inventory. Incremental index, full-corpus
+and 100-client workload acceptance remained open at that measurement.
+
+The [R3 evidence and replay bundle](prefix-r3.zip) is 60,203 bytes,
+SHA-256 `de753368e6b89333af8c7fb096698cfa84c283c3c3dc54a094ec00cb30a1a442`. Its manifest covers every payload. To
+recompute the sample percentiles, physical I/O and per-query recall, extract
+the archive into an empty directory and run `python3 verify.py` there. The
+included instructions also reproduce the exact cosine reference from pinned
+public Parquet rows and run the controlled native query in a disposable checkout.
+The closed native store, live-query measurements and full receipt hashes
+remain independently auditable on the original host.
 
 ## Evidence
 
