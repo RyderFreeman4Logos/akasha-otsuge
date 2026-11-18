@@ -81,6 +81,8 @@ pub(super) fn catalog(home: &Path) -> Result<Value> {
 }
 
 pub(super) fn tools() -> Value {
+    // Codex 0.164 keeps descriptions but drops numeric bounds from model-facing schemas.
+    let read_size = json!({"type":"integer","minimum":1,"maximum":16384,"description":"Read 1 to 16384 bytes per call."});
     let schemas = [
         ("context_describe", json!({}), vec![]),
         (
@@ -90,7 +92,7 @@ pub(super) fn tools() -> Value {
         ),
         (
             "context_read",
-            json!({"handle":{"type":"string"},"start":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":16384}}),
+            json!({"handle":{"type":"string"},"start":{"type":"integer","minimum":0},"max_bytes":read_size}),
             vec!["handle", "start", "max_bytes"],
         ),
         (
@@ -115,7 +117,7 @@ pub(super) fn tools() -> Value {
         ),
         (
             "code_read",
-            json!({"path":{"type":"string"},"start":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":16384}}),
+            json!({"path":{"type":"string"},"start":{"type":"integer","minimum":0},"max_bytes":read_size}),
             vec!["path", "start", "max_bytes"],
         ),
         (
