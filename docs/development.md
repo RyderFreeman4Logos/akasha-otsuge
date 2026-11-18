@@ -62,6 +62,13 @@ The output directory receives a source-identified native archive and its SHA-256
 The archive includes the executable, operator documentation, configuration example,
 license and source commit. See [Linux binary installation](linux-install.md).
 
+For a downloadable candidate, select **CI → Run workflow** in GitHub Actions and
+choose the source branch. After the checks pass, the run publishes an artifact
+named for the runner architecture and full commit. Extract the Actions artifact
+to obtain the tarball and its SHA-256 file. The candidate is retained for seven
+days. Tagged releases have a separate publication and download verification.
+
+
 Errors use one JSON line on stderr:
 
 ```json
