@@ -49,6 +49,16 @@ class WorkloadMonitor(unittest.IsolatedAsyncioTestCase):
         self.events.write_text("oom_kill 0\nhigh 3\n")
         self.execute = AsyncMock(return_value={"status": "error", "code": "RESOURCE_BUSY"})
 
+    def test_slow_sample_skips_only_closed_windows(self):
+        for previous, elapsed, expected in [
+            (0, 0.95, 1),
+            (0, 1.25, 1),
+            (0, 3.25, 3),
+            (3, 3.25, 4),
+        ]:
+            with self.subTest(previous=previous, elapsed=elapsed):
+                self.assertEqual(runner.next_sample_tick(previous, elapsed), expected)
+
     async def run_fixture(self, code, *, tick=0, oom=0):
         seen = set()
 
