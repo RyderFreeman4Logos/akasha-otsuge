@@ -86,8 +86,9 @@ def main():
             binary = root / 'install/bin/akasha-otsuge'
             assert hashlib.sha256(binary.read_bytes()).digest() == hashlib.sha256(candidate.read_bytes()).digest(), 'installed binary differs from release artifact'
             environment = dict(os.environ, AKASHA_ACCEPTANCE_BINARY=str(binary))
+            # This deadline covers the entire serial suite, including real retry delays.
             tests = command(['cargo', 'test', '--locked', '--test', 'daemon', '--', '--test-threads=1'],
-                            env=environment, timeout=300)
+                            env=environment, timeout=600)
             assert tests.returncode == 0, tests.stdout + tests.stderr
             print(tests.stdout, end='')
         config = root / 'config.toml'

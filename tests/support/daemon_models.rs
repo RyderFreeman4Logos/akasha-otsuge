@@ -287,6 +287,113 @@ fn await_request(endpoint: &Endpoint) {
 }
 
 #[test]
+fn waiting_count_and_reserved_queue_bytes_return_retryable_ipc_and_cli_errors() {
+    let endpoint = Endpoint::new();
+    endpoint.pause();
+    let mut daemon = Daemon::new();
+    let root = daemon.root.clone();
+    let settings = |count| {
+        format!(
+            "[access]\nread_roots=[{root:?}]\n{}",
+            text_config(&endpoint)
+                .replace("[runtime]", &format!("[runtime]\nmax_queued_jobs={count}"))
+                .replace("timeout='3s'", "timeout='120s'")
+        )
+    };
+    daemon.configure(&settings(1));
+    let binding = json!({
+        "source":{"adapter":"fixture","profile":"test","session":"queue","thread":"thread","agent":"agent"},
+        "scope":{"user":format!("uid:{}",rustix::process::geteuid().as_raw())},
+        "stream":"stream","coverage":"available_payloads"
+    });
+    let input = root.join("capture.jsonl");
+    let binding_file = root.join("binding.json");
+    std::fs::write(&input, "").unwrap();
+    std::fs::write(&binding_file, binding.to_string()).unwrap();
+    daemon.start();
+    submit_text(&daemon, "hold-worker");
+    await_request(&endpoint);
+    let capture = |id: &str| {
+        let mut stream = daemon.connect();
+        assert_eq!(receive(&mut stream)["protocol_version"], 1);
+        send(
+            &mut stream,
+            &json!({
+                "protocol_version":1,"request_id":id,
+                "command":{"op":"reconcile","binding":binding,"path":input,"idempotency_key":id}
+            }),
+        );
+        let reply = receive(&mut stream);
+        assert_eq!(reply["request_id"], id);
+        reply
+    };
+    let expect_busy = |id: &str| {
+        let error = capture(id)["error"].clone();
+        assert_eq!(error["code"], "RESOURCE_BUSY");
+        assert_eq!(error["retry_when"], "capacity_available");
+        assert!(
+            error["message"]
+                .as_str()
+                .unwrap()
+                .contains("original idempotency key")
+        );
+        let output = daemon
+            .command()
+            .args([
+                "capture",
+                "reconcile",
+                binding_file.to_str().unwrap(),
+                input.to_str().unwrap(),
+                "--idempotency-key",
+                id,
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(4));
+        let reply: Value = serde_json::from_slice(&output.stderr).unwrap();
+        assert_eq!(reply["error"], error);
+    };
+    let first = capture("first")["data"].clone();
+    assert_eq!(first["state"], "queued");
+    expect_busy("after-count");
+    assert_eq!(capture("first")["data"], first);
+
+    daemon.configure(&settings(100));
+    assert_eq!(
+        daemon.cli(&["config", "reload"])["data"]["status"],
+        "applied"
+    );
+    // The default 512 MiB profile can reserve 64 recoverable 128 KiB records.
+    assert_eq!(capture("after-count")["data"]["state"], "queued");
+    for i in 2..64 {
+        assert_eq!(capture(&format!("waiting-{i}"))["data"]["state"], "queued");
+    }
+    expect_busy("after-bytes");
+    assert_eq!(
+        daemon.cli(&["job", "cancel", "first"])["data"]["state"],
+        "cancelled"
+    );
+    let accepted = capture("after-bytes")["data"].clone();
+    assert_eq!(accepted["state"], "queued");
+    assert_eq!(capture("after-bytes")["data"], accepted);
+    endpoint.resume();
+    assert_eq!(terminal(&daemon, "hold-worker")["state"], "succeeded");
+    let mut wait = job_wait::JobWait::default();
+    loop {
+        let job = daemon.cli(&["job", "show", "after-bytes"]);
+        if !matches!(job["data"]["state"].as_str(), Some("queued" | "running")) {
+            assert_eq!(job["data"]["state"], "succeeded");
+            break;
+        }
+        wait.check(&job["data"]);
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    assert_eq!(endpoint.requests.lock().unwrap().len(), 1);
+    daemon.cli(&["daemon", "stop"]);
+    daemon.wait();
+}
+
+#[test]
 fn budget_reload_drains_running_work_then_reopens_without_resetting_jobs() {
     let endpoint = Endpoint::new();
     endpoint.pause();
@@ -346,7 +453,15 @@ fn budget_reload_drains_running_work_then_reopens_without_resetting_jobs() {
         .output()
         .unwrap();
     assert_eq!(refused.status.code(), Some(4));
-    assert!(String::from_utf8_lossy(&refused.stderr).contains("RESOURCE_BUSY"));
+    let refusal: Value = serde_json::from_slice(&refused.stderr).unwrap();
+    assert_eq!(refusal["error"]["code"], "RESOURCE_BUSY");
+    assert_eq!(refusal["error"]["retry_when"], "capacity_available");
+    assert!(
+        refusal["error"]["message"]
+            .as_str()
+            .unwrap()
+            .contains("original idempotency key")
+    );
     assert_eq!(endpoint.requests.lock().unwrap().len(), 1);
     assert_eq!(
         daemon.cli(&["job", "show", "queued-before-reopen"])["data"],

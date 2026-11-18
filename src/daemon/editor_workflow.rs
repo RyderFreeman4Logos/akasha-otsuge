@@ -171,9 +171,7 @@ impl Service {
     }
 
     pub(in crate::daemon::jobs) fn editor_checkpoint(&self, job: &Job) -> bool {
-        job.consult_plan
-            .as_ref()
-            .is_some_and(|p| p.editor.is_some())
+        job.consult_plan.as_ref().is_some_and(Plan::is_editor)
             && job
                 .result
                 .as_ref()

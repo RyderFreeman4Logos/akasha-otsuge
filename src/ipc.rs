@@ -76,6 +76,13 @@ impl Error {
     }
     pub fn value(self) -> Value {
         let message = match self.0 {
+            "RESOURCE_BUSY" => {
+                return json!({
+                    "code": self.0,
+                    "message": "Wait for capacity, then retry the same request with its original idempotency key, if any.",
+                    "retry_when": "capacity_available"
+                });
+            }
             "INVALID_ARGUMENT" => "Use --help for supported arguments",
             "IO_ERROR" => "Could not complete input or output",
             "DAEMON_UNAVAILABLE" => "The local daemon is unavailable",

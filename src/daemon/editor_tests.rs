@@ -598,3 +598,71 @@ async fn editor_without_a_response_checkpoint_requires_explicit_retry_after_rest
     assert!(service.storage.receipt(&id()).unwrap().is_none());
     service.storage.close().await.unwrap();
 }
+
+#[tokio::test]
+async fn queue_bytes_distinguish_ordinary_and_recoverable_editor_consults() {
+    let root = std::env::temp_dir().join(format!("akasha-consult-capacity-{}", std::process::id()));
+    private_dir(&root).unwrap();
+    let _cleanup = tests::Fixture(root.clone());
+    // Two full checkpoints fit. The fixture has one waiting editor with a checkpoint.
+    let settings = format!(
+        "[runtime]\nmemory_budget_mib=16\nmax_concurrent_jobs=2\n[executors.editor]\nkind='codex'\nbinary='/missing-native-must-not-run'\nnative_home={root:?}"
+    );
+    setup(&root, &settings, true).await;
+    let (service, binding) = tests::service_at(&root, &settings).await;
+    let plan = service.job(&id()).unwrap().1.consult_plan.unwrap();
+    let invocation = service.consult_invocation(&plan).unwrap();
+    let ordinary = service
+        .submit_consult(invocation, plan.native, ConsultArgs::new(None).unwrap())
+        .await
+        .unwrap();
+    let ordinary = ordinary["id"].as_str().unwrap().to_owned();
+    let sync = crate::retrieval::Request::Sync;
+    let path = root.join("capture.jsonl");
+    assert!(
+        service
+            .submit_retrieval("small".into(), sync.clone())
+            .await
+            .is_ok(),
+        "a waiting ordinary consult leaves room for a small retrieval"
+    );
+    service.cancel_job("small".into()).await.unwrap();
+    assert!(matches!(
+        service
+            .submit("capture".into(), binding.clone(), path.clone())
+            .await,
+        Err(Error("RESOURCE_BUSY"))
+    ));
+    assert!(service.claim(&ordinary, 0).await.unwrap());
+    service
+        .submit("capture".into(), binding, path)
+        .await
+        .unwrap();
+    assert!(service.claim(&id(), 1).await.unwrap());
+    assert!(matches!(
+        service.submit_retrieval("later".into(), sync.clone()).await,
+        Err(Error("RESOURCE_BUSY"))
+    ));
+    service.storage.close().await.unwrap();
+    drop(service);
+
+    let (service, _) = tests::service_at(&root, &settings).await;
+    service.recover().await.unwrap();
+    let failed = service.job(&ordinary).unwrap().1;
+    assert_eq!(failed.state, "failed");
+    assert_eq!(failed.error.as_deref(), Some("RUNNER_INTERRUPTED"));
+    assert_eq!(service.job(&id()).unwrap().1.state, "queued");
+    assert!(matches!(
+        service.submit_retrieval("later".into(), sync.clone()).await,
+        Err(Error("RESOURCE_BUSY"))
+    ));
+    service.cancel_job(id()).await.unwrap();
+    assert_eq!(
+        service
+            .submit_retrieval("later".into(), sync)
+            .await
+            .unwrap()["state"],
+        "queued"
+    );
+    service.storage.close().await.unwrap();
+}
