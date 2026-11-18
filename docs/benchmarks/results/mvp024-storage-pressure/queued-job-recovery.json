@@ -1,0 +1,17 @@
+{
+  "earlier_debug_binary_sha256": "ba92c5e936a171c922af741930e280a69a9ec476e900b618c1ac04ce3c4d2728",
+  "fixed_control_exit": 0,
+  "fixed_debug_binary_sha256": "f4418d524dda5b5eeea3fab4252686805f74ecf2de41dd71de67f5e5f98e1eb7",
+  "fixed_runtime_seconds": 4.0595911191776395,
+  "old_control_exit": 1,
+  "original_seed_binary_sha256": "78a4dc62e9b78c958fbee0f7e1d958bfee0d373d5a5127ea42aad63b87282284",
+  "source_fix": "b93d3b2ee5e3efd8f3b7b32999d9b55e11b55c34",
+  "test_commit": "72bb8e6fc656c186282957ed510a5ff94a953f98",
+  "verified": [
+    "Initial oversized job result returns typed RESOURCE_BUSY and no result pointer under 1 MiB of free space.",
+    "Historical draft and daemon PID survive failure.",
+    "First queued 16000-byte prompt under pressure stays queued at attempt zero and in its original admission. A separate queued 16000-byte job cancels with CANCELLED at attempt zero without a provider call.",
+    "Freeing the owned filler lets that same waiting job succeed on its first attempt. Submitting the same 24 KiB output with space succeeds.",
+    "Legacy authority and separate derived-volume controls pass."
+  ]
+}

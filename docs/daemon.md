@@ -203,3 +203,5 @@ stdout, and sends an acknowledgement bound to that receipt and hash. Only this
 acknowledgement moves Prepared to Delivered; failed stdout writes leave it
 Prepared. Lost acknowledgements remain uncertain, and a repeated successful replay
 is idempotent. Receipt viewing itself does not assert delivery.
+
+The [queued job controls](benchmarks/results/mvp024-storage-pressure/queued-job-recovery.json) exercise a large queued prompt and an in-flight response. The [notification controls](benchmarks/results/mvp024-storage-pressure/notification-recovery.json) include a non-idempotent external receiver across a pressured restart.
