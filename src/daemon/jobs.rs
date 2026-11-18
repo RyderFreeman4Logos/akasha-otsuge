@@ -99,7 +99,7 @@ mod tests {
             providers: crate::provider::Client::new().unwrap(),
             runner_slots: Arc::new(Semaphore::new(16)),
             notification_slots: Arc::new(Semaphore::new(1)),
-            search_index: Mutex::new(None),
+            search_index: Mutex::default(),
             index_builder: Mutex::new(()),
             index_epoch: std::sync::atomic::AtomicU64::new(0),
             batch_gate: Mutex::new(None),
@@ -1310,8 +1310,14 @@ impl Service {
             let (previous, mut ids) = service.active()?;
             let mut queued = 0;
             let mut reserved_bytes = 0;
+            let mut rebuild_admitted = false;
+            let mut sync_admitted = false;
             for id in &ids {
                 let (_, job, content_bytes) = service.job_with_size(id)?;
+                sync_admitted |=
+                    matches!(job.retrieval_plan, Some(crate::retrieval::Request::Sync));
+                rebuild_admitted |=
+                    matches!(job.retrieval_plan, Some(crate::retrieval::Request::Rebuild));
                 if job.state == "queued" {
                     queued += 1;
                 }
@@ -1350,19 +1356,20 @@ impl Service {
                 Some(crate::retrieval::Request::Search { .. })
             )
             .then_some(vector_snapshot.generation());
-            let pending = if matches!(retrieval_plan, Some(crate::retrieval::Request::Rebuild)) {
-                retrieval_target_seq.ok_or(Error("JOB_CORRUPT"))?
-            } else if let Some(target) = retrieval_target_seq {
-                let progress =
-                    crate::retrieval::Index::status(&service.storage, snapshot.resolved())?;
-                target.saturating_sub(
-                    progress
-                        .vector
-                        .as_ref()
-                        .map_or(progress.lexical_watermark, |v| {
-                            v.watermark.min(progress.lexical_watermark)
-                        }),
-                )
+            let pending = if let Some(target) = retrieval_target_seq {
+                if matches!(retrieval_plan, Some(crate::retrieval::Request::Rebuild))
+                    || rebuild_admitted
+                {
+                    // A queued replacement can begin from zero before this job gets the builder.
+                    target
+                } else {
+                    crate::retrieval::Index::remaining_sync(
+                        &service.storage,
+                        snapshot.resolved(),
+                        target,
+                        sync_admitted,
+                    )?
+                }
             } else {
                 0
             };

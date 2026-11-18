@@ -128,7 +128,7 @@ struct Service {
     providers: crate::provider::Client,
     runner_slots: Arc<Semaphore>,
     notification_slots: Arc<Semaphore>,
-    search_index: Mutex<Option<Arc<crate::retrieval::Index>>>,
+    search_index: Mutex<crate::retrieval::IndexCache>,
     index_builder: Mutex<()>,
     index_epoch: std::sync::atomic::AtomicU64,
     #[cfg(test)]
@@ -179,7 +179,7 @@ impl Service {
                     .get_or_insert(Error("JOB_ERROR"));
             }
         }
-        self.search_index.lock().await.take();
+        self.search_index.lock().await.published.take();
         if let Err(error) = self.storage.close().await {
             first_error.lock().unwrap().get_or_insert(error.into());
         }
@@ -295,20 +295,25 @@ impl Service {
             Command::IndexStatus { include_queue } => {
                 crate::domain::Domain::new(&self.storage)
                     .permission(&jobs::context()?, Some(&jobs::owner_scope()))?;
-                let mut value = serde_json::to_value(crate::retrieval::Index::status(
-                    &self.storage,
-                    self.config.pin().resolved(),
-                )?)?;
-                value["building"] =
-                    json!(self.index_epoch.load(std::sync::atomic::Ordering::Acquire) % 2 == 1);
-                let active = crate::retrieval::active_vector(&self.storage)?;
-                if include_queue {
-                    if let Some(active) = &active {
-                        value["active_vector_watermark"] =
-                            if value["vector"]["generation"].as_str() == Some(&active.generation) {
+                let snapshot = self.config.pin();
+                let mut value = self
+                    .storage
+                    .serialized_read(|| {
+                        let mut value = crate::retrieval::Index::status_report(
+                            &self.storage,
+                            snapshot.resolved(),
+                        )?;
+                        let active = crate::retrieval::active_vector(&self.storage)?;
+                        if include_queue && let Some(active) = &active {
+                            value["active_vector_watermark"] = if value["vector"]["generation"]
+                                .as_str()
+                                == Some(&active.generation)
+                            {
                                 value["vector"]["watermark"].clone()
                             } else {
-                                let snapshot = self.retrieval_snapshot(active.config_generation)?;
+                                let snapshot = self
+                                    .retrieval_snapshot(active.config_generation)
+                                    .map_err(|e| crate::storage::StorageError::new(e.0))?;
                                 let previous = crate::retrieval::Index::status(
                                     &self.storage,
                                     snapshot.resolved(),
@@ -320,10 +325,16 @@ impl Service {
                                         .map(|v| v.watermark)
                                 )
                             };
-                    }
+                        }
+                        value["active_vector"] = serde_json::to_value(active)?;
+                        Ok(value)
+                    })
+                    .await?;
+                value["building"] =
+                    json!(self.index_epoch.load(std::sync::atomic::Ordering::Acquire) % 2 == 1);
+                if include_queue {
                     value["queue"] = self.queue_observation().await?;
                 }
-                value["active_vector"] = serde_json::to_value(active)?;
                 value["searched_content"] = json!("active_memories");
                 Ok(value)
             }
@@ -737,7 +748,7 @@ async fn open_service(
         providers,
         runner_slots: Arc::new(Semaphore::new(16)),
         notification_slots: Arc::new(Semaphore::new(1)),
-        search_index: Mutex::new(None),
+        search_index: Mutex::default(),
         index_builder: Mutex::new(()),
         index_epoch: std::sync::atomic::AtomicU64::new(0),
         #[cfg(test)]

@@ -25,7 +25,11 @@ fn key(generation: &str) -> RecordKey {
     }
 }
 
-pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<VectorStatus>> {
+pub fn status(
+    storage: &Storage,
+    config: &ResolvedConfig,
+    lexical: &str,
+) -> Result<Option<VectorStatus>> {
     let Some(profile) = &config.config().retrieval.embedding else {
         return Ok(None);
     };
@@ -45,7 +49,6 @@ pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<Vecto
             scopes,
         ))?);
     }
-    let lexical = super::status(storage)?.generation;
     if lexical != GENERATION {
         generation = hash(&serde_json::to_vec(&(&generation, lexical))?);
     }
@@ -74,6 +77,7 @@ pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<Vecto
 }
 
 pub(crate) struct VectorIndex {
+    lexical_generation: String,
     pub generation: String,
     pub(super) table: Table,
     group_search: bool,
@@ -105,6 +109,7 @@ impl VectorIndex {
     pub async fn open(
         connection: &Connection,
         progress: &VectorStatus,
+        lexical_generation: &str,
         budget_mib: u32,
     ) -> Result<Self> {
         let dimension =
@@ -157,6 +162,7 @@ impl VectorIndex {
         }
         Ok(Self {
             generation: progress.generation.clone(),
+            lexical_generation: lexical_generation.into(),
             table,
             schema,
             // Only the constrained (512 MiB) profile demonstrated a benefit from serial groups.
@@ -184,7 +190,8 @@ impl VectorIndex {
         let mut progress = storage
             .serialized_read(|| {
                 authorize()?;
-                status(storage, config)?.ok_or_else(|| error("MODEL_NOT_CONFIGURED"))
+                status(storage, config, &self.lexical_generation)?
+                    .ok_or_else(|| error("MODEL_NOT_CONFIGURED"))
             })
             .await?;
         if progress.generation != self.generation {
@@ -591,19 +598,21 @@ pub(crate) struct ActiveVector {
     pub generation: String,
     pub config_generation: u64,
 }
-fn active_key(storage: &Storage) -> Result<RecordKey> {
-    let generation = super::status(storage)?.generation;
-    Ok(RecordKey {
+fn active_key(generation: &str) -> RecordKey {
+    RecordKey {
         kind: RecordKind::State,
         id: if generation == GENERATION {
             "search/vector-active".into()
         } else {
             format!("search/vector-active/{}", hash(generation.as_bytes()))
         },
-    })
+    }
 }
 pub(crate) fn active_vector(storage: &Storage) -> Result<Option<ActiveVector>> {
-    let active = match storage.current(&active_key(storage)?)? {
+    active_vector_for(storage, &super::status(storage)?.generation)
+}
+fn active_vector_for(storage: &Storage, lexical: &str) -> Result<Option<ActiveVector>> {
+    let active = match storage.current(&active_key(lexical))? {
         Some(row) if storage.locally_written(row.commit_seq)? => {
             Some(serde_json::from_str::<ActiveVector>(&row.content)?)
         }
@@ -635,12 +644,12 @@ pub(crate) async fn activate_vector(
         generation: vector.generation.clone(),
         config_generation: snapshot.generation(),
     };
-    if active_vector(storage)?
+    if active_vector_for(storage, &progress.generation)?
         .is_some_and(|v| v == candidate || v.config_generation > candidate.config_generation)
     {
         return Ok(());
     }
-    let active_key = active_key(storage)?;
+    let active_key = active_key(&progress.generation);
     let current = storage.current(&active_key)?;
     storage
         .commit_checked(|| {

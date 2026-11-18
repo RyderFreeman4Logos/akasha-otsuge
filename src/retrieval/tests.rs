@@ -429,68 +429,432 @@ async fn missing_native_index_does_not_reuse_a_completed_watermark() {
     let target = memory(&store, "durable", "durable searchable text", None).await;
     let index = Index::open(&config, &store).await.unwrap();
     sync(&index, &store, target).await;
-    index.connection.drop_table(TABLE, &[]).await.unwrap();
+    index.owner.connection.drop_table(TABLE, &[]).await.unwrap();
     drop(index);
     assert!(matches!(Index::open(&config, &store).await, Err(e) if e.code == "INDEX_MISSING"));
     store.close().await.unwrap();
 }
 
 #[tokio::test]
-async fn rebuild_generation_survives_restart_and_reclaims_only_old_native_tables() {
-    let fixture = Fixture::new();
-    let config = fixture.config();
-    let store = Storage::open(&config).await.unwrap();
-    let target = memory(&store, "original", "rebuild searchable text", None).await;
-    let original = Domain::new(&store).memory("original").unwrap().unwrap();
-    let index = Index::open(&config, &store).await.unwrap();
-    sync(&index, &store, target).await;
-    drop(index);
-    Index::begin_rebuild(&store, "rebuild-1", 1, &|| Ok(()))
+#[ignore = "launched only by the crash supervisor with an isolated database"]
+async fn rebuild_activation_child() {
+    let root = PathBuf::from(std::env::var_os("AKASHA_TEST_CRASH_ROOT").unwrap());
+    let fixture = std::mem::ManuallyDrop::new(Fixture(root));
+    let store = Storage::open(&fixture.config()).await.unwrap();
+    let pending = pending_rebuild(&store).unwrap().unwrap();
+    Index::publish_rebuild(&store, &pending, 1, pending.lexical_watermark, &|| Ok(()))
         .await
         .unwrap();
-    let pending = status(&store).unwrap();
-    assert_eq!(pending.lexical_watermark, 0);
-    assert_ne!(pending.generation, GENERATION);
-    store.close().await.unwrap();
-    let store = Storage::open(&config).await.unwrap();
-    assert_eq!(status(&store).unwrap().generation, pending.generation);
-    let index = Index::open(&config, &store).await.unwrap();
-    assert_eq!(
-        index
+    panic!("rebuild activation checkpoint not reached");
+}
+
+#[tokio::test]
+async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publication() {
+    for phase in ["rebuild-before-activation", "rebuild-after-activation"] {
+        let fixture = Fixture::new();
+        let config = fixture.config();
+        let store = Storage::open(&config).await.unwrap();
+        let orig = memory(&store, "original", "marmalade original", None).await;
+        let active = Index::open(&config, &store).await.unwrap();
+        sync(&active, &store, orig).await;
+        let added = memory(&store, "later", "watercress later", None).await;
+        let pending = Index::start_rebuild(&store, "replacement", 1, &|| Ok(()))
+            .await
+            .unwrap();
+        assert_eq!(status(&store).unwrap().generation, GENERATION);
+        assert_eq!(
+            Index::remaining_sync(&store, &config, added, false).unwrap(),
+            added
+        );
+        assert_eq!(
+            Index::publish_rebuild(&store, &pending, 1, added, &|| Ok(()))
+                .await
+                .unwrap_err()
+                .code,
+            "INDEX_NOT_READY"
+        );
+        let candidate = Index::open_generation(
+            Arc::new(IndexOwner::open(&config).await.unwrap()),
+            pending,
+            true,
+        )
+        .await
+        .unwrap();
+        let ready = sync(&candidate, &store, added).await;
+        assert_eq!(
+            Index::remaining_sync(&store, &config, added, true).unwrap(),
+            added
+        );
+        assert_eq!(
+            Index::remaining_sync(&store, &config, added, false).unwrap(),
+            0
+        );
+        assert_eq!(
+            active.keyword("marmalade", &scope(), 10).await.unwrap(),
+            [("original".into(), orig)]
+        );
+        assert!(
+            active
+                .keyword("watercress", &scope(), 10)
+                .await
+                .unwrap()
+                .is_empty()
+        );
+        assert_eq!(
+            candidate.keyword("watercress", &scope(), 10).await.unwrap(),
+            [("later".into(), added)]
+        );
+        drop((active, candidate));
+        store.close().await.unwrap();
+        crate::storage::crash_tests::kill_at(
+            &fixture.0,
+            phase,
+            "retrieval::tests::rebuild_activation_child",
+        );
+        let store = Storage::open(&config).await.unwrap();
+        let published = phase == "rebuild-after-activation";
+        let active = Index::open(&config, &store).await.unwrap();
+        assert_eq!(active.generation == ready.generation, published);
+        assert_eq!(
+            active.keyword("marmalade", &scope(), 10).await.unwrap(),
+            [("original".into(), orig)]
+        );
+        assert_eq!(
+            active
+                .keyword("watercress", &scope(), 10)
+                .await
+                .unwrap()
+                .len(),
+            usize::from(published)
+        );
+        assert_eq!(
+            active
+                .owner
+                .connection
+                .table_names()
+                .execute()
+                .await
+                .unwrap()
+                .len(),
+            2
+        );
+        drop(active);
+        if !published {
+            let resumed = pending_rebuild(&store).unwrap().unwrap();
+            assert_eq!(resumed.lexical_watermark, added);
+            Index::publish_rebuild(&store, &resumed, 1, added, &|| Ok(()))
+                .await
+                .unwrap();
+        }
+        let active = Index::open(&config, &store).await.unwrap();
+        let retry =
+            Index::start_rebuild(&store, "fresh-key-before-retirement", 1, &|| Ok(())).await;
+        assert!(matches!(retry, Err(e) if e.code == "INDEX_NOT_READY"));
+        active
+            .owner
+            .finish_retirement(&store, 1, &|| Ok(()))
+            .await
+            .unwrap();
+        assert!(pending_rebuild(&store).unwrap().is_none());
+        assert_eq!(
+            active
+                .owner
+                .connection
+                .table_names()
+                .execute()
+                .await
+                .unwrap(),
+            [table_name(&ready.generation)]
+        );
+        assert_eq!(
+            active.keyword("watercress", &scope(), 10).await.unwrap(),
+            [("later".into(), added)]
+        );
+        assert_eq!(
+            Domain::new(&store)
+                .memory("original")
+                .unwrap()
+                .unwrap()
+                .revision
+                .commit_seq,
+            orig
+        );
+        drop(active);
+        store.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table() {
+    for damaged in ["missing lexical", "corrupt lexical", "corrupt vector"] {
+        let fixture = Fixture::new();
+        let paths = Paths {
+            data_dir: fixture.0.join("data"),
+            socket_path: fixture.0.join("socket"),
+        };
+        let config = resolve("[retrieval]\nembedding='e'\n[models.e]\nkind='embedding'\nmodel='fixture'\nendpoint='http://127.0.0.1:1/v1'\ndimension=2\nlocal=true", None, "", &paths).unwrap();
+        let snapshot = crate::config::ConfigManager::new(1, config.clone(), |_| Ok(()))
+            .unwrap()
+            .pin();
+        let store = Storage::open(&config).await.unwrap();
+        let at = memory(&store, "original", "marmalade published", None).await;
+        let active = Index::open(&config, &store).await.unwrap();
+        sync(&active, &store, at).await;
+        let pending = Index::start_rebuild(&store, "first", 1, &|| Ok(()))
+            .await
+            .unwrap();
+        let old = pending.generation.clone();
+        let candidate = Index::open_candidate(
+            &store,
+            &active.owner,
+            &snapshot,
+            pending,
+            "first",
+            true,
+            &|| Ok(()),
+        )
+        .await
+        .unwrap();
+        sync(&candidate, &store, at).await;
+        drop(candidate);
+        let pending = Index::start_rebuild(&store, "another-key", 1, &|| Ok(()))
+            .await
+            .unwrap();
+        assert_eq!(pending.generation, old);
+        assert_eq!(pending.lexical_watermark, at);
+        let name = if damaged == "corrupt vector" {
+            format!(
+                "memory_vector_{}",
+                pending.candidate_vector.as_ref().unwrap()
+            )
+        } else {
+            table_name(&old)
+        };
+        active
+            .owner
+            .connection
+            .drop_table(&name, &[])
+            .await
+            .unwrap();
+        if damaged != "missing lexical" {
+            let schema = Arc::new(Schema::new(vec![Field::new(
+                "wrong",
+                DataType::UInt64,
+                false,
+            )]));
+            let batches =
+                RecordBatchIterator::new(vec![Ok(RecordBatch::new_empty(schema.clone()))], schema);
+            active
+                .owner
+                .connection
+                .create_table(
+                    &name,
+                    Box::new(batches) as Box<dyn arrow_array::RecordBatchReader + Send>,
+                )
+                .execute()
+                .await
+                .unwrap();
+        }
+        let err = Index::open_candidate(
+            &store,
+            &active.owner,
+            &snapshot,
+            pending.clone(),
+            "sync",
+            false,
+            &|| Ok(()),
+        )
+        .await
+        .err()
+        .unwrap();
+        assert_eq!(
+            err.code,
+            if damaged == "missing lexical" {
+                "INDEX_MISSING"
+            } else {
+                "INDEX_CORRUPT"
+            }
+        );
+        // Interrupt after the first candidate table is dropped, before replacement publication.
+        let drops = std::sync::atomic::AtomicUsize::new(0);
+        let interrupted = || {
+            if pending_rebuild(&store)?.is_some_and(|p| p.discarding)
+                && drops.fetch_add(1, std::sync::atomic::Ordering::Relaxed) >= 1
+            {
+                return Err(error("CANCELLED"));
+            }
+            Ok(())
+        };
+        let err = Index::open_candidate(
+            &store,
+            &active.owner,
+            &snapshot,
+            pending,
+            "repair",
+            true,
+            &interrupted,
+        )
+        .await
+        .err()
+        .unwrap();
+        assert_eq!(err.code, "CANCELLED");
+        assert_eq!(
+            active.keyword("marmalade", &scope(), 20).await.unwrap(),
+            [("original".into(), at)]
+        );
+        drop(active);
+        store.close().await.unwrap();
+        let store = Storage::open(&config).await.unwrap();
+        let pending = pending_rebuild(&store).unwrap().unwrap();
+        assert!(pending.discarding);
+        let replacement = Index::open_candidate(
+            &store,
+            &Arc::new(IndexOwner::open(&config).await.unwrap()),
+            &snapshot,
+            pending,
+            "reopen",
+            false,
+            &|| Ok(()),
+        )
+        .await
+        .unwrap();
+        assert_ne!(replacement.generation, old);
+        let new_vector = vector::status(&store, &config, &replacement.generation)
+            .unwrap()
+            .unwrap();
+        let names: std::collections::BTreeSet<_> = replacement
+            .owner
             .connection
             .table_names()
             .execute()
             .await
             .unwrap()
-            .len(),
-        2
-    );
-    index.retire_previous_tables(&|| Ok(())).await.unwrap();
-    assert_eq!(
-        index.connection.table_names().execute().await.unwrap(),
-        [table_name(&pending.generation)]
-    );
-    let progress = sync(&index, &store, target).await;
-    assert_eq!(progress.indexed_rows, 1);
-    assert_eq!(
-        index.keyword("rebuild", &scope(), 10).await.unwrap(),
-        [("original".into(), original.revision.commit_seq)]
-    );
-    assert_eq!(
-        Domain::new(&store)
-            .memory("original")
-            .unwrap()
-            .unwrap()
-            .revision,
-        original.revision
-    );
-    let sequence = store.sequence().unwrap();
-    Index::begin_rebuild(&store, "rebuild-1", 1, &|| Ok(()))
+            .into_iter()
+            .collect();
+        assert_eq!(
+            names,
+            [
+                TABLE.to_owned(),
+                table_name(&replacement.generation),
+                format!("memory_vector_{}", new_vector.generation)
+            ]
+            .into_iter()
+            .collect()
+        );
+        assert_eq!(status(&store).unwrap().generation, GENERATION);
+        drop(replacement);
+        store.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn candidate_manifest_detects_missing_data_and_truncated_index_files() {
+    use lance::index::DatasetIndexExt;
+    for damage_index in [false, true] {
+        let fixture = Fixture::new();
+        let config = fixture.config();
+        let store = Storage::open(&config).await.unwrap();
+        let at = memory(&store, "first", "purple orchard", None).await;
+        let pending = Index::start_rebuild(&store, "candidate", 1, &|| Ok(()))
+            .await
+            .unwrap();
+        let table = table_name(&pending.generation);
+        let index = Index::open_generation(
+            Arc::new(IndexOwner::open(&config).await.unwrap()),
+            pending,
+            true,
+        )
         .await
         .unwrap();
-    assert_eq!(store.sequence().unwrap(), sequence);
-    assert_eq!(status(&store).unwrap().lexical_watermark, target);
-    drop(index);
+        sync(&index, &store, at).await;
+        index.check_candidate_files(&|| Ok(())).await.unwrap();
+        let root = config
+            .config()
+            .paths
+            .data_dir
+            .join("search")
+            .join(format!("{table}.lance"));
+        let dataset = index.table.dataset().unwrap().get().await.unwrap();
+        if damage_index {
+            let indices = dataset.load_indices().await.unwrap();
+            let segment = &indices[0];
+            let file = &segment.files.as_ref().unwrap()[0];
+            assert!(file.size_bytes > 1);
+            std::fs::OpenOptions::new()
+                .write(true)
+                .open(
+                    root.join("_indices")
+                        .join(segment.uuid.to_string())
+                        .join(&file.path),
+                )
+                .unwrap()
+                .set_len(1)
+                .unwrap();
+        } else {
+            let file = &dataset.iter_fragments().next().unwrap().files[0];
+            std::fs::remove_file(root.join("data").join(&file.path)).unwrap();
+        }
+        assert!(index.check_candidate_files(&|| Ok(())).await.is_err());
+        assert_eq!(status(&store).unwrap().generation, GENERATION);
+        drop(index);
+        store.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn published_and_candidate_share_one_native_session_across_budget_changes() {
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let mut cache = IndexCache::default();
+    let published = Arc::new(
+        Index::open_generation(
+            cache.owner(&config).await.unwrap(),
+            status(&store).unwrap(),
+            false,
+        )
+        .await
+        .unwrap(),
+    );
+    cache.published = Some(published.clone());
+    let pending = Index::start_rebuild(&store, "candidate", 1, &|| Ok(()))
+        .await
+        .unwrap();
+    let candidate = Index::open_generation(cache.owner(&config).await.unwrap(), pending, true)
+        .await
+        .unwrap();
+    assert!(Arc::ptr_eq(&published.owner, &candidate.owner));
+    let session =
+        |table: Table| async move { table.dataset().unwrap().get().await.unwrap().session() };
+    assert!(Arc::ptr_eq(
+        &session(published.table.clone()).await,
+        &session(candidate.table.clone()).await
+    ));
+    let new_budget = if published.budget_mib == 512 {
+        1024
+    } else {
+        512
+    };
+    let changed = resolve(
+        &format!("[runtime]\nmemory_budget_mib={new_budget}"),
+        None,
+        "",
+        &config.config().paths,
+    )
+    .unwrap();
+    assert_eq!(
+        cache.owner(&changed).await.err().unwrap().code,
+        "RESOURCE_BUSY"
+    );
+    drop(published);
+    assert_eq!(
+        cache.owner(&changed).await.err().unwrap().code,
+        "RESOURCE_BUSY"
+    );
+    assert_eq!(cache.open_budget_mib(), Some(candidate.budget_mib));
+    drop(candidate);
+    let owner = cache.owner(&changed).await.unwrap();
+    assert_eq!(owner.budget_mib, new_budget);
     store.close().await.unwrap();
 }
 
@@ -524,6 +888,7 @@ async fn maintenance_keeps_unindexed_reads_and_authority_progress() {
     assert!(fragments > 2);
     let version = index.table.version().await.unwrap();
     let previous = index
+        .owner
         .connection
         .open_table(table_name(&index.generation))
         .execute()
