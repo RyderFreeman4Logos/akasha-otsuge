@@ -20,22 +20,58 @@ test('runner calls inherit the absolute deadline without restarting its budget',
       try { return await callback(...args); } catch (error) { return handler(error); }
     })};
   });
-  const start = Date.now(), deadline = start + 30000;
-  const $ = {env:{get:async key => key === 'AKASHA_RUN_BRIDGE' ? '/owned/bridge' : String(deadline)},
-    process:{run:async (_command, options) => {
-      timeouts.push(options.timeoutMs);
-      return {exitCode:0,stdout:JSON.stringify({data:{answer:'done'}})};
-    }}};
+  const start = Date.now(), deadline = start + 1_700_000;
+  const output = JSON.stringify({data:{answer:'done'}});
   const event = {tool:'mcp__akasha-runner__delegate',hint:'child'};
+  const argv = ['/owned/bridge', 'adapter', 'claude-read'];
+  const request = {operation:'delegate', hint:'child'};
+  let chunks = [{stream:'stdout', text:output.slice(0, 3)}, {stream:'stderr', text:'notice'}, {stream:'stdout', text:output.slice(3)}];
+  let exit = {code:0, signal:null};
+  let closed = 0;
+  const $ = {
+    env:{get:async key => key === 'AKASHA_RUN_BRIDGE' ? argv[0] : String(deadline)},
+    process:{
+      run:async (command, options) => {
+        assert.deepEqual(command, argv);
+        assert.deepEqual(JSON.parse(options.stdin), request);
+        timeouts.push(options.timeoutMs);
+        return {exitCode:0, stdout:output};
+      },
+      async *spawn(options) {
+        assert.deepEqual(options, {argv, input:JSON.stringify(request)});
+        try {
+          yield* chunks;
+          return exit;
+        } finally {
+          closed++;
+        }
+      },
+    },
+  };
+  const call = () => hooks.get('tool.call')($, event);
+  const success = {result:JSON.stringify({answer:'done'})};
+  const failure = {deny:'AKASHA_READ_FAILED'};
   t.mock.method(Date, 'now', () => start);
-  assert((await hooks.get('tool.call')($, event)).result);
-  t.mock.method(Date, 'now', () => start + 11000);
-  assert((await hooks.get('tool.call')($, event)).result);
-  assert.equal(timeouts[0] - timeouts[1], 11000);
-  assert(timeouts[0] > 15000);
-  t.mock.method(Date, 'now', () => deadline + 1);
-  assert((await hooks.get('tool.call')($, event)).deny);
-  assert.equal(timeouts.length, 2);
+  assert.deepEqual(await call(), success);
+  t.mock.method(Date, 'now', () => deadline - 600001);
+  assert.deepEqual(await call(), success);
+  exit = {code:1, signal:null};
+  assert.deepEqual(await call(), failure);
+  exit = {code:null, signal:'SIGTERM'};
+  assert.deepEqual(await call(), failure);
+  exit = {code:0, signal:null};
+  for (const stream of ['stderr', 'stdout']) {
+    chunks = [{stream:'stdout', text:output}, {stream, text:'字'.repeat(1_400_000)}];
+    assert.deepEqual(await call(), failure);
+  }
+  assert.equal(closed, 6);
+  for (const remaining of [600000, 30000, 19000, 1]) {
+    t.mock.method(Date, 'now', () => deadline - remaining);
+    assert.deepEqual(await call(), success);
+  }
+  t.mock.method(Date, 'now', () => deadline);
+  assert.deepEqual(await call(), {deny:'RUNNER_TIMEOUT'});
+  assert.deepEqual(timeouts, [600000, 30000, 19000, 1]);
 });
 
 async function fixture(initialCwd = '/workspace/A') {
