@@ -76,12 +76,17 @@ pub fn status(storage: &Storage, config: &ResolvedConfig) -> Result<Option<Vecto
 pub(crate) struct VectorIndex {
     pub generation: String,
     pub(super) table: Table,
+    group_search: bool,
     schema: Arc<Schema>,
     pub(super) maintained_version: std::sync::atomic::AtomicU64,
 }
 
 impl VectorIndex {
-    pub async fn open(connection: &Connection, progress: &VectorStatus) -> Result<Self> {
+    pub async fn open(
+        connection: &Connection,
+        progress: &VectorStatus,
+        budget_mib: u32,
+    ) -> Result<Self> {
         let dimension =
             i32::try_from(progress.dimension).map_err(|_| error("INVALID_DIMENSION"))?;
         let schema = Arc::new(Schema::new(vec![
@@ -134,6 +139,8 @@ impl VectorIndex {
             generation: progress.generation.clone(),
             table,
             schema,
+            // Only the constrained (512 MiB) profile demonstrated a benefit from serial groups.
+            group_search: budget_mib <= 512,
             maintained_version: std::sync::atomic::AtomicU64::new(0),
         })
     }
@@ -363,14 +370,21 @@ impl VectorIndex {
         vector: &[f32],
         scope: &Scope,
         limit: usize,
+        authorize: impl Fn() -> Result<()>,
     ) -> Result<Vec<(String, u64)>> {
         let filter = format!("scope = '{}'", hash(&serde_json::to_vec(scope)?));
-        if let Some(native) = self.table.dataset() {
+        if self.group_search
+            && let Some(native) = self.table.dataset()
+        {
+            authorize()?;
             let dataset = native.get().await.map_err(index_error)?;
-            if let Some(rows) = segments::search(&dataset, vector, &filter, limit).await? {
+            if let Some(rows) =
+                segments::search(&dataset, vector, &filter, limit, &authorize).await?
+            {
                 return Ok(rows);
             }
         }
+        authorize()?;
         let stream = self
             .table
             .query()

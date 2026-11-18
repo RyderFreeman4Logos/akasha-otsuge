@@ -703,12 +703,12 @@ async fn maintenance_keeps_the_writer_generation_when_a_reader_replaces_the_cach
         .unwrap();
     let reader_after = reader.table.version().await.unwrap();
     let reader_rows = reader
-        .search(&[1.0, 0.0], &scope(), 64)
+        .search(&[1.0, 0.0], &scope(), 64, || Ok(()))
         .await
         .unwrap()
         .len();
     let writer_rows = writer
-        .search(&[1.0, 0.0], &scope(), 64)
+        .search(&[1.0, 0.0], &scope(), 64, || Ok(()))
         .await
         .unwrap()
         .len();
@@ -745,10 +745,13 @@ async fn segmented_ann_preserves_unindexed_rows_and_snapshot_during_native_updat
     };
 
     let fixture = Fixture::new();
-    let cfg=resolve(
-        "[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint='http://127.0.0.1:1/v1'\nmodel='s'\ndimension=2\nlocal=true",
-        None,"",&Paths { data_dir:fixture.0.join("data"),socket_path:fixture.0.join("run/socket") },
-    ).unwrap();
+    let config = |budget| {
+        resolve(
+            &format!("[runtime]\nmemory_budget_mib={budget}\n[retrieval]\nembedding='embed'\n[models.embed]\nkind='embedding'\nendpoint='http://127.0.0.1:1/v1'\nmodel='s'\ndimension=2\nlocal=true"),
+            None, "", &Paths { data_dir: fixture.0.join("data"), socket_path: fixture.0.join("run/socket") },
+        ).unwrap()
+    };
+    let cfg = config(512);
     let storage = Storage::open(&cfg).await.unwrap();
     let owner = Index::open(&cfg, &storage).await.unwrap();
     let index = owner.vector_index(&storage, &cfg).await.unwrap();
@@ -793,7 +796,7 @@ async fn segmented_ann_preserves_unindexed_rows_and_snapshot_during_native_updat
     };
     table.add(records(0, 32)).execute().await.unwrap();
     assert_eq!(
-        index.search(&query, &scope(), 8).await.unwrap(),
+        index.search(&query, &scope(), 8, || Ok(())).await.unwrap(),
         hits(32, &[])
     );
     table
@@ -836,8 +839,45 @@ async fn segmented_ann_preserves_unindexed_rows_and_snapshot_during_native_updat
     let previous = snapshot.dataset().unwrap().get().await.unwrap();
     let previous_version = previous.version().version;
     let filter = format!("scope = '{key}'");
+    // Three ANN groups, tail discovery, one flat group, then the final row fetch.
+    for (stop, code) in [(2, "CANCELLED"), (5, "WORKFLOW_TIMEOUT"), (6, "CANCELLED")] {
+        let calls = std::cell::Cell::new(0);
+        let stopped = vector::segments::search(&previous, &query, &filter, 8, &|| {
+            calls.set(calls.get() + 1);
+            if calls.get() == stop {
+                Err(error(code))
+            } else {
+                Ok(())
+            }
+        })
+        .await
+        .unwrap_err();
+        assert_eq!(stopped.code, code);
+        assert_eq!(calls.get(), stop);
+    }
+
+    // A reopened index uses the live owner budget even when reading an old model generation.
+    let high = Index::open(&config(2048), &storage).await.unwrap();
+    let old_generation = high.vector_index(&storage, &cfg).await.unwrap();
+    assert_eq!(old_generation.generation, index.generation);
+    let calls = std::cell::Cell::new(0);
+    let native_hits = old_generation
+        .search(&query, &scope(), 8, || {
+            calls.set(calls.get() + 1);
+            Ok(())
+        })
+        .await
+        .unwrap();
+    assert_eq!(native_hits, hits(294, &[]));
+    assert_eq!(
+        calls.get(),
+        1,
+        "ample budget should dispatch the ordinary scan"
+    );
+    drop(old_generation);
+    drop(high);
     let old_query = async {
-        vector::segments::search(&previous, &query, &filter, 8)
+        vector::segments::search(&previous, &query, &filter, 8, &|| Ok(()))
             .await
             .unwrap()
             .unwrap()
@@ -861,14 +901,14 @@ async fn segmented_ann_preserves_unindexed_rows_and_snapshot_during_native_updat
     assert_eq!(old, hits(294, &[]));
     assert!(table.version().await.unwrap() > previous_version);
     assert_eq!(
-        vector::segments::search(&previous, &query, &filter, 8)
+        vector::segments::search(&previous, &query, &filter, 8, &|| Ok(()))
             .await
             .unwrap()
             .unwrap(),
         old
     );
     assert_eq!(
-        index.search(&query, &scope(), 8).await.unwrap(),
+        index.search(&query, &scope(), 8, || Ok(())).await.unwrap(),
         hits(300, &[286, 292])
     );
     table
@@ -876,8 +916,61 @@ async fn segmented_ann_preserves_unindexed_rows_and_snapshot_during_native_updat
         .await
         .unwrap();
     assert_eq!(
-        index.search(&query, &scope(), 8).await.unwrap(),
+        index.search(&query, &scope(), 8, || Ok(())).await.unwrap(),
         hits(300, &[286, 292])
+    );
+    // An unrelated scalar index whose segments name different columns cannot be
+    // described. The scoped vector scan itself can still use its healthy indices.
+    use lance::{Dataset, dataset::transaction::Operation, index::DatasetIndexExt};
+    for column in ["id", "key"] {
+        table
+            .create_index(&[column], NativeIndex::BTree(BTreeIndexBuilder::default()))
+            .execute()
+            .await
+            .unwrap();
+    }
+    let native = table.dataset().unwrap();
+    let current = native.get().await.unwrap();
+    let metadata = current.load_indices().await.unwrap();
+    let id = metadata.iter().find(|i| i.name == "id_idx").unwrap();
+    let key = metadata.iter().find(|i| i.name == "key_idx").unwrap();
+    let mut mixed = key.clone();
+    mixed.name.clone_from(&id.name);
+    let legacy = Dataset::commit(
+        current.uri(),
+        Operation::CreateIndex {
+            new_indices: vec![id.clone(), mixed],
+            removed_indices: vec![id.clone(), key.clone()],
+        },
+        Some(current.version().version),
+        None,
+        None,
+        current.session(),
+        false,
+    )
+    .await
+    .unwrap();
+    assert!(
+        legacy
+            .describe_indices(None)
+            .await
+            .err()
+            .unwrap()
+            .to_string()
+            .contains("Index fields")
+    );
+    native.update(legacy);
+    assert_eq!(
+        index.search(&query, &scope(), 8, || Ok(())).await.unwrap(),
+        hits(300, &[286, 292])
+    );
+    assert_eq!(
+        index
+            .search(&[1.0, 0.0, 0.0], &scope(), 8, || Ok(()))
+            .await
+            .unwrap_err()
+            .code,
+        "INDEX_IO"
     );
     drop(index);
     drop(owner);

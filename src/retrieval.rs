@@ -391,7 +391,7 @@ impl Index {
             .is_none_or(|v| v.generation != progress.generation)
         {
             *vector = Some(Arc::new(
-                vector::VectorIndex::open(&self.connection, &progress).await?,
+                vector::VectorIndex::open(&self.connection, &progress, self.budget_mib).await?,
             ));
         }
         Ok(vector.as_ref().unwrap().clone())

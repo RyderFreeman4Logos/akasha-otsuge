@@ -14,9 +14,14 @@ pub(in crate::retrieval) async fn search(
     query: &[f32],
     filter: &str,
     limit: usize,
+    authorize: &impl Fn() -> Result<()>,
 ) -> Result<Option<Vec<(String, u64)>>> {
     let column = dataset.schema().field_id("vector").map_err(index_error)? as u32;
-    let indices = dataset.describe_indices(None).await.map_err(index_error)?;
+    // Legacy manifests may lack the coverage metadata required for index descriptions.
+    // The ordinary native scanner can still read these tables.
+    let Ok(indices) = dataset.describe_indices(None).await else {
+        return Ok(None);
+    };
     let mut matching = indices.iter().filter(|index| index.field_ids() == [column]);
     let Some(index) = matching.next() else {
         return Ok(None);
@@ -61,6 +66,7 @@ pub(in crate::retrieval) async fn search(
             return Ok(None);
         }
         let (group, next) = rest.split_at(count);
+        authorize()?;
         let mut scanner = scanner()?;
         scanner
             .with_index_segments(group.iter().map(|s| s.uuid).collect())
@@ -68,6 +74,7 @@ pub(in crate::retrieval) async fn search(
         collect(&mut scanner, limit, &mut best).await?;
         rest = next;
     }
+    authorize()?;
     let unindexed = dataset
         .unindexed_fragments(index.name())
         .await
@@ -80,6 +87,7 @@ pub(in crate::retrieval) async fn search(
                 .map(|rows| (rows as u64).saturating_mul(query.len() as u64 * 4 + 32))
         }));
         let (group, next) = rest.split_at(count);
+        authorize()?;
         let mut scanner = scanner()?;
         scanner.with_fragments(group.to_vec()).use_index(false);
         collect(&mut scanner, limit, &mut best).await?;
@@ -91,6 +99,7 @@ pub(in crate::retrieval) async fn search(
     let row_ids: Vec<_> = best.into_iter().map(|(_, id)| id).collect();
     let projection =
         lance::dataset::ProjectionRequest::from_columns(["id", "revision"], dataset.schema());
+    authorize()?;
     let projected = dataset
         .take_rows(&row_ids, projection)
         .await
