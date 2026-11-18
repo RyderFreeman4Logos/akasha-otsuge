@@ -763,6 +763,71 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn queue_scan_restarts_from_the_oldest_waiter_when_a_worker_finishes() {
+        let (fixture, service, binding) =
+            fixture("completed-queue-slot", "[runtime]\nmax_concurrent_jobs=1").await;
+        let path = fixture.0.join("transcript");
+        std::fs::write(&path, "").unwrap();
+        let waiting: Vec<_> = (0..32).map(|i| format!("queued-{i:02}")).collect();
+        for id in std::iter::once("finished").chain(waiting.iter().map(String::as_str)) {
+            service
+                .submit(id.into(), binding.clone(), path.clone())
+                .await
+                .unwrap();
+        }
+        assert!(service.claim("finished", 0).await.unwrap());
+        let (persisted, finished) = tokio::sync::oneshot::channel();
+        let (release, retire) = tokio::sync::oneshot::channel();
+        let mut running = JoinSet::new();
+        let executor = service.clone();
+        let worker = running.spawn(async move {
+            let result = executor.execute_job("finished".into()).await;
+            persisted.send(()).unwrap();
+            retire.await.unwrap();
+            ("finished".to_owned(), result)
+        });
+        finished.await.unwrap();
+        assert_eq!(service.job("finished").unwrap().1.state, "succeeded");
+        let mut owned = BTreeSet::from(["finished".to_owned()]);
+        let ids = service.active().unwrap().1;
+        assert_eq!(ids, waiting);
+        let visited = std::cell::Cell::new(0);
+        let ids = ids.into_iter().inspect(|_| visited.set(visited.get() + 1));
+        {
+            let guard = service.admission.lock().await;
+            let mut scan = std::pin::pin!(service.dispatch_queued(ids, &mut owned, &mut running));
+            // The first claim is waiting for admission with the old running count.
+            assert!(futures::poll!(&mut scan).is_pending());
+            release.send(()).unwrap();
+            while !worker.is_finished() {
+                tokio::task::yield_now().await;
+            }
+            drop(guard);
+            let restart = scan.await.unwrap();
+            assert_eq!(
+                visited.get(),
+                2,
+                "queue entries visited before rechecking the head"
+            );
+            assert!(restart);
+        }
+        assert!(owned.is_empty());
+        assert!(running.is_empty());
+        for id in &waiting {
+            assert!(service.job(id).unwrap().1.started_at_ms.is_none());
+        }
+        let ids = service.active().unwrap().1;
+        service
+            .dispatch_queued(ids, &mut owned, &mut running)
+            .await
+            .unwrap();
+        assert!(service.job(&waiting[0]).unwrap().1.started_at_ms.is_some());
+        assert!(service.job(&waiting[1]).unwrap().1.started_at_ms.is_none());
+        service.drain_jobs(running, Ok(())).await.unwrap();
+        service.storage.close().await.unwrap();
+    }
+
+    #[tokio::test]
     async fn claim_checks_reloaded_cap_after_waiting_for_admission() {
         let (fixture, service, binding) =
             fixture("cap", "[runtime]\nmax_concurrent_jobs=2\n").await;
@@ -2087,6 +2152,41 @@ impl Service {
             }
         }
     }
+    // Return true when a completion requires a new pass from the head of the queue.
+    async fn dispatch_queued(
+        self: &Arc<Self>,
+        ids: impl IntoIterator<Item = String>,
+        owned: &mut BTreeSet<String>,
+        running: &mut JoinSet<(String, Result<()>)>,
+    ) -> Result<bool> {
+        for id in ids {
+            // A worker can finish while claim waits for admission or storage. Retry
+            // earlier waiters before letting a later job use the released slot.
+            let mut completed = false;
+            while let Some(result) = running.try_join_next() {
+                let (id, outcome) = result.map_err(|_| Error("JOB_ERROR"))?;
+                owned.remove(&id);
+                outcome?;
+                completed = true;
+            }
+            if completed {
+                return Ok(true);
+            }
+            if !owned.contains(&id) && self.claim(&id, owned.len()).await? {
+                owned.insert(id.clone());
+                let service = self.clone();
+                running.spawn(async move {
+                    let result = match service.clone().execute_job(id.clone()).await {
+                        Err(Error("RESOURCE_BUSY")) => service.finish_pressured_job(&id).await,
+                        result => result,
+                    };
+                    (id, result)
+                });
+            }
+        }
+        Ok(false)
+    }
+
     pub(super) async fn jobs(self: Arc<Self>) -> Result<()> {
         let mut running = JoinSet::new();
         let mut owned = BTreeSet::new();
@@ -2096,6 +2196,7 @@ impl Service {
         let mut tick = tokio::time::interval(Duration::from_secs(1));
         let outcome = async {
         loop {
+            let mut rescan = false;
             if !self.stopping.load(std::sync::atomic::Ordering::Acquire) && !self.storage_reopen_required() {
                 if running.is_empty() && notifications.is_empty() {
                     self.reconcile_kernel_limits().await?;
@@ -2111,19 +2212,7 @@ impl Service {
                     let _guard = self.admission.lock().await;
                     self.active()?.1
                 };
-                for id in ids {
-                    if !owned.contains(&id) && self.claim(&id, owned.len()).await? {
-                        owned.insert(id.clone());
-                        let service = self.clone();
-                        running.spawn(async move {
-                            let result = match service.clone().execute_job(id.clone()).await {
-                                Err(Error("RESOURCE_BUSY")) => service.finish_pressured_job(&id).await,
-                                result => result,
-                            };
-                            (id, result)
-                        });
-                    }
-                }
+                rescan = self.dispatch_queued(ids, &mut owned, &mut running).await?;
             } else if running.is_empty() && notifications.is_empty() {
                 self.reopen_ready.store(!self.stopping.load(std::sync::atomic::Ordering::Acquire), std::sync::atomic::Ordering::Release);
                 break;
@@ -2133,6 +2222,7 @@ impl Service {
                 Some(result)=running.join_next(),if !running.is_empty()=>{let (id,result)=result.map_err(|_|Error("JOB_ERROR"))?;owned.remove(&id);result?;},
                 _=self.work.notified()=>{},
                 _=tick.tick()=>{},
+                _=std::future::ready(()),if rescan=>{},
             }
         }
         Ok(())
