@@ -163,6 +163,9 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
         query = next(t for t in request['params']['dynamicTools'] if t['name'] == 'context_search')['inputSchema']['properties']['query']
         assert (query['minLength'], query['maxLength']) == (1, 512)
         assert 'non-whitespace' in query['description']
+        for term in ('你\n\t📚', '😀' * 512):
+            response = tool('context_search', {'query': term, 'limit': 1})
+            assert response['kind'] == 'page', response
         pagination = json.loads(result['result']['contentItems'][0]['text'])['value']['pagination']
         assert pagination['tools'] == ['context_list', 'context_search']
         assert (pagination['min_limit'], pagination['max_limit']) == (1, 16)
