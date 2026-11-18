@@ -564,3 +564,154 @@ async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publi
         store.close().await.unwrap();
     }
 }
+
+#[tokio::test]
+async fn damaged_candidate_cleanup_resumes_without_touching_the_published_table() {
+    for damaged in ["missing lexical", "corrupt lexical", "corrupt vector"] {
+        let fixture = Fixture::new();
+        let paths = Paths {
+            data_dir: fixture.0.join("data"),
+            socket_path: fixture.0.join("socket"),
+        };
+        let config = resolve("[retrieval]\nembedding='e'\n[models.e]\nkind='embedding'\nmodel='fixture'\nendpoint='http://127.0.0.1:1/v1'\ndimension=2\nlocal=true", None, "", &paths).unwrap();
+        let snapshot = crate::config::ConfigManager::new(1, config.clone(), |_| Ok(()))
+            .unwrap()
+            .pin();
+        let store = Storage::open(&config).await.unwrap();
+        let at = memory(&store, "original", "marmalade published", None).await;
+        let active = Index::open(&config, &store).await.unwrap();
+        sync(&active, &store, at).await;
+        let pending = Index::start_rebuild(&store, "first", 1, &|| Ok(()))
+            .await
+            .unwrap();
+        let old = pending.generation.clone();
+        let candidate =
+            Index::open_candidate(&store, &config, &snapshot, pending, "first", true, &|| {
+                Ok(())
+            })
+            .await
+            .unwrap();
+        sync(&candidate, &store, at).await;
+        drop(candidate);
+        let pending = Index::start_rebuild(&store, "another-key", 1, &|| Ok(()))
+            .await
+            .unwrap();
+        assert_eq!(pending.generation, old);
+        assert_eq!(pending.lexical_watermark, at);
+        let name = if damaged == "corrupt vector" {
+            format!(
+                "memory_vector_{}",
+                pending.candidate_vector.as_ref().unwrap()
+            )
+        } else {
+            table_name(&old)
+        };
+        active.connection.drop_table(&name, &[]).await.unwrap();
+        if damaged != "missing lexical" {
+            let schema = Arc::new(Schema::new(vec![Field::new(
+                "wrong",
+                DataType::UInt64,
+                false,
+            )]));
+            let batches =
+                RecordBatchIterator::new(vec![Ok(RecordBatch::new_empty(schema.clone()))], schema);
+            active
+                .connection
+                .create_table(
+                    &name,
+                    Box::new(batches) as Box<dyn arrow_array::RecordBatchReader + Send>,
+                )
+                .execute()
+                .await
+                .unwrap();
+        }
+        let err = Index::open_candidate(
+            &store,
+            &config,
+            &snapshot,
+            pending.clone(),
+            "sync",
+            false,
+            &|| Ok(()),
+        )
+        .await
+        .err()
+        .unwrap();
+        assert_eq!(
+            err.code,
+            if damaged == "missing lexical" {
+                "INDEX_MISSING"
+            } else {
+                "INDEX_CORRUPT"
+            }
+        );
+        // Interrupt after the first candidate table is dropped, before replacement publication.
+        let drops = std::sync::atomic::AtomicUsize::new(0);
+        let interrupted = || {
+            if pending_rebuild(&store)?.is_some_and(|p| p.discarding)
+                && drops.fetch_add(1, std::sync::atomic::Ordering::Relaxed) >= 1
+            {
+                return Err(error("CANCELLED"));
+            }
+            Ok(())
+        };
+        let err = Index::open_candidate(
+            &store,
+            &config,
+            &snapshot,
+            pending,
+            "repair",
+            true,
+            &interrupted,
+        )
+        .await
+        .err()
+        .unwrap();
+        assert_eq!(err.code, "CANCELLED");
+        assert_eq!(
+            active.keyword("marmalade", &scope(), 20).await.unwrap(),
+            [("original".into(), at)]
+        );
+        drop(active);
+        store.close().await.unwrap();
+        let store = Storage::open(&config).await.unwrap();
+        let pending = pending_rebuild(&store).unwrap().unwrap();
+        assert!(pending.discarding);
+        let replacement = Index::open_candidate(
+            &store,
+            &config,
+            &snapshot,
+            pending,
+            "reopen",
+            false,
+            &|| Ok(()),
+        )
+        .await
+        .unwrap();
+        assert_ne!(replacement.generation, old);
+        let new_vector = vector::status(&store, &config, &replacement.generation)
+            .unwrap()
+            .unwrap();
+        let names: std::collections::BTreeSet<_> = replacement
+            .connection
+            .table_names()
+            .execute()
+            .await
+            .unwrap()
+            .into_iter()
+            .collect();
+        assert_eq!(
+            names,
+            [
+                TABLE.to_owned(),
+                table_name(&replacement.generation),
+                format!("memory_vector_{}", new_vector.generation)
+            ]
+            .into_iter()
+            .collect()
+        );
+        assert_eq!(status(&store).unwrap().generation, GENERATION);
+        drop(replacement);
+        store.close().await.unwrap();
+    }
+}

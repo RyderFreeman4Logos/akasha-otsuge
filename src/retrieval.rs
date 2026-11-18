@@ -129,6 +129,10 @@ pub struct Status {
     pub indexed_rows: usize,
     #[serde(default)]
     pub vector: Option<VectorStatus>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    candidate_vector: Option<String>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    discarding: bool,
 }
 
 fn pending_key() -> RecordKey {
@@ -144,6 +148,8 @@ fn empty_progress(generation: String) -> Status {
         lexical_watermark: 0,
         indexed_rows: 0,
         vector: None,
+        candidate_vector: None,
+        discarding: false,
     }
 }
 
@@ -174,6 +180,13 @@ pub(crate) fn pending_rebuild(storage: &Storage) -> Result<Option<Status>> {
     let pending = serde_json::from_str::<Option<Status>>(&row.content)?;
     if let Some(progress) = &pending {
         validate_progress(storage, progress)?;
+        if progress
+            .candidate_vector
+            .as_ref()
+            .is_some_and(|id| id.len() != 64 || !id.bytes().all(|b| b.is_ascii_hexdigit()))
+        {
+            return Err(error("INDEX_CORRUPT"));
+        }
     }
     Ok(pending)
 }
@@ -217,23 +230,8 @@ impl Index {
         pending: bool,
     ) -> Result<Self> {
         let name = table_name(&progress.generation);
-        let root = config.config().paths.data_dir.join("search");
-        crate::daemon::private_dir(&root).map_err(|e| error(e.0))?;
         let budget_mib = config.config().runtime.memory_budget_mib;
-        let bytes = budget_mib as usize * 1024 * 1024;
-        let session = Session::new(
-            bytes / 32,
-            bytes / 64,
-            Arc::new(ObjectStoreRegistry::default()),
-        )
-        .with_spill_store(Arc::new(
-            lance_io::spill::LocalSpillStore::with_cap((bytes / 8) as u64).map_err(index_error)?,
-        ));
-        let connection = lancedb::connect(root.to_str().ok_or_else(|| error("INVALID_PATH"))?)
-            .session(Arc::new(session))
-            .execute()
-            .await
-            .map_err(index_error)?;
+        let connection = Self::connection(config).await?;
         let schema = Arc::new(Schema::new(vec![
             Field::new("key", DataType::Utf8, false),
             Field::new("id", DataType::Utf8, false),
@@ -283,29 +281,128 @@ impl Index {
         })
     }
 
+    async fn connection(config: &ResolvedConfig) -> Result<Connection> {
+        let root = config.config().paths.data_dir.join("search");
+        crate::daemon::private_dir(&root).map_err(|e| error(e.0))?;
+        let bytes = config.config().runtime.memory_budget_mib as usize * 1024 * 1024;
+        let session = Session::new(
+            bytes / 32,
+            bytes / 64,
+            Arc::new(ObjectStoreRegistry::default()),
+        )
+        .with_spill_store(Arc::new(
+            lance_io::spill::LocalSpillStore::with_cap((bytes / 8) as u64).map_err(index_error)?,
+        ));
+        lancedb::connect(root.to_str().ok_or_else(|| error("INVALID_PATH"))?)
+            .session(Arc::new(session))
+            .execute()
+            .await
+            .map_err(index_error)
+    }
+
     pub(crate) async fn start_rebuild(
         storage: &Storage,
         id: &str,
         config_generation: u64,
         authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<Status> {
-        let generation = format!("{GENERATION}-{}", hash(id.as_bytes()));
+        let published = status(storage)?.generation;
         if let Some(pending) = pending_rebuild(storage)?
-            && pending.generation == generation
+            && pending.generation != published
         {
             return Ok(pending);
         }
-        let progress = empty_progress(generation);
-        publish_progress(
-            storage,
-            pending_key(),
-            config_generation,
-            &progress,
-            vec![],
-            authorize,
-        )
-        .await?;
+        let suffix = hash(&serde_json::to_vec(&("rebuild", published, id))?);
+        let progress = empty_progress(format!("{GENERATION}-{suffix}"));
+        save_pending(storage, config_generation, Some(&progress), authorize).await?;
         Ok(progress)
+    }
+
+    // The service holds the sole builder throughout this operation. A candidate cannot
+    // acquire search readers until its generation becomes the published one.
+    pub(crate) async fn open_candidate(
+        storage: &Storage,
+        live: &ResolvedConfig,
+        config: &crate::config::Snapshot<()>,
+        mut pending: Status,
+        job: &str,
+        mut repair: bool,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<Self> {
+        loop {
+            if pending.generation == status(storage)?.generation {
+                return Err(error("INDEX_GENERATION_MISMATCH"));
+            }
+            let vector = vector::status(storage, config.resolved(), &pending.generation)?
+                .map(|v| v.generation);
+            let changed = matches!((&pending.candidate_vector, &vector), (Some(owned), Some(wanted)) if owned != wanted);
+            if !pending.discarding && !changed {
+                if pending.candidate_vector.is_none() && vector.is_some() {
+                    // Record ownership before opening or creating this native vector table.
+                    pending.candidate_vector.clone_from(&vector);
+                    save_pending(storage, config.generation(), Some(&pending), authorize).await?;
+                }
+                authorize()?;
+                let opened = async {
+                    let index = Self::open_generation(live, pending.clone(), true).await?;
+                    if vector.is_some() {
+                        index.vector_index(storage, config.resolved()).await?;
+                    }
+                    Ok(index)
+                }
+                .await;
+                match opened {
+                    Err(StorageError {
+                        code: "INDEX_MISSING" | "INDEX_CORRUPT" | "INDEX_IO",
+                        ..
+                    }) if repair => (),
+                    result => return result,
+                }
+            }
+            Self::discard_candidate(storage, live, config.generation(), &mut pending, authorize)
+                .await?;
+            let next = hash(&serde_json::to_vec(&("repair", &pending.generation, job))?);
+            pending = empty_progress(format!("{GENERATION}-{next}"));
+            save_pending(storage, config.generation(), Some(&pending), authorize).await?;
+            // A newly created table failing to open must surface the real storage error.
+            repair = false;
+        }
+    }
+
+    async fn discard_candidate(
+        storage: &Storage,
+        live: &ResolvedConfig,
+        generation: u64,
+        pending: &mut Status,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        // The marker survives a crash after either drop. Retrying the cleanup can only
+        // address this candidate's recorded tables and never requires opening a damaged table.
+        if let Some(active) = active_vector(storage)?
+            && pending.candidate_vector.as_ref() == Some(&active.generation)
+        {
+            return Err(error("INDEX_GENERATION_MISMATCH"));
+        }
+        if !pending.discarding {
+            pending.discarding = true;
+            save_pending(storage, generation, Some(pending), authorize).await?;
+        }
+        let connection = Self::connection(live).await?;
+        let vector_table = pending
+            .candidate_vector
+            .as_ref()
+            .map(|id| format!("memory_vector_{id}"));
+        for name in vector_table
+            .into_iter()
+            .chain([table_name(&pending.generation)])
+        {
+            authorize()?;
+            match connection.drop_table(&name, &[]).await {
+                Ok(()) | Err(lancedb::Error::TableNotFound { .. }) => (),
+                Err(e) => return Err(index_error(e)),
+            }
+        }
+        Ok(())
     }
 
     pub(crate) async fn reset_imported_generation(
@@ -335,8 +432,9 @@ impl Index {
         target: u64,
         authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<()> {
-        let pending = pending_rebuild(storage)?.ok_or_else(|| error("INDEX_NOT_READY"))?;
+        let mut pending = pending_rebuild(storage)?.ok_or_else(|| error("INDEX_NOT_READY"))?;
         if pending.generation != progress.generation
+            || pending.discarding
             || pending.lexical_watermark < target
             || progress
                 .vector
@@ -345,6 +443,7 @@ impl Index {
         {
             return Err(error("INDEX_NOT_READY"));
         }
+        pending.candidate_vector = None;
         #[cfg(test)]
         crate::storage::crash_tests::checkpoint("rebuild-before-activation");
         publish_progress(
@@ -366,15 +465,7 @@ impl Index {
         config_generation: u64,
         authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<()> {
-        publish_progress(
-            storage,
-            pending_key(),
-            config_generation,
-            &None::<Status>,
-            vec![],
-            authorize,
-        )
-        .await
+        save_pending(storage, config_generation, None, authorize).await
     }
 
     // The daemon holds exclusive cache ownership before discarding any old native table.
@@ -465,10 +556,15 @@ impl Index {
             Some(candidate) if candidate.generation != status(storage)?.generation => candidate,
             _ => status(storage)?,
         };
-        let watermark = vector::status(storage, config, &progress.generation)?
-            .map_or(progress.lexical_watermark, |v| {
-                v.watermark.min(progress.lexical_watermark)
-            });
+        let vector = vector::status(storage, config, &progress.generation)?;
+        if progress.discarding
+            || matches!((&progress.candidate_vector, &vector), (Some(owned), Some(wanted)) if owned != &wanted.generation)
+        {
+            return Ok(target);
+        }
+        let watermark = vector.map_or(progress.lexical_watermark, |v| {
+            v.watermark.min(progress.lexical_watermark)
+        });
         Ok(target.saturating_sub(watermark))
     }
 
@@ -484,6 +580,8 @@ impl Index {
             value["rebuild"] = serde_json::to_value(&pending)?;
             value["rebuild"]["phase"] = if pending.generation == published.generation {
                 "retiring"
+            } else if pending.discarding {
+                "discarding"
             } else {
                 "building"
             }
@@ -709,6 +807,23 @@ fn completion_change(
         )?,
     })
 }
+async fn save_pending(
+    storage: &Storage,
+    config_generation: u64,
+    progress: Option<&Status>,
+    authorize: &(impl Fn() -> Result<()> + Sync),
+) -> Result<()> {
+    publish_progress(
+        storage,
+        pending_key(),
+        config_generation,
+        &progress,
+        vec![],
+        authorize,
+    )
+    .await
+}
+
 async fn publish_progress(
     storage: &Storage,
     key: RecordKey,

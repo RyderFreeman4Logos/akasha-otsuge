@@ -195,7 +195,16 @@ impl Service {
                 if progress.generation != crate::retrieval::status(&self.storage)?.generation =>
             {
                 Arc::new(
-                    Index::open_generation(self.config.pin().resolved(), progress, true).await?,
+                    Index::open_candidate(
+                        &self.storage,
+                        self.config.pin().resolved(),
+                        &config,
+                        progress,
+                        id,
+                        matches!(plan, RetrievalRequest::Rebuild),
+                        &|| self.authorize_index_work(id, workflow),
+                    )
+                    .await?,
                 )
             }
             _ => self.retrieval_index(id, workflow).await?,
@@ -300,6 +309,7 @@ impl Service {
                                 target,
                             )
                             .await?;
+                            progress = Index::status(&self.storage, config.resolved())?;
                         }
                         return Ok(serde_json::to_value(progress)?);
                     }

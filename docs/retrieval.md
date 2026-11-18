@@ -44,8 +44,11 @@ lexical and configured vector prefixes. The initial request can return
 `RESOURCE_BUSY` while another reader holds the cache. `index status` shows
 the candidate under `rebuild` during backfill and retirement. Each search checks current
 authority and scope. After an interruption, use `index sync` with a fresh key
-to resume the saved candidate. An explicit rebuild with a fresh key starts a
-new candidate, including when a derived table is missing.
+to resume the saved candidate. Automatic sync deadlines count the remaining
+candidate work. A new `index rebuild` request also resumes a healthy candidate.
+If a candidate table cannot be opened, an explicit rebuild reclaims the
+candidate's tables and starts a replacement. Selecting a different embedding
+generation for an unfinished candidate also starts a replacement.
 
 Once both prefixes cover the job's target, publication waits for current
 readers, switches the active generation and reclaims the superseded native
