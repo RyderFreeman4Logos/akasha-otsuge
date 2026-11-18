@@ -14,6 +14,35 @@ fn field<'a>(row: &'a Value, key: &str) -> Result<&'a str> {
         .ok_or_else(invalid)
 }
 
+// The official SDK annotates each remapped copy with two canonical UUIDs.
+fn fork_uuid(value: &Value) -> Option<&str> {
+    let id = value.as_str()?;
+    if id.len() != 36
+        || !id.bytes().enumerate().all(|(i, byte)| {
+            if matches!(i, 8 | 13 | 18 | 23) {
+                byte == b'-'
+            } else {
+                byte.is_ascii_hexdigit()
+            }
+        })
+    {
+        return None;
+    }
+    Some(id)
+}
+
+fn copied_origin(row: &Value) -> Option<Value> {
+    let origin = row.get("forkedFrom")?;
+    let parent = fork_uuid(&origin["sessionId"])?;
+    let message = fork_uuid(&origin["messageUuid"])?;
+    if parent.eq_ignore_ascii_case(fork_uuid(&row["sessionId"])?)
+        || message.eq_ignore_ascii_case(fork_uuid(&row["uuid"])?)
+    {
+        return None;
+    }
+    Some(json!({"sessionId": parent, "messageUuid": message}))
+}
+
 pub(crate) fn transcript_frame(
     store: &Storage,
     binding: &CaptureBinding,
@@ -32,6 +61,7 @@ pub(crate) fn transcript_frame(
         kind,
         "queue-operation"
             | "last-prompt"
+            | "custom-title"
             | "cost-state"
             | "file-history-snapshot"
             | "progress"
@@ -168,6 +198,12 @@ pub(crate) fn transcript_frame(
         if let Some(value) = row.get(key) {
             raw[key] = value.clone();
         }
+    }
+    if source.agent == "main"
+        && let Some(origin) = copied_origin(&row)
+    {
+        // This identifies a copied original. Traversal stays on this session's local parent chain.
+        raw["forkedFrom"] = origin;
     }
     let raw = serde_json::to_vec(&raw)?;
     Ok(Some(CaptureFrame {

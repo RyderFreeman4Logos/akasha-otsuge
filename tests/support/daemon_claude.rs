@@ -65,7 +65,7 @@ fn native_claude_backfill_preserves_visible_payloads_links_and_partial_tail() {
         json!({"type":"queue-operation","operation":"enqueue","timestamp":"2026-10-28T15:40:43.067Z","sessionId":"session-a"}),
         json!({"type":"permission-mode","permissionMode":"auto","sessionId":"session-a"}),
         json!({"type":"user","uuid":"prompt-a","parentUuid":null,"sessionId":"session-a","version":"2.1.311","message":{"role":"user","content":"Keep the original 字 prompt"}}),
-        json!({"type":"assistant","uuid":"response-a","parentUuid":"prompt-a","sessionId":"session-a","version":"2.1.311","message":{"role":"assistant","content":[{"type":"thinking","thinking":"PRIVATE_THINKING_SENTINEL","signature":"PRIVATE_SIGNATURE"},{"type":"text","text":"Visible answer"},{"type":"tool_use","id":"tool-a","name":"Read","input":{"file_path":"visible.txt"}}]}}),
+        json!({"type":"assistant","uuid":"response-a","parentUuid":"prompt-a","sessionId":"session-a","version":"2.1.311","forkedFrom":{"sessionId":"not-a-uuid","messageUuid":"response-a"},"message":{"role":"assistant","content":[{"type":"thinking","thinking":"PRIVATE_THINKING_SENTINEL","signature":"PRIVATE_SIGNATURE"},{"type":"text","text":"Visible answer"},{"type":"tool_use","id":"tool-a","name":"Read","input":{"file_path":"visible.txt"}}]}}),
         json!({"type":"user","uuid":"result-a","parentUuid":"response-a","sessionId":"session-a","version":"2.1.311","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"tool-a","content":"tool result 原文"}]}}),
     ] {
         serde_json::to_writer(&mut bytes, &row).unwrap();
@@ -184,6 +184,7 @@ fn native_claude_backfill_preserves_visible_payloads_links_and_partial_tail() {
                 assert!(!raw.contains("PRIVATE_SIGNATURE"));
                 if id == "response-a" {
                     assert!(raw.contains("visible.txt"));
+                    assert!(!raw.contains("forkedFrom"));
                 }
                 let normalized = &event.event.normalized[0];
                 assert!(matches!(
@@ -249,6 +250,11 @@ fn recorded_native_fork_keeps_copied_history_and_branch_isolation() {
             "fork",
             "22222222-2222-4222-8222-222222222222",
             include_str!("../fixtures/claude/2.1.311/native-fork.jsonl"),
+        ),
+        (
+            "sdk-fork",
+            "52bb57bf-c662-480e-9dd0-fd0e71938e95",
+            include_str!("../fixtures/claude/2.1.322/native-sdk-fork.jsonl"),
         ),
     ];
     let mut captured = Vec::new();
@@ -341,6 +347,33 @@ fn recorded_native_fork_keeps_copied_history_and_branch_isolation() {
                     .iter()
                     .map(|e| capture.text(e).unwrap())
                     .collect();
+                if name == "sdk-fork" {
+                    assert!(texts.iter().any(|t| t == "alpha synthetic orchard"));
+                    assert!(texts.iter().any(|t| t == "epsilon synthetic SDK"));
+                    assert!(!texts.iter().any(|t| t == "beta synthetic meadow"));
+                    let origins: Vec<_> = page
+                        .events
+                        .iter()
+                        .filter_map(|event| {
+                            let raw: Value =
+                                serde_json::from_slice(&capture.raw(event).unwrap()).unwrap();
+                            raw.get("forkedFrom").cloned()
+                        })
+                        .collect();
+                    assert_eq!(origins.len(), 8);
+                    assert_eq!(
+                        origins[0],
+                        json!({
+                            "sessionId":"cefdc8d8-37fa-4202-a069-55a47ba27265",
+                            "messageUuid":"d4d02aa9-10a4-43f2-8e1e-0e384c7de9ee"
+                        })
+                    );
+                    continue;
+                }
+                assert!(page.events.iter().all(|event| {
+                    let raw: Value = serde_json::from_slice(&capture.raw(event).unwrap()).unwrap();
+                    raw.get("forkedFrom").is_none()
+                }));
                 assert!(texts.iter().any(|t| t == "PRIVATE_CALLER_INPUT start"));
                 assert!(texts.iter().any(|t| t == "PRIVATE_CALLER_INPUT resume"));
                 assert_eq!(
