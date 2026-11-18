@@ -95,7 +95,7 @@ pub(super) fn tools() -> Value {
         ),
         (
             "context_search",
-            json!({"cursor":{"type":["string","null"]},"query":{"type":"string"},"limit":{"type":"integer","minimum":1,"maximum":16}}),
+            json!({"cursor":{"type":["string","null"]},"query":{"type":"string","minLength":1,"maxLength":512,"description":"Include at least one non-whitespace character."},"limit":{"type":"integer","minimum":1,"maximum":16}}),
             vec!["query", "limit"],
         ),
         (

@@ -160,6 +160,9 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
             rejected = tool('context_list', {'cursor':None,'limit':limit})
             assert rejected['kind'] == 'error' and rejected['value']['code'] == 'INVALID_ARGUMENT'
     if scenario == 'conclusion_pagination':
+        query = next(t for t in request['params']['dynamicTools'] if t['name'] == 'context_search')['inputSchema']['properties']['query']
+        assert (query['minLength'], query['maxLength']) == (1, 512)
+        assert 'non-whitespace' in query['description']
         pagination = json.loads(result['result']['contentItems'][0]['text'])['value']['pagination']
         assert pagination['tools'] == ['context_list', 'context_search']
         assert (pagination['min_limit'], pagination['max_limit']) == (1, 16)

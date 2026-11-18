@@ -35,7 +35,7 @@ export function register(on) {
       context_describe: {},
       context_list: { cursor: { type: ['string', 'null'] }, limit: { type: 'integer', minimum: 1, maximum: 16 } },
       context_read: { handle: { type: 'string' }, start: { type: 'integer', minimum: 0 }, max_bytes: { type: 'integer', minimum: 1, maximum: 16384 } },
-      context_search: { cursor: { type: ['string', 'null'] }, query: { type: 'string' }, limit: { type: 'integer', minimum: 1, maximum: 16 } },
+      context_search: { cursor: { type: ['string', 'null'] }, query: { type: 'string', minLength: 1, maxLength: 512, description: 'Include at least one non-whitespace character.' }, limit: { type: 'integer', minimum: 1, maximum: 16 } },
       memory_search: { query: { type: 'string', maxLength: 512 } },
       memory_get: { memory_id: { type: 'string' }, revision: { type: 'integer', minimum: 1 } },
       code_search: { paths: { type: 'array', items: { type: 'string' }, minItems: 1, maxItems: 16 }, query: { type: 'string', maxLength: 512 } },
