@@ -1530,7 +1530,7 @@ impl Service {
     pub(super) async fn queue_observation(&self) -> Result<Value> {
         #[derive(Deserialize)]
         struct State<'a> {
-            id: &'a str,
+            id: String,
             state: &'a str,
         }
 
