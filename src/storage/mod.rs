@@ -392,7 +392,7 @@ impl Storage {
         self.commit_admitted(prepare, false).await
     }
 
-    /// Cancel or finish an admitted job even when ordinary large writes are suspended.
+    /// Requeue, cancel or finish an admitted job even when large writes are suspended.
     pub(crate) async fn commit_job_closeout(
         &self,
         request: CommitRequest,

@@ -64,9 +64,11 @@ slot and before each indexing window. A refused submission returns
 `RESOURCE_BUSY` (exit 4). Free space and retry its original idempotency key.
 
 Current and historical memory reads, receipt replays, and status remain
-available. Small commits and the cancellation or terminal record of an
-already admitted job can use the headroom. If space falls while a queued
-or running build waits, inspect its job state before resubmission. These
+available. A queued job whose running record is too large stays queued until
+space returns or its original queue deadline expires. If a running job cannot
+save its result under pressure, it can finish with `RESOURCE_BUSY`. Its
+recovery, cancellation and terminal records can use the headroom. Inspect the
+job state before resubmission. These
 checks measure available blocks at admission. A native indexing window,
 table maintenance or another writer can still exhaust the volume later.
 

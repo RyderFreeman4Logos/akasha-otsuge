@@ -1136,7 +1136,7 @@ impl Service {
             policy_revision: None,
             changes,
         };
-        if previous.is_some() && (job.terminal() || job.cancel_requested) {
+        if previous.is_some() && (job.terminal() || job.cancel_requested || job.state == "queued") {
             self.storage.commit_job_closeout(request).await?;
         } else {
             self.storage.commit(&request).await?;
@@ -1759,8 +1759,20 @@ impl Service {
         }
         job.lease_owner = Some(self.instance.clone());
         job.lease_until_ms = Some(now.saturating_add(30_000));
-        self.save_job(&job, Some(revision), vec![]).await?;
-        Ok(true)
+        match self.save_job(&job, Some(revision), vec![]).await {
+            Ok(()) => Ok(true),
+            Err(Error("RESOURCE_BUSY")) => Ok(false),
+            Err(error) => Err(error),
+        }
+    }
+    async fn finish_pressured_job(&self, id: &str) -> Result<()> {
+        let _guard = self.admission.lock().await;
+        let (revision, job) = self.job(id)?;
+        if job.state == "running" && job.lease_owner.as_deref() == Some(self.instance.as_str()) {
+            self.finish_job(job, revision, "failed", Some("RESOURCE_BUSY"))
+                .await?;
+        }
+        Ok(())
     }
     async fn execute_job(self: Arc<Self>, id: String) -> Result<()> {
         self.require_local_job(&id)?;
@@ -1991,7 +2003,10 @@ impl Service {
                         owned.insert(id.clone());
                         let service = self.clone();
                         running.spawn(async move {
-                            let result = service.execute_job(id.clone()).await;
+                            let result = match service.clone().execute_job(id.clone()).await {
+                                Err(Error("RESOURCE_BUSY")) => service.finish_pressured_job(&id).await,
+                                result => result,
+                            };
                             (id, result)
                         });
                     }
