@@ -5,13 +5,23 @@ The table records the outstanding acceptance work as of 2026-11-18. The dated en
 | Issue | Verified | Outstanding acceptance |
 | --- | --- | --- |
 | [#26](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26) | A downloaded Linux package passed installation, upgrade, rollback and restore. All four host guides have command checks. [Package receipt](../benchmarks/results/mvp026-linux-package/hosted-4e7b3a2.json) · [Guide checks](../benchmarks/results/mvp026-linux-package/four-host-guide-commands.json) | #12 passed its Claude-only acceptance. The remaining dependency is the full-scale run in #65. |
-| [#27](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) | All ten intent pairs have Direct and Consult results. All 27 observed Consult statuses missed their frozen expectations. The installed host matrix covers four single-host routes and a four-route cross-host cycle using deterministic local replies. Four native terminals also passed capture checks. [Model results](../benchmarks/results/mvp027/terminal-pairs-r2.json.gz) · [Host checks](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/98) | Resolve the source and authority mapping for 33 remaining tasks, and report quality against the frozen criteria. The 54 anonymized answers await human scoring. The [pagination fix](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/106) has a separate regression result. Preserve the measured failures and all 60 original tasks. |
+| [#27](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27) | All ten intent pairs have Direct and Consult results. All 27 observed Consult statuses missed their frozen expectations. The installed host matrix covers four single-host routes and a four-route cross-host cycle using deterministic local replies. Four native terminals also passed capture checks. [Model results](../benchmarks/results/mvp027/terminal-pairs-r2.json.gz) · [Host checks](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/98) | All 33 remaining tasks were replayed against their frozen inputs. Native checks returned 33 authority denials and a second missing precondition for V02. The historical review inputs are still unavailable. Record this coverage and score the 54 anonymized answers when a human reviewer is available. [Reconstruction](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27#issuecomment-6987978368) A supplemental A01 run traced one rejection to `context.read`. New diagnostics distinguish invalid read arguments. The 25 older incomplete traces lack this detail. [A01 observation](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27#issuecomment-6989998818) · [Read diagnostics](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/113) |
 | [#28](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/28) | A fresh candidate download passed the nine-step Pi rehearsal, including compilation, notification and restore. [Rehearsal](../benchmarks/results/mvp028-pi-rehearsal/README.md) | Finish the [24-requirement matrix](acceptance-matrix.md), publish the final tag and package, and repeat installation and readback from the published artifact. |
-| [#65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65) | A 30-minute private workload completed with 9,688 successes out of 29,700 offers. It missed 18 thresholds. The status-poll fix removed busy errors in a separate short control. [30-minute results](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-6985114780) · [Status polling](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/103) · [Sampling correction](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/107) | The original store passed row 1,241,088. Finish verifying 11,428,868 real records, 50,001,003,051 source bytes and 1,000,000 vectors. Check index coverage, vector bits, cold and warm recall, 100,000 persisted changes, original and historical readback, and the required 100-client intervals across resource profiles. Repeat recovery and resource checks at full scale. |
+| [#65](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65) | A 30-minute private workload completed with 9,688 successes out of 29,700 offers. It missed 18 thresholds. The status-poll fix removed busy errors in a separate short control. [30-minute results](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-6985114780) · [Status polling](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/103) · [Sampling correction](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/107) | The original import is still running. [Import and physical-build measurements](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-6991229386) Finish verifying 11,428,868 real records, 50,001,003,051 source bytes and 1,000,000 vectors. Check index coverage, vector bits, cold and warm recall, 100,000 persisted changes, original and historical readback, and the required 100-client intervals across resource profiles. Repeat recovery and resource checks at full scale. |
 
 The original store passed the boundary where the old writer had exceeded 640 MiB. The repaired writer replayed 4,096 rows, then committed 4,096 fresh rows. Both native receipts matched the private transition. [#99 closure and measurements](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/99#issuecomment-6987164146)
 
 Claude-only acceptance closed #12. Claude Code 2.1.311 with the approved local Grok backend completed one Caller and four Runner requests. After restart, the daemon returned the same answer and receipt and verified the complete 146-byte source. The unavailable optional memory index remained visible in the public result. SDK fork and resume were also verified on 2.1.322. [Authenticated acceptance and limitations](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12#issuecomment-6986770692) · [Fork provenance](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/102)
+
+The 16 Caller/Runner API contracts passed. The native CLI evidence covers four single-host routes and a four-route cross-host cycle. A separate run on each of the two tested Claude Code versions verified a typed request, an independent Runner, and readback of the original with both hint settings. [Host matrix](../benchmarks/results/mvp027/native-host-matrix-r1.md) · [Claude terminal receipts](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27#issuecomment-6989497475)
+
+The full-corpus work in #65 has the following dependencies. Each result must identify its dataset, runtime and profile.
+
+1. Complete the original import and verify all 2,791 input and acknowledgement units. Open the sealed authority store under its configured limit.
+2. Build the full lexical and vector indexes. Verify source coverage, all 1,000,000 vectors, scoped warm queries, and cold and warm ANN recall at both required budgets.
+3. Apply 100,000 revision changes. Read their original and revised contents, check each partition's exclusions, and verify retirement, restoration and scope precedence.
+4. Run the 100-client workload for 1,800 seconds per profile. Verify acknowledged original bytes offline. Measure write completion during a physical index build, role-specific throughput and latency, memory, queue growth, simultaneous burst admission, and overload recovery. The release-matched 90-second parent confirmed 1,080 original writes at P95 1.35 seconds. The rejected candidate confirmed 604 at P95 12.08 seconds. [Paired runs](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/111#issuecomment-6990261991)
+5. Verify low-memory startup and 2 GiB to 512 MiB hot reload, backlog recovery, correction during retrieval, generation switches, worker failures, invalid reloads, disk exhaustion and corruption. Check original receipts across each of the four specified process termination points and bind the real timeout results to the release. [Fault and resource criteria](../spec/08.md)
 
 ## Earlier status and measurements
 
@@ -1665,7 +1675,7 @@ Runtime post-merge main CI42779863508 also passed separately.
 
 Continue all unchecked MVP-024 enforcement/corpus/load/fault work in #65, then
 packaging (#26), fixed-oracle quality evaluation (#27) and final acceptance (#28).
-Claude authentication (#12) and mp SSH access remain explicit external blockers.
+At that checkpoint, Claude authentication and mp SSH access were outstanding. The current issue dependencies are listed at the top of this file.
 
 Incremental PR #61 is merged as 235c409 (reviewed source e4f973d).
 Canonical R4, conventional whole-range R3 and CI42866447962 all passed.
@@ -1689,17 +1699,13 @@ complete. Daybreak/new red-team work remains temporarily deferred by the owner.
 - [x] #26: execute upgrade with configuration, history and pending jobs preserved;
   verify backup/recovery and uninstall only owned integrations, preserving existing
   hooks, configuration and all user history.
-- [ ] #26: provide four host guides and execute their commands, including paths,
-  permissions, hints, model configuration, the 1700-second lifecycle, review,
-  notifications and resource profiles. Native Claude authentication stays deferred.
+- [x] Verify the four host guides for #26 with their [command checks](../benchmarks/results/mvp026-linux-package/four-host-guide-commands.json). The downloaded-package and Claude-only results are linked above.
 - [ ] #27: run the unchanged 60-task frozen reference and registered thresholds;
   compare direct retrieval and external consult for source, taste, condition,
   scope, version, branch, no-result, error and correction cases.
 - [ ] #27: measure added main-context tokens, additional reads, external tokens
   and quota, latency, relevance and incorrect revisions; retain failures.
-- [ ] #27: execute all 16 Caller/Runner contracts and actual cross-host coverage
-  across the four hosts; explicitly label the authorized temporary Codex
-  substitution and keep actual Claude authentication unverified.
+- [x] Run the 16 Caller/Runner API contracts and exercise a representative cross-host cycle for #27. The [matrix](../benchmarks/results/mvp027/native-host-matrix-r1.md) identifies the executable and protocol used by each route.
 - [ ] #27: require zero scope/retraction/authority violations, every critical
   decision, at least 90% relevant coverage and no more than 10% irrelevant output.
 - [x] Map all 24 original requirements to issues, merged commits, tests, public
@@ -1727,7 +1733,7 @@ complete. Daybreak/new red-team work remains temporarily deferred by the owner.
 - [x] [#9 [MVP-009] 可配置本地模型客户端与 1700 秒全链长测](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9) — dependencies: #2, #8.
 - [x] [#10 [MVP-010] 磁盘检索、混合召回、重排与有预算的原文读取](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/10) — dependencies: #5, #6, #9.
 - [x] [#11 [MVP-011] CallerAdapter/ContextSource 与 AgentRunner 公共契约](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/11) — dependencies: #7, #8, #10.
-- [ ] [#12 [MVP-012] Claude Code CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) — dependencies: #11.
+- [x] [#12 [MVP-012] Claude Code CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/12) — dependencies: #11.
 - [x] [#13 [MVP-013] Codex CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/13) — dependencies: #11.
 - [x] [#14 [MVP-014] Hermes CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/14) — dependencies: #11.
 - [x] [#15 [MVP-015] pi CallerAdapter 与 AgentRunner 实接](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/15) — dependencies: #11.
