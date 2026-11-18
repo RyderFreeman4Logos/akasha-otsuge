@@ -183,12 +183,21 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
         page = tool('context_list', {'cursor':None,'limit':4})['value']
     if 'history' in scenario:
         assert page['gaps'] == ['HISTORY_GAP'], page
-    short = scenario in ('editor_context_gap', 'conclusion_context_gap')
+    paged_read = scenario in ('conclusion_read_pages', 'conclusion_read_hole')
+    short = paged_read or scenario in ('editor_context_gap', 'conclusion_context_gap')
     text = tool('context_read', {'handle':page['events'][0]['handle'],'start':0,'max_bytes':1 if short else 1024})
     assert text['kind'] == 'text'
     if scenario == 'conclusion_pagination':
         assert text['value']['text'] == 'Run the synthetic native hook fixture.'
     if short: assert text['value']['truncated'] is True
+    if paged_read:
+        first = text['value']
+        start = first['end'] + (scenario == 'conclusion_read_hole')
+        last = tool('context_read', {'handle':page['events'][0]['handle'],'start':start,'max_bytes':1024})['value']
+        assert first['start'] == 0 and last['start'] == start and last['end'] == first['total_bytes'] == last['total_bytes']
+        assert last['sha256'] == first['sha256'] and not last['truncated']
+        if scenario == 'conclusion_read_pages':
+            assert hashlib.sha256((first['text'] + last['text']).encode()).hexdigest() == first['sha256']
 if scenario in ('editor_delegate_gap', 'editor_delegate_conflict_gap', 'conclusion_delegate_gap') and not hint:
     child = tool('delegate', {'hint':'child-with-limitation'})
     assert child['kind'] == 'research' and child['value']['status'] == 'incomplete', child
