@@ -156,6 +156,11 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
             'changed':value.get('changed'),'originals':len(value.get('originals', []))}))
         return response
     if scenario == 'conclusion_read_bounds':
+        for schema in request['params']['dynamicTools']:
+            if schema['name'] in ('context_read', 'code_read'):
+                size = schema['inputSchema']['properties']['max_bytes']
+                assert (size['minimum'], size['maximum']) == (1, 16384)
+                assert '1 to 16384 bytes' in size['description']
         page = tool('context_search', {'query':'Run the synthetic native hook fixture.', 'limit':4})['value']
         handle = page['events'][0]['handle']
         def read_range(start, count):
