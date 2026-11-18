@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import pathlib
+import selectors
 import shutil
 import signal
 import socket
@@ -14,6 +15,17 @@ import tempfile
 import time
 
 
+def kill_group(child):
+    try:
+        os.killpg(child.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    child.stdout.close()
+    if child.stderr is not None:
+        child.stderr.close()
+    child.wait()
+
+
 def command(argv, **kwargs):
     timeout = kwargs.pop('timeout', 20)
     child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
@@ -22,12 +34,37 @@ def command(argv, **kwargs):
         stdout, stderr = child.communicate(timeout=timeout)
         return subprocess.CompletedProcess(argv, child.returncode, stdout, stderr)
     except BaseException:
-        try:
-            os.killpg(child.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
-        child.communicate()
+        kill_group(child)
         raise
+
+
+def run_suite(argv, env, output, idle_timeout=300, timeout=1800):
+    child = subprocess.Popen(argv, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT, start_new_session=True)
+    deadline = time.monotonic() + timeout
+    idle_deadline = time.monotonic() + idle_timeout
+    try:
+        with selectors.DefaultSelector() as selector:
+            selector.register(child.stdout, selectors.EVENT_READ)
+            while True:
+                remaining = min(deadline, idle_deadline) - time.monotonic()
+                if remaining <= 0 or not selector.select(remaining):
+                    raise subprocess.TimeoutExpired(argv, timeout if deadline <= idle_deadline else idle_timeout)
+                chunk = os.read(child.stdout.fileno(), 8192)
+                if not chunk:
+                    break
+                output.write(chunk)
+                output.flush()
+                idle_deadline = time.monotonic() + idle_timeout
+        # A child can close its output before it exits.
+        child.wait(timeout=max(0, min(deadline, idle_deadline) - time.monotonic()))
+        if child.returncode:
+            raise subprocess.CalledProcessError(child.returncode, argv)
+    except BaseException:
+        kill_group(child)
+        raise
+    finally:
+        child.stdout.close()
 
 
 def owned_daemons(base):
@@ -86,10 +123,8 @@ def main():
             binary = root / 'install/bin/akasha-otsuge'
             assert hashlib.sha256(binary.read_bytes()).digest() == hashlib.sha256(candidate.read_bytes()).digest(), 'installed binary differs from release artifact'
             environment = dict(os.environ, AKASHA_ACCEPTANCE_BINARY=str(binary))
-            tests = command(['cargo', 'test', '--locked', '--test', 'daemon', '--', '--test-threads=1'],
-                            env=environment, timeout=300)
-            assert tests.returncode == 0, tests.stdout + tests.stderr
-            print(tests.stdout, end='')
+            run_suite(['cargo', 'test', '--locked', '--test', 'daemon', '--', '--test-threads=1'],
+                      environment, sys.stdout.buffer)
         config = root / 'config.toml'
         endpoint = root / 'run/service.sock'
         data = root / 'data'
