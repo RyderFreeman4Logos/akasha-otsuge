@@ -136,11 +136,10 @@ impl Service {
             Index::publish_rebuild(&self.storage, progress, generation, target, &authorize).await?;
             owned.published = None;
         }
-        let vector = crate::retrieval::active_vector(&self.storage)?;
         index
-            .retire_previous_tables(vector.as_ref().map(|v| v.generation.as_str()), &authorize)
+            .owner
+            .finish_retirement(&self.storage, generation, &authorize)
             .await?;
-        Index::finish_retirement(&self.storage, generation, &authorize).await?;
         Ok(())
     }
 
@@ -171,7 +170,7 @@ impl Service {
         };
         let pending = match &plan {
             RetrievalRequest::Rebuild => {
-                let owned = self
+                let mut owned = self
                     .search_index
                     .try_lock()
                     .map_err(|_| Error("RESOURCE_BUSY"))?;
@@ -182,12 +181,20 @@ impl Service {
                 {
                     return Err(Error("RESOURCE_BUSY"));
                 }
+                let authorize = || self.authorize_index_work(id, workflow);
+                if let Some(pending) = crate::retrieval::pending_rebuild(&self.storage)?
+                    && pending.generation == crate::retrieval::status(&self.storage)?.generation
+                {
+                    // Activation survived a stop. Release its old files before admitting another generation.
+                    let owner = owned.owner(self.config.pin().resolved()).await?;
+                    owner
+                        .finish_retirement(&self.storage, config.generation(), &authorize)
+                        .await?;
+                }
                 drop(owned);
                 Some(
-                    Index::start_rebuild(&self.storage, id, config.generation(), &|| {
-                        self.authorize_index_work(id, workflow)
-                    })
-                    .await?,
+                    Index::start_rebuild(&self.storage, id, config.generation(), &authorize)
+                        .await?,
                 )
             }
             RetrievalRequest::Sync => crate::retrieval::pending_rebuild(&self.storage)?,

@@ -248,7 +248,7 @@ impl IndexCache {
 
 pub struct Index {
     pub budget_mib: u32,
-    owner: Arc<IndexOwner>,
+    pub(crate) owner: Arc<IndexOwner>,
     generation: String,
     pending: bool,
     table: Table,
@@ -257,6 +257,46 @@ pub struct Index {
     vector: tokio::sync::Mutex<Option<Arc<vector::VectorIndex>>>,
 }
 impl IndexOwner {
+    // The daemon holds exclusive cache ownership before discarding any old native table.
+    pub(crate) async fn finish_retirement(
+        &self,
+        storage: &Storage,
+        config_generation: u64,
+        authorize: &(impl Fn() -> Result<()> + Sync),
+    ) -> Result<()> {
+        let published = status(storage)?.generation;
+        if pending_rebuild(storage)?.is_none_or(|p| p.generation != published) {
+            return Err(error("INDEX_NOT_READY"));
+        }
+        let current = table_name(&published);
+        let vector_table =
+            active_vector(storage)?.map(|v| format!("memory_vector_{}", v.generation));
+        for name in self
+            .connection
+            .table_names()
+            .execute()
+            .await
+            .map_err(index_error)?
+        {
+            let derived = name == TABLE
+                || [format!("{TABLE}_"), "memory_vector_".into()]
+                    .iter()
+                    .any(|prefix| {
+                        name.strip_prefix(prefix).is_some_and(|v| {
+                            v.len() == 64 && v.bytes().all(|b| b.is_ascii_hexdigit())
+                        })
+                    });
+            if derived && name != current && Some(&name) != vector_table.as_ref() {
+                authorize()?;
+                self.connection
+                    .drop_table(&name, &[])
+                    .await
+                    .map_err(index_error)?;
+            }
+        }
+        save_pending(storage, config_generation, None, authorize).await
+    }
+
     async fn open(config: &ResolvedConfig) -> Result<Self> {
         let root = config.config().paths.data_dir.join("search");
         crate::daemon::private_dir(&root).map_err(|e| error(e.0))?;
@@ -445,9 +485,10 @@ impl Index {
         authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<Status> {
         let published = status(storage)?.generation;
-        if let Some(pending) = pending_rebuild(storage)?
-            && pending.generation != published
-        {
+        if let Some(pending) = pending_rebuild(storage)? {
+            if pending.generation == published {
+                return Err(error("INDEX_NOT_READY"));
+            }
             return Ok(pending);
         }
         let suffix = hash(&serde_json::to_vec(&("rebuild", published, id))?);
@@ -595,50 +636,6 @@ impl Index {
         .await?;
         #[cfg(test)]
         crate::storage::crash_tests::checkpoint("rebuild-after-activation");
-        Ok(())
-    }
-
-    pub(crate) async fn finish_retirement(
-        storage: &Storage,
-        config_generation: u64,
-        authorize: &(impl Fn() -> Result<()> + Sync),
-    ) -> Result<()> {
-        save_pending(storage, config_generation, None, authorize).await
-    }
-
-    // The daemon holds exclusive cache ownership before discarding any old native table.
-    pub(crate) async fn retire_previous_tables(
-        &self,
-        keep_vector: Option<&str>,
-        authorize: &(impl Fn() -> Result<()> + Sync),
-    ) -> Result<()> {
-        let current = table_name(&self.generation);
-        let vector_table = keep_vector.map(|generation| format!("memory_vector_{generation}"));
-        for name in self
-            .owner
-            .connection
-            .table_names()
-            .execute()
-            .await
-            .map_err(index_error)?
-        {
-            let derived = name == TABLE
-                || [format!("{TABLE}_"), "memory_vector_".into()]
-                    .iter()
-                    .any(|prefix| {
-                        name.strip_prefix(prefix).is_some_and(|v| {
-                            v.len() == 64 && v.bytes().all(|b| b.is_ascii_hexdigit())
-                        })
-                    });
-            if derived && name != current && Some(&name) != vector_table.as_ref() {
-                authorize()?;
-                self.owner
-                    .connection
-                    .drop_table(&name, &[])
-                    .await
-                    .map_err(index_error)?;
-            }
-        }
         Ok(())
     }
 

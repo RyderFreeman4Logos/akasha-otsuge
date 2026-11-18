@@ -547,11 +547,16 @@ async fn interrupted_rebuild_preserves_complete_generation_on_each_side_of_publi
                 .unwrap();
         }
         let active = Index::open(&config, &store).await.unwrap();
+        assert_eq!(
+            Index::start_rebuild(&store, "fresh-key-before-retirement", 1, &|| Ok(()))
+                .await
+                .unwrap_err()
+                .code,
+            "INDEX_NOT_READY"
+        );
         active
-            .retire_previous_tables(None, &|| Ok(()))
-            .await
-            .unwrap();
-        Index::finish_retirement(&store, 1, &|| Ok(()))
+            .owner
+            .finish_retirement(&store, 1, &|| Ok(()))
             .await
             .unwrap();
         assert!(pending_rebuild(&store).unwrap().is_none());
