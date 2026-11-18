@@ -1043,6 +1043,7 @@ fn consult_public_result(large: bool) {
     daemon.configure(&format!("[access]\nread_roots=[{home:?}]\n"));
     daemon.cli(&["config", "reload"]);
     for args in [
+        vec!["job", "show", id],
         vec!["consult", "show", id],
         vec!["consult", "receipt", id],
         vec!["consult", "receipt", id, "--full"],
@@ -1054,6 +1055,57 @@ fn consult_public_result(large: bool) {
             serde_json::from_slice::<Value>(&output.stderr).unwrap()["error"]["code"],
             "READ_DENIED"
         );
+    }
+}
+
+#[test]
+fn consult_trace_distinguishes_context_errors_from_reported_gaps() {
+    let tool = json!({"stage":"context_dispatch", "tool":"context.list", "code":"INVALID_ARGUMENT", "count":2});
+    let report = json!({"stage":"conclusion", "code":"INVALID_ARGUMENT", "count":1});
+    let mut observed = Vec::new();
+    for scenario in [
+        "conclusion_diag_tool",
+        "conclusion_diag_report",
+        "conclusion_diag_both",
+    ] {
+        let (daemon, event, _) = consult_fixture(scenario);
+        let job = named_terminal(&daemon, event);
+        assert_eq!(job["state"], "succeeded", "{scenario}");
+        let public = daemon.cli(&["consult", "show", job["id"].as_str().unwrap()])["data"].clone();
+        assert_eq!(public["status"], "incomplete", "{scenario}");
+        assert_eq!(public["gaps"], json!(["INVALID_ARGUMENT"]), "{scenario}");
+        assert!(public.get("diagnostics").is_none());
+        let diagnostics = &job["run_trace"]["diagnostics"];
+        assert_eq!(diagnostics["omitted"], 0);
+        observed.push(diagnostics["entries"].clone());
+    }
+    assert_eq!(
+        observed,
+        vec![json!([tool]), json!([report]), json!([tool, report])]
+    );
+}
+
+#[test]
+fn consult_trace_separates_runner_failure_from_conclusion_validation() {
+    for (scenario, stage, code) in [
+        ("auth", "runner", "AUTH_REQUIRED"),
+        (
+            "conclusion_diag_unsearched",
+            "conclusion_validation",
+            "PROTOCOL_INVALID",
+        ),
+    ] {
+        let (daemon, event, _) = consult_fixture(scenario);
+        let job = named_terminal(&daemon, event);
+        assert_eq!(job["state"], "failed");
+        assert_eq!(job["error"], code);
+        assert_eq!(
+            job["run_trace"]["diagnostics"],
+            json!({"omitted":0,"entries":[{"stage":stage,"code":code,"count":1}]})
+        );
+        let result = daemon.cli(&["consult", "show", job["id"].as_str().unwrap()]);
+        assert_eq!(result["data"]["error"]["code"], code);
+        assert!(result["data"].get("diagnostics").is_none());
     }
 }
 

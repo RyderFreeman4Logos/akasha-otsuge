@@ -155,6 +155,10 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
             'items':[item['memory']['revision']['key']['id'] for item in value.get('items', [])],
             'changed':value.get('changed'),'originals':len(value.get('originals', []))}))
         return response
+    if scenario in ('conclusion_diag_tool', 'conclusion_diag_both'):
+        for _ in range(2):
+            rejected = tool('context_list', {'cursor':None,'limit':0})
+            assert rejected['kind'] == 'error' and rejected['value']['code'] == 'INVALID_ARGUMENT'
     if scenario == 'editor_history_search_gap':
         page = tool('context_search', {'cursor':None,'query':'controlled','limit':4})['value']
     else:
@@ -331,6 +335,10 @@ if scenario.startswith('conclusion_') or 'status' in turn_request['params']['out
             conclusion.update(status='incomplete', conflicts=['The child found conflicting evidence.'])
         else:
             conclusion.update(status='incomplete', gaps=['child_limit'])
+    if scenario in ('conclusion_diag_report', 'conclusion_diag_both'):
+        conclusion['gaps'] = ['INVALID_ARGUMENT']
+    if scenario == 'conclusion_diag_unsearched':
+        conclusion.update(status='no_hit', answer='No result.', sources=[], memories=[], gaps=[])
     if scenario == 'conclusion_no_hit':
         tool('context_search', {'cursor':None,'query':'absent-conclusion-query','limit':4})
         conclusion.update(status='no_hit', answer='No reliable relevant result in the searched scope.', sources=[], memories=[], gaps=[])

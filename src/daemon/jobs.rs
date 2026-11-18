@@ -1510,6 +1510,9 @@ impl Service {
             }
             value["run_trace"] =
                 json!({"usage":trace["usage"],"deadline":trace["deadline"],"runs":trace["runs"]});
+            if let Some(diagnostics) = trace.get("diagnostics") {
+                value["run_trace"]["diagnostics"] = diagnostics.clone();
+            }
             if job.state != "succeeded" {
                 value["result"] = Value::Null;
             }
