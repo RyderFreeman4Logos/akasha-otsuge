@@ -305,6 +305,71 @@ async fn description_reports_actual_binding_precision_even_on_capable_hosts() {
     }
     store.close().await.unwrap();
 }
+
+#[tokio::test]
+async fn failed_context_reads_leave_the_last_source_slot_available() {
+    let fixture = Fixture::new();
+    let store = fixture.open().await;
+    Domain::new(&store)
+        .set_read_grant("grant", "reader", Some(&scope()), None, 1)
+        .await
+        .unwrap();
+    let tip = event(
+        &store,
+        "a",
+        "parts",
+        &"a".repeat(16 * 1024 + 8),
+        None,
+        false,
+    )
+    .await;
+    let inv = Invocation::bind(&store, runtime(&fixture, &store, "a", tip, "call"))
+        .await
+        .unwrap();
+    let permit = lease(&inv);
+    let spent = lease(&inv);
+    spent
+        .charge_output(BudgetLimits::default().output_bytes)
+        .unwrap();
+    let mut captured = CapturedContext::new(&store, inv).unwrap();
+    let page = list(&mut captured, &permit, None, 1).await;
+    let read = |start, max_bytes| ContextRequest::Read {
+        handle: page.events[0].handle.clone(),
+        start,
+        max_bytes,
+    };
+    for start in 0..63 {
+        captured.execute(&permit, read(start, 1)).await.unwrap();
+    }
+    // Crossing the two immutable capture chunks needs two new source slots.
+    assert_eq!(
+        captured
+            .execute(&permit, read(16 * 1024 - 1, 2))
+            .await
+            .unwrap_err()
+            .code,
+        ErrorCode::BudgetExhausted
+    );
+    assert_eq!(
+        captured
+            .execute(&spent, read(63, 1))
+            .await
+            .unwrap_err()
+            .code,
+        ErrorCode::BudgetExhausted
+    );
+    captured.execute(&permit, read(64, 1)).await.unwrap();
+    captured.execute(&permit, read(64, 1)).await.unwrap();
+    assert_eq!(
+        captured
+            .execute(&permit, read(65, 1))
+            .await
+            .unwrap_err()
+            .code,
+        ErrorCode::BudgetExhausted
+    );
+    store.close().await.unwrap();
+}
 async fn list(
     context: &mut impl ContextSource,
     lease: &RunLease,

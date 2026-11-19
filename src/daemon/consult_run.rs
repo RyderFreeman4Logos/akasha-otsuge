@@ -193,7 +193,9 @@ impl Research<'_> {
                 input = serde_json::to_string(editor)?
             )
         } else {
-            instructions.to_owned()
+            format!(
+                "{instructions} For a tentative proposal, read its original first, then use memory_search with proposals=true and a phrase from the proposal. Follow next with the same query and cursor. Cite a proposal only as candidate evidence."
+            )
         };
         let mut runner = {
             let _guard = service.admission.lock().await;

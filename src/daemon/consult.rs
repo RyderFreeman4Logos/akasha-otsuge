@@ -303,14 +303,9 @@ impl Service {
             budget.cancel();
         }
         let answer = outcome?;
-        let (selected, memories) = context.selected_memories(&answer)?;
+        let selected = context.selected_memories(&answer)?;
         let mut trace = context.trace()?;
-        let mut sources = vec![];
-        for source in &answer.sources {
-            if !sources.contains(source) {
-                sources.push(source.clone());
-            }
-        }
+        let sources = selected.sources;
         let gaps = context.coverage_gaps(&answer)?;
         let status = if gaps.is_empty() {
             answer.status
@@ -329,7 +324,7 @@ impl Service {
         let receipt_id = format!("consult-result/{}", hash(id.as_bytes()));
         let output = serde_json::to_string(&json!({
             "status":status,"job_id":id,"receipt_id":receipt_id,"answer":answer.answer,"scope":scope,
-            "evidence":sources,"memories":memories,"code":code,"conditions":answer.conditions,
+            "evidence":sources,"memories":selected.details,"code":code,"conditions":answer.conditions,
             "conflicts":answer.conflicts,"gaps":gaps,
         }))?;
         let _guard = self.admission.lock().await;
@@ -350,7 +345,7 @@ impl Service {
             scope,
             read_seq: context.read_seq,
             retrieval_mode: RetrievalMode::CurrentState,
-            selected,
+            selected: selected.adopted,
             sources,
             status,
             coverage: Coverage {
@@ -376,7 +371,9 @@ impl Service {
             {
                 return Err(Error("OUTPUT_LIMIT"));
             }
-            domain.prepare_recall(&read_context, &full).await?;
+            domain
+                .prepare_consult_recall(&read_context, &full, &selected.proposals)
+                .await?;
             trace["detail_receipt_id"] = json!(full.request_id);
             draft.status = RecallStatus::Incomplete;
             draft.coverage = Coverage {
@@ -388,7 +385,9 @@ impl Service {
                 reason: "result_budget".into(),
             });
         }
-        domain.prepare_recall(&read_context, &draft).await?;
+        domain
+            .prepare_consult_recall(&read_context, &draft, &selected.proposals)
+            .await?;
         trace["receipt_id"] = json!(receipt_id);
         Ok(trace)
     }

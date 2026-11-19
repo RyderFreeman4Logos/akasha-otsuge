@@ -25,6 +25,13 @@ use crate::storage::{
 fn error(code: &'static str) -> StorageError {
     StorageError::new(code)
 }
+fn now_ms() -> Result<i64> {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .ok()
+        .and_then(|age| i64::try_from(age.as_millis()).ok())
+        .ok_or_else(|| error("CLOCK_INVALID"))
+}
 fn id(value: &str) -> bool {
     !value.trim().is_empty() && value.len() <= 256
 }

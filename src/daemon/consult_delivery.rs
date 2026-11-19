@@ -57,6 +57,11 @@ impl Service {
                 return Err(Error("STALE_RECALL"));
             }
         }
+        for proposal in &receipt.data.record.proposals {
+            domain
+                .current_candidate(&context, &receipt.data.record.scope, proposal)
+                .await?;
+        }
         Ok(serde_json::from_str(&receipt.data.output)?)
     }
 

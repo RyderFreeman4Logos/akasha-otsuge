@@ -433,6 +433,300 @@ fn recall(memory: &MemoryView, at: u64) -> RecallDraft {
     }
 }
 
+#[test]
+fn proposal_spans_need_contiguous_reads_of_the_same_original_revision() {
+    let span = SourceSpan {
+        event_id: "original".into(),
+        revision: 3,
+        content_sha256: "a".repeat(64),
+        start: 4,
+        end: 12,
+    };
+    let left = SourceSpan {
+        start: 0,
+        end: 8,
+        ..span.clone()
+    };
+    let right = SourceSpan {
+        start: 8,
+        end: 14,
+        ..span.clone()
+    };
+    assert!(span.covered_by(&[right.clone(), left.clone()]));
+    for mismatch in [
+        SourceSpan {
+            start: 9,
+            ..right.clone()
+        },
+        SourceSpan {
+            event_id: "other".into(),
+            ..right.clone()
+        },
+        SourceSpan {
+            revision: 4,
+            ..right.clone()
+        },
+        SourceSpan {
+            content_sha256: "b".repeat(64),
+            ..right
+        },
+    ] {
+        assert!(!span.covered_by(&[left.clone(), mismatch]));
+    }
+}
+
+#[tokio::test]
+async fn proposal_recall_requires_actual_reads_and_rechecks_open_review_at_commit() {
+    let fixture = Fixture::new();
+    let store = fixture.open().await;
+    let domain = Domain::new(&store);
+    let grant = grant(&domain).await;
+    let write = fact(&domain, "proposal", "Text with a condition").await;
+    let agent = agent(Origin::Extraction);
+    domain
+        .propose(&write, &agent, &policy(ReviewMode::Manual))
+        .await
+        .unwrap();
+    let item = domain
+        .review_list(&reader(), &scope(), None)
+        .await
+        .unwrap()
+        .items
+        .pop()
+        .unwrap();
+    let view = domain.memory("proposal").unwrap().unwrap();
+    let evidence = CandidateEvidence {
+        review_id: item.id.clone(),
+        revision: view.revision.clone(),
+    };
+    assert_eq!(
+        domain
+            .current_candidate(&reader(), &scope(), &evidence)
+            .await
+            .unwrap(),
+        view
+    );
+    assert_eq!(
+        domain
+            .current_candidate(&reader(), &policy(ReviewMode::Manual).scope, &evidence)
+            .await
+            .unwrap(),
+        view
+    );
+    let sibling = Scope {
+        project: Some("unrelated".into()),
+        ..scope()
+    };
+    assert_eq!(
+        domain
+            .current_candidate(&reader(), &sibling, &evidence)
+            .await
+            .unwrap_err()
+            .code,
+        "SCOPE_DENIED"
+    );
+
+    let active = MemoryWrite {
+        memory_id: "adopted".into(),
+        request_id: "adopted-write".into(),
+        ..write.clone()
+    };
+    domain
+        .propose(&active, &agent, &policy(ReviewMode::Automatic))
+        .await
+        .unwrap();
+    let mut draft = recall(
+        &domain.active("adopted").unwrap().unwrap(),
+        store.sequence().unwrap(),
+    );
+    let proposed = std::slice::from_ref(&evidence);
+    assert_eq!(
+        domain
+            .prepare_consult_recall(&reader(), &draft, proposed)
+            .await
+            .unwrap_err()
+            .code,
+        "INSUFFICIENT_EVIDENCE"
+    );
+    let span = &write.draft.source_spans[0];
+    draft.selected.clear();
+    draft.sources = vec![
+        SourceSpan {
+            end: 4,
+            ..span.clone()
+        },
+        SourceSpan {
+            start: 5,
+            ..span.clone()
+        },
+    ];
+    assert_eq!(
+        domain
+            .prepare_consult_recall(&reader(), &draft, proposed)
+            .await
+            .unwrap_err()
+            .code,
+        "INSUFFICIENT_EVIDENCE"
+    );
+    draft.sources[1].start = 4;
+
+    let prepared = domain
+        .prepare_consult_recall(&reader(), &draft, proposed)
+        .await
+        .unwrap();
+    assert_eq!(
+        domain
+            .prepare_consult_recall(&reader(), &draft, proposed)
+            .await
+            .unwrap(),
+        prepared
+    );
+    assert_eq!(
+        domain
+            .prepare_recall(&reader(), &draft)
+            .await
+            .unwrap_err()
+            .code,
+        "IDEMPOTENCY_CONFLICT"
+    );
+    let saved = domain
+        .recall_receipt(&reader(), &draft.request_id)
+        .await
+        .unwrap()
+        .data;
+    assert!(saved.record.selected.is_empty());
+    assert_eq!(saved.record.proposals, proposed);
+    assert_eq!(saved.record.sources, draft.sources);
+    let mut ordinary = draft.clone();
+    ordinary.request_id = "old-format".into();
+    let old = domain.prepare_recall(&reader(), &ordinary).await.unwrap();
+    assert_eq!(
+        domain
+            .prepare_consult_recall(&reader(), &ordinary, &[])
+            .await
+            .unwrap(),
+        old
+    );
+    let old = domain
+        .recall_receipt(&reader(), &ordinary.request_id)
+        .await
+        .unwrap()
+        .data
+        .record;
+    let bytes = serde_json::to_value(&old).unwrap();
+    assert!(bytes.get("proposals").is_none());
+    assert_eq!(serde_json::from_value::<RecallRecord>(bytes).unwrap(), old);
+    use sha2::{Digest, Sha256};
+    assert_eq!(
+        old.request_sha256,
+        Sha256::digest(serde_json::to_vec(&(reader(), &ordinary)).unwrap())
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>()
+    );
+
+    domain
+        .review_update(
+            &reader(),
+            "dismiss",
+            &ReviewUpdate {
+                id: item.id,
+                expected_revision: item.revision,
+                state: ReviewState::Dismissed,
+                reason: "Closed".into(),
+            },
+            1,
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        domain
+            .current_candidate(&reader(), &scope(), &evidence)
+            .await
+            .unwrap_err()
+            .code,
+        "STALE_RECALL"
+    );
+    draft.request_id = "closed-at-commit".into();
+    assert_eq!(
+        domain
+            .prepare_consult_recall(&reader(), &draft, proposed)
+            .await
+            .unwrap_err()
+            .code,
+        "STALE_RECALL"
+    );
+    assert_eq!(
+        domain
+            .recall_receipt(&reader(), &saved.record.receipt_id)
+            .await
+            .unwrap()
+            .data,
+        saved
+    );
+    domain
+        .set_read_grant("revoke-reader", "reader", None, Some(grant), 1)
+        .await
+        .unwrap();
+    assert_eq!(
+        domain
+            .recall_receipt(&reader(), &saved.record.receipt_id)
+            .await
+            .unwrap_err()
+            .code,
+        "READ_DENIED"
+    );
+    assert_eq!(
+        domain
+            .current_candidate(&reader(), &scope(), &evidence)
+            .await
+            .unwrap_err()
+            .code,
+        "READ_DENIED"
+    );
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn current_proposal_refuses_superseded_and_expired_candidates() {
+    let fixture = Fixture::new();
+    let store = fixture.open().await;
+    let domain = Domain::new(&store);
+    grant(&domain).await;
+    let mut write = fact(&domain, "proposal", "Scoped proposal").await;
+    let agent = agent(Origin::Extraction);
+    let manual = policy(ReviewMode::Manual);
+    domain.propose(&write, &agent, &manual).await.unwrap();
+    let old = domain.memory("proposal").unwrap().unwrap().revision;
+    write.request_id = "outdated".into();
+    write.expected_revision = Some(old.commit_seq);
+    write.draft.valid_until_ms = Some(10);
+    domain.propose(&write, &agent, &manual).await.unwrap();
+    let latest = domain.memory("proposal").unwrap().unwrap().revision;
+    let page = domain.review_list(&reader(), &scope(), None).await.unwrap();
+    assert_eq!(page.items.len(), 2);
+    for item in page.items {
+        let revision = if item.proposal_revision == old.commit_seq {
+            &old
+        } else {
+            &latest
+        };
+        let evidence = CandidateEvidence {
+            review_id: item.id,
+            revision: revision.clone(),
+        };
+        assert_eq!(
+            domain
+                .current_candidate(&reader(), &scope(), &evidence)
+                .await
+                .unwrap_err()
+                .code,
+            "STALE_RECALL"
+        );
+    }
+    store.close().await.unwrap();
+}
+
 async fn review_action(domain: &Domain<'_>, memory: &str, action: ReviewAction, name: &str) -> u64 {
     let current = domain.memory(memory).unwrap().unwrap();
     let target = ReviewTarget {

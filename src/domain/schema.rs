@@ -29,6 +29,37 @@ pub struct SourceSpan {
     pub end: usize,
 }
 
+impl SourceSpan {
+    /// Whether actual reads cover this entire byte range of the same source revision.
+    pub fn covered_by(&self, reads: &[SourceSpan]) -> bool {
+        if self.start >= self.end {
+            return false;
+        }
+        let mut ranges: Vec<_> = reads
+            .iter()
+            .filter(|span| {
+                span.event_id == self.event_id
+                    && span.revision == self.revision
+                    && span.content_sha256 == self.content_sha256
+                    && span.start < span.end
+            })
+            .map(|span| (span.start, span.end))
+            .collect();
+        ranges.sort_unstable();
+        let mut end = self.start;
+        for (start, next) in ranges {
+            if start > end {
+                break;
+            }
+            end = end.max(next);
+            if end >= self.end {
+                return true;
+            }
+        }
+        false
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct SourceDraft {

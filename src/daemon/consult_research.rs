@@ -3,7 +3,9 @@ use crate::adapter::{
     AdapterError, BoundWorkspace, CodeRead, ContextRequest, ContextResponse, ContextSource,
     ErrorCode, MAX_FRAME_BYTES, ReadBounds, RunLease,
 };
-use crate::domain::{Ingress, MemoryState, OriginalRange, SourceDraft, SourceSpan};
+use crate::domain::{
+    CandidateEvidence, Ingress, MemoryState, OriginalRange, ReviewState, SourceDraft, SourceSpan,
+};
 use crate::storage::RevisionRef;
 use futures::future::BoxFuture;
 use std::collections::BTreeMap;
@@ -36,6 +38,29 @@ fn covers_text(total_bytes: usize, mut ranges: Vec<(usize, usize)>) -> bool {
     end == total_bytes
 }
 
+enum ResearchRead {
+    ProposalPage {
+        query: String,
+        after: Option<String>,
+        found: BTreeMap<(String, u64), CandidateEvidence>,
+    },
+    Memory {
+        key: (String, u64),
+        detail: Value,
+        sources: Vec<SourceSpan>,
+        read_seq: u64,
+        truncated: bool,
+    },
+}
+
+#[derive(Default)]
+pub(super) struct ResearchSelection {
+    pub adopted: Vec<RevisionRef>,
+    pub proposals: Vec<CandidateEvidence>,
+    pub details: Vec<Value>,
+    pub sources: Vec<SourceSpan>,
+}
+
 pub(super) struct Research<'a> {
     service: &'a Service,
     id: &'a str,
@@ -46,7 +71,9 @@ pub(super) struct Research<'a> {
     captured_reads: BTreeMap<String, CapturedRead>,
     workspace: Option<BoundWorkspace<'a, ()>>,
     handles: BTreeMap<String, u64>,
-    expanded: BTreeMap<String, (u64, Value)>,
+    proposals: BTreeMap<(String, u64), CandidateEvidence>,
+    proposal_cursors: BTreeMap<String, String>,
+    expanded: BTreeMap<(String, u64), Value>,
     searched: bool,
     operations: u64,
     native: NativeExecutor,
@@ -97,6 +124,8 @@ impl<'a> Research<'a> {
                         .collect()
                 })
                 .unwrap_or_default(),
+            proposals: BTreeMap::new(),
+            proposal_cursors: BTreeMap::new(),
             expanded: BTreeMap::new(),
             searched: false,
             operations: 0,
@@ -206,6 +235,7 @@ impl<'a> Research<'a> {
                     .then_some("history_gap"),
             )
             .chain((!answer.conflicts.is_empty()).then_some("unresolved_conflict"))
+            .chain((!self.proposal_cursors.is_empty()).then_some("proposal_page_remaining"))
             .chain(read_gap)
         {
             if !gaps.iter().any(|g| g == gap) {
@@ -272,12 +302,143 @@ impl<'a> Research<'a> {
         Ok(output)
     }
 
+    async fn proposal_search(
+        &self,
+        lease: &RunLease,
+        query: &str,
+        cursor: Option<&str>,
+        read: &mut Option<ResearchRead>,
+    ) -> Result<Value> {
+        // The editor publishes through its patch checkpoint, which validates adopted targets.
+        if self.editor.is_some() {
+            return Err(Error("TOOL_DENIED"));
+        }
+        if query.trim().is_empty() || query.chars().count() > 512 {
+            return Err(Error("INVALID_ARGUMENT"));
+        }
+        let needle = query.trim().to_lowercase();
+        // A runner may continue only a page issued for this query and invocation.
+        let cursor_for =
+            |after: &str| hash(format!("{}:{needle}:{after}", self.invocation.id()).as_bytes());
+        let after = match cursor {
+            None => None,
+            Some(token) => Some(
+                self.proposal_cursors
+                    .get(&needle)
+                    .filter(|after| cursor_for(after) == token)
+                    .ok_or(Error("INVALID_ARGUMENT"))?
+                    .as_str(),
+            ),
+        };
+        lease.charge_read(MAX_FRAME_BYTES as u64)?;
+        let context = self.authorize(lease).await?;
+        let bound = self.invocation.diagnostic();
+        let domain = Domain::new(&self.service.storage);
+        let witnessed = self.captured.read_sources();
+        let mut hits = Vec::new();
+        let mut found = BTreeMap::new();
+        let mut count = self.proposals.len();
+        if witnessed.is_empty() {
+            return Ok(json!({"proposals":[],"next":null}));
+        }
+        let page = domain.review_list(&context, &bound.scope, after).await?;
+        let next = page.next;
+        for item in page.items {
+            if item.proposal_revision > bound.capture_seq
+                || !matches!(item.state, ReviewState::Open | ReviewState::Investigating)
+            {
+                continue;
+            }
+            let key = (item.memory_id.clone(), item.proposal_revision);
+            if found.contains_key(&key) {
+                continue;
+            }
+            let proposal = domain
+                .revision(&item.memory_id, item.proposal_revision)?
+                .ok_or(Error("DOMAIN_CORRUPT"))?;
+            let draft = &proposal.record.draft;
+            if draft.source_spans.is_empty()
+                || !draft.source_spans.iter().all(|s| s.covered_by(witnessed))
+                || !std::iter::once(&draft.claim)
+                    .chain(&draft.conditions)
+                    .chain(&draft.assumptions)
+                    .any(|text| text.to_lowercase().contains(&needle))
+            {
+                continue;
+            }
+            let evidence = CandidateEvidence {
+                review_id: item.id,
+                revision: proposal.revision,
+            };
+            match domain
+                .current_candidate(&context, &bound.scope, &evidence)
+                .await
+            {
+                Ok(_) => {}
+                Err(e) if matches!(e.code, "STALE_RECALL" | "READ_DENIED" | "SCOPE_DENIED") => {
+                    continue;
+                }
+                Err(e) => return Err(e.into()),
+            }
+            if !self.proposals.contains_key(&key) {
+                count += 1;
+                if count > 32 {
+                    return Err(Error("BUDGET_EXHAUSTED"));
+                }
+            }
+            hits.push(
+                json!({"memory_id":key.0,"revision":key.1,"authority":proposal.record.authority}),
+            );
+            found.insert(key, evidence);
+        }
+        let token = next.as_deref().map(cursor_for);
+        *read = Some(ResearchRead::ProposalPage {
+            query: needle,
+            after: next,
+            found,
+        });
+        Ok(json!({"proposals":hits,"next":token}))
+    }
+
     async fn memory_get(
-        &mut self,
+        &self,
         lease: &RunLease,
         memory_id: String,
         revision: u64,
+        read: &mut Option<ResearchRead>,
     ) -> Result<Value> {
+        let key = (memory_id.clone(), revision);
+        if let Some(proposal) = self.proposals.get(&key) {
+            lease.charge_read(MAX_FRAME_BYTES as u64)?;
+            let context = self.authorize(lease).await?;
+            let candidate = Domain::new(&self.service.storage)
+                .current_candidate(&context, &self.invocation.diagnostic().scope, proposal)
+                .await?;
+            let draft = &candidate.record.draft;
+            if !draft
+                .source_spans
+                .iter()
+                .all(|s| s.covered_by(self.captured.read_sources()))
+            {
+                return Err(Error("READ_DENIED"));
+            }
+            let sources = CapturedContext::new_read_sources(&self.sources, &draft.source_spans)?;
+            let detail = json!({
+                "reference":candidate.revision,"scope":draft.scope,"origin":candidate.record.provenance.origin,
+                "authority":candidate.record.authority,"lifecycle":candidate.record.lifecycle,
+                "claim":draft.claim,"conditions":draft.conditions,"assumptions":draft.assumptions,
+                "valid_from_ms":draft.valid_from_ms,"valid_until_ms":draft.valid_until_ms,
+                "sources":draft.source_spans,
+            });
+            *read = Some(ResearchRead::Memory {
+                key,
+                detail: detail.clone(),
+                sources,
+                read_seq: candidate.revision.commit_seq,
+                truncated: false,
+            });
+            return Ok(json!({"proposal":detail}));
+        }
         if self.handles.get(&memory_id) != Some(&revision) {
             return Err(Error("READ_DENIED"));
         }
@@ -338,25 +499,27 @@ impl<'a> Research<'a> {
             }
             remaining -= original.output.chars().count();
             truncated |= original.truncated;
-            if !self.sources.contains(&original.reference) {
-                if self.sources.len() == 64 {
-                    return Err(Error("BUDGET_EXHAUSTED"));
-                }
-                self.sources.push(original.reference.clone());
-            }
             originals.push(original);
         }
-        self.read_seq = self.read_seq.max(memory.read_seq);
-        if truncated {
-            self.gap("original_budget");
-        }
-        self.expanded.insert(memory_id, (revision, json!({
+        let spans: Vec<_> = originals
+            .iter()
+            .map(|original| original.reference.clone())
+            .collect();
+        let sources = CapturedContext::new_read_sources(&self.sources, &spans)?;
+        let detail = json!({
             "reference":active.memory.revision, "scope":active.memory.record.draft.scope,
             "authority":active.memory.record.authority, "conditions":active.memory.record.draft.conditions,
             "assumptions":active.memory.record.draft.assumptions,
             "valid_from_ms":active.memory.record.draft.valid_from_ms,
             "valid_until_ms":active.memory.record.draft.valid_until_ms,
-        })));
+        });
+        *read = Some(ResearchRead::Memory {
+            key,
+            detail,
+            sources,
+            read_seq: memory.read_seq,
+            truncated,
+        });
         Ok(json!({"memory":memory,"originals":originals,"truncated":truncated}))
     }
 
@@ -422,6 +585,7 @@ impl<'a> Research<'a> {
         lease: &RunLease,
         request: ContextRequest,
         bounds: &mut ReadBounds,
+        read: &mut Option<ResearchRead>,
     ) -> Result<ContextResponse> {
         let value = match request {
             ContextRequest::Describe {} if self.incident.is_some() => {
@@ -464,15 +628,27 @@ impl<'a> Research<'a> {
                 };
                 serde_json::to_value(self.run(child, args).await?)?
             }
-            ContextRequest::MemorySearch { query } => {
-                let found = self.memory_search(lease, query).await?;
-                self.searched = true;
-                found
+            ContextRequest::MemorySearch {
+                query,
+                proposals,
+                cursor,
+            } => {
+                if proposals {
+                    self.proposal_search(lease, &query, cursor.as_deref(), read)
+                        .await?
+                } else {
+                    if cursor.is_some() {
+                        return Err(Error("INVALID_ARGUMENT"));
+                    }
+                    let found = self.memory_search(lease, query).await?;
+                    self.searched = true;
+                    found
+                }
             }
             ContextRequest::MemoryGet {
                 memory_id,
                 revision,
-            } => self.memory_get(lease, memory_id, revision).await?,
+            } => self.memory_get(lease, memory_id, revision, read).await?,
             ContextRequest::CodeSearch { paths, query } => {
                 let found = self.workspace()?.search(lease, &paths, &query).await?;
                 self.searched = true;
@@ -509,14 +685,6 @@ impl<'a> Research<'a> {
                     .execute_with_bounds(lease, request, Some(bounds))
                     .await?;
                 self.searched |= searched;
-                for source in self.captured.read_sources() {
-                    if !self.sources.contains(source) {
-                        if self.sources.len() == 64 {
-                            return Err(Error("BUDGET_EXHAUSTED"));
-                        }
-                        self.sources.push(source.clone());
-                    }
-                }
                 return Ok(response);
             }
         };
@@ -529,8 +697,7 @@ impl<'a> Research<'a> {
             || conclusion.memories.iter().any(|m| {
                 !self
                     .expanded
-                    .get(&m.memory_id)
-                    .is_some_and(|(revision, _)| *revision == m.revision)
+                    .contains_key(&(m.memory_id.clone(), m.revision))
             })
         {
             return Err(Error("READ_DENIED"));
@@ -550,21 +717,36 @@ impl<'a> Research<'a> {
     pub fn selected_memories(
         &self,
         conclusion: &crate::adapter::ResearchConclusion,
-    ) -> Result<(Vec<RevisionRef>, Vec<Value>)> {
-        let mut selected = vec![];
-        let mut details = vec![];
-        for memory in &conclusion.memories {
-            let (_, detail) = self
-                .expanded
-                .get(&memory.memory_id)
-                .ok_or(Error("READ_DENIED"))?;
-            let reference = serde_json::from_value(detail["reference"].clone())?;
-            if !selected.contains(&reference) {
-                selected.push(reference);
-                details.push(detail.clone());
+    ) -> Result<ResearchSelection> {
+        let mut selected = ResearchSelection::default();
+        for source in &conclusion.sources {
+            if !selected.sources.contains(source) {
+                selected.sources.push(source.clone());
             }
         }
-        Ok((selected, details))
+        let mut seen = BTreeSet::new();
+        for memory in &conclusion.memories {
+            let key = (memory.memory_id.clone(), memory.revision);
+            if !seen.insert(key.clone()) {
+                continue;
+            }
+            let detail = self.expanded.get(&key).ok_or(Error("READ_DENIED"))?;
+            if let Some(proposal) = self.proposals.get(&key) {
+                selected.proposals.push(proposal.clone());
+                let spans: Vec<SourceSpan> = serde_json::from_value(detail["sources"].clone())?;
+                for span in spans {
+                    if !selected.sources.contains(&span) {
+                        selected.sources.push(span);
+                    }
+                }
+            } else {
+                selected
+                    .adopted
+                    .push(serde_json::from_value(detail["reference"].clone())?);
+            }
+            selected.details.push(detail.clone());
+        }
+        Ok(selected)
     }
 }
 
@@ -593,7 +775,8 @@ impl ContextSource for Research<'_> {
                     _ => None,
                 };
                 let mut bounds = ReadBounds::default();
-                let response = match self.dispatch(lease, request, &mut bounds).await {
+                let mut read = None;
+                let response = match self.dispatch(lease, request, &mut bounds, &mut read).await {
                     Ok(response) => response,
                     Err(error) => {
                         self.diagnostics.record_reason(
@@ -606,6 +789,14 @@ impl ContextSource for Research<'_> {
                         ContextResponse::Error(adapter_error(error))
                     }
                 };
+                self.authorize(lease).await.map_err(adapter_error)?;
+                let bytes = serde_json::to_vec(&response)
+                    .map_err(|_| ErrorCode::ProtocolInvalid)?
+                    .len();
+                if bytes > MAX_FRAME_BYTES {
+                    return Err(ErrorCode::OutputLimit.into());
+                }
+                lease.charge_output(bytes as u64)?;
                 match &response {
                     ContextResponse::Page(page) => {
                         for code in &page.gaps {
@@ -616,6 +807,10 @@ impl ContextSource for Research<'_> {
                     }
                     ContextResponse::Text(text) => {
                         if let Some(handle) = capture_handle {
+                            let sources =
+                                CapturedContext::new_read_sources(&self.sources, &text.sources)?;
+                            self.captured.confirm_read(&text.sources)?;
+                            self.sources.extend(sources);
                             let read =
                                 self.captured_reads
                                     .entry(handle)
@@ -630,14 +825,38 @@ impl ContextSource for Research<'_> {
                     }
                     _ => (),
                 }
-                self.authorize(lease).await.map_err(adapter_error)?;
-                let bytes = serde_json::to_vec(&response)
-                    .map_err(|_| ErrorCode::ProtocolInvalid)?
-                    .len();
-                if bytes > MAX_FRAME_BYTES {
-                    return Err(ErrorCode::OutputLimit.into());
+                match read {
+                    Some(ResearchRead::ProposalPage {
+                        query,
+                        after,
+                        found,
+                    }) => {
+                        for (key, evidence) in found {
+                            self.proposals.entry(key).or_insert(evidence);
+                        }
+                        if let Some(after) = after {
+                            self.proposal_cursors.insert(query, after);
+                        } else {
+                            self.proposal_cursors.remove(&query);
+                        }
+                        self.searched = true;
+                    }
+                    Some(ResearchRead::Memory {
+                        key,
+                        detail,
+                        sources,
+                        read_seq,
+                        truncated,
+                    }) => {
+                        self.read_seq = self.read_seq.max(read_seq);
+                        self.sources.extend(sources);
+                        self.expanded.insert(key, detail);
+                        if truncated {
+                            self.gap("original_budget");
+                        }
+                    }
+                    None => {}
                 }
-                lease.charge_output(bytes as u64)?;
                 Ok(response)
             }
             .await;

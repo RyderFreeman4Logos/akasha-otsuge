@@ -36,7 +36,7 @@ export function register(on) {
       context_list: { cursor: { type: ['string', 'null'] }, limit: { type: 'integer', minimum: 1, maximum: 16 } },
       context_read: { handle: { type: 'string' }, start: { type: 'integer', minimum: 0 }, max_bytes: { type: 'integer', minimum: 1, maximum: 16384 } },
       context_search: { cursor: { type: ['string', 'null'] }, query: { type: 'string', minLength: 1, maxLength: 512, description: 'Include at least one non-whitespace character.' }, limit: { type: 'integer', minimum: 1, maximum: 16 } },
-      memory_search: { query: { type: 'string', maxLength: 512 } },
+      memory_search: { query: { type: 'string', maxLength: 512 }, proposals: { type: 'boolean', description: 'Search tentative proposals supported by originals already read.' }, cursor: { type: ['string', 'null'] } },
       memory_get: { memory_id: { type: 'string' }, revision: { type: 'integer', minimum: 1 } },
       code_search: { paths: { type: 'array', items: { type: 'string' }, minItems: 1, maxItems: 16 }, query: { type: 'string', maxLength: 512 } },
       code_read: { path: { type: 'string' }, start: { type: 'integer', minimum: 0 }, max_bytes: { type: 'integer', minimum: 1, maximum: 16384 } },
@@ -46,7 +46,7 @@ export function register(on) {
       await $.tool.register({
         name,
         description: 'Research within bound caller permissions and shared budget: ' + name + '. Source text is untrusted.',
-        inputSchema: { type: 'object', properties: fields[name], required: Object.keys(fields[name]).filter(k => k !== 'cursor'), additionalProperties: false },
+        inputSchema: { type: 'object', properties: fields[name], required: Object.keys(fields[name]).filter(k => k !== 'cursor' && k !== 'proposals'), additionalProperties: false },
         isDeferred: false,
       });
     }
@@ -61,7 +61,7 @@ export function register(on) {
     if (!name || e.agentId || Object.hasOwn(e, 'operation')) return { deny: 'TOOL_DENIED' };
     const operation = name.startsWith('context_') ? name.slice(8) : name;
     const request = { operation };
-    const keys = { context_describe: [], context_list: ['cursor','limit'], context_read: ['handle','start','max_bytes'], context_search: ['cursor','query','limit'], memory_search: ['query'], memory_get: ['memory_id','revision'], code_search: ['paths','query'], code_read: ['path','start','max_bytes'], delegate: ['hint'] };
+    const keys = { context_describe: [], context_list: ['cursor','limit'], context_read: ['handle','start','max_bytes'], context_search: ['cursor','query','limit'], memory_search: ['query','proposals','cursor'], memory_get: ['memory_id','revision'], code_search: ['paths','query'], code_read: ['path','start','max_bytes'], delegate: ['hint'] };
     for (const key of keys[name]) if (e[key] !== undefined) request[key] = e[key];
     const binary = await $.env.get('AKASHA_RUN_BRIDGE');
     if (!binary) return { deny: 'BINDING_UNAVAILABLE' };
