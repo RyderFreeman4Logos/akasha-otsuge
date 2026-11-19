@@ -67,7 +67,7 @@ choose the source branch. After the checks pass, the run publishes an artifact
 named for the runner architecture and full commit. Extract the Actions artifact
 to obtain the tarball and its SHA-256 file. The candidate is retained for seven
 days. Tagged releases have a separate publication and download verification.
-Run the [installed Pi and binary-upgrade checks](benchmarks/results/mvp026-linux-package/README.md) against the archive to verify the operator workflow and storage continuity.
+Run the [installed Pi and binary-upgrade checks][source-mvp026-linux-package] against the archive to verify the operator workflow and storage continuity.
 
 
 Errors use one JSON line on stderr:
@@ -85,3 +85,6 @@ Implement one main Issue at a time, preserve its requirement/dependency mapping,
 run the shared gate on the candidate commit, review the diff and record evidence
 before merging and closing the Issue. Specification snapshots remain immutable.
 See `docs/plan/issues-index.md` for the full required scope.
+
+<!-- Source links for the Linux archive -->
+[source-mvp026-linux-package]: <benchmarks/results/mvp026-linux-package/README.md>

@@ -257,7 +257,7 @@ roles from outside the library and tests all 16 combinations through the real
 `CapturedContext`, with unique private caller markers. These contract fakes are
 not evidence that real installed host protocols work.
 
-The [reference set with erratum 1](evaluation/reference-v1-errata-1/README.md) freezes 60 sourced tasks,
+The [reference set with erratum 1][source-reference-v1-errata-1] freezes 60 sourced tasks,
 31 critical tasks and ten paired intents, plus oracles, counting rules, thresholds
 and the reference profile. The integrity checker and negative controls run in the
 canonical gate. Model quality, cost, four real isolated hosts, the real cross-host
@@ -303,7 +303,7 @@ are retained; attachments have visible unavailable markers. Retained raw JSON is
 a filtered native record, not a byte-identical copy of private configuration.
 All captured content is unverified input and conveys no human authority.
 
-[Native fixtures](../tests/fixtures/codex/0.164.0/README.md) bind sanitized examples
+[Native fixtures][source-0-164-0] bind sanitized examples
 to their native versions and source hashes. Controlled local SSE runs prove
 protocol and lifecycle behavior. [Native acceptance](adapters/codex-0.164.0/README.md)
 records authenticated Caller/Runner, actual tool restrictions and concurrent TUI
@@ -499,7 +499,7 @@ No later parent or sibling events are imported into the branch.
 ### Claude session plugin installation
 
 Supported Claude Code versions are 2.1.311 and 2.1.322. See the
-[2.1.322 native compatibility receipt](../tests/fixtures/claude/2.1.322/README.md). Install into a new directory whose parent
+[2.1.322 native compatibility receipt][source-2-1-322]. Install into a new directory whose parent
 already exists, using the same executable/configuration as the running daemon:
 
 ```sh
@@ -555,4 +555,10 @@ persisted cannot advance the file fence. Native permission metadata is skipped;
 turn-duration events retain their identity and session visibility. Authenticated
 model and the remaining TUI lifecycle acceptance remain separate.
 
-The [native diagnostic controls](benchmarks/results/mvp027/typed-diagnostics-r1.json) compare two tool errors, a conclusion that reported the same error, and their combination. They also cover failed submissions, revoked read access and previously stored Consult traces across an upgrade.
+The [native diagnostic controls][source-typed-diagnostics-r1] compare two tool errors, a conclusion that reported the same error, and their combination. They also cover failed submissions, revoked read access and previously stored Consult traces across an upgrade.
+
+<!-- Source links for the Linux archive -->
+[source-reference-v1-errata-1]: <evaluation/reference-v1-errata-1/README.md>
+[source-0-164-0]: <../tests/fixtures/codex/0.164.0/README.md>
+[source-2-1-322]: <../tests/fixtures/claude/2.1.322/README.md>
+[source-typed-diagnostics-r1]: <benchmarks/results/mvp027/typed-diagnostics-r1.json>

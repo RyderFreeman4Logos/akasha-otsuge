@@ -7,8 +7,8 @@ source `986a0278d5873cb667aeb4ba82118efceb9a3666`, tree
 Later documentation commits do not change that source; any reuse of the manual
 acceptance requires the release executable to have this exact hash.
 
-The [archive](benchmarks/results/mvp009/README.md) contains 148 original files,
-228,200 bytes, with [SHA256SUMS](benchmarks/results/mvp009/SHA256SUMS). Its manifest
+The [archive][source-mvp009] contains 148 original files,
+228,200 bytes, with [SHA256SUMS][source-sha256sums]. Its manifest
 SHA256 is `52393943d201e8b8e4a65e53589158bbcf6f506de331a604a68527053f632270`.
 No binaries, private corpus, credentials or expanded dataset are included.
 
@@ -31,8 +31,8 @@ Connection establishment has a separate 10-second limit. Idle timeout is disable
 automatic retries are zero, and provider execution is independent of the
 10-second CLI/IPC exchange. There is no external worker/RPC/host Runner in this
 path. All owned daemon/provider threads ended and scratch was removed.
-See the [collected checks](benchmarks/results/mvp009/mvp009-long-r2.collected.json)
-and [raw verified result](benchmarks/results/mvp009/mvp009-long-r2/verified.json).
+See the [collected checks][source-mvp009-long-r2-collected]
+and [raw verified result][source-verified].
 
 The same release passed actual GB10 compatibility on `http://gb10:18009/v1` at
 17:41:24–17:41:28 UTC:
@@ -47,7 +47,7 @@ These are observed configured aliases, not an attestation of remote weights or
 server versions. This bounded synthetic check proves protocol compatibility,
 not semantic quality or long-duration behavior of GB10 itself. Its three stages
 share the unchanged original 6,010,000 ms workflow budget. The
-[receipt](benchmarks/results/mvp009/mvp009-gb10-r2.collected.json) retains complete
+[receipt][source-mvp009-gb10-r2-collected] retains complete
 traces and executable identity. No service was restarted or reconfigured.
 
 ## Regressions, gate and review
@@ -57,7 +57,7 @@ Rust tests, eight Python tests, formatting, all-target Clippy, release builds an
 capture acceptance. The release was separately installed in the isolated harness
 and passed all 15 daemon cases, including kernel peer-UID denial with an accessible
 positive control and no daemon-owned TCP listener. Manual long/GB10 cases are
-excluded from these ordinary counts. [Gate receipt](benchmarks/results/mvp009/mvp009-gate2.collected.json).
+excluded from these ordinary counts. [Gate receipt][source-mvp009-gate2-collected].
 
 The suites cover independent text/embedding/reranker endpoints, malformed and
 oversized output, disconnects, slow bodies, throttling, cancellation, reload,
@@ -70,9 +70,9 @@ admission. Causal regressions first reproduced a successful expired job and an
 already-expired job sending a request. The repair resumes the durable original
 clock before awaiting locks and refuses expired queue/workflow admission before
 physical dispatch. All three exhausted provider-admission controls now send zero
-requests. The [repair index](benchmarks/results/mvp009/mvp009-r1-fix-evidence.json)
+requests. The [repair index][source-mvp009-r1-fix-evidence]
 preserves the failed fixture setup separately from behavioral RED/GREEN.
-Independent [R2 review](benchmarks/results/mvp009/mvp009-review-r2.md) covers the
+Independent [R2 review][source-mvp009-review-r2] covers the
 whole 17-file candidate and reports **PASS, zero actionable findings**.
 
 Historical `69853f1`/release `0596d114…` long and GB10 receipts remain archived as
@@ -86,3 +86,13 @@ Rust `1.99.1 (58cf8f9c3 2026-10-13)`. Exact commands are in each admission recei
 commands. Final publication, exact documentation-candidate gate/review and CI are
 recorded in [Issue #9](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/9).
 Host CLI Runner long tests and retrieval quality belong to their dependent Issues.
+
+<!-- Source links for the Linux archive -->
+[source-mvp009]: <benchmarks/results/mvp009/README.md>
+[source-sha256sums]: <benchmarks/results/mvp009/SHA256SUMS>
+[source-mvp009-long-r2-collected]: <benchmarks/results/mvp009/mvp009-long-r2.collected.json>
+[source-verified]: <benchmarks/results/mvp009/mvp009-long-r2/verified.json>
+[source-mvp009-gb10-r2-collected]: <benchmarks/results/mvp009/mvp009-gb10-r2.collected.json>
+[source-mvp009-gate2-collected]: <benchmarks/results/mvp009/mvp009-gate2.collected.json>
+[source-mvp009-r1-fix-evidence]: <benchmarks/results/mvp009/mvp009-r1-fix-evidence.json>
+[source-mvp009-review-r2]: <benchmarks/results/mvp009/mvp009-review-r2.md>

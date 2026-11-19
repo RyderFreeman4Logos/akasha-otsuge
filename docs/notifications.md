@@ -149,8 +149,12 @@ It also drives the independent file plugin through one persisted failure,
 100 grouped reports, important upgrades and stable external IDs.
 `python3 scripts/test_notifier_file.py` checks standalone capability/delivery,
 deduplication, update, concurrent replay and invalid-input/state preservation.
-The [focused evidence](benchmarks/results/mvp023-stdio/README.md) preserves passing
+The [focused evidence][source-mvp023-stdio] preserves passing
 checks and earlier failures; canonical gate, independent review and CI are
 separate publication requirements.
-The [R1 repair evidence](benchmarks/results/mvp023-stdio-r1-fixes/README.md)
+The [R1 repair evidence][source-mvp023-stdio-r1-fixes]
 retains the rejected candidate's gate/review and both causal regressions.
+
+<!-- Source links for the Linux archive -->
+[source-mvp023-stdio]: <benchmarks/results/mvp023-stdio/README.md>
+[source-mvp023-stdio-r1-fixes]: <benchmarks/results/mvp023-stdio-r1-fixes/README.md>

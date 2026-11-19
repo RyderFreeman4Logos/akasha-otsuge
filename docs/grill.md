@@ -87,5 +87,8 @@ the same job; changing its plan is a conflict. Resuming an unfinished job or
 changing the inherited question/evidence is rejected. New candidates are separate
 proposals; they never overwrite a previously reviewed or edited record.
 
-[Acceptance evidence](benchmarks/results/mvp018/README.md) includes real Pi and
+[Acceptance evidence][source-mvp018] includes real Pi and
 Pi/Codex samples, precise source identities and the retained failures.
+
+<!-- Source links for the Linux archive -->
+[source-mvp018]: <benchmarks/results/mvp018/README.md>

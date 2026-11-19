@@ -18,7 +18,7 @@ below 2048 MiB use 8/32/8 MiB memtable/cache/SST settings; larger budgets use
 64/128/64 MiB. Both use a two-memtable stall threshold, 256-byte value-log
 threshold, 16 MiB value-log segments, full value-log checksums, Zstd compression,
 unlimited native version retention and absolute-consistency WAL recovery.
-These settings reproduce the authority part of the [selected ADR](benchmarks/storage-decision.md).
+These settings reproduce the authority part of the [selected ADR][source-storage-decision].
 The library does not claim the final daemon's RSS, admission or full-corpus result.
 
 ## Records and transactions
@@ -148,3 +148,6 @@ Crash hooks compile only into the unit-test executable, never the product.
 The root `bash scripts/check.sh` remains the canonical gate. These are real
 native persistence fixtures, not a rerun of the 50 GB spike or a claim of hardware
 power-loss, encrypted-at-rest, daemon/worker, four-host or release acceptance.
+
+<!-- Source links for the Linux archive -->
+[source-storage-decision]: <benchmarks/storage-decision.md>

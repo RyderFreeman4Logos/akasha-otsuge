@@ -1,9 +1,9 @@
 # Execution outcomes
 
-The [MVP-021](spec/issues/MVP-021.md) protocol and wrapper were merged in
+The [MVP-021][source-mvp-021] protocol and wrapper were merged in
 [PR #52](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/52).
 Focused results and scope limits are recorded in
-[the acceptance evidence](benchmarks/outcome-acceptance.md).
+[the acceptance evidence][source-outcome-acceptance].
 
 An outcome identifies one execution event. Several builds in one agent run have
 different event IDs, workspace observations, artifact hashes and log sources.
@@ -96,3 +96,7 @@ files and unavailable Git metadata produce explicit workspace coverage gaps.
 Ignored build outputs are covered only when explicitly listed as artifacts.
 The wrapper observes the direct child and its output files; it cannot certify
 that escaped descendants have finished producing output.
+
+<!-- Source links for the Linux archive -->
+[source-mvp-021]: <spec/issues/MVP-021.md>
+[source-outcome-acceptance]: <benchmarks/outcome-acceptance.md>

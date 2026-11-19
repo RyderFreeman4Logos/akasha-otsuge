@@ -1,6 +1,6 @@
 # Codex0.164.0 acceptance
 
-[acceptance.json](acceptance.json) contains the sanitized native receipts and
+[acceptance.json][source-acceptance] contains the sanitized native receipts and
 hashes. It separates authenticated model runs from controlled Responses SSE
 fixtures. Both use the actual pinned Codex executable. It is runtime evidence;
 the final source gate, independent review, CI and merge have separate receipts.
@@ -42,7 +42,7 @@ may omit the hint; the hook supplies verified runtime identity and submits a
 durable job. Public output contains status and a bounded conclusion/receipt after
 success, while `consult show JOB_ID` continues a pending request. Private binding
 and run diagnostics remain in `job show JOB_ID`. Missing child proof never falls
-back to the root session. See the subsequent [MVP-016 Consult evidence](../../benchmarks/results/mvp016/README.md).
+back to the root session. See the subsequent [MVP-016 Consult evidence][source-mvp016].
 
 All native scratch, fixture credentials and owned processes were removed after
 each run. The successful two-TUI fixture allocated 5,115,904 bytes excluding
@@ -57,3 +57,7 @@ Pinned contracts: [app-server](https://learn.chatgpt.com/docs/app-server),
 [configuration schema](https://github.com/openai/codex/blob/rust-v0.164.0/codex-rs/core/config.schema.json),
 [native tool policy](https://github.com/openai/codex/blob/rust-v0.164.0/codex-rs/core/src/tools/spec_plan.rs),
 [nested Code Mode identity](https://github.com/openai/codex/blob/rust-v0.164.0/codex-rs/core/src/tools/code_mode/delegate.rs).
+
+<!-- Source links for the Linux archive -->
+[source-acceptance]: <acceptance.json>
+[source-mvp016]: <../../benchmarks/results/mvp016/README.md>

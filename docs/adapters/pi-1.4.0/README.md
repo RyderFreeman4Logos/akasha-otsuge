@@ -88,7 +88,7 @@ Native SDK loading, native SessionManager tree fixtures, seven Node bridge
 behaviors, three controlled Runner regressions and daemon recovery/cancellation
 checks pass. The Runner cases include 23 negative scenarios and exercise the
 actual Rust context bridge, including recovered authentication retries.
-The maintained [native CLI fixtures](../../../tests/fixtures/pi/1.4.0/README.md)
+The maintained [native CLI fixtures][source-1-4-0]
 also pass five Runner cases: all four context tools, actual automatic recovery
 after a local HTTP503, unissued-context refusal, cancellation and an unadvertised
 Bash call with no side effect. The native Caller binds six calls across two
@@ -98,7 +98,7 @@ all19 capture jobs finish. The three retained native files total42,065bytes.
 These fixtures use an isolated profile and synthetic loopback SSE, with the other
 three host CLIs absent. Their manifests pin the source before the Unicode hint
 correction; its separate regression accepts512 emoji and refuses513, matching
-the actual1.4.0 SDK schema validator. A subsequent [protocol receipt](../../../tests/fixtures/pi/1.4.0/protocol-controlled/manifest.json)
+the actual1.4.0 SDK schema validator. A subsequent [protocol receipt][source-manifest]
 binds the corrected source and both Chat Completions and Responses protocols.
 Each passes five Runner cases, six RPC Caller bindings/19 capture jobs, and four
 interactive Caller bindings/11 jobs in real foreground controlling terminals.
@@ -127,4 +127,9 @@ All owned processes/scratch ended and original native settings/models stayed
 unchanged. [The final acceptance receipt](https://github.com/RyderFreeman4Logos/akasha-otsuge/pull/44#issuecomment-6497475368)
 records hashes and scope. The exact candidate also passed the canonical gate,
 independent R4 review and CI40860874178. PR #44 merged and #15 closed. The subsequent durable Consult, delegation and
-long-request receipts are in the [MVP-016 evidence](../../benchmarks/results/mvp016/README.md).
+long-request receipts are in the [MVP-016 evidence][source-mvp016].
+
+<!-- Source links for the Linux archive -->
+[source-1-4-0]: <../../../tests/fixtures/pi/1.4.0/README.md>
+[source-manifest]: <../../../tests/fixtures/pi/1.4.0/protocol-controlled/manifest.json>
+[source-mvp016]: <../../benchmarks/results/mvp016/README.md>
