@@ -74,3 +74,24 @@ rm -- "$app"
 ```
 
 The history and user configuration have separate paths. For moving data into a new installation, see [neutral archive export and restore](neutral-archive.md).
+
+## Open-file limits for large stores
+
+If a large store fails to open with `STORAGE_ERROR`, check the daemon's open-file limit. On one 28.49 GB snapshot, the packaged daemon failed with a soft limit of 1,024. With a higher limit it opened the same store and had 1,782 file descriptors open when sampled. Descriptor use can grow with the store. [Measurement and package revision](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26#issuecomment-6996163976)
+
+In Bash, `ulimit -Sn` and `ulimit -Hn` show the shell's soft and hard limits. A service inherits limits from its service manager. For a running daemon, get the PID from its own status response and inspect its limits and current descriptor count.
+
+```bash
+pid=$("$app" "${opts[@]}" daemon status | python3 -c 'import json, sys; print(json.load(sys.stdin)["data"]["pid"])')
+grep '^Max open files' "/proc/$pid/limits"
+ls -1 "/proc/$pid/fd" | wc -l
+```
+
+If you run the daemon in a systemd user service, substitute its name for `akasha-otsuge.service`. Inspect its settings with `systemctl --user show akasha-otsuge.service -p LimitNOFILESoft -p LimitNOFILE`. To allow more descriptors for that service, run `systemctl --user edit akasha-otsuge.service` and enter the following drop-in.
+
+```ini
+[Service]
+LimitNOFILE=8192
+```
+
+This example sets both limits to 8,192 for that unit. Choose a value above the observed demand and within the user manager's inherited hard limit. At the next planned service restart, run `systemctl --user restart akasha-otsuge.service` and check the new PID's limits.
