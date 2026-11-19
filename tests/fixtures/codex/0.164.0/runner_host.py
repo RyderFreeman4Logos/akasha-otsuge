@@ -155,6 +155,9 @@ if scenario in ('research', 'code_policy') or scenario.startswith(('delegate_', 
             'items':[item['memory']['revision']['key']['id'] for item in value.get('items', [])],
             'changed':value.get('changed'),'originals':len(value.get('originals', []))}))
         return response
+    if scenario == 'conclusion_diag_empty_proposal_page':
+        empty = tool('memory_search', {'query':'decision', 'proposals':True})
+        assert empty['value'] == {'proposals':[], 'next':None}
     if scenario == 'conclusion_proposal_evidence':
         from proposal_evidence import investigate
         schema = next(t["inputSchema"] for t in request["params"]["dynamicTools"] if t["name"] == "memory_search")
@@ -402,9 +405,6 @@ if scenario.startswith('conclusion_') or 'status' in turn_request['params']['out
             conclusion.update(status='incomplete', gaps=['child_limit'])
     if scenario in ('conclusion_diag_report', 'conclusion_diag_both'):
         conclusion['gaps'] = ['INVALID_ARGUMENT']
-    if scenario == 'conclusion_diag_empty_proposal_page':
-        empty = tool('memory_search', {'query':'decision', 'proposals':True})
-        assert empty['value'] == {'proposals':[], 'next':None}
     if scenario in ('conclusion_diag_unsearched', 'conclusion_diag_empty_proposal_page'):
         conclusion.update(status='no_hit', answer='No result.', sources=[], memories=[], gaps=[])
     if scenario == 'conclusion_no_hit':
