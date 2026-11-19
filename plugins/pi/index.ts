@@ -11,7 +11,11 @@ export default function (pi: ExtensionAPI) {
     const limit = Type.Integer({ minimum: 1, maximum: 16 });
     const object = properties => Type.Object(properties, { additionalProperties: false });
     bridge.registerRunner(pi, getAgentDir, DEFAULTS, VERSION, {
-      memory_search: object({ query: Type.String({ maxLength: 512 }) }),
+      memory_search: object({
+        query: Type.String({ maxLength: 512 }),
+        proposals: Type.Optional(Type.Boolean({ description: 'Search tentative proposals supported by originals already read.' })),
+        cursor,
+      }),
       memory_get: object({ memory_id: Type.String(), revision: Type.Integer({ minimum: 1 }) }),
       code_search: object({ paths: Type.Array(Type.String(), { minItems: 1, maxItems: 16 }), query: Type.String({ maxLength: 512 }) }),
       code_read: object({ path: Type.String(), start: Type.Integer({ minimum: 0 }), max_bytes: Type.Integer({ minimum: 1, maximum: 16384 }) }),

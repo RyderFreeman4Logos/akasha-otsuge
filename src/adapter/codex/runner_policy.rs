@@ -102,7 +102,9 @@ pub(super) fn tools() -> Value {
         ),
         (
             "memory_search",
-            json!({"query":{"type":"string","maxLength":512}}),
+            json!({"query":{"type":"string","maxLength":512},
+                "proposals":{"type":"boolean","description":"Search tentative proposals supported by originals already read."},
+                "cursor":{"type":["string","null"]}}),
             vec!["query"],
         ),
         (

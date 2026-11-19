@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     capture::{Capture, CoverageLevel, EventRef, SourceIdentity, Visibility},
-    domain::Domain,
+    domain::{Domain, SourceSpan},
     storage::{Storage, hash},
 };
 use futures::future::BoxFuture;
@@ -39,6 +39,10 @@ pub enum ContextRequest {
     },
     MemorySearch {
         query: String,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        proposals: bool,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        cursor: Option<String>,
     },
     MemoryGet {
         memory_id: String,
@@ -220,6 +224,30 @@ impl<'a> CapturedContext<'a> {
     }
     pub(crate) fn read_sources(&self) -> &[crate::domain::SourceSpan] {
         &self.read_sources
+    }
+    pub(crate) fn new_read_sources(
+        current: &[SourceSpan],
+        incoming: &[SourceSpan],
+    ) -> Result<Vec<SourceSpan>> {
+        if current.len() > 64 {
+            return Err(ErrorCode::BudgetExhausted.into());
+        }
+        let mut additions = Vec::new();
+        for source in incoming {
+            if !current.contains(source) && !additions.contains(source) {
+                if current.len() + additions.len() >= 64 {
+                    return Err(ErrorCode::BudgetExhausted.into());
+                }
+                additions.push(source.clone());
+            }
+        }
+        Ok(additions)
+    }
+
+    pub(crate) fn confirm_read(&mut self, spans: &[SourceSpan]) -> Result<()> {
+        let additions = Self::new_read_sources(&self.read_sources, spans)?;
+        self.read_sources.extend(additions);
+        Ok(())
     }
     fn check(&self, lease: &RunLease) -> Result<()> {
         if lease.origin() != self.invocation.id() || lease.fence() != self.invocation.fence_hash() {
@@ -454,15 +482,10 @@ impl<'a> CapturedContext<'a> {
                 }
                 _ => return Err(ErrorCode::ToolDenied.into()),
             };
-            if let ContextResponse::Text(text) = &response {
-                for source in &text.sources {
-                    if !self.read_sources.contains(source) {
-                        if self.read_sources.len() >= 64 {
-                            return Err(ErrorCode::BudgetExhausted.into());
-                        }
-                        self.read_sources.push(source.clone());
-                    }
-                }
+            if let ContextResponse::Text(text) = &response
+                && self.read_sources.len() + text.sources.len() > 64
+            {
+                Self::new_read_sources(&self.read_sources, &text.sources)?;
             }
             let bytes = serde_json::to_vec(&response)
                 .map_err(|_| ErrorCode::ProtocolInvalid)?
@@ -482,6 +505,12 @@ impl ContextSource for CapturedContext<'_> {
         lease: &'a RunLease,
         request: ContextRequest,
     ) -> BoxFuture<'a, Result<ContextResponse>> {
-        self.execute_with_bounds(lease, request, None)
+        Box::pin(async move {
+            let response = self.execute_with_bounds(lease, request, None).await?;
+            if let ContextResponse::Text(text) = &response {
+                self.confirm_read(&text.sources)?;
+            }
+            Ok(response)
+        })
     }
 }

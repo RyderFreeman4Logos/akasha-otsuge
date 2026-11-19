@@ -1,5 +1,8 @@
 use super::*;
 
+#[path = "daemon_proposal_evidence.rs"]
+mod proposal_evidence;
+
 fn native(daemon: &Daemon, event: Value) -> Value {
     let mut stream = daemon.connect();
     assert_eq!(receive(&mut stream)["protocol_version"], 1);
@@ -1158,6 +1161,11 @@ fn consult_trace_separates_runner_failure_from_conclusion_validation() {
         ("auth", "runner", "AUTH_REQUIRED"),
         (
             "conclusion_diag_unsearched",
+            "conclusion_validation",
+            "PROTOCOL_INVALID",
+        ),
+        (
+            "conclusion_diag_empty_proposal_page",
             "conclusion_validation",
             "PROTOCOL_INVALID",
         ),

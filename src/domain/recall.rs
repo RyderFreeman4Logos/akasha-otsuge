@@ -62,6 +62,8 @@ pub struct RecallRecord {
     pub retrieval_mode: RetrievalMode,
     pub scope: Scope,
     pub selected: Vec<RevisionRef>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub proposals: Vec<CandidateEvidence>,
     pub sources: Vec<SourceSpan>,
     pub status: RecallStatus,
     pub coverage: Coverage,
@@ -159,13 +161,7 @@ impl Domain<'_> {
     ) -> Result<Vec<SourceSpan>> {
         self.storage.check_point(draft.read_seq)?;
         let mut sources = Vec::new();
-        let now = i64::try_from(
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .map_err(|_| error("CLOCK_INVALID"))?
-                .as_millis(),
-        )
-        .map_err(|_| error("CLOCK_INVALID"))?;
+        let now = now_ms()?;
         for reference in &draft.selected {
             let memory = self
                 .revision(&reference.key.id, reference.commit_seq)?
@@ -322,13 +318,49 @@ impl Domain<'_> {
         context: &ReadContext,
         draft: &RecallDraft,
     ) -> Result<CommitReceipt> {
+        self.prepare_consult_recall(context, draft, &[]).await
+    }
+
+    pub async fn prepare_consult_recall(
+        &self,
+        context: &ReadContext,
+        draft: &RecallDraft,
+        proposals: &[CandidateEvidence],
+    ) -> Result<CommitReceipt> {
         draft.validate()?;
-        let fingerprint = hash(&serde_json::to_vec(&(context, draft))?);
+        let mut keys = std::collections::BTreeSet::new();
+        if proposals.len() > 32
+            || (!proposals.is_empty()
+                && (draft.retrieval_mode != RetrievalMode::CurrentState
+                    || draft.status == RecallStatus::NoHit))
+            || proposals
+                .iter()
+                .any(|item| !keys.insert(&item.revision.key))
+        {
+            return Err(error("INVALID_RECALL"));
+        }
+        let fingerprint = if proposals.is_empty() {
+            hash(&serde_json::to_vec(&(context, draft))?)
+        } else {
+            hash(&serde_json::to_vec(&(context, draft, proposals))?)
+        };
         self.storage
             .commit_checked(|| {
                 let permission_revision = self.permission(context, Some(&draft.scope))?;
                 let validated = self.storage.sequence()?;
                 let sources = self.recall_selection(context, draft, validated)?;
+                for evidence in proposals {
+                    let view = self.checked_candidate(context, &draft.scope, evidence)?;
+                    if !view
+                        .record
+                        .draft
+                        .source_spans
+                        .iter()
+                        .all(|span| span.covered_by(&draft.sources))
+                    {
+                        return Err(error("INSUFFICIENT_EVIDENCE"));
+                    }
+                }
                 let (record, output) = if self
                     .storage
                     .current(&recall_key(&draft.request_id))?
@@ -358,6 +390,7 @@ impl Domain<'_> {
                         retrieval_mode: draft.retrieval_mode,
                         scope: draft.scope.clone(),
                         selected: draft.selected.clone(),
+                        proposals: proposals.to_vec(),
                         sources,
                         status: draft.status,
                         coverage: draft.coverage.clone(),
@@ -409,6 +442,17 @@ impl Domain<'_> {
                         .revision(&reference.key.id, reference.commit_seq)?
                         .ok_or_else(|| error("REVISION_NOT_FOUND"))?;
                     self.permission(context, Some(&memory.record.draft.scope))?;
+                }
+                for evidence in &data.record.proposals {
+                    let proposal = self
+                        .revision(&evidence.revision.key.id, evidence.revision.commit_seq)?
+                        .ok_or_else(|| error("REVISION_NOT_FOUND"))?;
+                    if proposal.revision != evidence.revision
+                        || !data.record.scope.contains(&proposal.record.draft.scope)
+                    {
+                        return Err(error("RECALL_CORRUPT"));
+                    }
+                    self.permission(context, Some(&proposal.record.draft.scope))?;
                 }
                 for span in &data.record.sources {
                     self.permission(context, Some(&self.span(span)?.payload.scope))?;

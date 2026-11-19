@@ -39,6 +39,14 @@ pub struct ReviewItem {
     pub reason: String,
 }
 
+/// An unadopted proposal, identified independently of adopted recall selections.
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct CandidateEvidence {
+    pub review_id: String,
+    pub revision: RevisionRef,
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ReviewDetail {
@@ -201,6 +209,58 @@ pub(super) fn migrated_withdrawal(storage: &Storage, memory: &MemoryView) -> Res
 }
 
 impl Domain<'_> {
+    pub async fn current_candidate(
+        &self,
+        context: &ReadContext,
+        scope: &Scope,
+        evidence: &CandidateEvidence,
+    ) -> Result<MemoryView> {
+        self.storage
+            .serialized_read(|| self.checked_candidate(context, scope, evidence))
+            .await
+    }
+
+    pub(super) fn checked_candidate(
+        &self,
+        context: &ReadContext,
+        scope: &Scope,
+        evidence: &CandidateEvidence,
+    ) -> Result<MemoryView> {
+        self.permission(context, Some(scope))?;
+        let review = self
+            .storage
+            .current(&key(&evidence.review_id)?)?
+            .ok_or_else(|| error("REVIEW_NOT_FOUND"))?;
+        let detail = self.review_detail(&evidence.review_id, review)?;
+        let proposal = detail.proposal;
+        if !scope.contains(&detail.item.scope) {
+            return Err(error("SCOPE_DENIED"));
+        }
+        self.permission(context, Some(&detail.item.scope))?;
+        if !matches!(
+            detail.item.state,
+            ReviewState::Open | ReviewState::Investigating
+        ) || proposal.revision != evidence.revision
+            || proposal.record.authority != Authority::Candidate
+            || proposal.record.lifecycle != Lifecycle::Candidate
+            || !proposal.record.draft.valid_at(now_ms()?)
+            || self
+                .storage
+                .current(&proposal.revision.key)?
+                .is_none_or(|current| current.commit_seq != proposal.revision.commit_seq)
+        {
+            return Err(error("STALE_RECALL"));
+        }
+        for span in &proposal.record.draft.source_spans {
+            let source = self.span(span)?;
+            if !scope.contains(&source.payload.scope) {
+                return Err(error("SCOPE_DENIED"));
+            }
+            self.permission(context, Some(&source.payload.scope))?;
+        }
+        Ok(proposal)
+    }
+
     fn review_detail(&self, id: &str, revision: Revision) -> Result<ReviewDetail> {
         let record: ReviewRecord = serde_json::from_str(&revision.content)?;
         if record.schema_version != 1

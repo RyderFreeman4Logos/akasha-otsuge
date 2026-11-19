@@ -177,6 +177,14 @@ an event after execution is not permission enforcement. A host that cannot
 provide this tool surface must refuse the Runner configuration. Provider network
 access is separate from allowing a model an arbitrary network tool.
 
+To investigate a tentative proposal, first read its original spans with
+`context_read`. Call `memory_search` with `proposals: true` and a phrase from
+the claim, conditions or assumptions. Pass the returned `next` as `cursor` with
+the same query to continue. Use `memory_get` to expand a returned ID and
+revision. Consult labels it `candidate` and returns the recorded origin,
+conditions, assumptions, validity interval and original spans. Ordinary
+`memory_search` continues to use adopted heads.
+
 `ReadCapability` issues 256 random bits and binds them to the original invocation
 and fence. It has redacted Debug output and no Serialize implementation. Transport
 code explicitly passes the bearer token out of band and authorizes it against the
