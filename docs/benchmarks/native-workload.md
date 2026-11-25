@@ -69,6 +69,10 @@ peak_mib = 640
 service_total_mib = 2048
 ```
 
+A scoped-history operation follows every `state_show` continuation at its fixed sequence,
+including empty pages, until it can verify all 100 expected members and the terminal cursor.
+Each page uses `request_timeout_s`. The complete paginated read uses `job_timeout_s`.
+
 For a short functional check, use 55 seconds to exercise every client role and
 duplicate original writes. The runner records each offer, admitted request,
 outcome and resource sample. If the process stops early, keep its journals
