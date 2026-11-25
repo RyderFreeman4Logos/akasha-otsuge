@@ -169,29 +169,48 @@ class NativeOperations:
         ):
             raise ValueError("history requires exactly 100 admitted members of one scope")
         cursor, seen, cursors, lengths = None, set(), set(), []
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + self.job_timeout_s
         while True:
-            value = await self.request(
-                dict(op="state_show", scope=expected["scope"], at=expected["at"], cursor=cursor),
-                identity + "/page/" + str(len(lengths)),
-            )
+            try:
+                async with asyncio.timeout_at(deadline):
+                    value = await self.request(
+                        dict(
+                            op="state_show",
+                            scope=expected["scope"],
+                            at=expected["at"],
+                            cursor=cursor,
+                        ),
+                        identity + "/page/" + str(len(lengths)),
+                    )
+            except TimeoutError as error:
+                raise OperationError("HISTORY_COMPLETION_TIMEOUT") from error
             page = value["data"]
             if value["read_seq"] != expected["at"] or value["retrieval_mode"] != "historical_state":
                 raise OperationError("HISTORY_SNAPSHOT_MISMATCH")
-            if not page["items"] or len(page["items"]) > 32:
+            items, examined = page["items"], page["examined"]
+            if (
+                not isinstance(items, list)
+                or type(examined) is not int
+                or not len(items) <= examined <= 32
+                or (examined == 0 and page["next"] is not None)
+            ):
                 raise OperationError("HISTORY_PAGE_BOUND")
-            for item in page["items"]:
+            for item in items:
                 memory = item["memory"]
                 key = memory["revision"]["key"]["id"]
                 if key not in members or key in seen:
                     raise OperationError("HISTORY_MEMBERSHIP_MISMATCH")
                 self.check_memory(memory, members[key])
                 seen.add(key)
-            lengths.append(len(page["items"]))
+            lengths.append(len(items))
+            if loop.time() >= deadline:
+                raise OperationError("HISTORY_COMPLETION_TIMEOUT")
             cursor = page["next"]
             if cursor is None:
                 break
             token = json.dumps(cursor, sort_keys=True)
-            if token in cursors or len(lengths) >= 100:
+            if token in cursors:
                 raise OperationError("HISTORY_CURSOR_LOOP")
             cursors.add(token)
         if seen != set(members):

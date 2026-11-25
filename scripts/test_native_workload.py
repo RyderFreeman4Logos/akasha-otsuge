@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import json
 import tempfile
 import unittest
@@ -6,6 +7,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 from scripts.native_workload import __main__ as runner
+from scripts.native_workload.ipc import TransportError
 from scripts.native_workload.journal import Journal, records
 from scripts.native_workload.operations import NativeOperations, OperationError
 from scripts.native_workload.schedule import run_schedule, summarize
@@ -151,6 +153,100 @@ class SearchRules(unittest.IsolatedAsyncioTestCase):
                 self.assertRaisesRegex(OperationError, "SEARCH_AUTHORITY_OR_SCOPE_MISMATCH"),
             ):
                 await self.search(oracle=legacy, rules=[unexpected])
+
+
+class ScopedHistory(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.ops = NativeOperations("unused")
+        scope = {"user": "owner", "project": "history"}
+        draft = {"scope": scope, "claim": "verified"}
+        claim_sha = hashlib.sha256(b"verified").hexdigest()
+        self.items = [
+            {
+                "memory": {
+                    "revision": {"key": {"id": str(n)}, "commit_seq": 17},
+                    "record": {"draft": draft},
+                }
+            }
+            for n in range(100)
+        ]
+        self.expected = {
+            "scope": scope,
+            "at": 20,
+            "members": {
+                str(n): {"id": str(n), "revision": 17, "scope": scope, "claim_sha256": claim_sha}
+                for n in range(100)
+            },
+        }
+
+    def page(self, items, after=None, examined=32):
+        cursor = {"query_sha256": "q", "after": str(after)} if after is not None else None
+        return {
+            "read_seq": 20,
+            "retrieval_mode": "historical_state",
+            "data": {"items": items, "next": cursor, "examined": examined},
+        }
+
+    async def test_sparse_snapshot_consumes_every_page_to_the_terminal_cursor(self):
+        pages = [self.page([], 0)]
+        pages += [self.page([item], n) for n, item in enumerate(self.items, 1)]
+        pages.append(self.page([]))
+        self.ops.request = AsyncMock(side_effect=pages)
+        result = await self.ops.scoped_history(self.expected, "history")
+        self.assertEqual(
+            result, {"read_seq": 20, "members": 100, "page_lengths": [0] + [1] * 100 + [0]}
+        )
+        cursor = None
+        self.assertEqual(self.ops.request.await_count, len(pages))
+        for n, (page, call) in enumerate(zip(pages, self.ops.request.await_args_list)):
+            self.assertEqual(
+                call.args,
+                (
+                    {
+                        "op": "state_show",
+                        "scope": self.expected["scope"],
+                        "at": 20,
+                        "cursor": cursor,
+                    },
+                    f"history/page/{n}",
+                ),
+            )
+            cursor = page["data"]["next"]
+
+    async def test_sparse_pages_still_fail_closed(self):
+        first = self.page([], 0)
+        for pages, code in [
+            ([first, self.page([])], "HISTORY_MEMBERSHIP_MISMATCH"),
+            ([first, first], "HISTORY_CURSOR_LOOP"),
+            ([self.page([], examined=33)], "HISTORY_PAGE_BOUND"),
+            ([self.page(self.items[:1], examined=0)], "HISTORY_PAGE_BOUND"),
+            ([self.page([self.items[0], self.items[0]])], "HISTORY_MEMBERSHIP_MISMATCH"),
+            ([first, dict(self.page([]), read_seq=21)], "HISTORY_SNAPSHOT_MISMATCH"),
+        ]:
+            with self.subTest(code=code), self.assertRaisesRegex(OperationError, code):
+                self.ops.request = AsyncMock(side_effect=pages)
+                await self.ops.scoped_history(self.expected, "history")
+
+    async def test_history_honors_page_and_completion_deadlines(self):
+        async def hold_greeting(reader, writer):
+            await reader.read()
+            writer.close()
+            await writer.wait_closed()
+
+        with tempfile.TemporaryDirectory() as directory:
+            socket = Path(directory) / "history.sock"
+            async with await asyncio.start_unix_server(hold_greeting, socket):
+                for page_timeout, total_timeout, error in [
+                    (0.05, 2, TransportError),
+                    (2, 0.05, OperationError),
+                ]:
+                    with self.subTest(error=error), self.assertRaises(error) as raised:
+                        ops = NativeOperations(socket, page_timeout, total_timeout)
+                        await asyncio.wait_for(ops.scoped_history(self.expected, "history"), 1)
+                    if error is TransportError:
+                        self.assertEqual(raised.exception.cause, "TimeoutError")
+                    else:
+                        self.assertEqual(raised.exception.code, "HISTORY_COMPLETION_TIMEOUT")
 
 
 class WorkloadBounds(unittest.IsolatedAsyncioTestCase):
