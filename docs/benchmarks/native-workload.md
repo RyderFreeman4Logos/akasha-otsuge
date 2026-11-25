@@ -102,8 +102,9 @@ them. A missing queue or generation measurement leaves a coverage gap.
 
 Before creating the output directory, the runner checks for 30 GiB of free
 space on the output volume and the effective daemon storage volumes. It reads
-the data directory and writable authority and search mounts from the daemon's
-mount namespace. Each sample records the output volume in
+the authority and search write paths from the daemon's mount namespace,
+including nested table data and index mounts. If the search directory has yet
+to be created, the check uses its parent. Each sample records the output volume in
 `filesystem_free_bytes` and the free space by daemon path in `storage_free_bytes`.
 A sampled value below 30 GiB stops the interval.
 

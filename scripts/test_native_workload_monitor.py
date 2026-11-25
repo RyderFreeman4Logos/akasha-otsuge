@@ -250,25 +250,32 @@ class WorkloadMonitor(unittest.IsolatedAsyncioTestCase):
             runner.daemon_path(self.root, Path("/storage/nested/kv")), Path("/other/kv")
         )
 
-    def test_writable_nested_mounts_with_spaces(self):
-        nested = self.data / "search" / "table with spaces" / "data"
-        read_only = self.data / "search" / "snapshot"
-        sibling = self.data / "search-backup"
+    def test_reserve_only_on_writable_storage_mounts(self):
+        authority = self.data / "authority/kv"
+        search = self.data / "search"
+        table = search / "memory_lexical_v1.lance"
+        nested = table / "_indices" / "index with spaces"
         mounts = b"".join(
-            b"1 1 0:1 / "
-            + str(path).encode().replace(b" ", rb"\040")
+            b"1 1 0:1 / " + str(path).encode().replace(b" ", rb"\040")
             + b" " + mode + b" - tmpfs none rw\n"
-            for path, mode in [(nested, b"rw"), (read_only, b"ro"), (sibling, b"rw")]
+            for path, mode in [
+                (nested, b"rw"), (table / "data", b"ro"), (search / "scratch", b"rw"),
+                (table / "scratch", b"rw"), (authority / "backup", b"rw"),
+                (authority / "wal", b"rw"), (self.data / "search-backup", b"rw"),
+            ]
         )
         with (
             patch.object(Path, "read_bytes", return_value=mounts),
             patch.object(runner.shutil, "disk_usage", return_value=SimpleNamespace(free=7)),
         ):
             values = runner.storage_free_bytes(self.pid, self.data)
-        self.assertEqual(
-            set(values),
-            {str(p) for p in (self.data, self.data / "authority/kv", self.data / "search", nested)},
-        )
+        self.assertEqual(set(values), {str(p) for p in (authority, authority / "wal", search, nested)})
+
+    def test_missing_search_uses_data_volume_until_it_exists(self):
+        (self.data / "search").rmdir()
+        with patch.object(runner.shutil, "disk_usage", return_value=SimpleNamespace(free=7)):
+            values = runner.storage_free_bytes(self.pid, self.data)
+        self.assertEqual(set(values), {str(self.data), str(self.data / "authority/kv")})
 
     async def test_other_status_failure_remains_fatal(self):
         with self.assertRaises(ExceptionGroup) as raised:

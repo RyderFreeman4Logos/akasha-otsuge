@@ -25,6 +25,8 @@ from .schedule import clients, offers, run_schedule, summarize
 
 MODULES = pathlib.Path(__file__).resolve().parent
 REPO = MODULES.parents[1]
+SEARCH_TABLE = re.compile(r"memory_(?:lexical_v1(?:_[0-9a-f]{64})?|vector_[0-9a-f]{64})\.lance")
+LANCE_WRITE_DIRS = {"data", "_indices", "_versions", "_transactions", "_deletions"}
 MINIMUMS = {
     "original_write": 10,
     "current": 2,
@@ -73,11 +75,11 @@ def storage_free_bytes(pid, data):
     data = daemon_path(root, data)
     authority = daemon_path(root, data / "authority" / "kv")
     search = daemon_path(root, data / "search")
-    paths = {data, authority}
+    paths = {authority}
     try:
         (root / search.relative_to("/")).stat()
     except FileNotFoundError:
-        pass  # A first search table inherits the data volume before creation.
+        paths.add(data)  # The first search table will be created on its parent volume.
     else:
         paths.add(search)
     # Lance data and indexes can themselves be separate writable mounts.
@@ -87,8 +89,16 @@ def storage_free_bytes(pid, data):
             continue
         name = re.sub(rb"\\([0-7]{3})", lambda m: bytes([int(m[1], 8)]), fields[4])
         mount = pathlib.Path(os.fsdecode(name))
-        if mount.is_relative_to(authority) or mount.is_relative_to(search):
-            paths.add(mount)
+        if mount.is_relative_to(authority):
+            parts = mount.relative_to(authority).parts
+            if parts and parts[0] in {"sstables", "vlog", "wal", "manifest"}:
+                paths.add(mount)
+        elif mount.is_relative_to(search):
+            parts = mount.relative_to(search).parts
+            if parts and SEARCH_TABLE.fullmatch(parts[0]):
+                if len(parts) == 1 or parts[1] in LANCE_WRITE_DIRS:
+                    paths.add(mount)
+    # Project quotas can report different free bytes for paths on one device.
     return {
         str(path): shutil.disk_usage(root / path.relative_to("/")).free for path in sorted(paths)
     }
@@ -317,7 +327,7 @@ async def run(plan_path, config_path, root):
     ops = NativeOperations(plan["socket"], 10, 600)
     effective = await ops.request({"op": "config_show"}, f"{plan['run_id']}/storage-volumes")
     data = pathlib.Path(effective["config"]["paths"]["data_dir"])
-    storage_free = storage_free_bytes(plan["daemon"]["pid"], data)
+    storage_free = await asyncio.to_thread(storage_free_bytes, plan["daemon"]["pid"], data)
     if min(shutil.disk_usage(root.parent).free, *storage_free.values()) < 30 * 1024**3:
         raise ValueError("free reserve on workload output or daemon storage volume")
     root.mkdir(mode=0o700)
@@ -434,7 +444,7 @@ async def run(plan_path, config_path, root):
             events=events,
             client_peak_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
             filesystem_free_bytes=shutil.disk_usage(root).free,
-            storage_free_bytes=storage_free_bytes(plan["daemon"]["pid"], data),
+            storage_free_bytes=await asyncio.to_thread(storage_free_bytes, plan["daemon"]["pid"], data),
         )
         if status_error is not None:
             row["status_error"] = status_error
