@@ -639,6 +639,69 @@ impl Index {
         Ok(())
     }
 
+    // This is a placement hint. Native optimization still validates and handles older manifests.
+    async fn lexical_merge_count(&self) -> Option<usize> {
+        use lance::index::DatasetIndexExt;
+        let dataset = self.table.dataset()?.get().await.ok()?;
+        let indices = dataset.load_indices().await.ok()?;
+        const MAX_LEXICAL_SEGMENTS: usize = 4;
+        if indices.len() > 3 * MAX_LEXICAL_SEGMENTS {
+            return None;
+        }
+        let coverage = |name: &'static str| {
+            indices
+                .iter()
+                .filter(move |s| s.name == name)
+                .map(|s| s.fragment_bitmap.as_ref())
+        };
+        let segments = coverage("body_idx").collect::<Option<Vec<_>>>()?;
+        if segments.is_empty()
+            || indices.len() != segments.len().checked_mul(3)?
+            || ["scope_idx", "key_idx"]
+                .into_iter()
+                .any(|name| !coverage(name).eq(segments.iter().copied().map(Some)))
+        {
+            return None;
+        }
+
+        let mut sizes = vec![0usize; segments.len()];
+        let mut unmatched = segments
+            .iter()
+            .try_fold(0u64, |n, s| n.checked_add(s.len()))?;
+        let mut incoming = 0usize;
+        for fragment in dataset.iter_fragments() {
+            if fragment.deletion_file.is_some() {
+                return None;
+            }
+            let id = u32::try_from(fragment.id).ok()?;
+            let rows = fragment.physical_rows?;
+            if let Some(i) = segments.iter().position(|s| s.contains(id)) {
+                sizes[i] = sizes[i].checked_add(rows)?;
+                unmatched = unmatched.checked_sub(1)?;
+            } else {
+                incoming = incoming.checked_add(rows)?;
+            }
+        }
+        // Each claimed fragment must match exactly one live fragment across all segments.
+        if unmatched != 0 {
+            return None;
+        }
+        let mut count = 0;
+        // Lance merges a trailing suffix. Retain a large clean segment until enough rows arrive.
+        if incoming == 0 {
+            return Some(0);
+        }
+        let minimum = (sizes.len() + 1).saturating_sub(MAX_LEXICAL_SEGMENTS);
+        for size in sizes.into_iter().rev() {
+            if count >= minimum && size > incoming {
+                break;
+            }
+            incoming = incoming.checked_add(size)?;
+            count += 1;
+        }
+        Some(count)
+    }
+
     // Native searches include newly appended rows until the next maintenance window.
     pub(crate) async fn maintain_tables(
         &self,
@@ -648,13 +711,9 @@ impl Index {
         let buffer_mib = (self.budget_mib / 64).clamp(1, 8) as usize;
         use lancedb::table::OptimizeOptions;
         // A vector partition split can reload every existing delta under the daemon's memory limit.
-        let lexical = (
-            &self.table,
-            &self.maintained_version,
-            OptimizeOptions::default(),
-        );
-        let vector = vector.map(|v| (&v.table, &v.maintained_version, OptimizeOptions::append()));
-        for (table, maintained, options) in std::iter::once(lexical).chain(vector) {
+        let lexical = (&self.table, &self.maintained_version, false);
+        let vector = vector.map(|v| (&v.table, &v.maintained_version, true));
+        for (table, maintained, is_vector) in std::iter::once(lexical).chain(vector) {
             authorize()?;
             if maintained.load(std::sync::atomic::Ordering::Relaxed)
                 == table.version().await.map_err(index_error)?
@@ -683,6 +742,13 @@ impl Index {
                 .await
                 .map_err(index_error)?;
             authorize()?;
+            let options = if is_vector {
+                OptimizeOptions::append()
+            } else {
+                self.lexical_merge_count()
+                    .await
+                    .map_or_else(OptimizeOptions::default, OptimizeOptions::merge)
+            };
             table
                 .optimize(lancedb::table::OptimizeAction::Index(options))
                 .await

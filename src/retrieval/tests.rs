@@ -180,6 +180,121 @@ async fn one_authority_batch_bounds_native_versions_and_keeps_every_lexical_row(
 }
 
 #[tokio::test]
+async fn a_small_lexical_increment_preserves_a_large_index_segment_across_reopen() {
+    use lance::index::DatasetIndexExt;
+
+    async fn body_segments(index: &Index) -> Vec<String> {
+        let dataset = index.table.dataset().unwrap().get().await.unwrap();
+        dataset
+            .load_indices()
+            .await
+            .unwrap()
+            .iter()
+            .filter(|segment| segment.name == "body_idx")
+            .map(|segment| segment.uuid.to_string())
+            .collect()
+    }
+
+    let fixture = Fixture::new();
+    let config = fixture.config();
+    let store = Storage::open(&config).await.unwrap();
+    let index = Index::open(&config, &store).await.unwrap();
+    let old = memory(&store, "seed-0", "original sequoia", None).await;
+    let mut target = old;
+    for i in 1..512 {
+        target = memory(&store, &format!("seed-{i}"), "base cypress", None).await;
+    }
+    sync(&index, &store, target).await;
+    index.maintain_tables(None, &|| Ok(())).await.unwrap();
+    drop(index);
+    // The first 16 rows were indexed before the remaining 496. Compact their now-common coverage.
+    let index = Index::open(&config, &store).await.unwrap();
+    index.maintain_tables(None, &|| Ok(())).await.unwrap();
+    let dataset = index.table.dataset().unwrap().get().await.unwrap();
+    let fragment_rows: Vec<_> = dataset.iter_fragments().map(|f| f.physical_rows).collect();
+    assert_eq!(fragment_rows, [Some(512)]);
+    drop(dataset);
+    let base = body_segments(&index).await;
+    assert_eq!(base.len(), 1);
+    drop(index);
+
+    let index = Index::open(&config, &store).await.unwrap();
+    let fresh = memory(&store, "increment", "amethyst orchard", None).await;
+    sync(&index, &store, fresh).await;
+    index.maintain_tables(None, &|| Ok(())).await.unwrap();
+    let segments = body_segments(&index).await;
+    assert!(segments.contains(&base[0]));
+    assert_eq!(segments.len(), 2);
+    assert_eq!(
+        index.keyword("amethyst", &scope(), 20).await.unwrap(),
+        vec![("increment".into(), fresh)]
+    );
+    let other = Scope {
+        project: Some("other".into()),
+        ..scope()
+    };
+    assert!(
+        index
+            .keyword("amethyst", &other, 20)
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    for count in [64, 32, 16, 8, 4, 2, 1] {
+        for i in 0..count {
+            target = memory(&store, &format!("delta-{count}-{i}"), "cypress", None).await;
+        }
+        sync(&index, &store, target).await;
+        index.maintain_tables(None, &|| Ok(())).await.unwrap();
+        let segments = body_segments(&index).await;
+        assert!(segments.len() <= 4, "{segments:?}");
+        assert!(segments.contains(&base[0]));
+    }
+    assert_eq!(
+        index.keyword("sequoia", &scope(), 20).await.unwrap(),
+        vec![("seed-0".into(), old)]
+    );
+    let updated = memory(&store, "seed-0", "copper meadow", Some(old)).await;
+    sync(&index, &store, updated).await;
+    let mut removals = NativeBatch::new(index.owner.budget_mib);
+    removals
+        .push(&index.table, hash(b"increment"), None)
+        .await
+        .unwrap();
+    removals.flush(&index.table).await.unwrap();
+    index.maintain_tables(None, &|| Ok(())).await.unwrap();
+    drop(index);
+    let index = Index::open(&config, &store).await.unwrap();
+    assert!(
+        index
+            .keyword("amethyst", &scope(), 20)
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    assert!(
+        index
+            .keyword("sequoia", &scope(), 20)
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(
+        index.keyword("copper", &scope(), 20).await.unwrap(),
+        vec![("seed-0".into(), updated)]
+    );
+    assert!(
+        index
+            .keyword("copper", &other, 20)
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    drop(index);
+    store.close().await.unwrap();
+}
+
+#[tokio::test]
 async fn native_batches_keep_last_operations_and_flush_bounded_buffers() {
     let fixture = Fixture::new();
     let config = fixture.config();
