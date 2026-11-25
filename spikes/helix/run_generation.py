@@ -161,7 +161,8 @@ def main():
         (output / 'OWNER').write_text('akasha-otsuge MVP-003 owned generation operation\n')
         state = dict(identity=identity, attempts=[], phase='admitted', controller=process_identity(os.getpid()), config_epoch=1)
         publish(state_path, state)
-        shutil.copy2(binary, output / 'probe')
+        subprocess.run(['cp', '--reflink=auto', '--', binary, output / 'probe'], check=True)
+        shutil.copystat(binary, output / 'probe')
         (output / 'config.toml').write_bytes(config_bytes)
         publish(output / 'request.json', request)
         if manifest_bytes is not None:

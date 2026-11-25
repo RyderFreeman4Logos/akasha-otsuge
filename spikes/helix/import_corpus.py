@@ -158,7 +158,7 @@ def main():
         owner_lock = (run / "controller.lock").open("a")
         fcntl.flock(owner_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         (run / "OWNER").write_text(OWNER)
-        shutil.copyfile(args.binary.resolve(strict=True), run / "probe")
+        subprocess.run(["cp", "--reflink=auto", "--", args.binary.resolve(strict=True), run / "probe"], check=True)
         (run / "probe").chmod(0o700)
         with (run / "probe").open("rb") as executable:
             os.fsync(executable.fileno())
