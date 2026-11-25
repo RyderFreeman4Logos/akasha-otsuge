@@ -1,3 +1,4 @@
+import asyncio
 import json
 import subprocess
 import tempfile
@@ -121,18 +122,41 @@ class WorkloadMonitor(unittest.IsolatedAsyncioTestCase):
     async def test_busy_status_preserves_offers_independent_samples_and_workload_errors(
         self,
     ):
-        result = await self.run_fixture("RESOURCE_BUSY")
+        append = runner.Journal.append
+        cutoff = None
+        delayed = None
+
+        async def delay_one_admission(journal, row):
+            nonlocal cutoff, delayed
+            await append(journal, row)
+            if row.get("event") == "interval":
+                cutoff = row["started_monotonic_s"] + row["duration_s"]
+            elif row.get("event") == "admitted" and delayed is None:
+                delayed = row["identity"]
+                loop = asyncio.get_running_loop()
+                while loop.time() < cutoff:
+                    await asyncio.sleep(cutoff - loop.time())
+
+        with patch.object(runner.Journal, "append", delay_one_admission):
+            result = await self.run_fixture("RESOURCE_BUSY")
         journal = list(records(self.output / "requests.jsonl"))
         self.assertEqual(journal[-1]["event"], "drained")
         offered = [r["identity"] for r in journal if r["event"] == "offered"]
         self.assertEqual(len(set(offered)), journal[0]["planned"])
         admitted = [r["identity"] for r in journal if r["event"] == "admitted"]
-        self.assertCountEqual([c.args[2] for c in self.execute.await_args_list], admitted)
-        outcomes = [r["outcome"] for r in journal if r["event"] == "outcome"]
-        self.assertEqual(len(outcomes), len(admitted))
-        self.assertTrue(
-            all(r["status"] == "error" and r["code"] == "RESOURCE_BUSY" for r in outcomes)
-        )
+        expired = [
+            r["identity"]
+            for r in journal
+            if r["event"] == "not_dispatched" and r["reason"] == "admission_expired"
+        ]
+        outcomes = [r for r in journal if r["event"] == "outcome"]
+        completed = [r["identity"] for r in outcomes]
+        self.assertIn(delayed, expired)
+        self.assertTrue(outcomes)
+        self.assertCountEqual(admitted, completed + expired)
+        self.assertCountEqual([c.args[2] for c in self.execute.await_args_list], completed)
+        for row in outcomes:
+            self.assertEqual(row["outcome"], {"status": "error", "code": "RESOURCE_BUSY"})
         ticks = {r["number"]: r for r in records(self.output / "metrics.jsonl")}
         busy = ticks[0]
         self.assertEqual(busy["status_error"]["code"], "RESOURCE_BUSY")
