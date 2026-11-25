@@ -199,8 +199,9 @@ async fn a_small_lexical_increment_preserves_a_large_index_segment_across_reopen
     let config = fixture.config();
     let store = Storage::open(&config).await.unwrap();
     let index = Index::open(&config, &store).await.unwrap();
-    let mut target = 0;
-    for i in 0..512 {
+    let old = memory(&store, "seed-0", "original sequoia", None).await;
+    let mut target = old;
+    for i in 1..512 {
         target = memory(&store, &format!("seed-{i}"), "base cypress", None).await;
     }
     sync(&index, &store, target).await;
@@ -239,9 +240,31 @@ async fn a_small_lexical_increment_preserves_a_large_index_segment_across_reopen
             .unwrap()
             .is_empty()
     );
-    let updated = memory(&store, "increment", "copper meadow", Some(fresh)).await;
+    for count in [64, 32, 16, 8, 4, 2, 1] {
+        for i in 0..count {
+            target = memory(&store, &format!("delta-{count}-{i}"), "cypress", None).await;
+        }
+        sync(&index, &store, target).await;
+        index.maintain_tables(None, &|| Ok(())).await.unwrap();
+        let segments = body_segments(&index).await;
+        assert!(segments.len() <= 4, "{segments:?}");
+        assert!(segments.contains(&base[0]));
+    }
+    assert_eq!(
+        index.keyword("sequoia", &scope(), 20).await.unwrap(),
+        vec![("seed-0".into(), old)]
+    );
+    let updated = memory(&store, "seed-0", "copper meadow", Some(old)).await;
     sync(&index, &store, updated).await;
+    let mut removals = NativeBatch::new(index.owner.budget_mib);
+    removals
+        .push(&index.table, hash(b"increment"), None)
+        .await
+        .unwrap();
+    removals.flush(&index.table).await.unwrap();
     index.maintain_tables(None, &|| Ok(())).await.unwrap();
+    drop(index);
+    let index = Index::open(&config, &store).await.unwrap();
     assert!(
         index
             .keyword("amethyst", &scope(), 20)
@@ -249,9 +272,23 @@ async fn a_small_lexical_increment_preserves_a_large_index_segment_across_reopen
             .unwrap()
             .is_empty()
     );
+    assert!(
+        index
+            .keyword("sequoia", &scope(), 20)
+            .await
+            .unwrap()
+            .is_empty()
+    );
     assert_eq!(
         index.keyword("copper", &scope(), 20).await.unwrap(),
-        vec![("increment".into(), updated)]
+        vec![("seed-0".into(), updated)]
+    );
+    assert!(
+        index
+            .keyword("copper", &other, 20)
+            .await
+            .unwrap()
+            .is_empty()
     );
     drop(index);
     store.close().await.unwrap();

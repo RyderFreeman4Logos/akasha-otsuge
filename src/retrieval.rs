@@ -644,6 +644,10 @@ impl Index {
         use lance::index::DatasetIndexExt;
         let dataset = self.table.dataset()?.get().await.ok()?;
         let indices = dataset.load_indices().await.ok()?;
+        const MAX_LEXICAL_SEGMENTS: usize = 4;
+        if indices.len() > 3 * MAX_LEXICAL_SEGMENTS {
+            return None;
+        }
         let coverage = |name: &'static str| {
             indices
                 .iter()
@@ -660,30 +664,33 @@ impl Index {
             return None;
         }
 
-        // Remove covered fragments once. Unknown, overlapping or stale coverage uses native defaults.
-        let mut remaining = std::collections::HashMap::with_capacity(dataset.fragments().len());
+        let mut sizes = vec![0usize; segments.len()];
+        let mut unmatched = segments
+            .iter()
+            .try_fold(0u64, |n, s| n.checked_add(s.len()))?;
+        let mut incoming = 0usize;
         for fragment in dataset.iter_fragments() {
             if fragment.deletion_file.is_some() {
                 return None;
             }
-            remaining.insert(u32::try_from(fragment.id).ok()?, fragment.physical_rows?);
+            let id = u32::try_from(fragment.id).ok()?;
+            let rows = fragment.physical_rows?;
+            if let Some(i) = segments.iter().position(|s| s.contains(id)) {
+                sizes[i] = sizes[i].checked_add(rows)?;
+                unmatched = unmatched.checked_sub(1)?;
+            } else {
+                incoming = incoming.checked_add(rows)?;
+            }
         }
-        let mut sizes = Vec::with_capacity(segments.len());
-        for segment in segments {
-            let size = segment
-                .iter()
-                .try_fold(0usize, |n, id| n.checked_add(remaining.remove(&id)?))?;
-            sizes.push(size);
+        // Each claimed fragment must match exactly one live fragment across all segments.
+        if unmatched != 0 {
+            return None;
         }
-        let mut incoming = remaining
-            .into_values()
-            .try_fold(0usize, usize::checked_add)?;
         let mut count = 0;
         // Lance merges a trailing suffix. Retain a large clean segment until enough rows arrive.
         if incoming == 0 {
             return Some(0);
         }
-        const MAX_LEXICAL_SEGMENTS: usize = 4;
         let minimum = (sizes.len() + 1).saturating_sub(MAX_LEXICAL_SEGMENTS);
         for size in sizes.into_iter().rev() {
             if count >= minimum && size > incoming {
