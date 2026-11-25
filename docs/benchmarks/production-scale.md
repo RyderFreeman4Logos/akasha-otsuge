@@ -4,6 +4,37 @@ MVP-024 acceptance is tracked in [#65](https://github.com/RyderFreeman4Logos/aka
 The earlier storage spike is not production-daemon acceptance. Full scale,
 concurrency, vector coverage and ordinary recovery remain pending.
 
+## Full import and disk use
+
+The November 2026 run imported 50,001,003,051 UTF-8 bytes from
+11,428,868 records. The independent input manifest matched all 2,791 units in
+the native write journal. The resulting corpus contains 11,564,715 claims and 1,000,000
+records selected for vector search. [Import receipts](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-7168165199)
+
+Before the first full index, the stopped store occupied **109,707,300,864 bytes**
+in allocated file blocks, or **2.194 times** the input text size.
+
+| Files | Allocated bytes |
+| --- | ---: |
+| Authority value log | 99,384,467,456 |
+| Authority sorted tables | 8,594,313,216 |
+| Existing lexical and vector search files | 1,723,097,088 |
+| Write-ahead log, manifests and other files | 5,423,104 |
+
+The database retains both source evidence and claim revisions. In 718 sampled
+pairs, the claim text matched the corresponding source span byte for byte.
+These pairs identify a possible saving. The whole-store saving remains unknown.
+[Storage measurements](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-7169208546)
+
+On November 25 at 18:58 UTC, package `688ab304` accepted the first full
+index job on the mirror SSD. The admission check used a threshold of
+89,124,983,763 free bytes. It covered projected index growth, temporary files
+and the free-space reserve. The SSD had 91,118,637,056 free bytes. The native job recorded target
+sequence 23,119,806. Final index size and coverage await the closed-store
+measurements. [Index admission](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-7171653817)
+
+## Seed the corpus
+
 `cargo build --locked --example corpus_seed` builds an offline benchmark component
 using the production `Storage` and `Domain`. It takes a new absolute data directory
 and a small JSON binding file, and reads newline-terminated JSON records from stdin.
