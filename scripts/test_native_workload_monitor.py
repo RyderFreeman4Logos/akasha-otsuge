@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 from scripts.native_workload import __main__ as runner
@@ -19,6 +20,9 @@ class WorkloadMonitor(unittest.IsolatedAsyncioTestCase):
         work = self.root / ".spike-work"
         work.mkdir()
         self.output = work / "native-workload-test"
+        self.data = self.root / "daemon data"
+        (self.data / "authority" / "kv").mkdir(parents=True)
+        (self.data / "search").mkdir()
         self.config = self.root / "settings.toml"
         self.config.write_text(
             "[execution]\nseconds=2\n[resources]\ntarget_mib=512\npeak_mib=640\n"
@@ -60,12 +64,14 @@ class WorkloadMonitor(unittest.IsolatedAsyncioTestCase):
             with self.subTest(previous=previous, elapsed=elapsed):
                 self.assertEqual(runner.next_sample_tick(previous, elapsed), expected)
 
-    async def run_fixture(self, code, *, tick=0, oom=0):
+    async def run_fixture(self, code, *, tick=0, oom=0, available=None):
         seen = set()
 
         async def request(_, command, request_id):
             self.assertNotIn(request_id, seen)
             seen.add(request_id)
+            if command["op"] == "config_show":
+                return {"config": {"paths": {"data_dir": str(self.data)}}}
             if command["op"] == "status":
                 if request_id == f"test/metrics/{tick}":
                     self.events.write_text(f"oom_kill {oom}\nhigh 7\n")
@@ -117,6 +123,8 @@ class WorkloadMonitor(unittest.IsolatedAsyncioTestCase):
         ):
             usage.return_value.ru_maxrss = 1024
             disk.return_value.free = 32 * 1024**3
+            if available:
+                disk.side_effect = lambda path: SimpleNamespace(free=available(Path(path)))
             return await runner.run(self.plan, self.config, self.output)
 
     async def test_busy_status_preserves_offers_independent_samples_and_workload_errors(
@@ -204,6 +212,63 @@ class WorkloadMonitor(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(OperationError, "RESOURCE_BUSY"):
             await self.run_fixture("RESOURCE_BUSY", tick=-1)
         self.execute.assert_not_awaited()
+
+    async def test_refuses_low_data_volume_before_opening_output(self):
+        def available(path):
+            return (1 if path.name == "search" else 32) * 1024**3
+
+        with self.assertRaisesRegex(ValueError, "free reserve"):
+            await self.run_fixture("RESOURCE_BUSY", available=available)
+        self.assertFalse(self.output.exists())
+        self.execute.assert_not_awaited()
+
+    async def test_busy_status_still_stops_on_low_authority_volume(self):
+        checks = 0
+
+        def available(path):
+            nonlocal checks
+            if path.name == "kv":
+                checks += 1
+                if checks == 3:
+                    return 1024**3
+            return 32 * 1024**3
+
+        with self.assertRaises(ExceptionGroup) as raised:
+            await self.run_fixture("RESOURCE_BUSY", available=available)
+        self.assertIn("free reserve", str(raised.exception.exceptions[0]))
+        row = list(records(self.output / "metrics.jsonl"))[-1]
+        self.assertEqual(row["status_error"]["code"], "RESOURCE_BUSY")
+        self.assertEqual(row["filesystem_free_bytes"], 32 * 1024**3)
+        self.assertEqual(row["storage_free_bytes"][str(self.data / "authority/kv")], 1024**3)
+
+    def test_absolute_symlink_uses_daemon_namespace(self):
+        alias = self.root / "storage"
+        alias.symlink_to("/inside")
+        (self.root / "inside").mkdir()
+        (self.root / "inside" / "nested").symlink_to("../other")
+        self.assertEqual(
+            runner.daemon_path(self.root, Path("/storage/nested/kv")), Path("/other/kv")
+        )
+
+    def test_writable_nested_mounts_with_spaces(self):
+        nested = self.data / "search" / "table with spaces" / "data"
+        read_only = self.data / "search" / "snapshot"
+        sibling = self.data / "search-backup"
+        mounts = b"".join(
+            b"1 1 0:1 / "
+            + str(path).encode().replace(b" ", rb"\040")
+            + b" " + mode + b" - tmpfs none rw\n"
+            for path, mode in [(nested, b"rw"), (read_only, b"ro"), (sibling, b"rw")]
+        )
+        with (
+            patch.object(Path, "read_bytes", return_value=mounts),
+            patch.object(runner.shutil, "disk_usage", return_value=SimpleNamespace(free=7)),
+        ):
+            values = runner.storage_free_bytes(self.pid, self.data)
+        self.assertEqual(
+            set(values),
+            {str(p) for p in (self.data, self.data / "authority/kv", self.data / "search", nested)},
+        )
 
     async def test_other_status_failure_remains_fatal(self):
         with self.assertRaises(ExceptionGroup) as raised:
