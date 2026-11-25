@@ -8,6 +8,7 @@ import json
 import math
 import os
 import pathlib
+import re
 import resource
 import shutil
 import time
@@ -24,6 +25,8 @@ from .schedule import clients, offers, run_schedule, summarize
 
 MODULES = pathlib.Path(__file__).resolve().parent
 REPO = MODULES.parents[1]
+SEARCH_TABLE = re.compile(r"memory_(?:lexical_v1(?:_[0-9a-f]{64})?|vector_[0-9a-f]{64})\.lance")
+LANCE_WRITE_DIRS = {"data", "_indices", "_versions", "_transactions", "_deletions"}
 MINIMUMS = {
     "original_write": 10,
     "current": 2,
@@ -43,6 +46,62 @@ def exact(identity):
         or str(observed["start_ticks"]) != str(identity["start_ticks"])
     ):
         raise RuntimeError("admitted native process exited or changed")
+
+
+def daemon_path(root, path):
+    # An absolute symlink below /proc/PID/root otherwise jumps to the caller's mounts.
+    for _ in range(41):
+        resolved = pathlib.Path("/")
+        parts = path.parts[1:]
+        for i, part in enumerate(parts):
+            if part == "..":
+                resolved = resolved.parent
+                continue
+            resolved = resolved / part
+            entry = root / resolved.relative_to("/")
+            if entry.is_symlink():
+                path = resolved.parent.joinpath(entry.readlink(), *parts[i + 1 :])
+                break
+        else:
+            return resolved
+    raise ValueError("too many symlinks in daemon storage path")
+
+
+def storage_free_bytes(pid, data):
+    if not data.is_absolute():
+        raise ValueError("absolute daemon data directory required")
+    proc = pathlib.Path("/proc") / str(pid)
+    root = proc / "root"
+    data = daemon_path(root, data)
+    authority = daemon_path(root, data / "authority" / "kv")
+    search = daemon_path(root, data / "search")
+    paths = {authority}
+    try:
+        (root / search.relative_to("/")).stat()
+    except FileNotFoundError:
+        paths.add(data)  # The first search table will be created on its parent volume.
+    else:
+        paths.add(search)
+    # Lance data and indexes can themselves be separate writable mounts.
+    for line in (proc / "mountinfo").read_bytes().splitlines():
+        fields = line.split()
+        if b"rw" not in fields[5].split(b","):
+            continue
+        name = re.sub(rb"\\([0-7]{3})", lambda m: bytes([int(m[1], 8)]), fields[4])
+        mount = pathlib.Path(os.fsdecode(name))
+        if mount.is_relative_to(authority):
+            parts = mount.relative_to(authority).parts
+            if parts and parts[0] in {"sstables", "vlog", "wal", "manifest"}:
+                paths.add(mount)
+        elif mount.is_relative_to(search):
+            parts = mount.relative_to(search).parts
+            if parts and SEARCH_TABLE.fullmatch(parts[0]):
+                if len(parts) == 1 or parts[1] in LANCE_WRITE_DIRS:
+                    paths.add(mount)
+    # Project quotas can report different free bytes for paths on one device.
+    return {
+        str(path): shutil.disk_usage(root / path.relative_to("/")).free for path in sorted(paths)
+    }
 
 
 def process_sample(identity):
@@ -265,8 +324,12 @@ async def run(plan_path, config_path, root):
         "native-workload-"
     ):
         raise ValueError("output must be an owned SSD workload directory")
-    if shutil.disk_usage(root.parent).free < 30 * 1024**3:
-        raise ValueError("free reserve")
+    ops = NativeOperations(plan["socket"], 10, 600)
+    effective = await ops.request({"op": "config_show"}, f"{plan['run_id']}/storage-volumes")
+    data = pathlib.Path(effective["config"]["paths"]["data_dir"])
+    storage_free = await asyncio.to_thread(storage_free_bytes, plan["daemon"]["pid"], data)
+    if min(shutil.disk_usage(root.parent).free, *storage_free.values()) < 30 * 1024**3:
+        raise ValueError("free reserve on workload output or daemon storage volume")
     root.mkdir(mode=0o700)
     (root / "OWNER").write_text("akasha-otsuge:native-workload-interval\n")
     with (root / "OWNER").open("rb") as owner:
@@ -296,6 +359,7 @@ async def run(plan_path, config_path, root):
         source_sha256={name: sha(MODULES / name) for name in source_names},
         plan=plan,
         config=config,
+        storage_free_bytes=storage_free,
         planned=sum(sum(1 for _ in offers(c, seconds)) for c in clients()),
         recovery="Existing interval roots are refused. Adopt the recorded live process or reconcile uncertain effects; never replay an interrupted continuous interval.",
         acceptance="Native interval only. Offline accepted-event, full corpus, ANN recall and recovery oracles are separate.",
@@ -304,7 +368,6 @@ async def run(plan_path, config_path, root):
     requests, preparations, metrics = (
         Journal(root / name) for name in ("requests.jsonl", "preparations.jsonl", "metrics.jsonl")
     )
-    ops = NativeOperations(plan["socket"], 10, 600)
     work = NativeWorkload(root, plan["run_id"], plan["oracles"], ops, preparations.append)
     counts = collections.Counter()
     done = asyncio.Event()
@@ -381,6 +444,7 @@ async def run(plan_path, config_path, root):
             events=events,
             client_peak_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
             filesystem_free_bytes=shutil.disk_usage(root).free,
+            storage_free_bytes=await asyncio.to_thread(storage_free_bytes, plan["daemon"]["pid"], data),
         )
         if status_error is not None:
             row["status_error"] = status_error
@@ -404,8 +468,8 @@ async def run(plan_path, config_path, root):
             raise RuntimeError("native peak or OOM")
         if row["client_peak_bytes"] > 512 * 1024**2 or lookup["VmHWM"] > 512 * 1024**2:
             raise RuntimeError("external helper ceiling")
-        if row["filesystem_free_bytes"] < 30 * 1024**3:
-            raise RuntimeError("free reserve crossed")
+        if min(row["filesystem_free_bytes"], *row["storage_free_bytes"].values()) < 30 * 1024**3:
+            raise RuntimeError("free reserve crossed on workload output or daemon storage volume")
         return group_path
 
     try:
