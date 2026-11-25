@@ -69,10 +69,10 @@
 
 ## 仍需执行的验收
 
-- 四宿主运行结果已公开。冻结评测中 27 组均未命中预期 Consult 状态，其余 33 个任务已用原始输入逐一复查，得到 33 个权限拒绝，V02 另缺一个前置条件。尚缺这些任务当时获准的审阅输入。保留全部 60 项和 10 组意图对照，待真人盲评 54 份匿名答案。安全、覆盖率至少 90%、实质无关至多 10% 和调用开销均按冻结规则计分。依赖 Daybreak 的测试暂缓。[来源与权限读回](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27#issuecomment-6987978368) · [宿主矩阵][hosts] · [冻结实测][pairs] · [原始范围][docs-plan-todo-md-l1632-l1654]
+- 四宿主运行结果已公开。冻结评测中 27 组均未命中预期 Consult 状态，其余 33 个任务已用原始输入逐一复查，得到 33 个权限拒绝，V02 另缺一个前置条件。尚缺这些任务当时获准的审阅输入。保留全部 60 项和 10 组意图对照，待真人盲评 54 份匿名答案。正式包另行验证 C02、H04 和 C03 的权限回归。[正式包回归][scope-regressions]。安全、覆盖率至少 90%、实质无关至多 10% 和调用开销均按冻结规则计分。依赖 Daybreak 的测试暂缓。[来源与权限读回](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27#issuecomment-6987978368) · [宿主矩阵][hosts] · [冻结实测][pairs] · [原始范围][docs-plan-todo-md-l1632-l1654]
 - 两次墙钟记录的路径不同。生产 daemon/provider 对 1605 秒延迟在 1605.030 秒成功，超时对照在 1700.001 秒失败。真实 pi 1.4.0 Runner 使用受控本地端点，1605 秒延迟在 1612.327485 秒成功，另有超时清理对照。69b007e 下载件又完成两条路径的独立重测，实测时间、原生进程和产物 SHA 见[候选包回执][integrated-clocks]。正式发行提交仍需逐项核对。[provider 原始结果][docs-providers-acceptance-md] · [pi Runner 长测][docs-benchmarks-results-mvp016-readme-md]
-- 规模与恢复。[#65][i65] 承接 [#24][i24]。保留已公开的存储试验、受控内存与生产前缀成绩。仍需可追溯 50 GB 数据与实际索引、100 个活跃客户端至少 30 分钟、512 MiB / 2 GiB 两档的资源组采样、吞吐与延迟、积压、降预算、冷开、磁盘满、崩溃恢复和正确性。[原始负载与门槛][docs-spec-08-md-l136-l154] · [生产样本范围][docs-benchmarks-production-scale-md]
-- 发行。Linux 下载件已完成干净首装、升级、回滚、卸载、恢复和 Pi 九步演练。Debian 12 已用 `2df37ab3` 下载件核验 CLI 错误输出及三个低磁盘场景，#115 已关闭。合入后的 `ed0ad0ee` 下载件及 #65 原规模验收另行核验。[Debian 12 回执][debian-abi] · [整合构建][linux-integrated]。#28 待同一发行提交通过完整矩阵、发布不可变标签与校验和，再从正式下载件重测。[候选包][pkg] · [九步演练](../benchmarks/results/mvp028-pi-rehearsal/README.md) · [发行要求][docs-spec-09-md-l64-l78]
+- 规模与恢复。[#65][i65] 承接 [#24][i24]。保留已公开的存储试验、受控内存与生产前缀成绩。全部 2,791 个批次的原文输入摘要与写入回执已对齐，共 50,001,003,051 字节。写入器正常退出，控制器在退出内存核验失败后终止，七个后续阶段均未执行。随后逐文件核对了停库的 9,045 份文件，正式包使用 512 MiB 配置打开完整原库，四条抽查原文均与源摘要一致。[全量输入及退出记录][full-input]。仍需核验完整索引、100 个活跃客户端至少 30 分钟、512 MiB / 2 GiB 两档的资源组采样、吞吐与延迟、积压、降预算、冷开、磁盘满、崩溃恢复和正确性。[原始负载与门槛][docs-spec-08-md-l136-l154] · [生产样本范围][docs-benchmarks-production-scale-md]
+- 发行。Linux 下载件已完成干净首装、升级、回滚、卸载、恢复和 Pi 九步演练。Debian 12 已用 `2df37ab3` 下载件核验 CLI 错误输出及三个低磁盘场景，#115 已关闭。`688ab304` 下载件已核对 28 页指南、144 个链接目标和 65 个代码块，并完成四个独立宿主及四条跨宿主路径的验证。[归档指南][archive-guide] · [同包验收][release-candidate]。#26 等待 #65 原规模验收。[Debian 12 回执][debian-abi] · [整合构建][linux-integrated]。#28 待同一发行提交通过完整矩阵、发布不可变标签与校验和，再从正式下载件重测。[候选包][pkg] · [九步演练](../benchmarks/results/mvp028-pi-rehearsal/README.md) · [发行要求][docs-spec-09-md-l64-l78]
 
 ## 已关闭事项复核
 
@@ -292,3 +292,8 @@
 [debian-abi]: https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/115#issuecomment-6994234461
 [queue-ranks]: https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-6994285222
 [linux-integrated]: https://github.com/RyderFreeman4Logos/akasha-otsuge/actions/runs/44417496377
+
+[scope-regressions]: https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/27#issuecomment-6996836860
+[full-input]: https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-7168165199
+[archive-guide]: https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/26#issuecomment-6996163976
+[release-candidate]: https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/28#issuecomment-6997255557
