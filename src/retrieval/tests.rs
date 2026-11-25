@@ -205,6 +205,14 @@ async fn a_small_lexical_increment_preserves_a_large_index_segment_across_reopen
     }
     sync(&index, &store, target).await;
     index.maintain_tables(None, &|| Ok(())).await.unwrap();
+    drop(index);
+    // The first 16 rows were indexed before the remaining 496. Compact their now-common coverage.
+    let index = Index::open(&config, &store).await.unwrap();
+    index.maintain_tables(None, &|| Ok(())).await.unwrap();
+    let dataset = index.table.dataset().unwrap().get().await.unwrap();
+    let fragment_rows: Vec<_> = dataset.iter_fragments().map(|f| f.physical_rows).collect();
+    assert_eq!(fragment_rows, [Some(512)]);
+    drop(dataset);
     let base = body_segments(&index).await;
     assert_eq!(base.len(), 1);
     drop(index);
