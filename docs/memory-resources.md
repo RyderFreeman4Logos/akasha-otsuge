@@ -22,6 +22,13 @@ parameters are not retained by Lance for later updates. These startup settings
 remain unchanged during budget reload, including the required 2048-to-512 MiB
 transition. Smaller compatible targets still use the same update buffer.
 
+On GNU/Linux, starting the daemon with a target below 512 MiB also defaults
+`MALLOC_TRIM_THRESHOLD_` to `65536` bytes. This lets glibc return free heap
+memory sooner after indexing so RSS-based admission can accept new searches.
+More frequent trimming can slow indexing. An explicit `MALLOC_TRIM_THRESHOLD_`
+is preserved, and glibc's `glibc.malloc.trim_threshold` tunable takes precedence.
+The threshold is chosen at process startup. A budget reload does not change it.
+
 These are working-memory settings, not total RSS limits. Other environment
 values remain inherited by the daemon and its children. An explicit
 [`glibc.malloc.arena_max` tunable](https://sourceware.org/glibc/manual/latest/html_node/Memory-Allocation-Tunables.html)

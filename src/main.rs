@@ -863,11 +863,17 @@ async fn execute(args: Vec<std::ffi::OsString>) -> Result<u8> {
             output(&bytes, false)?;
             return Ok(0);
         }
-        let native_environment = [
+        let mut native_environment = vec![
             ("MALLOC_ARENA_MAX", "2"),
             ("LANCE_FTS_NUM_SHARDS", "1"),
             ("LANCE_FTS_PARTITION_SIZE", "32"),
         ];
+        if cfg!(all(target_os = "linux", target_env = "gnu"))
+            && resolved.config().runtime.memory_budget_mib < 512
+            && std::env::var_os("MALLOC_TRIM_THRESHOLD_").is_none()
+        {
+            native_environment.push(("MALLOC_TRIM_THRESHOLD_", "65536"));
+        }
         if native_environment.iter().any(|(key, value)| {
             std::env::var_os(key).as_deref() != Some(std::ffi::OsStr::new(value))
         }) {

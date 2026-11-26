@@ -41,6 +41,39 @@ fn native_startup_limits_preserve_pid_and_unrelated_environment() {
     }
 }
 
+#[cfg(all(target_os = "linux", target_env = "gnu"))]
+#[test]
+fn low_budget_startup_defaults_heap_trim_only_when_unset() {
+    for (budget, inherited, expected) in [
+        (320, None, Some("65536")),
+        (320, Some("131072"), Some("131072")),
+        (512, None, None),
+    ] {
+        let mut daemon = Daemon::new();
+        daemon.configure(&format!("[runtime]\nmemory_budget_mib={budget}\n"));
+        let mut command = daemon.command();
+        // Exercise startup even when no other native setting requires re-exec.
+        command
+            .env("MALLOC_ARENA_MAX", "2")
+            .env("LANCE_FTS_NUM_SHARDS", "1")
+            .env("LANCE_FTS_PARTITION_SIZE", "32")
+            .env_remove("MALLOC_TRIM_THRESHOLD_")
+            .env_remove("GLIBC_TUNABLES");
+        if let Some(value) = inherited {
+            command.env("MALLOC_TRIM_THRESHOLD_", value);
+        }
+        daemon.start_command(command);
+        let pid = daemon.child.as_ref().unwrap().id();
+        let environment = std::fs::read(format!("/proc/{pid}/environ")).unwrap();
+        let actual = environment
+            .split(|byte| *byte == 0)
+            .find_map(|entry| entry.strip_prefix(b"MALLOC_TRIM_THRESHOLD_="));
+        assert_eq!(actual, expected.map(str::as_bytes));
+        daemon.cli(&["daemon", "stop"]);
+        daemon.wait();
+    }
+}
+
 pub(super) fn delegated_command(daemon: &Daemon) -> Command {
     let mut command = daemon.command();
     command.env_remove("DBUS_SESSION_BUS_ADDRESS");
