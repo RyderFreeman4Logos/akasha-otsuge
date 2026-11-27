@@ -15,11 +15,20 @@ store. Legacy SQLite is neither a writable backend nor a daemon state store.
 `open(&ResolvedConfig)` uses `paths.data_dir/authority`, containing `format.json`
 and the native `kv/` directory. Configuration owns the resource profile. Budgets
 below 2048 MiB use 8/32/8 MiB memtable/cache/SST settings; larger budgets use
-64/128/64 MiB. Both use a two-memtable stall threshold, 256-byte value-log
+64/128/64 MiB. Both use a two-memtable stall threshold, 8 KiB value-log
 threshold, 16 MiB value-log segments, full value-log checksums, Zstd compression,
 unlimited native version retention and absolute-consistency WAL recovery.
-These settings reproduce the authority part of the [selected ADR][source-storage-decision].
-The library does not claim the final daemon's RSS, admission or full-corpus result.
+The [storage ADR][source-storage-decision] records the original 256-byte cutoff.
+The new cutoff keeps more small values in compressed SSTs after the memtable
+flushes. Existing value-log records remain readable without a migration.
+
+On a 33,063-memory lexical index, closed authority files used 276.1 MB at
+8 KiB and 293.3 MB at 256 bytes. Across two runs per setting, warm historical
+point-read P95 through the daemon rose from 0.45–0.48 ms to 0.82–0.85 ms.
+A single-client history query over 100 memories took 9.99 ms and 10.79 ms
+at P95 respectively after the first traversal. A separate fresh-capture
+workload occupied 7.6% less space at 8 KiB. Each package read back the
+other package's original bytes. [Package measurements](benchmarks/results/mvp024-storage-pressure/completion-write-threshold.json)
 
 ## Records and transactions
 

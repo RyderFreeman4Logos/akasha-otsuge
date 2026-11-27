@@ -1,0 +1,252 @@
+{
+  "platform": {
+    "system": "Linux",
+    "kernel": "6.1.0-52-amd64",
+    "machine": "x86_64"
+  },
+  "issue": 146,
+  "package_source_commits_in_256_and_8192_order": [
+    "713632dfe34f7a4c8933dbc2d83d1221a9983e96",
+    "496fe3ea816a348805183d196927fe3c14276752"
+  ],
+  "package_elf_sha256_in_same_order": [
+    "482b748d3b921c480934d8dee4cc405da3e42f70b5ef3747f87cb580d619ff90",
+    "01ce783d31c79491ba7f58c538c7edfe6563c90118fe7c49624d9feb3258bd0a"
+  ],
+  "github_actions_runs": [
+    45739107468,
+    45946056994
+  ],
+  "raw_receipt_sha256": {
+    "lexical": "4dcbc12cd3a94f15c43fdb98be250d89b7cf960c18a8af3790ed88f531ecbf5e",
+    "capture_low": "52ae21e09ff636b53110426b835f5593f5808389a0ce954c392e43b0ac0591c3",
+    "capture_high": "4b8dbcb97d1f38d5e1adc4a1c0e398a40734e8b5f56193babbc0ca75365fe630",
+    "historical_scope": "011ca0c05d4791438fad91f4c6f4412afcddead35eb2877cc72d2f00bd80e960",
+    "low_memory_search": "5926bdee4ddd8040bc51445ee686600cd6d63ff67e17a87c6868e885442b7e14",
+    "retained_wal": "77a4d1013e37d8173a47461b6abab5e09f396b43dfbc04b35ab73d4da88b2326"
+  },
+  "index": {
+    "method": "Seed 32,768 authentic DBpedia/FineWeb records and two separate scope markers with examples/corpus_seed.rs. Reflink the same stopped authority per run. Submit index sync, wait for its terminal state, then verify two scoped searches and one cross-scope miss. Use 512/640 MiB, MALLOC_TRIM_THRESHOLD_=65536 for both versions. After clean shutdown, sum regular file st_blocks * 512 by family. Reopen each store and read the same 128 original memories using memory_show, both current and at their committed revision, in two passes. Elapsed point reads include local authenticated IPC.",
+    "order": [
+      "256-a",
+      "8192-a",
+      "8192-b",
+      "256-b"
+    ],
+    "source_utf8_bytes": 86606260,
+    "source_sha256": "072a7c2d8cd295aaa2860a79be6027f6f1064a8506f70425b78c4de22838dfa5",
+    "claims": 33063,
+    "seed_family_du_bytes": 258797568,
+    "reads_per_arm": 512,
+    "arms": {
+      "256-a": {
+        "authority_file_bytes": 293343232,
+        "search_du_bytes": 78626816,
+        "index_seconds": 49.581,
+        "sampled_rss_bytes": 296009728,
+        "cgroup_peak_bytes": 450740224,
+        "oom": 0,
+        "point_read_p95_us": {
+          "0-current": 1371,
+          "0-historical": 578,
+          "1-current": 525,
+          "1-historical": 484
+        }
+      },
+      "8192-a": {
+        "authority_file_bytes": 276119552,
+        "search_du_bytes": 78573568,
+        "index_seconds": 47.851,
+        "sampled_rss_bytes": 316764160,
+        "cgroup_peak_bytes": 394534912,
+        "oom": 0,
+        "point_read_p95_us": {
+          "0-current": 850,
+          "0-historical": 570,
+          "1-current": 609,
+          "1-historical": 819
+        }
+      },
+      "8192-b": {
+        "authority_file_bytes": 276127744,
+        "search_du_bytes": 78548992,
+        "index_seconds": 50.143,
+        "sampled_rss_bytes": 328105984,
+        "cgroup_peak_bytes": 395804672,
+        "oom": 0,
+        "point_read_p95_us": {
+          "0-current": 945,
+          "0-historical": 598,
+          "1-current": 707,
+          "1-historical": 849
+        }
+      },
+      "256-b": {
+        "authority_file_bytes": 293343232,
+        "search_du_bytes": 78516224,
+        "index_seconds": 51.155,
+        "sampled_rss_bytes": 292925440,
+        "cgroup_peak_bytes": 458702848,
+        "oom": 0,
+        "point_read_p95_us": {
+          "0-current": 931,
+          "0-historical": 522,
+          "1-current": 524,
+          "1-historical": 446
+        }
+      }
+    }
+  },
+  "fresh_capture": {
+    "method": "Create a fresh store per run. Submit 48 groups of four capture events, retry all request IDs, stop, export the archive with the other package, then reopen with that package to verify the same raw and normalized source bytes. The two low-budget repeats at each cutoff used ABBA order. Each high-budget setting was run once. The closed stores had WAL and value logs with no SST yet.",
+    "source_count": 192,
+    "utf8_bytes": 2746956,
+    "spans": 302,
+    "source_manifest_sha256": "aa9bf8d29898596035f1c46c0f10b54291d223fc8c80e3fefbcd73673d0f0638",
+    "arms": {
+      "256-a": {
+        "budget_and_peak_mib": [
+          512,
+          640
+        ],
+        "closed_authority_file_bytes": 5795840,
+        "write_completion_p95_ms": 104.648,
+        "writer_peak_rss": 42192896,
+        "value_log_pointers": 3203,
+        "all_originals_match": true
+      },
+      "8192-a": {
+        "budget_and_peak_mib": [
+          512,
+          640
+        ],
+        "closed_authority_file_bytes": 5353472,
+        "write_completion_p95_ms": 69.87,
+        "writer_peak_rss": 47120384,
+        "value_log_pointers": 101,
+        "all_originals_match": true
+      },
+      "8192-b": {
+        "budget_and_peak_mib": [
+          512,
+          640
+        ],
+        "closed_authority_file_bytes": 5353472,
+        "write_completion_p95_ms": 80.425,
+        "writer_peak_rss": 47808512,
+        "value_log_pointers": 101,
+        "all_originals_match": true
+      },
+      "256-b": {
+        "budget_and_peak_mib": [
+          512,
+          640
+        ],
+        "closed_authority_file_bytes": 5795840,
+        "write_completion_p95_ms": 86.117,
+        "writer_peak_rss": 42188800,
+        "value_log_pointers": 3203,
+        "all_originals_match": true
+      },
+      "high-256": {
+        "budget_and_peak_mib": [
+          2048,
+          2048
+        ],
+        "closed_authority_file_bytes": 5795840,
+        "write_completion_p95_ms": 105.221,
+        "writer_peak_rss": 41840640,
+        "value_log_pointers": 3203,
+        "all_originals_match": true
+      },
+      "high-8192": {
+        "budget_and_peak_mib": [
+          2048,
+          2048
+        ],
+        "closed_authority_file_bytes": 5353472,
+        "write_completion_p95_ms": 66.869,
+        "writer_peak_rss": 47636480,
+        "value_log_pointers": 101,
+        "all_originals_match": true
+      }
+    }
+  },
+  "historical_state": {
+    "method": "Seed 8,192 authentic sources. Export one neutral archive and import it into a fresh store with each candidate. Each store has at least one SST. Page through the same historical state of 100 memories, excluding 32 later same-scope sources. Check scope, member IDs, revisions and exact claim hashes on every traversal. One client, 512/640 MiB, 25 traversals per package; the subsequent P95 uses the last 24. First-request cache state was uncontrolled.",
+    "archive_manifest_sha256": "0d80a2916e5cc4d9cb59d676ef1b2546f4cafc91091bb8f05978876e6e26309a",
+    "arms": {
+      "256": {
+        "first_us": 13224,
+        "subsequent_p95_us": 9986,
+        "pages": [
+          25,
+          21,
+          24,
+          26,
+          4
+        ],
+        "observed_members": 100,
+        "oom": 0
+      },
+      "8192": {
+        "first_us": 18297,
+        "subsequent_p95_us": 10785,
+        "pages": [
+          25,
+          21,
+          24,
+          26,
+          4
+        ],
+        "observed_members": 100,
+        "oom": 0
+      }
+    }
+  },
+  "low_memory_search": {
+    "budget_and_peak_mib": [
+      320,
+      400
+    ],
+    "input": "Same 33,063-memory lexical fixture. Default packaged allocator.",
+    "indexed": 33063,
+    "search_outcomes": [
+      "accepted",
+      "accepted",
+      "accepted"
+    ],
+    "oom": 0,
+    "cgroup_peak_bytes": 313446400,
+    "exit": 0
+  },
+  "retained_wal_replay": {
+    "method": "Replay the 1,444 retained WAL transactions containing 58,456 physical writes from the interrupted original. Check current and historical values using an independent pinned SurrealKV reader. Each cutoff has two repeats. The explicit flush is a separate backend observation.",
+    "readback": {
+      "asof_reads": 588,
+      "current_keys": 55572,
+      "versions": 57013
+    },
+    "normal_close_bytes": {
+      "256": [
+        31244288,
+        31244288
+      ],
+      "8192": [
+        25997312,
+        25997312
+      ]
+    },
+    "after_explicit_flush_bytes": {
+      "256": [
+        22278144,
+        22278144
+      ],
+      "8192": [
+        5685248,
+        5685248
+      ]
+    }
+  },
+  "limits": "Lexical fixture, fresh-capture and historical read tests have distinct inputs. The original 50 GB index and sustained 100-client test on the final package are separate acceptance gates under issue 65."
+}
