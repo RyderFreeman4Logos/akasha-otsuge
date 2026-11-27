@@ -765,10 +765,24 @@ impl Index {
     // The daemon holds the cache lock and proves no query owns this index before pruning.
     pub(crate) async fn prune_versions(
         &self,
+        pruned_versions: &mut [Option<(String, u64)>; 2],
+        complete: bool,
         authorize: &(impl Fn() -> Result<()> + Sync),
     ) -> Result<()> {
         let vector = self.vector.lock().await;
-        for table in std::iter::once(&self.table).chain(vector.as_deref().map(|v| &v.table)) {
+        let tables = std::iter::once(&self.table).chain(vector.as_deref().map(|v| &v.table));
+        for (table, previous) in tables.zip(pruned_versions) {
+            authorize()?;
+            let version = table.version().await.map_err(index_error)?;
+            // The final sweep also reclaims files that aged into eligibility during this job.
+            if !complete
+                && previous
+                    .as_ref()
+                    .is_some_and(|(name, v)| name == table.name() && *v == version)
+            {
+                continue;
+            }
+            // Reading the version awaited I/O; check the lease at the deletion boundary.
             authorize()?;
             table
                 .optimize(lancedb::table::OptimizeAction::Prune {
@@ -778,6 +792,7 @@ impl Index {
                 })
                 .await
                 .map_err(index_error)?;
+            *previous = Some((table.name().to_owned(), version));
         }
         Ok(())
     }

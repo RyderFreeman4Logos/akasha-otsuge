@@ -1155,6 +1155,33 @@ async fn maintenance_keeps_the_writer_generation_when_a_reader_replaces_the_cach
             }
         }
     }
+    let mut pruned = [None, None];
+    let checks = std::sync::atomic::AtomicUsize::new(0);
+    let denied = index
+        .prune_versions(&mut pruned, false, &|| {
+            if checks.fetch_add(1, std::sync::atomic::Ordering::Relaxed) == 0 {
+                Ok(())
+            } else {
+                Err(error("LEASE_LOST"))
+            }
+        })
+        .await;
+    assert!(matches!(denied, Err(e) if e.code == "LEASE_LOST"));
+    assert_eq!(pruned, [None, None]);
+
+    // Both generations reached the same table version. An idle sweep must cover each one.
+    let mut first_version = None;
+    for config in &configs {
+        let vector = index.vector_index(&store, config).await.unwrap();
+        let version = vector.table.version().await.unwrap();
+        assert_eq!(*first_version.get_or_insert(version), version);
+        assert!(vector.table.list_versions().await.unwrap().len() > 1);
+        index
+            .prune_versions(&mut pruned, false, &|| Ok(()))
+            .await
+            .unwrap();
+        assert_eq!(vector.table.list_versions().await.unwrap().len(), 1);
+    }
     let writer = index.vector_index(&store, &configs[1]).await.unwrap();
     let reader = index.vector_index(&store, &configs[0]).await.unwrap();
     assert_ne!(writer.generation, reader.generation);
