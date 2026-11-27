@@ -357,7 +357,7 @@ impl Storage {
             .with_target_file_size((sst * MIB) as u64)
             .with_compression_per_level(vec![CompressionType::ZstdCompression])
             .with_enable_vlog(true)
-            .with_vlog_value_threshold(256)
+            .with_vlog_value_threshold(8192)
             .with_vlog_max_file_size((16 * MIB) as u64)
             .with_vlog_checksum_verification(VLogChecksumLevel::Full)
             .with_memtable_stall_threshold(2)
