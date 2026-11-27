@@ -29,9 +29,17 @@ These pairs identify a possible saving. The whole-store saving remains unknown.
 On November 25 at 18:58 UTC, package `688ab304` accepted the first full
 index job on the mirror SSD. The admission check used a threshold of
 89,124,983,763 free bytes. It covered projected index growth, temporary files
-and the free-space reserve. The SSD had 91,118,637,056 free bytes. The native job recorded target
-sequence 23,119,806. Final index size and coverage await the closed-store
-measurements. [Index admission](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-7171653817)
+and the free-space reserve. The SSD had 91,118,637,056 free bytes. The job targeted sequence 23,119,806.
+[Index admission](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-7171653817)
+
+On November 26, the full-index controller logged a peer UID mismatch while
+connecting for a read-only job status check. It did not record the peer credentials.
+The shutdown wait timed out after 18 seconds. The controller reported exit code 1
+at 11:33:18 UTC.
+The lowest sampled SSD free space was 80,013,352,960 bytes. A read-only inspection
+found 304,941 lexical rows and 124,494 vector rows in the retained manifests.
+Full index size, coverage and the downstream load tests remain open.
+[Terminal and retained manifests](https://github.com/RyderFreeman4Logos/akasha-otsuge/issues/65#issuecomment-7210256229)
 
 ## Seed the corpus
 
