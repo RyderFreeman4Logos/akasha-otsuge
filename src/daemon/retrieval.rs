@@ -298,6 +298,7 @@ impl Service {
         self.index_epoch.fetch_add(1, Ordering::Release);
         let _epoch = IndexBuild(&self.index_epoch);
         let mut windows_since_maintenance = 0u8;
+        let mut pruned_versions = [None, None];
         loop {
             {
                 let _guard = self.admission.lock().await;
@@ -360,14 +361,18 @@ impl Service {
                     .await?;
                 windows_since_maintenance = 0;
                 if index.is_pending() {
-                    index.prune_versions(&authorize_native).await?;
+                    index
+                        .prune_versions(&mut pruned_versions, complete, &authorize_native)
+                        .await?;
                 } else if let Ok(owned) = self.search_index.try_lock()
                     && owned.published.as_ref().is_some_and(|cached| {
                         Arc::ptr_eq(cached, index) && Arc::strong_count(cached) == 2
                     })
                 {
                     // New readers wait for native pruning behind this cache lock.
-                    index.prune_versions(&authorize_native).await?;
+                    index
+                        .prune_versions(&mut pruned_versions, complete, &authorize_native)
+                        .await?;
                 }
             }
             if complete {
@@ -458,6 +463,72 @@ mod tests {
             .collect::<Vec<_>>();
         versions.sort_unstable();
         versions
+    }
+
+    #[cfg(target_os = "linux")]
+    #[tokio::test]
+    async fn metadata_only_windows_prune_on_the_first_and_last_idle_window() {
+        use rustix::fs::inotify::{self, CreateFlags, ReadFlags, WatchFlags};
+
+        let (fixture, service, _) = fixture("idle-pruning", "").await;
+        for i in 0..2050 {
+            let id = format!("metadata-{i}");
+            service
+                .storage
+                .commit(&CommitRequest {
+                    request_id: id.clone(),
+                    config_generation: 1,
+                    policy_revision: None,
+                    changes: vec![Change {
+                        key: RecordKey {
+                            kind: RecordKind::State,
+                            id,
+                        },
+                        expected_revision: None,
+                        content: "metadata".into(),
+                    }],
+                })
+                .await
+                .unwrap();
+        }
+        let id = "metadata-sync";
+        service
+            .submit_retrieval(id.into(), RetrievalRequest::Sync)
+            .await
+            .unwrap();
+        assert!(service.claim(id, 0).await.unwrap());
+        let workflow = Deadline::start(
+            crate::config::deadline::Layer::Workflow,
+            Duration::from_secs(30),
+            None,
+        )
+        .unwrap();
+        drop(service.retrieval_index(id, &workflow).await.unwrap());
+
+        // Only Lance's recursive prune visits this fresh, unreferenced directory.
+        let probe = fixture
+            .0
+            .join("data/search/memory_lexical_v1.lance/data/idle-probe");
+        fs::create_dir_all(&probe).unwrap();
+        let fd = inotify::init(CreateFlags::NONBLOCK).unwrap();
+        inotify::add_watch(&fd, &probe, WatchFlags::OPEN | WatchFlags::CLOSE_NOWRITE).unwrap();
+        let result = service.retrieval_result(id, &workflow).await.unwrap();
+        assert!(result["lexical_watermark"].as_u64().unwrap() > 2048);
+        let mut buf = [std::mem::MaybeUninit::uninit(); 256];
+        let mut events = inotify::Reader::new(fd, &mut buf);
+        let mut visits = 0;
+        loop {
+            match events.next() {
+                Ok(event) => {
+                    visits +=
+                        usize::from(event.events().contains(ReadFlags::OPEN | ReadFlags::ISDIR))
+                }
+                Err(rustix::io::Errno::AGAIN) => break,
+                Err(error) => panic!("inotify read failed: {error}"),
+            }
+        }
+        service.close(Ok(())).await.unwrap();
+        assert_eq!(visits, 2);
     }
 
     #[tokio::test]
